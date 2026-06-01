@@ -80,7 +80,13 @@ export const BubbleBeforeNode: React.FC<BubbleBeforeNodeProps> = ({
   }
 
   if (context?.thoughtChain?.render) {
-    return (context.thoughtChain.render as any)(bubble, taskList.join(','));
+    // BubbleConfigContext.thoughtChain.render 形参声明为 BubbleProps<Record<string, any>>，
+    // 此处 bubble 的 T 是其更具体的子集（含 white_box_process 等字段），TS 默认不允许直接转换；
+    // 但运行时只读取 BubbleProps 的公共字段，因此用 unknown 中间断言安全消除类型差异。
+    return context.thoughtChain.render(
+      bubble as unknown as Parameters<typeof context.thoughtChain.render>[0],
+      taskList.join(','),
+    );
   }
 
   const isFinished = originData?.isFinished || originData?.isAborted;

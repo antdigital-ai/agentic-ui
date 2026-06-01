@@ -1,6 +1,5 @@
-﻿import Lottie from 'lottie-react';
 import React from 'react';
-import loadingLottie from './loading.json';
+import { createLottieComponent } from '../createLottieComponent';
 
 export interface LoadingLottieProps {
   /**
@@ -65,33 +64,11 @@ export interface LoadingLottieProps {
  * @param props.size - 动画尺寸（宽度和高度）
  * @returns 渲染的加载动画组件
  */
-export const LoadingLottie: React.FC<LoadingLottieProps> = ({
-  autoplay = true,
-  loop = true,
-  className,
-  style,
-  size,
-}) => {
-  const containerStyle: React.CSSProperties = {
-    width: size,
-    height: size,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...style,
-  };
-
-  return (
-    <Lottie
-      style={containerStyle}
-      className={className}
-      data-testid="lottie-animation"
-      aria-hidden="true"
-      animationData={loadingLottie}
-      loop={loop}
-      autoplay={autoplay}
-    />
-  );
-};
+export const LoadingLottie: React.FC<LoadingLottieProps> =
+  createLottieComponent({
+    loadJson: () => import('./loading.json'),
+    dataTestId: 'lottie-animation',
+    displayName: 'LoadingLottie',
+  });
 
 export default LoadingLottie;

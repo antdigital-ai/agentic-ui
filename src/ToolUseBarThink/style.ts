@@ -1,15 +1,30 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../Hooks/useStyle';
+﻿import {
+  CARD_RESIZE_DURATION_MS,
+  CARD_RESIZE_EASING,
+} from '../Constants/cardResizeMotion';
+import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
 
-const LIGHT_MODE_BACKGROUND = 'rgba(255, 255, 255, 0.65)';
 const LIGHT_MODE_BACKDROP_FILTER = 'blur(12px)';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'ToolUseBarThink'> = (token) => {
   return {
     [token.componentCls]: {
+      '--resize-dur': `${CARD_RESIZE_DURATION_MS}ms`,
+      '--resize-ease': CARD_RESIZE_EASING,
+      '@keyframes thinkSpin': {
+        from: { '--think-rotate': '0deg' },
+        to: { '--think-rotate': '360deg' },
+      },
+      '@keyframes thinkMaskSweep': {
+        '0%': {
+          maskPosition: '200% 0',
+          WebkitMaskPosition: '200% 0',
+        },
+        '100%': {
+          maskPosition: '-100% 0',
+          WebkitMaskPosition: '-100% 0',
+        },
+      },
       position: 'relative',
       cursor: 'pointer',
       borderRadius: 'var(--radius-card-base)',
@@ -25,7 +40,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       zIndex: 1,
       padding: '4px',
       paddingRight: '4px',
-      marginBottom: '12px',
+      marginBottom: '4px',
 
       '*': {
         boxSizing: 'border-box',
@@ -49,29 +64,11 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           boxShadow: 'var(--shadow-border-base)',
         },
       },
-      '&-light': {
-        boxShadow: 'none',
-        border: 'none',
-        borderRadius: '14px',
-        padding: 4,
-        background: LIGHT_MODE_BACKGROUND,
-        backdropFilter: LIGHT_MODE_BACKDROP_FILTER,
-        WebkitBackdropFilter: LIGHT_MODE_BACKDROP_FILTER,
-        '&:hover': {
-          background: 'none',
-          boxShadow: 'none',
-          [`${token.componentCls}-header-left-icon-light`]: {
-            color: 'var(--color-gray-text-secondary)',
-          },
-        },
-      },
       '&-loading': {
-        background: 'var(--color-gray-bg-card-white)',
         boxSizing: 'border-box',
         boxShadow:
           '0px 0px 1px 0px rgba(0, 19, 41, 0.05),0px 2px 7px 0px rgba(0, 19, 41, 0.05),0px 2px 5px -2px rgba(0, 19, 41, 0.06)',
         '&:hover': {
-          background: 'var(--color-gray-bg-card-white)',
           boxSizing: 'border-box',
           boxShadow:
             '0px 0px 1px 0px rgba(0, 19, 41, 0.05),0px 2px 7px 0px rgba(0, 19, 41, 0.05),0px 2px 5px -2px rgba(0, 19, 41, 0.06)',
@@ -79,8 +76,24 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
       '&-success': {
         borderRadius: 'var(--radius-card-base)',
-        background: 'var(--color-gray-bg-card-light)',
         boxShadow: 'inset 0px 0px 1px 0px rgba(0, 19, 41, 0.15)',
+      },
+      // Placed after &-success so light mode wins when both classes apply (success + light).
+      '&-light': {
+        boxShadow: 'none',
+        border: 'none',
+        borderRadius: '14px',
+        padding: 4,
+        backdropFilter: LIGHT_MODE_BACKDROP_FILTER,
+        WebkitBackdropFilter: LIGHT_MODE_BACKDROP_FILTER,
+        '&:hover': {
+          // light 模式 hover 保持一致的浅色背景，避免与 container border-left 颜色不协调
+          background: 'var(--color-gray-bg-card-light)',
+          boxShadow: 'none',
+          [`${token.componentCls}-header-left-icon-light`]: {
+            color: 'var(--color-gray-text-secondary)',
+          },
+        },
       },
       '&-bar': {
         borderRadius: 'var(--radius-card-base)',
@@ -105,26 +118,21 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         },
       },
 
-      '&-header-left': {
+      '&-header-left-icon': {
+        font: 'var(--font-text-body-emphasized-base)',
+        color: 'var(--color-gray-text-default)',
+        height: 20,
         display: 'flex',
         alignItems: 'center',
-        gap: 4,
-        '&-icon': {
-          font: 'var(--font-text-body-emphasized-base)',
-          color: 'var(--color-gray-text-default)',
-          height: 20,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderRadius: 'var(--radius-control-sm)',
+        justifyContent: 'center',
+        borderRadius: 'var(--radius-control-sm)',
+        '&:hover': {
+          backgroundColor: 'var(--color-gray-control-fill-hover)',
+        },
+        '&-light': {
+          color: 'var(--color-gray-text-light)',
           '&:hover': {
-            backgroundColor: 'var(--color-gray-control-fill-hover)',
-          },
-          '&-light': {
-            color: 'var(--color-gray-text-light)',
-            '&:hover': {
-              color: 'var(--color-gray-text-secondary)',
-            },
+            color: 'var(--color-gray-text-secondary)',
           },
         },
       },
@@ -162,41 +170,34 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         justifyContent: 'center',
         alignItems: 'center',
         padding: '4px',
-        gap: '0px 8px',
-        flexWrap: 'wrap',
-        alignContent: 'center',
         borderRadius: '200px',
         boxSizing: 'border-box',
         boxShadow: 'var(--shadow-border-base)',
         background: 'var(--color-gray-bg-card-white)',
         zIndex: 0,
+        position: 'relative',
+        color: 'var(--color-gray-text-secondary)',
+        fontSize: 'var(--font-size-lg)',
+        '& > svg, & > *:first-child': {
+          position: 'relative',
+          zIndex: 1,
+        },
         '&-loading': {
           borderRadius: '50%',
           transition: 'border-radius 0.3s ease-in-out',
-          position: 'relative',
+          animation: 'thinkSpin 1s linear infinite',
           '&::after': {
             content: '""',
             position: 'absolute',
             inset: '0',
             borderRadius: '50%',
             background:
-              'conic-gradient(from var(--rotate, 0deg),transparent 0deg 0deg, #5EF050 35deg 55deg, #37ABFF 105deg 115deg,  #D7B9FF 135deg 135deg, transparent 165deg 360deg)',
+              'conic-gradient(from var(--think-rotate, 0deg),transparent 0deg 0deg, #5EF050 35deg 55deg, #37ABFF 105deg 115deg,  #D7B9FF 135deg 135deg, transparent 165deg 360deg)',
             WebkitMask:
               'radial-gradient(50% 50% at 50% 50%, rgba(255, 0, 0, 0) 65%, #FF0000 100%)',
             mask: 'radial-gradient(50% 50% at 50% 50%, rgba(255, 0, 0, 0) 80%, #FF0000 80%, #FF0000 100%)',
           },
         },
-      },
-
-      '&-image': {
-        color: '#767E8B',
-        fontSize: 'var(--font-size-lg)',
-        position: 'absolute',
-        zIndex: 999,
-        borderRadius: '50%',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
       },
 
       '&-target': {
@@ -214,6 +215,35 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         letterSpacing: '0.04em',
         color: 'var(--color-gray-text-disabled)',
       },
+      '&-think-collapse': {
+        display: 'grid',
+        gridTemplateRows: 'minmax(0, 0fr)',
+        minHeight: 0,
+        maxHeight: 0,
+        overflow: 'hidden',
+        width: '100%',
+        pointerEvents: 'none',
+        transition: [
+          `grid-template-rows var(--resize-dur) var(--resize-ease)`,
+          `max-height var(--resize-dur) var(--resize-ease)`,
+        ].join(','),
+        willChange: 'grid-template-rows, max-height',
+      },
+      '&-think-collapse-open': {
+        gridTemplateRows: 'minmax(0, 1fr)',
+        maxHeight: 800,
+        pointerEvents: 'auto',
+      },
+      '&-think-collapse-inner': {
+        minHeight: 0,
+        maxHeight: '100%',
+        overflow: 'hidden',
+      },
+
+      '&-root-think-collapsed': {
+        gap: 0,
+      },
+
       '&-container': {
         width: '100%',
         padding: 8,
@@ -228,7 +258,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           paddingLeft: 12,
           marginLeft: 16,
           marginTop: -10,
-          background: LIGHT_MODE_BACKGROUND,
           backdropFilter: LIGHT_MODE_BACKDROP_FILTER,
           WebkitBackdropFilter: LIGHT_MODE_BACKDROP_FILTER,
         },
@@ -284,6 +313,15 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         alignItems: 'center',
         gap: 8,
         flex: 1,
+        '&-loading': {
+          maskImage:
+            'linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,1) 100%)',
+          WebkitMaskImage:
+            'linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,1) 100%)',
+          maskSize: '200% 100%',
+          WebkitMaskSize: '200% 100%',
+          animation: 'thinkMaskSweep 1.5s linear infinite',
+        },
       },
       '&-content': {
         font: 'var(--font-text-paragraph-sm)',
@@ -303,12 +341,11 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         fontSize: 'var(--font-size-base)',
         cursor: 'pointer',
         borderRadius: 'var(--radius-control-base)',
-        background: 'var(--color-gray-control-fill-active)',
+        background: 'transparent',
         color: 'var(--color-gray-text-secondary)',
         font: 'var(--font-text-body-emphasized-sm)',
         flexShrink: 0,
         '&:hover': {
-          background: 'var(--color-gray-control-fill-hover)',
           color: 'var(--color-gray-text-default)',
         },
       },
@@ -335,6 +372,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         zIndex: 10,
         transform: 'translateY(100%)',
         opacity: 0,
+        transition: 'transform 0.2s ease, opacity 0.2s ease',
         '&:hover': {
           boxShadow: 'var(--shadow-popover-base)',
         },
@@ -346,16 +384,20 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           transform: 'translateY(0)',
         },
       },
+
+      '@media (prefers-reduced-motion: reduce)': {
+        '&-think-collapse': {
+          transition: 'none !important',
+          willChange: 'auto',
+        },
+      },
     },
   };
 };
 
+const useGenStyle = genStyleHooks('ToolUseBarThink', genStyle);
+
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('tool-use-bar-think', (token) => {
-    const toolBarToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [genStyle(toolBarToken)];
-  });
+  const [, hashId] = useGenStyle(prefixCls ?? 'tool-use-bar-think');
+  return { hashId };
 }

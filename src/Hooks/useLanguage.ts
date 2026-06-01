@@ -1,5 +1,6 @@
-import { useCallback, useContext } from 'react';
+import { useContext } from 'react';
 import { I18nContext } from '../I18n';
+import { useRefFunction } from './useRefFunction';
 
 /**
  * useLanguage Hook - 语言切换 Hook
@@ -47,16 +48,18 @@ export function useLanguage() {
   const context = useContext(I18nContext);
 
   if (!context) {
-    throw new Error('useLanguage must be used within I18nProvide');
+    throw new Error(
+      '[useLanguage] called outside <I18nProvide /> — wrap your tree with the provider before using this hook',
+    );
   }
 
   const { language, locale, setLanguage } = context;
 
   // 切换中英文的方法
-  const toggleLanguage = useCallback(() => {
+  const toggleLanguage = useRefFunction(() => {
     const newLanguage = language === 'zh-CN' ? 'en-US' : 'zh-CN';
     setLanguage?.(newLanguage);
-  }, [language, setLanguage]);
+  });
 
   // 语言判断方法
   const isChinese = language === 'zh-CN';

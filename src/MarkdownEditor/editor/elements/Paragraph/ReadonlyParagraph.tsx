@@ -1,6 +1,5 @@
 import classNames from 'clsx';
 import React from 'react';
-import { Node } from 'slate';
 import { ElementProps, ParagraphNode } from '../../../el';
 
 /**
@@ -11,7 +10,7 @@ import { ElementProps, ParagraphNode } from '../../../el';
  *
  * @component
  * @description 只读段落预览组件，用于预览模式下的段落渲染
- * @param {ElementProps<ParagraphNode>} props - 组件属性
+ * @param {ElementProps<ParagraphNode>} props - 段落组件属性
  * @param {ParagraphNode} props.element - 段落节点元素
  * @param {React.ReactNode} props.children - 子组件内容
  * @param {Object} props.attributes - 元素属性
@@ -26,7 +25,7 @@ import { ElementProps, ParagraphNode } from '../../../el';
  * </ReadonlyParagraph>
  * ```
  *
- * @returns {React.ReactElement} 渲染的只读段落组件
+ * @returns {React.ReactElement}
  *
  * @remarks
  * - 移除拖拽手柄（DragHandle）
@@ -37,9 +36,7 @@ import { ElementProps, ParagraphNode } from '../../../el';
  */
 export const ReadonlyParagraph: React.FC<ElementProps<ParagraphNode>> =
   React.memo((props) => {
-    const str = Node.string(props.element).trim();
     const align = props.element.align ?? props.element.otherProps?.align;
-
     return (
       <div
         {...props.attributes}
@@ -47,7 +44,6 @@ export const ReadonlyParagraph: React.FC<ElementProps<ParagraphNode>> =
         className={classNames({})}
         data-align={align}
         style={{
-          display: !!str || !!props.children?.at(0).type ? undefined : 'none',
           textAlign: align,
         }}
       >

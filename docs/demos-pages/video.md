@@ -55,17 +55,17 @@ Markdown Editor 支持在 Markdown 中嵌入视频元素，支持多种视频格
 
 ## 支持的属性
 
-| 属性 | 说明 | 类型 | 默认值 | 版本 |
-| --- | --- | --- | --- | --- |
-| `src` | 视频源 URL | `string` | - | - |
-| `controls` | 是否显示播放控件 | `boolean` | - | - |
-| `autoplay` | 是否自动播放 | `boolean` | - | - |
-| `loop` | 是否循环播放 | `boolean` | - | - |
-| `muted` | 是否静音 | `boolean` | - | - |
-| `poster` | 视频封面图片 URL | `string` | - | - |
-| `width` | 视频宽度（像素） | `number` | - | - |
-| `height` | 视频高度（像素） | `number` | - | - |
-| `alt` | 视频描述文本 | `string` | - | - |
+| 属性       | 说明             | 类型      | 默认值 | 版本 |
+| ---------- | ---------------- | --------- | ------ | ---- |
+| `src`      | 视频源 URL       | `string`  | -      | -    |
+| `controls` | 是否显示播放控件 | `boolean` | -      | -    |
+| `autoplay` | 是否自动播放     | `boolean` | -      | -    |
+| `loop`     | 是否循环播放     | `boolean` | -      | -    |
+| `muted`    | 是否静音         | `boolean` | -      | -    |
+| `poster`   | 视频封面图片 URL | `string`  | -      | -    |
+| `width`    | 视频宽度（像素） | `number`  | -      | -    |
+| `height`   | 视频高度（像素） | `number`  | -      | -    |
+| `alt`      | 视频描述文本     | `string`  | -      | -    |
 
 ## 特殊格式支持
 

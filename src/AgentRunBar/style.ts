@@ -1,9 +1,5 @@
 import { Keyframes } from '@ant-design/cssinjs';
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
 
 // 定义旋转动画
 const stopIconRotate = new Keyframes('stopIconRotate', {
@@ -30,8 +26,26 @@ const borderSpin = new Keyframes('borderSpin', {
  * @param token - 主题令牌，包含全局样式变量
  * @returns CSS-in-JS 样式对象
  */
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'AgentRunBar'> = (token) => {
   const { componentCls } = token;
+
+  // 优先使用 antd token，回退到原有的 CSS 变量（兼容尚未注入 antd token 的旧主题）
+  const colorText = `var(--color-gray-text-default, ${token.colorText})`;
+  const colorTextSecondary = `var(--color-gray-text-light, ${token.colorTextSecondary})`;
+  const colorTextTertiary = `var(--color-gray-text-secondary, ${token.colorTextTertiary})`;
+  const colorBgContainer = `var(--color-gray-bg-card-white, ${token.colorBgContainer})`;
+  const colorBgLayout = `var(--color-gray-bg-page-dark, ${token.colorBgLayout})`;
+  const colorFillSecondary = `var(--color-gray-control-fill-secondary, ${token.colorFillSecondary})`;
+  const colorFillTertiary = `var(--color-gray-control-fill-secondary-hover, ${token.colorFillTertiary})`;
+  const colorFillActive = `var(--color-gray-control-fill-active, ${token.colorFillTertiary})`;
+  const colorPrimary = `var(--color-primary-control-fill-primary, ${token.colorPrimary})`;
+  const colorPrimaryBg = `var(--color-primary-control-fill-secondary, ${token.colorPrimaryBg})`;
+  const borderRadiusLG = `var(--radius-card-lg, ${token.borderRadiusLG}px)`;
+  const borderRadius = `var(--radius-control-base, ${token.borderRadius}px)`;
+  const borderRadiusSM = `var(--radius-control-sm, ${token.borderRadiusSM}px)`;
+  const boxShadowSecondary = `var(--shadow-popover-base, ${token.boxShadowSecondary})`;
+  const boxShadow = `var(--shadow-control-base, ${token.boxShadow})`;
+  const fontSize = `var(--font-size-base, ${token.fontSize}px)`;
 
   return {
     [componentCls]: {
@@ -46,7 +60,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
-      borderRadius: 'var(--radius-card-lg)',
+      borderRadius: borderRadiusLG,
 
       '&-border': {
         position: 'absolute',
@@ -55,21 +69,21 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         right: 0,
         bottom: 0,
         zIndex: -1,
-        // background:
-        //   'conic-gradient(from 180deg at 50% 50%, #D3FEFF -31deg, #D3FEFF 82deg, #FFF16F 110deg, rgba(82, 212, 255, 0.2329) 221deg, #D3FEFF 329deg, #D3FEFF 427deg)',
         background:
           'linear-gradient(90deg, #D3FEFF 0%, #FFF16F 16%, rgba(82, 212, 255, 0.2329) 50%, #D3FEFF 75%, #D3FEFF 100%)',
         backgroundSize: '200% 50%',
-        borderRadius: 'var(--radius-card-lg)',
+        borderRadius: borderRadiusLG,
         opacity: 1,
-        boxShadow: 'var(--shadow-popover-base)',
+        boxShadow: boxShadowSecondary,
         animationName: borderSpin,
         animationDuration: '8s',
         animationTimingFunction: 'linear',
         animationIterationCount: 'infinite',
         pointerEvents: 'none',
         overflow: 'hidden',
-        transition: 'background 0.25s cubic-bezier(0.645, 0.045, 0.355, 1)',
+        transitionProperty: 'background',
+        transitionDuration: token.motionDurationMid,
+        transitionTimingFunction: token.motionEaseInOut,
       },
 
       '&-background': {
@@ -79,7 +93,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         right: 2,
         bottom: 2,
         zIndex: -1,
-        background: 'var(--color-gray-bg-card-white)',
+        background: colorBgContainer,
         borderRadius: 14,
         pointerEvents: 'none',
       },
@@ -88,9 +102,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         display: 'flex',
         alignItems: 'center',
         gap: 8,
-        fontSize: 'var(--font-size-base)',
+        fontSize,
         lineHeight: '20px',
-        color: 'var(--color-gray-text-default)',
+        color: colorText,
         flex: 1,
         minWidth: 0,
       },
@@ -107,12 +121,14 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       '&-left-content': {
         display: 'flex',
         flexDirection: 'column',
-        gap: -2,
+        // 标题与描述的纵向间距由各自 lineHeight 控制（CSS gap 不接受负值，
+        // 历史代码里的 gap: -2 等同于 0，已显式改为 0 以避免误导）
+        gap: 0,
         overflow: 'hidden',
 
         // title
         [`${componentCls}-left-main-text`]: {
-          color: 'var(--color-gray-text-default)',
+          color: colorText,
           lineHeight: '20px',
           font: 'var(--font-text-h6-base)',
 
@@ -136,7 +152,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           '-webkit-box-orient': 'vertical',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
-          color: 'var(--color-gray-text-light)',
+          color: colorTextSecondary,
         },
       },
 
@@ -151,29 +167,31 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         },
       },
 
-      // TODO: 抽离为公共图标按钮组件
+      // 圆形图标控制按钮（停止 / 暂停 / 继续）共用样式
       '&-pause, &-play': {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         width: 32,
         height: 32,
-        color: 'var(--color-gray-text-secondary)',
+        color: colorTextTertiary,
         fontSize: 16,
-        background: 'var(--color-gray-control-fill-secondary)',
+        background: colorFillSecondary,
         backdropFilter: 'blur(40px)',
         borderRadius: 200,
         zIndex: 0,
         cursor: 'pointer',
-        transition: 'all 0.2s ease-in-out',
+        transitionProperty: 'background-color, color',
+        transitionDuration: token.motionDurationMid,
+        transitionTimingFunction: token.motionEaseInOut,
 
         '&:hover': {
-          background: 'var(--color-gray-control-fill-secondary-hover)',
+          background: colorFillTertiary,
         },
 
         '&:active': {
-          color: 'var(--color-primary-control-fill-primary)',
-          background: 'var(--color-primary-control-fill-secondary)',
+          color: colorPrimary,
+          background: colorPrimaryBg,
         },
       },
 
@@ -204,7 +222,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
     // Status pause
     [`${componentCls}-status-pause`]: {
       [`${componentCls}-border`]: {
-        background: 'var(--color-gray-bg-card-white)',
+        background: colorBgContainer,
       },
     },
 
@@ -216,9 +234,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       borderRadius: 8,
 
       [`${componentCls}-border`]: {
-        background: 'var(--color-gray-bg-page-dark)',
-        borderRadius: 'var(--radius-control-base)',
-        boxShadow: 'var(--shadow-control-base)',
+        background: colorBgLayout,
+        borderRadius,
+        boxShadow,
       },
 
       [`${componentCls}-background`]: {
@@ -227,13 +245,13 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         left: 0,
         right: 0,
         bottom: 0,
-        background: 'var(--color-gray-bg-page-dark)',
+        background: colorBgLayout,
         borderRadius: 8,
       },
 
       // title
       [`${componentCls}-left-main-text`]: {
-        color: 'var(--color-gray-text-default)',
+        color: colorText,
         fontWeight: 'normal',
         lineHeight: '16px',
         font: 'var(--font-text-paragraph-base)',
@@ -247,19 +265,19 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       [`${componentCls}-play, ${componentCls}-pause`]: {
         width: 28,
         height: 28,
-        color: 'var(--color-gray-text-default)',
+        color: colorText,
         fontSize: 14,
         background: 'transparent',
-        borderRadius: 'var(--radius-control-sm)',
+        borderRadius: borderRadiusSM,
         cursor: 'pointer',
 
         '&:hover': {
-          background: 'var(--color-gray-control-fill-active)',
+          background: colorFillActive,
         },
 
         '&:active': {
-          color: 'var(--color-primary-control-fill-primary)',
-          background: 'var(--color-primary-control-fill-secondary)',
+          color: colorPrimary,
+          background: colorPrimaryBg,
         },
       },
     },
@@ -276,19 +294,16 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * - 动画效果
  *
  * @param prefixCls - 组件类名前缀
- * @returns 包含样式和 SSR 包装器的对象
+ * @returns 包含 `hashId` 的对象
  *
  * @example
  * ```tsx
- * const { wrapSSR, hashId } = useStyle('my-prefix');
+ * const { hashId } = useStyle('my-prefix');
  * ```
  */
+const useGenStyle = genStyleHooks('AgentRunBar', genStyle);
+
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('task-running', (token) => {
-    const taskRunningToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [genStyle(taskRunningToken)];
-  });
+  const [, hashId] = useGenStyle(prefixCls ?? 'agent-run-bar');
+  return { hashId };
 }

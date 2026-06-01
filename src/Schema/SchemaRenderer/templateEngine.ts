@@ -1,5 +1,5 @@
 interface TemplateData {
-  [key: string]: string | number | boolean;
+  [key: string]: string | number | boolean | object | null | undefined;
 }
 
 export class TemplateEngine {

@@ -1,6 +1,7 @@
 import Lottie from 'lottie-react';
-import React from 'react';
-import voicingLottie from './voicing.json';
+import React, { useMemo } from 'react';
+
+import { useAsyncLottieData } from '../../../Components/lotties/useAsyncLottieData';
 
 export interface LottieVoiceProps {
   /**
@@ -66,6 +67,9 @@ export const VoicingLottie: React.FC<LottieVoiceProps> = ({
   style,
   size,
 }) => {
+  const loadJson = useMemo(() => () => import('./voicing.json'), []);
+  const animationData = useAsyncLottieData(loadJson);
+
   const containerStyle: React.CSSProperties = {
     width: size,
     height: size,
@@ -75,12 +79,16 @@ export const VoicingLottie: React.FC<LottieVoiceProps> = ({
     ...style,
   };
 
+  if (animationData === null) {
+    return <div style={containerStyle} className={className} aria-hidden />;
+  }
+
   return (
     <Lottie
       style={containerStyle}
       className={className}
       aria-hidden="true"
-      animationData={voicingLottie}
+      animationData={animationData}
       loop={loop}
       autoplay={autoplay}
     />

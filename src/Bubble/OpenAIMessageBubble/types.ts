@@ -1,5 +1,5 @@
-import type { MessageBubbleData } from '../../Types/message';
 import type { RoleType } from '../../Types/common';
+import type { MessageBubbleData } from '../../Types/message';
 
 /**
  * OpenAI Chat Completions 风格的多段 content（与官方结构兼容，库内自建）

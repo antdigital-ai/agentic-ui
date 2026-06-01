@@ -76,11 +76,12 @@ const ToolUseBarComponent: React.FC<ToolUseBarProps> = ({
   light = false,
   disableAnimation = false,
   style,
+  testId,
   ...props
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-tool-use-bar');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   const [activeKeys, setActiveKeys] = useMergedState(
     props.defaultActiveKeys || [],
@@ -176,13 +177,21 @@ const ToolUseBarComponent: React.FC<ToolUseBarProps> = ({
 
   if (!tools?.length)
     return (
-      <div className={containerClassName} style={style} data-testid="ToolUse" />
+      <div
+        className={containerClassName}
+        data-testid={testId ?? 'ToolUse'}
+        style={style}
+      />
     );
 
-  return wrapSSR(
-    <div className={containerClassName} style={style} data-testid="ToolUse">
+  return (
+    <div
+      className={containerClassName}
+      data-testid={testId ?? 'ToolUse'}
+      style={style}
+    >
       {toolItems}
-    </div>,
+    </div>
   );
 };
 

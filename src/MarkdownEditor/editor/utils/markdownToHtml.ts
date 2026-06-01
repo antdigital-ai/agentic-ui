@@ -10,6 +10,12 @@ import type { Plugin, Processor } from 'unified';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
 import {
+  getRemarkMathOptions,
+  isFormulaEnabled,
+  type FormulaConfig,
+} from '../../../Config/formulaConfig';
+import { rehypeSanitizeUserHtml } from '../../../Utils/rehypeSanitizeUserHtml';
+import {
   JINJA_DOLLAR_PLACEHOLDER,
   preprocessNormalizeLeafToContainerDirective,
 } from '../parser/constants';
@@ -46,6 +52,8 @@ export interface MarkdownToHtmlConfig {
   openLinksInNewTab?: boolean;
   /** 自定义段落标签，默认为 'p' */
   paragraphTag?: string;
+  /** 公式解析与 KaTeX 渲染配置 */
+  formula?: FormulaConfig;
   /** 用户自定义的 unified 插件配置 */
   markedConfig?: MarkdownRemarkPlugin[];
 }
@@ -89,7 +97,6 @@ export function escapeHtml(html: string, encode?: boolean): string {
   return html;
 }
 
-const INLINE_MATH_WITH_SINGLE_DOLLAR = { singleDollarTextMath: true };
 const FRONTMATTER_LANGUAGES: readonly string[] = ['yaml'];
 
 const remarkRehypePlugin = remarkRehype as unknown as Plugin;
@@ -253,14 +260,26 @@ const REMARK_DIRECTIVE_CONTAINER_OPTIONS = {
   titleElement: { className: ['markdown-container__title'] },
 };
 
-export const DEFAULT_MARKDOWN_REMARK_PLUGINS: readonly MarkdownRemarkPlugin[] =
-  [
+export const buildDefaultMarkdownRemarkPlugins = (
+  formulaConfig?: FormulaConfig,
+): MarkdownRemarkPlugin[] => {
+  const remarkMathOptions = getRemarkMathOptions(formulaConfig);
+  const plugins: MarkdownRemarkPlugin[] = [
     remarkParse,
     [remarkGfm, { singleTilde: false }],
     fixStrongWithSpecialChars,
     convertParagraphToImage,
-    protectJinjaDollarInText,
-    [remarkMath as unknown as Plugin, INLINE_MATH_WITH_SINGLE_DOLLAR],
+  ];
+
+  if (remarkMathOptions) {
+    plugins.push(protectJinjaDollarInText);
+    plugins.push([
+      remarkMath as unknown as Plugin,
+      remarkMathOptions,
+    ] as MarkdownRemarkPlugin);
+  }
+
+  plugins.push(
     [remarkFrontmatter, FRONTMATTER_LANGUAGES],
     remarkDirectiveContainersOnly as unknown as Plugin,
     [remarkDirectiveContainer, REMARK_DIRECTIVE_CONTAINER_OPTIONS],
@@ -271,11 +290,13 @@ export const DEFAULT_MARKDOWN_REMARK_PLUGINS: readonly MarkdownRemarkPlugin[] =
         handlers: REMARK_REHYPE_DIRECTIVE_HANDLERS,
       },
     ],
-  ] as const;
+  );
 
-const DEFAULT_REMARK_PLUGINS: MarkdownRemarkPlugin[] = [
-  ...DEFAULT_MARKDOWN_REMARK_PLUGINS,
-];
+  return plugins;
+};
+
+export const DEFAULT_MARKDOWN_REMARK_PLUGINS: readonly MarkdownRemarkPlugin[] =
+  buildDefaultMarkdownRemarkPlugins();
 
 const applyPlugins = (
   processor: Processor,
@@ -301,9 +322,10 @@ const applyPlugins = (
 
 const resolveRemarkPlugins = (
   plugins?: MarkdownToHtmlOptions,
+  formulaConfig?: FormulaConfig,
 ): MarkdownRemarkPlugin[] => {
   if (!plugins || plugins.length === 0) {
-    return DEFAULT_REMARK_PLUGINS;
+    return buildDefaultMarkdownRemarkPlugins(formulaConfig);
   }
   return plugins;
 };
@@ -313,9 +335,16 @@ const createMarkdownProcessor = (
   config?: MarkdownToHtmlConfig,
 ) => {
   const processor = unified();
-  const remarkPlugins = resolveRemarkPlugins(plugins);
+  const formulaConfig = config?.formula;
+  const remarkPlugins = resolveRemarkPlugins(plugins, formulaConfig);
   applyPlugins(processor, remarkPlugins);
-  processor.use(rehypeRaw).use(rehypeKatex as unknown as Plugin);
+  processor
+    .use(rehypeRaw)
+    .use(rehypeSanitizeUserHtml as unknown as Plugin);
+
+  if (isFormulaEnabled(formulaConfig)) {
+    processor.use(rehypeKatex as unknown as Plugin);
+  }
 
   // 应用配置选项
   if (config?.openLinksInNewTab) {

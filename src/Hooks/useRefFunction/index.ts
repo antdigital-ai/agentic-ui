@@ -1,48 +1,43 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useLayoutEffect, useRef } from 'react';
 
 /**
- * useRefFunction Hook - 函数引用 Hook
+ * useRefFunction Hook - 稳定函数引用 Hook
  *
- * 该 Hook 用于创建一个稳定的函数引用，避免因为函数重新创建导致的子组件不必要的重新渲染。
- * 通过 useRef 保存最新的函数引用，同时使用 useCallback 返回稳定的函数。
+ * 创建一个引用恒定的函数包装器，包装器内部始终调用最新一次渲染传入的函数实现，
+ * 从而避免父组件重渲染时把"新函数引用"透传给子组件，造成子组件不必要的重新渲染。
  *
- * @description 函数引用 Hook，用于创建稳定的函数引用避免子组件重新渲染
- * @template T - 函数类型
- * @param {T} reFunction - 需要创建引用的函数
- * @returns {T} 稳定的函数引用
+ * @description 稳定的函数引用包装器，等价于 React 团队推荐的 latestRef 模式
+ * @template T - 被包装函数的类型
+ * @param {T} reFunction - 当前渲染要保存的最新函数实现
+ * @returns {T} 引用恒定的函数包装器，可安全作为子组件 prop 或 effect deps
  *
  * @example
  * ```tsx
  * const MyComponent = () => {
  *   const [count, setCount] = useState(0);
- *
- *   // 使用 useRefFunction 创建稳定的函数引用
  *   const handleClick = useRefFunction((value: number) => {
- *     console.log('点击了:', value);
  *     setCount(count + value);
  *   });
- *
- *   return (
- *     <div>
- *       <p>计数: {count}</p>
- *       <ChildComponent onClick={handleClick} />
- *     </div>
- *   );
+ *   return <ChildComponent onClick={handleClick} />;
  * };
  * ```
  *
  * @remarks
- * - 避免函数重新创建导致的子组件重新渲染
- * - 保持函数引用的稳定性
- * - 适用于需要传递给子组件的回调函数
- * - 使用 useRef 保存最新函数引用
- * - 使用 useCallback 返回稳定函数
+ * - 包装器在渲染期同步调用也是安全的（如 useState 的 lazy initializer），ref
+ *   初始值即为传入的最新实现，后续每次 commit 阶段由 useLayoutEffect 同步刷新
+ * - 用 useLayoutEffect 而非渲染期写 ref，避免 R18 并发渲染下被丢弃的渲染版本污染 ref
  */
-const useRefFunction = <T extends (...args: any) => any>(reFunction: T) => {
-  const ref = useRef<any>(null);
-  ref.current = reFunction;
+const useRefFunction = <T extends (...args: any[]) => any>(reFunction: T) => {
+  // 初始值即为当前渲染传入的实现，保证渲染期同步调用包装器（如 useState lazy
+  // initializer、useMemo）时也能拿到可用的函数。
+  // useLayoutEffect 在 DOM 更新后、浏览器 paint 前同步执行，后续每次 commit
+  // 阶段刷新 ref，保证 effect/事件回调里读取的 ref 永远是最新版本。
+  const ref = useRef<T>(reFunction);
+  useLayoutEffect(() => {
+    ref.current = reFunction;
+  });
   return useCallback((...rest: Parameters<T>): ReturnType<T> => {
-    return ref.current?.(...(rest as any));
+    return ref.current(...rest);
   }, []);
 };
 

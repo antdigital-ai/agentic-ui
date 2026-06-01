@@ -30,8 +30,19 @@ Bubble 组件支持自定义标题渲染，可以：
     {
       createAt: Date.now() - 120000,
       updateAt: Date.now() - 120000,
-      meta: { avatar: undefined, title: 'Code Assistant', description: '代码助手 v2.1' },
-      extra: { status: 'success', priority: 'high', customTags: ['代码优化', '性能'], model: 'GPT-4', duration: 2300, confidence: 0.95 },
+      meta: {
+        avatar: undefined,
+        title: 'Code Assistant',
+        description: '代码助手 v2.1',
+      },
+      extra: {
+        status: 'success',
+        priority: 'high',
+        customTags: ['代码优化', '性能'],
+        model: 'GPT-4',
+        duration: 2300,
+        confidence: 0.95,
+      },
     },
   ),
   createUserMessage('2', '这个功能很实用！能演示一下不同的标题渲染效果吗？', {
@@ -55,8 +66,18 @@ Bubble 组件支持自定义标题渲染，可以：
     {
       createAt: Date.now() - 10000,
       updateAt: Date.now() - 10000,
-      meta: { avatar: undefined, title: 'Code Assistant', description: '代码助手 v2.1' },
-      extra: { status: 'processing', priority: 'medium', model: 'GPT-4', duration: 1500, confidence: 0.88 },
+      meta: {
+        avatar: undefined,
+        title: 'Code Assistant',
+        description: '代码助手 v2.1',
+      },
+      extra: {
+        status: 'processing',
+        priority: 'medium',
+        model: 'GPT-4',
+        duration: 1500,
+        confidence: 0.88,
+      },
     },
   ),
 ];
@@ -84,14 +105,36 @@ export default () => {
         <span style={{ fontWeight: 600 }}>{meta.title}</span>
         {extra?.status && (
           <Tag
-            color={extra.status === 'success' ? 'green' : extra.status === 'processing' ? 'blue' : 'red'}
-            icon={extra.status === 'success' ? <CheckCircleOutlined /> : extra.status === 'processing' ? <ClockCircleOutlined /> : <ExclamationCircleOutlined />}
+            color={
+              extra.status === 'success'
+                ? 'green'
+                : extra.status === 'processing'
+                  ? 'blue'
+                  : 'red'
+            }
+            icon={
+              extra.status === 'success' ? (
+                <CheckCircleOutlined />
+              ) : extra.status === 'processing' ? (
+                <ClockCircleOutlined />
+              ) : (
+                <ExclamationCircleOutlined />
+              )
+            }
           >
             {extra.status}
           </Tag>
         )}
         {extra?.priority && (
-          <Tag color={extra.priority === 'high' ? 'red' : extra.priority === 'medium' ? 'orange' : 'green'}>
+          <Tag
+            color={
+              extra.priority === 'high'
+                ? 'red'
+                : extra.priority === 'medium'
+                  ? 'orange'
+                  : 'green'
+            }
+          >
             {extra.priority}
           </Tag>
         )}
@@ -106,7 +149,14 @@ export default () => {
     const isAssistant = props.originData.role === 'assistant';
 
     return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          flexWrap: 'wrap',
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <Avatar
             size="small"
@@ -118,13 +168,25 @@ export default () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           {extra?.status && (
             <Badge
-              status={extra.status === 'success' ? 'success' : extra.status === 'processing' ? 'processing' : 'error'}
+              status={
+                extra.status === 'success'
+                  ? 'success'
+                  : extra.status === 'processing'
+                    ? 'processing'
+                    : 'error'
+              }
               text={extra.status}
             />
           )}
-          {extra?.duration && <span style={{ fontSize: 12, color: '#666' }}>⏱️ {extra.duration}ms</span>}
+          {extra?.duration && (
+            <span style={{ fontSize: 12, color: '#666' }}>
+              ⏱️ {extra.duration}ms
+            </span>
+          )}
           {extra?.confidence && (
-            <span style={{ fontSize: 12, color: '#666' }}>🎯 {(extra.confidence * 100).toFixed(0)}%</span>
+            <span style={{ fontSize: 12, color: '#666' }}>
+              🎯 {(extra.confidence * 100).toFixed(0)}%
+            </span>
           )}
         </div>
         <div style={{ fontSize: 11, color: '#999' }}>{timeStr}</div>
@@ -138,8 +200,10 @@ export default () => {
     enhanced: enhancedTitleRender,
   };
 
-  const handleLike = async (bubble: MessageBubbleData) => console.log('点赞消息:', bubble);
-  const handleDisLike = async (bubble: MessageBubbleData) => console.log('点踩消息:', bubble);
+  const handleLike = async (bubble: MessageBubbleData) =>
+    console.log('点赞消息:', bubble);
+  const handleDisLike = async (bubble: MessageBubbleData) =>
+    console.log('点踩消息:', bubble);
   const handleReply = (content: string) => console.log('回复内容:', content);
 
   return (
@@ -153,7 +217,11 @@ export default () => {
               type={renderMode === mode ? 'primary' : 'default'}
               onClick={() => setRenderMode(mode)}
             >
-              {mode === 'default' ? '默认模式' : mode === 'custom' ? '自定义模式' : '增强模式'}
+              {mode === 'default'
+                ? '默认模式'
+                : mode === 'custom'
+                  ? '自定义模式'
+                  : '增强模式'}
             </Button>
           ))}
         </Space>

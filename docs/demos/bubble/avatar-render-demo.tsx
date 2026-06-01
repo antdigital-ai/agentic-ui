@@ -6,7 +6,10 @@ import React, { useRef, useState } from 'react';
 import { BubbleDemoCard } from './BubbleDemoCard';
 import { createAssistantMessage, createUserMessage } from './shared';
 
-const LEVEL_MAP: Record<string, { color: string; icon: string; label: string }> = {
+const LEVEL_MAP: Record<
+  string,
+  { color: string; icon: string; label: string }
+> = {
   expert: { color: '#ff4d4f', icon: '👑', label: '专家' },
   senior: { color: '#fa8c16', icon: '⭐', label: '高级' },
   intermediate: { color: '#52c41a', icon: '🔰', label: '中级' },
@@ -28,15 +31,11 @@ avatarRender 允许你完全自定义消息气泡的头像区域，可以：
       extra: { isOnline: true, userLevel: 'expert', isVip: true },
     },
   ),
-  createUserMessage(
-    '2',
-    '请帮我分析这段代码的性能问题，并提供优化建议。',
-    {
-      createAt: Date.now() - 60000,
-      updateAt: Date.now() - 60000,
-      extra: { isOnline: true, userLevel: 'senior', isVip: false },
-    },
-  ),
+  createUserMessage('2', '请帮我分析这段代码的性能问题，并提供优化建议。', {
+    createAt: Date.now() - 60000,
+    updateAt: Date.now() - 60000,
+    extra: { isOnline: true, userLevel: 'senior', isVip: false },
+  }),
   createAssistantMessage(
     '3',
     `## 性能分析报告
@@ -57,11 +56,17 @@ const OptimizedComponent = React.memo(({ data }) => {
 
 type AvatarStyle = 'default' | 'status' | 'role' | 'enhanced';
 
-const AVATAR_STYLE_LABELS: Record<AvatarStyle, { label: string; desc: string }> = {
+const AVATAR_STYLE_LABELS: Record<
+  AvatarStyle,
+  { label: string; desc: string }
+> = {
   default: { label: '默认样式', desc: '使用默认头像渲染' },
   status: { label: '在线状态', desc: '显示在线/离线状态指示器' },
   role: { label: '角色标识', desc: '显示用户和AI助手的角色标识' },
-  enhanced: { label: '增强样式', desc: '显示完整信息（状态、角色、等级、VIP标识）' },
+  enhanced: {
+    label: '增强样式',
+    desc: '显示完整信息（状态、角色、等级、VIP标识）',
+  },
 };
 
 const RoleIcon: React.FC<{ isAssistant: boolean }> = ({ isAssistant }) =>
@@ -76,7 +81,10 @@ export default () => {
       size={40}
       src={props.originData?.meta?.avatar}
       icon={<RoleIcon isAssistant={props.originData?.role === 'assistant'} />}
-      style={{ border: `2px solid ${borderColor}`, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+      style={{
+        border: `2px solid ${borderColor}`,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+      }}
     />
   );
 
@@ -95,7 +103,17 @@ export default () => {
         <Badge dot color={isOnline ? '#52c41a' : '#d9d9d9'} offset={[-8, 8]}>
           {createBaseAvatar(props, isOnline ? '#52c41a' : '#d9d9d9')}
         </Badge>
-        <div style={{ position: 'absolute', bottom: -20, left: '50%', transform: 'translateX(-50%)', fontSize: 10, color: isOnline ? '#52c41a' : '#999', whiteSpace: 'nowrap' }}>
+        <div
+          style={{
+            position: 'absolute',
+            bottom: -20,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            fontSize: 10,
+            color: isOnline ? '#52c41a' : '#999',
+            whiteSpace: 'nowrap',
+          }}
+        >
           {isOnline ? '在线' : '离线'}
         </div>
       </div>
@@ -108,10 +126,37 @@ export default () => {
     return (
       <div style={{ position: 'relative' }}>
         {createBaseAvatar(props, color)}
-        <div style={{ position: 'absolute', bottom: -4, right: -4, width: 16, height: 16, borderRadius: '50%', background: color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, color: 'white', border: '2px solid white' }}>
+        <div
+          style={{
+            position: 'absolute',
+            bottom: -4,
+            right: -4,
+            width: 16,
+            height: 16,
+            borderRadius: '50%',
+            background: color,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 8,
+            color: 'white',
+            border: '2px solid white',
+          }}
+        >
           {isAssistant ? '🤖' : '👤'}
         </div>
-        <div style={{ position: 'absolute', bottom: -20, left: '50%', transform: 'translateX(-50%)', fontSize: 10, color, whiteSpace: 'nowrap', fontWeight: 500 }}>
+        <div
+          style={{
+            position: 'absolute',
+            bottom: -20,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            fontSize: 10,
+            color,
+            whiteSpace: 'nowrap',
+            fontWeight: 500,
+          }}
+        >
           {isAssistant ? 'AI助手' : '用户'}
         </div>
       </div>
@@ -132,26 +177,96 @@ export default () => {
         <Badge dot color={isOnline ? '#52c41a' : '#d9d9d9'} offset={[-8, 8]}>
           {createBaseAvatar(props, roleColor)}
         </Badge>
-        <div style={{ position: 'absolute', bottom: -4, right: -4, width: 16, height: 16, borderRadius: '50%', background: roleColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, color: 'white', border: '2px solid white' }}>
+        <div
+          style={{
+            position: 'absolute',
+            bottom: -4,
+            right: -4,
+            width: 16,
+            height: 16,
+            borderRadius: '50%',
+            background: roleColor,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 8,
+            color: 'white',
+            border: '2px solid white',
+          }}
+        >
           {isAssistant ? '🤖' : '👤'}
         </div>
         {isVip && (
-          <div style={{ position: 'absolute', top: -4, left: -4, width: 16, height: 16, borderRadius: '50%', background: 'linear-gradient(45deg, #ffd700, #ffed4e)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, color: '#d48806', border: '2px solid white' }}>
+          <div
+            style={{
+              position: 'absolute',
+              top: -4,
+              left: -4,
+              width: 16,
+              height: 16,
+              borderRadius: '50%',
+              background: 'linear-gradient(45deg, #ffd700, #ffed4e)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 8,
+              color: '#d48806',
+              border: '2px solid white',
+            }}
+          >
             <CrownOutlined />
           </div>
         )}
         {levelInfo && !isAssistant && (
           <Tooltip title={`等级: ${userLevel}`}>
-            <div style={{ position: 'absolute', top: -4, right: -4, width: 16, height: 16, borderRadius: '50%', background: levelInfo.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, color: 'white', border: '2px solid white' }}>
+            <div
+              style={{
+                position: 'absolute',
+                top: -4,
+                right: -4,
+                width: 16,
+                height: 16,
+                borderRadius: '50%',
+                background: levelInfo.color,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 8,
+                color: 'white',
+                border: '2px solid white',
+              }}
+            >
               {levelInfo.icon}
             </div>
           </Tooltip>
         )}
-        <div style={{ position: 'absolute', bottom: -25, left: '50%', transform: 'translateX(-50%)', fontSize: 10, color: isOnline ? '#52c41a' : '#999', whiteSpace: 'nowrap', fontWeight: 500 }}>
+        <div
+          style={{
+            position: 'absolute',
+            bottom: -25,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            fontSize: 10,
+            color: isOnline ? '#52c41a' : '#999',
+            whiteSpace: 'nowrap',
+            fontWeight: 500,
+          }}
+        >
           {isAssistant ? 'AI助手' : isOnline ? '在线' : '离线'}
         </div>
         {levelInfo && !isAssistant && (
-          <div style={{ position: 'absolute', bottom: -40, left: '50%', transform: 'translateX(-50%)', fontSize: 9, color: levelInfo.color, whiteSpace: 'nowrap', fontWeight: 500 }}>
+          <div
+            style={{
+              position: 'absolute',
+              bottom: -40,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              fontSize: 9,
+              color: levelInfo.color,
+              whiteSpace: 'nowrap',
+              fontWeight: 500,
+            }}
+          >
             {levelInfo.label}
           </div>
         )}
@@ -159,7 +274,10 @@ export default () => {
     );
   };
 
-  const avatarRenders: Record<AvatarStyle, (props: BubbleProps) => React.ReactNode> = {
+  const avatarRenders: Record<
+    AvatarStyle,
+    (props: BubbleProps) => React.ReactNode
+  > = {
     default: defaultAvatarRender,
     status: statusAvatarRender,
     role: roleAvatarRender,
@@ -186,8 +304,17 @@ export default () => {
             ))}
           </Space>
         </div>
-        <div style={{ padding: 12, background: '#f8f9fa', borderRadius: 6, fontSize: 14, color: '#666' }}>
-          <strong>当前样式：</strong>{AVATAR_STYLE_LABELS[avatarStyle].desc}
+        <div
+          style={{
+            padding: 12,
+            background: '#f8f9fa',
+            borderRadius: 6,
+            fontSize: 14,
+            color: '#666',
+          }}
+        >
+          <strong>当前样式：</strong>
+          {AVATAR_STYLE_LABELS[avatarStyle].desc}
         </div>
       </div>
 

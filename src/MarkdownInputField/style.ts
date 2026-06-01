@@ -1,4 +1,8 @@
-import { Keyframes } from '@ant-design/cssinjs';
+﻿import { Keyframes } from '@ant-design/cssinjs';
+import {
+  INPUT_FIELD_EDITOR_CONTENT_PADDING_MOBILE_CSS_VAR,
+  MOBILE_INPUT_FIELD_EDITOR_CONTENT_PADDING_DEFAULT,
+} from '../Constants/contentPaddingVars';
 import { MOBILE_BREAKPOINT, MOBILE_PADDING } from '../Constants/mobile';
 import {
   ChatTokenType,
@@ -64,6 +68,9 @@ const INPUT_FIELD_PADDING = {
 // MarkdownInputField 中 code block 的默认高度，避免初始占位过高
 const DEFAULT_INPUT_CODE_BLOCK_HEIGHT = 120;
 
+/** 输入框内编辑器正文默认字号（覆盖 MarkdownEditor content 的 15px / paragraph-lg） */
+const INPUT_FIELD_EDITOR_CONTENT_FONT_SIZE = 14;
+
 // 定义旋转动画
 const stopIconRotate = new Keyframes('stopIconRotate', {
   '0%': {
@@ -80,8 +87,7 @@ const genStyle: GenerateStyle<
     ? {}
     : {
         '&:hover': {
-          boxShadow:
-            '0px 0px 1px 0px rgba(10, 48, 104, 0.25), 0px 2px 7px 0px rgba(10, 48, 104, 0.05), 0px 2px 5px -2px rgba(10, 48, 104, 0.06)',
+          boxShadow: 'var(--shadow-control-lg)',
         },
       };
 
@@ -94,6 +100,7 @@ const genStyle: GenerateStyle<
       alignItems: 'center',
       justifyContent: 'center',
       padding: INPUT_FIELD_PADDING.NONE,
+      background: 'var(--color-gray-bg-card-white)',
       borderRadius: '12px',
       minHeight: '48px',
       maxWidth: 980,
@@ -102,16 +109,10 @@ const genStyle: GenerateStyle<
       '> * ': {
         boxSizing: 'border-box',
       },
-      '&:active,&.active': {
-        outline: '1px solid transparent',
-        outlineColor: 'var(--mif-active-outline-color, transparent)',
-      },
-      boxShadow:
-        '0px 0px 1px 0px rgba(10, 48, 104, 0.15), 0px 1.5px 4px -1px rgba(10, 48, 104, 0.04)',
+      boxShadow: 'var(--shadow-control-base)',
       ...hoverStyle,
       '&-focused': {
-        boxShadow:
-          '0px 0px 1px 0px rgba(10, 48, 104, 0.25), 0px 2px 7px 0px rgba(10, 48, 104, 0.05), 0px 2px 5px -2px rgba(10, 48, 104, 0.06)',
+        boxShadow: 'var(--shadow-control-lg)',
       },
 
       '&-enlarged': {
@@ -139,7 +140,7 @@ const genStyle: GenerateStyle<
         boxSizing: 'border-box',
       },
       '&-content-wrapper': {
-        backgroundColor: '#fff',
+        backgroundColor: 'var(--color-gray-bg-card-white)',
         display: 'flex',
         flexDirection: 'column',
         width: '100%',
@@ -156,8 +157,7 @@ const genStyle: GenerateStyle<
         height: '100%',
         overflowY: 'visible',
         cursor: 'text',
-        scrollbarColor:
-          'var(--color-gray-text-tertiary, #505c716b) transparent',
+        scrollbarColor: 'var(--color-gray-text-secondary) transparent',
         scrollbarWidth: 'thin',
         '&&-disabled': {
           backgroundColor: 'rgba(0,0,0,0.04)',
@@ -167,11 +167,21 @@ const genStyle: GenerateStyle<
           margin: '0 !important',
           padding: '0 !important',
         },
+        [`${token.antCls}-agentic-md-editor-content`]: {
+          fontSize: INPUT_FIELD_EDITOR_CONTENT_FONT_SIZE,
+          font: `var(--font-text-paragraph-base, ${INPUT_FIELD_EDITOR_CONTENT_FONT_SIZE}px / ${token.lineHeight} ${token.fontFamily})`,
+          letterSpacing: 'var(--letter-spacing-paragraph-base, normal)',
+        },
       },
       // 仅覆盖 MarkdownInputField 内的代码块默认高度
       '& [data-language][data-is-unclosed="true"]': {
         height: `${DEFAULT_INPUT_CODE_BLOCK_HEIGHT}px !important`,
         minHeight: `${DEFAULT_INPUT_CODE_BLOCK_HEIGHT}px !important`,
+      },
+      '& [data-be="code"]': {
+        background: 'var(--color-gray-bg-card-light) !important',
+        color:
+          'var(--color-gray-text-default, rgba(20, 22, 28, 0.88)) !important',
       },
       '&-editor-content': {
         display: 'flex',
@@ -183,7 +193,9 @@ const genStyle: GenerateStyle<
         overflow: 'hidden',
         position: 'relative',
         [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
-          padding: `${MOBILE_PADDING} !important`,
+          [INPUT_FIELD_EDITOR_CONTENT_PADDING_MOBILE_CSS_VAR]:
+            MOBILE_INPUT_FIELD_EDITOR_CONTENT_PADDING_DEFAULT,
+          padding: `var(${INPUT_FIELD_EDITOR_CONTENT_PADDING_MOBILE_CSS_VAR}, ${MOBILE_PADDING})`,
         },
       },
       '&-has-tools-wrapper': {
@@ -232,7 +244,10 @@ const genStyle: GenerateStyle<
         borderRadius: 0,
       },
       '&-tools-wrapper': {
-        backgroundColor: '#fff',
+        // 使用 minHeight，避免在 border-box 下固定 height 与 paddingBottom
+        // 争用导致内容区 < 32px、Toggle 工具与发送区纵向错位
+        minHeight: '32px',
+        backgroundColor: 'var(--color-gray-bg-card-white)',
         display: 'flex',
         boxSizing: 'border-box',
         borderRadius: 0,

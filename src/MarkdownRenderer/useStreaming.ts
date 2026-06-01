@@ -1,4 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+﻿import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  INITIAL_FENCE_STATE,
+  updateFenceStateForLine,
+  type FenceState,
+} from './streaming/fenceTracker';
 
 /**
  * 流式 token 缓存类型。
@@ -25,6 +30,8 @@ interface StreamCache {
   token: StreamCacheTokenType;
   processedLength: number;
   completeMarkdown: string;
+  fenceState: FenceState;
+  currentLine: string;
 }
 
 interface Recognizer {
@@ -59,7 +66,10 @@ const parsePipeRowCells = (line: string): string[] | null => {
   if (!trimmedLine.startsWith('|') || !trimmedLine.endsWith('|')) {
     return null;
   }
-  const cells = trimmedLine.split('|').slice(1, -1).map((cell) => cell.trim());
+  const cells = trimmedLine
+    .split('|')
+    .slice(1, -1)
+    .map((cell) => cell.trim());
   if (!cells.length) return null;
   return cells;
 };
@@ -196,66 +206,84 @@ const recognize = (
   }
 };
 
-const recognizeHandlers = Object.values(tokenRecognizerMap).map((rec) => ({
-  tokenType: rec!.tokenType,
-  recognize: (cache: StreamCache) => recognize(cache, rec!.tokenType),
-}));
+const recognizersInOrder: StreamCacheTokenType[] = Object.values(
+  tokenRecognizerMap,
+)
+  .filter((rec): rec is Recognizer => !!rec)
+  .map((rec) => rec.tokenType);
+
+// tokenType → recognize 函数：非 Text 分支用，O(1) 查表替代 switch/线性遍历
+const recognizerByType = new Map<
+  StreamCacheTokenType,
+  (cache: StreamCache) => void
+>(
+  recognizersInOrder.map((tokenType) => [
+    tokenType,
+    (cache: StreamCache) => recognize(cache, tokenType),
+  ]),
+);
+
+// 各 recognizer 启动字符，用于 Text 分支 O(1) 候选过滤
+const RECOGNIZER_START_CHARS: Partial<
+  Record<StreamCacheTokenType, readonly string[]>
+> = {
+  [StreamCacheTokenType.Link]: ['['],
+  [StreamCacheTokenType.Image]: ['!'],
+  [StreamCacheTokenType.Html]: ['<'],
+  [StreamCacheTokenType.Emphasis]: ['*', '_'],
+  [StreamCacheTokenType.List]: ['-', '+', '*'],
+  [StreamCacheTokenType.Table]: ['|'],
+  [StreamCacheTokenType.InlineCode]: ['`'],
+};
+
+// pending 首字符 → 候选 tokenType[]，保持原 Object.values 遍历序避免 `*`
+// 这种重叠首字符（Emphasis vs List）改变胜出方
+const recognizersByStartChar = (() => {
+  const map = new Map<string, StreamCacheTokenType[]>();
+  for (const tokenType of recognizersInOrder) {
+    const chars = RECOGNIZER_START_CHARS[tokenType];
+    if (!chars) continue;
+    for (const ch of chars) {
+      const list = map.get(ch);
+      if (list) list.push(tokenType);
+      else map.set(ch, [tokenType]);
+    }
+  }
+  return map;
+})();
+
+const tryRecognizeFromText = (cache: StreamCache): void => {
+  const firstChar = cache.pending.charAt(0);
+  if (!firstChar) return;
+  const candidates = recognizersByStartChar.get(firstChar);
+  if (!candidates) return;
+  for (const tokenType of candidates) {
+    recognize(cache, tokenType);
+    // recognize 在 Text 分支命中后会把 cache.token 切走；后续 candidate 必然 noop，可提前退出
+    if (cache.token !== StreamCacheTokenType.Text) return;
+  }
+};
 
 const getInitialCache = (): StreamCache => ({
   pending: '',
   token: StreamCacheTokenType.Text,
   processedLength: 0,
   completeMarkdown: '',
+  fenceState: { ...INITIAL_FENCE_STATE },
+  currentLine: '',
 });
 
 const getStreamingOutput = (cache: StreamCache): string => {
-  if (cache.completeMarkdown) return cache.completeMarkdown;
+  // 围栏内正文留在 pending、不 commit，但仍需交给下游 parse，否则代码块流式阶段 frozen
+  const visible = cache.fenceState.inFenced
+    ? cache.completeMarkdown + cache.pending
+    : cache.completeMarkdown;
+  if (visible) return visible;
   if (cache.pending) return STREAMING_LOADING_PLACEHOLDER;
   return '';
 };
 
-const isInCodeBlock = (text: string, isFinalChunk = false): boolean => {
-  const lines = text.split('\n');
-  let inFenced = false;
-  let fenceChar = '';
-  let fenceLen = 0;
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].endsWith('\r') ? lines[i].slice(0, -1) : lines[i];
-    const match = line.match(/^(`{3,}|~{3,})(.*)$/);
-    if (match) {
-      const fence = match[1];
-      const after = match[2];
-      const char = fence[0];
-      const len = fence.length;
-      if (!inFenced) {
-        inFenced = true;
-        fenceChar = char;
-        fenceLen = len;
-      } else {
-        const isValidEnd =
-          char === fenceChar && len >= fenceLen && /^\s*$/.test(after);
-        if (isValidEnd && (isFinalChunk || i < lines.length - 1)) {
-          inFenced = false;
-          fenceChar = '';
-          fenceLen = 0;
-        }
-      }
-    }
-  }
-  return inFenced;
-};
-
-/**
- * 流式 Markdown 缓存 hook。
- *
- * 逐字符扫描输入，识别不完整的 Markdown token（link、image、table、emphasis 等），
- * 将已完成的内容输出，不完整的部分暂缓，避免 parser 错误解析。
- *
- * @param input - 完整的 markdown 内容（持续增长）
- * @param enabled - 是否启用流式缓存（非流式直接透传）
- * @returns 安全的可解析 markdown 字符串
- */
+/** 流式 token 缓存——暂缓不完整的 link/image/table 等，避免 parser 错误解析 */
 export const useStreaming = (input: string, enabled: boolean): string => {
   const [output, setOutput] = useState('');
   const cacheRef = useRef<StreamCache>(getInitialCache());
@@ -277,33 +305,50 @@ export const useStreaming = (input: string, enabled: boolean): string => {
     const chunk = text.slice(cache.processedLength);
     if (!chunk) return;
 
+    // 非前缀重置后重建围栏状态（全量兜底，仅此处 O(n)）
+    if (cache.processedLength === 0 && text.length > 0) {
+      const existingText = cache.completeMarkdown + cache.pending;
+      if (existingText.length === 0) {
+        cache.fenceState = { ...INITIAL_FENCE_STATE };
+        cache.currentLine = '';
+      }
+    }
+
     cache.processedLength += chunk.length;
-    let wasInCodeBlock = isInCodeBlock(cache.completeMarkdown + cache.pending);
+
     for (const char of chunk) {
       cache.pending += char;
-      const inCodeBlock = isInCodeBlock(
-        cache.completeMarkdown + cache.pending,
-      );
-      if (inCodeBlock) {
-        wasInCodeBlock = true;
-        continue;
-      }
-      if (wasInCodeBlock) {
-        wasInCodeBlock = false;
-        commitCache(cache);
-        continue;
+
+      if (char === '\n') {
+        const prevInFenced = cache.fenceState.inFenced;
+        cache.fenceState = updateFenceStateForLine(
+          cache.fenceState,
+          cache.currentLine,
+        );
+        cache.currentLine = '';
+
+        if (cache.fenceState.inFenced) {
+          continue;
+        }
+        if (prevInFenced && !cache.fenceState.inFenced) {
+          commitCache(cache);
+          continue;
+        }
+      } else {
+        cache.currentLine += char;
+        if (cache.fenceState.inFenced) {
+          continue;
+        }
       }
       if (cache.token === StreamCacheTokenType.Text) {
-        for (const handler of recognizeHandlers) handler.recognize(cache);
+        tryRecognizeFromText(cache);
       } else {
-        const handler = recognizeHandlers.find(
-          (h) => h.tokenType === cache.token,
-        );
-        handler?.recognize(cache);
+        const recognizeForActive = recognizerByType.get(cache.token);
+        recognizeForActive?.(cache);
         if (
           (cache.token as StreamCacheTokenType) === StreamCacheTokenType.Text
         ) {
-          for (const h of recognizeHandlers) h.recognize(cache);
+          tryRecognizeFromText(cache);
         }
       }
       if (cache.token === StreamCacheTokenType.Text) {
@@ -320,11 +365,12 @@ export const useStreaming = (input: string, enabled: boolean): string => {
       cacheRef.current = getInitialCache();
       return;
     }
-    if (enabled) {
-      processStreaming(input);
-    } else {
+    if (!enabled) {
       setOutput(input);
+      cacheRef.current = getInitialCache();
+      return;
     }
+    processStreaming(input);
   }, [input, enabled, processStreaming]);
 
   return output;

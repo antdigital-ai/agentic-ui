@@ -1,7 +1,7 @@
 import { Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
 import { IEditor } from '../../BaseMarkdownEditor';
-import { EditorStore } from '../store';
+import type { EditorStore } from '../store';
 import { getMediaType } from './dom';
 
 export const getRemoteMediaType = async (url: string) => {

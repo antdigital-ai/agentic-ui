@@ -1,4 +1,4 @@
-import { Paperclip } from '@sofa-design/icons';
+﻿import { Paperclip } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import React, { useContext } from 'react';
@@ -9,10 +9,15 @@ import AttachmentButtonPopover, {
 } from './AttachmentButtonPopover';
 import { useStyle } from './style';
 import { AttachmentFile, UploadResponse } from './types';
-import { isImageFile } from './utils';
 
 export * from './AttachmentButtonPopover';
 export type { AttachmentFile, UploadResponse } from './types';
+/**
+ * `upLoadFileToServer` 已迁移至 `src/MarkdownInputField/utils/uploadFile.ts`，
+ * 此处保留 re-export 兼容层，确保 `src/index.ts` 的公开 API 与下游调用方
+ * （`FileUploadManager`、`hooks/usePasteHandler` 等）的导入路径不发生破坏性变更。
+ */
+export { upLoadFileToServer } from '../utils/uploadFile';
 
 /**
  * AttachmentButton 组件属性
@@ -33,7 +38,7 @@ export type AttachmentButtonProps = {
   supportedFormat?: AttachmentButtonPopoverProps['supportedFormat'];
   /** 是否禁用按钮 */
   disabled?: boolean;
-  /** 国际化文案，会传递给 AttachmentButtonPopover。支持 `input.openGallery`、`input.openFile`、`input.supportedFormatMessage` 等 */
+  /** 国际化文案，会传递给 AttachmentButtonPopover。支持 `input.supportedFormatMessage` 等 */
   locale?: Partial<LocalKeys>;
   /** 自定义渲染函数，用于替换默认的 Popover */
   render?: (props: {
@@ -72,305 +77,15 @@ export type AttachmentButtonProps = {
   removeFileOnUploadError?: boolean;
 };
 
-/**
- * 文件上传配置
- */
-type UploadProps = {
-  /** 文件映射表 */
-  fileMap?: Map<string, AttachmentFile>;
-  /** 文件映射变更回调 */
-  onFileMapChange?: (files?: Map<string, AttachmentFile>) => void;
-  /** 上传函数，返回文件 URL */
-  upload?: (file: AttachmentFile, index: number) => Promise<string>;
-  /** 上传函数（返回完整响应） */
-  uploadWithResponse?: (
-    file: AttachmentFile,
-    index: number,
-  ) => Promise<UploadResponse>;
-  /** 单文件最大大小（字节） */
-  maxFileSize?: number;
-  /** 最大文件数量 */
-  maxFileCount?: number;
-  /** 最小文件数量 */
-  minFileCount?: number;
-  /** 国际化文案 */
-  locale?: any;
-  /** 文件数量超出 maxFileCount 限制时的回调 */
-  onExceedMaxCount?: (info: {
-    maxCount: number;
-    currentCount: number;
-    selectedCount: number;
-  }) => void;
-  /** 文件超出 maxFileSize 大小限制时的回调 */
-  onExceedMaxSize?: (info: { file: AttachmentFile; maxSize: number }) => void;
-  /** 文件上传失败时的回调 */
-  onUploadError?: (info: { file: AttachmentFile; error: unknown }) => void;
-  /**
-   * 上传失败时自动将文件从列表中移除（退回），不显示错误状态
-   * @default false
-   */
-  removeFileOnUploadError?: boolean;
-};
-
-const WAIT_TIME_MS = 16;
-const DEFAULT_MESSAGES = {
-  uploading: 'Uploading...',
-  uploadSuccess: 'Upload success',
-  uploadFailed: 'Upload failed',
-  maxFileCountExceeded: (count: number) => `最多只能上传 ${count} 个文件`,
-  minFileCountRequired: (count: number) => `至少需要上传 ${count} 个文件`,
-  fileSizeExceeded: (size: number) => `超过 ${size} KB`,
-};
-
-const waitTime = (ms: number) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
-
-const generateFileUUID = (fileName: string) => {
-  return Date.now() + Math.random() * 1000 + fileName;
-};
-
-const prepareFile = (file: AttachmentFile) => {
-  file.status = 'uploading';
-  file.uuid = generateFileUUID(file.name);
-  if (isImageFile(file)) {
-    file.previewUrl = URL.createObjectURL(file);
-  }
-};
-
-const getLocaleMessage = (locale: any, key: string, defaultMsg: string) => {
-  return locale?.[key] || defaultMsg;
-};
-
-const validateFileSize = (
-  file: AttachmentFile,
-  props: UploadProps,
-): boolean => {
-  if (!props.maxFileSize || file.size <= props.maxFileSize) return true;
-
-  return false;
-};
-
-const updateFileMap = (
-  map: Map<string, AttachmentFile>,
-  file: AttachmentFile,
-  onFileMapChange?: (files?: Map<string, AttachmentFile>) => void,
-) => {
-  if (file.uuid) {
-    map.set(file.uuid, file);
-    onFileMapChange?.(map);
-  }
-};
-
-const uploadSingleFile = async (
-  file: AttachmentFile,
-  index: number,
-  props: UploadProps,
-): Promise<{ url?: string; isSuccess: boolean; errorMsg: string | null }> => {
-  if (props.uploadWithResponse) {
-    const result = await props.uploadWithResponse(file, index);
-    file.uploadResponse = result;
-    return {
-      url: result.fileUrl,
-      isSuccess: result.uploadStatus === 'SUCCESS',
-      errorMsg: result.errorMessage || null,
-    };
-  }
-
-  if (props.upload) {
-    const url = await props.upload(file, index);
-    return { url, isSuccess: !!url, errorMsg: null };
-  }
-
-  return { url: file.previewUrl, isSuccess: !!file.previewUrl, errorMsg: null };
-};
-
-const handleUploadSuccess = (
-  file: AttachmentFile,
-  url: string,
-  map: Map<string, AttachmentFile>,
-  props: UploadProps,
-) => {
-  file.status = 'done';
-  file.url = url;
-  updateFileMap(map, file, props.onFileMapChange);
-};
-
-const handleUploadError = (
-  file: AttachmentFile,
-  errorMsg: string | null,
-  map: Map<string, AttachmentFile>,
-  props: UploadProps,
-  rawError?: unknown,
-) => {
-  if (props.removeFileOnUploadError) {
-    if (file.uuid) map.delete(file.uuid);
-    props.onFileMapChange?.(map);
-  } else {
-    file.status = 'error';
-    if (errorMsg !== null) file.errorMessage = errorMsg;
-    updateFileMap(map, file, props.onFileMapChange);
-  }
-  props.onUploadError?.({ file, error: rawError ?? errorMsg });
-};
-
-const processFile = async (
-  file: AttachmentFile,
-  index: number,
-  map: Map<string, AttachmentFile>,
-  props: UploadProps,
-) => {
-  await waitTime(WAIT_TIME_MS);
-
-  if (!validateFileSize(file, props)) {
-    const maxSizeKb = Math.round((props.maxFileSize || 0) / 1024);
-    const raw = getLocaleMessage(
-      props.locale,
-      'markdownInput.fileSizeExceeded',
-      DEFAULT_MESSAGES.fileSizeExceeded(maxSizeKb),
-    );
-    file.errorMessage = raw.includes('${maxSize}')
-      ? raw.replace(/\$\{maxSize\}/g, String(maxSizeKb))
-      : raw;
-    file.errorCode = 'FILE_SIZE_EXCEEDED';
-    file.status = 'error';
-    updateFileMap(map, file, props.onFileMapChange);
-    props.onExceedMaxSize?.({ file, maxSize: props.maxFileSize || 0 });
-    return;
-  }
-
-  try {
-    const { url, isSuccess, errorMsg } = await uploadSingleFile(
-      file,
-      index,
-      props,
-    );
-
-    if (isSuccess && url) {
-      handleUploadSuccess(file, url, map, props);
-    } else {
-      handleUploadError(file, errorMsg, map, props);
-    }
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : getLocaleMessage(
-            props.locale,
-            'uploadFailed',
-            DEFAULT_MESSAGES.uploadFailed,
-          );
-    handleUploadError(file, errorMessage, map, props, error);
-  }
-};
-
-/**
- * 上传文件到服务器
- *
- * @param files - 要上传的文件列表
- * @param props - 上传配置项
- * @param props.upload - 上传函数，返回文件 URL
- * @param props.uploadWithResponse - 上传函数（返回完整响应）
- * @param props.fileMap - 文件映射表
- * @param props.onFileMapChange - 文件映射变更回调
- * @param props.maxFileSize - 单文件最大大小（字节）
- * @param props.maxFileCount - 最大文件数量
- * @param props.minFileCount - 最小文件数量
- * @param props.locale - 国际化文案
- */
-export const upLoadFileToServer = async (
-  files: ArrayLike<File>,
-  props: UploadProps,
-) => {
-  const map = props.fileMap || new Map<string, AttachmentFile>();
-  const existingFileCount = map.size;
-  // Always notify with a new Map reference so React state setters always trigger re-renders,
-  // regardless of whether the caller wraps the callback or passes a raw setState directly.
-  const notifyChange = (m: Map<string, AttachmentFile>) =>
-    props.onFileMapChange?.(new Map(m));
-  const hideLoading = () => {};
-
-  const fileList = Array.from(files) as AttachmentFile[];
-  fileList.forEach(prepareFile);
-
-  const totalCount = fileList.length + existingFileCount;
-  const isMaxExceeded =
-    typeof props.maxFileCount === 'number' && totalCount > props.maxFileCount;
-  const isMinNotMet =
-    typeof props.minFileCount === 'number' && totalCount < props.minFileCount;
-
-  // Wrap all internal change notifications to use notifyChange so every update
-  // produces a new Map reference that React's state setter will always accept.
-  const propsWithNotify: UploadProps = {
-    ...props,
-    onFileMapChange: notifyChange as UploadProps['onFileMapChange'],
-  };
-
-  if (isMaxExceeded || isMinNotMet) {
-    hideLoading();
-    if (isMaxExceeded) {
-      const maxCount = props.maxFileCount!;
-      const rawMessage = getLocaleMessage(
-        props.locale,
-        'markdownInput.maxFileCountExceeded',
-        DEFAULT_MESSAGES.maxFileCountExceeded(maxCount),
-      );
-      const errorMessage = rawMessage.replace(
-        /\$\{maxFileCount\}/g,
-        String(maxCount),
-      );
-      fileList.forEach((file) => {
-        file.status = 'error';
-        file.errorCode = 'FILE_COUNT_EXCEEDED';
-        file.errorMessage = errorMessage;
-        if (file.uuid) map.set(file.uuid, file);
-      });
-      notifyChange(map);
-      props.onExceedMaxCount?.({
-        maxCount,
-        currentCount: existingFileCount,
-        selectedCount: fileList.length,
-      });
-    }
-    return;
-  }
-
-  // 验证通过后再添加到 fileMap
-  fileList.forEach((file) =>
-    updateFileMap(map, file, notifyChange as UploadProps['onFileMapChange']),
-  );
-
-  try {
-    for (let i = 0; i < fileList.length; i++) {
-      await processFile(fileList[i], i, map, propsWithNotify);
-    }
-  } catch (error) {
-    fileList.forEach((file) => {
-      file.status = 'error';
-      updateFileMap(map, file, notifyChange as UploadProps['onFileMapChange']);
-    });
-  } finally {
-    hideLoading();
-  }
-};
-
-const BUTTON_WITH_TITLE_STYLE: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 4,
-};
-
-const BUTTON_TITLE_STYLE: React.CSSProperties = {
-  font: 'var(--font-text-body-base)',
-  letterSpacing: 'var(--letter-spacing-body-base, normal)',
-  color: 'var(--color-gray-text-default)',
-};
-
-const ButtonContent: React.FC<{ title?: React.ReactNode }> = ({ title }) => {
+const ButtonContent: React.FC<{
+  title?: React.ReactNode;
+  prefixCls: string;
+}> = ({ title, prefixCls }) => {
   return (
     <>
       <Paperclip />
       {title !== null && title ? (
-        <div style={BUTTON_TITLE_STYLE}>{title}</div>
+        <span className={`${prefixCls}-title`}>{title}</span>
       ) : null}
     </>
   );
@@ -402,46 +117,48 @@ export const AttachmentButton: React.FC<
 > = ({ disabled, uploadImage, title, supportedFormat, locale, render }) => {
   const context = useContext(ConfigProvider.ConfigContext);
   const prefix = context?.getPrefixCls('agentic-md-editor-attachment-button');
-  const { wrapSSR, hashId } = useStyle(prefix);
+  const { hashId } = useStyle(prefix);
 
   const format = supportedFormat || SupportedFileFormats.image;
 
-  const handleClick = () => {
-    if (disabled) return;
-    uploadImage?.();
-  };
-
-  const buttonWithStyle = (
-    <div style={BUTTON_WITH_TITLE_STYLE}>
-      <ButtonContent title={title} />
+  const buttonContent = (
+    <div className={`${prefix}-inner`}>
+      <ButtonContent title={title} prefixCls={prefix} />
     </div>
   );
 
+  const handleWrapperClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (disabled) {
+      // disabled 时拦截所有点击，阻止冒泡至 Popover 内部触发上传
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    if (!disabled) {
+      uploadImage();
+    }
+  };
+
   const wrapper = render ? (
     render({
-      children: buttonWithStyle,
+      children: buttonContent,
       supportedFormat: format,
       locale,
     })
   ) : (
-    <AttachmentButtonPopover
-      supportedFormat={format}
-      uploadImage={uploadImage}
-      locale={locale}
-    >
-      {buttonWithStyle}
+    <AttachmentButtonPopover supportedFormat={format} locale={locale}>
+      {buttonContent}
     </AttachmentButtonPopover>
   );
 
-  return wrapSSR(
+  return (
     <div
       className={classNames(`${prefix}`, hashId, {
         [`${prefix}-disabled`]: disabled,
       })}
-      onClick={handleClick}
+      onClick={handleWrapperClick}
       data-testid="attachment-button"
     >
       {wrapper}
-    </div>,
+    </div>
   );
 };

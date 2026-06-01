@@ -13,6 +13,10 @@ import { TAG_STYLES } from './tagStyles';
 const COMMENT_HIGHLIGHT_COLOR =
   'var(--agentic-ui-comment-highlight-color, rgba(21, 0, 255, 0.15))';
 
+/** 行内 `<mark>` 搜索/强调高亮（编辑器与 MarkdownRenderer 共用） */
+const MARK_HIGHLIGHT_BG = 'var(--agentic-ui-mark-bg, #e8b339)';
+const MARK_HIGHLIGHT_COLOR = 'var(--agentic-ui-mark-color, #4d3c1a)';
+
 /** Jinja 语法高亮 CSS 变量名，在 .ant-agentic-md-editor-content 上覆盖即可定制 */
 const JINJA_CSS_VAR = {
   variable: '--agentic-ui-md-editor-color-jinja-variable',
@@ -173,8 +177,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       wordWrap: 'break-word',
       fontSize: '15px',
       // Jinja 语法高亮，仅通过 CSS 变量定制（在 .ant-agentic-md-editor-content 上覆盖）
-      [JINJA_CSS_VAR.variable]:
-        'var(--color-primary-control-fill-primary, #1677ff)',
+      [JINJA_CSS_VAR.variable]: 'var(--color-primary-control-fill-primary)',
       [JINJA_CSS_VAR.tag]: 'var(--color-orange-6, #d46b08)',
       [JINJA_CSS_VAR.comment]: 'var(--color-text-tertiary, rgba(0,0,0,0.25))',
       [JINJA_CSS_VAR.keyword]: '#5c4033',
@@ -182,14 +185,14 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       [JINJA_CSS_VAR.number]: 'var(--color-primary-10, #066ced)',
       [JINJA_CSS_VAR.filter]: 'var(--color-primary-8, #689ef0)',
       [JINJA_CSS_VAR.variableName]: 'var(--color-green-10, #10af74)',
-      [JINJA_CSS_VAR.placeholder]:
-        'var(--color-primary-control-fill-primary, #1677ff)',
+      [JINJA_CSS_VAR.placeholder]: 'var(--color-primary-control-fill-primary)',
       [JINJA_CSS_VAR.placeholderBg]:
         'var(--color-primary-bg-tip, rgba(0,102,255,0.08))',
       [JINJA_CSS_VAR.delimiter]: '#d4b84b',
       '::-webkit-scrollbar': { width: '8px', height: '8px' },
       '::-webkit-scrollbar-thumb': {
-        backgroundColor: 'var(--color-gray-text-tertiary, var(--color-gray-text-light))',
+        backgroundColor:
+          'var(--color-gray-text-tertiary, var(--color-gray-text-light))',
         borderRadius: '20px',
       },
       '&-edit': {
@@ -201,7 +204,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           '&::before': {
             cursor: 'text',
             content: 'attr(data-slate-placeholder)',
-            color: 'rgba(0,0,0,0.45)',
+            color: 'var(--color-gray-text-disabled, rgba(20, 22, 28, 0.25))',
             display: 'inline-block',
             position: 'absolute',
             width: 'max-content',
@@ -224,6 +227,15 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
       '&> *:first-child': {
         marginTop: 0,
+      },
+      '* :not(div[data-be="paragraph"]):last-child': {
+        marginBottom: '0 !important',
+      },
+      '* :not(div[data-be="paragraph"]):first-child': {
+        marginTop: '0 !important',
+      },
+      '&-readonly': {
+        '--agentic-ui-table-cell-min-width': 'unset',
       },
       '&-report': {
         fontSize: '16px',
@@ -454,7 +466,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           marginBottom: '8px',
         },
         '&.info': {
-          borderLeftColor: 'var(--color-info, #1677ff)',
+          borderLeftColor: 'var(--color-primary-control-fill-primary)',
           backgroundColor: 'var(--color-info-bg, rgba(22, 119, 255, 0.08))',
         },
         '&.warning': {
@@ -462,7 +474,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           backgroundColor: 'var(--color-warning-bg, rgba(250, 173, 20, 0.08))',
         },
         '&.success': {
-          borderLeftColor: 'var(--color-success, #52c41a)',
+          borderLeftColor: 'var(--color-green-text-default)',
           backgroundColor: 'var(--color-success-bg, rgba(82, 196, 26, 0.08))',
         },
         '&.error': {
@@ -470,7 +482,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           backgroundColor: 'var(--color-error-bg, rgba(255, 77, 79, 0.08))',
         },
         '&.tip': {
-          borderLeftColor: 'var(--color-info, #1677ff)',
+          borderLeftColor: 'var(--color-primary-control-fill-primary)',
           backgroundColor: 'var(--color-info-bg, rgba(22, 119, 255, 0.08))',
         },
       },
@@ -565,6 +577,18 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         zIndex: 1,
         borderRadius: '6px',
         background: 'var(--color-gray-bg-tip)',
+      },
+      '& mark, & [data-testid="markdown-mark"]': {
+        color: MARK_HIGHLIGHT_COLOR,
+        backgroundColor: MARK_HIGHLIGHT_BG,
+        padding: '2px 4px',
+        borderRadius: 4,
+      },
+      '& mark[data-readonly-comment="true"]': {
+        color: 'inherit',
+        padding: 0,
+        borderRadius: 0,
+        backgroundColor: 'transparent',
       },
       '& &-comment-comment': {
         display: 'inline-block',

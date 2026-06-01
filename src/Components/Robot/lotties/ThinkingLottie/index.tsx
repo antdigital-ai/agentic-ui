@@ -1,6 +1,5 @@
-import Lottie from 'lottie-react';
 import React from 'react';
-import thinkingLottie from './thinking.json';
+import { createLottieComponent } from '../../../lotties/createLottieComponent';
 
 export interface ThinkingLottieProps {
   /**
@@ -58,32 +57,11 @@ export interface ThinkingLottieProps {
  * - 支持播放控制
  * - 支持自定义样式
  */
-export const ThinkingLottie: React.FC<ThinkingLottieProps> = ({
-  autoplay = true,
-  loop = true,
-  className,
-  style,
-  size = 32,
-}) => {
-  const containerStyle: React.CSSProperties = {
-    width: size,
-    height: size,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...style,
-  };
-
-  return (
-    <Lottie
-      style={containerStyle}
-      className={className}
-      aria-hidden="true"
-      animationData={thinkingLottie}
-      loop={loop}
-      autoplay={autoplay}
-    />
-  );
-};
+export const ThinkingLottie: React.FC<ThinkingLottieProps> =
+  createLottieComponent({
+    loadJson: () => import('./thinking.json'),
+    defaultSize: 32,
+    displayName: 'RobotThinkingLottie',
+  });
 
 export default ThinkingLottie;

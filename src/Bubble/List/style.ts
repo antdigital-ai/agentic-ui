@@ -1,17 +1,17 @@
-﻿import {
-  ChatTokenType,
-  GenerateStyle,
+import {
+  genStyleHooks,
   resetComponent,
-  useEditorStyleRegister,
+  type GenStyleFn,
 } from '../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'BubbleList'> = (token) => {
   return {
     [token.componentCls]: {
       display: 'flex',
       flexDirection: 'column',
       gap: 32,
       overflowY: 'auto',
+      overflowX: 'hidden',
       minHeight: 200,
       padding: 'var(--padding-6x)',
       [`${token.componentCls}-content-list`]: {
@@ -29,14 +29,18 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * BubbleItem
  * @param prefixCls
  * @returns
+ *
+ * 注意：旧实现 styleFn 返回 `[genStyle, resetComponent]`，即 resetComponent
+ * 后写，其 `padding: 0` 会在 CSS 级联里覆盖 genStyle 的 `padding: var(--padding-6x)`，
+ * 实际渲染时容器是 `padding: 0`。这里必须保留同样的顺序，避免迁移后默认内边距
+ * 变成 24px，破坏既有视觉。
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('BubbleItem', (token) => {
-    const proChatToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('BubbleList', (token, info) => [
+  genStyle(token, info),
+  resetComponent(token),
+]);
 
-    return [genStyle(proChatToken), resetComponent(proChatToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [, hashId] = useGenStyle(prefixCls ?? 'BubbleItem');
+  return { hashId };
 }

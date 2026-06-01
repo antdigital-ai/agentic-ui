@@ -62,7 +62,9 @@ const FilemapItem: React.FC<{
   let events: ReturnType<NonNullable<BubbleProps['fileViewEvents']>> = {};
   try {
     events = fileViewEvents?.(defaultHandlers) || {};
-  } catch {}
+  } catch (error) {
+    console.warn('fileViewEvents execution failed', error);
+  }
 
   if (parsed === null || fileMap.size === 0) return null;
 
@@ -73,9 +75,14 @@ const FilemapItem: React.FC<{
       style={fileViewConfig?.style}
       placement={placement}
       onPreview={
-        events?.onPreview ?? fileMapConfig?.onPreview ?? defaultHandlers.onPreview
+        events?.onPreview ??
+        fileMapConfig?.onPreview ??
+        defaultHandlers.onPreview
       }
-      onDownload={events?.onDownload}
+      onFileClick={fileViewConfig?.onFileClick}
+      disableDefaultFileClick={fileViewConfig?.disableDefaultFileClick}
+      // FileMapConfig 当前不暴露 onDownload，因此 fallback 链为 events → defaultHandlers
+      onDownload={events?.onDownload ?? defaultHandlers.onDownload}
       itemRender={fileViewConfig?.itemRender ?? fileMapConfig?.itemRender}
       maxDisplayCount={fileViewConfig?.maxDisplayCount}
       showMoreButton={fileViewConfig?.showMoreButton}
@@ -96,7 +103,14 @@ export const ContentFilemapView: React.FC<{
   fileMapConfig?: FileMapConfig;
   placement?: 'left' | 'right';
   style?: React.CSSProperties;
-}> = ({ blocks, fileViewConfig, fileViewEvents, fileMapConfig, placement, style }) => {
+}> = ({
+  blocks,
+  fileViewConfig,
+  fileViewEvents,
+  fileMapConfig,
+  placement,
+  style,
+}) => {
   if (blocks.length === 0) return null;
   return (
     <div style={style} data-testid="content-filemap-view">

@@ -1,4 +1,4 @@
-import { ConfigProvider } from 'antd';
+﻿import { ConfigProvider } from 'antd';
 import type { LegendItem, PointStyle } from 'chart.js';
 import {
   BarElement,
@@ -22,7 +22,7 @@ import {
   downloadChart,
 } from '../components';
 import { defaultColorList } from '../const';
-import { useChartTheme } from '../hooks';
+import { useChartTheme, useResolvedChartTheme } from '../hooks';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
 import type { ChartClassNames, ChartStyles } from '../types/classNames';
 import {
@@ -106,7 +106,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
   className,
   classNames: classNamesProp,
   dataTime,
-  theme = 'light',
+  theme,
   showLegend = true,
   legendPosition = 'bottom',
   legendAlign = 'start',
@@ -158,7 +158,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
   // 样式注册
   const context = useContext(ConfigProvider.ConfigContext);
   const baseClassName = context?.getPrefixCls('funnel-chart-container');
-  const { wrapSSR } = useStyle(baseClassName);
+  useStyle(baseClassName);
 
   const chartRef = useRef<ChartJS<'bar'>>(null);
   const [showTrapezoid, setShowTrapezoid] = useState(true);
@@ -428,8 +428,8 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
     return filterLabels?.map((l) => ({ key: l, label: l }));
   }, [filterLabels]);
 
-  // 使用 useChartTheme hook 获取主题相关颜色
-  const { axisTextColor, isLight } = useChartTheme(theme);
+  const { resolvedTheme, autoDetectTheme } = useResolvedChartTheme(theme);
+  const { axisTextColor, isLight } = useChartTheme(resolvedTheme);
 
   const options: ChartOptions<'bar'> = {
     responsive: true,
@@ -747,11 +747,12 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
 
   const classNamesObj = classNamesProp;
 
-  return wrapSSR(
+  return (
     <ChartContainer
       baseClassName={baseClassName}
       className={classNames(classNamesObj?.root, className, containerClassName)}
-      theme={theme}
+      theme={resolvedTheme}
+      autoDetectTheme={autoDetectTheme}
       isMobile={isMobile}
       variant={props.variant}
       style={{
@@ -762,7 +763,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
     >
       <ChartToolBar
         title={title}
-        theme={theme}
+        theme={resolvedTheme}
         onDownload={handleDownload}
         dataTime={dataTime}
         extra={toolbarExtra}
@@ -780,7 +781,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
                 selectedCustomSelection: selectedFilterLabel,
                 onSelectionChange: setSelectedFilterLabel,
               })}
-              theme={theme}
+              theme={resolvedTheme}
               variant="compact"
             />
           ) : undefined
@@ -797,7 +798,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
             selectedCustomSelection: selectedFilterLabel,
             onSelectionChange: setSelectedFilterLabel,
           })}
-          theme={theme}
+          theme={resolvedTheme}
         />
       )}
 
@@ -811,7 +812,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
           style={props.styles?.statisticContainer}
         >
           {statistics.map((config, index) => (
-            <ChartStatistic key={index} {...config} theme={theme} />
+            <ChartStatistic key={index} {...config} theme={resolvedTheme} />
           ))}
         </div>
       )}
@@ -834,7 +835,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
           plugins={[trapezoidPlugin, rightLabelPlugin]}
         />
       </div>
-    </ChartContainer>,
+    </ChartContainer>
   );
 };
 

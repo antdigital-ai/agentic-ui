@@ -1,10 +1,21 @@
 import type { CSSInterpolation } from '@ant-design/cssinjs';
+import {
+  DEFAULT_TEXT_SWAP_DURATION_MS,
+  TEXT_SWAP_BLUR_PX,
+  TEXT_SWAP_EASING,
+} from '../Components/TextSwap/constants';
+import {
+  CONTENT_PADDING_CSS_VAR,
+  CONTENT_PADDING_MOBILE_CSS_VAR,
+  DESKTOP_CONTENT_PADDING_FALLBACK,
+  MOBILE_CONTENT_PADDING_DEFAULT,
+} from '../Constants/contentPaddingVars';
 import { MOBILE_BREAKPOINT, MOBILE_PADDING } from '../Constants/mobile';
 import {
-  ChatTokenType,
-  GenerateStyle,
+  genStyleHooks,
   resetComponent,
-  useEditorStyleRegister,
+  type FullToken,
+  type GenStyleFn,
 } from '../Hooks/useStyle';
 
 // ── Table ──────────────────────────────────────────────────────────────────
@@ -29,7 +40,7 @@ const TABLE_CELL = {
 };
 
 const genTableStyle = (
-  token: ChatTokenType,
+  token: FullToken<'MarkdownEditor'>,
   mobileBreakpoint: string,
   mobilePadding: string,
 ): Record<string, CSSInterpolation> => {
@@ -70,6 +81,15 @@ const genTableStyle = (
         border: 'none',
         transform: 'translateX(50%)',
         transition: 'all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1)',
+        color: 'var(--color-gray-text-default)',
+      },
+
+      // Dark theme for table actions
+      '&-dark': {
+        [`${tableCls}-readonly-table-actions`]: {
+          backgroundColor: 'var(--color-gray-bg-page-dark, #1f1f1f)',
+          color: 'rgba(255, 255, 255, 0.85)',
+        },
       },
 
       table: {
@@ -121,11 +141,11 @@ const genTableStyle = (
         'tr td:first-child:not(.config-td)': { fontWeight: 600 },
 
         'tbody tr:not(.config-tr)': {
-          animation: 'agenticTableRowFadeIn 0.3s ease both',
+          animation: `agenticMdBlurFadeIn ${DEFAULT_TEXT_SWAP_DURATION_MS}ms ${TEXT_SWAP_EASING} both`,
         },
         'tbody tr:not(.config-tr):hover': {
           background:
-            'linear-gradient(var(--agentic-ui-table-hover-bg, rgba(0, 0, 0, 0.04)), var(--agentic-ui-table-hover-bg, rgba(0, 0, 0, 0.04))), linear-gradient(var(--agentic-ui-table-cell-bg, #ffffff), var(--agentic-ui-table-cell-bg, #ffffff))',
+            'linear-gradient(var(--agentic-ui-table-hover-bg, rgba(0, 0, 0, 0.04)), var(--agentic-ui-table-hover-bg, rgba(0, 0, 0, 0.04))), linear-gradient(var(--agentic-ui-table-cell-bg, var(--color-gray-bg-card-white)), var(--agentic-ui-table-cell-bg, var(--color-gray-bg-card-white)))',
         },
         [`@media (max-width: ${mobileBreakpoint})`]: {
           'th, td': { padding: mobilePadding },
@@ -202,23 +222,23 @@ const genTableStyle = (
       boxShadow: 'var(--shadow-border-base)',
       color: 'var(--color-gray-text-secondary)',
       '&:hover': {
-        backgroundColor: '#FFF',
+        backgroundColor: 'var(--color-gray-bg-card-white)',
         boxShadow: 'var(--shadow-control-lg)',
       },
     },
     [`${token.componentCls}-table-cell-index-delete-icon`]: {
       '&:hover': {
-        color: '#ff4d4f',
+        color: 'var(--color-red-text-default)',
       },
     },
     [`${token.componentCls}-table-cell-index-insert-row-before`]: {
       '&:hover': {
-        color: '#52c41a',
+        color: 'var(--color-green-text-default)',
       },
     },
     [`${token.componentCls}-table-cell-index-insert-row-after`]: {
       '&:hover': {
-        color: '#52c41a',
+        color: 'var(--color-green-text-default)',
       },
     },
     [`${token.componentCls}-table-cell-index-spacer`]: {
@@ -262,36 +282,50 @@ const genTableStyle = (
       boxShadow: 'var(--shadow-border-base)',
       color: 'var(--color-gray-text-secondary)',
       '&:hover': {
-        backgroundColor: '#FFF',
+        backgroundColor: 'var(--color-gray-bg-card-white)',
         boxShadow: 'var(--shadow-control-lg)',
       },
     },
     [`${token.componentCls}-table-cell-index-spacer-delete-icon`]: {
       '&:hover': {
-        color: '#ff4d4f',
+        color: 'var(--color-red-text-default)',
       },
     },
     [`${token.componentCls}-table-cell-index-spacer-insert-column-before`]: {
       '&:hover': {
-        color: '#52c41a',
+        color: 'var(--color-green-text-default)',
       },
     },
     [`${token.componentCls}-table-cell-index-spacer-insert-column-after`]: {
       '&:hover': {
-        color: '#52c41a',
+        color: 'var(--color-green-text-default)',
       },
     },
 
-    '@keyframes agenticTableRowFadeIn': {
-      from: { opacity: 0, transform: 'translateY(4px)' },
-      to: { opacity: 1, transform: 'translateY(0)' },
+    '@keyframes agenticMdBlurFadeIn': {
+      from: {
+        opacity: 0,
+        filter: `blur(${TEXT_SWAP_BLUR_PX}px)`,
+      },
+      to: {
+        opacity: 1,
+        filter: 'blur(0)',
+      },
+    },
+
+    '@media (prefers-reduced-motion: reduce)': {
+      [`${tableCls} table tbody tr:not(.config-tr)`]: {
+        animation: 'none',
+      },
     },
   };
 };
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'MarkdownEditor'> = (token) => {
   return {
     [token.componentCls]: {
+      '--agentic-ui-table-cell-padding':
+        'var(--agentic-ui-editor-table-cell-padding-default, 6px 8px)',
       boxSizing: 'border-box',
       height: 'max-content',
       maxWidth: '100%',
@@ -339,17 +373,17 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       '&-container': {
         // 默认 padding，可以通过 contentStyle 覆盖
         // 使用 CSS 变量，允许通过内联样式覆盖
-        padding: 'var(--agentic-ui-content-padding, 4px 20px)',
+        padding: `var(${CONTENT_PADDING_CSS_VAR}, ${DESKTOP_CONTENT_PADDING_FALLBACK})`,
         overflow: 'auto',
         display: 'flex',
         position: 'relative',
         gap: 24,
         outline: 'none',
         [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
-          padding: 'var(--agentic-ui-content-padding, 4px 4px)',
+          [CONTENT_PADDING_MOBILE_CSS_VAR]: MOBILE_CONTENT_PADDING_DEFAULT,
+          padding: `var(${CONTENT_PADDING_MOBILE_CSS_VAR}, var(${CONTENT_PADDING_CSS_VAR}, var(--padding-1x, 4px)))`,
         },
       },
-      '&-content': {},
       '&-focus': {
         height: 64,
       },
@@ -457,7 +491,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
       [`${token.componentCls}-link-card__container`]: {
         padding: 12,
-        border: '1px solid #f0f0f0',
+        border: '1px solid var(--color-gray-border-light)',
         borderRadius: '0.5em',
         margin: '8px 0',
         width: '100%',
@@ -469,14 +503,14 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         display: 'flex',
         alignItems: 'center',
         gap: 12,
-        color: '#262626',
+        color: 'var(--color-gray-text-default)',
         justifyContent: 'space-between',
         '& [data-icon-box]': {
           padding: '0 18px',
-          color: '#6b7280',
+          color: 'var(--color-gray-text-light)',
           cursor: 'pointer',
           '&:hover': {
-            color: '#1667ff',
+            color: 'var(--color-primary-control-fill-primary)',
           },
         },
       },
@@ -484,7 +518,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         display: 'flex',
         alignItems: 'center',
         gap: 12,
-        color: '#262626',
+        color: 'var(--color-gray-text-default)',
         fontSize: 16,
         flex: 1,
         minWidth: 0,
@@ -495,7 +529,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         textWrap: 'nowrap',
         textDecoration: 'none',
         display: 'block',
-        color: '#262626',
+        color: 'var(--color-gray-text-default)',
       },
       [`${token.componentCls}-link-card__description`]: {
         flex: 1,
@@ -531,8 +565,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         background: 'var(--color-primary-bg-tip)',
 
         '[data-tag-popup-input]': {
+          color: 'var(--color-primary-text-default, rgba(20, 22, 28, 0.88))',
           '&:not([data-composition]).empty::before': {
-            color: 'var(--color-primary-text-disabled)',
+            color: 'var(--color-gray-text-light, rgba(80, 94, 119, 0.53))',
             content: 'attr(title)',
             userSelect: 'none',
             position: 'absolute',
@@ -591,7 +626,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         fontFamily: `'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace`,
         wordWrap: 'break-word',
         borderRadius: '12px',
-        background: '#FFFFFF',
+        background: 'var(--color-gray-bg-card-white)',
         boxShadow: 'var(--shadow-control-base)',
 
         // SVG 渲染优化
@@ -599,53 +634,46 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           // 节点样式
           '& .node': {
             '& rect, & circle, & ellipse, & polygon': {
-              stroke: '#333',
+              stroke: 'var(--color-gray-text-default)',
               strokeWidth: '1px',
-              fill: '#fff',
+              fill: 'var(--color-gray-bg-card-white)',
             },
-          },
-
-          // 强制设置所有文字样式
-          '& text': {
-            // 确保文字不会被裁剪
-            dominantBaseline: 'middle',
-            textAnchor: 'middle',
           },
 
           // 节点标签 - 更大的字体
           '& .nodeLabel': {
             fontWeight: 500,
-            fill: '#333 !important',
+            fill: 'var(--color-gray-text-default) !important',
           },
 
           // 边标签 - 稍小一些但仍然清晰
           '& .edgeLabel': {
-            fill: '#666 !important',
+            fill: 'var(--color-gray-text-secondary) !important',
           },
 
           // 专门针对流程图的文字
           '& .flowchart-label': {
-            fill: '#333 !important',
+            fill: 'var(--color-gray-text-default) !important',
           },
 
           // 针对不同类型的标签
           '& .label': {
-            fill: '#333 !important',
+            fill: 'var(--color-gray-text-default) !important',
           },
         },
 
         // 错误状态样式
         '&-error': {
-          color: '#d73a49',
-          background: '#ffeaea',
-          border: '1px solid #f97583',
+          color: 'var(--color-red-text-default)',
+          background: 'var(--color-red-bg-page-light)',
+          border: '1px solid var(--color-red-border-default)',
           padding: '12px',
           borderRadius: '4px',
           textAlign: 'left',
 
           '& pre': {
             margin: '8px 0 0',
-            background: '#f6f8fa',
+            background: 'var(--color-gray-bg-page-light)',
             padding: '8px',
             borderRadius: '4px',
             fontSize: '12px',
@@ -664,13 +692,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * @param prefixCls
  * @returns
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('MarkdownEditor', (token) => {
-    const editorToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('MarkdownEditor', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+]);
 
-    return [resetComponent(editorToken), genStyle(editorToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [, hashId] = useGenStyle(prefixCls ?? 'MarkdownEditor');
+  return { hashId };
 }

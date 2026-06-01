@@ -1,10 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'ChartContainer'> = (token) => {
   return {
     [token.componentCls]: {
       // 图表容器基础样式
@@ -19,14 +15,14 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
       // 浅色主题边框
       '&&-light-theme': {
-        border: '1px solid #e8e8e8',
-        backgroundColor: '#fff',
+        border: '1px solid var(--color-gray-border-light)',
+        backgroundColor: 'var(--color-gray-bg-card-white)',
       },
 
       // 深色主题：略浅于纯黑页面底，与雷达等图表的「卡片」层次一致
       '&&-dark-theme': {
         border: '1px solid rgba(255, 255, 255, 0.08)',
-        backgroundColor: '#1f1f1f',
+        backgroundColor: 'var(--color-gray-bg-page-dark)',
       },
 
       // 移动端适配
@@ -81,13 +77,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * @param baseClassName 基础类名
  * @returns 样式相关对象
  */
-export const useStyle = (baseClassName: string) => {
-  return useEditorStyleRegister('Chart-Container' + baseClassName, (token) => {
-    const containerToken = {
-      ...token,
-      componentCls: `.${baseClassName}`,
-    };
+const useGenStyle = genStyleHooks('ChartContainer', genStyle);
 
-    return [genStyle(containerToken)];
-  });
+export const useStyle = (baseClassName: string) => {
+  const [, hashId] = useGenStyle(baseClassName);
+  return { hashId };
 };

@@ -1,10 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'TaskList'> = (token) => {
   const { componentCls } = token;
 
   return {
@@ -55,11 +51,16 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         },
       },
 
-      '&-status-idle': {
-        height: 16,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+      '&-status-success': {
+        color: 'var(--color-green-control-fill-primary)',
+      },
+
+      '&-status-loading': {
+        color: 'var(--color-primary-control-fill-primary)',
+      },
+
+      '&-status-error': {
+        color: 'var(--color-red-control-fill-primary)',
       },
 
       '&-top': {
@@ -101,12 +102,16 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           flexShrink: 0,
           width: 16,
           height: 16,
-          transition: 'all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1)',
+          transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
         },
       },
 
       '&-body': {
-        display: 'flex',
+        overflow: 'hidden',
+        height: 'auto',
+        opacity: 1,
+        transition:
+          'height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease',
 
         [`${componentCls}-content`]: {
           font: 'var(--font-text-paragraph-sm)',
@@ -119,11 +124,15 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         },
       },
 
+      '&-body-collapsed': {
+        opacity: 0,
+      },
+
       // Simple variant - wrapper
       '&-simple-wrapper': {
+        width: 'fit-content',
+        maxWidth: '100%',
         borderRadius: 'var(--radius-control-base, 8px)',
-        background: 'var(--color-gray-bg-page-dark, #f5f5f5)',
-        boxShadow: 'var(--shadow-control-base, none)',
         overflow: 'hidden',
       },
 
@@ -132,11 +141,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         display: 'flex',
         alignItems: 'center',
         height: 36,
-        padding: '0 12px',
+        padding: '0 4px',
         gap: 8,
         cursor: 'pointer',
         userSelect: 'none' as const,
-        transition: 'background 0.2s ease',
+        borderRadius: 'var(--radius-control-base, 8px)',
+        transition: 'background 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
 
         '&:hover': {
           background: 'var(--color-gray-control-fill-active, rgba(0,0,0,0.04))',
@@ -167,38 +177,66 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           whiteSpace: 'nowrap',
         },
 
-        [`${componentCls}-simple-progress`]: {
-          flexShrink: 0,
-          font: 'var(--font-text-paragraph-sm, 12px)',
-          color: 'var(--color-gray-text-secondary, rgba(0,3,9,0.45))',
-        },
-
         [`${componentCls}-simple-arrow`]: {
           flexShrink: 0,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
         },
+
+        [`${componentCls}-simple-count`]: {
+          flexShrink: 0,
+          font: 'var(--font-text-paragraph-sm, 12px)',
+          color: 'var(--color-gray-text-secondary, rgba(0,3,9,0.45))',
+          letterSpacing: 'var(--letter-spacing-paragraph-sm, normal)',
+          lineHeight: 1,
+        },
       },
 
-      // Simple variant - expanded content
+      // Simple variant - content area
       '&-simple-content': {
-        overflow: 'hidden',
+        display: 'grid',
+        gridTemplateRows: '0fr',
+        opacity: 0,
+        transition:
+          'grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+
+        '& > *': {
+          overflow: 'hidden',
+        },
+
+        '&-expanded': {
+          gridTemplateRows: '1fr',
+          opacity: 1,
+        },
       },
 
       '&-simple-list': {
-        padding: '4px 12px 8px',
+        padding: '4px 4px 8px',
+
+        // 在 simple 模式下，子项 icon 和文字与摘要栏对齐
+        [`${componentCls}-thoughtChainItem`]: {
+          [`${componentCls}-left`]: {
+            padding: '4px 0 0',
+          },
+          [`${componentCls}-right`]: {
+            padding: '4px 0',
+          },
+          [`${componentCls}-top ${componentCls}-title`]: {
+            marginLeft: 8,
+          },
+        },
+        [`${componentCls}-body ${componentCls}-content`]: {
+          marginLeft: 8,
+        },
       },
     },
   };
 };
 
+const useGenStyle = genStyleHooks('TaskList', genStyle);
+
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('task-list', (token) => {
-    const taskListToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [genStyle(taskListToken)];
-  });
+  const [, hashId] = useGenStyle(prefixCls ?? 'task-list');
+  return { hashId };
 }

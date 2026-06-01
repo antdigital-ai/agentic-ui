@@ -1,4 +1,4 @@
-import {
+﻿import {
   BoxAndWiskers,
   BoxPlotController,
 } from '@sgratzl/chartjs-chart-boxplot';
@@ -23,7 +23,7 @@ import {
   downloadChart,
 } from '../components';
 import { defaultColorList } from '../const';
-import { StatisticConfigType } from '../hooks/useChartStatistic';
+import { StatisticConfigType, useResolvedChartTheme } from '../hooks';
 import type { ChartClassNames, ChartStyles } from '../types/classNames';
 import { hexToRgba, resolveCssVariable } from '../utils';
 import { useStyle } from './style';
@@ -153,7 +153,7 @@ const BoxPlotChart: React.FC<BoxPlotChartProps> = ({
   style,
   styles,
   dataTime,
-  theme = 'light',
+  theme,
   color,
   showLegend = true,
   legendPosition = 'bottom',
@@ -191,7 +191,7 @@ const BoxPlotChart: React.FC<BoxPlotChartProps> = ({
 
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('boxplot-chart');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   // 处理 ChartStatistic 组件配置
   const statistics = useMemo(() => {
@@ -382,7 +382,8 @@ const BoxPlotChart: React.FC<BoxPlotChartProps> = ({
     return { labels, datasets };
   }, [filteredData, types, labels, color, showOutliers]);
 
-  const isLight = theme === 'light';
+  const { resolvedTheme, autoDetectTheme } = useResolvedChartTheme(theme);
+  const isLight = resolvedTheme === 'light';
   const axisTextColor = isLight
     ? 'rgba(0, 25, 61, 0.3255)'
     : 'rgba(255, 255, 255, 0.8)';
@@ -497,10 +498,11 @@ const BoxPlotChart: React.FC<BoxPlotChartProps> = ({
 
   // 空数据处理
   if (safeData.length === 0 || labels.length === 0) {
-    return wrapSSR(
+    return (
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`, hashId)}
-        theme={theme}
+        theme={resolvedTheme}
+        autoDetectTheme={autoDetectTheme}
         className={classNames(classNamesProp?.root, className)}
         isMobile={isMobile}
         variant={props.variant}
@@ -531,14 +533,15 @@ const BoxPlotChart: React.FC<BoxPlotChartProps> = ({
         >
           暂无有效数据
         </div>
-      </ChartContainer>,
+      </ChartContainer>
     );
   }
 
-  return wrapSSR(
+  return (
     <ChartContainer
       baseClassName={classNames(`${prefixCls}-container`, hashId)}
-      theme={theme}
+      theme={resolvedTheme}
+      autoDetectTheme={autoDetectTheme}
       className={classNames(classNamesProp?.root, className)}
       isMobile={isMobile}
       variant={props.variant}
@@ -551,7 +554,7 @@ const BoxPlotChart: React.FC<BoxPlotChartProps> = ({
     >
       <ChartToolBar
         title={title || '箱线图'}
-        theme={theme}
+        theme={resolvedTheme}
         onDownload={handleDownload}
         extra={toolbarExtra}
         dataTime={dataTime}
@@ -567,7 +570,7 @@ const BoxPlotChart: React.FC<BoxPlotChartProps> = ({
                 selectedCustomSelection: selectedFilterLabel,
                 onSelectionChange: setSelectedFilterLabel,
               })}
-              theme={theme}
+              theme={resolvedTheme}
               variant="compact"
             />
           ) : undefined
@@ -583,7 +586,7 @@ const BoxPlotChart: React.FC<BoxPlotChartProps> = ({
           style={styles?.statisticContainer}
         >
           {statistics.map((config, index) => (
-            <ChartStatistic key={index} {...config} theme={theme} />
+            <ChartStatistic key={index} {...config} theme={resolvedTheme} />
           ))}
         </div>
       )}
@@ -598,7 +601,7 @@ const BoxPlotChart: React.FC<BoxPlotChartProps> = ({
             selectedCustomSelection: selectedFilterLabel,
             onSelectionChange: setSelectedFilterLabel,
           })}
-          theme={theme}
+          theme={resolvedTheme}
         />
       )}
 
@@ -616,7 +619,7 @@ const BoxPlotChart: React.FC<BoxPlotChartProps> = ({
           options={options}
         />
       </div>
-    </ChartContainer>,
+    </ChartContainer>
   );
 };
 

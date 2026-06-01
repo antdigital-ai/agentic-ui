@@ -4,12 +4,13 @@ import classNames from 'clsx';
 import { isFunction } from 'lodash-es';
 import { useMergedState } from 'rc-util';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { useNativeTitleTooltipFallback } from '../../Hooks/useNativeTitleTooltipFallback';
 import { useStyle } from './style';
 
-export type ActionIconBoxProps = {
+export interface ActionIconBoxProps {
   children: ((isHovered: boolean) => React.ReactNode) | React.ReactNode;
   showTitle?: boolean;
-  onClick?: (e: any) => void;
+  onClick?: (e: React.MouseEvent) => void | Promise<void>;
   tooltipProps?: TooltipProps;
   title?: React.ReactNode;
   type?: 'danger' | 'primary';
@@ -31,7 +32,43 @@ export type ActionIconBoxProps = {
   iconStyle?: React.CSSProperties;
   onLoadingChange?: (loading: boolean) => void;
   theme?: 'light' | 'dark';
-};
+}
+
+/**
+ * 安全地把 iconStyle 合并到一个 ReactElement 上：
+ * - 不传播原 props（cloneElement 默认会保留原 props，无需手动 ...child.props）
+ * - 仅合并 style，避免覆盖子元素的事件 / className
+ */
+function applyIconStyle(
+  child: React.ReactNode,
+  iconStyle?: React.CSSProperties,
+): React.ReactNode {
+  if (!React.isValidElement(child)) return child;
+  if (!iconStyle) return child;
+
+  const childProps = (child.props ?? {}) as { style?: React.CSSProperties };
+  return React.cloneElement(
+    child as React.ReactElement<{ style?: React.CSSProperties }>,
+    {
+      style: { ...childProps.style, ...iconStyle },
+    },
+  );
+}
+
+/**
+ * 把任意 children 节点（单个 / 数组）统一处理为合并了 iconStyle 的节点。
+ */
+function renderIconChildren(
+  element: React.ReactNode,
+  iconStyle?: React.CSSProperties,
+): React.ReactNode {
+  if (React.isValidElement(element)) {
+    return applyIconStyle(element, iconStyle);
+  }
+  return React.Children.map(element, (child) =>
+    applyIconStyle(child, iconStyle),
+  );
+}
 /**
  * ActionIconBox 组件 - 操作图标盒子组件
  *
@@ -84,189 +121,135 @@ export type ActionIconBoxProps = {
  * - 响应式交互设计
  */
 export const ActionIconBox: React.FC<ActionIconBoxProps> = (props) => {
-  const propLoading = props.isLoading ?? props.loading;
+  const {
+    children,
+    showTitle,
+    onClick,
+    tooltipProps,
+    title,
+    type,
+    transform,
+    className,
+    borderLess,
+    loading: legacyLoading,
+    isLoading,
+    style,
+    active,
+    onInit,
+    'data-testid': dataTestId,
+    noPadding,
+    iconStyle,
+    onLoadingChange,
+    theme,
+  } = props;
+
+  const propLoading = isLoading ?? legacyLoading;
+  // 是否是受控 loading：受控时不再内部 setLoading，避免覆盖外部状态
+  const isLoadingControlled = propLoading !== undefined;
+
   const [loading, setLoading] = useMergedState(false, {
     value: propLoading,
-    onChange: props.onLoadingChange,
+    onChange: onLoadingChange,
   });
   const [isHovered, setIsHovered] = useState(false);
+  const keepNativeTitleFallback = useNativeTitleTooltipFallback();
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-md-editor-action-icon-box');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   useEffect(() => {
-    props.onInit?.();
+    onInit?.();
+    // onInit 仅在挂载时触发一次
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const icon = useMemo(() => {
     if (loading) {
-      return <LoadingOutlined style={props.iconStyle} />;
+      return <LoadingOutlined style={iconStyle} />;
     }
+    const element = isFunction(children) ? children(isHovered) : children;
+    return renderIconChildren(element, iconStyle);
+  }, [loading, isHovered, iconStyle, children]);
 
-    const element = isFunction(props.children)
-      ? props.children(isHovered)
-      : props.children;
-
-    // 处理单个子元素的情况
-    if (React.isValidElement(element)) {
-      try {
-        return React.cloneElement(element as any, {
-          // @ts-ignore
-          ...element?.props,
-          style: {
-            // @ts-ignore
-            ...element?.props?.style,
-            ...props.iconStyle,
-          },
-        });
-      } catch (error) {
-        console.error('ActionIconBox: 克隆元素时出错', error);
-        return element;
-      }
-    }
-
-    // 处理多个子元素的情况
+  // 抽出共用的交互处理函数，避免 Tooltip 与无 Tooltip 两个分支重复 60+ 行
+  // 内部用 React.MouseEvent 签名以兼容历史调用方；键盘事件场景下传入的是
+  // KeyboardEvent，runtime 仅会用到 preventDefault/stopPropagation，安全
+  const triggerOnClick = async (e: React.MouseEvent) => {
+    if (!onClick) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (loading) return;
+    // 仅在非受控时由内部 setLoading；受控由外部决定
+    if (!isLoadingControlled) setLoading(true);
     try {
-      return React.Children.map(element, (child) => {
-        if (React.isValidElement(child)) {
-          return React.cloneElement(child as any, {
-            // @ts-ignore
-            ...child?.props,
-            style: {
-              // @ts-ignore
-              ...child?.props?.style,
-              ...props.iconStyle,
-            },
-          });
-        }
-        return child;
-      });
+      await onClick(e);
     } catch (error) {
-      console.error('ActionIconBox: 处理子元素时出错', error);
-      return element;
+      console.error('ActionIconBox onClick 错误:', error);
+    } finally {
+      if (!isLoadingControlled) setLoading(false);
     }
-  }, [loading, isHovered, props.loading, props.iconStyle, props.children]);
+  };
 
-  return wrapSSR(
-    props.title ? (
-      <Tooltip
-        title={props.title}
-        arrow={false}
-        mouseEnterDelay={1}
-        {...props.tooltipProps}
-      >
-        <span
-          data-title={props.title?.toString()}
-          data-testid={props['data-testid'] || 'action-icon-box'}
-          role="button"
-          tabIndex={0}
-          aria-label={props.title?.toString()}
-          className={classNames(prefixCls, hashId, props.className, {
-            [`${prefixCls}-danger`]: props.type === 'danger',
-            [`${prefixCls}-primary`]: props.type === 'primary',
-            [`${prefixCls}-border-less`]: props.borderLess,
-            [`${prefixCls}-active`]: props.active,
-            [`${prefixCls}-transform`]: props.transform,
-            [`${prefixCls}-${props.theme || 'light'}`]: props.theme || 'light',
-            [`${prefixCls}-noPadding`]: props.noPadding,
-          })}
-          onClick={async (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (!props.onClick) return;
-            if (loading) return;
-            setLoading(true);
-            try {
-              await props.onClick?.(e as any);
-            } catch (error) {
-              console.error('ActionIconBox onClick 错误:', error);
-            } finally {
-              setLoading(false);
-            }
-          }}
-          onKeyDown={async (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              e.stopPropagation();
-              if (!props.onClick) return;
-              if (loading) return;
-              setLoading(true);
-              try {
-                await props.onClick(e as any);
-              } catch (error) {
-                console.error('ActionIconBox onKeyDown 错误:', error);
-              } finally {
-                setLoading(false);
-              }
-            }
-          }}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          style={props.style}
-        >
-          {icon}
-          {props.showTitle && (
-            <span className={`${prefixCls}-title ${hashId}`}>
-              {props.title}
-            </span>
-          )}
+  const handleClick = (e: React.MouseEvent) => {
+    void triggerOnClick(e);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      void triggerOnClick(e as unknown as React.MouseEvent);
+    }
+  };
+
+  const titleText = useMemo(() => {
+    if (title === null || title === undefined) return undefined;
+    return typeof title === 'string' ? title : undefined;
+  }, [title]);
+
+  const rootClassName = classNames(prefixCls, hashId, className, {
+    [`${prefixCls}-danger`]: type === 'danger',
+    [`${prefixCls}-primary`]: type === 'primary',
+    [`${prefixCls}-border-less`]: borderLess,
+    [`${prefixCls}-active`]: active,
+    [`${prefixCls}-transform`]: transform,
+    [`${prefixCls}-${theme || 'light'}`]: theme || 'light',
+    [`${prefixCls}-noPadding`]: noPadding,
+  });
+
+  const renderInner = (extraProps?: { 'data-title'?: string }) => (
+    <span
+      data-title={extraProps?.['data-title']}
+      data-testid={dataTestId || 'action-icon-box'}
+      role="button"
+      tabIndex={0}
+      aria-label={titleText}
+      title={
+        titleText === undefined
+          ? undefined
+          : extraProps && !keepNativeTitleFallback
+            ? undefined
+            : titleText
+      }
+      className={rootClassName}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={style}
+    >
+      {icon}
+      {showTitle && (
+        <span className={classNames(`${prefixCls}-title`, hashId)}>
+          {title}
         </span>
-      </Tooltip>
-    ) : (
-      <span
-        data-testid={props['data-testid'] || 'action-icon-box'}
-        role="button"
-        tabIndex={0}
-        aria-label={props.title?.toString()}
-        title={props.title?.toString()}
-        className={classNames(prefixCls, hashId, props.className, {
-          [`${prefixCls}-danger`]: props.type === 'danger',
-          [`${prefixCls}-primary`]: props.type === 'primary',
-          [`${prefixCls}-border-less`]: props.borderLess,
-          [`${prefixCls}-active`]: props.active,
-          [`${prefixCls}-transform`]: props.transform,
-          [`${prefixCls}-${props.theme || 'light'}`]: props.theme || 'light',
-          [`${prefixCls}-noPadding`]: props.noPadding,
-        })}
-        onClick={async (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          if (!props.onClick) return;
-          if (loading) return;
-          setLoading(true);
-          try {
-            await props.onClick?.(e as any);
-          } catch (error) {
-            console.error('ActionIconBox onClick 错误:', error);
-          } finally {
-            setLoading(false);
-          }
-        }}
-        onKeyDown={async (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            e.stopPropagation();
-            if (!props.onClick) return;
-            if (loading) return;
-            setLoading(true);
-            try {
-              await props.onClick(e as any);
-            } catch (error) {
-              console.error('ActionIconBox onKeyDown 错误:', error);
-            } finally {
-              setLoading(false);
-            }
-          }
-        }}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        style={props.style}
-      >
-        {icon}
-        {props.showTitle && (
-          <span className={`${prefixCls}-title ${hashId}`}>{props.title}</span>
-        )}
-      </span>
-    ),
+      )}
+    </span>
+  );
+
+  return title ? (
+    <Tooltip title={title} arrow={false} mouseEnterDelay={1} {...tooltipProps}>
+      {renderInner({ 'data-title': titleText })}
+    </Tooltip>
+  ) : (
+    renderInner()
   );
 };

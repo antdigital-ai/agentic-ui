@@ -1,32 +1,42 @@
-import { ConfigProvider } from 'antd';
+﻿import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import React, { memo, useContext, useState } from 'react';
 import { TextLoading } from '../Components/lotties/TextLoading';
 import { useLocale } from '../I18n';
 import { BaseMarkdownEditor } from '../MarkdownEditor';
-import { BorderBeamAnimation } from './BorderBeamAnimation';
+import {
+  DEFAULT_BORDER_RADIUS_PX,
+  ENLARGED_DEFAULT_HEIGHT_PX,
+  FALLBACK_BORDER_RADIUS_PX,
+  ROOT_TAB_INDEX,
+} from './constants';
 import { useFileUploadManager } from './FileUploadManager';
-import { useMarkdownInputFieldActions } from './hooks/useMarkdownInputFieldActions';
-import { useMarkdownInputFieldHandlers } from './hooks/useMarkdownInputFieldHandlers';
-import { useMarkdownInputFieldLayout } from './hooks/useMarkdownInputFieldLayout';
-import { useMarkdownInputFieldRefs } from './hooks/useMarkdownInputFieldRefs';
+import { useEditorValueSync } from './hooks/useEditorValueSync';
+import { useEnlargeAndContainerHandler } from './hooks/useEnlargeAndContainerHandler';
+import { useExposeInputRef } from './hooks/useExposeInputRef';
+import { useInputFieldGeometry } from './hooks/useInputFieldGeometry';
+import { useInputFieldRefContainer } from './hooks/useInputFieldRefContainer';
+import { useKeyboardHandler } from './hooks/useKeyboardHandler';
 import { useMarkdownInputFieldState } from './hooks/useMarkdownInputFieldState';
-import { useMarkdownInputFieldStyles } from './hooks/useMarkdownInputFieldStyles';
+import { usePasteHandler } from './hooks/usePasteHandler';
+import { useSendHandler } from './hooks/useSendHandler';
 import { QuickActions } from './QuickActions';
+import { SendActions } from './SendActions';
+import { resolveSendDisabled } from './SendButton';
 import { SkillModeBar } from './SkillModeBar';
 import { useStyle } from './style';
 import { Suggestion } from './Suggestion';
 import { MARKDOWN_INPUT_FIELD_TEST_IDS } from './testIds';
 import TopOperatingArea from './TopOperatingArea';
-import type { MarkdownInputFieldProps } from './types/MarkdownInputFieldProps';
-import {
-  useAttachmentList,
-  useBeforeTools,
-  useSendActionsNode,
-} from './utils/renderHelpers';
+import type {
+  ActionsSlotState,
+  MarkdownInputFieldProps,
+  SlotRenderState,
+} from './types/MarkdownInputFieldProps';
+import { useAttachmentList, useBeforeTools } from './utils/renderHelpers';
 import { useVoiceInputManager } from './VoiceInputManager';
 
-export type { MarkdownInputFieldProps };
+export type { ActionsSlotState, MarkdownInputFieldProps, SlotRenderState };
 
 /**
  * MarkdownInputField 组件 - Markdown输入字段组件
@@ -75,18 +85,24 @@ const DEFAULT_ATTACHMENT = { enable: false } as const;
 const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
   tagInputProps,
   markdownProps,
-  borderRadius = 16,
+  borderRadius = DEFAULT_BORDER_RADIUS_PX,
   onBlur,
   onFocus,
   isShowTopOperatingArea = false,
   testId,
   ...props
 }) => {
+  const {
+    contentStyle: markdownContentStyle,
+    markdown: markdownConfig,
+    ...markdownPropsRest
+  } = markdownProps ?? {};
+
   // 默认关闭文件上传，需显式传入 attachment.enable: true 开启
   const attachment = { ...DEFAULT_ATTACHMENT, ...props.attachment };
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const baseCls = getPrefixCls('agentic-md-input-field');
-  const { wrapSSR, hashId } = useStyle(baseCls, props.disableHoverAnimation);
+  const { hashId } = useStyle(baseCls, props.disableHoverAnimation);
   const locale = useLocale();
 
   // 状态管理
@@ -107,64 +123,62 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
     attachment,
   });
 
-  // 边框光束动画状态
   const [isFocused, setIsFocused] = useState(false);
-  const [animationComplete, setAnimationComplete] = useState(false);
 
-  // 布局管理
+  // 各类按钮存在性 & 计数：纯布尔运算，原 useMarkdownInputFieldActions hook
+  // 已被内联到此处，避免为 5 行计算单开 hook + 在主组件做胶水。
+  const hasEnlargeAction = !!props.enlargeable?.enable;
+  const hasRefineAction = !!props.refinePrompt?.enable;
+  const hasCustomQuickAction = !!props.quickActionRender;
+  const hasActionsRender = !!props.actionsRender;
+  const hasToolsRender = !!props.toolsRender;
+  const totalActionCount =
+    Number(hasEnlargeAction) +
+    Number(hasRefineAction) +
+    Number(hasCustomQuickAction) +
+    Number(hasActionsRender) +
+    Number(hasToolsRender);
+  const isMultiRowLayout = totalActionCount > 0;
+
+  // 几何信息：合并自原 useMarkdownInputFieldLayout + useMarkdownInputFieldStyles。
+  // SendActions / QuickActions 的尺寸回调直接交回 hook 内部消化，
+  // 主组件不再充当 setter 胶水。
   const {
-    collapseSendActions,
-    rightPadding,
-    setRightPadding,
-    topRightPadding,
-    setTopRightPadding,
-    quickRightOffset,
-    setQuickRightOffset,
     inputRef,
-  } = useMarkdownInputFieldLayout();
-
-  // 动作计算
-  const {
-    hasEnlargeAction,
-    hasRefineAction,
-    isMultiRowLayout,
-    totalActionCount,
-  } = useMarkdownInputFieldActions({
-    enlargeable: props.enlargeable,
-    refinePrompt: props.refinePrompt,
-    quickActionRender: props.quickActionRender,
-    actionsRender: props.actionsRender,
-    toolsRender: props.toolsRender,
-  });
-
-  // 样式计算
-  const {
+    collapseSendActions,
+    onSendActionsResize,
+    onQuickActionsResize,
     computedRightPadding,
     collapsedHeightPx,
     computedMinHeight,
     enlargedStyle,
-  } = useMarkdownInputFieldStyles({
-    hasTools: !!props.toolsRender || !!props.actionsRender,
-    maxHeight: props.maxHeight,
-    style: props.style,
-    attachment,
+  } = useInputFieldGeometry({
     isEnlarged,
-    rightPadding,
-    topRightPadding,
-    quickRightOffset,
+    hasTools: hasToolsRender || hasActionsRender,
     hasEnlargeAction,
     hasRefineAction,
     totalActionCount,
     isMultiRowLayout,
+    maxHeight: props.maxHeight,
+    style: props.style,
+    attachment,
   });
 
-  // Refs 管理
-  const { markdownEditorRef, quickActionsRef, actionsRef, isSendingRef, onEditorChange } =
-    useMarkdownInputFieldRefs({
-      inputRef: props.inputRef,
-      value: props.value,
-      setValue,
-    });
+  // Refs 管理 — 拆分为三个单一职责 hook：
+  // 1) 持有 ref 容器  2) 同步外部 value → 编辑器  3) 透出 inputRef 给调用方
+  const { markdownEditorRef, quickActionsRef, actionsRef, isSendingRef } =
+    useInputFieldRefContainer();
+
+  const { onEditorChange } = useEditorValueSync({
+    value: props.value,
+    markdownEditorRef,
+  });
+
+  useExposeInputRef({
+    inputRef: props.inputRef,
+    markdownEditorRef,
+    setValue,
+  });
 
   // 文件上传管理
   const {
@@ -189,39 +203,48 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
     onValueChange: setValue,
   });
 
-  // 事件处理
-  const {
-    handleEnlargeClick,
-    sendMessage,
-    handlePaste,
-    handleKeyDown,
-    handleContainerClick,
-    activeInput,
-  } = useMarkdownInputFieldHandlers({
+  // 事件处理（按职责拆分自原 useMarkdownInputFieldHandlers）
+  // useKeyboardHandler 依赖 useSendHandler.sendMessage，必须串行调用
+  const { sendMessage } = useSendHandler({
     props: {
       disabled: props.disabled,
       typing: props.typing,
       onChange: props.onChange,
       onSend: props.onSend,
       allowEmptySubmit: props.allowEmptySubmit,
-      markdownProps,
-      attachment,
-      triggerSendKey: props.triggerSendKey,
     },
+    sendDisabled: resolveSendDisabled(props.sendButtonProps, fileUploadStatus),
     markdownEditorRef,
-    inputRef,
     isSendingRef,
     isLoading,
     setIsLoading,
     value,
     setValue,
-    fileMap,
     setFileMap,
     recording,
     stopRecording,
-    isEnlarged,
-    setIsEnlarged,
   });
+
+  const { handlePaste } = usePasteHandler({
+    props: { attachment, markdownProps },
+    fileMap,
+    setFileMap,
+  });
+
+  const { handleKeyDown } = useKeyboardHandler({
+    props: { triggerSendKey: props.triggerSendKey, onSend: props.onSend },
+    markdownEditorRef,
+    sendMessage,
+  });
+
+  const { handleEnlargeClick, handleContainerClick, activeInput } =
+    useEnlargeAndContainerHandler({
+      props: { disabled: props.disabled, typing: props.typing },
+      markdownEditorRef,
+      inputRef,
+      isEnlarged,
+      setIsEnlarged,
+    });
 
   // 渲染辅助
   const attachmentList = useAttachmentList({
@@ -234,47 +257,64 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
 
   const beforeTools = useBeforeTools({
     beforeToolsRender: props.beforeToolsRender,
-    props,
+    attachment,
+    value,
+    fileMap,
+    onFileMapChange: setFileMap,
+    fileUploadStatus,
+    fileUploadSummary,
+    disabled: props.disabled,
+    typing: props.typing,
     isHover,
     isLoading,
   });
 
   const editorReadonly = isLoading || !!props.typing;
 
-  const sendActionsNode = useSendActionsNode({
-    props: {
-      attachment,
-      voiceRecognizer: props.voiceRecognizer,
-      value,
-      disabled: props.disabled,
-      typing: props.typing,
-      allowEmptySubmit: props.allowEmptySubmit,
-      actionsRender: props.actionsRender,
-      toolsRender: props.toolsRender,
-      sendButtonProps: props.sendButtonProps,
-      triggerSendKey: props.triggerSendKey,
-    },
-    fileMap,
-    setFileMap,
-    supportedFormat,
-    fileUploadDone,
-    fileUploadStatus,
-    fileUploadSummary,
-    recording,
-    isLoading,
-    collapseSendActions,
-    uploadImage,
-    startRecording,
-    stopRecording,
-    sendMessage,
-    setIsLoading,
-    onStop: props.onStop,
-    setRightPadding,
-    baseCls,
-    hashId,
-  });
+  // SendActions 节点。原本封装在 useSendActionsNode 中，但其 useMemo
+  // 依赖列表包含 27 项（含 attachment / sendProps 等每次渲染都会变的引用），
+  // 缓存命中率几乎为零，因此直接内联到 JSX 渲染，去除虚假的"性能优化"。
+  const sendActionsNode = (
+    <SendActions
+      attachment={{
+        ...attachment,
+        supportedFormat,
+        fileMap,
+        onFileMapChange: setFileMap,
+        upload: attachment?.upload
+          ? (file) => attachment.upload!(file, 0)
+          : undefined,
+      }}
+      voiceRecognizer={props.voiceRecognizer}
+      value={value}
+      disabled={props.disabled}
+      typing={props.typing}
+      isLoading={isLoading}
+      fileUploadDone={fileUploadDone}
+      fileUploadStatus={fileUploadStatus}
+      fileUploadSummary={fileUploadSummary}
+      recording={recording}
+      collapseSendActions={collapseSendActions}
+      allowEmptySubmit={props.allowEmptySubmit}
+      uploadImage={uploadImage}
+      onStartRecording={startRecording}
+      onStopRecording={stopRecording}
+      onSend={sendMessage}
+      onStop={() => {
+        setIsLoading(false);
+        props.onStop?.();
+      }}
+      actionsRender={props.actionsRender}
+      prefixCls={baseCls}
+      hashId={hashId}
+      hasTools={!!props.toolsRender}
+      onResize={onSendActionsResize}
+      sendButtonProps={props.sendButtonProps}
+      triggerSendKey={props.triggerSendKey}
+    />
+  );
 
-  return wrapSSR(
+  return (
     <>
       {isShowTopOperatingArea && (
         <div
@@ -296,95 +336,87 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
           {beforeTools}
         </div>
       ) : null}
-      <Suggestion
-        tagInputProps={{
-          enable: true,
-          type: 'dropdown',
-          ...tagInputProps,
+      <div
+        ref={inputRef}
+        data-testid={testId ?? MARKDOWN_INPUT_FIELD_TEST_IDS.ROOT}
+        className={classNames(baseCls, hashId, props.className, {
+          [`${baseCls}-disabled`]: props.disabled,
+          [`${baseCls}-skill-mode`]: props.skillMode?.open,
+          [`${baseCls}-typing`]: !!props.typing,
+          [`${baseCls}-loading`]: isLoading,
+          [`${baseCls}-is-multi-row`]: isMultiRowLayout,
+          [`${baseCls}-enlarged`]: isEnlarged,
+          [`${baseCls}-focused`]: isFocused,
+          [`${baseCls}-has-tools-wrapper`]: !!props.toolsRender,
+        })}
+        style={{
+          ...props.style,
+          ...enlargedStyle,
+          height: isEnlarged
+            ? `${props.enlargeable?.height ?? ENLARGED_DEFAULT_HEIGHT_PX}px`
+            : `min(${collapsedHeightPx}px,100%)`,
+          borderRadius: borderRadius || FALLBACK_BORDER_RADIUS_PX,
+          minHeight: computedMinHeight,
+          maxHeight: isEnlarged
+            ? 'none'
+            : props.maxHeight !== undefined
+              ? typeof props.maxHeight === 'number'
+                ? `${props.maxHeight}px`
+                : props.maxHeight
+              : `min(${collapsedHeightPx}px,100%)`,
         }}
+        tabIndex={ROOT_TAB_INDEX}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        onClick={handleContainerClick}
+        onKeyDown={handleKeyDown}
       >
         <div
-          ref={inputRef}
-          data-testid={testId ?? MARKDOWN_INPUT_FIELD_TEST_IDS.ROOT}
-          className={classNames(baseCls, hashId, props.className, {
-            [`${baseCls}-disabled`]: props.disabled,
-            [`${baseCls}-skill-mode`]: props.skillMode?.open,
-            [`${baseCls}-typing`]: !!props.typing,
-            [`${baseCls}-loading`]: isLoading,
-            [`${baseCls}-is-multi-row`]: isMultiRowLayout,
-            [`${baseCls}-enlarged`]: isEnlarged,
-            [`${baseCls}-focused`]: isFocused,
-            [`${baseCls}-has-tools-wrapper`]: !!props.toolsRender,
-          })}
           style={{
-            ...props.style,
-            ...enlargedStyle,
-            height: isEnlarged
-              ? `${props.enlargeable?.height ?? 980}px`
-              : `min(${collapsedHeightPx}px,100%)`,
-            borderRadius: borderRadius || 12,
-            minHeight: computedMinHeight,
-            maxHeight: isEnlarged
-              ? 'none'
-              : props.maxHeight !== undefined
-                ? typeof props.maxHeight === 'number'
-                  ? `${props.maxHeight}px`
-                  : props.maxHeight
-                : `min(${collapsedHeightPx}px,100%)`,
+            display: 'flex',
+            flexDirection: 'column',
+            borderRadius: !!props.toolsRender ? 0 : 'inherit',
+            borderTopLeftRadius: 'inherit',
+            borderTopRightRadius: 'inherit',
+            height: isEnlarged ? '100%' : 'auto',
+            flex: 1,
+            minHeight: 0,
           }}
-          tabIndex={1}
-          onMouseEnter={() => setHover(true)}
-          onMouseLeave={() => setHover(false)}
-          onClick={handleContainerClick}
-          onKeyDown={handleKeyDown}
+          className={classNames(`${baseCls}-editor`, hashId, {
+            [`${baseCls}-editor-hover`]: isHover,
+            [`${baseCls}-editor-disabled`]: props.disabled,
+          })}
+          data-testid={MARKDOWN_INPUT_FIELD_TEST_IDS.EDITOR}
         >
-          <BorderBeamAnimation
-            isVisible={isFocused && !animationComplete}
-            borderRadius={borderRadius || 16}
-            onAnimationComplete={() => setAnimationComplete(true)}
+          {/* 技能模式部分 */}
+          <SkillModeBar
+            skillMode={props.skillMode}
+            onSkillModeOpenChange={props.onSkillModeOpenChange}
           />
+
           <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              borderRadius: !!props.toolsRender ? 0 : 'inherit',
-              borderTopLeftRadius: 'inherit',
-              borderTopRightRadius: 'inherit',
-              height: isEnlarged ? '100%' : 'auto',
-              flex: 1,
-              minHeight: 0,
-            }}
-            className={classNames(`${baseCls}-editor`, hashId, {
-              [`${baseCls}-editor-hover`]: isHover,
-              [`${baseCls}-editor-disabled`]: props.disabled,
-            })}
-            data-testid={MARKDOWN_INPUT_FIELD_TEST_IDS.EDITOR}
+            className={classNames(`${baseCls}-editor-content`, hashId)}
+            data-testid={MARKDOWN_INPUT_FIELD_TEST_IDS.EDITOR_CONTENT}
           >
-            {/* 技能模式部分 */}
-            <SkillModeBar
-              skillMode={props.skillMode}
-              onSkillModeOpenChange={props.onSkillModeOpenChange}
-            />
+            {attachmentList}
 
-            <div
-              className={classNames(`${baseCls}-editor-content`, hashId)}
-              data-testid={MARKDOWN_INPUT_FIELD_TEST_IDS.EDITOR_CONTENT}
+            {(props.typing || isLoading) && !value && (
+              <div
+                className={classNames(`${baseCls}-typing-hint`, hashId)}
+                aria-live="polite"
+                aria-label={locale['input.typing.hint']}
+              >
+                <TextLoading text={locale['input.typing.hint']} fontSize={13} />
+              </div>
+            )}
+
+            <Suggestion
+              tagInputProps={{
+                enable: true,
+                type: 'dropdown',
+                ...tagInputProps,
+              }}
             >
-              {attachmentList}
-
-              {(props.typing || isLoading) && !value && (
-                <div
-                  className={classNames(`${baseCls}-typing-hint`, hashId)}
-                  aria-live="polite"
-                  aria-label={locale['input.typing.hint']}
-                >
-                  <TextLoading
-                    text={locale['input.typing.hint']}
-                    fontSize={13}
-                  />
-                </div>
-              )}
-
               <BaseMarkdownEditor
                 editorRef={markdownEditorRef}
                 leafRender={props.leafRender}
@@ -405,6 +437,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                   alignItems: 'flex-start',
                   padding: 'var(--padding-3x)',
                   paddingRight: computedRightPadding || 'var(--padding-3x)',
+                  ...markdownContentStyle,
                 }}
                 textAreaProps={{
                   enable: true,
@@ -443,13 +476,11 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                   onFocus?.(value, schema, e);
                   activeInput(true);
                   setIsFocused(true);
-                  setAnimationComplete(false);
                 }}
                 onBlur={(value, schema, e) => {
                   onBlur?.(value, schema, e);
                   activeInput(false);
                   setIsFocused(false);
-                  setAnimationComplete(false);
                 }}
                 onPaste={(e) => {
                   handlePaste(e);
@@ -461,7 +492,11 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                   plainTextOnly: true,
                   ...props.pasteConfig,
                 }}
-                {...markdownProps}
+                markdown={{
+                  enableInsertCompletion: false,
+                  ...markdownConfig,
+                }}
+                {...markdownPropsRest}
               >
                 {props?.quickActionRender ||
                 props.refinePrompt?.enable ||
@@ -481,51 +516,50 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                       setValue(text);
                       props.onChange?.(text);
                     }}
-                    quickActionRender={props.quickActionRender as any}
+                    quickActionRender={props.quickActionRender}
                     prefixCls={baseCls}
                     hashId={hashId}
                     enlargeable={!!props.enlargeable?.enable}
                     isEnlarged={isEnlarged}
                     onEnlargeClick={handleEnlargeClick}
-                    onResize={(width, rightOffset) => {
-                      setTopRightPadding(width);
-                      setQuickRightOffset(rightOffset);
-                    }}
+                    onResize={onQuickActionsResize}
                   />
                 ) : null}
               </BaseMarkdownEditor>
-            </div>
+            </Suggestion>
           </div>
-          {props.toolsRender || props.actionsRender ? (
-            <div
-              className={classNames(`${baseCls}-tools-wrapper`, hashId)}
-              data-testid={MARKDOWN_INPUT_FIELD_TEST_IDS.TOOLS_WRAPPER}
-            >
-              <div
-                ref={actionsRef}
-                contentEditable={false}
-                className={classNames(`${baseCls}-send-tools`, hashId)}
-                data-testid={MARKDOWN_INPUT_FIELD_TEST_IDS.SEND_TOOLS}
-              >
-                {props?.toolsRender?.({
-                  value,
-                  fileMap,
-                  onFileMapChange: setFileMap,
-                  attachment,
-                  ...props,
-                  isHover,
-                  isLoading,
-                  fileUploadStatus,
-                })}
-              </div>
-              {sendActionsNode}
-            </div>
-          ) : (
-            sendActionsNode
-          )}
         </div>
-      </Suggestion>
-    </>,
+        {props.toolsRender || props.actionsRender ? (
+          <div
+            className={classNames(`${baseCls}-tools-wrapper`, hashId)}
+            data-testid={MARKDOWN_INPUT_FIELD_TEST_IDS.TOOLS_WRAPPER}
+          >
+            <div
+              ref={actionsRef}
+              contentEditable={false}
+              className={classNames(`${baseCls}-send-tools`, hashId)}
+              data-testid={MARKDOWN_INPUT_FIELD_TEST_IDS.SEND_TOOLS}
+            >
+              {props?.toolsRender?.({
+                value,
+                fileMap,
+                onFileMapChange: setFileMap,
+                attachment,
+                disabled: props.disabled,
+                typing: props.typing,
+                isHover,
+                isLoading,
+                fileUploadStatus,
+                fileUploadSummary,
+              })}
+            </div>
+            {sendActionsNode}
+          </div>
+        ) : (
+          sendActionsNode
+        )}
+      </div>
+    </>
   );
 };
 

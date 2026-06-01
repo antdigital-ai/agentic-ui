@@ -7,26 +7,20 @@
  */
 export { useStyle } from '../MarkdownEditor/style';
 
-import { useEditorStyleRegister } from '../Hooks/useStyle';
+import { genStyleHooks } from '../Hooks/useStyle';
+
+const useGenVarStyle = genStyleHooks('MarkdownRendererVars', (token) => ({
+  [`:where(${token.componentCls})`]: {
+    '--margin-2x': '8px',
+    '--margin-4x': '16px',
+    '--margin-8x': '20px',
+    '--padding-2x': '8px',
+    '--padding-4x': '16px',
+    '--padding-5x': '20px',
+  },
+}));
 
 export const useRendererVarStyle = (prefixCls: string) => {
-  return useEditorStyleRegister('MarkdownRendererVars', (_token) => {
-    return {
-      [`:where(.${prefixCls})`]: {
-        '--margin-2x': '8px',
-        '--margin-4x': '16px',
-        '--margin-8x': '20px',
-        '--padding-2x': '8px',
-        '--padding-4x': '16px',
-        '--padding-5x': '20px',
-      },
-
-      // 流式文字淡入动画（opacity + translateY，GPU 硬件加速，清爽流派）
-      // 仅使用 opacity 和 transform，避免 blur 带来的重绘开销
-      '@keyframes markdownRendererSlideFadeIn': {
-        from: { opacity: 0, transform: 'translateY(2px)', filter: 'blur(1px)' },
-        to: { opacity: 1, transform: 'translateY(0)', filter: 'blur(0px)' },
-      },
-    };
-  });
+  const [, hashId] = useGenVarStyle(prefixCls);
+  return { hashId };
 };

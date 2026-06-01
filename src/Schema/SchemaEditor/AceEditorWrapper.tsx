@@ -3,19 +3,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { getAceLangs, modeMap } from '../../MarkdownEditor/editor/utils/ace';
 import { loadAceEditor } from '../../Plugins/code/loadAceEditor';
 
-// 确保 ResizeObserver 在测试环境中可用
-if (typeof window !== 'undefined' && !window.ResizeObserver) {
-  window.ResizeObserver = class ResizeObserver {
-    constructor(callback: any) {
-      this.callback = callback;
-    }
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-    private callback: any;
-  } as any;
-}
-
 interface AceEditorWrapperProps {
   /** 代码内容 */
   value: string;
@@ -51,6 +38,8 @@ export const AceEditorWrapper: React.FC<AceEditorWrapperProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<Ace.Editor>();
   const valueRef = useRef(value);
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
   const aceModuleRef = useRef<typeof import('ace-builds') | null>(null);
   const [aceLoaded, setAceLoaded] = useState(false);
 
@@ -107,12 +96,12 @@ export const AceEditorWrapper: React.FC<AceEditorWrapperProps> = ({
         }, 16);
 
         // 配置编辑器事件
-        if (!readonly && onChange) {
+        if (!readonly && onChangeRef.current) {
           codeEditor.on('change', () => {
             const newValue = codeEditor.getValue();
             if (newValue !== valueRef.current) {
               valueRef.current = newValue;
-              onChange(newValue);
+              onChangeRef.current?.(newValue);
             }
           });
         }
@@ -182,5 +171,3 @@ export const AceEditorWrapper: React.FC<AceEditorWrapperProps> = ({
     />
   );
 };
-
-export default AceEditorWrapper;

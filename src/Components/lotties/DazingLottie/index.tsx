@@ -1,6 +1,5 @@
-import Lottie from 'lottie-react';
 import React from 'react';
-import dazingLottie from './dazing.json';
+import { createLottieComponent } from '../createLottieComponent';
 
 export interface DazingLottieProps {
   /**
@@ -59,32 +58,9 @@ export interface DazingLottieProps {
  * - 支持自定义样式
  * - 提供默认的加载动画
  */
-export const DazingLottie: React.FC<DazingLottieProps> = ({
-  autoplay = true,
-  loop = true,
-  className,
-  style,
-  size,
-}) => {
-  const containerStyle: React.CSSProperties = {
-    width: size,
-    height: size,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...style,
-  };
-
-  return (
-    <Lottie
-      style={containerStyle}
-      className={className}
-      aria-hidden="true"
-      animationData={dazingLottie}
-      loop={loop}
-      autoplay={autoplay}
-    />
-  );
-};
+export const DazingLottie: React.FC<DazingLottieProps> = createLottieComponent({
+  loadJson: () => import('./dazing.json'),
+  displayName: 'DazingLottie',
+});
 
 export default DazingLottie;

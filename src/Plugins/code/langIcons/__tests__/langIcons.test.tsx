@@ -42,7 +42,10 @@ describe('Language Icons', () => {
     it(`应该渲染 ${name} 48 size 图标`, () => {
       const IconComponent = Icons[name as 'AplIcon'] as unknown as any;
       render(
-        <IconComponent size={48} data-testid={`${name.toLowerCase()}-icon-48`} />,
+        <IconComponent
+          size={48}
+          data-testid={`${name.toLowerCase()}-icon-48`}
+        />,
       );
       const icon = screen.getByTestId(`${name.toLowerCase()}-icon-48`);
       expect(icon).toHaveAttribute('width', '48');

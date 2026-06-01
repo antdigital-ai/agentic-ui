@@ -1,6 +1,6 @@
 import classNames from 'clsx';
-import { motion } from 'framer-motion';
 import React, { useMemo } from 'react';
+import { useRefFunction } from '../Hooks/useRefFunction';
 import { MarkdownEditorProps } from '../MarkdownEditor/types';
 import { DeepThink } from './DeepThink';
 import { RagRetrievalInfo } from './RagRetrievalInfo';
@@ -160,7 +160,7 @@ const ThoughtChainItemIcon = React.memo<{
   icon: React.ReactNode;
 }>(({ prefixCls, hashId, hasOutput, icon }) => {
   return (
-    <motion.div
+    <div
       className={classNames(
         `${prefixCls}-content-list-item-icon`,
         {
@@ -171,7 +171,7 @@ const ThoughtChainItemIcon = React.memo<{
       )}
     >
       {icon}
-    </motion.div>
+    </div>
   );
 });
 
@@ -209,39 +209,36 @@ const ThoughtChainItemIcon = React.memo<{
  * - 性能优化的 memo 组件
  */
 // 动画容器组件 - 独立 memo
+// 替代 framer-motion 的 motion.div + variants(y:8→0, opacity:0→1, delay=0.1*index)
+// 通过 CSS keyframes + inline animation-delay 实现按 index 的 stagger 入场。
+// 测试环境下不挂载入场动画类，避免影响断言/快照。
 const ThoughtChainItemMotion = React.memo<{
   prefixCls: string;
   hashId: string;
   index: number;
   children: React.ReactNode;
 }>(({ prefixCls, hashId, index, children }) => {
-  const variants = useMemo(() => {
-    if (process.env.NODE_ENV === 'test') return undefined;
+  const enableAnimation = process.env.NODE_ENV !== 'test';
 
-    return {
-      hidden: {
-        y: 8,
-        opacity: 0,
-      },
-      visible: {
-        y: 0,
-        opacity: 1,
-        transition: {
-          delay: 0.1 * index,
-          duration: 0.3,
-        },
-      },
-    };
-  }, [index]);
+  const motionStyle = useMemo<React.CSSProperties | undefined>(() => {
+    if (!enableAnimation) return undefined;
+    return { animationDelay: `${0.1 * index}s` };
+  }, [enableAnimation, index]);
 
   return (
-    <motion.div
+    <div
       role="listitem"
-      className={classNames(`${prefixCls}-content-list-item`, hashId)}
-      variants={variants}
+      className={classNames(
+        `${prefixCls}-content-list-item`,
+        {
+          [`${prefixCls}-content-list-item-motion`]: enableAnimation,
+        },
+        hashId,
+      )}
+      style={motionStyle}
     >
       {children}
-    </motion.div>
+    </div>
   );
 });
 
@@ -329,16 +326,13 @@ export const ThoughtChainListItem: React.FC<
     return !!props?.bubble?.isFinished || !!props.isFinished;
   }, [props?.bubble?.isFinished, props.isFinished]);
 
-  const handleMetaClick = React.useCallback(
-    (meta: DocMeta) => {
-      setDocMeta(meta);
-    },
-    [setDocMeta],
-  );
+  const handleMetaClick = useRefFunction((meta: DocMeta) => {
+    setDocMeta(meta);
+  });
 
-  const handleCollapseChange = React.useCallback((change: boolean) => {
+  const handleCollapseChange = useRefFunction((change: boolean) => {
     setCollapse(change);
-  }, []);
+  });
 
   React.useEffect(() => {
     if (!collapse) {
@@ -417,8 +411,7 @@ export const ThoughtChainListItem: React.FC<
               display: 'grid',
               gridTemplateRows: collapse ? '0fr' : '1fr',
               opacity: collapse ? 0 : 1,
-              transition:
-                'grid-template-rows 0.16s ease, opacity 0.12s ease',
+              transition: 'grid-template-rows 0.16s ease, opacity 0.12s ease',
               pointerEvents: collapse ? 'none' : 'auto',
             }}
             aria-hidden={collapse}

@@ -170,8 +170,6 @@ export interface ThoughtChainListProps extends BaseStyleProps {
   finishAutoCollapse?: boolean;
   locale?: {
     thinking?: string;
-    taskFinished?: string;
-    taskCost?: string;
     taskAborted?: string;
     totalTimeUsed?: string;
     taskComplete?: string;

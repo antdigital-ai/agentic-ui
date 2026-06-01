@@ -1,8 +1,29 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 interface LoadingSpinnerIconProps extends React.SVGProps<SVGSVGElement> {
   size?: number;
 }
+
+const KEYFRAMES_STYLE_ID = 'agentic-ui-loading-spinner-keyframes';
+const KEYFRAMES_RULE = `@keyframes agentic-ui-spin {from{transform:rotate(0deg);}to{transform:rotate(360deg);}}`;
+
+/**
+ * 在文档中按需注入 spin keyframes，仅注入一次。
+ *
+ * 之前的实现把 `<style>{`@keyframes spin`}</style>` 放在每个 SVG 内部，
+ * 一旦同时渲染多个 LoadingSpinnerIcon，DOM 中会出现多个重复的 `<style>` 节点，
+ * 还会污染全局 `spin` 关键字（与其它库冲突）。改为：
+ * - 模块级单例 keyframes，名字加 `agentic-ui-` 前缀避免冲突
+ * - 用 useEffect 在挂载时确保已注入
+ */
+const ensureSpinKeyframesInjected = (): void => {
+  if (typeof document === 'undefined') return;
+  if (document.getElementById(KEYFRAMES_STYLE_ID)) return;
+  const styleEl = document.createElement('style');
+  styleEl.id = KEYFRAMES_STYLE_ID;
+  styleEl.textContent = KEYFRAMES_RULE;
+  document.head.appendChild(styleEl);
+};
 
 /**
  * LoadingSpinnerIcon 组件 - 加载旋转图标组件
@@ -40,6 +61,10 @@ export const LoadingSpinnerIcon: React.FC<LoadingSpinnerIconProps> = ({
   size = 24,
   ...props
 }) => {
+  useEffect(() => {
+    ensureSpinKeyframesInjected();
+  }, []);
+
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -49,22 +74,10 @@ export const LoadingSpinnerIcon: React.FC<LoadingSpinnerIconProps> = ({
       fill="none"
       {...props}
       style={{
-        animation: 'spin 1s linear infinite',
+        animation: 'agentic-ui-spin 1s linear infinite',
         ...props.style,
       }}
     >
-      <style>
-        {`
-          @keyframes spin {
-            from {
-              transform: rotate(0deg);
-            }
-            to {
-              transform: rotate(360deg);
-            }
-          }
-        `}
-      </style>
       <path
         d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM12 4C16.4183 4 20 7.58172 20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12C4 7.58172 7.58172 4 12 4Z"
         fill="#4E5969"

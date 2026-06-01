@@ -1,4 +1,4 @@
-﻿import { Chart } from 'chart.js';
+import { Chart } from 'chart.js';
 import ResizeObserver from 'rc-resize-observer';
 import React, { useEffect, useRef, useState } from 'react';
 import { debounce } from '../utils';
@@ -39,7 +39,7 @@ export const Container: React.FC<{
         Math.abs(preSize.width - newSize.width) > 30 || // 从 20 增加到 30
         Math.abs(preSize.height - newSize.height) > 30 // 从 20 增加到 30
       ) {
-        chart.resize(newSize.width, newSize.height);
+        chart.resize?.(newSize.width, newSize.height);
         sizeRef.current = newSize;
         return;
       }

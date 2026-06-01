@@ -3,19 +3,12 @@ import clsx from 'clsx';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Loading } from '../../Components/Loading';
+import { useRefFunction } from '../../Hooks/useRefFunction';
 import { ChartRender } from '../../Plugins/chart/ChartRender';
 import { parseChineseCurrencyToNumber } from '../../Plugins/chart/utils';
+import { debugInfo } from '../../Utils/debugUtils';
+import { extractBlockTextContent } from '../extractBlockTextContent';
 import type { RendererBlockProps } from '../types';
-
-const extractTextContent = (children: React.ReactNode): string => {
-  if (typeof children === 'string') return children;
-  if (typeof children === 'number') return String(children);
-  if (Array.isArray(children)) return children.map(extractTextContent).join('');
-  if (React.isValidElement(children) && children.props?.children) {
-    return extractTextContent(children.props.children);
-  }
-  return '';
-};
 
 interface ChartData {
   config?: any;
@@ -89,9 +82,9 @@ const ChartWithRetry: React.FC<{
   } = props;
   const [retryKey, setRetryKey] = useState(0);
 
-  const handleChartError = React.useCallback(
+  const handleChartError = useRefFunction(
     (error: Error, info: React.ErrorInfo) => {
-      console.error('[MarkdownRenderer ChartBlockRenderer] 渲染失败:', {
+      debugInfo('[MarkdownRenderer ChartBlockRenderer] 渲染失败', {
         chartType,
         title: rest?.title,
         x,
@@ -104,12 +97,11 @@ const ChartWithRetry: React.FC<{
       });
       setRetryKey((k) => (k === 0 ? 1 : k));
     },
-    [chartType, rest?.title, x, y, chartDataItems.length, columns.length],
   );
 
-  const handleRetry = React.useCallback(() => {
+  const handleRetry = useRefFunction(() => {
     setRetryKey((k) => k + 1);
-  }, []);
+  });
 
   const chartFallback = (
     <div
@@ -188,20 +180,30 @@ export const ChartBlockRenderer: React.FC<RendererBlockProps> = (props) => {
   const [columnLength, setColumnLength] = useState(2);
   const [mounted, setMounted] = useState(false);
 
-  const code = extractTextContent(children);
+  const code = extractBlockTextContent(children);
   const chartData = useMemo(() => parseChartData(code), [code]);
 
   useEffect(() => {
     // 延迟一帧渲染图表，确保容器已挂载到 DOM 且有正确的宽度
     // 解决 recharts ResponsiveContainer 在零宽容器中崩溃的问题
+    let cancelled = false;
     const raf = requestAnimationFrame(() => {
+      if (cancelled) {
+        return;
+      }
       setMounted(true);
     });
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf);
+    };
   }, []);
 
   useEffect(() => {
     if (!mounted) return;
+    if (typeof window === 'undefined') {
+      return;
+    }
     const updateWidth = () => {
       const width = containerRef.current?.clientWidth || 400;
       const configs = chartData?.config

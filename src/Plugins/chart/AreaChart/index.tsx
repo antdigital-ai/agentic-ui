@@ -1,4 +1,4 @@
-import { ConfigProvider } from 'antd';
+﻿import { ConfigProvider } from 'antd';
 import {
   ChartData,
   Chart as ChartJS,
@@ -21,6 +21,7 @@ import {
   useChartDataFilter,
   useChartStatistics,
   useChartTheme,
+  useResolvedChartTheme,
   useResponsiveSize,
 } from '../hooks';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
@@ -217,7 +218,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
   style,
   styles: stylesProp,
   dataTime,
-  theme = 'light',
+  theme,
   color,
   showLegend = true,
   legendPosition = 'bottom',
@@ -247,7 +248,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
   // 样式注册
   const context = useContext(ConfigProvider.ConfigContext);
   const baseClassName = context?.getPrefixCls('area-chart-container');
-  const { wrapSSR, hashId } = useStyle(baseClassName);
+  const { hashId } = useStyle(baseClassName);
 
   const chartRef = useRef<ChartJS<'line'>>(null);
 
@@ -266,8 +267,8 @@ const AreaChart: React.FC<AreaChartProps> = ({
     filteredDataByFilterLabel,
   } = useChartDataFilter(data);
 
-  // 主题颜色
-  const { axisTextColor, gridColor, isLight } = useChartTheme(theme);
+  const { resolvedTheme, autoDetectTheme } = useResolvedChartTheme(theme);
+  const { axisTextColor, gridColor, isLight } = useChartTheme(resolvedTheme);
 
   // 从数据中提取唯一的类型
   const types = useMemo(() => {
@@ -470,18 +471,19 @@ const AreaChart: React.FC<AreaChartProps> = ({
   const toolbarClassName = classNames(classNamesProp?.toolbar);
   const toolbarStyle = stylesProp?.toolbar;
 
-  return wrapSSR(
+  return (
     <ChartContainer
       baseClassName={baseClassName}
       className={rootClassName}
-      theme={theme}
+      theme={resolvedTheme}
+      autoDetectTheme={autoDetectTheme}
       isMobile={isMobile}
       variant={variant}
       style={rootStyle}
     >
       <ChartToolBar
         title={title}
-        theme={theme}
+        theme={resolvedTheme}
         onDownload={handleDownload}
         className={toolbarClassName}
         style={toolbarStyle}
@@ -499,7 +501,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
                 selectedCustomSelection: selectedFilterLabel,
                 onSelectionChange: setSelectedFilterLabel,
               })}
-              theme={theme}
+              theme={resolvedTheme}
               variant="compact"
             />
           ) : undefined
@@ -511,7 +513,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
           className={classNames(`${baseClassName}-statistic-container`, hashId)}
         >
           {statistics.map((config, index) => (
-            <ChartStatistic key={index} {...config} theme={theme} />
+            <ChartStatistic key={index} {...config} theme={resolvedTheme} />
           ))}
         </div>
       )}
@@ -526,7 +528,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
             selectedCustomSelection: selectedFilterLabel,
             onSelectionChange: setSelectedFilterLabel,
           })}
-          theme={theme}
+          theme={resolvedTheme}
         />
       )}
 
@@ -536,7 +538,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
       >
         <Line ref={chartRef} data={processedData} options={options} />
       </div>
-    </ChartContainer>,
+    </ChartContainer>
   );
 };
 

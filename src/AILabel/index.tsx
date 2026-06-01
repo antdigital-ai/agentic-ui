@@ -1,20 +1,31 @@
 import { ConfigProvider, Tooltip, TooltipProps } from 'antd';
 import classNames from 'clsx';
 import React, { memo, useContext, useMemo, useState } from 'react';
+import { useRefFunction } from '../Hooks/useRefFunction';
 import { AIGraphic } from './AIGraphic';
 import { AIGraphicDisabled } from './AIGraphicDisabled';
 import { prefixCls, useStyle } from './style';
 
 /**
+ * AI 标签所有可选状态值的列表（运行时可枚举）。
+ *
+ * 使用 `as const` 元组而非 `enum`，与项目 TypeScript 规范一致：
+ * - 没有 enum 带来的双向映射、运行时常量对象等额外产物
+ * - 可直接 `.includes()` 校验输入合法性
+ * - 类型 {@link AILabelStatus} 由该数组派生，新增状态只需在此一处维护
+ */
+export const AI_LABEL_STATUSES = ['default', 'watermark', 'emphasis'] as const;
+
+/**
  * AI 标签状态类型
  * @typedef AILabelStatus
- * @description 定义 AI 标签的显示状态
+ * @description 定义 AI 标签的显示状态。由 {@link AI_LABEL_STATUSES} 派生。
  *
- * @property {'default'} default - 默认状态，标准 AI 标签样式
- * @property {'watermark'} watermark - 水印状态，半透明样式，用于合规性标识
- * @property {'emphasis'} emphasis - 强调状态，突出显示 AI 标签，带有渐变背景
+ * - `default`: 默认状态，标准 AI 标签样式
+ * - `watermark`: 水印状态，半透明样式，用于合规性标识
+ * - `emphasis`: 强调状态，突出显示 AI 标签，带有渐变背景
  */
-export type AILabelStatus = 'default' | 'watermark' | 'emphasis';
+export type AILabelStatus = (typeof AI_LABEL_STATUSES)[number];
 
 /**
  * AI 标签组件的属性接口
@@ -22,6 +33,8 @@ export type AILabelStatus = 'default' | 'watermark' | 'emphasis';
  * @extends React.HTMLAttributes<HTMLSpanElement>
  */
 export interface AILabelProps extends React.HTMLAttributes<HTMLSpanElement> {
+  /** 自动化测试用根节点标识，未设置时默认与主题前缀一致 */
+  'data-testid'?: string;
   /**
    * 标签状态
    * @description 控制标签的视觉样式，支持默认、水印和强调三种状态
@@ -108,8 +121,11 @@ export interface AILabelProps extends React.HTMLAttributes<HTMLSpanElement> {
  * - 提供位置偏移功能，可精确控制标签位置
  * - 支持 Tooltip 提示，可自定义提示内容
  * - 当存在子元素时，标签会自动定位到子元素右上角
- * - 使用 framer-motion 提供平滑的动画效果
+ * - 切换状态时使用 CSS transition 提供平滑过渡（详见 `style.ts`）
  * - 水印状态下，当 Tooltip 未打开时显示禁用图标
+ *
+ * @important children 应为 inline 级元素或文本，避免传入 `<div>` 等 block 级元素
+ *   （根节点是 `<span>`，块级元素嵌入会构成无效 HTML，被浏览器宽容修正后可能影响布局）
  */
 const AILabelComponent = React.forwardRef<HTMLSpanElement, AILabelProps>(
   (props, ref) => {
@@ -121,24 +137,28 @@ const AILabelComponent = React.forwardRef<HTMLSpanElement, AILabelProps>(
       style,
       rootStyle,
       children,
+      'data-testid': dataTestId,
       ...restProps
     } = props;
 
     const context = useContext(ConfigProvider.ConfigContext);
     const baseCls = context?.getPrefixCls(prefixCls);
-    const { wrapSSR, hashId } = useStyle(baseCls);
+    const { hashId } = useStyle(baseCls);
 
     // 合并样式，处理偏移量
+    // - 水平方向：通过 `insetInlineEnd: -offsetX` 实现 RTL 友好的右侧偏移
+    //   （offsetX 为正 → 标签向左，offsetX 为负 → 标签向右）
+    // - 垂直方向：直接通过 `marginTop` 推/拉
+    // 直接使用 number，避免 `String(...) + parseInt` 带来的精度丢失与冗余转换
     const mergedStyle = useMemo<React.CSSProperties>(() => {
       if (!offset) {
         return { ...style };
       }
 
-      const horizontalOffset = Number.parseInt(String(offset[0]), 10);
-
+      const [offsetX, offsetY] = offset;
       const offsetStyle: React.CSSProperties = {
-        marginTop: offset[1],
-        insetInlineEnd: -horizontalOffset,
+        marginTop: offsetY,
+        insetInlineEnd: -offsetX,
       };
 
       return { ...offsetStyle, ...style };
@@ -148,10 +168,10 @@ const AILabelComponent = React.forwardRef<HTMLSpanElement, AILabelProps>(
     const [tooltipOpen, setTooltipOpen] = useState(false);
 
     // 处理 Tooltip 状态变化
-    const handleTooltipOpenChange = (open: boolean) => {
+    const handleTooltipOpenChange = useRefFunction((open: boolean) => {
       setTooltipOpen(open);
       tooltip?.onOpenChange?.(open);
-    };
+    });
 
     // 计算类名
     const badgeClassName = classNames(
@@ -165,19 +185,22 @@ const AILabelComponent = React.forwardRef<HTMLSpanElement, AILabelProps>(
       hashId,
     );
 
-    // 渲染图标（使用提前返回优化）
-    const renderIcon = () => {
+    // 缓存图标节点，避免每次渲染创建新元素：
+    // - watermark 且 Tooltip 关闭：灰色置灰图标
+    // - 其他情况：彩色图标
+    const iconNode = useMemo(() => {
       if (status === 'watermark' && !tooltipOpen) {
         return <AIGraphicDisabled />;
       }
       return <AIGraphic />;
-    };
+    }, [status, tooltipOpen]);
 
-    return wrapSSR(
+    return (
       <span
         ref={ref}
         {...restProps}
         className={badgeClassName}
+        data-testid={dataTestId ?? baseCls}
         style={rootStyle}
       >
         {children}
@@ -186,10 +209,10 @@ const AILabelComponent = React.forwardRef<HTMLSpanElement, AILabelProps>(
             className={classNames(`${baseCls}-dot`, hashId)}
             style={mergedStyle}
           >
-            {renderIcon()}
+            {iconNode}
           </sup>
         </Tooltip>
-      </span>,
+      </span>
     );
   },
 );
@@ -198,3 +221,7 @@ AILabelComponent.displayName = 'AILabel';
 
 // 使用 React.memo 优化性能，避免不必要的重新渲染
 export const AILabel = memo(AILabelComponent);
+
+// memo 包装会丢失内部 forwardRef 的 displayName，这里显式补回，
+// 便于 React DevTools / 测试 snapshot 识别。
+(AILabel as unknown as { displayName?: string }).displayName = 'AILabel';

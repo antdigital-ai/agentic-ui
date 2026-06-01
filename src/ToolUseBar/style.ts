@@ -1,16 +1,30 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../Hooks/useStyle';
+﻿import {
+  CARD_RESIZE_DURATION_MS,
+  CARD_RESIZE_EASING,
+} from '../Constants/cardResizeMotion';
+import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'ToolUseBar'> = (token) => {
   return {
+    '@property --tool-rotate': {
+      syntax: "'<angle>'",
+      inherits: false,
+      initialValue: '0deg',
+    } as any,
+    '@keyframes toolUseBarSpin': {
+      from: { '--tool-rotate': '0deg' },
+      to: { '--tool-rotate': '360deg' },
+    },
     [token.componentCls]: {
+      '--resize-dur': `${CARD_RESIZE_DURATION_MS}ms`,
+      '--resize-ease': CARD_RESIZE_EASING,
       maxWidth: '100%',
       '&-no-animation': {
         '& *': {
           transition: 'none !important',
+        },
+        '&-tool-image-wrapper-loading': {
+          animation: 'none !important',
         },
       },
       display: 'flex',
@@ -139,7 +153,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         cursor: 'pointer',
         transition: 'all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
         '&:hover': {
-          color: '#959DA8',
+          color: 'var(--color-gray-text-light)',
         },
       },
 
@@ -154,7 +168,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         lineClamp: 1,
         '&-loading': {
           position: 'relative',
-          color: '#000',
+          color: 'var(--color-gray-text-default)',
         },
       },
 
@@ -176,13 +190,18 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         '&-loading': {
           borderRadius: '50%',
           position: 'relative',
+          animation: 'toolUseBarSpin 1s linear infinite',
+          '& > svg, & > *:first-child': {
+            position: 'relative',
+            zIndex: 1,
+          },
           '&::after': {
             content: '""',
             position: 'absolute',
             inset: '0',
             borderRadius: '50%',
             background:
-              'conic-gradient(from var(--rotate, 0deg),transparent 0deg 0deg, #5EF050 35deg 55deg, #37ABFF 105deg 115deg,  #D7B9FF 135deg 135deg, transparent 165deg 360deg)',
+              'conic-gradient(from var(--tool-rotate, 0deg), transparent 0deg 0deg, #5EF050 35deg 55deg, #37ABFF 105deg 115deg, #D7B9FF 135deg 135deg, transparent 165deg 360deg)',
             WebkitMask:
               'radial-gradient(50% 50% at 50% 50%, rgba(255, 0, 0, 0) 65%, #FF0000 100%)',
             mask: 'radial-gradient(50% 50% at 50% 50%, rgba(255, 0, 0, 0) 80%, #FF0000 80%, #FF0000 100%)',
@@ -246,7 +265,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         },
         '&-loading': {
           position: 'relative',
-          color: '#000',
+          color: 'var(--color-gray-text-default)',
         },
       },
       '&-tool-time-expand': {
@@ -266,28 +285,30 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         borderRadius: '12px',
         background: 'var(--color-gray-control-fill-active)',
         padding: '4px 6px',
-        color: '#767E8B',
+        color: 'var(--color-gray-text-secondary)',
         gap: '8px',
         zIndex: 1,
       },
       '&-tool-container': {
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-        maxHeight: 0,
-        overflow: 'hidden',
+        display: 'grid',
+        gridTemplateRows: '0fr',
         opacity: 0,
         pointerEvents: 'none',
-        transition:
-          'max-height 0.16s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.12s linear',
+        transition: [
+          `grid-template-rows var(--resize-dur) var(--resize-ease)`,
+          `opacity var(--resize-dur) var(--resize-ease)`,
+        ].join(','),
         position: 'relative',
         paddingInline: 4,
         paddingBottom: 0,
+        '& > *': {
+          overflow: 'hidden',
+          minHeight: 0,
+        },
         '&-expanded': {
-          maxHeight: 700,
+          gridTemplateRows: '1fr',
           opacity: 1,
           pointerEvents: 'auto',
-          overflowY: 'auto',
           paddingBottom: 4,
         },
         '&-light': {
@@ -304,7 +325,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         fontWeight: 'normal',
         lineHeight: '160%',
         letterSpacing: 'normal',
-        color: '#767E8B',
+        color: 'var(--color-gray-text-secondary)',
       },
       '&-tool-content-expand': {
         display: 'flex',
@@ -329,8 +350,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         display: 'flex',
         width: '100%',
         borderRadius: 'var(--radius-control-base)',
-        background: 'var(--color-yellow-bg-tip)',
-        color: '#A56900',
+        background: 'var(--color-yellow-bg-tip, rgba(250, 173, 20, 0.08))',
+        color: 'var(--color-yellow-text-secondary)',
         padding: '8px',
         fontSize: 'var(--font-size-base)',
         alignItems: 'center',
@@ -344,21 +365,58 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
       '&-tool-error': {
         '&-tool-image-wrapper': {
-          '& .anticon': {
-            color: '#F15B50',
+          [`& ${token.iconCls}`]: {
+            color: 'var(--color-red-text-default)',
           },
+        },
+      },
+
+      // 加载态横扫蒙版动画（替代 framer-motion 的 maskImage 关键帧动画）
+      // 通过遮罩在文字上做从左到右的高光横扫，提示进行中
+      [`@keyframes ${token.componentCls}-toolMaskSweep`]: {
+        from: {
+          WebkitMaskImage:
+            'linear-gradient(to right, rgba(0,0,0,0.99) -50%, rgba(0,0,0,0.15) -50%, rgba(0,0,0,0.99) 150%)',
+          maskImage:
+            'linear-gradient(to right, rgba(0,0,0,0.99) -50%, rgba(0,0,0,0.15) -50%, rgba(0,0,0,0.99) 150%)',
+        },
+        to: {
+          WebkitMaskImage:
+            'linear-gradient(to right, rgba(0,0,0,0.99) -50%, rgba(0,0,0,0.15) 150%, rgba(0,0,0,0.99) 150%)',
+          maskImage:
+            'linear-gradient(to right, rgba(0,0,0,0.99) -50%, rgba(0,0,0,0.15) 150%, rgba(0,0,0,0.99) 150%)',
+        },
+      },
+      // 加载态横扫修饰类，由 ToolHeaderRight 在 loading 时挂载
+      '&-tool-header-right-loading': {
+        WebkitMaskImage:
+          'linear-gradient(to right, rgba(0,0,0,0.99) -30%, rgba(0,0,0,0.15) -50%, rgba(0,0,0,0.99) 120%)',
+        maskImage:
+          'linear-gradient(to right, rgba(0,0,0,0.99) -30%, rgba(0,0,0,0.15) -50%, rgba(0,0,0,0.99) 120%)',
+        animationName: `${token.componentCls}-toolMaskSweep`,
+        animationDuration: '1s',
+        animationTimingFunction: 'linear',
+        animationIterationCount: 'infinite',
+      },
+
+      '@media (prefers-reduced-motion: reduce)': {
+        '&-tool-container': {
+          transition: 'none !important',
+        },
+        '&-tool-image-wrapper-loading': {
+          animation: 'none',
+        },
+        '&-tool-header-right-loading': {
+          animation: 'none',
         },
       },
     },
   } as any;
 };
 
+const useGenStyle = genStyleHooks('ToolUseBar', genStyle);
+
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('tool-use-bar', (token) => {
-    const toolBarToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [genStyle(toolBarToken)];
-  });
+  const [, hashId] = useGenStyle(prefixCls ?? 'tool-use-bar');
+  return { hashId };
 }

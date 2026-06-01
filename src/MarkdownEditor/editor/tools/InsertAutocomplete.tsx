@@ -11,16 +11,11 @@ import { Button, ConfigProvider, Input, Menu, Tabs } from 'antd';
 import { ItemType } from 'antd/es/breadcrumb/Breadcrumb';
 import classNames from 'clsx';
 import isHotkey from 'is-hotkey';
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-} from 'react';
+import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { Editor, Element, Node, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
+import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { I18nContext, LocalKeys } from '../../../I18n';
 import { CardNode } from '../../el';
 import { useSubject } from '../../hooks/subscribe';
@@ -289,14 +284,14 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
     text: '',
   });
 
-  const clickClose = useCallback((e: Event) => {
+  const clickClose = useRefFunction((e: Event) => {
     if (!dom.current?.contains(e.target as HTMLElement)) {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       close();
     }
-  }, []);
+  });
 
-  const close = useCallback(() => {
+  const close = useRefFunction(() => {
     setState({
       filterOptions: [],
       options: [],
@@ -308,9 +303,9 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
     });
     if (typeof window === 'undefined') return;
     window.removeEventListener('click', clickClose);
-  }, []);
+  });
 
-  const runInsertTask = useCallback(
+  const runInsertTask = useRefFunction(
     async (
       op: InsertOptions['children'][number],
       params?: {
@@ -359,10 +354,9 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
         close();
       }
     },
-    [],
   );
 
-  const insertAttachByLink = useCallback(async () => {
+  const insertAttachByLink = useRefFunction(async () => {
     setState({ loading: true });
     try {
       let url = state.insertUrl;
@@ -411,9 +405,9 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
     } finally {
       setState({ loading: false });
     }
-  }, []);
+  });
 
-  const keydown = useCallback((e: KeyboardEvent) => {
+  const keydown = useRefFunction((e: KeyboardEvent) => {
     if (
       state.options.length &&
       (e.key === 'ArrowUp' || e.key === 'ArrowDown')
@@ -464,7 +458,7 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
       setOpenInsertCompletion?.(false);
       EditorUtils.focus(markdownEditorRef.current);
     }
-  }, []);
+  });
 
   const i18n = useContext(I18nContext);
 
@@ -479,7 +473,7 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
   /**
    * 插入媒体
    */
-  const insertMedia = useCallback(async () => {
+  const insertMedia = useRefFunction(async () => {
     setState({ loading: true });
     try {
       let url = state.insertUrl;
@@ -520,7 +514,7 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
     } finally {
       setState({ loading: false });
     }
-  }, []);
+  });
 
   useSubject(insertCompletionText$, (text) => {
     let tempText = text || '';
@@ -640,7 +634,10 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
         };
         if (node?.[0]?.type === 'paragraph') {
           try {
-            const el = ReactEditor.toDOMNode(markdownEditorRef.current, node[0]);
+            const el = ReactEditor.toDOMNode(
+              markdownEditorRef.current,
+              node[0],
+            );
             if (el) {
               const position = calculatePosition(el, document.body);
               if (position) {
@@ -676,211 +673,207 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
     `agentic-md-editor-insert-autocomplete`,
   );
 
-  const { wrapSSR, hashId } = useStyle(baseClassName);
+  const { hashId } = useStyle(baseClassName);
 
   return ReactDOM.createPortal(
-    wrapSSR(
-      <div
-        ref={dom}
-        className={classNames(baseClassName, hashId)}
-        style={{
-          position: 'absolute',
-          zIndex: 9999,
-          display:
-            !openInsertCompletion || !state.filterOptions.length
-              ? 'none'
-              : 'flex',
-          width: state.insertLink || state.insertAttachment ? 320 : undefined,
-          maxHeight: 212,
-          overflowY: 'auto',
-          left: state.left,
-          top: state.top,
-          bottom: state.bottom,
-        }}
-        onMouseDown={(e) => {
-          e.preventDefault();
-        }}
-      >
-        {!state.insertLink && !state.insertAttachment && (
-          <>
-            <Menu
-              items={
-                props.optionsRender?.(
-                  state.filterOptions
-                    .map((l) => {
-                      return {
-                        label: l?.label?.[1],
-                        key: l?.key,
-                        icon: l?.children?.[0]?.icon,
-                        children: l?.children?.map((el) => ({
-                          label: el.label?.[1],
-                          key: el.key,
-                          icon: el.icon,
-                          onClick: (_: any) => {
-                            _.domEvent.stopPropagation();
-                            _.domEvent.preventDefault();
+    <div
+      ref={dom}
+      className={classNames(baseClassName, hashId)}
+      style={{
+        position: 'absolute',
+        zIndex: 9999,
+        display:
+          !openInsertCompletion || !state.filterOptions.length
+            ? 'none'
+            : 'flex',
+        width: state.insertLink || state.insertAttachment ? 320 : undefined,
+        maxHeight: 212,
+        overflowY: 'auto',
+        left: state.left,
+        top: state.top,
+        bottom: state.bottom,
+      }}
+      onMouseDown={(e) => {
+        e.preventDefault();
+      }}
+    >
+      {!state.insertLink && !state.insertAttachment && (
+        <>
+          <Menu
+            _internalDisableMenuItemTitleTooltip
+            items={
+              props.optionsRender?.(
+                state.filterOptions
+                  .map((l) => {
+                    return {
+                      label: l?.label?.[1],
+                      key: l?.key,
+                      icon: l?.children?.[0]?.icon,
+                      children: l?.children?.map((el) => ({
+                        label: el.label?.[1],
+                        key: el.key,
+                        icon: el.icon,
+                        onClick: (_: any) => {
+                          _.domEvent.stopPropagation();
+                          _.domEvent.preventDefault();
 
-                            const task = insertOptions
-                              .map((o) => o?.children)
-                              .flat(1)
-                              .find((o) => {
-                                return o.key === el.key;
-                              });
+                          const task = insertOptions
+                            .map((o) => o?.children)
+                            .flat(1)
+                            .find((o) => {
+                              return o.key === el.key;
+                            });
 
-                            const myInsertOptions =
-                              props?.insertOptions?.find?.(
-                                (o) => o.key === el.key,
-                              );
+                          const myInsertOptions = props?.insertOptions?.find?.(
+                            (o) => o.key === el.key,
+                          );
 
-                            if (myInsertOptions) {
-                              runInsertTask(myInsertOptions, {
-                                isCustom: true,
-                              });
-                              return;
-                            }
-
-                            if (task) {
-                              runInsertTask(task);
-                            }
-                          },
-                        })),
-                      };
-                    })
-                    .map((l) => {
-                      return l?.children;
-                    })
-                    .flat(1) || [],
-                ) as any[]
-              }
-            />
-          </>
-        )}
-        {state.insertLink && (
-          <div
-            style={{
-              padding: 8,
-            }}
-          >
-            <div
-              style={{
-                fontSize: '1em',
-                color: 'rgba(0,0,0,0.8)',
-                marginBottom: 4,
-                display: 'flex',
-                alignContent: 'center',
-                gap: 4,
-              }}
-            >
-              <PlayCircleOutlined />
-              <span>Embed media links</span>
-            </div>
-            <Input
-              placeholder={'Paste media link'}
-              onMouseDown={(e) => e.stopPropagation()}
-              value={state.insertUrl}
-              onKeyDown={(e) => {
-                if (isHotkey('enter', e)) {
-                  insertMedia();
-                }
-              }}
-              onChange={(e) => setState({ insertUrl: e.target.value })}
-            />
-            <Button
-              block={true}
-              loading={state.loading}
-              type={'primary'}
-              size={'small'}
-              style={{
-                marginTop: '1em',
-              }}
-              onClick={insertMedia}
-              disabled={!state.insertUrl}
-            >
-              Embed
-            </Button>
-          </div>
-        )}
-        {state.insertAttachment && (
-          <div
-            style={{
-              width: 320,
-              padding: 8,
-            }}
-          >
-            <Tabs
-              size={'small'}
-              items={[
-                {
-                  label: 'Local',
-                  key: 'local',
-                  children: (
-                    <div>
-                      <Button
-                        block={true}
-                        size={'small'}
-                        type={'primary'}
-                        onClick={() => {
-                          Transforms.insertText(markdownEditorRef.current, '', {
-                            at: {
-                              anchor: Editor.start(
-                                markdownEditorRef.current,
-                                ctx.current.path,
-                              ),
-                              focus: Editor.end(
-                                markdownEditorRef.current,
-                                ctx.current.path,
-                              ),
-                            },
-                          });
-                          setState({ insertUrl: '' });
-                          insertAttachByLink();
-                        }}
-                      >
-                        Choose a file
-                      </Button>
-                    </div>
-                  ),
-                },
-                {
-                  label: 'Embed Link',
-                  key: 'embed',
-                  children: (
-                    <div>
-                      <Input
-                        placeholder={'Paste attachment link'}
-                        onMouseDown={(e) => e.stopPropagation()}
-                        value={state.insertUrl}
-                        onKeyDown={(e) => {
-                          if (isHotkey('enter', e)) {
-                            insertAttachByLink();
+                          if (myInsertOptions) {
+                            runInsertTask(myInsertOptions, {
+                              isCustom: true,
+                            });
+                            return;
                           }
-                        }}
-                        onChange={(e) =>
-                          setState({ insertUrl: e.target.value })
-                        }
-                      />
-                      <Button
-                        block={true}
-                        loading={state.loading}
-                        type={'primary'}
-                        style={{
-                          marginTop: '1em',
-                        }}
-                        size={'small'}
-                        onClick={insertAttachByLink}
-                        disabled={!state.insertUrl}
-                      >
-                        Embed
-                      </Button>
-                    </div>
-                  ),
-                },
-              ]}
-            />
+
+                          if (task) {
+                            runInsertTask(task);
+                          }
+                        },
+                      })),
+                    };
+                  })
+                  .map((l) => {
+                    return l?.children;
+                  })
+                  .flat(1) || [],
+              ) as any[]
+            }
+          />
+        </>
+      )}
+      {state.insertLink && (
+        <div
+          style={{
+            padding: 8,
+          }}
+        >
+          <div
+            style={{
+              fontSize: '1em',
+              color: 'rgba(0,0,0,0.8)',
+              marginBottom: 4,
+              display: 'flex',
+              alignContent: 'center',
+              gap: 4,
+            }}
+          >
+            <PlayCircleOutlined />
+            <span>{i18n.locale['editor.embedMediaLinks']}</span>
           </div>
-        )}
-      </div>,
-    ),
+          <Input
+            placeholder={i18n.locale['editor.pasteMediaLink']}
+            onMouseDown={(e) => e.stopPropagation()}
+            value={state.insertUrl}
+            onKeyDown={(e) => {
+              if (isHotkey('enter', e)) {
+                insertMedia();
+              }
+            }}
+            onChange={(e) => setState({ insertUrl: e.target.value })}
+          />
+          <Button
+            block={true}
+            loading={state.loading}
+            type={'primary'}
+            size={'small'}
+            style={{
+              marginTop: '1em',
+            }}
+            onClick={insertMedia}
+            disabled={!state.insertUrl}
+          >
+            {i18n.locale['editor.embed']}
+          </Button>
+        </div>
+      )}
+      {state.insertAttachment && (
+        <div
+          style={{
+            width: 320,
+            padding: 8,
+          }}
+        >
+          <Tabs
+            size={'small'}
+            items={[
+              {
+                label: i18n.locale['editor.local'],
+                key: 'local',
+                children: (
+                  <div>
+                    <Button
+                      block={true}
+                      size={'small'}
+                      type={'primary'}
+                      onClick={() => {
+                        Transforms.insertText(markdownEditorRef.current, '', {
+                          at: {
+                            anchor: Editor.start(
+                              markdownEditorRef.current,
+                              ctx.current.path,
+                            ),
+                            focus: Editor.end(
+                              markdownEditorRef.current,
+                              ctx.current.path,
+                            ),
+                          },
+                        });
+                        setState({ insertUrl: '' });
+                        insertAttachByLink();
+                      }}
+                    >
+                      {i18n.locale['editor.chooseFile']}
+                    </Button>
+                  </div>
+                ),
+              },
+              {
+                label: i18n.locale['editor.embedLink'],
+                key: 'embed',
+                children: (
+                  <div>
+                    <Input
+                      placeholder={i18n.locale['editor.pasteAttachmentLink']}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      value={state.insertUrl}
+                      onKeyDown={(e) => {
+                        if (isHotkey('enter', e)) {
+                          insertAttachByLink();
+                        }
+                      }}
+                      onChange={(e) => setState({ insertUrl: e.target.value })}
+                    />
+                    <Button
+                      block={true}
+                      loading={state.loading}
+                      type={'primary'}
+                      style={{
+                        marginTop: '1em',
+                      }}
+                      size={'small'}
+                      onClick={insertAttachByLink}
+                      disabled={!state.insertUrl}
+                    >
+                      Embed
+                    </Button>
+                  </div>
+                ),
+              },
+            ]}
+          />
+        </div>
+      )}
+    </div>,
     document.body,
   );
 };

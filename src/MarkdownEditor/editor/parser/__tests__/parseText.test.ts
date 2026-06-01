@@ -15,21 +15,6 @@ vi.mock('../parse/parseElements', () => ({
   handleInlineCode: vi.fn((n: any) => ({ code: true, text: n?.value ?? '' })),
 }));
 
-vi.mock('../parse/parseMath', () => ({
-  shouldTreatInlineMathAsText: vi.fn((value: string) => {
-    if (!value?.trim()) return true;
-    if (/[=^_\\{}]/.test(value)) return false;
-    return (
-      /^[+-]?\d{1,3}(?:,\d{3})*(?:\.\d+)?(?:%|[kKmMbB]|千|万|亿|兆|万亿|百万|亿万)?$/.test(
-        value,
-      ) ||
-      /^[+-]?\d+(?:\.\d+)?(?:%|[kKmMbB]|千|万|亿|兆|万亿|百万|亿万)?$/.test(
-        value,
-      )
-    );
-  }),
-}));
-
 describe('parseText', () => {
   describe('setFinishedProp', () => {
     it('finished 不为 false 时返回原 leaf', () => {
@@ -113,15 +98,16 @@ describe('parseText', () => {
       expect(result[0].text).toBe('code');
     });
 
-    it('inlineMath 当 shouldTreatInlineMathAsText 为 false 时生成 inline-katex', () => {
+    it('inlineMath 始终保留为 $...$ 文本，不生成 inline-katex', () => {
       const result = parseText([{ type: 'inlineMath', value: 'x^2' } as any]);
-      expect(result[0].type).toBe('inline-katex');
-      expect(result[0].children).toEqual([{ text: 'x^2' }]);
+      expect(result[0].type).toBeUndefined();
+      expect(result[0].text).toBe('$x^2$');
     });
 
-    it('inlineMath 当 shouldTreatInlineMathAsText 为 true 时生成文本', () => {
-      const result = parseText([{ type: 'inlineMath', value: '1' } as any]);
-      expect(result[0].text).toBe('$1$');
+    it('inlineMath 金额类内容保留为文本', () => {
+      const result = parseText([{ type: 'inlineMath', value: '24.4B' } as any]);
+      expect(result[0].text).toBe('$24.4B$');
+      expect(result[0].type).toBeUndefined();
     });
 
     it('text 节点走默认 value 分支', () => {
@@ -169,6 +155,11 @@ describe('parseText', () => {
     it('tag 为 strong 时设置 bold', () => {
       const result = applyHtmlTagsToElement({ text: 'x' }, [{ tag: 'strong' }]);
       expect(result.bold).toBe(true);
+    });
+
+    it('tag 为 mark 时设置 mark', () => {
+      const result = applyHtmlTagsToElement({ text: 'hi' }, [{ tag: 'mark' }]);
+      expect(result).toEqual({ text: 'hi', mark: true });
     });
   });
 

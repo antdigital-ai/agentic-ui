@@ -37,12 +37,20 @@ Pure 模式是 Bubble 组件的简洁版本，特点：
 - ⚡ **轻量级**：减少视觉干扰，突出内容
 
 适用于需要低调显示的聊天场景。`,
-    { createAt: Date.now() - 180000, updateAt: Date.now() - 180000, meta: ASSISTANT_DESIGN_META },
+    {
+      createAt: Date.now() - 180000,
+      updateAt: Date.now() - 180000,
+      meta: ASSISTANT_DESIGN_META,
+    },
   ),
   createUserMessage(
     '2',
     '这样看起来确实更简洁！什么时候使用 Pure 模式比较合适？',
-    { createAt: Date.now() - 120000, updateAt: Date.now() - 120000, meta: USER_PM_META },
+    {
+      createAt: Date.now() - 120000,
+      updateAt: Date.now() - 120000,
+      meta: USER_PM_META,
+    },
   ),
   createAssistantMessage(
     '3',
@@ -61,12 +69,20 @@ Pure 模式是 Bubble 组件的简洁版本，特点：
 | 适合独立聊天窗口 | 更好地融入页面布局 |
 
 试试切换下方的开关，感受两种模式的差异！`,
-    { createAt: Date.now() - 60000, updateAt: Date.now() - 60000, meta: ASSISTANT_DESIGN_META },
+    {
+      createAt: Date.now() - 60000,
+      updateAt: Date.now() - 60000,
+      meta: ASSISTANT_DESIGN_META,
+    },
   ),
   createUserMessage(
     '4',
     '太棒了！我现在明白了 Pure 模式的优势。能看看和普通模式的对比吗？',
-    { createAt: Date.now() - 30000, updateAt: Date.now() - 30000, meta: USER_PM_META },
+    {
+      createAt: Date.now() - 30000,
+      updateAt: Date.now() - 30000,
+      meta: USER_PM_META,
+    },
   ),
 ];
 
@@ -75,7 +91,11 @@ export default () => {
   const [isPureMode, setIsPureMode] = useState(true);
   const [showComparison, setShowComparison] = useState(false);
 
-  const renderBubble = (msg: typeof mockMessages[number], pure: boolean, keyPrefix = '') => (
+  const renderBubble = (
+    msg: (typeof mockMessages)[number],
+    pure: boolean,
+    keyPrefix = '',
+  ) => (
     <Bubble
       key={`${keyPrefix}${msg.id}`}
       avatar={msg.meta!}
@@ -91,7 +111,11 @@ export default () => {
     <div style={{ maxWidth: 900, margin: '0 auto', padding: 24 }}>
       <Card
         style={{ marginBottom: 24 }}
-        title={<Title level={4} style={{ margin: 0 }}>Pure 模式演示</Title>}
+        title={
+          <Title level={4} style={{ margin: 0 }}>
+            Pure 模式演示
+          </Title>
+        }
       >
         <Text type="secondary">
           Pure 模式提供更简洁的聊天气泡样式，适用于需要低调展示的场景。
@@ -100,28 +124,59 @@ export default () => {
         <Space size="large" style={{ display: 'flex', marginTop: 16 }}>
           <div>
             <Text strong>Pure 模式: </Text>
-            <Switch checked={isPureMode} onChange={setIsPureMode} checkedChildren="开启" unCheckedChildren="关闭" />
+            <Switch
+              checked={isPureMode}
+              onChange={setIsPureMode}
+              checkedChildren="开启"
+              unCheckedChildren="关闭"
+            />
           </div>
           <div>
             <Text strong>对比模式: </Text>
-            <Switch checked={showComparison} onChange={setShowComparison} checkedChildren="开启" unCheckedChildren="关闭" />
+            <Switch
+              checked={showComparison}
+              onChange={setShowComparison}
+              checkedChildren="开启"
+              unCheckedChildren="关闭"
+            />
           </div>
         </Space>
       </Card>
 
       {showComparison ? (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 24 }}>
-          {[{ title: '普通模式', pure: false, prefix: 'normal-' }, { title: 'Pure 模式', pure: true, prefix: 'pure-' }].map(({ title, pure, prefix }) => (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 24,
+            marginBottom: 24,
+          }}
+        >
+          {[
+            { title: '普通模式', pure: false, prefix: 'normal-' },
+            { title: 'Pure 模式', pure: true, prefix: 'pure-' },
+          ].map(({ title, pure, prefix }) => (
             <Card key={title} title={title} size="small">
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {mockMessages.slice(0, 2).map((msg) => renderBubble(msg, pure, prefix))}
+              <div
+                style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
+              >
+                {mockMessages
+                  .slice(0, 2)
+                  .map((msg) => renderBubble(msg, pure, prefix))}
               </div>
             </Card>
           ))}
         </div>
       ) : (
         <BubbleDemoCard title={`${isPureMode ? '✨ Pure' : '🎯 普通'}模式展示`}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: 24 }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 16,
+              padding: 24,
+            }}
+          >
             {mockMessages.map((msg) => renderBubble(msg, isPureMode))}
           </div>
         </BubbleDemoCard>

@@ -46,7 +46,8 @@ const INITIAL_MESSAGES: MessageBubbleData[] = [
 ];
 
 const BasicDemo = () => {
-  const [messages, setMessages] = useState<MessageBubbleData[]>(INITIAL_MESSAGES);
+  const [messages, setMessages] =
+    useState<MessageBubbleData[]>(INITIAL_MESSAGES);
   const chatRef = useRef<ChatLayoutRef>(null);
 
   const handleAddMessage = () => {

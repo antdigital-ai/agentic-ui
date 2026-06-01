@@ -5,9 +5,11 @@
 import type { RootContent, Table } from 'mdast';
 import { describe, expect, it, vi } from 'vitest';
 import {
+  columnKeyMatchesConfiguredField,
   getColumnAlignment,
   normalizeFieldName,
   parseTableOrChart,
+  resolveChartAxisFieldToColumnKey,
 } from '../parse/parseTable';
 import { parserMarkdownToSlateNode } from '../parserMarkdownToSlateNode';
 
@@ -48,6 +50,34 @@ describe('parseTable', () => {
     it('转义字符规范化', () => {
       expect(normalizeFieldName('a\\_b')).toBe('a_b');
       expect(normalizeFieldName('a\\\\b')).toBe('a\\b');
+    });
+  });
+
+  describe('columnKeyMatchesConfiguredField / resolveChartAxisFieldToColumnKey', () => {
+    it('全角括号单位后缀视为同一逻辑列名', () => {
+      expect(
+        columnKeyMatchesConfiguredField('GDP总量（万亿元）', 'GDP总量'),
+      ).toBe(true);
+    });
+
+    it('半角括号与多层括号后缀', () => {
+      expect(columnKeyMatchesConfiguredField('销量(万台)', '销量')).toBe(true);
+      expect(columnKeyMatchesConfiguredField('指标(A)(B)', '指标')).toBe(true);
+    });
+
+    it('配置名与列名不同时不匹配', () => {
+      expect(columnKeyMatchesConfiguredField('GDP', 'GDP总量')).toBe(false);
+      expect(columnKeyMatchesConfiguredField('GDP总量估算', 'GDP总量')).toBe(
+        false,
+      );
+    });
+
+    it('resolveChartAxisFieldToColumnKey 将短名解析为带单位的 dataIndex', () => {
+      const keys = ['年份', 'GDP总量（万亿元）'];
+      expect(resolveChartAxisFieldToColumnKey('GDP总量', keys)).toBe(
+        'GDP总量（万亿元）',
+      );
+      expect(resolveChartAxisFieldToColumnKey('年份', keys)).toBe('年份');
     });
   });
 
@@ -103,6 +133,30 @@ describe('parseTable', () => {
       const dataSource = inner?.otherProps?.dataSource;
       expect(dataSource).toHaveLength(1);
       expect(dataSource[0]).toEqual({ X: 'a', Y: 'b' });
+    });
+
+    it('图表 x/y 为短名且表头带括号单位时仍解析为 chart 并改写为实际 dataIndex', () => {
+      const table = minimalTable(
+        ['年份', 'GDP总量（万亿元）'],
+        [['2020', '103.49']],
+      );
+      const pre: RootContent = {
+        type: 'code',
+        language: 'html',
+        otherProps: {
+          chartType: 'column',
+          x: '年份',
+          y: 'GDP总量',
+          title: '中国GDP增长趋势',
+        },
+      };
+      const result = parseTableOrChart(table, pre, [], noopParseNodes as any);
+      const inner = (result as any).children?.[1];
+      expect(inner.type).toBe('chart');
+      const cfg = inner.otherProps?.config;
+      expect(cfg.chartType).toBe('column');
+      expect(cfg.x).toBe('年份');
+      expect(cfg.y).toBe('GDP总量（万亿元）');
     });
 
     it('contextChartConfig 中 config 为数字键对象时转为数组（262, 263）', () => {
@@ -268,6 +322,51 @@ describe('parseTableOrChart 通过 parserMarkdownToSlateNode', () => {
     expect(Array.isArray(config)).toBe(true);
     expect(config[0].chartType).toBe('line');
     expect(config[1].chartType).toBe('bar');
+  });
+
+  it('docCards 命中默认主标题别名时产出 chart 节点（保持 chartType 与列契约）', () => {
+    const md = `<!-- {"chartType": "docCards", "title": "优秀文档站"} -->
+| 名称 | 地址 | 简介 | 亮点 |
+| --- | --- | --- | --- |
+| Tailwind | https://tailwindcss.com | 文档结构清晰 | 交互式, 暗色模式 |
+| MDN | https://developer.mozilla.org | Web 权威参考 | 多语言, 可折叠 |`;
+    const result = parserMarkdownToSlateNode(md);
+    const card = result.schema.find((n: any) => n.type === 'card');
+    expect(card).toBeDefined();
+    const chart = (card as any).children?.[1];
+    expect(chart.type).toBe('chart');
+    const config = chart?.otherProps?.config;
+    expect(config?.chartType).toBe('docCards');
+    expect(chart?.otherProps?.dataSource).toHaveLength(2);
+    const columnIndices = (chart?.otherProps?.columns || []).map(
+      (c: any) => c.dataIndex,
+    );
+    expect(columnIndices).toEqual(['名称', '地址', '简介', '亮点']);
+  });
+
+  it('docCards 无可识别主标题列时整表降级为普通表格', () => {
+    const md = `<!-- {"chartType": "docCards"} -->
+| col1 | col2 |
+| --- | --- |
+| a | b |`;
+    const result = parserMarkdownToSlateNode(md);
+    const card = result.schema.find((n: any) => n.type === 'card');
+    expect(card).toBeDefined();
+    const inner = (card as any).children?.[1];
+    expect(inner.type).toBe('table');
+  });
+
+  it('docCards 通过 fieldMap.title 显式覆盖时即便表头无默认别名也能识别', () => {
+    const md = `<!-- {"chartType": "docCards", "fieldMap": {"title": "Foo"}} -->
+| Foo | Bar |
+| --- | --- |
+| x | y |`;
+    const result = parserMarkdownToSlateNode(md);
+    const card = result.schema.find((n: any) => n.type === 'card');
+    expect(card).toBeDefined();
+    const chart = (card as any).children?.[1];
+    expect(chart.type).toBe('chart');
+    expect(chart?.otherProps?.config?.chartType).toBe('docCards');
   });
 
   it('mergeCells + 空单元格通过注释传入', () => {

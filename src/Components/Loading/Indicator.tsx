@@ -74,10 +74,13 @@ const defaultStrokeColor: ProgressProps['strokeColor'] = {
  */
 function Indicator({ indicator, percent, size, style }: IndicatorProps) {
   if (indicator && React.isValidElement(indicator)) {
-    return cloneElement(indicator, (currentProps: any) => ({
-      style: { ...currentProps.style, ...style },
+    const indicatorProps = (indicator.props ?? {}) as {
+      style?: React.CSSProperties;
+    };
+    return cloneElement(indicator as React.ReactElement<any>, {
+      style: { ...indicatorProps.style, ...style },
       percent,
-    }));
+    });
   }
 
   if (percent !== undefined && percent !== null) {
@@ -86,9 +89,7 @@ function Indicator({ indicator, percent, size, style }: IndicatorProps) {
         type="circle"
         percent={percent}
         strokeColor={defaultStrokeColor}
-        // TODO：Progress 不适用 1em 的 size
-        // @ts-ignore
-        size={size}
+        size={size as number | undefined}
         showInfo={false}
         strokeWidth={12}
         style={style}

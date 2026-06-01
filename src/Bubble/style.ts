@@ -6,6 +6,13 @@ import {
 } from '../Hooks/useStyle';
 import { BubbleProps } from './type';
 
+/** 气泡内容最大宽度上限（与 Markdown 编辑器内容容器对齐） */
+const BUBBLE_CONTENT_MAX_WIDTH = 'min(860px,100%)';
+/** 气泡内容圆角，与设计系统对齐 */
+const BUBBLE_CONTENT_RADIUS = '12px';
+/** 用户气泡最大宽度（设计稿约束） */
+const USER_BUBBLE_MAX_WIDTH = '668px';
+
 const genStyle = (
   token: ChatTokenType,
   classNames?: BubbleProps['classNames'],
@@ -82,7 +89,7 @@ const genStyle = (
       '&-bubble-content': {
         fontSize: '1em',
         minHeight: '2em',
-        maxWidth: 'min(860px,100%)',
+        maxWidth: BUBBLE_CONTENT_MAX_WIDTH,
         justifyContent: 'center',
         gap: 0,
         lineHeight: '22px',
@@ -90,7 +97,7 @@ const genStyle = (
         backdropFilter: 'blur(10px)',
         color: 'var(--color-gray-text-secondary)',
         width: 'max-content',
-        borderRadius: '12px',
+        borderRadius: BUBBLE_CONTENT_RADIUS,
         background: 'var(--color-gray-bg-card-white)',
         boxShadow: 'var(--shadow-control-base)',
         display: 'flex',
@@ -108,19 +115,32 @@ const genStyle = (
           color: 'var(--color-gray-text-default)',
         },
         '&-standalone': {
-          maxWidth: 'min(860px,100%)',
+          maxWidth: BUBBLE_CONTENT_MAX_WIDTH,
         },
-        '*': {
-          whiteSpace: 'pre-wrap',
+        // 换行仅作用于 Markdown 正文节点（不再对 bubble-content 使用 `*`）
+        [`& ${token.antCls}-agentic-md-editor-content div[data-be="paragraph"],
+          & ${token.antCls}-agentic-md-editor-content h1,
+          & ${token.antCls}-agentic-md-editor-content h2,
+          & ${token.antCls}-agentic-md-editor-content h3,
+          & ${token.antCls}-agentic-md-editor-content h4,
+          & ${token.antCls}-agentic-md-editor-content h5,
+          & ${token.antCls}-agentic-md-editor-content h6,
+          & ${token.antCls}-agentic-md-editor-content li,
+          & ${token.antCls}-agentic-md-editor-content blockquote`]: {
+          whiteSpace: 'normal',
+          wordBreak: 'normal',
           textWrap: 'wrap',
-          wordWrap: 'break-word',
+          overflowWrap: 'break-word',
         },
-        video: {
-          borderRadius: '12px',
+        // 代码块统一规则：换行 + 圆角 + 滚动（合并自原本两段重复的 [data-be="code"] 选择器）
+        [`& ${token.antCls}-agentic-md-editor-content div[data-be="code"]`]: {
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-all',
+          borderRadius: BUBBLE_CONTENT_RADIUS,
           overflow: 'auto',
         },
-        [`div['data-be=code']`]: {
-          borderRadius: '12px',
+        video: {
+          borderRadius: BUBBLE_CONTENT_RADIUS,
           overflow: 'auto',
         },
         [`div[data-be="paragraph"]`]: {
@@ -129,7 +149,7 @@ const genStyle = (
           letterSpacing: 'var(--letter-spacing-paragraph-lg, normal)',
         },
         img: {
-          borderRadius: '12px',
+          borderRadius: BUBBLE_CONTENT_RADIUS,
           overflow: 'auto',
         },
       },
@@ -137,26 +157,27 @@ const genStyle = (
         width: 'max-content',
         minWidth: '0px',
         display: 'flex',
-        maxWidth: 'min(860px,100%)',
+        maxWidth: BUBBLE_CONTENT_MAX_WIDTH,
         '&-left': {
           justifyContent: 'flex-start',
-          maxWidth: 'min(860px,100%)',
+          maxWidth: BUBBLE_CONTENT_MAX_WIDTH,
         },
         '&-right': {
           justifyContent: 'flex-end',
-          maxWidth: 'min(860px,100%)',
+          maxWidth: BUBBLE_CONTENT_MAX_WIDTH,
         },
       },
       '&-bubble-before': {
         width: 'max-content',
         minWidth: '0px',
-        maxWidth: 'min(860px,100%)',
+        maxWidth: BUBBLE_CONTENT_MAX_WIDTH,
       },
       '&-bubble-content-right': {
         maxWidth: '75%',
         borderRadius: '16px 16px 2px 16px',
-        background: 'var(--color-primary-control-fill-secondary-active)',
-        color: 'var(--color-gray-text-default)',
+        background:
+          'var(--color-primary-control-fill-tag, var(--color-primary-control-fill-secondary-active, rgba(230, 244, 255, 0.92)))',
+        color: 'var(--color-gray-text-default, rgba(20, 22, 28, 0.88))',
         boxShadow: 'none',
         // inline-code 基础规则用 code.cls（元素+类）选择器，需匹配相同结构才能覆盖
         [`& code${token.antCls}-agentic-md-editor-content-inline-code`]: {
@@ -181,20 +202,19 @@ const genStyle = (
 
       // 用户消息特定样式
       '&-bubble-user': {
-        marginBlockStart: -20, // title line height
         '&-avatar-title-user': {
           flexDirection: 'row-reverse', // 用户消息头像和标题顺序相反
           justifyContent: 'flex-end',
         },
         '&-container-user': {
           alignItems: 'flex-end',
-          maxWidth: 'max(668px,75%)',
+          maxWidth: `max(${USER_BUBBLE_MAX_WIDTH},75%)`,
         },
         '&-content-user': {
           background: 'var(--color-primary-bg-card-light)',
           color: 'var(--color-gray-text-default)',
           borderRadius: '12px 12px 2px 12px',
-          maxWidth: '668px',
+          maxWidth: USER_BUBBLE_MAX_WIDTH,
           // inline-code 基础规则用 code.cls（元素+类）选择器，需匹配相同结构才能覆盖
           [`& code${token.antCls}-agentic-md-editor-content-inline-code`]: {
             background: 'var(--color-primary-control-fill-secondary-active)',
@@ -254,15 +274,23 @@ const genStyle = (
 };
 
 /**
- * Probubble
- * @param prefixCls
- * @returns
+ * 注册 Bubble 组件样式。
+ *
+ * 注意：cssinjs 缓存以 `(salt, prefixCls)` 为 key，不会感知 `classNames` 变化。
+ * 因此把 classNames 显式拼进 salt，避免不同 classNames 命中同一份样式表导致
+ * `[span.<bubbleNameClassName>]` 选择器失效或互相覆盖。
+ *
+ * @param prefixCls 组件前缀
+ * @param classNames 自定义类名配置（仅 bubbleNameClassName 影响样式生成）
  */
 export function useStyle(
   prefixCls?: string,
   classNames?: BubbleProps['classNames'],
 ) {
-  return useEditorStyleRegister('ListItem', (token) => {
+  const salt = classNames?.bubbleNameClassName
+    ? `ListItem|${classNames.bubbleNameClassName}`
+    : 'ListItem';
+  return useEditorStyleRegister(salt, (token) => {
     const proChatToken = {
       ...token,
       componentCls: `.${prefixCls}`,

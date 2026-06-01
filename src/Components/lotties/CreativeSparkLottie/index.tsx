@@ -1,6 +1,5 @@
-﻿import Lottie from 'lottie-react';
 import React from 'react';
-import creativeSpark from './creativeSpark.json';
+import { createLottieComponent } from '../createLottieComponent';
 
 export interface CreativeSparkLottieProps {
   /**
@@ -65,33 +64,11 @@ export interface CreativeSparkLottieProps {
  * @param props.size - 动画尺寸（宽度和高度）
  * @returns 渲染的创意生成中火花组件
  */
-export const CreativeSparkLottie: React.FC<CreativeSparkLottieProps> = ({
-  autoplay = true,
-  loop = true,
-  className,
-  style,
-  size,
-}) => {
-  const containerStyle: React.CSSProperties = {
-    width: size,
-    height: size,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...style,
-  };
-
-  return (
-    <Lottie
-      style={containerStyle}
-      className={className}
-      data-testid="lottie-animation"
-      aria-hidden="true"
-      animationData={creativeSpark}
-      loop={loop}
-      autoplay={autoplay}
-    />
-  );
-};
+export const CreativeSparkLottie: React.FC<CreativeSparkLottieProps> =
+  createLottieComponent({
+    loadJson: () => import('./creativeSpark.json'),
+    dataTestId: 'lottie-animation',
+    displayName: 'CreativeSparkLottie',
+  });
 
 export default CreativeSparkLottie;

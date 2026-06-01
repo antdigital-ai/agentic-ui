@@ -1,5 +1,8 @@
 import { Workspace } from '@ant-design/agentic-ui';
-import type { FileNode, GroupNode } from '@ant-design/agentic-ui/Workspace/types';
+import type {
+  FileNode,
+  GroupNode,
+} from '@ant-design/agentic-ui/Workspace/types';
 import React, { useMemo } from 'react';
 
 /** 足以观察长列表性能，体量适中 */

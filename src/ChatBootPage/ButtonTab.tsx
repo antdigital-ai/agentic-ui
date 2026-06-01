@@ -1,5 +1,8 @@
+import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
-import React, { memo, useCallback } from 'react';
+import React, { memo, useContext } from 'react';
+import { useRefFunction } from '../Hooks/useRefFunction';
+import { I18nContext } from '../I18n';
 import { useStyle } from './ButtonTabStyle';
 
 export interface ButtonTabProps {
@@ -7,6 +10,8 @@ export interface ButtonTabProps {
   children?: React.ReactNode;
   /** 是否选中 */
   selected?: boolean;
+  /** 是否禁用 */
+  disabled?: boolean;
   /** 点击回调 */
   onClick?: () => void;
   /** 图标点击回调 */
@@ -22,41 +27,44 @@ export interface ButtonTabProps {
 const ButtonTabComponent: React.FC<ButtonTabProps> = ({
   children,
   selected = false,
+  disabled = false,
   onClick,
   onIconClick,
   className,
   icon,
-  prefixCls = 'md-editor-button-tab',
+  prefixCls: customPrefixCls,
 }) => {
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
+  const { locale } = useContext(I18nContext);
+  // P0-4：走 ConfigProvider 体系，并将默认前缀从 'md-editor-button-tab' 改为
+  // 'agentic-chatboot-button-tab'，使其归属于 ChatBootPage 命名空间，避免冒充
+  // markdown-editor 的命名空间；同时支持外层 ConfigProvider 自定义 prefixCls。
+  const prefixCls = getPrefixCls(
+    'agentic-chatboot-button-tab',
+    customPrefixCls,
+  );
+  const { hashId } = useStyle(prefixCls);
 
-  // 使用 useCallback 优化事件处理函数
-  const handleClick = useCallback(() => {
+  // P0-3：disabled 时统一短路，避免键盘 Enter/Space 仍能触发 onClick
+  const handleClick = useRefFunction(() => {
+    if (disabled) return;
     onClick?.();
-  }, [onClick]);
+  });
 
-  const handleIconClick = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation();
-      onIconClick?.();
-    },
-    [onIconClick],
-  );
+  const handleIconClick = useRefFunction((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (disabled) return;
+    onIconClick?.();
+  });
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        onClick?.();
-      }
-    },
-    [onClick],
-  );
+  // 注意：原生 <button> 已原生处理 Enter/Space 触发 onClick，
+  // 无需额外 handleKeyDown，避免同一按键触发两次。
 
   const buttonClassName = classNames(
     prefixCls,
     {
       [`${prefixCls}-selected`]: selected,
+      [`${prefixCls}-disabled`]: disabled,
     },
     className,
     hashId,
@@ -65,18 +73,35 @@ const ButtonTabComponent: React.FC<ButtonTabProps> = ({
   const iconClassName = classNames(
     `${prefixCls}-icon`,
     {
-      [`${prefixCls}-icon-clickable`]: !!onIconClick,
+      [`${prefixCls}-icon-clickable`]: !!onIconClick && !disabled,
     },
     hashId,
   );
 
-  return wrapSSR(
+  // P1-5：当 icon 区域是独立可点的（onIconClick 存在）时，需要让键盘也能触发它。
+  // 用 role="button" + tabIndex + 键盘 handler 让 icon span 成为独立 a11y 元素；
+  // 同时阻止键盘事件冒泡到外层主按钮，避免一次按键触发两次 onClick。
+  const handleIconKeyDown = useRefFunction((e: React.KeyboardEvent) => {
+    if (disabled || !onIconClick) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      e.stopPropagation();
+      onIconClick();
+    }
+  });
+
+  // P1-9：testid 与 prefixCls 解耦
+  const testId = 'agentic-chatboot-button-tab';
+
+  return (
     <button
       type="button"
       className={buttonClassName}
+      data-testid={testId}
       onClick={handleClick}
-      onKeyDown={handleKeyDown}
-      tabIndex={0}
+      disabled={disabled}
+      aria-disabled={disabled || undefined}
+      tabIndex={disabled ? -1 : 0}
     >
       {children && (
         <span className={classNames(`${prefixCls}-text`, hashId)}>
@@ -86,12 +111,16 @@ const ButtonTabComponent: React.FC<ButtonTabProps> = ({
       {icon && (
         <span
           className={iconClassName}
-          onClick={onIconClick ? handleIconClick : undefined}
+          onClick={onIconClick && !disabled ? handleIconClick : undefined}
+          onKeyDown={onIconClick && !disabled ? handleIconKeyDown : undefined}
+          role={onIconClick && !disabled ? 'button' : undefined}
+          tabIndex={onIconClick && !disabled ? 0 : undefined}
+          aria-label={onIconClick && !disabled ? locale['chatBootPage.tabIconAction'] : undefined}
         >
           {icon}
         </span>
       )}
-    </button>,
+    </button>
   );
 };
 

@@ -19,13 +19,15 @@ import {
 } from 'slate';
 import { HistoryEditor } from 'slate-history';
 import { ReactEditor } from 'slate-react';
-import { Elements, FootnoteDefinitionNode, ListNode } from '../el';
+import type { Elements, FootnoteDefinitionNode, ListNode } from '../el';
 import type { MarkdownEditorPlugin } from '../plugin';
 import { CommentDataType, MarkdownEditorProps } from '../types';
 import { parserMdToSchema } from './parser/parserMdToSchema';
-import { KeyboardTask, Methods, parserSlateNodeToMarkdown } from './utils';
+import { parserSlateNodeToMarkdown } from './parser/parserSlateNodeToMarkdown';
 import { getOffsetLeft, getOffsetTop } from './utils/dom';
 import { EditorUtils, findByPathAndText } from './utils/editorUtils';
+import { KeyboardTask, Methods } from './utils/keyboard';
+import type { ParserMarkdownToSlateNodeConfig } from './parser/parserMarkdownToSlateNode';
 import type { MarkdownToHtmlOptions } from './utils/markdownToHtml';
 import { markdownToHtmlSync } from './utils/markdownToHtml';
 const { createContext, useContext } = React;
@@ -185,6 +187,7 @@ export class EditorStore {
   /** 当前 setMDContent 操作的 AbortController */
   private _currentAbortController: AbortController | null = null;
   private markdownToHtmlOptions?: MarkdownToHtmlOptions;
+  private parserConfig?: ParserMarkdownToSlateNodeConfig;
 
   /**
    * 获取当前编辑器实例。
@@ -199,11 +202,13 @@ export class EditorStore {
     _editor: React.MutableRefObject<BaseEditor & ReactEditor & HistoryEditor>,
     plugins?: MarkdownEditorPlugin[],
     markdownToHtmlOptions?: MarkdownToHtmlOptions,
+    parserConfig?: ParserMarkdownToSlateNodeConfig,
   ) {
     this.dragStart = this.dragStart.bind(this);
     this._editor = _editor;
     this.plugins = plugins;
     this.markdownToHtmlOptions = markdownToHtmlOptions;
+    this.parserConfig = parserConfig;
   }
 
   /**
@@ -355,13 +360,9 @@ export class EditorStore {
    * Clears all content from the editor, replacing it with an empty paragraph.
    */
   clearContent() {
-    this._editor.current.selection = null;
-    this._editor.current.children = [
-      {
-        type: 'paragraph',
-        children: [{ text: '' }],
-      },
-    ];
+    EditorUtils.replaceEditorContent(this._editor.current, [
+      { type: 'paragraph', children: [{ text: '' }] },
+    ]);
   }
 
   /**
@@ -391,6 +392,11 @@ export class EditorStore {
     },
   ): void | Promise<void> {
     if (md === undefined) return;
+    if (!md) {
+      if (this._shouldSkipSetContent('')) return;
+      this.clearContent();
+      return;
+    }
     if (this._shouldSkipSetContent(md)) return;
 
     this.cancelSetMDContent();
@@ -456,9 +462,9 @@ export class EditorStore {
     onProgress?: (progress: number) => void,
   ): void {
     try {
-      const nodeList = parserMdToSchema(md, plugins).schema;
+      const nodeList = parserMdToSchema(md, plugins, this.parserConfig).schema;
+      this._editor.current.selection = null;
       this.setContent(nodeList);
-      this._editor.current.children = nodeList;
       this._safeDeselect();
       onProgress?.(1);
     } catch (error) {
@@ -478,8 +484,8 @@ export class EditorStore {
     try {
       const allNodes = this._parseChunksToNodes(chunks, plugins);
       if (allNodes.length > 0) {
+        this._editor.current.selection = null;
         this.setContent(allNodes);
-        this._editor.current.children = allNodes;
         this._safeDeselect();
       }
       onProgress?.(1);
@@ -499,7 +505,7 @@ export class EditorStore {
     const allNodes: Node[] = [];
     for (const chunk of chunks) {
       if (chunk.trim()) {
-        const { schema } = parserMdToSchema(chunk, plugins);
+        const { schema } = parserMdToSchema(chunk, plugins, this.parserConfig);
         allNodes.push(...schema);
       }
     }
@@ -596,13 +602,14 @@ export class EditorStore {
             const chunk = chunks[i];
             if (chunk.trim()) {
               try {
-                const { schema } = parserMdToSchema(chunk, plugins);
+                const { schema } = parserMdToSchema(chunk, plugins, this.parserConfig);
 
                 if (schema.length > 0) {
                   if (isFirstBatch) {
-                    // 第一批：清空并插入
-                    this._editor.current.children = schema;
-                    this._editor.current.onChange();
+                    EditorUtils.replaceEditorContent(
+                      this._editor.current,
+                      schema,
+                    );
                     isFirstBatch = false;
                   } else {
                     // 后续批次：追加节点
@@ -862,7 +869,9 @@ export class EditorStore {
     if (options) {
       this.markdownToHtmlOptions = options;
     }
-    return markdownToHtmlSync(markdown, appliedOptions);
+    return markdownToHtmlSync(markdown, appliedOptions, {
+      formula: this.parserConfig?.formula,
+    });
   }
 
   /**
@@ -908,8 +917,10 @@ export class EditorStore {
    * @private
    */
   private _replaceNodeAt(path: Path, newNode: Node): void {
-    Transforms.removeNodes(this._editor.current, { at: path });
-    Transforms.insertNodes(this._editor.current, newNode, { at: path });
+    Editor.withoutNormalizing(this._editor.current, () => {
+      Transforms.removeNodes(this._editor.current, { at: path });
+      Transforms.insertNodes(this._editor.current, newNode, { at: path });
+    });
   }
 
   /**
@@ -918,19 +929,7 @@ export class EditorStore {
    * @param nodeList - 要设置为编辑器内容的节点列表
    */
   setContent(nodeList: Node[]) {
-    const currentChildren = this._editor.current.children;
-    this._editor.current.children = nodeList;
-    this._editor.current.onChange();
-    // 检查最后一个节点是否以换行符结尾
-    const lastNode = currentChildren[currentChildren.length - 1];
-    if (lastNode && Text.isText(lastNode)) {
-      const text = Node.string(lastNode);
-      if (!text.endsWith('\n')) {
-        this._editor.current.insertText('\n', {
-          at: [currentChildren.length - 1],
-        });
-      }
-    }
+    EditorUtils.replaceEditorContent(this._editor.current, nodeList);
   }
 
   /**
@@ -972,7 +971,7 @@ export class EditorStore {
       }
     } catch (error) {
       console.error('Failed to update nodes with optimized method:', error);
-      this._editor.current.children = nodeList;
+      EditorUtils.replaceEditorContent(this._editor.current, nodeList);
     }
   }
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { mapOpenClawMessagesToMessageBubbleData } from '../mapOpenClawMessages';
 import { mapOpenAIMessagesToMessageBubbleData } from '../mapOpenAIMessages';
+import { mapOpenClawMessagesToMessageBubbleData } from '../mapOpenClawMessages';
 import {
   normalizeOpenClawMessageToOpenAI,
   normalizeOpenClawMessagesToOpenAI,
@@ -76,9 +76,7 @@ describe('mapOpenClawMessagesToMessageBubbleData', () => {
   });
 
   it('keeps message id stable when content grows (SSE)', () => {
-    const short: OpenClawChatMessage[] = [
-      { role: 'assistant', content: 'a' },
-    ];
+    const short: OpenClawChatMessage[] = [{ role: 'assistant', content: 'a' }];
     const long: OpenClawChatMessage[] = [
       { role: 'assistant', content: 'a'.repeat(80) },
     ];

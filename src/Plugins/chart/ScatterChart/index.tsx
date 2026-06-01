@@ -22,7 +22,7 @@ import {
   downloadChart,
 } from '../components';
 import { defaultColorList } from '../const';
-import { useChartTheme } from '../hooks';
+import { useChartTheme, useResolvedChartTheme } from '../hooks';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
 import type { ChartClassNames, ChartStyles } from '../types/classNames';
 import { hexToRgba, resolveCssVariable } from '../utils';
@@ -117,7 +117,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
   hiddenX = false,
   hiddenY = false,
   showGrid = true,
-  theme = 'light',
+  theme,
   color,
   statistic: statisticConfig,
   textMaxWidth = 80,
@@ -144,10 +144,10 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
 
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('scatter-chart');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
-  // 主题颜色 - 必须在所有条件返回之前调用
-  const { axisTextColor, gridColor, isLight } = useChartTheme(theme);
+  const { resolvedTheme, autoDetectTheme } = useResolvedChartTheme(theme);
+  const { axisTextColor, gridColor, isLight } = useChartTheme(resolvedTheme);
 
   // 处理 ChartStatistic 组件配置
   const statistics = useMemo(() => {
@@ -257,10 +257,11 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
 
   // 如果没有有效数据，返回空状态
   if (safeData.length === 0 || datasetTypes.length === 0) {
-    return wrapSSR(
+    return (
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
-        theme={theme}
+        theme={resolvedTheme}
+        autoDetectTheme={autoDetectTheme}
         className={classNames(classNamesObj?.root, hashId, className)}
         isMobile={isMobile}
         variant={props.variant}
@@ -273,7 +274,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
       >
         <ChartToolBar
           title={title || '散点图'}
-          theme={theme}
+          theme={resolvedTheme}
           onDownload={() => {}}
           extra={toolbarExtra}
           dataTime={dataTime}
@@ -292,7 +293,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
         >
           暂无有效数据
         </div>
-      </ChartContainer>,
+      </ChartContainer>
     );
   }
 
@@ -315,8 +316,10 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
     const range = dataMax - dataMin || 1;
     const padding = range * 0.1;
     return {
-      min: overrideMin !== undefined ? overrideMin : Math.floor(dataMin - padding),
-      max: overrideMax !== undefined ? overrideMax : Math.ceil(dataMax + padding),
+      min:
+        overrideMin !== undefined ? overrideMin : Math.floor(dataMin - padding),
+      max:
+        overrideMax !== undefined ? overrideMax : Math.ceil(dataMax + padding),
     };
   };
 
@@ -776,129 +779,89 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
   };
 
   // 最终渲染，包含错误边界
-  try {
-    return wrapSSR(
-      <ChartContainer
-        baseClassName={classNames(`${prefixCls}-container`)}
-        theme={theme}
-        className={classNames(classNamesObj?.root, hashId, className)}
-        isMobile={isMobile}
-        variant={props.variant}
-        style={{
-          width: responsiveWidth,
-          height: responsiveHeight,
-          ...props.style,
-          ...props.styles?.root,
-        }}
-      >
-        <ChartToolBar
-          title={title || '散点图'}
-          theme={theme}
-          onDownload={handleDownload}
-          extra={toolbarExtra}
-          dataTime={dataTime}
-          loading={loading}
-          filter={
-            renderFilterInToolbar && filterEnum.length > 0 ? (
-              <ChartFilter
-                filterOptions={filterEnum}
-                selectedFilter={selectedFilter}
-                onFilterChange={setSelectedFilter}
-                {...(filterLabels && {
-                  customOptions: filteredDataByFilterLabel,
-                  selectedCustomSelection: selectedFilterLabel,
-                  onSelectionChange: setSelectedFilterLabel,
-                })}
-                theme={theme}
-                variant="compact"
-              />
-            ) : undefined
-          }
+  return (
+    <ChartContainer
+      baseClassName={classNames(`${prefixCls}-container`)}
+      theme={resolvedTheme}
+      autoDetectTheme={autoDetectTheme}
+      className={classNames(classNamesObj?.root, hashId, className)}
+      isMobile={isMobile}
+      variant={props.variant}
+      style={{
+        width: responsiveWidth,
+        height: responsiveHeight,
+        ...props.style,
+        ...props.styles?.root,
+      }}
+    >
+      <ChartToolBar
+        title={title || '散点图'}
+        theme={resolvedTheme}
+        onDownload={handleDownload}
+        extra={toolbarExtra}
+        dataTime={dataTime}
+        loading={loading}
+        filter={
+          renderFilterInToolbar && filterEnum.length > 0 ? (
+            <ChartFilter
+              filterOptions={filterEnum}
+              selectedFilter={selectedFilter}
+              onFilterChange={setSelectedFilter}
+              {...(filterLabels && {
+                customOptions: filteredDataByFilterLabel,
+                selectedCustomSelection: selectedFilterLabel,
+                onSelectionChange: setSelectedFilterLabel,
+              })}
+              theme={resolvedTheme}
+              variant="compact"
+            />
+          ) : undefined
+        }
+      />
+
+      {!renderFilterInToolbar && filterEnum.length > 0 && (
+        <ChartFilter
+          filterOptions={filterEnum}
+          selectedFilter={selectedFilter}
+          onFilterChange={setSelectedFilter}
+          {...(filterLabels && {
+            customOptions: filteredDataByFilterLabel,
+            selectedCustomSelection: selectedFilterLabel,
+            onSelectionChange: setSelectedFilterLabel,
+          })}
+          theme={resolvedTheme}
         />
+      )}
 
-        {!renderFilterInToolbar && filterEnum.length > 0 && (
-          <ChartFilter
-            filterOptions={filterEnum}
-            selectedFilter={selectedFilter}
-            onFilterChange={setSelectedFilter}
-            {...(filterLabels && {
-              customOptions: filteredDataByFilterLabel,
-              selectedCustomSelection: selectedFilterLabel,
-              onSelectionChange: setSelectedFilterLabel,
-            })}
-            theme={theme}
-          />
-        )}
-
-        {/* 统计数据组件 */}
-        {statistics && (
-          <div
-            className={classNames(
-              classNamesObj?.statisticContainer,
-              `${prefixCls}-statistic-container`,
-            )}
-            style={props.styles?.statisticContainer}
-          >
-            {statistics.map((config, index) => (
-              <ChartStatistic key={index} {...config} theme={theme} />
-            ))}
-          </div>
-        )}
-
+      {/* 统计数据组件 */}
+      {statistics && (
         <div
           className={classNames(
-            classNamesObj?.wrapper,
-            `${prefixCls}-chart-wrapper`,
+            classNamesObj?.statisticContainer,
+            `${prefixCls}-statistic-container`,
           )}
-          style={{
-            height: responsiveHeight,
-            ...props.styles?.wrapper,
-          }}
+          style={props.styles?.statisticContainer}
         >
-          <Scatter ref={chartRef} data={processedData} options={options} />
+          {statistics.map((config, index) => (
+            <ChartStatistic key={index} {...config} theme={resolvedTheme} />
+          ))}
         </div>
-      </ChartContainer>,
-    );
-  } catch (error) {
-    console.error('ScatterChart 渲染错误:', error);
-    return wrapSSR(
-      <ChartContainer
-        baseClassName={classNames(`${prefixCls}-container`)}
-        theme={theme}
-        isMobile={isMobile}
-        className={classNames(hashId, className)}
-        variant={props.variant}
+      )}
+
+      <div
+        className={classNames(
+          classNamesObj?.wrapper,
+          `${prefixCls}-chart-wrapper`,
+        )}
         style={{
-          width: responsiveWidth,
           height: responsiveHeight,
-          ...props.style,
-          ...props.styles?.root,
+          ...props.styles?.wrapper,
         }}
       >
-        <ChartToolBar
-          title={title || '散点图'}
-          theme={theme}
-          onDownload={() => {}}
-          extra={toolbarExtra}
-          dataTime={dataTime}
-          loading={loading}
-        />
-        <div
-          className={classNames(`${prefixCls}-error-wrapper`, hashId)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: responsiveHeight,
-            color: '#ff4d4f',
-            fontSize: '14px',
-          }}
-        >
-          图表渲染失败，请检查数据格式
-        </div>
-      </ChartContainer>,
-    );
-  }
+        <Scatter ref={chartRef} data={processedData} options={options} />
+      </div>
+    </ChartContainer>
+  );
 };
 
 export default ScatterChart;

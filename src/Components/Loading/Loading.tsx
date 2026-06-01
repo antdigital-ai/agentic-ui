@@ -2,8 +2,8 @@ import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import { isString } from 'lodash-es';
 import React, { useContext } from 'react';
-import { TextLoading } from '../lotties';
 import { LoadingLottieProps } from '../lotties/LoadingLottie';
+import { TextLoading } from '../lotties/TextLoading';
 import Indicator from './Indicator';
 import { prefixCls, useStyle } from './style';
 
@@ -158,9 +158,9 @@ export const Loading = ({
 }: LoadingProps) => {
   const context = useContext(ConfigProvider.ConfigContext);
   const baseCls = context?.getPrefixCls(prefixCls);
-  const { wrapSSR, hashId } = useStyle(baseCls);
+  const { hashId } = useStyle(baseCls);
 
-  const isNestedPattern = React.useMemo<boolean>(() => !!children, [children]);
+  const isNestedPattern = !!children;
 
   const mergedSize = size ?? (isNestedPattern ? 32 : '1em');
 
@@ -189,6 +189,7 @@ export const Loading = ({
         [`${baseCls}-with-tip`]: !!tip,
         [`${baseCls}-with-children`]: isNestedPattern,
       })}
+      data-testid={baseCls}
       style={{
         fontSize: mergedSize,
         ...styles?.root,
@@ -206,7 +207,7 @@ export const Loading = ({
   );
 
   if (isNestedPattern) {
-    return wrapSSR(
+    return (
       <div
         className={classNames(
           `${baseCls}-nested-pattern`,
@@ -214,15 +215,16 @@ export const Loading = ({
           wrapperClassName,
           spinning && `${baseCls}-spinning`,
         )}
+        data-testid={`${baseCls}-nested-pattern`}
         style={styles?.wrapper}
       >
         {spinning ? loadingElement : null}
         <div className={classNames(`${baseCls}-container`, hashId)}>
           {children}
         </div>
-      </div>,
+      </div>
     );
   }
 
-  return wrapSSR(loadingElement);
+  return loadingElement;
 };

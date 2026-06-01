@@ -3,6 +3,7 @@ import { memo, MutableRefObject, useMemo } from 'react';
 import React from 'react';
 import { debugInfo } from '../Utils/debugUtils';
 import { AIBubble } from './AIBubble';
+import { bubblePropsAreEqual } from './bubblePropsAreEqual';
 import { useSchemaEditorBridge } from './schema-editor';
 import type { BubbleProps } from './type';
 import { UserBubble } from './UserBubble';
@@ -77,14 +78,15 @@ const BubbleComponent: React.FC<
       ? originData?.role === 'user'
       : props.placement === 'right';
 
-  // 稳定 originData 引用
-  const memoizedOriginData = useMemo(
-    () =>
-      originData
-        ? { ...originData, ...(isStringContent && { content }) }
-        : undefined,
-    [originData, isStringContent, originData?.isLast, content],
-  );
+  // 稳定 originData 引用：仅当 schema editor 实际改写了 string content 时才创建新对象，
+  // 否则复用 originData 引用，让 bubblePropsAreEqual 中的 a === b 短路命中，避免下游 memo 失效。
+  const shouldOverrideContent =
+    isStringContent && content !== originData?.content;
+  const memoizedOriginData = useMemo(() => {
+    if (!originData) return undefined;
+    if (!shouldOverrideContent) return originData;
+    return { ...originData, content };
+  }, [originData, shouldOverrideContent, content]);
 
   // 计算 placement
   const placement = props.placement || (isUserMessage ? 'right' : 'left');
@@ -101,6 +103,9 @@ const BubbleComponent: React.FC<
     bubbleProps,
   });
 
+  // 推荐 prop 是 aiBubbleProps，aIBubbleProps 为 deprecated 兼容写法（@since 2.30.0）
+  const aiOverride = props.aiBubbleProps ?? props.aIBubbleProps;
+
   // 使用提前返回优化
   if (isUserMessage) {
     return (
@@ -108,10 +113,10 @@ const BubbleComponent: React.FC<
     );
   }
 
-  return <AIBubble {...bubbleProps} {...props.aIBubbleProps} />;
+  return <AIBubble {...bubbleProps} {...aiOverride} />;
 };
 
 BubbleComponent.displayName = 'Bubble';
 
-// 使用 React.memo 优化性能，避免不必要的重新渲染
-export const Bubble = memo(BubbleComponent);
+// 自定义比较：列表侧常传入新的 styles / avatar 对象引用；扩展 props 时同步 bubblePropsAreEqual
+export const Bubble = memo(BubbleComponent, bubblePropsAreEqual);

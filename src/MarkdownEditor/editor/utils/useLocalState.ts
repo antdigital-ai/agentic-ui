@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { useCallback, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
+import { useRefFunction } from '../../../Hooks/useRefFunction';
 
 type GetFields<
   T,
@@ -22,7 +23,7 @@ export const useLocalState = <T extends Record<string, any>>(
   const stateRef = useRef(state);
   stateRef.current = state;
 
-  const setState = useCallback((update: any) => {
+  const setState = useRefFunction((update: any) => {
     if (update instanceof Function) {
       setReactState((prevState) => {
         const newState = { ...prevState };
@@ -35,7 +36,7 @@ export const useLocalState = <T extends Record<string, any>>(
         ...update,
       }));
     }
-  }, []);
+  });
 
   return [state, setState];
 };

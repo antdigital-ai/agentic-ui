@@ -5,7 +5,6 @@ import { debugInfo } from '../../../../Utils/debugUtils';
 import { ElementProps, HeadNode } from '../../../el';
 import { useSelStatus } from '../../../hooks/editor';
 import { useEditorStore } from '../../store';
-import { DragHandle } from '../../tools/DragHandle';
 import { slugify } from '../../utils/dom';
 
 export function Head({
@@ -43,10 +42,7 @@ export function Head({
           empty: !str,
         }),
       },
-      <>
-        <DragHandle />
-        {children}
-      </>,
+      <>{children}</>,
     );
   }, [element.level, str, element.children, selected, path]);
 }

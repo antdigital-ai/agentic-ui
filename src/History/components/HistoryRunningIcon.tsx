@@ -1,6 +1,37 @@
 import React from 'react';
 
 /**
+ * 模块级自增计数器，给每个 HistoryRunningIcon 实例分配稳定且唯一的 id。
+ *
+ * 之前用 `Math.random().toString(36).substr(2,9)`：
+ * 1. SSR 与 client 两次随机不一致 → React hydration 警告
+ * 2. 极小概率 id 撞车导致 keyframes / clipPath / linearGradient 互相污染
+ * 3. `String.prototype.substr` 是已废弃 API
+ *
+ * 计数器从模块加载开始单调递增，SSR 与 client 行为一致；
+ * 仓库 peerDeps 是 React >=16.9.0，无法直接用 React 18 的 `useId`，
+ * 所以选择稳定 counter 而非 `useId`。
+ */
+let runningIconCounter = 0;
+
+/**
+ * 全局只注入一次的 keyframes 标记，避免每个实例都往 DOM 写一份 `<style>`。
+ * key 用 `keyframes` 名字本身做缓存，做到「同名只注入一次」。
+ */
+const injectedKeyframes = new Set<string>();
+
+/** 把 keyframes 注入到 document.head（仅浏览器、仅一次） */
+const ensureKeyframesInjected = (animationName: string): void => {
+  if (typeof document === 'undefined') return;
+  if (injectedKeyframes.has(animationName)) return;
+  injectedKeyframes.add(animationName);
+  const styleEl = document.createElement('style');
+  styleEl.setAttribute('data-history-running-icon', animationName);
+  styleEl.textContent = `@keyframes ${animationName} { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`;
+  document.head.appendChild(styleEl);
+};
+
+/**
  * 运行图标组件的属性接口
  */
 export interface HistoryRunningIconProps extends React.SVGProps<SVGSVGElement> {
@@ -63,11 +94,16 @@ export const HistoryRunningIcon: React.FC<HistoryRunningIconProps> = React.memo(
     className,
     ...svgProps
   }) => {
-    // 生成唯一的动画ID，避免多个图标之间的冲突
-    const animationId = React.useMemo(
-      () => `history-running-${Math.random().toString(36).substr(2, 9)}`,
-      [],
-    );
+    // 用模块级 counter 生成稳定 id，SSR 与 client 一致；不再使用 Math.random
+    const animationId = React.useMemo(() => {
+      runningIconCounter += 1;
+      return `history-running-${runningIconCounter}`;
+    }, []);
+
+    // 仅在启用动画时往 head 注入一次 keyframes（同名只注入一次）
+    if (animated) {
+      ensureKeyframesInjected(animationId);
+    }
 
     // 合并样式
     const mergedStyle: React.CSSProperties = {
@@ -80,27 +116,8 @@ export const HistoryRunningIcon: React.FC<HistoryRunningIconProps> = React.memo(
       }),
     };
 
-    // 生成CSS动画
-    const animationCSS = animated
-      ? `
-    @keyframes ${animationId} {
-      from {
-        transform: rotate(0deg);
-      }
-      to {
-        transform: rotate(360deg);
-      }
-    }
-  `
-      : '';
-
     return (
       <>
-        {/* 注入CSS动画 */}
-        {animated && process?.env?.NODE_ENV !== 'test' && (
-          <style dangerouslySetInnerHTML={{ __html: animationCSS }} />
-        )}
-
         {/* SVG图标 */}
         <svg
           xmlns="http://www.w3.org/2000/svg"

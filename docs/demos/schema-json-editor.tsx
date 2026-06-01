@@ -1,4 +1,4 @@
-import {
+﻿import {
   LowCodeSchema,
   SchemaRenderer,
   validator,
@@ -145,7 +145,9 @@ const SchemaJsonEditor: React.FC = () => {
               <Spin
                 tip="正在渲染..."
                 style={{ width: '100%', marginTop: '100px' }}
-              />
+              >
+                <div style={{ minHeight: 120 }} aria-hidden />
+              </Spin>
             ) : schema ? (
               <SchemaRenderer
                 schema={schema}

@@ -1,11 +1,10 @@
 import {
-  ChatTokenType,
-  GenerateStyle,
+  genStyleHooks,
   resetComponent,
-  useEditorStyleRegister,
+  type GenStyleFn,
 } from '../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'VoiceInput'> = (token) => {
   return {
     [token.componentCls]: {
       height: '32px',
@@ -34,12 +33,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
+const useGenStyle = genStyleHooks('VoiceInput', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+]);
+
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('VoiceInputButton', (token) => {
-    const componentToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [resetComponent(componentToken), genStyle(componentToken)];
-  });
+  const [, hashId] = useGenStyle(prefixCls ?? 'VoiceInputButton');
+  return { hashId };
 }

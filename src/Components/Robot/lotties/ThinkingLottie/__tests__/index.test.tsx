@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ThinkingLottie } from '../index';
@@ -15,7 +15,7 @@ vi.mock('lottie-react', () => ({
     ...props
   }: any) => (
     <div
-      data-testid="lottie-animation"
+      data-testid="lottie-mock"
       data-loop={loop}
       data-autoplay={autoplay}
       data-animation={animationData ? 'loaded' : 'empty'}
@@ -33,10 +33,13 @@ describe('ThinkingLottie Component', () => {
     vi.clearAllMocks();
   });
 
-  it('should render with default props', () => {
+  it('should render with default props', async () => {
     render(<ThinkingLottie />);
 
-    const lottieAnimation = screen.getByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
+    await waitFor(() => {
+      expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
+    });
     expect(lottieAnimation).toBeInTheDocument();
     expect(lottieAnimation).toHaveAttribute('data-loop', 'true');
     expect(lottieAnimation).toHaveAttribute('data-autoplay', 'true');
@@ -44,33 +47,45 @@ describe('ThinkingLottie Component', () => {
     expect(lottieAnimation).toHaveAttribute('aria-hidden', 'true');
   });
 
-  it('should render with custom autoplay prop', () => {
+  it('should render with custom autoplay prop', async () => {
     render(<ThinkingLottie autoplay={false} />);
 
-    const lottieAnimation = screen.getByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
+    await waitFor(() => {
+      expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
+    });
     expect(lottieAnimation).toHaveAttribute('data-autoplay', 'false');
   });
 
-  it('should render with custom loop prop', () => {
+  it('should render with custom loop prop', async () => {
     render(<ThinkingLottie loop={false} />);
 
-    const lottieAnimation = screen.getByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
+    await waitFor(() => {
+      expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
+    });
     expect(lottieAnimation).toHaveAttribute('data-loop', 'false');
   });
 
-  it('should render with custom className', () => {
+  it('should render with custom className', async () => {
     const customClassName = 'custom-thinking-lottie';
     render(<ThinkingLottie className={customClassName} />);
 
-    const lottieAnimation = screen.getByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
+    await waitFor(() => {
+      expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
+    });
     expect(lottieAnimation).toHaveClass(customClassName);
   });
 
-  it('should render with custom size', () => {
+  it('should render with custom size', async () => {
     const customSize = 64;
     render(<ThinkingLottie size={customSize} />);
 
-    const lottieAnimation = screen.getByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
+    await waitFor(() => {
+      expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
+    });
     expect(lottieAnimation).toHaveStyle({
       width: `${customSize}px`,
       height: `${customSize}px`,
@@ -78,11 +93,14 @@ describe('ThinkingLottie Component', () => {
     });
   });
 
-  it('should render with custom style', () => {
+  it('should render with custom style', async () => {
     const customStyle = { border: '1px solid red', margin: '10px' };
     render(<ThinkingLottie style={customStyle} />);
 
-    const lottieAnimation = screen.getByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
+    await waitFor(() => {
+      expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
+    });
     expect(lottieAnimation).toHaveStyle({
       border: '1px solid red',
       margin: '10px',
@@ -90,12 +108,15 @@ describe('ThinkingLottie Component', () => {
     });
   });
 
-  it('should merge custom style with default container style', () => {
+  it('should merge custom style with default container style', async () => {
     const customSize = 48;
     const customStyle = { backgroundColor: 'blue' };
     render(<ThinkingLottie size={customSize} style={customStyle} />);
 
-    const lottieAnimation = screen.getByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
+    await waitFor(() => {
+      expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
+    });
     // 检查关键样式属性
     expect(lottieAnimation).toHaveStyle({
       width: `${customSize}px`,
@@ -107,7 +128,7 @@ describe('ThinkingLottie Component', () => {
     expect(styleAttr).toContain('background-color: blue');
   });
 
-  it('should render with all props combined', () => {
+  it('should render with all props combined', async () => {
     const customSize = 80;
     const customClassName = 'test-class';
     const customStyle = { padding: '5px' };
@@ -121,7 +142,10 @@ describe('ThinkingLottie Component', () => {
       />,
     );
 
-    const lottieAnimation = screen.getByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
+    await waitFor(() => {
+      expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
+    });
     expect(lottieAnimation).toHaveAttribute('data-autoplay', 'false');
     expect(lottieAnimation).toHaveAttribute('data-loop', 'false');
     expect(lottieAnimation).toHaveClass(customClassName);
@@ -132,20 +156,26 @@ describe('ThinkingLottie Component', () => {
     });
   });
 
-  it('should render without size prop', () => {
+  it('should render without size prop', async () => {
     render(<ThinkingLottie autoplay={true} loop={true} />);
 
-    const lottieAnimation = screen.getByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
+    await waitFor(() => {
+      expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
+    });
     expect(lottieAnimation).toBeInTheDocument();
     // 当没有 size 时，width 和 height 应该是 undefined，但会被 style 对象包含
     const style = lottieAnimation.getAttribute('style');
     expect(style).toBeTruthy();
   });
 
-  it('should render with size 0', () => {
+  it('should render with size 0', async () => {
     render(<ThinkingLottie size={0} />);
 
-    const lottieAnimation = screen.getByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
+    await waitFor(() => {
+      expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
+    });
     expect(lottieAnimation).toHaveStyle({
       width: '0px',
       height: '0px',
@@ -153,18 +183,24 @@ describe('ThinkingLottie Component', () => {
     });
   });
 
-  it('should render without className prop', () => {
+  it('should render without className prop', async () => {
     render(<ThinkingLottie size={32} />);
 
-    const lottieAnimation = screen.getByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
+    await waitFor(() => {
+      expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
+    });
     expect(lottieAnimation).toBeInTheDocument();
     expect(lottieAnimation.className).toBe('');
   });
 
-  it('should render without style prop', () => {
+  it('should render without style prop', async () => {
     render(<ThinkingLottie size={32} />);
 
-    const lottieAnimation = screen.getByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
+    await waitFor(() => {
+      expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
+    });
     expect(lottieAnimation).toBeInTheDocument();
     expect(lottieAnimation).toHaveStyle({
       width: '32px',
@@ -173,11 +209,14 @@ describe('ThinkingLottie Component', () => {
     });
   });
 
-  it('should handle style override with size', () => {
+  it('should handle style override with size', async () => {
     const customStyle = { width: '100px', height: '100px' };
     render(<ThinkingLottie size={50} style={customStyle} />);
 
-    const lottieAnimation = screen.getByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
+    await waitFor(() => {
+      expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
+    });
     // style 会覆盖 size 设置的 width 和 height
     expect(lottieAnimation).toHaveStyle({
       width: '100px',
@@ -185,17 +224,23 @@ describe('ThinkingLottie Component', () => {
     });
   });
 
-  it('should render with empty string className', () => {
+  it('should render with empty string className', async () => {
     render(<ThinkingLottie className="" />);
 
-    const lottieAnimation = screen.getByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
+    await waitFor(() => {
+      expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
+    });
     expect(lottieAnimation.className).toBe('');
   });
 
-  it('should handle undefined autoplay and loop', () => {
+  it('should handle undefined autoplay and loop', async () => {
     render(<ThinkingLottie autoplay={undefined} loop={undefined} />);
 
-    const lottieAnimation = screen.getByTestId('lottie-animation');
+    const lottieAnimation = await screen.findByTestId('lottie-mock');
+    await waitFor(() => {
+      expect(lottieAnimation).toHaveAttribute('data-animation', 'loaded');
+    });
     // 默认值应该是 true
     expect(lottieAnimation).toHaveAttribute('data-autoplay', 'true');
     expect(lottieAnimation).toHaveAttribute('data-loop', 'true');

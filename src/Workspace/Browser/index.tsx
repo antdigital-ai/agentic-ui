@@ -13,6 +13,7 @@ import {
 import classNames from 'clsx';
 import React, { useContext, useMemo, useState } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
+import { useAdaptiveTooltipProps } from '../../Hooks/useAdaptiveTooltipProps';
 import { I18nContext, compileTemplate } from '../../I18n';
 import { useBrowserStyle } from './style';
 
@@ -69,8 +70,8 @@ const renderSiteAvatar = (site: string, icon?: string) => {
 const useBrowserContext = () => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('browser');
-  const { wrapSSR, hashId } = useBrowserStyle(prefixCls);
-  return { prefixCls, wrapSSR, hashId };
+  const { hashId } = useBrowserStyle(prefixCls);
+  return { prefixCls, hashId };
 };
 
 export interface BrowserItemProps {
@@ -88,7 +89,7 @@ export const BrowserItemComponent: React.FC<BrowserItemProps> = ({
   onLocate,
   onOpen,
 }) => {
-  const { prefixCls, wrapSSR, hashId } = useBrowserContext();
+  const { prefixCls, hashId } = useBrowserContext();
   const { locale } = useContext(I18nContext);
 
   const handleOpen = (e: React.MouseEvent) => {
@@ -119,7 +120,7 @@ export const BrowserItemComponent: React.FC<BrowserItemProps> = ({
     window.open(item.url, '_blank', 'noopener,noreferrer');
   };
 
-  return wrapSSR(
+  return (
     <List.Item
       className={className}
       style={itemStyle}
@@ -186,7 +187,7 @@ export const BrowserItemComponent: React.FC<BrowserItemProps> = ({
           </Tooltip>
         </div>
       </div>
-    </List.Item>,
+    </List.Item>
   );
 };
 
@@ -199,9 +200,10 @@ export const BrowserHeader: React.FC<BrowserHeaderProps> = ({
   activeLabel,
   onBack,
 }) => {
-  const { prefixCls, wrapSSR, hashId } = useBrowserContext();
+  const { prefixCls, hashId } = useBrowserContext();
+  const headerTooltipProps = useAdaptiveTooltipProps('informational');
 
-  return wrapSSR(
+  return (
     <div className={classNames(`${prefixCls}-header-left`, hashId)}>
       {onBack && (
         <Button
@@ -217,12 +219,16 @@ export const BrowserHeader: React.FC<BrowserHeaderProps> = ({
           onClick={onBack}
         />
       )}
-      <Tooltip title={activeLabel} mouseEnterDelay={0.5}>
+      <Tooltip
+        title={activeLabel}
+        mouseEnterDelay={0.5}
+        {...headerTooltipProps}
+      >
         <div className={classNames(`${prefixCls}-header-title`, hashId)}>
           {activeLabel}
         </div>
       </Tooltip>
-    </div>,
+    </div>
   );
 };
 
@@ -253,7 +259,7 @@ export const BrowserList: React.FC<BrowserListProps> = ({
   onLocate,
   onOpen,
 }) => {
-  const { prefixCls, wrapSSR, hashId } = useBrowserContext();
+  const { prefixCls, hashId } = useBrowserContext();
   const { locale } = useContext(I18nContext);
 
   const safeItems = Array.isArray(items) ? items : [];
@@ -265,7 +271,7 @@ export const BrowserList: React.FC<BrowserListProps> = ({
   const totalResultsTemplate =
     locale['browser.totalResults'] || 'Total ${count} results';
 
-  return wrapSSR(
+  return (
     <div data-testid="browser-list">
       <header
         className={classNames(`${prefixCls}-header-wrapper`, hashId)}
@@ -317,7 +323,7 @@ export const BrowserList: React.FC<BrowserListProps> = ({
         )}
         footer={null}
       />
-    </div>,
+    </div>
   );
 };
 
@@ -368,7 +374,8 @@ const Browser: React.FC<BrowserProps> = ({
   );
   const { locale } = useContext(I18nContext);
 
-  const { prefixCls, wrapSSR, hashId } = useBrowserContext();
+  const { prefixCls, hashId } = useBrowserContext();
+  const suggestionLabelTooltipProps = useAdaptiveTooltipProps('informational');
 
   const { items: results, loading } = useMemo(() => {
     if (!activeSuggestion) {
@@ -390,7 +397,7 @@ const Browser: React.FC<BrowserProps> = ({
   const totalResultsTemplate =
     locale['browser.totalResults'] || 'Total ${count} results';
 
-  return wrapSSR(
+  return (
     <div>
       {currentView === 'suggestions' && (
         <div>
@@ -430,7 +437,11 @@ const Browser: React.FC<BrowserProps> = ({
                   >
                     {suggestionIcon || <Search />}
                   </div>
-                  <Tooltip title={item.label} mouseEnterDelay={0.5}>
+                  <Tooltip
+                    title={item.label}
+                    mouseEnterDelay={0.5}
+                    {...suggestionLabelTooltipProps}
+                  >
                     <div
                       className={classNames(
                         `${prefixCls}-suggestion-text`,
@@ -462,7 +473,7 @@ const Browser: React.FC<BrowserProps> = ({
           onOpen={onOpen}
         />
       )}
-    </div>,
+    </div>
   );
 };
 

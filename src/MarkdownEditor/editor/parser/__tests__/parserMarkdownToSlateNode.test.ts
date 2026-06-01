@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { handleDefinition } from '../parse/parseElements';
+import { normalizeThinkTagAliases } from '../parse/parseHtml';
 import { handleMath, shouldTreatInlineMathAsText } from '../parse/parseMath';
 import { handleAttachmentLink, handleImage } from '../parse/parseMedia';
 import {
@@ -23,7 +24,7 @@ describe('parserMarkdownToSlateNode', () => {
       });
     });
 
-    it('should parse single dollar inline math into inline-katex node', () => {
+    it('should keep single dollar inline math as plain text by default', () => {
       const markdown = 'Inline math $a^2 + b^2 = c^2$ stays inline.';
       const { schema } = parserMarkdownToSlateNode(markdown);
 
@@ -34,15 +35,51 @@ describe('parserMarkdownToSlateNode', () => {
       const inlineKatexNode = paragraph.children.find(
         (child: any) => child?.type === 'inline-katex',
       );
-      expect(inlineKatexNode).toMatchObject({
-        type: 'inline-katex',
-        children: [{ text: 'a^2 + b^2 = c^2' }],
+      expect(inlineKatexNode).toBeUndefined();
+
+      const textContent = paragraph.children
+        .map((c: any) => c?.text ?? '')
+        .join('');
+      expect(textContent).toContain('$a^2 + b^2 = c^2$');
+    });
+
+    it('should parse single dollar inline math as plain text even when enabled', () => {
+      const markdown = 'Inline math $a^2 + b^2 = c^2$ stays inline.';
+      const { schema } = parserMarkdownToSlateNode(markdown, undefined, {
+        formula: { singleDollarTextMath: true },
       });
 
-      const numericTextNode = paragraph.children.find(
-        (child: any) => child?.text === '$a^2 + b^2 = c^2$',
+      expect(schema).toHaveLength(1);
+      const paragraph = schema[0] as any;
+
+      const inlineKatexNode = paragraph.children.find(
+        (child: any) => child?.type === 'inline-katex',
       );
-      expect(numericTextNode).toBeUndefined();
+      expect(inlineKatexNode).toBeUndefined();
+
+      const textContent = paragraph.children
+        .map((c: any) => c?.text ?? '')
+        .join('');
+      expect(textContent).toContain('$a^2 + b^2 = c^2$');
+    });
+
+    it('should keep $24.4B$ financial amounts as plain text', () => {
+      const markdown = '$24.4B$ 订单 / $18.2B$ 订单';
+      const { schema } = parserMarkdownToSlateNode(markdown, undefined, {
+        formula: { singleDollarTextMath: true },
+      });
+
+      const paragraph = schema[0] as any;
+      const inlineKatexNode = paragraph.children.find(
+        (child: any) => child?.type === 'inline-katex',
+      );
+      expect(inlineKatexNode).toBeUndefined();
+
+      const textContent = paragraph.children
+        .map((c: any) => c?.text ?? '')
+        .join('');
+      expect(textContent).toContain('$24.4B$');
+      expect(textContent).toContain('$18.2B$');
     });
 
     it('should keep $ inside Jinja {{ }} as plain text (system variable)', () => {
@@ -144,6 +181,51 @@ describe('parserMarkdownToSlateNode', () => {
           { text: ' text' },
         ],
       });
+    });
+
+    it('should parse inline <mark> as highlighted leaf (not html code block)', () => {
+      const markdown =
+        'prefix <mark>/alipay-aipay-product-intro </mark> suffix';
+      const result = parserMarkdownToSlateNode(markdown);
+      expect(result.schema).toHaveLength(1);
+      expect(result.schema[0]).toMatchObject({
+        type: 'paragraph',
+        children: [
+          { text: 'prefix ' },
+          { text: '/alipay-aipay-product-intro ', mark: true },
+          { text: ' suffix' },
+        ],
+      });
+    });
+
+    it('should parse block-only <mark>...</mark> as paragraph with mark', () => {
+      const markdown = '<mark>/alipay-aipay-product-intro </mark>';
+      const result = parserMarkdownToSlateNode(markdown);
+      expect(result.schema).toHaveLength(1);
+      expect(result.schema[0]).toMatchObject({
+        type: 'paragraph',
+        children: [{ text: '/alipay-aipay-product-intro ', mark: true }],
+      });
+    });
+
+    it('should decode HTML entities in mark color/bg/label (block-only)', () => {
+      const markdown =
+        '<mark color="red&quot;x" bg="a&amp;b" label="Note: &quot;重要&quot; &lt;hl&gt;">v</mark>';
+      const result = parserMarkdownToSlateNode(markdown);
+      const leaf = (result.schema[0] as any).children[0];
+      expect(leaf.markColor).toBe('red"x');
+      expect(leaf.markBg).toBe('a&b');
+      expect(leaf.markLabel).toBe('Note: "重要" <hl>');
+    });
+
+    it('should decode HTML entities in mark color/bg/label (inline)', () => {
+      const markdown =
+        'pre <mark color="red&quot;x" label="&amp;Note">v</mark> post';
+      const result = parserMarkdownToSlateNode(markdown);
+      const para: any = result.schema[0];
+      const marked = para.children.find((c: any) => c?.mark);
+      expect(marked.markColor).toBe('red"x');
+      expect(marked.markLabel).toBe('&Note');
     });
 
     it('should handle paragraph with inline code', () => {
@@ -1158,6 +1240,29 @@ console.log('测试代码');
       const value = codeNode.value as string;
       expect(value).toContain('【CODE_BLOCK:think】');
       expect(value).toContain('这是嵌套的 think 代码块');
+    });
+
+    it('should not alter markdown when alias open tag appears without closing pair', () => {
+      const aliasOpen = '<' + 'redacted_' + 'thinking' + '>';
+      const md = `正文里出现 ${aliasOpen} 但不闭合`;
+      expect(normalizeThinkTagAliases(md)).toBe(md);
+    });
+
+    it('should fold nested ```json inside <think> into one think code node', () => {
+      const markdown = `<think>
+\`\`\`json
+{"file_type":"docx"}
+\`\`\`
+</think>`;
+      const result = parserMarkdownToSlateNode(markdown);
+
+      expect(result.schema).toHaveLength(1);
+      expect(result.schema[0]).toMatchObject({
+        type: 'code',
+        language: 'think',
+      });
+      const codeNode = result.schema[0] as { value?: string };
+      expect(codeNode.value).toContain('【CODE_BLOCK:json】');
     });
   });
 

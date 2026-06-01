@@ -7,6 +7,19 @@ export type UseSpeechSynthesisOptions = {
   text: string;
   /** 初始倍速，默认 1（范围建议 0.5~2） */
   defaultRate?: number;
+  /**
+   * 指定音色（按 `SpeechSynthesisVoice.voiceURI` 精确匹配）。
+   * - 不传：使用浏览器默认音色（由 `lang` 与系统设置决定）
+   * - 传入：在 `getVoices()` 列表中查找匹配项；找不到则回退默认音色
+   * - 兼容：`speechSynthesis.getVoices()` 在 Chrome 首次调用常返回空数组，
+   *   内置实现会挂 `onvoiceschanged` 等待并重启朗读，外部适配器需自行处理
+   */
+  voiceURI?: string;
+  /**
+   * 朗读语种（BCP 47 标签），如 `'zh-CN'`、`'en-US'`。
+   * 不传时由浏览器根据 `text` 内容自动推断；与 `voiceURI` 同时传入时，`voiceURI` 优先。
+   */
+  lang?: string;
 };
 
 /**

@@ -2,6 +2,7 @@ import { HighlightOutlined } from '@ant-design/icons';
 import { ColorPicker } from 'antd';
 import classNames from 'clsx';
 import React from 'react';
+import { useRefFunction } from '../../../../../Hooks/useRefFunction';
 import { ToolBarItem } from './ToolBarItem';
 
 const colors = [
@@ -35,12 +36,9 @@ export const ColorPickerButton = React.memo<ColorPickerButtonProps>(
     onColorChange,
     onToggleHighColor,
   }) => {
-    const handleColorChange = React.useCallback(
-      (color: any) => {
-        onColorChange(color.toHexString());
-      },
-      [onColorChange],
-    );
+    const handleColorChange = useRefFunction((color: any) => {
+      onColorChange(color.toHexString());
+    });
 
     return (
       <ToolBarItem

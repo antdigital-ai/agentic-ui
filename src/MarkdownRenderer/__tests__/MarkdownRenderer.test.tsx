@@ -2,6 +2,8 @@ import { act, render } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MarkdownRenderer } from '../index';
+import type { MarkdownRendererRef } from '../types';
+import { installRafStub } from './installRafStub';
 
 vi.mock('mermaid', () => ({
   default: {
@@ -15,10 +17,12 @@ vi.mock('mermaid', () => ({
 describe('MarkdownRenderer', () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    installRafStub();
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.unstubAllGlobals();
   });
 
   it('应渲染基础 markdown 内容', async () => {
@@ -129,11 +133,7 @@ describe('MarkdownRenderer', () => {
   it('流式表格应在 header 与首行完整后再渲染', () => {
     const tablePrefix = '| Header |\n| --- |\n| Cel';
     const { container, rerender } = render(
-      <MarkdownRenderer
-        content={tablePrefix}
-        streaming={true}
-        queueOptions={{ animate: false }}
-      />,
+      <MarkdownRenderer content={tablePrefix} streaming={true} />,
     );
 
     expect(container.querySelector('table')).toBeFalsy();
@@ -142,7 +142,7 @@ describe('MarkdownRenderer', () => {
       <MarkdownRenderer
         content={'| Header |\n| --- |\n| Cell |'}
         streaming={true}
-        queueOptions={{ animate: false }}
+        isFinished
       />,
     );
 
@@ -183,36 +183,57 @@ describe('MarkdownRenderer', () => {
     expect(container.textContent).toContain('updated');
   });
 
-  it('流式模式下应通过字符队列逐步输出', () => {
+  it('关闭限流时应即时输出完整内容', () => {
     const { container } = render(
       <MarkdownRenderer
         content="Hello World"
         streaming={true}
-        queueOptions={{ charsPerFrame: 5, animate: true }}
+        throttleOptions={{ enabled: false }}
       />,
     );
 
-    // 一帧后输出 5 个字符
-    act(() => {
-      vi.advanceTimersByTime(16);
-    });
-
-    expect(container.textContent).toContain('Hello');
-
-    // 再一帧输出剩余
-    act(() => {
-      vi.advanceTimersByTime(16);
-    });
-
-    expect(container.textContent).toContain('Hello Worl');
+    expect(container.textContent).toContain('Hello World');
   });
 
-  it('流式模式下 isFinished 应 flush 全部内容', () => {
+  it('流式模式下应按限流顺序逐步输出', async () => {
+    const ref = React.createRef<MarkdownRendererRef>();
+    const throttleOptions = { charsPerFrame: 5, speed: 1 as const };
+
+    const { rerender } = render(
+      <MarkdownRenderer
+        ref={ref}
+        content="Hello World"
+        streaming={true}
+        throttleOptions={throttleOptions}
+      />,
+    );
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(32);
+    });
+    expect(ref.current?.getDisplayedContent()).toContain('Hello');
+    expect(ref.current?.getDisplayedContent()).not.toBe('Hello World');
+
+    await act(async () => {
+      rerender(
+        <MarkdownRenderer
+          ref={ref}
+          content="Hello World"
+          streaming={true}
+          isFinished
+          throttleOptions={throttleOptions}
+        />,
+      );
+    });
+    expect(ref.current?.getDisplayedContent()).toBe('Hello World');
+  });
+
+  it('流式 isFinished 应 flush 全部内容', () => {
     const { container, rerender } = render(
       <MarkdownRenderer
         content="Hello World"
         streaming={true}
-        queueOptions={{ charsPerFrame: 1, animate: true }}
+        throttleOptions={{ charsPerFrame: 1 }}
       />,
     );
 
@@ -221,7 +242,7 @@ describe('MarkdownRenderer', () => {
         content="Hello World"
         streaming={true}
         isFinished={true}
-        queueOptions={{ charsPerFrame: 1, animate: true }}
+        throttleOptions={{ charsPerFrame: 1 }}
       />,
     );
 
@@ -258,12 +279,16 @@ describe('MarkdownRenderer', () => {
     expect(container.querySelector('h3')?.textContent).toBe('H3');
   });
 
-  it('应渲染代码块', () => {
+  it('应渲染代码块', async () => {
     const { container } = render(
       <MarkdownRenderer content={'```js\nconst x = 1;\n```'} />,
     );
 
-    // 代码块应使用 CodeContainer（data-be="code"）
+    // 代码块走 React.lazy，等 Suspense 解析完成后再断言
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+
     expect(container.querySelector('[data-be="code"]')).toBeTruthy();
     expect(
       container.querySelector('[data-testid="code-toolbar"]'),
@@ -327,7 +352,7 @@ describe('MarkdownRenderer', () => {
           'Microsoft Corporation 是一家领先的技术公司，专注于云计算、生产力软件、业务应用程序和消费技术。公司的核心业务模式围绕三大分部展开：Productivity and Business Processes（生产力和业务流程）、Intelligent Cloud（智能云）、以及 More Personal Computing（更多个人计算）。[^1]'
         }
         streaming={true}
-        queueOptions={{ animate: false }}
+        isFinished
       />,
     );
 
@@ -340,11 +365,7 @@ describe('MarkdownRenderer', () => {
     const baseContent =
       'Microsoft Corporation 是一家领先的技术公司，专注于云计算、生产力软件、业务应用程序和消费技术。';
     const { container, rerender } = render(
-      <MarkdownRenderer
-        content={baseContent}
-        streaming={true}
-        queueOptions={{ animate: false }}
-      />,
+      <MarkdownRenderer content={baseContent} streaming={true} />,
     );
 
     expect(container.textContent).toContain('Microsoft Corporation');
@@ -353,7 +374,7 @@ describe('MarkdownRenderer', () => {
       <MarkdownRenderer
         content={`${baseContent}[^1]`}
         streaming={true}
-        queueOptions={{ animate: false }}
+        isFinished
       />,
     );
 
@@ -376,7 +397,7 @@ describe('MarkdownRenderer', () => {
     expect(container.textContent).toContain('最终回答');
   });
 
-  it('应将 HTML 注释 + 表格组合渲染为图表', () => {
+  it('应将 HTML 注释 + 表格组合渲染为图表', async () => {
     const content = [
       '<!-- [{"chartType":"line","title":"趋势","x":"month","y":"value"}] -->',
       '',
@@ -387,6 +408,11 @@ describe('MarkdownRenderer', () => {
     ].join('\n');
 
     const { container } = render(<MarkdownRenderer content={content} />);
+
+    // ChartBlockRenderer 走 React.lazy，等 Suspense 解析完成后再断言
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
 
     const chartEl = container.querySelector('[data-be="chart"]');
     expect(chartEl).toBeTruthy();
@@ -425,14 +451,18 @@ describe('MarkdownRenderer', () => {
     expect(img?.getAttribute('alt')).toBe('alt text');
   });
 
-  it('流式模式下应保留图片节点', () => {
+  it('流式模式下应保留图片节点', async () => {
     const { container } = render(
       <MarkdownRenderer
         content="![alt text](https://example.com/image.png)"
         streaming={true}
-        queueOptions={{ animate: false }}
+        isFinished
       />,
     );
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(16);
+    });
 
     const img = container.querySelector('img');
     expect(img).toBeTruthy();
@@ -440,7 +470,7 @@ describe('MarkdownRenderer', () => {
     expect(img?.getAttribute('alt')).toBe('alt text');
   });
 
-  it('应将 schema 代码块渲染为 SchemaRenderer', () => {
+  it('应将 schema 代码块渲染为 SchemaRenderer', async () => {
     const schemaJson = JSON.stringify({
       type: 'object',
       properties: { name: { type: 'string' } },
@@ -448,6 +478,11 @@ describe('MarkdownRenderer', () => {
     const { container } = render(
       <MarkdownRenderer content={'```schema\n' + schemaJson + '\n```'} />,
     );
+
+    // SchemaBlockRenderer 走 React.lazy，等 Suspense 解析完成后再断言
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
 
     const schemaEl = container.querySelector('[data-testid="schema-renderer"]');
     expect(schemaEl).toBeTruthy();
@@ -497,7 +532,7 @@ describe('MarkdownRenderer', () => {
     expect(customEl?.textContent).toContain('Custom: form');
   });
 
-  it('应将 agentic-ui-task 代码块渲染为 TaskList', () => {
+  it('应将 agentic-ui-task 代码块渲染为 TaskList', async () => {
     const json = JSON.stringify({
       items: [
         {
@@ -512,6 +547,11 @@ describe('MarkdownRenderer', () => {
       <MarkdownRenderer content={'```agentic-ui-task\n' + json + '\n```'} />,
     );
 
+    // AgenticUiTaskBlockRenderer 走 React.lazy，等 Suspense 解析完成后再断言
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+
     expect(
       container.querySelector('[data-testid="agentic-ui-task-block"]'),
     ).toBeTruthy();
@@ -520,7 +560,7 @@ describe('MarkdownRenderer', () => {
     ).toBeTruthy();
   });
 
-  it('应将 agentic-ui-toolusebar 代码块渲染为 ToolUseBar', () => {
+  it('应将 agentic-ui-toolusebar 代码块渲染为 ToolUseBar', async () => {
     const json = JSON.stringify({
       tools: [
         {
@@ -536,6 +576,11 @@ describe('MarkdownRenderer', () => {
         content={'```agentic-ui-toolusebar\n' + json + '\n```'}
       />,
     );
+
+    // AgenticUiToolUseBarBlockRenderer 走 React.lazy，等 Suspense 解析完成后再断言
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
 
     expect(
       container.querySelector('[data-testid="agentic-ui-toolusebar-block"]'),
@@ -559,7 +604,7 @@ describe('MarkdownRenderer', () => {
     expect(container.querySelector('[data-testid="ToolUse"]')).toBeTruthy();
   });
 
-  it('应将 agentic-ui-filemap 代码块渲染为 FileMapView', () => {
+  it('应将 agentic-ui-filemap 代码块渲染为 FileMapView', async () => {
     const json = JSON.stringify({
       fileList: [
         {
@@ -581,6 +626,11 @@ describe('MarkdownRenderer', () => {
     const { container } = render(
       <MarkdownRenderer content={'```agentic-ui-filemap\n' + json + '\n```'} />,
     );
+
+    // AgenticUiFileMapBlockRenderer 走 React.lazy，等 Suspense 解析完成后再断言
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
 
     expect(
       container.querySelector('[data-testid="agentic-ui-filemap-block"]'),

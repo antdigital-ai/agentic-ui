@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { DeleteOutlined } from '@ant-design/icons';
 import { Input, InputRef, Modal, Tooltip } from 'antd';
-import React, { useCallback, useContext, useRef } from 'react';
+import React, { useContext, useRef } from 'react';
 import { Selection, Text, Transforms } from 'slate';
 import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { I18nContext } from '../../../I18n';
@@ -72,11 +72,11 @@ export const InsertLink = () => {
     filterAnchors: [] as { item: DocItem; value: string }[],
   });
 
-  const prevent = useCallback((e: WheelEvent) => {
+  const prevent = useRefFunction((e: WheelEvent) => {
     e.preventDefault();
-  }, []);
+  });
 
-  const setPath = useCallback((path: string) => {
+  const setPath = useRefFunction((path: string) => {
     if (isLink(path)) {
       close(path);
     } else {
@@ -88,7 +88,7 @@ export const InsertLink = () => {
       const relativePath = realPath;
       close(`${relativePath}${parse.hash ? `#${parse.hash}` : ''}`);
     }
-  }, []);
+  });
 
   const openInsertLink = useRefFunction((sel: Selection) => {
     if (domRect) {
@@ -129,7 +129,7 @@ export const InsertLink = () => {
 
   useSubject(openInsertLink$, openInsertLink);
 
-  const close = useCallback((url?: string) => {
+  const close = useRefFunction((url?: string) => {
     markdownContainerRef.current!.parentElement?.removeEventListener(
       'wheel',
       prevent,
@@ -143,7 +143,7 @@ export const InsertLink = () => {
     );
     if (typeof window === 'undefined') return;
     if (typeof window.matchMedia === 'undefined') return;
-  }, []);
+  });
 
   if (!state().open) return null;
 

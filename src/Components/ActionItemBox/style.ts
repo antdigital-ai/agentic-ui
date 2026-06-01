@@ -1,11 +1,18 @@
 import {
-  ChatTokenType,
-  GenerateStyle,
+  genStyleHooks,
   resetComponent,
-  useEditorStyleRegister,
+  type GenStyleFn,
 } from '../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+/**
+ * ActionItemBox 与 ActionItemContainer 共享的样式生成函数。
+ *
+ * 两个组件使用同一个 prefixCls（`agentic-chat-action-item-box`），
+ * 因此样式生成函数也共享一份。ActionItemContainer 通过自己的
+ * `useStyle` 入口（`ActionItemContainer/style.ts`）以独立的 styleKey
+ * 注册同一份 genStyle，避免直接跨组件导入 ActionItemBox 的 useStyle。
+ */
+export const genStyle: GenStyleFn<'ActionItemBox'> = (token) => {
   return {
     [token.componentCls]: {
       borderRadius: '11px',
@@ -17,7 +24,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       gap: '12px',
       justifyContent: 'space-between',
       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-      backgroundColor: '#FFF',
+      backgroundColor: 'var(--color-gray-bg-card-white)',
       boxShadow: 'var(--shadow-border-base)',
       minHeight: 32,
       '&-overflow-container': {
@@ -26,8 +33,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         top: 0,
         bottom: 0,
         pointerEvents: 'none',
-        background:
-          'linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.85) 60%, #FFFFFF 100%)',
+        background: `linear-gradient(to right, transparent 0%, var(--color-gray-bg-card-white) 100%)`,
         borderRadius: 12,
         width: 72,
         height: '100%', // 防止遮挡下部的scrollbar
@@ -39,7 +45,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           width: 40,
           height: '100%',
           backgroundColor:
-            'linear-gradient(270deg, #F7F8F9 57%, rgba(255, 255, 255, 0) 100%)',
+            'linear-gradient(270deg, var(--color-gray-bg-page-light) 57%, rgba(255, 255, 255, 0) 100%)',
         },
         '&-indicator': {
           flex: 1,
@@ -51,7 +57,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           height: 32,
           zIndex: 10,
           background:
-            'linear-gradient(270deg, #FFFFFF 57%, rgba(255, 255, 255, 0) 100%)',
+            'linear-gradient(270deg, var(--color-gray-bg-card-white) 57%, rgba(255, 255, 255, 0) 100%)',
           border: 'none',
           boxShadow: 'none',
           borderRadius: 0,
@@ -60,7 +66,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           width: 32,
           height: 32,
           borderRadius: 'var(--radius-control-base)',
-          background: '#FFFFFF',
+          background: 'var(--color-gray-bg-card-white)',
           boxShadow: 'inset 0px 0px 1px 0px rgba(0, 19, 41, 0.15)',
           color: 'var(--color-gray-text-secondary)',
           display: 'flex',
@@ -215,7 +221,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#505C71',
+            color: 'var(--color-gray-text-secondary)',
             opacity: 0.6,
             cursor: 'grab',
             userSelect: 'none',
@@ -228,7 +234,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             width: 20,
             height: 20,
             borderRadius: 6,
-            backgroundColor: '#F7F9FC',
+            backgroundColor: 'var(--color-gray-bg-page-light)',
           },
           [`${token.componentCls}-content-description`]: {
             display: 'none',
@@ -242,7 +248,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       '&-container': {
         borderRadius: 'var(--radius-control-base)',
         position: 'relative',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'var(--color-gray-bg-card-white)',
         alignItems: 'center',
         width: '100%',
         cursor: 'pointer',
@@ -340,18 +346,38 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 };
 
 /**
+ * 入场动画：从左侧 -10px 滑入并淡入
+ *
+ * 替代 framer-motion 的 `initial={x:-10, opacity:0}` → `animate={x:0, opacity:1}`，
+ * 通过 CSS keyframes 实现，无需 JS 动画运行时。
+ */
+const genMotionStyle: GenStyleFn<'ActionItemBox'> = (token) => {
+  return {
+    [`${token.componentCls}-motion-slide-in-left`]: {
+      animationName: `${token.componentCls}-slideInLeft`,
+      animationDuration: '0.3s',
+      animationTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      animationFillMode: 'both',
+    },
+    [`@keyframes ${token.componentCls}-slideInLeft`]: {
+      from: { transform: 'translateX(-10px)', opacity: 0 },
+      to: { transform: 'translateX(0)', opacity: 1 },
+    },
+  };
+};
+
+/**
  * ActionItemBox
  * @param prefixCls
  * @returns
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('ActionItemBox', (token) => {
-    const proChatToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('ActionItemBox', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+  genMotionStyle(token, info),
+]);
 
-    // Apply reset first, then component styles to allow overrides like padding
-    return [resetComponent(proChatToken), genStyle(proChatToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [, hashId] = useGenStyle(prefixCls ?? 'ActionItemBox');
+  return { hashId };
 }

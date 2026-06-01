@@ -1,5 +1,5 @@
-import type { MessageBubbleData } from '../../Types/message';
 import type { RoleType } from '../../Types/common';
+import type { MessageBubbleData } from '../../Types/message';
 import type {
   OpenAIChatContentPart,
   OpenAIChatMessage,
@@ -22,11 +22,17 @@ export function extractTextFromContent(
   }
   const parts: string[] = [];
   for (const part of content) {
-    if (part.type === 'text' && typeof (part as { text?: string }).text === 'string') {
+    if (
+      part.type === 'text' &&
+      typeof (part as { text?: string }).text === 'string'
+    ) {
       parts.push((part as { text: string }).text);
       continue;
     }
-    if ('refusal' in part && typeof (part as { refusal?: string }).refusal === 'string') {
+    if (
+      'refusal' in part &&
+      typeof (part as { refusal?: string }).refusal === 'string'
+    ) {
       parts.push((part as { refusal: string }).refusal);
       continue;
     }
@@ -115,9 +121,13 @@ export function mapOpenAIMessagesToMessageBubbleData(
       text = extractTextFromContent(a.content);
       text = appendAssistantExtras(a, text, appendToolCallsToContent);
     } else if (msg.role === 'user' || msg.role === 'system') {
-      text = extractTextFromContent(msg.content as string | OpenAIChatContentPart[] | null);
+      text = extractTextFromContent(
+        msg.content as string | OpenAIChatContentPart[] | null,
+      );
     } else if (msg.role === 'tool') {
-      const prefix = msg.tool_call_id ? `[tool_call_id: ${msg.tool_call_id}]\n` : '';
+      const prefix = msg.tool_call_id
+        ? `[tool_call_id: ${msg.tool_call_id}]\n`
+        : '';
       text = prefix + (msg.content ?? '');
     } else if (msg.role === 'function') {
       const prefix = msg.name ? `[function: ${msg.name}]\n` : '';

@@ -2,13 +2,15 @@ import { RefreshCcw, SwapRight } from '@sofa-design/icons';
 import { ConfigProvider, Tooltip } from 'antd';
 import classNames from 'clsx';
 import React, {
-  useCallback,
+  memo,
   useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
+import { useAdaptiveTooltipProps } from '../../Hooks/useAdaptiveTooltipProps';
+import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext } from '../../I18n';
 import { useStyle } from './style';
 
@@ -42,63 +44,100 @@ export interface SuggestionListProps {
   };
 }
 
-const OverflowTooltip: React.FC<{
+interface OverflowTooltipProps {
   children: React.ReactNode;
   title: string;
   prefixCls: string;
   hashId: string;
   forceShow?: boolean;
-}> = ({ children, title, prefixCls, hashId, forceShow = false }) => {
-  const textRef = useRef<HTMLSpanElement>(null);
-  const [isOverflowing, setIsOverflowing] = useState(false);
+}
 
-  const checkOverflow = useCallback(() => {
-    if (textRef.current) {
-      const { scrollWidth, clientWidth } = textRef.current;
-      const overflowing = scrollWidth > clientWidth;
-      setIsOverflowing(overflowing);
-    }
-  }, []);
+/**
+ * 溢出检测 Tooltip：当文字被截断（或 forceShow=true）时才挂 Tooltip。
+ *
+ * 之前实现存在两处性能问题：
+ * 1. 每次 render 都会注册一个 window resize 监听 + 一个 MutationObserver，
+ *    且依赖项 `[children, checkOverflow]` 会随父节点 re-render 频繁触发。
+ * 2. 直接在 render 中比较 scrollWidth/clientWidth 触发 setState，可能引起
+ *    重复 layout。
+ *
+ * 这里收紧依赖：resize 监听仅注册一次；MutationObserver 在 mount 时挂一次；
+ * children 变化通过单独 effect 触发一次 checkOverflow。
+ */
+const OverflowTooltip: React.FC<OverflowTooltipProps> = memo(
+  ({ children, title, prefixCls, hashId, forceShow = false }) => {
+    const textRef = useRef<HTMLSpanElement>(null);
+    const [isOverflowing, setIsOverflowing] = useState(false);
+    const adaptiveTooltip = useAdaptiveTooltipProps('informational');
 
-  useEffect(() => {
-    checkOverflow();
-    window.addEventListener('resize', checkOverflow);
-    return () => window.removeEventListener('resize', checkOverflow);
-  }, [children, checkOverflow]);
-
-  useEffect(() => {
-    if (!textRef.current) return;
-    if (typeof MutationObserver === 'undefined') return;
-
-    const observer = new MutationObserver(checkOverflow);
-
-    observer.observe(textRef.current, {
-      childList: true,
-      subtree: true,
-      characterData: true,
+    const checkOverflow = useRefFunction(() => {
+      const node = textRef.current;
+      if (!node) return;
+      const overflowing = node.scrollWidth > node.clientWidth;
+      setIsOverflowing((prev) => (prev === overflowing ? prev : overflowing));
     });
 
-    return () => observer.disconnect();
-  }, [checkOverflow]);
+    // 仅在 children 内容变化时复检
+    useEffect(() => {
+      checkOverflow();
+    }, [children, checkOverflow]);
 
-  const shouldShowTooltip = forceShow || isOverflowing;
+    // resize 监听 + MutationObserver 仅挂一次
+    useEffect(() => {
+      const node = textRef.current;
+      if (!node) return;
 
-  if (!shouldShowTooltip) {
+      const handleResize = () => checkOverflow();
+      window.addEventListener('resize', handleResize);
+
+      let observer: MutationObserver | undefined;
+      if (typeof MutationObserver !== 'undefined') {
+        observer = new MutationObserver(checkOverflow);
+        observer.observe(node, {
+          childList: true,
+          subtree: true,
+          characterData: true,
+        });
+      }
+
+      return () => {
+        window.removeEventListener('resize', handleResize);
+        observer?.disconnect();
+      };
+    }, [checkOverflow]);
+
+    const shouldShowTooltip = forceShow || isOverflowing;
+
+    if (!shouldShowTooltip) {
+      return (
+        <span
+          ref={textRef}
+          className={classNames(`${prefixCls}-label`, hashId)}
+        >
+          {children}
+        </span>
+      );
+    }
+
     return (
-      <span ref={textRef} className={classNames(`${prefixCls}-label`, hashId)}>
-        {children}
-      </span>
+      <Tooltip
+        mouseEnterDelay={0.3}
+        title={title}
+        placement="top"
+        {...adaptiveTooltip}
+      >
+        <span
+          ref={textRef}
+          className={classNames(`${prefixCls}-label`, hashId)}
+        >
+          {children}
+        </span>
+      </Tooltip>
     );
-  }
+  },
+);
 
-  return (
-    <Tooltip mouseEnterDelay={0.3} title={title} placement="top">
-      <span ref={textRef} className={classNames(`${prefixCls}-label`, hashId)}>
-        {children}
-      </span>
-    </Tooltip>
-  );
-};
+OverflowTooltip.displayName = 'OverflowTooltip';
 
 export const SuggestionList: React.FC<SuggestionListProps> = ({
   className,
@@ -114,7 +153,7 @@ export const SuggestionList: React.FC<SuggestionListProps> = ({
   const { locale } = useContext(I18nContext);
   const prefixCls = context?.getPrefixCls('follow-up');
 
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
   const [submitting, setSubmitting] = useState(false);
 
   const derivedItems: SuggestionItem[] = useMemo(() => {
@@ -131,9 +170,10 @@ export const SuggestionList: React.FC<SuggestionListProps> = ({
     `${prefixCls}-${type}`,
   );
 
-  return wrapSSR(
+  return (
     <div
       className={rootCls}
+      data-testid={prefixCls}
       style={style}
       role="group"
       aria-label={locale?.['suggestion.area'] || '追问区域'}
@@ -146,24 +186,33 @@ export const SuggestionList: React.FC<SuggestionListProps> = ({
           aria-label={locale?.['suggestion.label'] || '追问建议'}
         >
           {showMore?.enable ? (
-            <div
-              className={classNames(`${prefixCls}-more`, hashId)}
-              aria-label={
-                showMore?.text ||
-                locale?.['suggestion.searchMore'] ||
-                '搜索更多'
-              }
-            >
+            <div className={classNames(`${prefixCls}-more`, hashId)}>
               <span className={classNames(`${prefixCls}-more-text`, hashId)}>
                 {showMore?.text ||
                   locale?.['suggestion.searchMore'] ||
                   '搜索更多'}
               </span>
+              {/*
+                可点击的 icon 容器：role="button" 用于交互语义，
+                之前同时设置了 aria-hidden（与 role=button 冲突，会被屏幕阅读器跳过点击区），
+                这里改为 tabIndex=0 + aria-label，让其可被键盘聚焦与朗读。
+              */}
               <span
                 className={classNames(`${prefixCls}-more-icon`, hashId)}
                 role="button"
+                tabIndex={0}
+                aria-label={
+                  showMore?.text ||
+                  locale?.['suggestion.searchMore'] ||
+                  '搜索更多'
+                }
                 onClick={() => showMore?.onClick?.()}
-                aria-hidden
+                onKeyDown={(evt) => {
+                  if (evt.key === 'Enter' || evt.key === ' ') {
+                    evt.preventDefault();
+                    showMore?.onClick?.();
+                  }
+                }}
               >
                 {showMore?.icon || <RefreshCcw width={14} height={14} />}
               </span>
@@ -190,14 +239,26 @@ export const SuggestionList: React.FC<SuggestionListProps> = ({
               <div
                 key={item?.key ?? label}
                 role="button"
+                tabIndex={isDisabled ? -1 : 0}
+                aria-disabled={isDisabled || undefined}
                 className={classNames(`${prefixCls}-suggestion`, hashId, {
                   [`${prefixCls}-suggestion-disabled`]: isDisabled,
                 })}
                 onClick={handleClick}
+                onKeyDown={(evt) => {
+                  if (isDisabled) return;
+                  if (evt.key === 'Enter' || evt.key === ' ') {
+                    evt.preventDefault();
+                    void handleClick();
+                  }
+                }}
                 aria-label={`${locale?.['suggestion.select'] || '选择建议'}：${label || locale?.['suggestion.followUp'] || '追问'}`}
               >
                 {item?.icon ? (
-                  <span className={classNames(`${prefixCls}-icon`, hashId)}>
+                  <span
+                    className={classNames(`${prefixCls}-icon`, hashId)}
+                    aria-hidden
+                  >
                     {item?.icon}
                   </span>
                 ) : null}
@@ -226,7 +287,7 @@ export const SuggestionList: React.FC<SuggestionListProps> = ({
           })}
         </div>
       ) : null}
-    </div>,
+    </div>
   );
 };
 

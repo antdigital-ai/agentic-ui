@@ -1,6 +1,6 @@
 import React from 'react';
-import AbstractLottie, { AbstractLottieProps } from '../Abstract';
-import likeAnimation from './lottie.json';
+import { AbstractLottieProps } from '../Abstract';
+import { createBubbleActionLottie } from '../createBubbleActionLottie';
 
 export type LikeLottieProps = Omit<AbstractLottieProps, 'animationData'>;
 
@@ -43,8 +43,9 @@ export type LikeLottieProps = Omit<AbstractLottieProps, 'animationData'>;
  * @param props.size - 动画尺寸（宽度和高度），默认为 '1em'
  * @returns 渲染的点赞操作动画组件
  */
-export const LikeLottie: React.FC<LikeLottieProps> = (props) => (
-  <AbstractLottie {...props} animationData={likeAnimation} />
-);
+export const LikeLottie: React.FC<LikeLottieProps> = createBubbleActionLottie({
+  loadJson: () => import('./lottie.json'),
+  displayName: 'LikeLottie',
+});
 
 export default LikeLottie;

@@ -17,6 +17,7 @@ import {
   EditorStoreContext,
   useEditorStore,
 } from '../../../MarkdownEditor/editor/store';
+import { getSlateElementPlainText } from '../../../MarkdownEditor/editor/utils/codeBlockPlainText';
 import { EditorUtils } from '../../../MarkdownEditor/editor/utils/editorUtils';
 import { CodeNode, ElementProps } from '../../../MarkdownEditor/el';
 import { ToolUseBarThink } from '../../../ToolUseBarThink';
@@ -168,10 +169,7 @@ export function ThinkBlock(props: ThinkBlockProps) {
     prevExpandedRef.current = currentExpanded;
   }, [thinkBlockContext?.expanded]);
 
-  const rawContent =
-    element?.value !== null && element?.value !== undefined
-      ? String(element.value).trim()
-      : '';
+  const rawContent = getSlateElementPlainText(element).trim();
 
   // 恢复内容中被转义的代码块
   const content = restoreCodeBlocks(rawContent);
@@ -182,21 +180,29 @@ export function ThinkBlock(props: ThinkBlockProps) {
     ? locale?.['think.deepThinkingInProgress'] || '深度思考...'
     : locale?.['think.deepThinking'] || '深度思考';
 
+  const thinkBlockRootStyles = useMemo(
+    () => ({
+      root: {
+        boxSizing: 'border-box' as const,
+        maxWidth: '680px',
+        marginTop: 8,
+      },
+    }),
+    [],
+  );
+
   return (
     <ToolUseBarThink
       testId="think-block"
-      styles={{
-        root: {
-          boxSizing: 'border-box',
-          maxWidth: '680px',
-          marginTop: 8,
-        },
-      }}
+      styles={thinkBlockRootStyles}
       expanded={expanded}
       onExpandedChange={setExpanded}
       toolName={toolNameText}
       thinkContent={content}
       status={isLoading ? 'loading' : 'success'}
+      scrollIntoViewOnExpand={
+        editorProps?.codeProps?.scrollDeepThinkIntoViewOnExpand
+      }
     />
   );
 }

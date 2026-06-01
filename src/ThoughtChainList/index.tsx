@@ -10,12 +10,12 @@ import { ConfigProvider, Descriptions, Drawer, Typography } from 'antd';
 import classNames from 'clsx';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import { motion } from 'framer-motion';
 import { merge } from 'lodash-es';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ActionIconBox } from '../Components/ActionIconBox';
 import { useAutoScroll } from '../Hooks/useAutoScroll';
+import { useRefFunction } from '../Hooks/useRefFunction';
 import { I18nContext } from '../I18n';
 import { MarkdownEditorProps } from '../MarkdownEditor/types';
 import { DotLoading } from './DotAni';
@@ -30,6 +30,14 @@ import {
 } from './types';
 
 const COLLAPSE_ANIMATION_DURATION_MS = 160;
+
+/** 流式更新时复用同一引用，避免列表项 props 每次变引用导致 DeepThink 整树重渲染 */
+const THOUGHT_CHAIN_LOADING_ICON = <Loader />;
+const THOUGHT_CHAIN_SUCCESS_ICON = <CircleCheckBig />;
+const THOUGHT_CHAIN_ERROR_ICON_STYLE: React.CSSProperties = { color: 'red' };
+const THOUGHT_CHAIN_ERROR_ICON = (
+  <CloseCircleFilled style={THOUGHT_CHAIN_ERROR_ICON_STYLE} />
+);
 
 // Initialize dayjs plugins
 try {
@@ -77,7 +85,7 @@ const ThoughtChainTitle = React.memo<{
     );
 
     const dom = (
-      <motion.div
+      <div
         className={classNames(`${prefixCls}-title`, hashId, {
           [`${prefixCls}-title-collapse`]: collapse,
           [`${prefixCls}-title-compact`]: compact,
@@ -95,7 +103,7 @@ const ThoughtChainTitle = React.memo<{
         <span className={classNames(`${prefixCls}-title-extra`, hashId)}>
           {props.titleExtraRender ? props.titleExtraRender(extra) : extra}
         </span>
-      </motion.div>
+      </div>
     );
     if (props.titleRender) {
       return props.titleRender(dom);
@@ -210,7 +218,7 @@ const ThoughtChainContent = React.memo<
 
       return thoughtChainList.map((item, index) => {
         let info = item.info;
-        let icon = <Loader />;
+        let icon: React.ReactNode = THOUGHT_CHAIN_LOADING_ICON;
         let isFinished = false;
 
         if (
@@ -219,17 +227,11 @@ const ThoughtChainContent = React.memo<
           item.output?.type !== 'RUNNING'
         ) {
           isFinished = true;
-          icon = <CircleCheckBig />;
+          icon = THOUGHT_CHAIN_SUCCESS_ICON;
         }
 
         if (item.output?.errorMsg) {
-          icon = (
-            <CloseCircleFilled
-              style={{
-                color: 'red',
-              }}
-            />
-          );
+          icon = THOUGHT_CHAIN_ERROR_ICON;
         }
 
         return {
@@ -264,7 +266,7 @@ const ThoughtChainContent = React.memo<
     );
 
     return (
-      <motion.div
+      <div
         className={classNames(
           `${prefixCls}-content`,
           {
@@ -275,11 +277,9 @@ const ThoughtChainContent = React.memo<
         )}
         ref={containerRef}
       >
-        <motion.div
+        <div
           role="list"
           className={classNames(`${prefixCls}-content-list`, hashId)}
-          initial={false}
-          animate={{ opacity: 1 }}
         >
           {processedItems.map((item, index) => {
             const info = item.info?.split(/(\$\{\w+\})/);
@@ -322,8 +322,8 @@ const ThoughtChainContent = React.memo<
               </ErrorBoundary>
             );
           })}
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     );
   },
 );
@@ -392,12 +392,11 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
     const context = useContext(ConfigProvider.ConfigContext);
     const [collapse, setCollapse] = React.useState<boolean>(false);
     const prefixCls = context?.getPrefixCls('thought-chain-list');
-    const { wrapSSR, hashId } = useStyle(prefixCls);
+    const { hashId } = useStyle(prefixCls);
     const { ...restStyle } = customStyle || {};
     const [docMeta, setDocMeta] = React.useState<Partial<DocMeta> | null>(null);
 
-    // 为组件实例生成唯一ID，避免多个实例间的key冲突
-    const instanceId = 'ThoughtChainList';
+    const instanceId = React.useId();
 
     useEffect(() => {
       if (bubble?.isFinished && finishAutoCollapse !== false) {
@@ -406,22 +405,19 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
     }, [bubble?.isFinished, finishAutoCollapse]);
 
     // memo 化的回调函数
-    const handleCollapseToggle = React.useCallback(() => {
+    const handleCollapseToggle = useRefFunction(() => {
       setCollapse((prev) => !prev);
-    }, []);
+    });
 
-    const handleDocMetaClose = React.useCallback(() => {
+    const handleDocMetaClose = useRefFunction(() => {
       setDocMeta(null);
       onDocMetaClick?.(null);
-    }, [onDocMetaClick]);
+    });
 
-    const handleDocMetaClick = React.useCallback(
-      (meta: DocMeta) => {
-        setDocMeta(meta);
-        onDocMetaClick?.(meta);
-      },
-      [onDocMetaClick],
-    );
+    const handleDocMetaClick = useRefFunction((meta: DocMeta) => {
+      setDocMeta(meta);
+      onDocMetaClick?.(meta);
+    });
 
     const endStatusDisplay = useMemo(() => {
       const time = ((bubble?.endTime || 0) - (bubble?.createAt || 0)) / 1000;
@@ -476,7 +472,7 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
       locale,
     ]);
 
-    return wrapSSR(
+    return (
       <>
         <DocumentDrawer
           docMeta={docMeta}
@@ -484,8 +480,12 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
           locale={locale}
         />
 
-        <div className={classNames(`${prefixCls}`, hashId)} style={restStyle}>
-          <motion.div
+        <div
+          className={classNames(`${prefixCls}`, hashId)}
+          data-testid={prefixCls}
+          style={restStyle}
+        >
+          <div
             className={classNames(`${prefixCls}-container`, hashId, {
               [`${prefixCls}-container-loading`]: !bubble?.isFinished,
             })}
@@ -524,9 +524,9 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
                 {...props.thoughtChainItemRender}
               />
             </div>
-          </motion.div>
+          </div>
         </div>
-      </>,
+      </>
     );
   },
 );

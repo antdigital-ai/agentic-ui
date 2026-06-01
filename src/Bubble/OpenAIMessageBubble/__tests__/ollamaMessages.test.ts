@@ -102,7 +102,9 @@ describe('mapOllamaMessagesToMessageBubbleData', () => {
 
   it('keeps id stable when assistant content grows (stream)', () => {
     const short: OllamaChatMessage[] = [{ role: 'assistant', content: 'a' }];
-    const long: OllamaChatMessage[] = [{ role: 'assistant', content: 'a'.repeat(50) }];
+    const long: OllamaChatMessage[] = [
+      { role: 'assistant', content: 'a'.repeat(50) },
+    ];
     const o1 = mapOllamaMessagesToMessageBubbleData(short, { baseTime });
     const o2 = mapOllamaMessagesToMessageBubbleData(long, { baseTime });
     expect(o1[0].id).toBe(o2[0].id);

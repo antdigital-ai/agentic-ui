@@ -97,7 +97,7 @@ describe('DragHandle Component', () => {
     render(<DragHandle style={customStyle} />);
 
     const dragHandle = document.querySelector('[data-drag-handle]');
-    expect(dragHandle).toHaveStyle('background-color: rgb(255, 0, 0)');
+    expect(dragHandle).toHaveStyle({ backgroundColor: 'red' });
   });
 
   it('handles mouse down event correctly', () => {

@@ -1,11 +1,10 @@
 import {
-  ChatTokenType,
-  GenerateStyle,
+  genStyleHooks,
   resetComponent,
-  useEditorStyleRegister,
+  type GenStyleFn,
 } from '../../../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'ChartToolBar'> = (token) => {
   return {
     [token.componentCls]: {
       display: 'flex',
@@ -20,7 +19,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         lineHeight: '24px',
         letterSpacing: '0em',
         fontVariationSettings: '"opsz" auto',
-        color: '#343a45',
+        color: 'var(--color-gray-text-default)',
         flex: 1,
         overflow: 'hidden',
         textOverflow: 'ellipsis',
@@ -38,7 +37,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
         [`${token.componentCls}-time-icon`]: {
           fontSize: '14px',
-          color: '#00183d',
+          color: 'var(--color-primary-text-default)',
           marginRight: '2px',
         },
 
@@ -55,31 +54,32 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           marginRight: '8px',
         },
 
-        [`${token.componentCls}-download-btn`]: {
-          color: 'rgba(0, 25, 61, 0.3255)',
-          padding: '3px',
-          height: 'auto',
-          backgroundColor: 'transparent',
-          border: 'none',
-          cursor: 'pointer',
-          borderRadius: '6px',
-          transition: 'all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
+        [`${token.componentCls}-download-btn, ${token.componentCls}-copy-btn`]:
+          {
+            color: 'rgba(0, 25, 61, 0.3255)',
+            padding: '3px',
+            height: 'auto',
+            backgroundColor: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            borderRadius: '6px',
+            transition: 'all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
 
-          '&:hover': {
-            backgroundColor: 'rgba(0, 0, 0, 0.04)',
-          },
+            '&:hover': {
+              backgroundColor: 'rgba(0, 0, 0, 0.04)',
+            },
 
-          '&:focus': {
-            backgroundColor: 'rgba(0, 0, 0, 0.04)',
-            outline: 'none',
+            '&:focus': {
+              backgroundColor: 'rgba(0, 0, 0, 0.04)',
+              outline: 'none',
+            },
           },
-        },
       },
 
       // Dark theme styles
       '&-dark': {
         [`${token.componentCls}-header-title`]: {
-          color: '#fff',
+          color: 'var(--color-gray-bg-card-white)',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
@@ -87,26 +87,27 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
         [`${token.componentCls}-header-actions`]: {
           [`${token.componentCls}-time-icon`]: {
-            color: '#fff',
+            color: 'var(--color-gray-bg-card-white)',
           },
 
           [`${token.componentCls}-data-time`]: {
             color: 'rgba(255, 255, 255, 0.65)',
           },
 
-          [`${token.componentCls}-download-btn`]: {
-            color: 'rgba(255, 255, 255, 0.65)',
-            backgroundColor: 'transparent',
+          [`${token.componentCls}-download-btn, ${token.componentCls}-copy-btn`]:
+            {
+              color: 'rgba(255, 255, 255, 0.65)',
+              backgroundColor: 'transparent',
 
-            '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            },
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              },
 
-            '&:focus': {
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              outline: 'none',
+              '&:focus': {
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                outline: 'none',
+              },
             },
-          },
         },
       },
     },
@@ -118,13 +119,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * @param prefixCls
  * @returns
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('ChartToolBar', (token) => {
-    const chartToolBarToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('ChartToolBar', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+]);
 
-    return [resetComponent(chartToolBarToken), genStyle(chartToolBarToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [, hashId] = useGenStyle(prefixCls ?? 'ChartToolBar');
+  return { hashId };
 }

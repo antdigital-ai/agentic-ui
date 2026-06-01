@@ -1,6 +1,5 @@
-import Lottie from 'lottie-react';
 import React from 'react';
-import lottieData from './lottie.json';
+import { createLottieComponent } from '../../../lotties/createLottieComponent';
 
 export interface PeekLottieProps {
   /**
@@ -58,32 +57,10 @@ export interface PeekLottieProps {
  * - 支持播放控制
  * - 支持自定义样式
  */
-export const PeekLottie: React.FC<PeekLottieProps> = ({
-  autoplay = true,
-  loop = true,
-  className,
-  style,
-  size = 32,
-}) => {
-  const containerStyle: React.CSSProperties = {
-    width: size,
-    height: size,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...style,
-  };
-
-  return (
-    <Lottie
-      style={containerStyle}
-      className={className}
-      aria-hidden="true"
-      animationData={lottieData}
-      loop={loop}
-      autoplay={autoplay}
-    />
-  );
-};
+export const PeekLottie: React.FC<PeekLottieProps> = createLottieComponent({
+  loadJson: () => import('./lottie.json'),
+  defaultSize: 32,
+  displayName: 'PeekLottie',
+});
 
 export default PeekLottie;

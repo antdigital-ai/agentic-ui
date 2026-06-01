@@ -7,11 +7,10 @@ import {
 } from '@sofa-design/icons';
 import { Popover } from 'antd';
 import classNames from 'clsx';
-import { motion } from 'framer-motion';
 import React, { useContext, useMemo } from 'react';
 import { DocMeta } from '.';
+import { ActionIconBox } from '../Components/ActionIconBox';
 import { I18nContext } from '../I18n';
-import { ActionIconBox } from '../index';
 import { CostMillis } from './CostMillis';
 import { FlipText } from './FlipText';
 
@@ -135,7 +134,7 @@ export const TitleInfo = (props: {
                   .filter((item) => item)
                   .map((item, subIndex) => {
                     return (
-                      <motion.span
+                      <span
                         key={`${index}-${subIndex}`}
                         className={classNames(
                           `${props.prefixCls}-content-list-item-info`,
@@ -161,13 +160,13 @@ export const TitleInfo = (props: {
                         >
                           {item.name}
                         </span>
-                      </motion.span>
+                      </span>
                     );
                   })}
               </div>
             }
           >
-            <motion.span
+            <span
               key={index}
               className={classNames(
                 `${props.prefixCls}-content-list-item-info`,
@@ -200,7 +199,7 @@ export const TitleInfo = (props: {
                   <FlipText word={infoTitle || tag} />
                 )}
               </span>
-            </motion.span>
+            </span>
           </Popover>
         );
       }

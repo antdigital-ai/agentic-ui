@@ -1,4 +1,5 @@
 ---
+title: MarkdownInputField 输入框
 nav:
   order: 1
 atomId: MarkdownInputField
@@ -20,13 +21,8 @@ group:
 - 🎯 支持技能模式
 
 ```tsx
-import { Space, message } from 'antd';
-import {
-  DownOutlined,
-  AimOutlined,
-  GlobalOutlined,
-  EditOutlined,
-} from '@ant-design/icons';
+import { message } from 'antd';
+import { AimOutlined, GlobalOutlined, EditOutlined } from '@ant-design/icons';
 import { Sparkles, ChevronDown } from '@sofa-design/icons';
 import {
   ActionItemBox,
@@ -36,6 +32,7 @@ import {
   ActionIconBox,
   ToggleButton,
   CreateRecognizer,
+  type MarkdownEditorInstance,
 } from '@ant-design/agentic-ui';
 
 const createRecognizer: CreateRecognizer = async ({ onPartial, onError }) => {
@@ -62,8 +59,17 @@ export default () => {
   const markdownRef = React.useRef<MarkdownEditorInstance>(null);
 
   return (
-    <div>
+    <div
+      style={{
+        boxSizing: 'border-box',
+        margin: '0 auto',
+        maxWidth: 920,
+        padding: '0 12px',
+        width: '100%',
+      }}
+    >
       <MarkdownInputField
+        style={{ maxWidth: '100%' }}
         value={value}
         inputRef={markdownRef}
         voiceRecognizer={createRecognizer}
@@ -118,7 +124,7 @@ export default () => {
         beforeToolsRender={() => {
           return (
             <ActionItemContainer showMenu={true}>
-              {new Array(12).fill(0).map((_, index) => (
+              {new Array(6).fill(0).map((_, index) => (
                 <ActionItemBox
                   onClick={() => message.info('快捷技能' + index)}
                   icon="https://mdn.alipayobjects.com/huamei_ptjqan/afts/img/A*Bgr8QrMHLvoAAAAAF1AAAAgAekN6AQ/original"
@@ -174,7 +180,7 @@ export default () => {
       <SuggestionList
         style={{
           marginTop: 8,
-          maxWidth: '980px',
+          maxWidth: '100%',
         }}
         items={[
           {
@@ -332,10 +338,11 @@ export default () => {
 
 发送按钮自定义配置。
 
-| 属性      | 说明                     | 类型               | 默认值 | 版本 |
-| --------- | ------------------------ | ------------------ | ------ | ---- |
-| `compact` | 是否使用紧凑模式显示按钮 | `boolean`          | -      | -    |
-| `colors`  | 自定义按钮颜色配置       | `SendButtonColors` | -      | -    |
+| 属性       | 说明                                                                                   | 类型               | 默认值 | 版本 |
+| ---------- | -------------------------------------------------------------------------------------- | ------------------ | ------ | ---- |
+| `compact`  | 是否使用紧凑模式显示按钮                                                               | `boolean`          | -      | -    |
+| `colors`   | 自定义按钮颜色配置                                                                     | `SendButtonColors` | -      | -    |
+| `disabled` | 是否禁用发送按钮。显式传入时优先级高于内部上传状态判断；未传入时，文件上传中会自动禁用 | `boolean`          | -      | -    |
 
 #### SendButtonColors
 
@@ -440,7 +447,7 @@ export default App;
 ### 小屏幕
 
 ```tsx
-import { Space, message } from 'antd';
+import { message } from 'antd';
 import { AimOutlined, GlobalOutlined, EditOutlined } from '@ant-design/icons';
 import { Sparkles, ChevronDown } from '@sofa-design/icons';
 import {
@@ -451,6 +458,7 @@ import {
   ActionIconBox,
   ToggleButton,
   CreateRecognizer,
+  type MarkdownEditorInstance,
 } from '@ant-design/agentic-ui';
 
 const createRecognizer: CreateRecognizer = async ({ onPartial, onError }) => {
@@ -479,13 +487,17 @@ export default () => {
   return (
     <div
       style={{
-        maxWidth: 460,
+        boxSizing: 'border-box',
         border: '1px solid #eee',
-        padding: 16,
         margin: 'auto',
+        maxWidth: 460,
+        overflow: 'hidden',
+        padding: 16,
+        width: '100%',
       }}
     >
       <MarkdownInputField
+        style={{ maxWidth: '100%' }}
         value={value}
         inputRef={markdownRef}
         voiceRecognizer={createRecognizer}
@@ -540,7 +552,7 @@ export default () => {
         beforeToolsRender={() => {
           return (
             <ActionItemContainer showMenu={true}>
-              {new Array(12).fill(0).map((_, index) => (
+              {new Array(6).fill(0).map((_, index) => (
                 <ActionItemBox
                   onClick={() => message.info('快捷技能' + index)}
                   icon="https://mdn.alipayobjects.com/huamei_ptjqan/afts/img/A*Bgr8QrMHLvoAAAAAF1AAAAgAekN6AQ/original"
@@ -589,7 +601,7 @@ export default () => {
       <SuggestionList
         style={{
           marginTop: 8,
-          maxWidth: '980px',
+          maxWidth: '100%',
         }}
         items={[
           {
@@ -851,24 +863,17 @@ export default () => {
 
 **Props 说明：**
 
-- `isShowTopOperatingArea` - 是否显示便捷操作区域，默认为false
-- `iShowBackTo` - 是否显示到顶到底
+- `isShowTopOperatingArea` - 是否显示便捷操作区域，默认为 false
+- `isShowBackTo` - 是否显示到顶到底
 - `operationBtnRender` - 自定义操作按钮渲染函数，用于在便捷操作区中添加自定义按钮
 
 ````tsx
-import { Space, message } from 'antd';
-import { AimOutlined, GlobalOutlined, EditOutlined } from '@ant-design/icons';
-import { Sparkles, ChevronDown } from '@sofa-design/icons';
-import {
-  ActionItemBox,
-  ActionItemContainer,
-  MarkdownInputField,
-  SuggestionList,
-  ActionIconBox,
-  ToggleButton,
-  CreateRecognizer,
-} from '@ant-design/agentic-ui';
 import { Button } from 'antd';
+import {
+  MarkdownInputField,
+  CreateRecognizer,
+  type MarkdownEditorInstance,
+} from '@ant-design/agentic-ui';
 
 const createRecognizer: CreateRecognizer = async ({ onPartial, onError }) => {
   let timer: ReturnType<typeof setInterval>;
@@ -888,7 +893,13 @@ const createRecognizer: CreateRecognizer = async ({ onPartial, onError }) => {
 };
 export default () => {
   const [value, setValue] = React.useState(
-    '帮我创建一个定时任务。请根据我的描述: `${placeholder:任务名称}` 、 `${placeholder:执行频率}` ，内容如下： \n ```markdown  \n任务内容\n``` \n 帮我生成合适的定时任务配置。',
+    [
+      '帮我创建一个定时任务。请根据我的描述: `${placeholder:任务名称}` 、 `${placeholder:执行频率}` ，内容如下：',
+      '```markdown',
+      '任务内容',
+      '```',
+      '帮我生成合适的定时任务配置。',
+    ].join('\n'),
   );
 
   const markdownRef = React.useRef<MarkdownEditorInstance>(null);
@@ -897,10 +908,14 @@ export default () => {
   return (
     <div
       style={{
-        height: 450,
+        boxSizing: 'border-box',
         display: 'flex',
         flexDirection: 'column',
-        gap: '12px',
+        gap: 12,
+        height: 450,
+        margin: '0 auto',
+        maxWidth: 720,
+        width: '100%',
       }}
     >
       <div
@@ -942,6 +957,7 @@ export default () => {
           )}
           style={{
             maxHeight: 120,
+            maxWidth: '100%',
           }}
           attachment={{
             enable: true,
@@ -953,48 +969,6 @@ export default () => {
               return URL.createObjectURL(file);
             },
             onDelete: async () => {},
-          }}
-          tagInputProps={{
-            type: 'dropdown',
-            enable: true,
-            items: async (props) => {
-              if (props?.placeholder === '目标场景') {
-                return [];
-              }
-              return ['tag1', 'tag2', 'tag3'].map((item) => {
-                return {
-                  key: item,
-                  label: props?.placeholder + item,
-                };
-              });
-            },
-          }}
-          beforeToolsRender={() => {
-            return (
-              <ActionItemContainer showMenu={true}>
-                {new Array(12).fill(0).map((_, index) => (
-                  <ActionItemBox
-                    onClick={() => message.info('快捷技能' + index)}
-                    icon="https://mdn.alipayobjects.com/huamei_ptjqan/afts/img/A*Bgr8QrMHLvoAAAAAF1AAAAgAekN6AQ/original"
-                    iconSize={16}
-                    size="small"
-                    title={
-                      <span
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 8,
-                        }}
-                      >
-                        {'快捷技能' + index}
-                      </span>
-                    }
-                    disabled={index < 2}
-                    key={'快捷技能' + index}
-                  />
-                ))}
-              </ActionItemContainer>
-            );
           }}
           onChange={(newValue) => {
             setValue(newValue);
@@ -1222,6 +1196,12 @@ export default () => {
           value={value}
           toolsRender={() => [
             <ToggleButton
+              key="custom"
+              onClick={() => console.log('自定义工具栏按钮')}
+            >
+              自定义
+            </ToggleButton>,
+            <ToggleButton
               key="bold"
               triggerIcon={<ChevronDown />}
               onClick={() => console.log('DeepThink clicked')}
@@ -1242,14 +1222,6 @@ export default () => {
             </ToggleButton>,
           ]}
           onChange={setValue}
-          toolsRender={(props) => [
-            <ToggleButton
-              key="custom"
-              onClick={() => console.log('自定义按钮')}
-            >
-              自定义
-            </ToggleButton>,
-          ]}
           actionsRender={(props) => [
             <button key="custom" onClick={() => console.log('自定义按钮')}>
               自定义

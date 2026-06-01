@@ -4,6 +4,84 @@ import { EditorUtils } from '../../utils';
 import partialJsonParse from '../json-parse';
 
 /**
+ * 规范标签名必须与 `preprocessSpecialTags(markdown, 'think')` 一致：该函数用 `<${tagName}>` / `</${tagName}>`，
+ * 即字面量 `<think>`…`</think>`，再包成 `` ```think ``。若此处改名须同步改 `parserSlateNodeToMarkdown` 里 think 序列化。
+ */
+const THINK_TAG_CANONICAL_OPEN = '<think>';
+const THINK_TAG_CANONICAL_CLOSE = '</think>';
+
+/** 部分模型输出的外壳别名；拼接避免与规范标签在源码中混淆 */
+const REDACTED_THINKING_ALIAS_OPEN = '<' + 'redacted_' + 'thinking' + '>';
+const REDACTED_THINKING_ALIAS_CLOSE = '</' + 'redacted_' + 'thinking' + '>';
+
+const THINKING_ALIAS_OPEN = '<' + 'thinking' + '>';
+const THINKING_ALIAS_CLOSE = '</' + 'thinking' + '>';
+
+const escapeRegExp = (value: string) =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/** 仅替换「成对」别名标签，避免正文里偶然出现的孤立字面量被误换 */
+const REDACTED_THINKING_ALIAS_PAIR_REGEX = new RegExp(
+  `${escapeRegExp(REDACTED_THINKING_ALIAS_OPEN)}([\\s\\S]*?)${escapeRegExp(
+    REDACTED_THINKING_ALIAS_CLOSE,
+  )}`,
+  'gi',
+);
+
+const THINKING_ALIAS_PAIR_REGEX = new RegExp(
+  `${escapeRegExp(THINKING_ALIAS_OPEN)}([\\s\\S]*?)${escapeRegExp(
+    THINKING_ALIAS_CLOSE,
+  )}`,
+  'gi',
+);
+
+const FIND_THINK_CANONICAL_BLOCK_RE = new RegExp(
+  `^\\s*${escapeRegExp(THINK_TAG_CANONICAL_OPEN)}([\\s\\S]*?)${escapeRegExp(
+    THINK_TAG_CANONICAL_CLOSE,
+  )}\\s*$`,
+  'i',
+);
+
+const FIND_THINK_ALIAS_BLOCK_RE = new RegExp(
+  `^\\s*(?:${escapeRegExp(REDACTED_THINKING_ALIAS_OPEN)}|${escapeRegExp(THINKING_ALIAS_OPEN)})([\\s\\S]*?)(?:${escapeRegExp(REDACTED_THINKING_ALIAS_CLOSE)}|${escapeRegExp(THINKING_ALIAS_CLOSE)})\\s*$`,
+  'i',
+);
+
+/**
+ * 将成对的别名标签 `<think>`…`</think>` 归一为与 `preprocessSpecialTags(..., 'think')` 契约一致的规范标签。
+ * 否则 `preprocessThinkTags` 无法把思考区内的 ``` 围栏换成 【CODE_BLOCK】，内层 JSON 会变成顶层独立 code 节点。
+ */
+export function normalizeThinkTagAliases(markdown: string): string {
+  if (!markdown) return markdown;
+  const replaceToCanonical = (_match: string, inner: string) =>
+    `${THINK_TAG_CANONICAL_OPEN}${inner}${THINK_TAG_CANONICAL_CLOSE}`;
+
+  let result = markdown;
+  if (result.indexOf(REDACTED_THINKING_ALIAS_OPEN) !== -1) {
+    result = result.replace(
+      REDACTED_THINKING_ALIAS_PAIR_REGEX,
+      replaceToCanonical,
+    );
+  }
+  if (result.indexOf(THINKING_ALIAS_OPEN) !== -1) {
+    result = result.replace(THINKING_ALIAS_PAIR_REGEX, replaceToCanonical);
+  }
+  return result;
+}
+
+/**
+ * 反向解码 HTML 属性常见实体，与 parserSlateNodeToMarkdown 的 escapeHtmlAttr 配对，
+ * 保证 mark 颜色/背景/label 的往返一致。
+ */
+const decodeHtmlAttr = (value: string): string =>
+  value
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&');
+
+/**
  * 解码 URI 组件，处理错误情况
  */
 export const decodeURIComponentUrl = (url: string) => {
@@ -22,8 +100,9 @@ export const decodeURIComponentUrl = (url: string) => {
  */
 const findThinkElement = (str: string) => {
   try {
-    // 匹配 <think>内容</think> 格式
-    const thinkMatch = str.match(/^\s*<think>([\s\S]*?)<\/think>\s*$/);
+    const thinkMatch =
+      str.match(FIND_THINK_CANONICAL_BLOCK_RE) ||
+      str.match(FIND_THINK_ALIAS_BLOCK_RE);
     if (thinkMatch) {
       return {
         content: thinkMatch[1].trim(),
@@ -31,6 +110,9 @@ const findThinkElement = (str: string) => {
     }
     return null;
   } catch (e) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn('[parseHtml] findThinkElement failed', e);
+    }
     return null;
   }
 };
@@ -393,6 +475,48 @@ const handleBlockHtml = (
     return createMediaNodeFromElement(mediaElement);
   }
 
+  const blockOnlyMarkMatch =
+    typeof currentElement?.value === 'string' &&
+    currentElement.value.match(/^\s*<mark(?:\s[^>]*)?>([\s\S]*?)<\/mark>\s*$/i);
+  if (blockOnlyMarkMatch) {
+    const innerMd = blockOnlyMarkMatch[1];
+    // 提取 mark 标签属性：color、bg、label
+    const tagAttrs = currentElement.value.match(
+      /^<mark([^>]*)>/i,
+    );
+    const attrStr = tagAttrs?.[1] || '';
+    const colorMatch = attrStr.match(/\bcolor\s*=\s*["']([^"']*)["']/i);
+    const bgMatch = attrStr.match(/\bbg\s*=\s*["']([^"']*)["']/i);
+    const labelMatch = attrStr.match(/\blabel\s*=\s*["']([^"']*)["']/i);
+    const markProps: Record<string, any> = { mark: true };
+    if (colorMatch?.[1]) markProps.markColor = decodeHtmlAttr(colorMatch[1]);
+    if (bgMatch?.[1]) markProps.markBg = decodeHtmlAttr(bgMatch[1]);
+    if (labelMatch?.[1]) markProps.markLabel = decodeHtmlAttr(labelMatch[1]);
+
+    const applyMarkRecursive = (node: any): any => {
+      if (node && typeof node.text === 'string') {
+        return { ...node, ...markProps };
+      }
+      if (node?.children && Array.isArray(node.children)) {
+        return {
+          ...node,
+          children: node.children.map(applyMarkRecursive),
+        };
+      }
+      return node;
+    };
+    if (parseMarkdownFn) {
+      const { schema: markSchema } = parseMarkdownFn(innerMd);
+      if (markSchema?.length) {
+        return markSchema.map(applyMarkRecursive);
+      }
+    }
+    return {
+      type: 'paragraph',
+      children: [{ text: innerMd, ...markProps }],
+    };
+  }
+
   if (currentElement.value === '<br/>') {
     return { type: 'paragraph', children: [{ text: '' }] };
   }
@@ -596,6 +720,20 @@ const processFontTag = (str: string, tag: string, htmlTag: any[]): any[] => {
 };
 
 /**
+ * 处理 mark 标签的 color/bg/label 属性（纯函数版本）
+ */
+const processMarkTag = (str: string, tag: string, htmlTag: any[]): any[] => {
+  const colorMatch = str.match(/\bcolor\s*=\s*["']([^"']*)["']/i);
+  const bgMatch = str.match(/\bbg\s*=\s*["']([^"']*)["']/i);
+  const labelMatch = str.match(/\blabel\s*=\s*["']([^"']*)["']/i);
+  const entry: Record<string, any> = { tag };
+  if (colorMatch?.[1]) entry.markColor = decodeHtmlAttr(colorMatch[1]);
+  if (bgMatch?.[1]) entry.markBg = decodeHtmlAttr(bgMatch[1]);
+  if (labelMatch?.[1]) entry.markLabel = decodeHtmlAttr(labelMatch[1]);
+  return [...htmlTag, entry];
+};
+
+/**
  * HTML 标签处理器映射表
  */
 const htmlTagProcessors: Record<
@@ -605,6 +743,7 @@ const htmlTagProcessors: Record<
   span: processSpanTag,
   a: processATag,
   font: processFontTag,
+  mark: processMarkTag,
 };
 
 /**
@@ -648,7 +787,7 @@ const processInlineHtml = (
   }
 
   const htmlMatch = value.match(
-    /<\/?(b|i|del|font|code|span|sup|sub|strong|a)[^\n>]*?>/,
+    /<\/?(b|i|del|font|code|span|sup|sub|strong|a|mark)[^\n>]*?>/,
   );
   if (htmlMatch) {
     const [str, tag] = htmlMatch;
@@ -818,7 +957,7 @@ export function preprocessSpecialTags(
  * @returns 处理后的 Markdown 字符串
  */
 export function preprocessThinkTags(markdown: string): string {
-  return preprocessSpecialTags(markdown, 'think');
+  return preprocessSpecialTags(normalizeThinkTagAliases(markdown), 'think');
 }
 
 /**

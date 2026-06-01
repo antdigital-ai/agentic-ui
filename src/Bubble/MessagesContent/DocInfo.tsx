@@ -1,9 +1,8 @@
-﻿import { ExportOutlined, RightOutlined } from '@ant-design/icons';
+import { ExportOutlined, RightOutlined } from '@ant-design/icons';
 
 import { ConfigProvider, Descriptions, Drawer, Popover } from 'antd';
 import classNames from 'clsx';
 import dayjs from 'dayjs';
-import { motion } from 'framer-motion';
 import React, { useContext } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { I18nContext } from '../../I18n';
@@ -51,13 +50,13 @@ export const DocInfoList: React.FC<DocInfoListProps> = ({
   const baseCls = configContext?.getPrefixCls(`agent-doc-info`);
   const chatContext = useContext(BubbleConfigContext);
   const { locale } = useContext(I18nContext);
-  const { wrapSSR, hashId } = useStyle(baseCls);
+  const { hashId } = useStyle(baseCls);
 
   const docInfoList = props.options?.filter((item) => item) || [];
 
   const [docMeta, setDocMeta] = React.useState<DocMeta | null>(null);
 
-  return wrapSSR(
+  return (
     <>
       <Drawer
         title={locale?.['chat.message.preview'] || '预览' + docMeta?.doc_name}
@@ -167,8 +166,11 @@ export const DocInfoList: React.FC<DocInfoListProps> = ({
             </span>
           </div>
         </div>
-        <motion.div
-          layout
+        {/* 列表展开/收起的高度+透明度过渡由 inline transition 控制；
+            列表与子项的入场淡入由 CSS keyframes 控制（参见 docInfoStyle.ts）。
+            每个子项通过 --doc-item-delay 实现 staggered 入场，等价于
+            原 framer-motion 父级 staggerChildren 的效果。 */}
+        <div
           className={classNames(`${baseCls}-list`, hashId)}
           style={{
             height: expanded ? '0px' : 'auto',
@@ -182,29 +184,10 @@ export const DocInfoList: React.FC<DocInfoListProps> = ({
             padding: expanded ? 0 : '12px',
             background: '#FBFCFD',
           }}
-          whileInView="visible"
-          variants={{
-            hidden: {
-              opacity: 0,
-              scale: 0,
-              transition: {
-                when: 'afterChildren',
-              },
-            },
-            visible: {
-              opacity: 1,
-              scale: 1,
-              transition: {
-                when: 'beforeChildren',
-              },
-            },
-          }}
-          initial="hidden"
-          animate="visible"
         >
           {docInfoList.map((item, index) => {
             const dom = (
-              <motion.div
+              <div
                 key={index}
                 className={classNames(`${baseCls}-list-item`, hashId)}
                 title={item?.content}
@@ -214,14 +197,11 @@ export const DocInfoList: React.FC<DocInfoListProps> = ({
                   }
                   window.open(item.originUrl);
                 }}
-                variants={{
-                  hidden: {
-                    opacity: 0,
-                  },
-                  visible: {
-                    opacity: 1,
-                  },
-                }}
+                style={
+                  {
+                    '--doc-item-delay': `${index * 0.05}s`,
+                  } as React.CSSProperties
+                }
               >
                 <div
                   className={classNames(`${baseCls}-list-item-title`, hashId)}
@@ -314,7 +294,7 @@ export const DocInfoList: React.FC<DocInfoListProps> = ({
                     </ActionIconBox>
                   ) : null}
                 </div>
-              </motion.div>
+              </div>
             );
             if ((item?.content?.trim()?.length || 0) < 20) {
               return dom;
@@ -399,8 +379,8 @@ export const DocInfoList: React.FC<DocInfoListProps> = ({
               </Popover>
             );
           })}
-        </motion.div>
+        </div>
       </div>
-    </>,
+    </>
   );
 };

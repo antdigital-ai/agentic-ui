@@ -5,6 +5,61 @@ import { useRefFunction } from '../../Hooks/useRefFunction';
 import { useStyle } from './style';
 
 /**
+ * 单个图片组件 - 提到模块顶层，避免在父组件每次渲染时重新创建组件类型，
+ * 否则 React.memo 会失效，且内部 useState(imageError) 会被反复重置。
+ */
+interface VisualListImageProps {
+  item: VisualListItem;
+  prefixCls: string;
+  hashId: string;
+  shape: 'default' | 'circle';
+  imageStyle?: React.CSSProperties;
+}
+
+const VisualListImage = memo<VisualListImageProps>(
+  ({ item, prefixCls, hashId, shape, imageStyle }) => {
+    const [imageError, setImageError] = useState(false);
+
+    const handleImageError = useRefFunction(() => {
+      setImageError(true);
+    });
+
+    if (imageError || !item.src) {
+      return (
+        <div
+          data-type="image"
+          className={classNames(`${prefixCls}-default-icon`, hashId)}
+          style={{
+            ...imageStyle,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#f5f5f5',
+            border: '1px solid #d9d9d9',
+            borderRadius: shape === 'circle' ? '50%' : '4px',
+          }}
+        >
+          <SquareArrowUpRight />
+        </div>
+      );
+    }
+
+    return (
+      <img
+        src={item.src}
+        alt={item.alt || item.title || ''}
+        title={item.title}
+        className={classNames(`${prefixCls}-image`, hashId)}
+        style={imageStyle}
+        onError={handleImageError}
+      />
+    );
+  },
+);
+
+VisualListImage.displayName = 'VisualListImage';
+
+/**
  * 视觉列表项数据接口
  */
 export interface VisualListItem {
@@ -125,7 +180,7 @@ const VisualListComponent: React.FC<VisualListProps> = ({
 }) => {
   // 兼容旧属性
   const loading = isLoading ?? legacyLoading;
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   // 使用 useMemo 优化过滤后的数据计算
   const displayList = useMemo(() => {
@@ -150,99 +205,45 @@ const VisualListComponent: React.FC<VisualListProps> = ({
   }, [prefixCls, hashId, variant, className]);
 
   /**
-   * 图片组件 - 独立的 memo 组件，避免不必要的重渲染
+   * 默认列表项渲染函数
    */
-  const ImageComponent = memo<{
-    item: VisualListItem;
-    prefixCls: string;
-    hashId: string;
-    shape: 'default' | 'circle';
-    imageStyle?: React.CSSProperties;
-    onImageError: () => void;
-  }>(({ item, prefixCls, hashId, shape, imageStyle, onImageError }) => {
-    const [imageError, setImageError] = useState(false);
-
-    const handleImageError = useRefFunction(() => {
-      setImageError(true);
-      onImageError();
-    });
-
-    if (imageError || !item.src) {
-      return (
-        <div
-          data-type="image"
-          className={classNames(`${prefixCls}-default-icon`, hashId)}
-          style={{
-            ...imageStyle,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: '#f5f5f5',
-            border: '1px solid #d9d9d9',
-            borderRadius: shape === 'circle' ? '50%' : '4px',
-          }}
-        >
-          <SquareArrowUpRight />
-        </div>
-      );
-    }
+  const defaultRenderItem = (item: VisualListItem, index: number) => {
+    const itemClassNames = [
+      `${prefixCls}-item`,
+      shape === 'circle' ? `${prefixCls}-item-circle` : '',
+      hashId,
+    ]
+      .filter(Boolean)
+      .join(' ');
 
     return (
-      <img
-        src={item.src}
-        alt={item.alt || item.title || ''}
-        title={item.title}
-        className={classNames(`${prefixCls}-image`, hashId)}
-        style={imageStyle}
-        onError={handleImageError}
-      />
-    );
-  });
-
-  /**
-   * 默认列表项渲染函数 - 使用 useRefFunction 优化
-   */
-  const defaultRenderItem = useRefFunction(
-    (item: VisualListItem, index: number) => {
-      const itemClassNames = [
-        `${prefixCls}-item`,
-        shape === 'circle' ? `${prefixCls}-item-circle` : '',
-        hashId,
-      ]
-        .filter(Boolean)
-        .join(' ');
-
-      return (
-        <li key={item.id || index} className={itemClassNames} style={itemStyle}>
-          {item.href ? (
-            <a
-              href={item.href}
-              className={classNames(`${prefixCls}-link`, hashId)}
-              style={linkStyle}
-            >
-              <ImageComponent
-                item={item}
-                prefixCls={prefixCls}
-                hashId={hashId}
-                shape={shape}
-                imageStyle={imageStyle}
-                onImageError={() => {}} // 空函数，因为错误处理在 ImageComponent 内部
-              />
-            </a>
-          ) : (
-            <ImageComponent
+      <li key={item.id || index} className={itemClassNames} style={itemStyle}>
+        {item.href ? (
+          <a
+            href={item.href}
+            className={classNames(`${prefixCls}-link`, hashId)}
+            style={linkStyle}
+          >
+            <VisualListImage
               item={item}
               prefixCls={prefixCls}
               hashId={hashId}
               shape={shape}
               imageStyle={imageStyle}
-              onImageError={() => {}} // 空函数，因为错误处理在 ImageComponent 内部
             />
-          )}
-        </li>
-      );
-    },
-  );
+          </a>
+        ) : (
+          <VisualListImage
+            item={item}
+            prefixCls={prefixCls}
+            hashId={hashId}
+            shape={shape}
+            imageStyle={imageStyle}
+          />
+        )}
+      </li>
+    );
+  };
 
   // 使用 useMemo 优化列表渲染
   const listItems = useMemo(() => {
@@ -252,11 +253,20 @@ const VisualListComponent: React.FC<VisualListProps> = ({
       }
       return defaultRenderItem(item, index);
     });
-  }, [displayList, renderItem, defaultRenderItem]);
+  }, [
+    displayList,
+    renderItem,
+    prefixCls,
+    shape,
+    hashId,
+    itemStyle,
+    linkStyle,
+    imageStyle,
+  ]);
 
   // 加载状态渲染
   if (loading) {
-    return wrapSSR(
+    return (
       <ul
         className={classNames(
           prefixCls,
@@ -264,16 +274,17 @@ const VisualListComponent: React.FC<VisualListProps> = ({
           hashId,
           className,
         )}
+        data-testid={`${prefixCls}-loading`}
         style={style}
       >
         {loadingRender ? loadingRender() : <span>加载中...</span>}
-      </ul>,
+      </ul>
     );
   }
 
   // 空状态渲染
   if (displayList.length === 0) {
-    return wrapSSR(
+    return (
       <ul
         className={classNames(
           prefixCls,
@@ -281,15 +292,16 @@ const VisualListComponent: React.FC<VisualListProps> = ({
           hashId,
           className,
         )}
+        data-testid={`${prefixCls}-empty`}
         style={style}
       >
         {emptyRender ? emptyRender() : <span>暂无数据</span>}
-      </ul>,
+      </ul>
     );
   }
 
-  return wrapSSR(
-    <div className={containerClassName} style={style}>
+  return (
+    <div className={containerClassName} data-testid={prefixCls} style={style}>
       <ul className={classNames(prefixCls, hashId)}>{listItems}</ul>
       {/* 用来处理margin-8*/}
       <div style={{ width: 4 }} />
@@ -298,7 +310,7 @@ const VisualListComponent: React.FC<VisualListProps> = ({
           {description}
         </div>
       )}
-    </div>,
+    </div>
   );
 };
 

@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ChartDataItem, getDataHash } from '../utils';
 
+const EMPTY_DATA: ChartDataItem[] = [];
+
 /**
  * 图表数据筛选 Hook
  *
@@ -28,7 +30,7 @@ import { ChartDataItem, getDataHash } from '../utils';
  * @since 1.0.0
  */
 export const useChartDataFilter = (data: ChartDataItem[]) => {
-  const safeData = Array.isArray(data) ? data : [];
+  const safeData = Array.isArray(data) ? data : EMPTY_DATA;
 
   // 使用数据哈希来优化依赖项比较
   const dataHash = useMemo(() => getDataHash(safeData), [safeData]);

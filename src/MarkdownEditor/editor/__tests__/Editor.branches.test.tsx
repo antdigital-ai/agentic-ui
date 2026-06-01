@@ -22,7 +22,7 @@ const mockOnChange = vi.fn();
 /* ========== Module Mocks ========== */
 
 // useDebounceFn：让 handleSelectionChange 同步执行
-vi.mock('@ant-design/pro-components', () => ({
+vi.mock('../../../Hooks/useDebounceFn', () => ({
   useDebounceFn: (fn: any) => ({ run: fn, cancel: vi.fn() }),
 }));
 
@@ -88,7 +88,7 @@ vi.mock('slate-react', () => ({
   },
 }));
 
-vi.mock('../../Hooks/useRefFunction', () => ({
+vi.mock('../../../Hooks/useRefFunction', () => ({
   useRefFunction: (fn: (...args: any[]) => any) => fn,
 }));
 
@@ -106,7 +106,6 @@ vi.mock('../plugins/useHighlight', () => ({
 
 vi.mock('../style', () => ({
   useStyle: () => ({
-    wrapSSR: (node: React.ReactNode) => node,
     hashId: 'test-hash',
   }),
 }));
@@ -457,6 +456,38 @@ describe('Editor branches - handleSelectionChange', () => {
     window.getSelection = origGetSelection;
   });
 
+  it('readonly: stale selection path should skip toDOMRange and clear domRect', async () => {
+    const setDomRect = vi.fn();
+    setupStore({ readonly: true, setDomRect });
+
+    const staleSelection = {
+      anchor: { path: [99, 0], offset: 0 },
+      focus: { path: [99, 0], offset: 1 },
+    };
+    vi.mocked(getSelectionFromDomSelection).mockReturnValue(
+      staleSelection as any,
+    );
+    vi.mocked(Range.isCollapsed).mockReturnValue(false);
+    vi.mocked(Editor.hasPath).mockReturnValue(false);
+
+    const origGetSelection = window.getSelection;
+    window.getSelection = vi.fn(
+      () =>
+        ({
+          anchorNode: document.createElement('div'),
+          focusNode: document.createElement('div'),
+          rangeCount: 1,
+        }) as any,
+    );
+
+    renderEditor({ reportMode: true });
+    await editableProps.onSelect({});
+
+    expect(ReactEditor.toDOMRange).not.toHaveBeenCalled();
+    expect(setDomRect).toHaveBeenCalledWith(null);
+    window.getSelection = origGetSelection;
+  });
+
   it('readonly: collapsed selection sets domRect to null', async () => {
     const setDomRect = vi.fn();
     setupStore({ readonly: true, setDomRect });
@@ -562,6 +593,16 @@ describe('Editor branches - handleClipboardCopy', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     editableProps = {};
+    /**
+     * 同 worker 内若先有测试加载真实 slate（如 EditorStore.unit.test），此处 vi.mock('slate') 不生效，
+     * 真实 Editor.hasPath 在 createMockEditor 上会对 [0,0] 返回 false，导致 clearData 后即 return，
+     * setData / Transforms.delete / 内层 catch 均无法覆盖。
+     */
+    vi.spyOn(Editor, 'hasPath').mockReturnValue(true);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('copy with valid selection sets clipboard data and returns true', () => {
@@ -638,6 +679,35 @@ describe('Editor branches - handleClipboardCopy', () => {
     expect(getSelectionFromDomSelection).toHaveBeenCalled();
     expect(event.clipboardData.clearData).toHaveBeenCalled();
     window.getSelection = origGetSelection;
+  });
+
+  it('copy with invalid selection path stops before writing clipboard payload', () => {
+    const { editor } = setupStore({ readonly: false });
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 5 },
+    };
+    vi.mocked(isEventHandled).mockReturnValue(false);
+    vi.mocked(hasEditableTarget).mockReturnValue(true);
+    vi.mocked(Editor.hasPath).mockReturnValueOnce(false);
+
+    renderEditor({});
+
+    const event = {
+      preventDefault: vi.fn(),
+      clipboardData: {
+        clearData: vi.fn(),
+        setData: vi.fn(),
+      },
+      target: document.createElement('div'),
+    } as any;
+
+    editableProps.onCopy(event);
+
+    expect(event.clipboardData.clearData).toHaveBeenCalled();
+    expect(event.clipboardData.setData).not.toHaveBeenCalled();
+    expect(ReactEditor.setFragmentData).not.toHaveBeenCalled();
+    expect(event.preventDefault).toHaveBeenCalled();
   });
 
   it('cut gets selection from DOM, deletes content, and sets clipboard', () => {
@@ -1177,7 +1247,7 @@ describe('Editor branches - handlePasteEvent', () => {
       },
     );
 
-    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     renderEditor({});
 
     const event = {
@@ -1193,7 +1263,8 @@ describe('Editor branches - handlePasteEvent', () => {
     editableProps.onPaste(event);
     await flushPromises();
 
-    expect(consoleSpy).toHaveBeenCalledWith('insert error', expect.any(Error));
+    // 源码中 catch 块使用 console.error('[handlePaste] 处理纯文本粘贴失败:', e)
+    expect(consoleSpy).toHaveBeenCalled();
     consoleSpy.mockRestore();
   });
 
@@ -1613,7 +1684,7 @@ describe('Editor branches - onCompositionStart/End', () => {
     }).not.toThrow();
   });
 
-  it('compositionEnd removes data-composition and sets inputComposition false', () => {
+  it('compositionEnd 推迟清除 inputComposition，避免 IME Enter 确认选字误触', async () => {
     const { editor } = setupStore({ readonly: false });
     editor.selection = {
       anchor: { path: [0, 0], offset: 0 },
@@ -1622,12 +1693,17 @@ describe('Editor branches - onCompositionStart/End', () => {
 
     renderEditor({});
 
-    // First start
     editableProps.onCompositionStart({ preventDefault: vi.fn() });
     expect(mockStoreConfig.store.inputComposition).toBe(true);
 
-    // Then end
     editableProps.onCompositionEnd();
+    expect(mockStoreConfig.store.inputComposition).toBe(true);
+
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => resolve());
+      });
+    });
     expect(mockStoreConfig.store.inputComposition).toBe(false);
   });
 
@@ -1723,6 +1799,9 @@ describe('Editor branches - decorateFn', () => {
       throw new Error('hasPath error');
     });
 
+    // 源码在高亮计算失败时会通过 console.error 输出
+    // "[highlight] 高亮计算失败:"，本用例正是构造该异常路径，需要静默
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
     renderEditor({
@@ -1748,6 +1827,7 @@ describe('Editor branches - decorateFn', () => {
 
     expect(result).toEqual([]);
     consoleSpy.mockRestore();
+    errorSpy.mockRestore();
   });
 });
 
@@ -1788,13 +1868,16 @@ describe('Editor branches - mouseup effect', () => {
     editableProps = {};
   });
 
-  it('mouseup on container calls handleSelectionChange.run', async () => {
+  it('mouseup/touchend on container register selection sync listeners', async () => {
     const { container } = setupStore({ readonly: false });
     const addSpy = vi.spyOn(container, 'addEventListener');
 
     renderEditor({});
 
     expect(addSpy).toHaveBeenCalledWith('mouseup', expect.any(Function));
+    expect(addSpy).toHaveBeenCalledWith('touchend', expect.any(Function), {
+      passive: true,
+    });
     addSpy.mockRestore();
   });
 

@@ -9,6 +9,8 @@ group:
 
 分段控制器用于在多个选项之间进行选择。
 
+> 💡 **说明**：本页展示的 `Segmented` 直接使用 Ant Design 的原生组件，`@ant-design/agentic-ui` 未做二次封装。完整 API 请参考 [Ant Design Segmented](https://ant.design/components/segmented-cn)。
+
 ## 代码演示
 
 ```tsx

@@ -39,30 +39,52 @@ const defaultHandlers = {
   onViewAll: () => {},
 } as const;
 
+/**
+ * 解析 fileViewConfig.renderFileMoreAction 的多种合法写法：
+ *   1. ReactNode（直接 JSX）
+ *   2. (file) => ReactNode
+ *   3. () => ReactNode
+ *   4. () => (file) => ReactNode
+ *
+ * 实现要点：始终用 `(file)` 形式调用函数，并对返回值做一次类型分发。
+ * 不再依赖 `cfg.length === 0` 来区分 0 参/1 参函数 —— 在 TS/默认参数下 `length` 经常不可靠。
+ */
+type RenderMoreActionConfig =
+  | React.ReactNode
+  | ((file: AttachmentFile) => React.ReactNode)
+  | (() => React.ReactNode)
+  | (() => (file: AttachmentFile) => React.ReactNode);
+
 const renderMoreAction = (
-  cfg: any,
+  cfg: RenderMoreActionConfig | undefined,
   file: AttachmentFile,
 ): React.ReactNode | undefined => {
-  if (!cfg) return undefined;
-  if (React.isValidElement(cfg)) return cfg as React.ReactNode;
-  if (typeof cfg !== 'function') return cfg as React.ReactNode;
+  if (cfg === null || cfg === undefined || cfg === false) return undefined;
+  if (typeof cfg !== 'function') {
+    // ReactNode 直传
+    return cfg as React.ReactNode;
+  }
 
   try {
-    const result = cfg.length === 0 ? cfg() : cfg(file);
-    return typeof result === 'function' ? result(file) : result;
+    // 始终以 (file) 调用：对 (file)=>Node 与 ()=>Node 都兼容
+    const result = (cfg as (file?: AttachmentFile) => React.ReactNode)(file);
+    if (typeof result === 'function') {
+      // currying 形态：()=>(file)=>Node
+      return (result as (file: AttachmentFile) => React.ReactNode)(file);
+    }
+    return result;
   } catch {
     return undefined;
   }
 };
 
 const createViewAllHandler = (
-  handler: ((files: AttachmentFile[]) => void) | undefined,
+  handler: ((files: AttachmentFile[]) => boolean | void) | undefined,
 ) => {
   if (!handler) return undefined;
 
   return (files: AttachmentFile[]) => {
-    handler(files);
-    return false;
+    return handler(files);
   };
 };
 
@@ -102,12 +124,17 @@ export const BubbleFileView: React.FC<BubbleFileViewProps> = ({
       maxDisplayCount={fileViewConfig.maxDisplayCount}
       showMoreButton={fileViewConfig.showMoreButton}
       onPreview={events.onPreview}
+      onFileClick={fileViewConfig.onFileClick}
+      disableDefaultFileClick={fileViewConfig.disableDefaultFileClick}
       onDownload={events.onDownload}
       onViewAll={createViewAllHandler(events.onViewAll)}
       renderMoreAction={
         fileViewConfig.renderFileMoreAction
           ? (file) =>
-              renderMoreAction(fileViewConfig.renderFileMoreAction, file)
+              renderMoreAction(
+                fileViewConfig.renderFileMoreAction as RenderMoreActionConfig,
+                file,
+              )
           : undefined
       }
       customSlot={fileViewConfig.customSlot}

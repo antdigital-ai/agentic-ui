@@ -1,4 +1,4 @@
-import {
+﻿import {
   Brain,
   ChevronDown,
   ChevronsDownUp,
@@ -6,454 +6,86 @@ import {
 } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
-import { motion } from 'framer-motion';
 import { useMergedState } from 'rc-util';
 import React, {
   memo,
-  useCallback,
   useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
+
+import {
+  CARD_RESIZE_DURATION_MS,
+  CARD_RESIZE_EASING,
+} from '../Constants/cardResizeMotion';
 import { useRefFunction } from '../Hooks/useRefFunction';
 import { useLocale } from '../I18n';
 import { useStyle } from './style';
 
-const getChevronStyle = (expanded: boolean): React.CSSProperties => ({
-  transform: expanded ? 'rotate(0deg)' : 'rotate(-90deg)',
-  transition: 'transform 0.2s',
-});
+if (typeof CSS !== 'undefined' && CSS.registerProperty) {
+  try {
+    CSS.registerProperty({
+      name: '--think-rotate',
+      syntax: '<angle>',
+      inherits: true,
+      initialValue: '0deg',
+    });
+  } catch {
+    // already registered
+  }
+}
 
 const FLOATING_ICON_STYLE: React.CSSProperties = {
   fontSize: 16,
   color: 'var(--color-gray-text-light)',
 };
 
-/** 内容超出此高度时自动收起 */
 const CONTENT_COLLAPSE_THRESHOLD = 200;
 
-const LOADING_ANIMATION = {
-  animate: {
-    '--rotate': ['0deg', '360deg'],
-  },
-  transition: {
-    '--rotate': {
-      duration: 1,
-      repeat: Infinity,
-      ease: 'linear',
-    },
-  },
-  style: {
-    '--rotation': '360deg',
-  } as React.CSSProperties,
+const CHEVRON_EXPANDED: React.CSSProperties = {
+  transform: 'rotate(0deg)',
+  transition: `transform ${CARD_RESIZE_DURATION_MS}ms ${CARD_RESIZE_EASING}`,
+};
+const CHEVRON_COLLAPSED: React.CSSProperties = {
+  transform: 'rotate(-90deg)',
+  transition: `transform ${CARD_RESIZE_DURATION_MS}ms ${CARD_RESIZE_EASING}`,
 };
 
-const IDLE_ANIMATION = {
-  animate: {},
-  transition: {},
-  style: {
-    '--rotation': '0deg',
-  } as React.CSSProperties,
+const CONTENT_CLAMPED_STYLE: React.CSSProperties = {
+  maxHeight: CONTENT_COLLAPSE_THRESHOLD,
+  overflow: 'hidden',
 };
 
-const HEADER_RIGHT_LOADING_ANIMATION = {
-  animate: {
-    maskImage: [
-      'linear-gradient(to right, rgba(0,0,0,0.99)  -50%, rgba(0,0,0,0.15)   -50%,rgba(0,0,0,0.99)  150%)',
-      'linear-gradient(to right, rgba(0,0,0,0.99)  -50%,  rgba(0,0,0,0.15)  150%,rgba(0,0,0,0.99)  150%)',
-    ],
-  },
-  transition: {
-    maskImage: {
-      duration: 1,
-      repeat: Infinity,
-      ease: 'linear',
-    },
-  },
-  style: {
-    maskImage:
-      'linear-gradient(to right, rgba(0,0,0,0.99) -30%, rgba(0,0,0,0.15) -50%, rgba(0,0,0,0.99) 120%)',
-  } as React.CSSProperties,
-};
+const CONTAINER_STYLE: React.CSSProperties = { overflow: 'hidden' };
 
-const buildClassName = (...args: Parameters<typeof classNames>) =>
-  classNames(...args);
-
-interface LightModeIconProps {
-  prefixCls: string;
-  hashId: string;
-  hover: boolean;
-  expandedState: boolean;
-}
-
-const LightModeIcon: React.FC<LightModeIconProps> = ({
-  prefixCls,
-  hashId,
-  hover,
-  expandedState,
-}) => {
-  const iconClassName = buildClassName(
-    `${prefixCls}-header-left-icon`,
-    `${prefixCls}-header-left-icon-light`,
-    hashId,
-  );
-
-  const chevronStyle = getChevronStyle(expandedState);
-  const icon = hover ? <ChevronDown style={chevronStyle} /> : <Brain />;
-
-  return <div className={iconClassName}>{icon}</div>;
-};
-
-interface HeaderContentProps {
-  toolName: React.ReactNode;
-  toolTarget?: React.ReactNode;
-  prefixCls: string;
-  hashId: string;
-  light: boolean;
-  classNames?: ToolUseBarThinkProps['classNames'];
-  styles?: ToolUseBarThinkProps['styles'];
-}
-
-const HeaderContent: React.FC<HeaderContentProps> = ({
-  toolName,
-  toolTarget,
-  prefixCls,
-  hashId,
-  light,
-  classNames: customClassNames,
-  styles,
-}) => {
-  const nameClassName = buildClassName(
-    `${prefixCls}-name`,
-    { [`${prefixCls}-name-light`]: light },
-    hashId,
-    customClassNames?.name,
-  );
-
-  const targetClassName = buildClassName(
-    `${prefixCls}-target`,
-    hashId,
-    customClassNames?.target,
-  );
-
-  return (
-    <>
-      {toolName && (
-        <div className={nameClassName} style={styles?.name}>
-          {toolName}
-        </div>
-      )}
-      {toolTarget ? (
-        <div className={targetClassName} style={styles?.target}>
-          {toolTarget}
-        </div>
-      ) : (
-        <div />
-      )}
-    </>
-  );
-};
-
-interface TimeElementProps {
-  time?: React.ReactNode;
-  prefixCls: string;
-  hashId: string;
-  classNames?: ToolUseBarThinkProps['classNames'];
-  styles?: ToolUseBarThinkProps['styles'];
-}
-
-const TimeElement: React.FC<TimeElementProps> = ({
-  time,
-  prefixCls,
-  hashId,
-  classNames: customClassNames,
-  styles,
-}) => {
-  if (!time) return null;
-
-  const timeClassName = buildClassName(
-    `${prefixCls}-time`,
-    hashId,
-    customClassNames?.time,
-  );
-
-  return (
-    <div className={timeClassName} style={styles?.time}>
-      {time}
-    </div>
-  );
-};
-
-interface ExpandButtonProps {
-  thinkContent?: React.ReactNode;
-  light: boolean;
-  expandedState: boolean;
-  prefixCls: string;
-  hashId: string;
-  classNames?: ToolUseBarThinkProps['classNames'];
-  styles?: ToolUseBarThinkProps['styles'];
-  onToggleExpand: () => void;
-}
-
-const ExpandButton: React.FC<ExpandButtonProps> = ({
-  thinkContent,
-  light,
-  expandedState,
-  prefixCls,
-  hashId,
-  classNames: customClassNames,
-  styles,
-  onToggleExpand,
-}) => {
-  if (!thinkContent || light) return null;
-
-  const expandClassName = buildClassName(
-    `${prefixCls}-expand`,
-    hashId,
-    customClassNames?.expand,
-  );
-
-  const expandIcon = expandedState ? <ChevronsDownUp /> : <ChevronsUpDown />;
-
-  return (
-    <div
-      className={expandClassName}
-      onClick={onToggleExpand}
-      style={styles?.expand}
-    >
-      {expandIcon}
-    </div>
-  );
-};
-
-interface ThinkContainerProps {
-  thinkContent?: React.ReactNode;
-  expandedState: boolean;
-  floatingExpandedState: boolean;
-  status?: 'loading' | 'success' | 'error';
-  light: boolean;
-  prefixCls: string;
-  hashId: string;
-  classNames?: ToolUseBarThinkProps['classNames'];
-  styles?: ToolUseBarThinkProps['styles'];
-  onToggleFloatingExpand: () => void;
-}
-
-const ThinkContainer: React.FC<ThinkContainerProps> = ({
-  thinkContent,
-  expandedState,
-  floatingExpandedState,
-  status,
-  light,
-  prefixCls,
-  hashId,
-  classNames: customClassNames,
-  styles,
-  onToggleFloatingExpand,
-}) => {
-  const locale = useLocale();
-  const contentInnerRef = useRef<HTMLDivElement>(null);
-  const [isContentOverflowing, setIsContentOverflowing] = useState(false);
-  const [contentExpanded, setContentExpanded] = useState(false);
-
-  const containerClassName = buildClassName(
-    `${prefixCls}-container`,
-    hashId,
-    customClassNames?.container,
-    {
-      [`${prefixCls}-container-expanded`]: expandedState,
-      [`${prefixCls}-container-loading`]:
-        status === 'loading' && !floatingExpandedState,
-      [`${prefixCls}-container-light`]: light,
-      [`${prefixCls}-container-floating-expanded`]: floatingExpandedState,
-    },
-  );
-
-  const contentClassName = buildClassName(
-    `${prefixCls}-content`,
-    hashId,
-    customClassNames?.content,
-  );
-
-  const floatingExpandClassName = buildClassName(
-    `${prefixCls}-floating-expand`,
-    hashId,
-    customClassNames?.floatingExpand,
-  );
-
-  const contentExpandClassName = buildClassName(
-    `${prefixCls}-content-expand`,
-    hashId,
-  );
-
-  const floatingIcon = floatingExpandedState ? (
-    <ChevronsDownUp style={FLOATING_ICON_STYLE} />
-  ) : (
-    <ChevronsUpDown style={FLOATING_ICON_STYLE} />
-  );
-
-  const floatingText = floatingExpandedState ? locale.collapse : locale.expand;
-
-  const showFloatingExpand = status === 'loading' && !light;
-
-  const checkOverflow = useCallback(() => {
-    const el = contentInnerRef.current;
-    if (!el) return;
-    const { scrollHeight } = el;
-    setIsContentOverflowing(scrollHeight > CONTENT_COLLAPSE_THRESHOLD);
-  }, []);
-
-  useEffect(() => {
-    if (!expandedState || !thinkContent) return;
-    checkOverflow();
-    const el = contentInnerRef.current;
-    if (!el) return;
-    const observer = new ResizeObserver(checkOverflow);
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [expandedState, thinkContent, checkOverflow]);
-
-  const handleContentExpandToggle = useRefFunction(() => {
-    setContentExpanded((prev) => !prev);
-  });
-
-  const showContentExpand =
-    expandedState &&
-    thinkContent &&
-    status !== 'loading' &&
-    isContentOverflowing;
-
-  const contentInnerStyle = useMemo((): React.CSSProperties | undefined => {
-    if (!showContentExpand) return undefined;
-    if (contentExpanded) return undefined;
-    return {
-      maxHeight: CONTENT_COLLAPSE_THRESHOLD,
-      overflow: 'hidden',
-    };
-  }, [showContentExpand, contentExpanded]);
-
-  const contentExpandButton = useMemo(() => {
-    if (!showContentExpand) return null;
-    const icon = contentExpanded ? <ChevronsDownUp /> : <ChevronsUpDown />;
-    const text = contentExpanded ? locale.collapse : locale.expand;
-    return (
-      <div
-        className={contentExpandClassName}
-        onClick={handleContentExpandToggle}
-        data-testid="tool-use-bar-think-content-expand"
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            handleContentExpandToggle();
-          }
-        }}
-      >
-        {icon}
-        {text}
-      </div>
-    );
-  }, [
-    showContentExpand,
-    contentExpanded,
-    contentExpandClassName,
-    handleContentExpandToggle,
-    locale,
-  ]);
-
-  const innerContent = (
-    <>
-      <div ref={contentInnerRef} style={contentInnerStyle}>
-        <div className={contentClassName} style={styles?.content}>
-          {thinkContent}
-        </div>
-      </div>
-      {contentExpandButton}
-      {showFloatingExpand ? (
-        <div
-          className={floatingExpandClassName}
-          onClick={onToggleFloatingExpand}
-          data-testid="tool-use-bar-think-floating-expand"
-          style={styles?.floatingExpand}
-        >
-          {floatingIcon}
-          {floatingText}
-        </div>
-      ) : null}
-    </>
-  );
-
-  // 收起时不渲染 thinkContent，无动画避免展开/收起卡顿
-  if (expandedState) {
-    return (
-      <div
-        className={containerClassName}
-        data-testid="tool-use-bar-think-container"
-        style={{ overflow: 'hidden' }}
-      >
-        {innerContent}
-      </div>
-    );
-  }
-  if (showFloatingExpand) {
-    return (
-      <div
-        className={floatingExpandClassName}
-        onClick={onToggleFloatingExpand}
-        data-testid="tool-use-bar-think-floating-expand"
-        style={styles?.floatingExpand}
-      >
-        {floatingIcon}
-        {floatingText}
-      </div>
-    );
-  }
-  return null;
-};
-
-/**
- * ToolUseBarThink 组件属性
- */
 export interface ToolUseBarThinkProps {
-  /** 工具名称 */
   toolName: React.ReactNode;
-  /** 工具目标 */
   toolTarget?: React.ReactNode;
-  /** 时间显示 */
   time?: React.ReactNode;
-  /** 自定义图标 */
   icon?: React.ReactNode;
-  /** 思考内容 */
   thinkContent?: React.ReactNode;
-  /** 测试ID */
   testId?: string;
-  /** 状态 */
   status?: 'loading' | 'success' | 'error';
-  /** 是否展开 */
   expanded?: boolean;
-  /** 轻量模式 */
   light?: boolean;
-  /** 默认展开状态 */
   defaultExpanded?: boolean;
-  /** 展开状态变更回调 */
   onExpandedChange?: (expanded: boolean) => void;
-  /** 浮动展开状态 */
   floatingExpanded?: boolean;
-  /** 默认浮动展开状态 */
   defaultFloatingExpanded?: boolean;
-  /** 浮动展开状态变更回调 */
   onFloatingExpandedChange?: (floatingExpanded: boolean) => void;
-  /** 自定义类名 */
+  /**
+   * 展开时是否将组件滚动到视窗内。
+   * 传入 `true` 时使用默认参数 `{ behavior: 'smooth', block: 'nearest' }`，
+   * 也可直接传入 `ScrollIntoViewOptions` 自定义滚动行为。初次挂载不触发。
+   */
+  scrollIntoViewOnExpand?: boolean | ScrollIntoViewOptions;
   classNames?: {
     root?: string;
     bar?: string;
     header?: string;
-    headerLeft?: string;
     imageWrapper?: string;
-    image?: string;
     name?: string;
     target?: string;
     time?: string;
@@ -462,14 +94,11 @@ export interface ToolUseBarThinkProps {
     content?: string;
     floatingExpand?: string;
   };
-  /** 自定义样式 */
   styles?: {
     root?: React.CSSProperties;
     bar?: React.CSSProperties;
     header?: React.CSSProperties;
-    headerLeft?: React.CSSProperties;
     imageWrapper?: React.CSSProperties;
-    image?: React.CSSProperties;
     name?: React.CSSProperties;
     target?: React.CSSProperties;
     time?: React.CSSProperties;
@@ -480,21 +109,6 @@ export interface ToolUseBarThinkProps {
   };
 }
 
-/**
- * ToolUseBarThink 组件
- *
- * 用于显示工具使用过程中的思考内容和状态
- *
- * @example
- * ```tsx
- * <ToolUseBarThink
- *   toolName="思考"
- *   toolTarget="分析问题"
- *   status="loading"
- *   thinkContent={<div>思考内容...</div>}
- * />
- * ```
- */
 const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
   toolName,
   toolTarget,
@@ -512,10 +126,12 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
   classNames: customClassNames,
   styles,
   light = false,
+  scrollIntoViewOnExpand = false,
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-tool-use-bar-think');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
+  const locale = useLocale();
 
   const [expandedState, setExpandedState] = useMergedState(defaultExpanded, {
     value: expanded,
@@ -530,7 +146,9 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
     },
   );
 
-  const [hover, setHover] = React.useState(false);
+  const [hover, setHover] = useState(false);
+  const onMouseMove = useRefFunction(() => setHover(true));
+  const onMouseLeave = useRefFunction(() => setHover(false));
 
   const handleToggleExpand = useRefFunction(() => {
     setExpandedState(!expandedState);
@@ -540,158 +158,321 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
     setFloatingExpandedState(!floatingExpandedState);
   });
 
+  const isLoading = status === 'loading';
+
   useEffect(() => {
-    if (status === 'loading') {
+    if (isLoading) {
       setExpandedState(true);
     }
-  }, [status, setExpandedState]);
+  }, [isLoading, setExpandedState]);
 
-  const rootClassName = buildClassName(
-    prefixCls,
-    hashId,
-    customClassNames?.root,
-    {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const didMountRef = useRef(false);
+
+  useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
+    }
+    if (!expandedState || !scrollIntoViewOnExpand) return;
+
+    const options: ScrollIntoViewOptions =
+      typeof scrollIntoViewOnExpand === 'object'
+        ? scrollIntoViewOnExpand
+        : { behavior: 'smooth', block: 'nearest' };
+
+    const timer = window.setTimeout(() => {
+      rootRef.current?.scrollIntoView(options);
+    }, CARD_RESIZE_DURATION_MS);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [expandedState, scrollIntoViewOnExpand]);
+
+  // --- Container overflow detection ---
+  // Only active when expanded AND not loading (overflow UI is hidden during loading)
+  const contentInnerRef = useRef<HTMLDivElement>(null);
+  const [isContentOverflowing, setIsContentOverflowing] = useState(false);
+  const [contentExpanded, setContentExpanded] = useState(false);
+
+  const needOverflowCheck = expandedState && !isLoading && !!thinkContent;
+
+  const checkOverflow = useRefFunction(() => {
+    const el = contentInnerRef.current;
+    if (!el) return;
+    setIsContentOverflowing(el.scrollHeight > CONTENT_COLLAPSE_THRESHOLD);
+  });
+
+  useEffect(() => {
+    if (!needOverflowCheck) return;
+    checkOverflow();
+    const el = contentInnerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(checkOverflow);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [needOverflowCheck, checkOverflow]);
+
+  const handleContentExpandToggle = useRefFunction(() => {
+    setContentExpanded((prev) => !prev);
+  });
+
+  const showContentExpand = needOverflowCheck && isContentOverflowing;
+  const showFloatingExpand = isLoading && !light;
+
+  const contentInnerStyle = useMemo(
+    (): React.CSSProperties | undefined =>
+      showContentExpand && !contentExpanded ? CONTENT_CLAMPED_STYLE : undefined,
+    [showContentExpand, contentExpanded],
+  );
+
+  // --- Class names (memoized) ---
+  const cls = useMemo(() => {
+    const root = classNames(prefixCls, hashId, customClassNames?.root, {
       [`${prefixCls}-expanded`]: !expandedState,
-      [`${prefixCls}-loading`]: status === 'loading',
+      [`${prefixCls}-loading`]: isLoading,
       [`${prefixCls}-active`]: expandedState,
       [`${prefixCls}-success`]: status === 'success',
       [`${prefixCls}-light`]: light,
-    },
-  );
-
-  const barClassName = buildClassName(
-    `${prefixCls}-bar`,
+    });
+    const bar = classNames(`${prefixCls}-bar`, hashId, customClassNames?.bar);
+    const header = classNames(
+      `${prefixCls}-header`,
+      hashId,
+      customClassNames?.header,
+      { [`${prefixCls}-header-light`]: light },
+    );
+    const imageWrapper = classNames(
+      `${prefixCls}-image-wrapper`,
+      hashId,
+      customClassNames?.imageWrapper,
+      { [`${prefixCls}-image-wrapper-loading`]: isLoading },
+    );
+    const headerRight = classNames(`${prefixCls}-header-right`, hashId, {
+      [`${prefixCls}-header-right-loading`]: isLoading,
+    });
+    const name = classNames(
+      `${prefixCls}-name`,
+      hashId,
+      customClassNames?.name,
+      {
+        [`${prefixCls}-name-light`]: light,
+      },
+    );
+    const container = classNames(
+      `${prefixCls}-container`,
+      hashId,
+      customClassNames?.container,
+      {
+        [`${prefixCls}-container-expanded`]: expandedState,
+        [`${prefixCls}-container-loading`]: isLoading && !floatingExpandedState,
+        [`${prefixCls}-container-light`]: light,
+        [`${prefixCls}-container-floating-expanded`]: floatingExpandedState,
+      },
+    );
+    const content = classNames(
+      `${prefixCls}-content`,
+      hashId,
+      customClassNames?.content,
+      { [`${prefixCls}-content-light`]: light },
+    );
+    const floatingExpand = classNames(
+      `${prefixCls}-floating-expand`,
+      hashId,
+      customClassNames?.floatingExpand,
+    );
+    const target = classNames(
+      `${prefixCls}-target`,
+      hashId,
+      customClassNames?.target,
+    );
+    const timeEl = classNames(
+      `${prefixCls}-time`,
+      hashId,
+      customClassNames?.time,
+    );
+    const expand = classNames(
+      `${prefixCls}-expand`,
+      hashId,
+      customClassNames?.expand,
+    );
+    const contentExpand = classNames(`${prefixCls}-content-expand`, hashId);
+    const lightIcon = classNames(
+      `${prefixCls}-header-left-icon`,
+      `${prefixCls}-header-left-icon-light`,
+      hashId,
+    );
+    return {
+      root,
+      bar,
+      header,
+      imageWrapper,
+      headerRight,
+      name,
+      container,
+      content,
+      floatingExpand,
+      target,
+      time: timeEl,
+      expand,
+      contentExpand,
+      lightIcon,
+    };
+  }, [
+    prefixCls,
     hashId,
-    customClassNames?.bar,
-  );
+    customClassNames,
+    expandedState,
+    isLoading,
+    status,
+    light,
+    floatingExpandedState,
+  ]);
 
-  const headerClassName = buildClassName(
-    `${prefixCls}-header`,
-    hashId,
-    customClassNames?.header,
-    { [`${prefixCls}-header-light`]: light },
-  );
-
-  const headerLeftClassName = buildClassName(
-    `${prefixCls}-header-left`,
-    hashId,
-    customClassNames?.headerLeft,
-  );
-
-  const imageAnimationProps =
-    status === 'loading' ? LOADING_ANIMATION : IDLE_ANIMATION;
-  const headerRightAnimation =
-    status === 'loading' ? HEADER_RIGHT_LOADING_ANIMATION : {};
-
-  const imageWrapperClassName = buildClassName(
-    `${prefixCls}-image-wrapper`,
-    hashId,
-    customClassNames?.imageWrapper,
-    {
-      [`${prefixCls}-image-wrapper-rotating`]: status === 'loading',
-      [`${prefixCls}-image-wrapper-loading`]: status === 'loading',
-    },
-  );
-
-  const imageClassName = buildClassName(
-    `${prefixCls}-image`,
-    hashId,
-    customClassNames?.image,
-  );
-
-  const headerRightClassName = buildClassName(
-    `${prefixCls}-header-right`,
-    hashId,
-  );
-
-  return wrapSSR(
+  return (
     <div
+      ref={rootRef}
       data-testid={testId || 'ToolUseBarThink'}
-      className={rootClassName}
+      className={classNames(cls.root, {
+        [`${prefixCls}-root-think-collapsed`]:
+          Boolean(thinkContent) && !expandedState,
+      })}
       style={styles?.root}
     >
+      {/* Bar */}
       <div
-        className={barClassName}
+        className={cls.bar}
         data-testid="tool-use-bar-think-bar"
         style={styles?.bar}
         onClick={handleToggleExpand}
       >
         <div
-          className={headerClassName}
+          className={cls.header}
           data-testid="tool-use-bar-think-header"
           style={styles?.header}
-          onMouseMove={() => setHover(true)}
-          onMouseLeave={() => setHover(false)}
+          onMouseMove={onMouseMove}
+          onMouseLeave={onMouseLeave}
         >
-          <div className={headerLeftClassName} style={styles?.headerLeft}>
-            {light ? (
-              <LightModeIcon
-                prefixCls={prefixCls}
-                hashId={hashId}
-                hover={hover}
-                expandedState={expandedState}
-              />
-            ) : (
-              <motion.div
-                className={imageWrapperClassName}
-                {...imageAnimationProps}
-              >
-                {icon || (
-                  <div className={imageClassName} style={styles?.image}>
-                    <Brain />
-                  </div>
-                )}
-              </motion.div>
+          {light ? (
+            <div className={cls.lightIcon}>
+              {hover ? (
+                <ChevronDown
+                  style={expandedState ? CHEVRON_EXPANDED : CHEVRON_COLLAPSED}
+                />
+              ) : (
+                <Brain />
+              )}
+            </div>
+          ) : (
+            <div className={cls.imageWrapper} style={styles?.imageWrapper}>
+              {icon || <Brain />}
+            </div>
+          )}
+          <div className={cls.headerRight}>
+            {toolName && (
+              <div className={cls.name} style={styles?.name}>
+                {toolName}
+              </div>
+            )}
+            {toolTarget && (
+              <div className={cls.target} style={styles?.target}>
+                {toolTarget}
+              </div>
             )}
           </div>
-          <motion.div
-            className={headerRightClassName}
-            {...headerRightAnimation}
-          >
-            <HeaderContent
-              toolName={toolName}
-              toolTarget={toolTarget}
-              prefixCls={prefixCls}
-              hashId={hashId}
-              light={light}
-              classNames={customClassNames}
-              styles={styles}
-            />
-          </motion.div>
         </div>
-        <TimeElement
-          time={time}
-          prefixCls={prefixCls}
-          hashId={hashId}
-          classNames={customClassNames}
-          styles={styles}
-        />
-        <ExpandButton
-          thinkContent={thinkContent}
-          light={light}
-          expandedState={expandedState}
-          prefixCls={prefixCls}
-          hashId={hashId}
-          classNames={customClassNames}
-          styles={styles}
-          onToggleExpand={handleToggleExpand}
-        />
+        {time && (
+          <div className={cls.time} style={styles?.time}>
+            {time}
+          </div>
+        )}
+        {thinkContent && !light && (
+          <div
+            className={cls.expand}
+            onClick={handleToggleExpand}
+            style={styles?.expand}
+          >
+            {expandedState ? <ChevronsDownUp /> : <ChevronsUpDown />}
+          </div>
+        )}
       </div>
-      {thinkContent ? (
-        <ThinkContainer
-          thinkContent={thinkContent}
-          expandedState={expandedState}
-          floatingExpandedState={floatingExpandedState}
-          status={status}
-          light={light}
-          prefixCls={prefixCls}
-          hashId={hashId}
-          classNames={customClassNames}
-          styles={styles}
-          onToggleFloatingExpand={handleToggleFloatingExpand}
-        />
-      ) : null}
-    </div>,
+
+      {/* Container：grid 折叠 + Card resize 时长，与工具条一致 */}
+      {thinkContent && (
+        <div
+          className={classNames(`${prefixCls}-think-collapse`, hashId, {
+            [`${prefixCls}-think-collapse-open`]: expandedState,
+          })}
+        >
+          <div
+            className={classNames(`${prefixCls}-think-collapse-inner`, hashId)}
+          >
+            <div
+              className={cls.container}
+              data-testid="tool-use-bar-think-container"
+              style={CONTAINER_STYLE}
+            >
+              <div ref={contentInnerRef} style={contentInnerStyle}>
+                <div className={cls.content} style={styles?.content}>
+                  {thinkContent}
+                </div>
+              </div>
+              {showContentExpand && (
+                <div
+                  className={cls.contentExpand}
+                  onClick={handleContentExpandToggle}
+                  data-testid="tool-use-bar-think-content-expand"
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleContentExpandToggle();
+                    }
+                  }}
+                >
+                  {contentExpanded ? <ChevronsDownUp /> : <ChevronsUpDown />}
+                  {contentExpanded ? locale.collapse : locale.expand}
+                </div>
+              )}
+              {showFloatingExpand && (
+                <div
+                  className={cls.floatingExpand}
+                  onClick={handleToggleFloatingExpand}
+                  data-testid="tool-use-bar-think-floating-expand"
+                  style={styles?.floatingExpand}
+                >
+                  {floatingExpandedState ? (
+                    <ChevronsDownUp style={FLOATING_ICON_STYLE} />
+                  ) : (
+                    <ChevronsUpDown style={FLOATING_ICON_STYLE} />
+                  )}
+                  {floatingExpandedState ? locale.collapse : locale.expand}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Standalone floating button when collapsed + loading */}
+      {thinkContent && !expandedState && showFloatingExpand && (
+        <div
+          className={cls.floatingExpand}
+          onClick={handleToggleFloatingExpand}
+          data-testid="tool-use-bar-think-floating-expand"
+          style={styles?.floatingExpand}
+        >
+          {floatingExpandedState ? (
+            <ChevronsDownUp style={FLOATING_ICON_STYLE} />
+          ) : (
+            <ChevronsUpDown style={FLOATING_ICON_STYLE} />
+          )}
+          {floatingExpandedState ? locale.collapse : locale.expand}
+        </div>
+      )}
+    </div>
   );
 };
 

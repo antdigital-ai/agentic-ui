@@ -1,4 +1,8 @@
-import type { AttachmentFile, BubbleMetaData, MessageBubbleData } from '@ant-design/agentic-ui';
+import type {
+  AttachmentFile,
+  BubbleMetaData,
+  MessageBubbleData,
+} from '@ant-design/agentic-ui';
 
 export const ASSISTANT_AVATAR =
   'https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original';

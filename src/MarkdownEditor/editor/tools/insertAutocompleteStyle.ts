@@ -1,11 +1,10 @@
 import {
-  ChatTokenType,
-  GenerateStyle,
+  genStyleHooks,
   resetComponent,
-  useEditorStyleRegister,
+  type GenStyleFn,
 } from '../../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'InsertAutocomplete'> = (token) => {
   return {
     [token.componentCls]: {
       display: 'flex',
@@ -33,13 +32,16 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * @param prefixCls
  * @returns
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('InsertAutocomplete-' + prefixCls, (token) => {
-    const editorToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('InsertAutocomplete', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+]);
 
-    return [resetComponent(editorToken), genStyle(editorToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  // 与 InsertAutocomplete 组件内
+  // `getPrefixCls('agentic-md-editor-insert-autocomplete')` 对齐
+  const [, hashId] = useGenStyle(
+    prefixCls ?? 'agentic-md-editor-insert-autocomplete',
+  );
+  return { hashId };
 }

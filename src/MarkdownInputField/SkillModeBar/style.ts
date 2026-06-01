@@ -1,16 +1,27 @@
 import {
-  ChatTokenType,
-  GenerateStyle,
+  genStyleHooks,
   resetComponent,
-  useEditorStyleRegister,
+  type GenStyleFn,
 } from '../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'SkillModeBar'> = (token) => {
   return {
     [`${token.componentCls}-container`]: {
       // overflow: 'hidden', // 会把Quote的弹框遮挡
       borderTopLeftRadius: 'inherit',
       borderTopRightRadius: 'inherit',
+      // 替代 framer-motion 的 height:0↔auto + opacity 入场/退出动画。
+      // 使用 grid-template-rows 0fr↔1fr 实现"任意高度"过渡。
+      display: 'grid',
+      gridTemplateRows: '1fr',
+      opacity: 1,
+      transition:
+        'grid-template-rows 0.3s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)',
+      '&[data-state="exit"]': {
+        gridTemplateRows: '0fr',
+        opacity: 0,
+        pointerEvents: 'none',
+      },
     },
 
     [`${token.componentCls}`]: {
@@ -25,6 +36,20 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       display: 'flex',
       alignItems: 'flex-start',
       justifyContent: 'space-between',
+      // 替代 framer-motion 的 padding/backgroundColor/borderColor 关键帧动画
+      padding: '12px',
+      backgroundColor: 'var(--color-gray-bg-page)',
+      borderColor: 'rgba(0, 16, 64, 0.0627)',
+      overflow: 'hidden',
+      // 内层 padding/bg/border 同步过渡
+      transition:
+        'padding 0.3s cubic-bezier(0.25, 0.1, 0.25, 1), background-color 0.3s cubic-bezier(0.25, 0.1, 0.25, 1), border-color 0.3s cubic-bezier(0.25, 0.1, 0.25, 1), min-height 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)',
+      '&[data-state="exit"]': {
+        padding: '0px',
+        backgroundColor: 'transparent',
+        borderColor: 'transparent',
+        minHeight: 0,
+      },
     },
 
     [`${token.componentCls}-title`]: {
@@ -88,13 +113,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * @param prefixCls 类名前缀
  * @returns 样式相关函数和变量
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('SkillModeBar', (token) => {
-    const skillModeToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('SkillModeBar', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+]);
 
-    return [resetComponent(skillModeToken), genStyle(skillModeToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [, hashId] = useGenStyle(prefixCls ?? 'SkillModeBar');
+  return { hashId };
 }

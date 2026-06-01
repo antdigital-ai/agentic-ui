@@ -1,10 +1,9 @@
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
-import { motion } from 'framer-motion';
 import React, { useContext, useEffect } from 'react';
 import { useStyle } from './style';
 
-export type ActionItemBoxProps = {
+export interface ActionItemBoxProps {
   onClick: () => void;
   icon?: string;
   title: React.ReactNode;
@@ -18,33 +17,28 @@ export type ActionItemBoxProps = {
   compact?: boolean;
   hoverBg?: boolean;
   disabled?: boolean;
-};
+}
 
 export const ActionItemBox = (props: ActionItemBoxProps) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const basePrefixCls = getPrefixCls('agentic-chat-action-item-box');
-  const { wrapSSR, hashId } = useStyle(basePrefixCls);
+  const { hashId } = useStyle(basePrefixCls);
 
   useEffect(() => {
     props?.onInit?.();
+    // onInit 仅在挂载时触发一次，刻意不依赖 props.onInit
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return wrapSSR(
-    <motion.div
-      initial="hidden"
-      animate="visible"
+  return (
+    <div
+      data-testid={basePrefixCls}
+      className={classNames(`${basePrefixCls}-motion-slide-in-left`, hashId)}
       style={{
         flex: props.size ? 'none' : 1,
         display: 'flex',
         height: 'min-content',
         ...props.style,
-      }}
-      variants={{
-        hidden: { x: -10, opacity: 0 },
-        visible: {
-          x: 0,
-          opacity: 1,
-        },
       }}
     >
       <div
@@ -146,7 +140,7 @@ export const ActionItemBox = (props: ActionItemBoxProps) => {
           </div>
         </div>
       </div>
-    </motion.div>,
+    </div>
   );
 };
 

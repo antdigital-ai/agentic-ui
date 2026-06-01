@@ -1,4 +1,4 @@
-/* eslint-disable no-case-declarations */
+﻿/* eslint-disable no-case-declarations */
 import React from 'react';
 import {
   BaseSelection,
@@ -15,6 +15,7 @@ import { HeadNode, ParagraphNode, TableNode } from '../../../el';
 import { EditorStore } from '../../store';
 import { isMod } from '../../utils';
 import { EditorUtils } from '../../utils/editorUtils';
+import { isImeComposing } from '../../utils/isImeComposing';
 import { BlockMathNodes } from '../elements';
 import { BackspaceKey } from './backspace';
 export class EnterKey {
@@ -31,7 +32,7 @@ export class EnterKey {
   }
   run(e: React.KeyboardEvent) {
     let sel = this.editor.selection;
-    if (!sel || this.store.inputComposition) return;
+    if (!sel || isImeComposing(e, this.store.inputComposition)) return;
     if (!Range.isCollapsed(sel)) {
       e.preventDefault();
       this.backspace.range();
@@ -74,9 +75,10 @@ export class EnterKey {
         }
       }
       if (el.type === 'table-cell') {
-        const table = Editor.parent(this.editor, path);
-        if (table[0].type === 'table-row') {
-          this.table(table as NodeEntry<TableNode>, sel, e);
+        const row = Editor.parent(this.editor, path);
+        if (row[0].type === 'table-row') {
+          // 必须传入 table-cell 的 NodeEntry：列索引用 cell path 末位，下一行用 Path.next(rowPath)
+          this.table(node as NodeEntry<TableNode>, sel, e);
           e.preventDefault();
           return;
         }
@@ -109,32 +111,26 @@ export class EnterKey {
       if (!Path.hasPrevious(path)) {
         const hashNext = Editor.hasPath(this.editor, Path.next(path));
         if (!hashNext) {
-          Transforms.delete(this.editor, {
-            at: parentPath,
+          Editor.withoutNormalizing(this.editor, () => {
+            Transforms.delete(this.editor, { at: parentPath });
+            Transforms.insertNodes(
+              this.editor,
+              { type: 'paragraph', children: [{ text: '' }] },
+              { at: parentPath, select: true },
+            );
           });
-          Transforms.insertNodes(
-            this.editor,
-            {
-              type: 'paragraph',
-              children: [{ text: '' }],
-            },
-            { at: parentPath, select: true },
-          );
           e.preventDefault();
         }
       }
       if (!Editor.hasPath(this.editor, Path.next(path))) {
-        Transforms.delete(this.editor, {
-          at: path,
+        Editor.withoutNormalizing(this.editor, () => {
+          Transforms.delete(this.editor, { at: path });
+          Transforms.insertNodes(
+            this.editor,
+            { type: 'paragraph', children: [{ text: '' }] },
+            { at: Path.next(parentPath), select: true },
+          );
         });
-        Transforms.insertNodes(
-          this.editor,
-          {
-            type: 'paragraph',
-            children: [{ text: '' }],
-          },
-          { at: Path.next(parentPath), select: true },
-        );
         e.preventDefault();
       }
     }
@@ -144,54 +140,57 @@ export class EnterKey {
       const realEmpty = parent.children.length === 1;
       if (ul.children.length === 1 && realEmpty) {
         e.preventDefault();
-        Transforms.delete(this.editor, { at: ulPath });
-        Transforms.insertNodes(this.editor, EditorUtils.p, {
-          at: ulPath,
-          select: true,
+        Editor.withoutNormalizing(this.editor, () => {
+          Transforms.delete(this.editor, { at: ulPath });
+          Transforms.insertNodes(this.editor, EditorUtils.p, {
+            at: ulPath,
+            select: true,
+          });
         });
         return;
       }
       if (realEmpty) {
         e.preventDefault();
-        if (!Path.hasPrevious(parentPath)) {
-          Transforms.delete(this.editor, { at: parentPath });
-          Transforms.insertNodes(this.editor, EditorUtils.p, {
-            at: ulPath,
-            select: true,
-          });
-        } else if (!Editor.hasPath(this.editor, Path.next(parentPath))) {
-          Transforms.delete(this.editor, { at: parentPath });
-          Transforms.insertNodes(this.editor, EditorUtils.p, {
-            at: Path.next(ulPath),
-            select: true,
-          });
-        } else {
-          Transforms.liftNodes(this.editor, {
-            at: parentPath,
-          });
-          Transforms.delete(this.editor, { at: Path.next(ulPath) });
-          Transforms.insertNodes(this.editor, EditorUtils.p, {
-            at: Path.next(ulPath),
-            select: true,
-          });
-        }
+        Editor.withoutNormalizing(this.editor, () => {
+          if (!Path.hasPrevious(parentPath)) {
+            Transforms.delete(this.editor, { at: parentPath });
+            Transforms.insertNodes(this.editor, EditorUtils.p, {
+              at: ulPath,
+              select: true,
+            });
+          } else if (!Editor.hasPath(this.editor, Path.next(parentPath))) {
+            Transforms.delete(this.editor, { at: parentPath });
+            Transforms.insertNodes(this.editor, EditorUtils.p, {
+              at: Path.next(ulPath),
+              select: true,
+            });
+          } else {
+            Transforms.liftNodes(this.editor, { at: parentPath });
+            Transforms.delete(this.editor, { at: Path.next(ulPath) });
+            Transforms.insertNodes(this.editor, EditorUtils.p, {
+              at: Path.next(ulPath),
+              select: true,
+            });
+          }
+        });
       } else {
         if (!Editor.hasPath(this.editor, Path.next(path))) {
           e.preventDefault();
-          Transforms.delete(this.editor, { at: path });
-          Transforms.insertNodes(
-            this.editor,
-            {
-              type: 'list-item',
-              checked: typeof parent.checked === 'boolean' ? false : undefined,
-              children: [EditorUtils.p],
-            },
-            { at: Path.next(parentPath), select: true },
-          );
+          Editor.withoutNormalizing(this.editor, () => {
+            Transforms.delete(this.editor, { at: path });
+            Transforms.insertNodes(
+              this.editor,
+              {
+                type: 'list-item',
+                checked:
+                  typeof parent.checked === 'boolean' ? false : undefined,
+                children: [EditorUtils.p],
+              },
+              { at: Path.next(parentPath), select: true },
+            );
+          });
         } else if (!Path.hasPrevious(path)) {
           e.preventDefault();
-          // 在列表项开头按回车时，只创建新的空列表项，不移动任何节点
-          // 这样可以避免将嵌套列表或其他节点移动到新列表项内部，导致缩进
           Transforms.insertNodes(
             this.editor,
             {
@@ -294,24 +293,26 @@ export class EnterKey {
           anchor: end,
           focus: elEnd,
         });
-        Transforms.delete(this.editor, {
-          at: {
-            anchor: start,
-            focus: elEnd,
-          },
+        Editor.withoutNormalizing(this.editor, () => {
+          Transforms.delete(this.editor, {
+            at: {
+              anchor: start,
+              focus: elEnd,
+            },
+          });
+          Transforms.insertNodes(
+            this.editor,
+            {
+              type: 'paragraph',
+              children: fragment[0]?.children || [{ text: '' }],
+            },
+            { at: Path.next(path) },
+          );
+          Transforms.select(
+            this.editor,
+            Editor.start(this.editor, Path.next(path)),
+          );
         });
-        Transforms.insertNodes(
-          this.editor,
-          {
-            type: 'paragraph',
-            children: fragment[0]?.children || [{ text: '' }],
-          },
-          { at: Path.next(path) },
-        );
-        Transforms.select(
-          this.editor,
-          Editor.start(this.editor, Path.next(path)),
-        );
       }
     }
     return true;
@@ -322,6 +323,9 @@ export class EnterKey {
     node: NodeEntry<ParagraphNode>,
     sel: Range,
   ) {
+    if (isImeComposing(e, this.store.inputComposition)) {
+      return false;
+    }
     const parent = Editor.parent(this.editor, node[1]);
     const end = Editor.end(this.editor, node[1]);
     if (Point.equals(end, sel.focus)) {
@@ -333,7 +337,7 @@ export class EnterKey {
             continue;
           const m = str?.match(n.reg);
           if (m) {
-            n.run({
+            const handled = n.run({
               editor: this.editor,
               path: node[1],
               match: m,
@@ -341,6 +345,7 @@ export class EnterKey {
               sel,
               startText: m[0],
             });
+            if (handled === false) continue;
             e.preventDefault();
             return true;
           }
@@ -358,10 +363,12 @@ export class EnterKey {
 
       if (isListWithSingleEmptyItem) {
         e.preventDefault();
-        Transforms.removeNodes(this.editor, { at: listPath });
-        Transforms.insertNodes(this.editor, EditorUtils.p, {
-          at: listPath,
-          select: true,
+        Editor.withoutNormalizing(this.editor, () => {
+          Transforms.removeNodes(this.editor, { at: listPath });
+          Transforms.insertNodes(this.editor, EditorUtils.p, {
+            at: listPath,
+            select: true,
+          });
         });
         return true;
       }
@@ -370,33 +377,30 @@ export class EnterKey {
         const text = Point.equals(end, sel.focus)
           ? [{ text: '' }]
           : EditorUtils.cutText(this.editor, sel.focus);
-        Transforms.insertNodes(
-          this.editor,
-          {
-            type: 'paragraph',
-            children: text || ' ',
-          },
-          { at: Path.next(node[1]) },
-        );
-        if (!Point.equals(end, sel.focus)) {
-          Transforms.delete(this.editor, {
-            at: {
-              anchor: sel.focus,
-              focus: end,
+        Editor.withoutNormalizing(this.editor, () => {
+          Transforms.insertNodes(
+            this.editor,
+            {
+              type: 'paragraph',
+              children: text || ' ',
             },
-          });
-        }
-        if (Editor.hasPath(this.editor, Path.next(node[1]))) {
-          Transforms.select(
-            this.editor,
-            Editor.start(this.editor, Path.next(node[1])),
+            { at: Path.next(node[1]) },
           );
-        } else {
-          Transforms.select(
-            this.editor,
-            Editor.start(this.editor, Path.next(node[1])),
-          );
-        }
+          if (!Point.equals(end, sel.focus)) {
+            Transforms.delete(this.editor, {
+              at: {
+                anchor: sel.focus,
+                focus: end,
+              },
+            });
+          }
+          if (Editor.hasPath(this.editor, Path.next(node[1]))) {
+            Transforms.select(
+              this.editor,
+              Editor.start(this.editor, Path.next(node[1])),
+            );
+          }
+        });
         e.preventDefault();
         return true;
       } else {
@@ -431,46 +435,47 @@ export class EnterKey {
           ? [{ text: '' }]
           : EditorUtils.cutText(this.editor, sel.focus);
 
-        Transforms.insertNodes(
-          this.editor,
-          {
-            type: 'list-item',
-            children: [
-              {
-                type: 'paragraph',
-                children: text || [{ text: '' }],
-              },
-            ],
-            checked,
-          },
-          { at: Path.next(parent[1]) },
-        );
-
-        if (!Point.equals(sel.anchor, Editor.end(this.editor, node[1]))) {
-          Transforms.delete(this.editor, {
-            at: {
-              anchor: sel.anchor,
-              focus: Editor.end(this.editor, node[1]),
-            },
-          });
-        }
-
-        if (
-          Point.equals(sel.anchor, Editor.start(this.editor, node[1])) &&
-          Node.string(Node.get(this.editor, node[1])) !== ''
-        ) {
-          EditorUtils.clearMarks(this.editor);
-        }
-
-        if (Editor.start(this.editor, Path.next(parent[1]))) {
-          Transforms.select(
+        Editor.withoutNormalizing(this.editor, () => {
+          Transforms.insertNodes(
             this.editor,
-            Editor.start(this.editor, Path.next(parent[1])),
+            {
+              type: 'list-item',
+              children: [
+                {
+                  type: 'paragraph',
+                  children: text || [{ text: '' }],
+                },
+              ],
+              checked,
+            },
+            { at: Path.next(parent[1]) },
           );
-        }
 
-        // 不再移动任何节点到新列表项内部，避免导致新列表项被缩进
-        // 嵌套列表应该保留在原列表项中
+          if (!Point.equals(sel.anchor, Editor.end(this.editor, node[1]))) {
+            Transforms.delete(this.editor, {
+              at: {
+                anchor: sel.anchor,
+                focus: Editor.end(this.editor, node[1]),
+              },
+            });
+          }
+
+          if (
+            Point.equals(sel.anchor, Editor.start(this.editor, node[1])) &&
+            Node.string(Node.get(this.editor, node[1])) !== ''
+          ) {
+            EditorUtils.clearMarks(this.editor);
+          }
+
+          const nextParentPath = Path.next(parent[1]);
+          if (Editor.hasPath(this.editor, nextParentPath)) {
+            Transforms.select(
+              this.editor,
+              Editor.start(this.editor, nextParentPath),
+            );
+          }
+        });
+
         return true;
       }
     }

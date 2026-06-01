@@ -1,10 +1,9 @@
 import { Button, ConfigProvider } from 'antd';
 import classNames from 'clsx';
-import React, { useContext } from 'react';
+import React, { forwardRef, useContext } from 'react';
 import { useStyle } from './style';
 
 export interface ToggleButtonProps {
-  key?: React.Key;
   icon?: React.ReactNode;
   triggerIcon?: React.ReactNode;
   disabled?: boolean;
@@ -15,67 +14,76 @@ export interface ToggleButtonProps {
   children?: React.ReactNode;
 }
 
-export const ToggleButton: React.FC<ToggleButtonProps> = ({
-  className,
-  style,
-  icon,
-  triggerIcon,
-  disabled,
-  active,
-  onClick,
-  children,
-}) => {
-  const context = useContext(ConfigProvider.ConfigContext);
-  const prefixCls = context?.getPrefixCls('toggle-button');
+export const ToggleButton = forwardRef<HTMLDivElement, ToggleButtonProps>(
+  (
+    {
+      className,
+      style,
+      icon,
+      triggerIcon,
+      disabled,
+      active,
+      onClick,
+      children,
+    },
+    ref,
+  ) => {
+    const context = useContext(ConfigProvider.ConfigContext);
+    const prefixCls = context?.getPrefixCls('toggle-button');
 
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+    const { hashId } = useStyle(prefixCls);
 
-  const rootCls = classNames(prefixCls, className, hashId);
+    const rootCls = classNames(prefixCls, className, hashId);
 
-  return wrapSSR(
-    <div
-      className={classNames(rootCls, {
-        [`${prefixCls}-active`]: active,
-        [`${prefixCls}-disabled`]: disabled,
-      })}
-      style={style}
-    >
-      <ConfigProvider
-        wave={{
-          disabled: true,
-        }}
+    return (
+      <div
+        ref={ref}
+        className={classNames(rootCls, {
+          [`${prefixCls}-active`]: active,
+          [`${prefixCls}-disabled`]: disabled,
+        })}
+        data-testid={prefixCls}
+        style={style}
       >
-        <Button
-          disabled={disabled}
-          onClick={onClick}
-          className={classNames(`${prefixCls}-button`, hashId)}
-          style={{
-            border: 'none',
-            background: 'transparent',
-            padding: 0,
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            boxShadow: 'none',
+        <ConfigProvider
+          wave={{
+            disabled: true,
           }}
         >
-          {icon && (
-            <span className={classNames(`${prefixCls}-icon`, hashId)}>
-              {icon}
-            </span>
-          )}
-          {children && (
-            <span className={classNames(`${prefixCls}-text`, hashId)}>
-              {children}
-            </span>
-          )}
-          {triggerIcon && (
-            <span className={classNames(`${prefixCls}-trigger-icon`, hashId)}>
-              {triggerIcon}
-            </span>
-          )}
-        </Button>
-      </ConfigProvider>
-    </div>,
-  );
-};
+          <Button
+            disabled={disabled}
+            onClick={onClick}
+            className={classNames(`${prefixCls}-button`, hashId)}
+            style={{
+              border: 'none',
+              background: 'transparent',
+              padding: 0,
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              boxShadow: 'none',
+            }}
+          >
+            {icon && (
+              <span className={classNames(`${prefixCls}-icon`, hashId)}>
+                {icon}
+              </span>
+            )}
+            {children && (
+              <span className={classNames(`${prefixCls}-text`, hashId)}>
+                {children}
+              </span>
+            )}
+            {triggerIcon && (
+              <span className={classNames(`${prefixCls}-trigger-icon`, hashId)}>
+                {triggerIcon}
+              </span>
+            )}
+          </Button>
+        </ConfigProvider>
+      </div>
+    );
+  },
+);
+
+ToggleButton.displayName = 'ToggleButton';

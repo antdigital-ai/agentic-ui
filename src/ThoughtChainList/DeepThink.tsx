@@ -108,7 +108,7 @@ export const DeepThink = (
                 padding: '8px',
                 gap: '10px',
                 alignSelf: 'stretch',
-                background: '#FBFCFD',
+                background: 'var(--color-gray-bg-card-light, #FBFCFD)',
                 zIndex: 2,
               }}
             >
@@ -129,7 +129,7 @@ export const DeepThink = (
                 padding: '8px 12px',
                 gap: '10px',
                 alignSelf: 'stretch',
-                background: '#FBFCFD',
+                background: 'var(--color-gray-bg-card-light, #FBFCFD)',
                 zIndex: 1,
                 borderRadius: '12px',
               }}
@@ -170,13 +170,12 @@ export const DeepThink = (
                 display: 'flex',
                 padding: '12px 12px',
                 alignSelf: 'stretch',
-                background: '#FFEDEC',
+                background: 'var(--color-red-bg-page-light, #FFEDEC)',
                 wordBreak: 'break-all',
                 minHeight: 18,
                 wordWrap: 'break-word',
                 zIndex: 2,
-                backgroundColor: '#FFEDEC',
-                border: '1px solid rgba(244, 244, 247, 0.7473)',
+                border: '1px solid var(--color-red-border-default, rgba(244, 244, 247, 0.7473))',
                 gap: 8,
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -192,7 +191,7 @@ export const DeepThink = (
                 <div>
                   <CloseCircleFilled
                     style={{
-                      color: '#FF4141',
+                      color: 'var(--color-red-text-default, #FF4141)',
                       marginRight: 8,
                     }}
                   />
@@ -203,7 +202,7 @@ export const DeepThink = (
                 </div>
                 <Typography
                   style={{
-                    color: '#FF4141',
+                    color: 'var(--color-red-text-default, #FF4141)',
                     wordBreak: 'break-all',
                     wordWrap: 'break-word',
                   }}
@@ -216,5 +215,5 @@ export const DeepThink = (
         </div>
       </>
     );
-  }, [props.category, JSON.stringify(props.output), props.costMillis]);
+  }, [props.category, props.output?.type, props.output?.data, props.output?.errorMsg, props.output?.response, props.costMillis]);
 };

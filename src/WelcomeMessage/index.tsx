@@ -42,10 +42,17 @@ export interface WelcomeMessageProps {
   title?: React.ReactNode;
   /** 描述 */
   description?: React.ReactNode;
-  /** 自定义样式类名，用于各个提示项的不同部分 */
+  /** 自定义样式类名，用于各个部分 */
   classNames?: {
+    root?: string;
     title?: string;
     description?: string;
+  };
+  /** 自定义内联样式，用于各个部分 */
+  styles?: {
+    root?: React.CSSProperties;
+    title?: React.CSSProperties;
+    description?: React.CSSProperties;
   };
   /** 标题动画属性 */
   titleAnimateProps?: WelcomeMessageTitleAnimateProps;
@@ -53,7 +60,7 @@ export interface WelcomeMessageProps {
   descriptionAnimateProps?: WelcomeMessageDescriptionAnimateProps;
   /** 自定义样式 */
   style?: React.CSSProperties;
-  /** 自定义根节点样式类名 */
+  /** 自定义根节点样式类名 @deprecated 请使用 classNames.root 替代 */
   rootClassName?: string;
 }
 
@@ -67,7 +74,7 @@ export interface WelcomeMessageProps {
  * @description 欢迎消息组件，用于显示聊天开始时的欢迎信息
  * @param {WelcomeMessageProps} props - 组件属性
  * @param {React.ReactNode} [props.title] - 欢迎标题
- * @param {string} [props.description] - 欢迎描述
+ * @param {React.ReactNode} [props.description] - 欢迎描述
  * @param {Object} [props.classNames] - 自定义样式类名
  * @param {string} [props.classNames.title] - 标题样式类名
  * @param {string} [props.classNames.description] - 描述样式类名
@@ -97,34 +104,37 @@ export interface WelcomeMessageProps {
  * - 集成 Ant Design 主题系统
  * - 响应式布局适配
  */
-export const WelcomeMessage: React.FC<WelcomeMessageProps> = ({
+const WelcomeMessageComponent: React.FC<WelcomeMessageProps> = ({
   title,
   description,
   classNames,
+  styles,
   titleAnimateProps,
   descriptionAnimateProps,
-  style: customStyle,
+  style,
   rootClassName,
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-welcome');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
-  const { ...restStyle } = customStyle || {};
+  const { hashId } = useStyle(prefixCls);
 
-  return wrapSSR(
-    <div className={clsx(prefixCls, hashId, rootClassName)} style={restStyle}>
-      {/* Title */}
+  return (
+    <div
+      className={clsx(prefixCls, hashId, classNames?.root, rootClassName)}
+      data-testid={prefixCls}
+      style={{ ...style, ...styles?.root }}
+    >
       {title && (
         <TypingAnimation
           as="div"
           {...titleAnimateProps}
           className={clsx(`${prefixCls}-title`, classNames?.title)}
+          style={styles?.title}
         >
           {title}
         </TypingAnimation>
       )}
 
-      {/* Description */}
       {description && (
         <TextAnimate
           as="div"
@@ -133,10 +143,15 @@ export const WelcomeMessage: React.FC<WelcomeMessageProps> = ({
           once
           {...descriptionAnimateProps}
           className={clsx(`${prefixCls}-description`, classNames?.description)}
+          style={styles?.description}
         >
           {description}
         </TextAnimate>
       )}
-    </div>,
+    </div>
   );
 };
+
+WelcomeMessageComponent.displayName = 'WelcomeMessage';
+
+export const WelcomeMessage = React.memo(WelcomeMessageComponent);

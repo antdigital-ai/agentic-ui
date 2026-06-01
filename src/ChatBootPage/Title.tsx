@@ -35,21 +35,24 @@ const TitleComponent: React.FC<TitleProps> = ({
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-chatboot-title', customPrefixCls);
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
-  // 使用提前返回优化
   if (!title && !subtitle) {
-    return null;
+    return <></>;
   }
 
   const mainCls = classNames(`${prefixCls}-main`, hashId);
   const subtitleCls = classNames(`${prefixCls}-subtitle`, hashId);
 
-  return wrapSSR(
-    <div className={classNames(prefixCls, hashId, className)} style={style}>
+  return (
+    <div
+      className={classNames(prefixCls, hashId, className)}
+      data-testid="agentic-chatboot-title"
+      style={style}
+    >
       {title && <div className={mainCls}>{title}</div>}
       {subtitle && <div className={subtitleCls}>{subtitle}</div>}
-    </div>,
+    </div>
   );
 };
 

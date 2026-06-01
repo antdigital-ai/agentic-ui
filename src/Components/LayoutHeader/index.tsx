@@ -82,7 +82,7 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = ({
   const { locale } = useContext(I18nContext);
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('layout-header');
-  const { wrapSSR, hashId } = useLayoutHeaderStyle(prefixCls);
+  const { hashId } = useLayoutHeaderStyle(prefixCls);
 
   // 使用 useMergedState 管理左侧折叠状态
   const [leftCollapsed, setLeftCollapsed] = useMergedState(
@@ -118,8 +118,11 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = ({
     onShare?.();
   };
 
-  return wrapSSR(
-    <div className={classNames(prefixCls, hashId, className)}>
+  return (
+    <div
+      className={classNames(prefixCls, hashId, className)}
+      data-testid={prefixCls}
+    >
       {/* 左侧区域：标题和左侧折叠按钮 */}
       <div className={classNames(`${prefixCls}-left`, hashId)}>
         {leftCollapsible && (
@@ -166,7 +169,7 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = ({
         )}
         {rightExtra}
       </div>
-    </div>,
+    </div>
   );
 };
 

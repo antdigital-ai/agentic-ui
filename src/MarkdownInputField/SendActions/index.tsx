@@ -9,10 +9,12 @@ import type { AttachmentButtonProps } from '../AttachmentButton';
 import { AttachmentButton } from '../AttachmentButton';
 import type { AttachmentFile } from '../AttachmentButton/types';
 import type { SendButtonCustomizationProps } from '../SendButton';
-import { SendButton } from '../SendButton';
+import { SendButton, resolveSendDisabled } from '../SendButton';
+import { MARKDOWN_INPUT_FIELD_TEST_IDS } from '../testIds';
+import type { FileUploadStatus, FileUploadSummary } from '../types/shared';
+import type { ActionsSlotState } from '../types/slots';
 import type { CreateRecognizer } from '../VoiceInput';
 import { VoiceInputButton } from '../VoiceInput';
-import { MARKDOWN_INPUT_FIELD_TEST_IDS } from '../testIds';
 
 export interface SendActionsProps {
   /** 附件配置 */
@@ -44,15 +46,10 @@ export interface SendActionsProps {
   fileUploadDone?: boolean;
 
   /** 文件上传状态 */
-  fileUploadStatus?: 'uploading' | 'done' | 'error';
+  fileUploadStatus?: FileUploadStatus;
 
   /** 文件上传状态统计 */
-  fileUploadSummary?: {
-    totalCount: number;
-    doneCount: number;
-    uploadingCount: number;
-    errorCount: number;
-  };
+  fileUploadSummary?: FileUploadSummary;
 
   /** 是否正在录音 */
   recording?: boolean;
@@ -78,9 +75,14 @@ export interface SendActionsProps {
   /** 停止操作回调 */
   onStop?: () => void;
 
-  /** 自定义渲染函数 */
+  /**
+   * 自定义渲染函数
+   *
+   * 入参为 {@link ActionsSlotState}（与公开 API
+   * `MarkdownInputFieldProps.actionsRender` 同签名）。
+   */
   actionsRender?: (
-    props: any,
+    state: ActionsSlotState,
     defaultActions: React.ReactNode[],
   ) => React.ReactNode[];
 
@@ -135,6 +137,7 @@ export const SendActions: React.FC<SendActionsProps> = ({
   triggerSendKey,
 }) => {
   const fileMap = attachment?.fileMap;
+  const sendDisabled = resolveSendDisabled(sendButtonProps, fileUploadStatus);
 
   const defaultActionsLen = [
     attachment?.enable ? '()' : null,
@@ -187,7 +190,6 @@ export const SendActions: React.FC<SendActionsProps> = ({
           (fileMap && fileMap.size > 0) ||
           recording
         }
-        disabled={disabled}
         onClick={() => {
           if (typing || isLoading) {
             onStop?.();
@@ -197,11 +199,13 @@ export const SendActions: React.FC<SendActionsProps> = ({
         }}
         triggerSendKey={triggerSendKey}
         {...sendButtonProps}
+        disabled={disabled || sendDisabled}
       />,
     ].filter(Boolean);
   }, [
     attachment,
     fileUploadDone,
+    sendDisabled,
     value,
     collapseSendActions,
     isLoading,
@@ -223,23 +227,19 @@ export const SendActions: React.FC<SendActionsProps> = ({
   const actionsList = actionsRender
     ? actionsRender(
         {
-          attachment,
-          voiceRecognizer,
+          // SlotRenderState 公共字段
           value,
-          disabled,
-          typing,
-          isLoading,
-          fileUploadDone,
-          recording,
-          collapseSendActions,
-          allowEmptySubmit,
-          uploadImage,
-          onStartRecording,
-          onStopRecording,
-          onSend,
-          onStop,
+          isHover: false,
+          isLoading: !!isLoading,
+          fileMap,
+          onFileMapChange: attachment?.onFileMapChange,
           fileUploadStatus,
           fileUploadSummary,
+          attachment,
+          disabled,
+          typing,
+          // ActionsSlotState 专属
+          collapseSendActions,
         },
         defaultActions,
       )

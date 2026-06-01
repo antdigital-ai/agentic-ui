@@ -171,10 +171,10 @@ const SuperInputCard: React.FC = () => {
               联网搜索
             </ToggleButton>,
           ]}
-          actionsRender={(props, defaultActions) => {
+          actionsRender={(state, defaultActions) => {
             return [
               <ActionIconBox
-                showTitle={props.collapseSendActions}
+                showTitle={state.collapseSendActions}
                 title="提示词库"
                 key="prompt"
                 style={{

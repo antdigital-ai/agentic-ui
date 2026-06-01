@@ -14,7 +14,6 @@ interface CodeContainerProps {
   onEditorClick: () => void;
   children: ReactNode;
   readonly?: boolean;
-  theme: string;
 }
 
 export function CodeContainer({
@@ -23,7 +22,6 @@ export function CodeContainer({
   hide,
   onEditorClick,
   children,
-  theme,
 }: CodeContainerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -54,17 +52,15 @@ export function CodeContainer({
         style={{
           padding: hide ? 1 : 1,
           marginBottom: hide ? 0 : undefined,
-          boxShadow: 'var(--shadow-control-base)',
-          borderRadius: 'var(--radius-card-base)',
+          boxShadow:
+            'var(--shadow-control-base, 0 1px 2px rgba(20, 22, 28, 0.06))',
+          borderRadius: 'var(--radius-card-base, 12px)',
           backgroundColor: showBorder
             ? 'rgba(59, 130, 246, 0.1)'
             : hide
               ? 'transparent'
-              : theme === 'chaos'
-                ? 'var(--color-gray-text-default)'
-                : 'rgb(252, 252, 252)',
-          color:
-            theme === 'chaos' ? '#FFFFFF' : 'var(--color-gray-text-default)',
+              : 'var(--color-gray-bg-page-light, #fafafa)',
+          color: 'var(--color-gray-text-default, rgba(20, 22, 28, 0.88))',
           height: hide ? 0 : 'auto',
           opacity: hide ? 0 : 1,
         }}

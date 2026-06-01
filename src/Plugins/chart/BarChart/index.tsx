@@ -1,4 +1,4 @@
-import { ConfigProvider } from 'antd';
+﻿import { ConfigProvider } from 'antd';
 import {
   BarElement,
   CategoryScale,
@@ -23,6 +23,7 @@ import {
   downloadChart,
 } from '../components';
 import { defaultColorList } from '../const';
+import { useChartTheme, useResolvedChartTheme } from '../hooks';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
 import type { ChartClassNames, ChartStyles } from '../types/classNames';
 import {
@@ -33,7 +34,6 @@ import {
   resolveCssVariable,
   toNumber,
 } from '../utils';
-import { useChartTheme } from '../hooks';
 import { useStyle } from './style';
 
 /**
@@ -201,7 +201,7 @@ const BarChart: React.FC<BarChartProps> = ({
   style,
   styles,
   dataTime,
-  theme = 'light',
+  theme,
   color,
   showLegend = true,
   legendPosition = 'bottom',
@@ -261,7 +261,7 @@ const BarChart: React.FC<BarChartProps> = ({
   // 样式注册
   const context = useContext(ConfigProvider.ConfigContext);
   const baseClassName = context?.getPrefixCls('bar-chart-container');
-  const { wrapSSR } = useStyle(baseClassName);
+  useStyle(baseClassName);
 
   const chartRef = useRef<ChartJS<'bar'>>(null);
 
@@ -631,8 +631,10 @@ const BarChart: React.FC<BarChartProps> = ({
     }));
   }, [filterLabels]);
 
+  const { resolvedTheme, autoDetectTheme } = useResolvedChartTheme(theme);
+
   // 使用 useChartTheme hook 获取主题相关颜色
-  const { axisTextColor, gridColor, isLight } = useChartTheme(theme);
+  const { axisTextColor, gridColor, isLight } = useChartTheme(resolvedTheme);
 
   // 标签宽度计算函数
   const calculateLabelWidth = (text: string, fontSize: number = 11): number => {
@@ -1007,18 +1009,19 @@ const BarChart: React.FC<BarChartProps> = ({
     ...styles?.wrapper,
   };
 
-  return wrapSSR(
+  return (
     <ChartContainer
       baseClassName={baseClassName}
       className={rootClassName}
-      theme={theme}
+      theme={resolvedTheme}
+      autoDetectTheme={autoDetectTheme}
       isMobile={isMobile}
       variant={variant}
       style={rootStyle}
     >
       <ChartToolBar
         title={title}
-        theme={theme}
+        theme={resolvedTheme}
         onDownload={handleDownload}
         extra={toolbarExtra}
         dataTime={dataTime}
@@ -1036,7 +1039,7 @@ const BarChart: React.FC<BarChartProps> = ({
                 selectedCustomSelection: selectedFilterLabel,
                 onSelectionChange: setSelectedFilterLabel,
               })}
-              theme={theme}
+              theme={resolvedTheme}
               variant="compact"
               className={filterClassName}
               style={filterStyle}
@@ -1051,7 +1054,7 @@ const BarChart: React.FC<BarChartProps> = ({
           style={statisticContainerStyle}
         >
           {statistics.map((config, index) => (
-            <ChartStatistic key={index} {...config} theme={theme} />
+            <ChartStatistic key={index} {...config} theme={resolvedTheme} />
           ))}
         </div>
       )}
@@ -1066,7 +1069,7 @@ const BarChart: React.FC<BarChartProps> = ({
             selectedCustomSelection: selectedFilterLabel,
             onSelectionChange: setSelectedFilterLabel,
           })}
-          theme={theme}
+          theme={resolvedTheme}
           className={filterClassName}
           style={filterStyle}
         />
@@ -1080,7 +1083,7 @@ const BarChart: React.FC<BarChartProps> = ({
           plugins={[ChartDataLabels]}
         />
       </div>
-    </ChartContainer>,
+    </ChartContainer>
   );
 };
 

@@ -1,11 +1,10 @@
 import {
-  ChatTokenType,
-  GenerateStyle,
+  genStyleHooks,
   resetComponent,
-  useEditorStyleRegister,
+  type GenStyleFn,
 } from '../../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'BubbleVoiceButton'> = (token) => {
   const playBoxSize = 28;
   const innerBoxSize = 24;
   return {
@@ -37,7 +36,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         alignItems: 'center',
         justifyContent: 'space-between',
         borderRadius: 6,
-        background: '#FFFFFF',
+        background: 'var(--color-gray-bg-card-white)',
         boxShadow: 'var(--shadow-control-base)',
         width: 86,
         height: 28,
@@ -82,10 +81,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
+const useGenStyle = genStyleHooks('BubbleVoiceButton', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+]);
+
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('VoiceButton', (token) => {
-    const cls = prefixCls ? `.${prefixCls}` : `${token.chatCls}-voice-button`;
-    const proChatToken = { ...token, componentCls: cls };
-    return [resetComponent(proChatToken), genStyle(proChatToken)];
-  });
+  const [, hashId] = useGenStyle(prefixCls ?? 'VoiceButton');
+  return { hashId };
 }

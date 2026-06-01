@@ -1,42 +1,54 @@
-import { CircleDashed, SuccessFill, X } from '@sofa-design/icons';
+﻿import { SuccessFill, X } from '@sofa-design/icons';
 import classNames from 'clsx';
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { Loading } from '../../Components/Loading';
-import { LOADING_SIZE } from '../constants';
+import { getTaskStatusStyleKey, LOADING_SIZE } from '../constants';
 import type { TaskStatus } from '../types';
 
 interface StatusIconProps {
   status: TaskStatus;
   prefixCls: string;
   hashId: string;
+  /**
+   * 覆盖根节点 `data-testid`（默认 `task-list-status-${status}`）
+   * @description simple 汇总条与列表项都会渲染状态图标，需区分时可传入独立 testid
+   */
+  statusTestId?: string;
 }
 
-export const StatusIcon: React.FC<StatusIconProps> = memo(
-  ({ status, prefixCls, hashId }) => {
-    const statusMap: Record<TaskStatus, React.ReactNode> = {
+const StatusIconComponent: React.FC<StatusIconProps> = ({
+  status,
+  prefixCls,
+  hashId,
+  statusTestId,
+}) => {
+  const styleKey = getTaskStatusStyleKey(status);
+
+  const statusContent = useMemo(() => {
+    if (styleKey === 'loading') {
+      return <Loading size={LOADING_SIZE} />;
+    }
+    const contentMap: Record<'success' | 'error', React.ReactNode> = {
       success: <SuccessFill />,
-      loading: <Loading size={LOADING_SIZE} />,
-      pending: (
-        <div className={classNames(`${prefixCls}-status-idle`, hashId)}>
-          <CircleDashed />
-        </div>
-      ),
       error: <X />,
     };
+    return contentMap[styleKey as 'success' | 'error'];
+  }, [styleKey]);
 
-    return (
-      <div
-        className={classNames(
-          `${prefixCls}-status`,
-          `${prefixCls}-status-${status}`,
-          hashId,
-        )}
-        data-testid={`task-list-status-${status}`}
-      >
-        {statusMap[status]}
-      </div>
-    );
-  },
-);
+  return (
+    <div
+      className={classNames(
+        `${prefixCls}-status`,
+        `${prefixCls}-status-${styleKey}`,
+        hashId,
+      )}
+      data-testid={statusTestId ?? `task-list-status-${status}`}
+    >
+      {statusContent}
+    </div>
+  );
+};
 
-StatusIcon.displayName = 'StatusIcon';
+StatusIconComponent.displayName = 'StatusIcon';
+
+export const StatusIcon = memo(StatusIconComponent);

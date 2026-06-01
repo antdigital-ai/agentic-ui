@@ -11,13 +11,10 @@ export const MermaidCodePreview = (props: { code: string }) => {
   const context = useContext(ConfigProvider.ConfigContext);
   const baseCls =
     context?.getPrefixCls('agentic-plugin-mermaid') || 'agentic-plugin-mermaid';
-  const { wrapSSR, hashId } = useStyle(baseCls);
+  const { hashId } = useStyle(baseCls);
 
-  return wrapSSR(
-    <div
-      className={classNames(baseCls, hashId)}
-      contentEditable={false}
-    >
+  return (
+    <div className={classNames(baseCls, hashId)} contentEditable={false}>
       <div className={classNames(`${baseCls}-empty`, hashId)}>
         <pre
           style={{
@@ -29,6 +26,6 @@ export const MermaidCodePreview = (props: { code: string }) => {
           {props.code}
         </pre>
       </div>
-    </div>,
+    </div>
   );
 };

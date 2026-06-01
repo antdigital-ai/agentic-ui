@@ -1,19 +1,16 @@
-import { ConfigProvider, Image, Input, Spin, Typography } from 'antd';
-
+import { ApartmentOutlined, BarsOutlined } from '@ant-design/icons';
 import {
-  ChevronDown as DownIcon,
-  Download as DownloadIcon,
-  Eye as EyeIcon,
-  Locate,
-  ChevronRight as RightIcon,
-  Search,
-  SquareArrowOutUpRight as ShareIcon,
-} from '@sofa-design/icons';
-import { Empty } from 'antd';
+  ConfigProvider,
+  Empty,
+  Image,
+  Segmented,
+  Spin,
+  Typography,
+} from 'antd';
 import classNames from 'clsx';
-import { AnimatePresence, motion } from 'framer-motion';
 import React, {
   type FC,
+  type ReactNode,
   useContext,
   useEffect,
   useMemo,
@@ -21,716 +18,56 @@ import React, {
   useState,
 } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
-import { ActionIconBox } from '../../Components/ActionIconBox';
 import { I18nContext, compileTemplate } from '../../I18n';
 import type { MarkdownEditorProps } from '../../MarkdownEditor';
-import type { FileNode, FileProps, FileType, GroupNode } from '../types';
-import { formatFileSize, formatLastModified } from '../utils';
-import { fileTypeProcessor, isImageFile } from './FileTypeProcessor';
+import type {
+  FileNode,
+  FilePanelViewMode,
+  FileProps,
+  FileType,
+  GroupNode,
+} from '../types';
+import { buildFileNodeRelativePathIndex } from './buildFileNodeRelativePathIndex';
+import {
+  FileGroup,
+  GROUP_INITIAL_PAGE_SIZE,
+  GROUP_PAGE_SIZE_INCREMENT,
+} from './components/FileGroup';
+import { FileItem } from './components/FileItem';
+import { SearchInput } from './components/SearchInput';
+import { FileTree } from './FileTree';
+import { isImageFile } from './FileTypeProcessor';
+import {
+  getPreviewSource,
+  handleDefaultShare,
+  handleFileDownload,
+} from './handlers';
 import { PreviewComponent } from './PreviewComponent';
 import { useFileStyle } from './style';
-import { generateUniqueId, getFileTypeIcon, getGroupIcon } from './utils';
+import { generateUniqueId } from './utils';
 
-/** Initial number of files shown per group before "show more" */
-const GROUP_INITIAL_PAGE_SIZE = 50;
-/** Number of additional files revealed per "show more" click */
-const GROUP_PAGE_SIZE_INCREMENT = 100;
+/**
+ * 检查 onPreview 返回值是否是 FileNode（最小可信判定：是非 ReactElement 的对象 + 含 `name` 字符串字段）
+ */
+const isFileNodeReturn = (value: unknown): value is FileNode => {
+  if (!value || typeof value !== 'object') return false;
+  if (React.isValidElement(value as object)) return false;
+  return typeof (value as { name?: unknown }).name === 'string';
+};
 
-// 通用的键盘事件处理函数
-const handleKeyboardEvent = (
-  e: React.KeyboardEvent,
-  callback: (e: any) => void,
-) => {
-  if (e.key === 'Enter' || e.key === ' ') {
-    callback(e);
+const toSegmentAccessibleName = (
+  raw: ReactNode | undefined,
+  fallback: string,
+): string => {
+  if (typeof raw === 'string' || typeof raw === 'number') {
+    return String(raw);
   }
+  return fallback;
 };
 
-// 通用的下载处理函数
-const handleFileDownload = (file: FileNode) => {
-  let blobUrl: string | null = null;
-
-  try {
-    // 创建下载链接
-    const link = document.createElement('a');
-
-    if (file.url) {
-      // 使用url作为下载链接
-      link.href = file.url;
-    } else if (file.content) {
-      // 使用文件内容创建 Blob 对象
-      const blob = new Blob([file.content], { type: 'text/plain' });
-      blobUrl = URL.createObjectURL(blob);
-      link.href = blobUrl;
-    } else if (file.file instanceof File || file.file instanceof Blob) {
-      // 处理 File 或 Blob 对象
-      blobUrl = URL.createObjectURL(file.file);
-      link.href = blobUrl;
-    } else {
-      return; // 没有可下载的内容
-    }
-
-    // 设置文件名（如果是 File 对象且没有指定文件名，使用 File 对象的名称）
-    link.download =
-      file.name || (file.file instanceof File ? file.file.name : '');
-
-    // 执行下载
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  } finally {
-    // 清理 Blob URL
-    if (blobUrl) {
-      URL.revokeObjectURL(blobUrl);
-    }
-  }
-};
-
-// 通用的默认分享处理函数
-const handleDefaultShare = async (file: FileNode) => {
-  try {
-    const shareUrl = file.url || file.previewUrl || window.location.href;
-    await navigator.clipboard.writeText(shareUrl);
-  } catch (error) {
-    // 复制失败时静默处理
-  }
-};
-
-// 确保节点有唯一ID的辅助函数
-const ensureNodeWithId = <T extends FileNode | GroupNode>(node: T): T => ({
-  ...node,
-  id: node.id || generateUniqueId(node),
-});
-
-// 获取文件预览源的辅助函数
-const getPreviewSource = (file: FileNode): string => {
-  return file.previewUrl || file.url || '';
-};
-
-// 通用的可访问按钮组件
-interface AccessibleButtonProps {
-  icon: React.ReactNode;
-  onClick: (e: React.MouseEvent) => void;
-  className?: string;
-  ariaLabel: string;
-  id?: string;
-}
-
-const AccessibleButton: FC<AccessibleButtonProps> = ({
-  icon,
-  onClick,
-  className,
-  ariaLabel,
-  id,
-}) => (
-  <div
-    id={id}
-    className={className}
-    onClick={onClick}
-    role="button"
-    tabIndex={0}
-    onKeyDown={(e) => handleKeyboardEvent(e, onClick)}
-    aria-label={ariaLabel}
-  >
-    {icon}
-  </div>
-);
-
-// 搜索框组件 - 确保在所有渲染路径中保持一致
-interface SearchInputProps {
-  keyword?: string;
-  onChange?: (keyword: string) => void;
-  searchPlaceholder?: string;
-  prefixCls: string;
-  hashId: string;
-  locale?: any;
-}
-
-const SearchInput: FC<SearchInputProps> = React.memo(
-  ({ keyword, onChange, searchPlaceholder, prefixCls, hashId, locale }) => {
-    const inputRef = useRef<any>(null);
-
-    return (
-      <div className={classNames(`${prefixCls}-search`, hashId)}>
-        <Input
-          ref={inputRef}
-          key="file-search-input" // 添加稳定的 key
-          allowClear
-          placeholder={
-            searchPlaceholder ||
-            locale?.['workspace.searchPlaceholder'] ||
-            '搜索文件名'
-          }
-          prefix={<Search />}
-          value={keyword ?? ''}
-          onChange={(e) => onChange?.(e.target.value)}
-        />
-      </div>
-    );
-  },
-);
-
-SearchInput.displayName = 'SearchInput';
-
-// 文件项组件
-const FileItemComponent: FC<{
-  file: FileNode;
-  onClick?: (file: FileNode) => void;
-  onDownload?: (file: FileNode) => void;
-  onPreview?: (file: FileNode) => void;
-  onShare?: (
-    file: FileNode,
-    ctx?: { anchorEl?: HTMLElement; origin: 'list' | 'preview' },
-  ) => void;
-  onLocate?: (file: FileNode) => void;
-  prefixCls: string;
-  hashId: string;
-  locale?: any;
-  /** 是否在元素上绑定 id（默认 false） */
-  bindDomId?: boolean;
-}> = React.memo(({
-  file,
-  onClick,
-  onDownload,
-  onPreview,
-  onShare,
-  onLocate,
-  prefixCls,
-  hashId,
-  locale,
-  bindDomId = false,
-}) => {
-  // 确保文件有唯一ID
-  const fileWithId = ensureNodeWithId(file);
-  const fileTypeInfo = fileTypeProcessor.inferFileType(fileWithId);
-
-  // 禁用状态
-  const isDisabled = fileWithId.disabled === true;
-
-  const handleClick = () => {
-    // 禁用状态下不响应点击
-    if (isDisabled) return;
-
-    // 如果有传入 onClick 事件，优先使用
-    if (onClick) {
-      onClick(fileWithId);
-      return;
-    }
-
-    // 如果没有传入 onClick 事件，默认打开预览页面
-    if (onPreview) {
-      onPreview(fileWithId);
-    }
-  };
-
-  // 判断是否显示下载按钮：优先使用用户 canDownload；否则当存在 onDownload/url/content/file 时显示
-  const showDownloadButton = (() => {
-    if (fileWithId.canDownload !== undefined) {
-      return fileWithId.canDownload;
-    }
-    return Boolean(
-      onDownload || fileWithId.url || fileWithId.content || fileWithId.file,
-    );
-  })();
-
-  const handleDownload = (e: React.MouseEvent) => {
-    e.stopPropagation();
-
-    // 优先使用用户传入的下载方法
-    if (onDownload) {
-      onDownload(fileWithId);
-      return;
-    }
-
-    handleFileDownload(fileWithId);
-  };
-
-  const handlePreview = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onPreview?.(fileWithId);
-  };
-
-  const handleShare = (e: React.MouseEvent) => {
-    e.stopPropagation();
-
-    // 如果有自定义的分享方法，优先使用
-    if (onShare) {
-      onShare(fileWithId, {
-        anchorEl: e.currentTarget as HTMLElement,
-        origin: 'list',
-      });
-      return;
-    }
-
-    // 使用默认分享行为
-    handleDefaultShare(fileWithId);
-  };
-
-  // 判断是否显示预览按钮：
-  // 1. 如果用户设置了 canPreview，优先使用用户的设置
-  // 2. 如果没有设置，则使用系统默认逻辑：图片类型有 url 就可以预览；其他类型按原有逻辑判断
-  const showPreviewButton = (() => {
-    // 如果用户明确设置了 canPreview，直接使用用户设置
-    if (fileWithId.canPreview !== undefined) {
-      return fileWithId.canPreview;
-    }
-
-    // 否则使用系统默认逻辑
-    return (
-      onPreview &&
-      (isImageFile(fileWithId)
-        ? !!(fileWithId.url || fileWithId.previewUrl)
-        : fileTypeProcessor.processFile(fileWithId).canPreview)
-    );
-  })();
-
-  const showShareButton = fileWithId.canShare === true;
-
-  const showLocationButton = fileWithId.canLocate === true;
-
-  const handleLocate = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onLocate?.(fileWithId);
-  };
-
-  // 内置操作按钮
-  const actionBtnClass = classNames(
-    `${prefixCls}-item-action-btn`,
-    hashId,
-  );
-
-  const builtinActions = {
-    preview: showPreviewButton ? (
-      <ActionIconBox
-        key="preview"
-        title={locale?.['workspace.file.preview'] || '预览'}
-        onClick={handlePreview}
-        tooltipProps={{ mouseEnterDelay: 0.3 }}
-        className={actionBtnClass}
-      >
-        <EyeIcon />
-      </ActionIconBox>
-    ) : null,
-    locate: showLocationButton ? (
-      <ActionIconBox
-        key="locate"
-        title={locale?.['workspace.file.location'] || '定位'}
-        onClick={handleLocate}
-        tooltipProps={{ mouseEnterDelay: 0.3 }}
-        className={actionBtnClass}
-      >
-        <Locate />
-      </ActionIconBox>
-    ) : null,
-    share: showShareButton ? (
-      <ActionIconBox
-        key="share"
-        title={locale?.['workspace.file.share'] || '分享'}
-        onClick={handleShare}
-        tooltipProps={{ mouseEnterDelay: 0.3 }}
-        className={actionBtnClass}
-      >
-        <ShareIcon />
-      </ActionIconBox>
-    ) : null,
-    download: showDownloadButton ? (
-      <ActionIconBox
-        key="download"
-        title={locale?.['workspace.file.download'] || '下载'}
-        onClick={handleDownload}
-        tooltipProps={{ mouseEnterDelay: 0.3 }}
-        className={actionBtnClass}
-      >
-        <DownloadIcon />
-      </ActionIconBox>
-    ) : null,
-  };
-
-  // 自定义渲染上下文
-  const renderContext = {
-    file: fileWithId,
-    prefixCls,
-    hashId,
-    disabled: isDisabled,
-    actions: builtinActions,
-  };
-
-  return (
-    <AccessibleButton
-      icon={
-        <>
-          <div className={classNames(`${prefixCls}-item-icon`, hashId)}>
-            {getFileTypeIcon(
-              fileTypeInfo.fileType,
-              fileWithId.icon,
-              fileWithId.name,
-            )}
-          </div>
-          <div className={classNames(`${prefixCls}-item-info`, hashId)}>
-            <div className={classNames(`${prefixCls}-item-name`, hashId)}>
-              {fileWithId.renderName ? (
-                fileWithId.renderName(renderContext)
-              ) : (
-                <Typography.Text ellipsis={{ tooltip: fileWithId.name }}>
-                  {fileWithId.name}
-                </Typography.Text>
-              )}
-            </div>
-            {(fileWithId.renderDetails ||
-            fileTypeInfo.displayType ||
-            fileWithId.size ||
-            fileWithId.lastModified) && (
-            <div
-              className={classNames(`${prefixCls}-item-details`, hashId)}
-            >
-              {fileWithId.renderDetails ? (
-                fileWithId.renderDetails(renderContext)
-              ) : (
-                <Typography.Text type="secondary" ellipsis>
-                  {fileTypeInfo.displayType && (
-                    <span
-                      className={classNames(
-                        `${prefixCls}-item-type`,
-                        hashId,
-                      )}
-                    >
-                      {fileTypeInfo.displayType}
-                    </span>
-                  )}
-                  {fileWithId.size && (
-                    <>
-                      {fileTypeInfo.displayType && (
-                        <span
-                          className={classNames(
-                            `${prefixCls}-item-separator`,
-                            hashId,
-                          )}
-                        >
-                          |
-                        </span>
-                      )}
-                      <span
-                        className={classNames(
-                          `${prefixCls}-item-size`,
-                          hashId,
-                        )}
-                      >
-                        {formatFileSize(fileWithId.size)}
-                      </span>
-                    </>
-                  )}
-                  {fileWithId.lastModified && (
-                    <>
-                      {(fileTypeInfo.displayType || fileWithId.size) && (
-                        <span
-                          className={classNames(
-                            `${prefixCls}-item-separator`,
-                            hashId,
-                          )}
-                        >
-                          |
-                        </span>
-                      )}
-                      <span
-                        className={classNames(
-                          `${prefixCls}-item-time`,
-                          hashId,
-                        )}
-                      >
-                        {formatLastModified(fileWithId.lastModified)}
-                      </span>
-                    </>
-                  )}
-                </Typography.Text>
-              )}
-            </div>
-          )}
-          </div>
-          <div
-            className={classNames(`${prefixCls}-item-actions`, hashId)}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {fileWithId.renderActions ? (
-              fileWithId.renderActions(renderContext)
-            ) : !isDisabled ? (
-              <>
-                {builtinActions.preview}
-                {builtinActions.locate}
-                {builtinActions.share}
-                {builtinActions.download}
-              </>
-            ) : null}
-          </div>
-        </>
-      }
-      onClick={handleClick}
-      className={classNames(
-        `${prefixCls}-item`,
-        { [`${prefixCls}-item-disabled`]: isDisabled },
-        hashId,
-      )}
-      ariaLabel={`${locale?.['workspace.file'] || '文件'}：${fileWithId.name}`}
-      id={bindDomId ? fileWithId.id : undefined}
-    />
-  );
-});
-
-// 分组标题栏组件
-const GroupHeader: FC<{
-  group: GroupNode;
-  onToggle?: (groupId: string, type: FileType, collapsed: boolean) => void;
-  onGroupDownload?: (files: FileNode[], groupType: FileType) => void;
-  prefixCls: string;
-  hashId: string;
-  locale?: any;
-}> = React.memo(({ group, onToggle, onGroupDownload, prefixCls, hashId, locale }) => {
-  const groupTypeInfo = fileTypeProcessor.inferFileType(group);
-  const groupType = group.type || groupTypeInfo.fileType;
-
-  const handleToggle = () => {
-    onToggle?.(group.id!, groupType, !group.collapsed);
-  };
-
-  const handleDownload = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onGroupDownload?.(group.children, groupType);
-  };
-
-  const CollapseIcon = group.collapsed ? RightIcon : DownIcon;
-
-  // 获取分组图标
-  const groupIcon = getGroupIcon(group, groupType, group.icon);
-
-  // 判断是否显示下载按钮：优先使用用户 canDownload；否则当存在 onGroupDownload 时显示
-  const showDownloadButton = (() => {
-    if (group.canDownload !== undefined) {
-      return group.canDownload;
-    }
-    if (!onGroupDownload) {
-      return false;
-    }
-    // 如果组内所有文件都明确禁止下载，则不显示分组下载
-    return group.children.some(
-      (child) =>
-        child.canDownload === true ||
-        (child.canDownload !== false &&
-          Boolean(child.url || child.content || child.file)),
-    );
-  })();
-
-  return (
-    <AccessibleButton
-      icon={
-        <>
-          <div
-            className={classNames(
-              `${prefixCls}-group-header-left`,
-              hashId,
-            )}
-          >
-            <CollapseIcon
-              className={classNames(
-                `${prefixCls}-group-toggle-icon`,
-                hashId,
-              )}
-            />
-            <div
-              className={classNames(
-                `${prefixCls}-group-type-icon`,
-                hashId,
-              )}
-            >
-              {groupIcon}
-            </div>
-            <span
-              className={classNames(
-                `${prefixCls}-group-type-name`,
-                hashId,
-              )}
-            >
-              {group.name}
-            </span>
-          </div>
-          <div
-            className={classNames(
-              `${prefixCls}-group-header-right`,
-              hashId,
-            )}
-          >
-            <span
-              className={classNames(`${prefixCls}-group-count`, hashId)}
-            >
-              {group.children.length}
-            </span>
-            {showDownloadButton && (
-              <ActionIconBox
-                title={locale?.['workspace.file.download'] || '下载'}
-                onClick={handleDownload}
-                tooltipProps={{ mouseEnterDelay: 0.3 }}
-                className={classNames(
-                  `${prefixCls}-group-action-btn`,
-                  hashId,
-                )}
-              >
-                <DownloadIcon />
-              </ActionIconBox>
-            )}
-          </div>
-        </>
-      }
-      onClick={handleToggle}
-      className={classNames(`${prefixCls}-group-header`, hashId)}
-      ariaLabel={`${group.collapsed ? locale?.['workspace.expand'] || '展开' : locale?.['workspace.collapse'] || '收起'}${group.name}${locale?.['workspace.group'] || '分组'}`}
-    />
-  );
-});
-
-// 文件分组组件
-const FileGroupComponent: FC<{
-  group: GroupNode;
-  onToggle?: (groupId: string, type: FileType, collapsed: boolean) => void;
-  onGroupDownload?: (files: FileNode[], groupType: FileType) => void;
-  onDownload?: (file: FileNode) => void;
-  onFileClick?: (file: FileNode) => void;
-  onPreview?: (file: FileNode) => void;
-  onShare?: (
-    file: FileNode,
-    ctx?: { anchorEl?: HTMLElement; origin: 'list' | 'preview' },
-  ) => void;
-  onLocate?: (file: FileNode) => void;
-  prefixCls: string;
-  hashId: string;
-  locale?: any;
-  bindDomId?: boolean;
-}> = React.memo(({
-  group,
-  onToggle,
-  onGroupDownload,
-  onDownload,
-  onFileClick,
-  onPreview,
-  onShare,
-  onLocate,
-  prefixCls,
-  hashId,
-  locale,
-  bindDomId,
-}) => {
-  const [visibleCount, setVisibleCount] = useState(GROUP_INITIAL_PAGE_SIZE);
-
-  // 分组数据变化时重置分页，避免切换数据源后一次性展示过多节点
-  useEffect(() => {
-    setVisibleCount(GROUP_INITIAL_PAGE_SIZE);
-  }, [group.id, group.children.length]);
-
-  const totalCount = group.children.length;
-  const visibleFiles = group.children.slice(0, visibleCount);
-  const remainingCount = totalCount - visibleCount;
-  const hasMore = remainingCount > 0;
-
-  const handleShowMore = useRefFunction((e: React.MouseEvent) => {
-    e.stopPropagation();
-    setVisibleCount((prev) => prev + GROUP_PAGE_SIZE_INCREMENT);
-  });
-
-  const handleShowMoreKeyDown = useRefFunction((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      e.stopPropagation();
-      setVisibleCount((prev) => prev + GROUP_PAGE_SIZE_INCREMENT);
-    }
-  });
-
-  const contentVariants = useMemo(
-    () => ({
-      expanded: {
-        height: 'auto',
-        opacity: 1,
-      },
-      collapsed: {
-        height: 0,
-        opacity: 0,
-      },
-    }),
-    [],
-  );
-
-  const contentTransition = useMemo(
-    () => ({
-      height: {
-        duration: 0.26,
-        ease: [0.4, 0, 0.2, 1],
-      },
-      opacity: {
-        duration: 0.2,
-        ease: 'linear',
-      },
-    }),
-    [],
-  );
-
-  const showMoreLabel = hasMore
-    ? compileTemplate(
-        locale?.['workspace.file.showMore'] || '查看更多（还有 ${count} 个）',
-        { count: String(remainingCount) },
-      )
-    : (locale?.['workspace.file.showMoreFiles'] || '查看更多文件');
-
-  return (
-    <div className={classNames(`${prefixCls}-container--group`, hashId)}>
-      <GroupHeader
-        group={group}
-        onToggle={onToggle}
-        onGroupDownload={onGroupDownload}
-        prefixCls={prefixCls}
-        hashId={hashId}
-        locale={locale}
-      />
-      <AnimatePresence initial={false}>
-        {!group.collapsed && (
-          <motion.div
-            key="group-content"
-            variants={contentVariants}
-            initial="collapsed"
-            animate="expanded"
-            exit="collapsed"
-            transition={contentTransition}
-            className={classNames(`${prefixCls}-group-content`, hashId)}
-          >
-            {visibleFiles.map((file) => (
-              <FileItemComponent
-                key={file.id}
-                file={file}
-                onClick={onFileClick}
-                onDownload={onDownload}
-                onPreview={onPreview}
-                onShare={onShare}
-                onLocate={onLocate}
-                prefixCls={prefixCls}
-                hashId={hashId}
-                locale={locale}
-                bindDomId={!!bindDomId}
-              />
-            ))}
-            {hasMore && (
-              <div
-                role="button"
-                tabIndex={0}
-                className={classNames(`${prefixCls}-show-more`, hashId)}
-                onClick={handleShowMore}
-                onKeyDown={handleShowMoreKeyDown}
-                aria-label={showMoreLabel}
-              >
-                {showMoreLabel}
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-});
-
+/**
+ * 文件主组件：列表 / 分组 / 搜索 / 预览路由 + 渐进展示 + actionRef
+ */
 export const FileComponent: FC<{
   nodes: FileProps['nodes'];
   onGroupDownload?: FileProps['onGroupDownload'];
@@ -738,43 +75,34 @@ export const FileComponent: FC<{
   onShare?: FileProps['onShare'];
   onFileClick?: FileProps['onFileClick'];
   onLocate?: FileProps['onLocate'];
-  /**
-   * Group 子组件切换事件
-   * @deprecated @since 2.29.0 请使用 onGroupToggle 替代（符合命名规范）
-   */
+  /** @deprecated @since 2.29.0 请使用 onGroupToggle 替代 */
   onToggleGroup?: FileProps['onToggleGroup'];
-  /** Group 子组件切换事件 */
   onGroupToggle?: FileProps['onGroupToggle'];
   onPreview?: FileProps['onPreview'];
   onBack?: FileProps['onBack'];
   /** 重置标识，用于重置预览状态（内部使用） */
   resetKey?: FileProps['resetKey'];
-  /**
-   * MarkdownEditor 的配置项，用于自定义预览效果
-   * @description 这里的配置会覆盖默认的预览配置
-   */
   markdownEditorProps?: Partial<
     Omit<MarkdownEditorProps, 'editorRef' | 'initValue' | 'readonly'>
   >;
-  /**
-   * 自定义预览页面右侧操作区域
-   * @description 可以是 ReactNode 或者根据文件返回 ReactNode 的函数
-   */
   customActions?: React.ReactNode | ((file: FileNode) => React.ReactNode);
   actionRef?: FileProps['actionRef'];
+  /**
+   * @deprecated @since 2.29.0 请使用 isLoading 代替
+   */
   loading?: FileProps['loading'];
+  isLoading?: FileProps['isLoading'];
   loadingRender?: FileProps['loadingRender'];
   emptyRender?: FileProps['emptyRender'];
   /** 搜索关键字（受控） */
   keyword?: string;
-  /** 搜索关键字变化回调 */
   onChange?: (keyword: string) => void;
-  /** 是否显示搜索框，默认显示 */
+  /** 是否显示搜索框，默认不显示 */
   showSearch?: boolean;
-  /** 搜索框占位符 */
   searchPlaceholder?: string;
-  /** 是否在元素上绑定 DOM id（默认 false） */
+  searchPlaceholderTree?: string;
   bindDomId?: FileProps['bindDomId'];
+  fileTreeSwitch?: FileProps['fileTreeSwitch'];
 }> = ({
   nodes,
   onGroupDownload,
@@ -790,78 +118,88 @@ export const FileComponent: FC<{
   markdownEditorProps,
   customActions,
   actionRef,
-  loading,
+  loading: loadingProp,
+  isLoading,
   loadingRender,
   emptyRender,
   keyword,
   onChange,
   showSearch = false,
   searchPlaceholder,
+  searchPlaceholderTree,
   bindDomId = false,
+  fileTreeSwitch,
 }) => {
   const [previewFile, setPreviewFile] = useState<FileNode | null>(null);
   const [customPreviewContent, setCustomPreviewContent] =
     useState<React.ReactNode | null>(null);
   const [customPreviewHeader, setCustomPreviewHeader] =
     useState<React.ReactNode | null>(null);
-  // 标题区域文件信息覆盖，仅影响展示
   const [headerFileOverride, setHeaderFileOverride] =
     useState<Partial<FileNode> | null>(null);
   const [imagePreview, setImagePreview] = useState<{
     visible: boolean;
     src: string;
   }>({ visible: false, src: '' });
-  // 添加内部状态来管理分组的折叠状态
   const [collapsedGroups, setCollapsedGroups] = useState<
     Record<string, boolean>
   >({});
-  // 扁平文件列表（非分组模式）分页状态
-  const [flatVisibleCount, setFlatVisibleCount] = useState(GROUP_INITIAL_PAGE_SIZE);
+  const [flatVisibleCount, setFlatVisibleCount] = useState(
+    GROUP_INITIAL_PAGE_SIZE,
+  );
+  const [innerPanelView, setInnerPanelView] = useState<FilePanelViewMode>(
+    () => fileTreeSwitch?.defaultView ?? 'list',
+  );
 
-  // nodes 或 keyword 变化时重置扁平列表分页，避免切换数据源后一次性渲染过多节点
+  const isControlledPanelView = fileTreeSwitch?.view !== undefined;
+  const panelView: FilePanelViewMode = fileTreeSwitch
+    ? isControlledPanelView
+      ? (fileTreeSwitch.view as FilePanelViewMode)
+      : innerPanelView
+    : 'list';
+
+  // nodes / keyword 变化时重置扁平列表分页
   useEffect(() => {
     setFlatVisibleCount(GROUP_INITIAL_PAGE_SIZE);
   }, [nodes, keyword]);
 
-  // 追踪预览请求的序号，避免异步竞态
+  // 异步预览请求序号，避免竞态
   const previewRequestIdRef = useRef(0);
-  // 缓存节点 ID，避免每次渲染重新生成（使用 WeakMap 自动清理不再使用的节点）
+  // 节点 ID 缓存：WeakMap 自动回收，避免每次渲染重生成
   const nodeIdCacheRef = useRef<WeakMap<FileNode | GroupNode, string>>(
     new WeakMap(),
   );
 
   const safeNodes = nodes || [];
+  const fileNodeByRelativePath = useMemo(
+    () => buildFileNodeRelativePathIndex(safeNodes),
+    [safeNodes],
+  );
+  // 优先使用 isLoading，向后兼容 loading
+  const loading = isLoading ?? loadingProp;
 
-  // 使用 ConfigProvider 获取前缀类名
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const { locale } = useContext(I18nContext);
   const prefixCls = getPrefixCls('workspace-file');
+  const { hashId } = useFileStyle(prefixCls);
 
-  const { wrapSSR, hashId } = useFileStyle(prefixCls);
+  // 注入稳定 ID（基于 WeakMap 缓存）
+  const ensureNodeWithStableId = useRefFunction(
+    <T extends FileNode | GroupNode>(node: T): T => {
+      if (node.id) return { ...node };
 
-  // 确保节点有稳定的唯一 ID（使用缓存）
-  const ensureNodeWithStableId = useRefFunction(<T extends FileNode | GroupNode>(
-    node: T,
-  ): T => {
-    if (node.id) return { ...node };
+      let cachedId = nodeIdCacheRef.current.get(node);
+      if (!cachedId) {
+        cachedId = generateUniqueId(node);
+        nodeIdCacheRef.current.set(node, cachedId);
+      }
 
-    // 尝试从缓存获取 ID
-    let cachedId = nodeIdCacheRef.current.get(node);
-    if (!cachedId) {
-      // 生成新 ID 并缓存
-      cachedId = generateUniqueId(node);
-      nodeIdCacheRef.current.set(node, cachedId);
-    }
+      return { ...node, id: cachedId };
+    },
+  );
 
-    return {
-      ...node,
-      id: cachedId,
-    };
-  });
-
-  // 返回列表（供预览页调用）
+  // 返回列表（供预览页/外部调用）
   const handleBackToList = useRefFunction(() => {
-    // 使进行中的预览请求失效
     previewRequestIdRef.current++;
     setPreviewFile(null);
     setCustomPreviewContent(null);
@@ -869,110 +207,94 @@ export const FileComponent: FC<{
     setHeaderFileOverride(null);
   });
 
-  // 监听 resetKey 变化，重置预览状态
+  // resetKey 变化 → 重置预览（仅依赖 resetKey；勿依赖 previewFile，否则 onPreview 将 previewFile 从 null 置为有值时会再跑一遍 effect，在 resetKey 已为 0 等合法值时误触发返回列表）
   useEffect(() => {
-    if (resetKey !== undefined && previewFile) {
-      // 当 resetKey 变化且当前处于预览状态时，重置预览状态
-      handleBackToList();
-    }
-  }, [resetKey]);
+    if (resetKey === undefined) return;
+    handleBackToList();
+  }, [resetKey, handleBackToList]);
 
-  // 监听 nodes 变化，同步更新 previewFile
+  // nodes 变化 → 同步更新 previewFile（保持预览内容跟随外部数据）
   useEffect(() => {
     if (!previewFile) return;
 
-    // 在所有节点中查找与当前预览文件匹配的文件
     const findUpdatedFile = (
       nodesList: (FileNode | GroupNode)[],
     ): FileNode | null => {
       for (const node of nodesList) {
         if ('children' in node) {
-          // 分组节点，递归查找子节点
           const found = findUpdatedFile(node.children);
           if (found) return found;
-        } else {
-          // 文件节点，比较 ID 或文件引用
-          if (
-            (node.id && node.id === previewFile.id) ||
-            (node.name === previewFile.name && node.type === previewFile.type)
-          ) {
-            return node;
-          }
+        } else if (
+          (node.id && node.id === previewFile.id) ||
+          (node.name === previewFile.name && node.type === previewFile.type)
+        ) {
+          return node;
         }
       }
       return null;
     };
 
     const updatedFile = findUpdatedFile(safeNodes);
-
-    // 如果找到了更新的文件，更新 previewFile
     if (updatedFile) {
       setPreviewFile(updatedFile);
     }
-  }, [nodes]);
+    // 故意使用 nodes 而非 safeNodes 作为依赖：safeNodes 每次渲染都是新引用
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nodes, previewFile?.id, previewFile?.name, previewFile?.type]);
 
-  // 处理分组折叠/展开
-  const handleToggleGroup = useRefFunction((
-    groupId: string,
-    type: FileType,
-    collapsed: boolean,
-  ) => {
-    // 更新内部状态，使用 groupId 作为 key
-    setCollapsedGroups((prev) => ({
-      ...prev,
-      [groupId]: collapsed,
-    }));
-    // 优先使用新的事件名，保持向后兼容
-    if (onGroupToggle) {
-      onGroupToggle(type, collapsed);
-    } else if (onToggleGroup) {
-      onToggleGroup(type, collapsed);
-    }
-  });
+  // 分组折叠/展开
+  const handleToggleGroup = useRefFunction(
+    (groupId: string, type: FileType, collapsed: boolean) => {
+      setCollapsedGroups((prev) => ({ ...prev, [groupId]: collapsed }));
+      if (onGroupToggle) {
+        onGroupToggle(type, collapsed);
+      } else if (onToggleGroup) {
+        onToggleGroup(type, collapsed);
+      }
+    },
+  );
 
-  // 包装后的返回逻辑，允许外部拦截
+  // 包装的返回逻辑：支持外部 onBack 拦截（返回 false 阻止）
   const handleBack = useRefFunction(async () => {
     if (previewFile) {
       try {
-        const result = await (onBack?.(previewFile) as any);
+        const result = await Promise.resolve(onBack?.(previewFile));
         if (result === false) return;
-      } catch (_) {
+      } catch {
         // 外部抛错不应阻断默认行为
       }
     }
     handleBackToList();
   });
 
-  // 预览页面的下载（供预览页调用）
+  // 预览页内的下载
   const handleDownloadInPreview = useRefFunction((file: FileNode) => {
-    // 优先使用用户传入的下载方法
     if (onDownload) {
       onDownload(file);
       return;
     }
-
     handleFileDownload(file);
   });
 
-  // 预览文件处理
+  // 文件预览处理：支持自定义预览（onPreview 返回 false / ReactNode / FileNode / void）
   const handlePreview = useRefFunction(async (file: FileNode) => {
-    // 如果用户提供了预览方法，尝试使用用户的方法
     if (onPreview) {
       const currentCallId = ++previewRequestIdRef.current;
 
       try {
         const previewData = await onPreview(file);
         if (previewRequestIdRef.current !== currentCallId) return;
-        // 当用户返回 false：阻止内部预览逻辑，交由外部处理（如自定义弹窗）
+
+        // 用户返回 false：阻止内部预览，交由外部处理
         if (previewData === false) {
           setCustomPreviewContent(null);
           setCustomPreviewHeader(null);
           setPreviewFile(null);
           return;
         }
-        // 只有当返回结果不是 false 时，才设置预览文件并处理预览数据
+
         if (previewData) {
-          // 区分返回类型：ReactNode -> 自定义内容；FileNode -> 新文件预览
+          // ReactNode / 字符串 / 数字 / 布尔 → 自定义内容渲染
           if (
             React.isValidElement(previewData) ||
             typeof previewData === 'string' ||
@@ -988,7 +310,6 @@ export const FileComponent: FC<{
                   download: () => handleDownloadInPreview(file),
                   share: () => {
                     if (onShare) {
-                      // 为保持回调参数签名一致，显式传入第二个参数为 undefined
                       onShare(file, undefined);
                     } else {
                       handleDefaultShare(file);
@@ -998,14 +319,11 @@ export const FileComponent: FC<{
               : (previewData as React.ReactNode);
             setCustomPreviewHeader(null);
             setCustomPreviewContent(content);
-          } else if (
-            typeof previewData === 'object' &&
-            previewData !== null &&
-            'name' in (previewData as any)
-          ) {
+          } else if (isFileNodeReturn(previewData)) {
+            // FileNode → 切换到该文件的默认预览
             setCustomPreviewContent(null);
             setCustomPreviewHeader(null);
-            setPreviewFile(previewData as FileNode);
+            setPreviewFile(previewData);
           } else {
             setCustomPreviewContent(null);
             setCustomPreviewHeader(null);
@@ -1013,11 +331,12 @@ export const FileComponent: FC<{
           }
           return;
         }
-        // previewData 为 undefined 或 null，使用默认预览
+
+        // previewData === undefined / null → 走默认预览
         setCustomPreviewContent(null);
         setPreviewFile(file);
         return;
-      } catch (err) {
+      } catch {
         if (previewRequestIdRef.current !== currentCallId) return;
         setCustomPreviewContent(null);
         setPreviewFile(file);
@@ -1025,13 +344,9 @@ export const FileComponent: FC<{
       }
     }
 
-    // 使用组件库内部的预览逻辑
+    // 默认内部预览：图片走 antd Image preview，其他走 PreviewComponent
     if (isImageFile(file)) {
-      const previewSrc = getPreviewSource(file);
-      setImagePreview({
-        visible: true,
-        src: previewSrc,
-      });
+      setImagePreview({ visible: true, src: getPreviewSource(file) });
       return;
     }
     setCustomPreviewContent(null);
@@ -1039,16 +354,14 @@ export const FileComponent: FC<{
   });
 
   // 通过 actionRef 暴露可编程接口
-  React.useEffect(() => {
+  useEffect(() => {
     if (!actionRef) return;
     actionRef.current = {
       openPreview: (file: FileNode) => {
         const fileWithId = ensureNodeWithStableId(file);
         void handlePreview(fileWithId);
       },
-      backToList: () => {
-        handleBackToList();
-      },
+      backToList: () => handleBackToList(),
       updatePreviewHeader: (partial) => {
         setHeaderFileOverride((prev) => ({ ...(prev || {}), ...partial }));
       },
@@ -1060,30 +373,111 @@ export const FileComponent: FC<{
 
   const hasKeyword = Boolean((keyword ?? '').trim());
 
-  // 渲染搜索框组件 - 确保在所有情况下都保持一致
-  const renderSearchInput = useRefFunction(() => {
-    if (!showSearch) return null;
-    return (
-      <SearchInput
-        keyword={keyword}
-        onChange={onChange}
-        searchPlaceholder={searchPlaceholder}
-        prefixCls={prefixCls}
-        hashId={hashId}
-        locale={locale}
-      />
-    );
+  const handlePanelViewChange = useRefFunction((next: FilePanelViewMode) => {
+    if (!isControlledPanelView) {
+      setInnerPanelView(next);
+    }
+    fileTreeSwitch?.onViewChange?.(next);
   });
 
-  // 渲染空状态内容
-  const renderEmptyContent = useRefFunction(() => {
+  const renderToolbarRow = () => {
+    const showSwitcher = Boolean(fileTreeSwitch);
+    const showSearchInToolbar = showSearch;
+    if (!showSwitcher && !showSearchInToolbar) {
+      return null;
+    }
+    const listFallback = locale?.['workspace.file'] ?? 'File';
+    const treeFallback = locale?.['workspace.fileTree'] ?? 'File tree';
+    const rawListLabel = fileTreeSwitch?.listLabel ?? listFallback;
+    const rawTreeLabel = fileTreeSwitch?.treeLabel ?? treeFallback;
+    const listAccessible = toSegmentAccessibleName(rawListLabel, listFallback);
+    const treeAccessible = toSegmentAccessibleName(rawTreeLabel, treeFallback);
+    const switchTrailing = showSwitcher && !showSearchInToolbar;
+
+    const resolvedSearchPlaceholder =
+      fileTreeSwitch && panelView === 'tree'
+        ? (searchPlaceholderTree ??
+          locale?.['workspace.fileTreeSearchPlaceholder'] ??
+          searchPlaceholder ??
+          locale?.['workspace.searchPlaceholder'] ??
+          '搜索已展开目录内的文件名')
+        : (searchPlaceholder ??
+          locale?.['workspace.searchPlaceholder'] ??
+          '搜索文件名');
+
+    return (
+      <div
+        className={classNames(`${prefixCls}-toolbar`, hashId)}
+        data-testid="file-toolbar"
+      >
+        {showSearchInToolbar ? (
+          <div className={classNames(`${prefixCls}-toolbar-search`, hashId)}>
+            <SearchInput
+              keyword={keyword}
+              onChange={onChange}
+              searchPlaceholder={resolvedSearchPlaceholder}
+              prefixCls={prefixCls}
+              hashId={hashId}
+              locale={locale}
+            />
+          </div>
+        ) : null}
+        {showSwitcher ? (
+          <Segmented<FilePanelViewMode>
+            size="small"
+            className={classNames(`${prefixCls}-toolbar-switch`, hashId, {
+              [`${prefixCls}-toolbar-switch--trailing`]: switchTrailing,
+            })}
+            value={panelView}
+            onChange={handlePanelViewChange}
+            options={[
+              {
+                value: 'list',
+                label: (
+                  <span
+                    className={classNames(
+                      `${prefixCls}-toolbar-switch-icon`,
+                      hashId,
+                    )}
+                    title={listAccessible}
+                    aria-label={listAccessible}
+                  >
+                    <BarsOutlined />
+                  </span>
+                ),
+              },
+              {
+                value: 'tree',
+                label: (
+                  <span
+                    className={classNames(
+                      `${prefixCls}-toolbar-switch-icon`,
+                      hashId,
+                    )}
+                    title={treeAccessible}
+                    aria-label={treeAccessible}
+                  >
+                    <ApartmentOutlined />
+                  </span>
+                ),
+              },
+            ]}
+            data-testid="file-panel-view-switch"
+          />
+        ) : null}
+      </div>
+    );
+  };
+
+  const renderEmptyContent = () => {
     if (hasKeyword) {
       return (
         <Typography.Text type="secondary">
-          {(
+          {compileTemplate(
             locale?.['workspace.noResultsFor'] ||
-            `未找到与「${keyword}」匹配的结果`
-          ).replace('${keyword}', String(keyword))}
+              '未找到与「${keyword}」匹配的结果',
+            { keyword: String(keyword) },
+          )}
         </Typography.Text>
       );
     }
@@ -1097,7 +491,7 @@ export const FileComponent: FC<{
         <Empty description={locale?.['workspace.empty'] || 'No data'} />
       )
     );
-  });
+  };
 
   const handleFlatShowMore = useRefFunction(() => {
     setFlatVisibleCount((prev) => prev + GROUP_PAGE_SIZE_INCREMENT);
@@ -1110,9 +504,8 @@ export const FileComponent: FC<{
     }
   });
 
-  // 渲染文件内容
-  const renderFileContent = useRefFunction(() => {
-    if ((!nodes || nodes.length === 0) && !loading) {
+  const renderFileContent = () => {
+    if (safeNodes.length === 0 && !loading) {
       return (
         <div className={classNames(`${prefixCls}-empty`, hashId)}>
           {renderEmptyContent()}
@@ -1120,37 +513,25 @@ export const FileComponent: FC<{
       );
     }
 
-    if (safeNodes.length === 0) {
-      return (
-        <div className={classNames(`${prefixCls}-empty`, hashId)}>
-          {renderEmptyContent()}
-        </div>
-      );
-    }
-
-    // Determine whether this is a purely flat list (no groups) so we can paginate
+    // 纯扁平列表（无 group）才走分页
     const isFlat = safeNodes.every((n) => !('children' in n));
     const nodesToRender = isFlat
       ? safeNodes.slice(0, flatVisibleCount)
       : safeNodes;
-    const flatRemaining = isFlat
-      ? safeNodes.length - flatVisibleCount
-      : 0;
+    const flatRemaining = isFlat ? safeNodes.length - flatVisibleCount : 0;
     const flatHasMore = flatRemaining > 0;
 
     const items = nodesToRender.map((node: FileNode | GroupNode) => {
       const nodeWithId = ensureNodeWithStableId(node);
 
       if ('children' in nodeWithId) {
-        // 分组节点，使用内部状态覆盖外部的 collapsed 属性
         const groupNode: GroupNode = {
           ...nodeWithId,
           collapsed: collapsedGroups[nodeWithId.id!] ?? nodeWithId.collapsed,
-          // 确保子节点也有唯一ID
           children: nodeWithId.children.map(ensureNodeWithStableId),
         };
         return (
-          <FileGroupComponent
+          <FileGroup
             key={nodeWithId.id}
             group={groupNode}
             onToggle={handleToggleGroup}
@@ -1168,9 +549,8 @@ export const FileComponent: FC<{
         );
       }
 
-      // 文件节点
       return (
-        <FileItemComponent
+        <FileItem
           key={nodeWithId.id}
           file={nodeWithId as FileNode}
           onClick={onFileClick}
@@ -1208,9 +588,9 @@ export const FileComponent: FC<{
         </div>
       </>
     );
-  });
+  };
 
-  // 图片预览组件
+  // 隐藏的 antd Image，用于触发图片预览
   const ImagePreviewComponent = (
     <Image
       className={classNames(`${prefixCls}-hidden-image`, hashId)}
@@ -1224,7 +604,7 @@ export const FileComponent: FC<{
     />
   );
 
-  // 如果正在预览文件，显示预览组件
+  // 预览页路由
   if (previewFile) {
     return (
       <>
@@ -1258,31 +638,61 @@ export const FileComponent: FC<{
     );
   }
 
-  // 统一的渲染逻辑 - 确保搜索框位置稳定
-  return wrapSSR(
-    <>
-      {loading && loadingRender ? (
-        // 使用自定义loading渲染函数
+  const renderListBody = () => {
+    if (panelView === 'tree' && fileTreeSwitch) {
+      return (
         <div
-          className={classNames(`${prefixCls}-container`, hashId)}
-          data-testid="file-component"
+          className={classNames(`${prefixCls}-tree-panel`, hashId)}
+          data-testid="file-tree-embed"
         >
-          {renderSearchInput()}
-          {loadingRender()}
+          <FileTree
+            {...fileTreeSwitch.treeProps}
+            resetKey={resetKey}
+            filterKeyword={
+              hasKeyword ? String(keyword ?? '').trim() : undefined
+            }
+            fileItemPrefixCls={prefixCls}
+            fileItemHashId={hashId}
+            onDownload={onDownload}
+            onPreview={handlePreview}
+            onShare={onShare}
+            onLocate={onLocate}
+            onFileClick={onFileClick}
+            fileNodeByRelativePath={fileNodeByRelativePath}
+          />
         </div>
-      ) : (
-        // 使用默认的Spin组件
-        <Spin spinning={!!loading}>
-          <div
-            className={classNames(`${prefixCls}-container`, hashId)}
-            data-testid="file-component"
-          >
-            {renderSearchInput()}
-            {renderFileContent()}
-          </div>
-        </Spin>
-      )}
+      );
+    }
+
+    return renderFileContent();
+  };
+
+  const renderListLoading = () => {
+    if (loadingRender) {
+      return loadingRender();
+    }
+
+    return (
+      <div
+        className={classNames(`${prefixCls}-panel-loading`, hashId)}
+        data-testid="file-panel-loading"
+      >
+        <Spin />
+      </div>
+    );
+  };
+
+  // 列表页：loading 时仅展示加载态，避免嵌套 Spin 与列表/空态叠加出现双 loading
+  return (
+    <>
+      <div
+        className={classNames(`${prefixCls}-container`, hashId)}
+        data-testid="file-component"
+      >
+        {renderToolbarRow()}
+        {loading ? renderListLoading() : renderListBody()}
+      </div>
       {ImagePreviewComponent}
-    </>,
+    </>
   );
 };

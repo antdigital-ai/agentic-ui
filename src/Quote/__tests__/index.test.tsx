@@ -2,7 +2,7 @@ import { fireEvent, render } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import Quote from '../index';
+import { Quote } from '../index';
 
 // 在ConfigProvider中包装组件来提供完整的样式上下文
 const renderWithProvider = (ui: React.ReactElement) => {
@@ -11,15 +11,15 @@ const renderWithProvider = (ui: React.ReactElement) => {
 
 describe('Quote 组件', () => {
   it('应该正确渲染基本内容', () => {
-    const { getByText } = renderWithProvider(
+    const { getByText, queryByText } = renderWithProvider(
       <Quote fileName="test.ts" quoteDescription="测试内容" />,
     );
 
     // 主视图中只显示quoteDescription，不显示fileName
     expect(getByText('测试内容')).toBeInTheDocument();
 
-    // 文件名不在主视图中显示
-    expect(() => getByText('test.ts')).toThrow();
+    // 文件名不在主视图中显示（无 popupDetail 时不渲染 popup）
+    expect(queryByText('test.ts')).not.toBeInTheDocument();
   });
 
   it('应该在有popupDetail时显示弹出层文件信息', () => {
@@ -134,7 +134,7 @@ describe('Quote 组件', () => {
     const quoteContainer = container.querySelector(
       '[data-testid="quote-container"]',
     );
-    expect(quoteContainer).toHaveStyle('background-color: rgb(255, 0, 0)');
+    expect(quoteContainer).toHaveStyle({ backgroundColor: 'red' });
   });
 
   it('应该支持不传文件名', () => {

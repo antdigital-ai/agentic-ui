@@ -2,6 +2,7 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 import { ConfigProvider, Tooltip } from 'antd';
 import clsx from 'clsx';
 import React, { useContext } from 'react';
+import { useAdaptiveTooltipProps } from '../../../Hooks/useAdaptiveTooltipProps';
 import { useStyle } from './style';
 import { formatNumber, NumberFormatOptions } from './utils';
 
@@ -76,7 +77,8 @@ const ChartStatistic: React.FC<ChartStatisticProps> = ({
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('chart-statistic');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
+  const informationalTooltip = useAdaptiveTooltipProps('informational');
 
   // 渲染数值
   const renderValue = () => {
@@ -117,7 +119,12 @@ const ChartStatistic: React.FC<ChartStatisticProps> = ({
     ) : null;
 
     const questionIcon = tooltip ? (
-      <Tooltip mouseEnterDelay={0.3} title={tooltip} placement="top">
+      <Tooltip
+        mouseEnterDelay={0.3}
+        title={tooltip}
+        placement="top"
+        {...informationalTooltip}
+      >
         <QuestionCircleOutlined
           className={clsx(
             `${prefixCls}-question-icon`,
@@ -176,7 +183,7 @@ const ChartStatistic: React.FC<ChartStatisticProps> = ({
   );
   const rootStyle = { ...style, ...styles?.root };
 
-  return wrapSSR(
+  return (
     <div className={rootClassName} style={rootStyle}>
       {renderHeader()}
       <div
@@ -209,7 +216,7 @@ const ChartStatistic: React.FC<ChartStatisticProps> = ({
           </span>
         )}
       </div>
-    </div>,
+    </div>
   );
 };
 

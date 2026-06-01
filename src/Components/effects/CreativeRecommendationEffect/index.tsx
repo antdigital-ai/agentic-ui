@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import EffectPlayer, { EffectPlayerProps } from '../EffectPlayer';
 import creativeRecommendation from './creativeRecommendation.json';
 

@@ -72,7 +72,10 @@ function forEachCellPath(
 export function clearTableSelection(editor: Editor, tablePath: number[]) {
   forEachCellPath(editor, tablePath, (_, cellNode) => {
     try {
-      const domNode = ReactEditor.toDOMNode(editor, cellNode as unknown as Node);
+      const domNode = ReactEditor.toDOMNode(
+        editor,
+        cellNode as unknown as Node,
+      );
       domNode?.removeAttribute('data-select');
     } catch {
       // cell may not be mounted yet
@@ -91,7 +94,11 @@ export function selectTableRow(
   const rowNode = tableNode.children?.[rowIndex];
   if (!rowNode?.children?.length) return;
 
-  for (let columnIndex = 0; columnIndex < rowNode.children.length; columnIndex += 1) {
+  for (
+    let columnIndex = 0;
+    columnIndex < rowNode.children.length;
+    columnIndex += 1
+  ) {
     const cellPath = [...tablePath, rowIndex, columnIndex];
     if (!Editor.hasPath(editor, cellPath)) {
       continue;
@@ -147,7 +154,10 @@ export function selectTableColumn(
 export function selectWholeTable(editor: Editor, tablePath: number[]) {
   forEachCellPath(editor, tablePath, (_, cellNode) => {
     try {
-      const domNode = ReactEditor.toDOMNode(editor, cellNode as unknown as Node);
+      const domNode = ReactEditor.toDOMNode(
+        editor,
+        cellNode as unknown as Node,
+      );
       domNode?.setAttribute('data-select', 'true');
     } catch {
       // cell may not be mounted yet

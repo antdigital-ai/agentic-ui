@@ -80,14 +80,14 @@ export const TextLoading: React.FC<TextLoadingProps> = ({
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-text-loading');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   const containerStyle: React.CSSProperties = {
     fontSize,
     ...style,
   };
 
-  return wrapSSR(
+  return (
     <span
       className={classNames(prefixCls, hashId, className, {
         [`${prefixCls}-disabled`]: disabled,
@@ -101,7 +101,7 @@ export const TextLoading: React.FC<TextLoadingProps> = ({
       aria-live="polite"
     >
       {text}
-    </span>,
+    </span>
   );
 };
 

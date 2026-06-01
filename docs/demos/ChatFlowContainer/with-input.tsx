@@ -267,7 +267,12 @@ const ChatLayoutDemo: React.FC = () => {
                     }}
                   />
                 </Flex>
-                <MarkdownInputField />
+                <MarkdownInputField
+                  placeholder="输入消息..."
+                  onSend={async (text) => {
+                    console.log('发送消息:', text);
+                  }}
+                />
               </Flex>
             }
           >

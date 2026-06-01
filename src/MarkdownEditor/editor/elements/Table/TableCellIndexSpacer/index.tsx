@@ -1,15 +1,15 @@
-import {
+﻿import {
   DeleteOutlined,
   InsertRowLeftOutlined,
   InsertRowRightOutlined,
 } from '@ant-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
-import React, { useContext, useRef } from 'react';
-import { useSlate } from 'slate-react';
+import React, { memo, useContext, useRef } from 'react';
 import { useClickAway } from '../../../../../Hooks/useClickAway';
 import { useRefFunction } from '../../../../../Hooks/useRefFunction';
 import { I18nContext } from '../../../../../I18n';
+import { useEditorStore } from '../../../store';
 import {
   clearTableSelection,
   insertTableColumn,
@@ -17,7 +17,10 @@ import {
   selectTableColumn,
   selectWholeTable,
 } from '../commands/tableCommands';
-import { TablePropsContext } from '../TableContext';
+import {
+  useSetTableChromePosition,
+  useTableColumnChromeActive,
+} from '../TableContext';
 
 /**
  * TableCellIndexSpacer 组件的属性接口
@@ -70,7 +73,7 @@ export interface TableCellIndexSpacerProps {
  * - 用于占位和布局
  * - 支持点击选中整列功能
  */
-export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
+export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = memo(({
   style,
   className,
   columnIndex,
@@ -81,18 +84,19 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
   const baseClassName = context?.getPrefixCls(
     'agentic-md-editor-table-cell-index-spacer',
   );
-  const editor = useSlate();
-  const tableContext = useContext(TablePropsContext);
-
-  const { deleteIconPosition, setDeleteIconPosition } = tableContext;
+  const { markdownEditorRef } = useEditorStore();
+  const setDeleteIconPosition = useSetTableChromePosition();
+  const shouldShowDeleteIcon = useTableColumnChromeActive(columnIndex);
   const isSelectWholeTable = columnIndex === -1;
   const actionColumnIndex = isSelectWholeTable ? 0 : columnIndex;
 
   const clearSelect = useRefFunction((clearIcon = true) => {
     if (clearIcon) {
-      setDeleteIconPosition?.(null);
+      setDeleteIconPosition(null);
     }
     if (!tablePath) return;
+    const editor = markdownEditorRef.current;
+    if (!editor) return;
     clearTableSelection(editor, tablePath);
   });
 
@@ -105,7 +109,7 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
 
     // 如果提供了列索引，显示删除图标
     if (columnIndex !== undefined) {
-      setDeleteIconPosition?.({
+      setDeleteIconPosition({
         columnIndex,
       });
     }
@@ -116,6 +120,8 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
 
     try {
       clearSelect(false);
+      const editor = markdownEditorRef.current;
+      if (!editor) return;
       if (isSelectWholeTable) {
         selectWholeTable(editor, tablePath);
         return;
@@ -138,6 +144,8 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
       if (!tablePath || actionColumnIndex === undefined) {
         return;
       }
+      const editor = markdownEditorRef.current;
+      if (!editor) return;
       removeTableColumn(editor, tablePath, actionColumnIndex);
       clearSelect();
     } catch (error) {
@@ -156,6 +164,8 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
       if (!tablePath || actionColumnIndex === undefined) {
         return;
       }
+      const editor = markdownEditorRef.current;
+      if (!editor) return;
       insertTableColumn(editor, tablePath, actionColumnIndex, 'before');
       clearSelect();
     } catch (error) {
@@ -174,6 +184,8 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
       if (!tablePath || actionColumnIndex === undefined) {
         return;
       }
+      const editor = markdownEditorRef.current;
+      if (!editor) return;
       insertTableColumn(editor, tablePath, actionColumnIndex, 'after');
       clearSelect();
     } catch (error) {
@@ -184,20 +196,17 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
   const ref = useRef<HTMLTableDataCellElement>(null);
 
   useClickAway(() => {
-    if (
-      deleteIconPosition &&
-      deleteIconPosition.columnIndex === columnIndex
-    ) {
+    if (shouldShowDeleteIcon) {
       clearSelect();
     }
   }, ref);
 
-  // 检查是否应该显示删除图标
-  const shouldShowDeleteIcon =
-    deleteIconPosition && deleteIconPosition.columnIndex === columnIndex;
-
-  // 判断是否应该显示增加列的按钮（总是显示）
   const shouldShowInsertButtons = shouldShowDeleteIcon;
+
+  const stopEditorMouseDown = useRefFunction((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  });
 
   return (
     <td
@@ -214,6 +223,7 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
         ...style,
       }}
       onClick={handleClick}
+      onMouseDown={stopEditorMouseDown}
       title={
         columnIndex !== undefined
           ? columnIndex === -1
@@ -237,6 +247,7 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
               `${baseClassName}-insert-column-before`,
             )}
             onClick={handleInsertColumnBefore}
+            onMouseDown={stopEditorMouseDown}
             title={locale?.['table.insertColumnBefore'] || '在前面增加一列'}
           >
             <InsertRowLeftOutlined />
@@ -248,6 +259,7 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
             `${baseClassName}-delete-icon`,
           )}
           onClick={handleDeleteClick}
+          onMouseDown={stopEditorMouseDown}
           title={locale?.['table.deleteColumn'] || '删除整列'}
         >
           <DeleteOutlined />
@@ -260,6 +272,7 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
               `${baseClassName}-insert-column-after`,
             )}
             onClick={handleInsertColumnAfter}
+            onMouseDown={stopEditorMouseDown}
             title={locale?.['table.insertColumnAfter'] || '在后面增加一列'}
           >
             <InsertRowRightOutlined />
@@ -268,4 +281,6 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
       </div>
     </td>
   );
-};
+});
+
+TableCellIndexSpacer.displayName = 'TableCellIndexSpacer';

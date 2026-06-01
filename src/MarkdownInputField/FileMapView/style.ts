@@ -1,11 +1,10 @@
 import {
-  ChatTokenType,
-  GenerateStyle,
+  genStyleHooks,
   resetComponent,
-  useEditorStyleRegister,
+  type GenStyleFn,
 } from '../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'FileMapView'> = (token) => {
   return {
     [`${token.componentCls}`]: {
       maxWidth: '100%',
@@ -16,7 +15,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       overflow: 'auto',
       gap: '8px',
       borderRadius: 'inherit',
-      padding: 8,
+      padding: '2px',
       position: 'relative',
       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
       '&-left': {
@@ -59,7 +58,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         border: 'var(--color-gray-border-light)',
 
         '&:hover': {
-          background: '#F7F8FA',
+          background: 'var(--color-gray-bg-page)',
           transform: 'scale(1.05)',
         },
         '&-icon': {
@@ -144,7 +143,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         '& svg': {
           width: 48,
           height: 48,
-          color: '#fff',
+          color: 'var(--color-gray-bg-card-white)',
         },
       },
       '&-image-list-view': {
@@ -323,6 +322,30 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           color: 'var(--color-text-tertiary, rgba(0,0,0,0.45))',
         },
       },
+
+      // 列表入场淡入（替代 framer-motion variants opacity 动画）
+      // 原 staggerChildren 因子项不是 motion.* 实际未生效，故仅做整体 fade
+      '&-motion-fade-in': {
+        animationName: `${token.componentCls}-fileViewFadeIn`,
+        animationDuration: '0.3s',
+        animationTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+        animationFillMode: 'both',
+      },
+      // 单个文件项入场：从右侧 20px 滑入并淡入（替代 motion variants x:20→0, opacity:0→1）
+      '&-item-motion-slide-in': {
+        animationName: `${token.componentCls}-fileItemSlideInRight`,
+        animationDuration: '0.25s',
+        animationTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+        animationFillMode: 'both',
+      },
+      [`@keyframes ${token.componentCls}-fileViewFadeIn`]: {
+        from: { opacity: 0 },
+        to: { opacity: 1 },
+      },
+      [`@keyframes ${token.componentCls}-fileItemSlideInRight`]: {
+        from: { transform: 'translateX(20px)', opacity: 0 },
+        to: { transform: 'translateX(0)', opacity: 1 },
+      },
     },
   };
 };
@@ -332,13 +355,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * @param prefixCls
  * @returns
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('md-md-editor-file-view', (token) => {
-    const proChatToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('FileMapView', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+]);
 
-    return [resetComponent(proChatToken), genStyle(proChatToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [, hashId] = useGenStyle(prefixCls ?? 'md-md-editor-file-view');
+  return { hashId };
 }

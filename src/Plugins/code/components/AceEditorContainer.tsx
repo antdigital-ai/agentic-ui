@@ -4,6 +4,7 @@
  */
 
 import React, { RefObject } from 'react';
+import { getCodeBlockPlainText } from '../../../MarkdownEditor/editor/utils/codeBlockPlainText';
 import { CodeNode } from '../../../MarkdownEditor/el';
 
 interface AceEditorContainerProps {
@@ -35,7 +36,7 @@ export function AceEditorContainer({
           pointerEvents: 'none',
         }}
       >
-        {element?.value?.replaceAll('\n', ' ')}
+        {getCodeBlockPlainText(element)?.replaceAll('\n', ' ')}
         {children}
       </div>
     </>

@@ -1,4 +1,4 @@
-﻿import { CloseCircleFilled } from '@ant-design/icons';
+import { CloseCircleFilled } from '@ant-design/icons';
 import { Typography } from 'antd';
 import React, { useContext, useMemo } from 'react';
 import { WhiteBoxProcessInterface } from '.';

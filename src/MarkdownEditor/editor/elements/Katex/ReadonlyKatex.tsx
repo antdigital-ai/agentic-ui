@@ -1,6 +1,7 @@
 import React from 'react';
 import { RenderElementProps } from 'slate-react';
 import { debugInfo } from '../../../../Utils/debugUtils';
+import { getSlateElementPlainText } from '../../utils/codeBlockPlainText';
 
 /**
  * ReadonlyKatex 组件 - 只读数学公式块预览组件
@@ -54,7 +55,7 @@ export const ReadonlyKatex: React.FC<RenderElementProps> = React.memo(
           wordWrap: 'break-word',
         }}
       >
-        <code>{element.value}</code>
+        <code>{getSlateElementPlainText(element)}</code>
         <div
           style={{
             display: 'none',

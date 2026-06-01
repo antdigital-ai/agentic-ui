@@ -1,4 +1,4 @@
-import classNames from 'clsx';
+﻿import classNames from 'clsx';
 import React, { useContext, useEffect, useState } from 'react';
 import { Node } from 'slate';
 import { I18nContext } from '../../../../I18n';
@@ -24,19 +24,24 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
   const { locale } = useContext(I18nContext);
   const [selected] = useSelStatus(props.element);
 
-  // 将 store.inputComposition（可变对象属性）同步到 React state，
-  // 使 useMemo 能在组合输入状态变化时重新评估 isEmpty，
-  // 避免竞态导致占位符在组合结束后短暂闪现。
   const [isComposing, setIsComposing] = useState(false);
   useEffect(() => {
     const container = markdownContainerRef.current;
     if (!container) return;
 
-    const observer = new MutationObserver(() => {
-      setIsComposing(container.hasAttribute('data-composition'));
-    });
-    observer.observe(container, { attributes: true, attributeFilter: ['data-composition'] });
-    return () => observer.disconnect();
+    const onStart = () => setIsComposing(true);
+    // 与 Editor 一致：compositionend 后推迟清除，避免微信 WebView 上 Slate 尚未写入就恢复 empty
+    const onEnd = () => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setIsComposing(false));
+      });
+    };
+    container.addEventListener('compositionstart', onStart);
+    container.addEventListener('compositionend', onEnd);
+    return () => {
+      container.removeEventListener('compositionstart', onStart);
+      container.removeEventListener('compositionend', onEnd);
+    };
   }, [markdownContainerRef]);
 
   return React.useMemo(() => {
@@ -47,13 +52,9 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
       readonly,
       align,
     });
-    // 检查是否为空：trim 后的字符串为空（包括只包含空格的情况），且所有子节点都是纯文本节点（没有 type、code、tag）
-    // 当只输入空格时，trim() 后为空字符串，应该显示 placeholder
     const hasOnlyTextNodes = props.element?.children?.every?.(
       (child: any) => !child.type && !child.code && !child.tag,
     );
-    // 组合输入进行中时，Slate 模型尚未更新（字符还在 IME 候选区），
-    // 此时强制视为非空以隐藏占位符，避免用户输入时占位符仍然可见。
     const isEmpty =
       !str &&
       !isComposing &&
@@ -83,7 +84,6 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
         }}
         data-empty={isEmpty}
         style={{
-          display: !!str || !!props.children?.at(0).type ? undefined : 'none',
           textAlign: align,
         }}
       >
@@ -94,7 +94,6 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
   }, [
     props.element.children,
     align,
-    readonly,
     selected,
     isComposing,
     markdownEditorRef.current?.children.length,

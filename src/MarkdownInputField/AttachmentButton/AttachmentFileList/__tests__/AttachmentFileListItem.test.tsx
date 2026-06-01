@@ -52,7 +52,9 @@ describe('AttachmentFileListItem', () => {
       />,
     );
     expect(screen.getByTestId('file-item')).toBeInTheDocument();
-    expect(screen.queryByTestId('file-meta-placeholder')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('file-meta-placeholder'),
+    ).not.toBeInTheDocument();
   });
 
   it('should fallback to FileMetaPlaceholder when done and no urls', () => {

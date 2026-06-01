@@ -512,6 +512,10 @@ export interface BubbleProps<
     style?: React.CSSProperties;
     /** 自定义每个媒体（图片/视频）条目的渲染，透传 FileMapView */
     itemRender?: FileMapViewProps['itemRender'];
+    /** 自定义普通文件卡片点击回调，透传 FileMapView */
+    onFileClick?: FileMapViewProps['onFileClick'];
+    /** 禁用普通文件卡片点击触发的默认预览行为，透传 FileMapView */
+    disableDefaultFileClick?: FileMapViewProps['disableDefaultFileClick'];
     /** 最大展示条目数（默认 3） */
     maxDisplayCount?: number;
     /** 是否显示"查看更多"按钮 */

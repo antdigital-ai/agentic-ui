@@ -25,7 +25,11 @@ function protectLineFromDirectiveTime(markdownLine: string): string {
 /**
  * CommonMark 行内代码：起始与结束为等长反引号串，结束串后不得紧跟反引号（避免与更长串混淆）。
  */
-function findInlineCodeClose(line: string, contentStart: number, openCount: number): number {
+function findInlineCodeClose(
+  line: string,
+  contentStart: number,
+  openCount: number,
+): number {
   for (let pos = contentStart; pos < line.length; pos++) {
     if (line[pos] !== '`') continue;
     let k = 0;
@@ -33,7 +37,8 @@ function findInlineCodeClose(line: string, contentStart: number, openCount: numb
       k++;
     }
     if (k !== openCount) continue;
-    if (pos + openCount < line.length && line[pos + openCount] === '`') continue;
+    if (pos + openCount < line.length && line[pos + openCount] === '`')
+      continue;
     return pos;
   }
   return -1;

@@ -14,6 +14,18 @@ const DEFAULT_DARK_BORDER_COLOR = '#434343';
 const DEFAULT_PRIMARY_COLOR = '#1677ff';
 const DEFAULT_FONT_FAMILY = 'Inter, -apple-system, Segoe UI, sans-serif';
 
+/**
+ * 与宿主样式共存：流程图默认用 foreignObject 画 HTML 标签，易被外层 CSS 影响；
+ * 顶层与 flowchart 同时关闭 htmlLabels，强制走 SVG 文本（Mermaid 11 读取二者之一）。
+ */
+const MERMAID_BASE_INIT = {
+  startOnLoad: false,
+  htmlLabels: false,
+  flowchart: {
+    htmlLabels: false,
+  },
+} as const;
+
 export interface MermaidThemeToken {
   colorBgContainer?: string;
   colorBgElevated?: string;
@@ -198,12 +210,12 @@ export const applyMermaidTheme = (
   }
 
   if (!themeConfig) {
-    api.initialize({ startOnLoad: false });
+    api.initialize({ ...MERMAID_BASE_INIT });
     return;
   }
 
   api.initialize({
-    startOnLoad: false,
+    ...MERMAID_BASE_INIT,
     theme: 'base',
     darkMode: themeConfig.darkMode,
     themeVariables: themeConfig.themeVariables,
@@ -260,7 +272,7 @@ export const renderSvgToContainer = (
   if (svgElement) {
     const existingStyle = svgElement.getAttribute('style') || '';
     const newStyle =
-      `${existingStyle}; max-width: 100%; height: auto; overflow: hidden;`.trim();
+      `${existingStyle}; display: block; max-width: 100%; width: 100%; height: auto; overflow: visible;`.trim();
     svgElement.setAttribute('style', newStyle);
     svgElement.setAttribute('data-mermaid-svg', 'true');
     svgElement.setAttribute(
@@ -283,7 +295,7 @@ export const renderSvgToContainer = (
     if (extractedSvg) {
       extractedSvg.setAttribute(
         'style',
-        'max-width: 100%; height: auto; overflow: hidden;',
+        'display: block; max-width: 100%; width: 100%; height: auto; overflow: visible;',
       );
       extractedSvg.setAttribute('data-mermaid-svg', 'true');
       wrapper.appendChild(extractedSvg);

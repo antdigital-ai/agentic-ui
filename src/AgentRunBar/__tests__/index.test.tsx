@@ -2,9 +2,19 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { Button } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { TASK_RUNNING_STATUS, TASK_STATUS, TaskRunning } from '../index';
+import {
+  AgentRunBar,
+  TASK_RUNNING_STATUS,
+  TASK_STATUS,
+  TaskRunning,
+} from '../index';
 
-describe('TaskRunning Component', () => {
+describe('AgentRunBar Component', () => {
+  // 验证向后兼容：TaskRunning 应是 AgentRunBar 的别名
+  it('keeps TaskRunning as a deprecated alias of AgentRunBar', () => {
+    expect(TaskRunning).toBe(AgentRunBar);
+  });
+
   // 基础 props
   const baseProps = {
     taskStatus: TASK_STATUS.RUNNING,
@@ -19,7 +29,7 @@ describe('TaskRunning Component', () => {
 
   // 测试默认渲染
   it('should render without title and description', () => {
-    render(<TaskRunning {...baseProps} />);
+    render(<AgentRunBar {...baseProps} />);
 
     // 应该渲染基本的组件结构，但没有文案内容
     expect(screen.getByLabelText('暂停')).toBeInTheDocument();
@@ -285,7 +295,7 @@ describe('TaskRunning Component', () => {
 
     const taskRunningElement = container.firstChild as HTMLElement;
     expect(taskRunningElement).toHaveClass(customClassName);
-    expect(taskRunningElement).toHaveStyle('background-color: rgb(255, 0, 0)');
+    expect(taskRunningElement).toHaveStyle({ backgroundColor: 'red' });
   });
 
   // 测试机器人状态变化
@@ -475,19 +485,19 @@ describe('TaskRunning Component', () => {
   // 测试 variant 对样式类名的影响
   it('should apply correct CSS classes based on variant', () => {
     const { container, rerender } = render(
-      <TaskRunning {...baseProps} variant="default" />,
+      <AgentRunBar {...baseProps} variant="default" />,
     );
 
-    let taskRunningElement = container.firstChild as HTMLElement;
-    expect(taskRunningElement).toHaveClass('ant-task-running-default');
-    expect(taskRunningElement).not.toHaveClass('ant-task-running-simple');
+    let el = container.firstChild as HTMLElement;
+    expect(el).toHaveClass('ant-agent-run-bar-default');
+    expect(el).not.toHaveClass('ant-agent-run-bar-simple');
 
     // 重新渲染为 simple variant
-    rerender(<TaskRunning {...baseProps} variant="simple" />);
+    rerender(<AgentRunBar {...baseProps} variant="simple" />);
 
-    taskRunningElement = container.firstChild as HTMLElement;
-    expect(taskRunningElement).toHaveClass('ant-task-running-simple');
-    expect(taskRunningElement).not.toHaveClass('ant-task-running-default');
+    el = container.firstChild as HTMLElement;
+    expect(el).toHaveClass('ant-agent-run-bar-simple');
+    expect(el).not.toHaveClass('ant-agent-run-bar-default');
   });
 
   // 测试 variant 对操作按钮的影响

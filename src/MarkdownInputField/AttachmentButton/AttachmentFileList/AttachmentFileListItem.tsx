@@ -1,7 +1,6 @@
 import { FileFailed, FileUploadingSpin, X } from '@sofa-design/icons';
 import { Tooltip } from 'antd';
 import classNames from 'clsx';
-import { motion } from 'framer-motion';
 import React, { useContext } from 'react';
 import { I18nContext } from '../../../I18n';
 import { AttachmentFile } from '../types';
@@ -23,6 +22,18 @@ interface FileListItemProps {
   className?: string;
   prefixCls?: string;
   hashId?: string;
+  /**
+   * 入场/退出动画状态，由父组件 AttachmentFileList 控制：
+   * - `enter`：入场播放 slide-in-up
+   * - `exit`：退出播放 slide-out-up，动画结束后由父组件真正卸载
+   *
+   * 等价于 framer-motion 的 AnimatePresence + variants={hidden/visible/exit}。
+   */
+  motionState?: 'enter' | 'exit';
+  /**
+   * 入场动画延迟（秒），等价于 framer-motion 父级 `staggerChildren: 0.1 * index`。
+   */
+  motionDelaySec?: number;
 }
 
 const getFileNameWithoutExtension = (fileName: string) => {
@@ -67,6 +78,29 @@ const FileIcon: React.FC<{
   );
 };
 
+const DoneFileSizeItems: React.FC<{
+  file: AttachmentFile;
+  prefixCls?: string;
+  hashId?: string;
+}> = ({ file, prefixCls, hashId }) => {
+  const fileExtension = getFileExtension(file.name);
+  const fileSize = file.size ? kbToSize(file.size / 1024) : '';
+  const sizeItems = [fileExtension, fileSize].filter(Boolean);
+
+  return (
+    <>
+      {sizeItems.map((item) => (
+        <span
+          key={item}
+          className={classNames(`${prefixCls}-file-size-item`, hashId)}
+        >
+          {item}
+        </span>
+      ))}
+    </>
+  );
+};
+
 const FileSizeInfo: React.FC<{
   file: AttachmentFile;
   prefixCls?: string;
@@ -76,64 +110,41 @@ const FileSizeInfo: React.FC<{
   const status = (file.status || 'done') as FileStatus;
   const baseClassName = classNames(`${prefixCls}-file-size`, hashId);
 
-  const statusContentMap: Record<FileStatus, React.ReactNode> = {
-    uploading: locale?.uploading || '上传中...',
-    pending: locale?.uploading || '上传中...',
-    error: (
+  if (status === 'uploading' || status === 'pending') {
+    return (
+      <div className={baseClassName}>{locale?.uploading || 'Uploading...'}</div>
+    );
+  }
+
+  if (status === 'error') {
+    return (
       <div
         className={classNames(baseClassName, `${prefixCls}-file-size-error`)}
       >
-        {file.errorMessage || locale?.uploadFailed || '上传失败'}
+        {file.errorMessage || locale?.uploadFailed || 'Upload failed'}
       </div>
-    ),
-    done: (() => {
-      const fileExtension = getFileExtension(file.name);
-      const fileSize = file.size ? kbToSize(file.size / 1024) : '';
-      const sizeItems = [fileExtension, fileSize].filter(Boolean);
-
-      return sizeItems.map((item) => (
-        <span
-          key={item}
-          className={classNames(`${prefixCls}-file-size-item`, hashId)}
-        >
-          {item}
-        </span>
-      ));
-    })(),
-  };
-
-  const content = statusContentMap[status];
-
-  return typeof content === 'string' ? (
-    <div className={baseClassName}>{content}</div>
-  ) : (
-    <div className={baseClassName}>{content}</div>
-  );
-};
-
-const DeleteButton: React.FC<{
-  isVisible: boolean;
-  onClick: (e: React.MouseEvent) => void;
-  prefixCls?: string;
-  hashId?: string;
-}> = ({ isVisible, onClick, prefixCls, hashId }) => {
-  if (!isVisible) return null;
+    );
+  }
 
   return (
-    <div
-      onClick={onClick}
-      className={classNames(`${prefixCls}-close-icon`, hashId)}
-    >
-      <X role="img" aria-label="X" />
+    <div className={baseClassName}>
+      <DoneFileSizeItems file={file} prefixCls={prefixCls} hashId={hashId} />
     </div>
   );
 };
 
-const ANIMATION_VARIANTS = {
-  hidden: { y: 20, opacity: 0 },
-  visible: { y: 0, opacity: 1 },
-  exit: { opacity: 0, y: -20 },
-};
+const DeleteButton: React.FC<{
+  onClick: (e: React.MouseEvent) => void;
+  prefixCls?: string;
+  hashId?: string;
+}> = ({ onClick, prefixCls, hashId }) => (
+  <div
+    onClick={onClick}
+    className={classNames(`${prefixCls}-close-icon`, hashId)}
+  >
+    <X role="img" aria-label="X" />
+  </div>
+);
 
 export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
   file,
@@ -143,6 +154,8 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
   onRetry,
   onDelete,
   className,
+  motionState = 'enter',
+  motionDelaySec = 0,
 }) => {
   const { locale } = useContext(I18nContext);
   const isErrorStatus = file.status === 'error';
@@ -179,20 +192,28 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
       title={canRetry ? locale?.clickToRetry || '点击重试' : undefined}
       open={canRetry ? undefined : false}
     >
-      <motion.div
-        variants={ANIMATION_VARIANTS}
+      {/* 入场/退出动画由 CSS 控制（参见 AttachmentFileList/style.ts 的 -item-motion）。
+          通过 data-state 切换 enter/exit keyframes，配合父组件维护的"正在退出"
+          影子状态 + 延迟卸载，等价于 framer-motion 的 AnimatePresence + variants。
+          注意：style 选择器定义在父级 componentCls 上（{prefix}-item-motion），
+          这里 props.prefixCls 是 `${parentPrefix}-item`，拼接后类名为
+          `${parentPrefix}-item-motion`，与 style.ts 中的选择器一致。 */}
+      <div
         onClick={handleFileClick}
-        className={classNames(className, {
+        className={classNames(className, `${prefixCls}-motion`, {
           [`${prefixCls}-meta-placeholder`]: isFileMetaPlaceholderState(file),
         })}
         data-testid="file-item"
-        exit={ANIMATION_VARIANTS.exit}
+        data-state={motionState}
+        style={
+          {
+            '--attachment-item-delay': `${motionDelaySec}s`,
+          } as React.CSSProperties
+        }
       >
         <FileIcon file={file} prefixCls={prefixCls} hashId={hashId} />
         <div className={classNames(`${prefixCls}-file-info`, hashId)}>
-          <div
-            className={classNames(`${prefixCls}-file-name`, hashId)}
-          >
+          <div className={classNames(`${prefixCls}-file-name`, hashId)}>
             <span className={classNames(`${prefixCls}-file-name-text`, hashId)}>
               {getFileNameWithoutExtension(file.name)}
             </span>
@@ -204,13 +225,14 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
             locale={locale}
           />
         </div>
-        <DeleteButton
-          isVisible={canDelete}
-          onClick={handleDeleteClick}
-          prefixCls={prefixCls}
-          hashId={hashId}
-        />
-      </motion.div>
+        {canDelete && (
+          <DeleteButton
+            onClick={handleDeleteClick}
+            prefixCls={prefixCls}
+            hashId={hashId}
+          />
+        )}
+      </div>
     </Tooltip>
   );
 };

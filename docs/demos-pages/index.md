@@ -34,7 +34,6 @@ group:
 <!-- tool-use-bar.tsx 为最简列表，与 tool-use-bar-basic 重叠，不在此聚合 -->
 <!-- tool-use-bar-all 与 tool-use-bar-advanced 均为「多字段工具项」展示，advanced 含动态进度；Props 说明见 components/tool-use-bar.md -->
 
-
 ### 工具使用栏 - 思考模式
 
 主流程见 `tool-use-bar-think.tsx`；`think-simple` / `think-standalone` 为拆解场景，与完整版有重叠。

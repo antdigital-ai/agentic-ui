@@ -7,7 +7,6 @@ import {
 import { Avatar, ConfigProvider, Popconfirm, Tooltip } from 'antd';
 import classNames from 'clsx';
 import dayjs from 'dayjs';
-import { motion } from 'framer-motion';
 import React, { useContext } from 'react';
 import { Transforms } from 'slate';
 import {
@@ -20,38 +19,13 @@ import { EditorStoreContext, useEditorStore } from '../../store';
 import { useStyle } from './style';
 
 /**
- * 导航动画变体配置
- * 定义评论列表的展开和收起动画效果
+ * 列表项 stagger 入场延迟（秒），与 framer-motion 时代的
+ * `staggerChildren: 0.07, delayChildren: 0.2` 等价。
+ *
+ * 不再依赖 framer-motion，由 CSS keyframes + 每项 inline animation-delay 实现。
  */
-const navVariants = {
-  open: {
-    transition: { staggerChildren: 0.07, delayChildren: 0.2 },
-  },
-  closed: {
-    transition: { staggerChildren: 0.05, staggerDirection: -1 },
-  },
-};
-
-/**
- * 项目动画变体配置
- * 定义单个评论项的动画效果
- */
-const itemVariants = {
-  open: {
-    y: 0,
-    opacity: 1,
-    transition: {
-      y: { stiffness: 1000, velocity: -100 },
-    },
-  },
-  closed: {
-    y: 50,
-    opacity: 0,
-    transition: {
-      y: { stiffness: 1000 },
-    },
-  },
-};
+const COMMENT_ITEM_BASE_DELAY_S = 0.2;
+const COMMENT_ITEM_STEP_DELAY_S = 0.07;
 
 /**
  * CommentList 组件 - 评论列表组件
@@ -103,8 +77,8 @@ export const CommentList: React.FC<{
   const context = useContext(ConfigProvider.ConfigContext);
   const { setShowComment } = useContext(EditorStoreContext) || {};
   const baseCls = context?.getPrefixCls('agentic-md-editor-comment-view');
-  const { wrapSSR, hashId } = useStyle(baseCls);
-  return wrapSSR(
+  const { hashId } = useStyle(baseCls);
+  return (
     <>
       {!props.pure ? (
         <div
@@ -113,12 +87,10 @@ export const CommentList: React.FC<{
           }}
         />
       ) : null}
-      <motion.div
+      {/* 入场滑入与列表项 stagger/hover 全部由 CSS 控制（参见 style.ts） */}
+      <div
         style={props.style}
         className={classNames(hashId, props.className, baseCls)}
-        initial={{ transform: 'translateX(100%)', opacity: 0 }}
-        animate={{ transform: 'translateX(0)', opacity: 1 }}
-        exit={{ transform: 'translateX(100%)', opacity: 0 }}
       >
         <div
           style={{
@@ -135,28 +107,31 @@ export const CommentList: React.FC<{
             }}
           />
         </div>
-        <motion.div
-          variants={navVariants}
+        <div
           style={{
             display: 'flex',
             flexDirection: 'column',
             gap: 8,
           }}
-          initial="closed"
-          whileInView="open"
         >
           {props.commentList?.map((item, index) => {
             return (
-              <motion.div
+              <div
                 key={index}
-                whileHover={{ scale: 1.04 }}
-                variants={itemVariants}
                 onClick={async (e) => {
                   e.stopPropagation();
                   e.preventDefault();
                   await props.comment?.onClick?.(item.id, item);
                 }}
                 className={classNames(`${baseCls}-item`, hashId)}
+                style={
+                  {
+                    '--comment-item-delay': `${
+                      COMMENT_ITEM_BASE_DELAY_S +
+                      index * COMMENT_ITEM_STEP_DELAY_S
+                    }s`,
+                  } as React.CSSProperties
+                }
               >
                 <div className={classNames(`${baseCls}-item-header`, hashId)}>
                   <div
@@ -287,11 +262,11 @@ export const CommentList: React.FC<{
                 <div className={classNames(`${baseCls}-item-content`, hashId)}>
                   {item.content}
                 </div>
-              </motion.div>
+              </div>
             );
           })}
-        </motion.div>
-      </motion.div>
-    </>,
+        </div>
+      </div>
+    </>
   );
 };

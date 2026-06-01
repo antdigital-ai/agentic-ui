@@ -13,7 +13,9 @@ import React, {
   useMemo,
 } from 'react';
 import { I18nContext, compileTemplate } from '../../I18n';
-import { LowCodeSchema, SchemaProperty } from '../types';
+import { ComponentConfig, LowCodeSchema, SchemaProperty } from '../types';
+
+const EMPTY_COMPONENT: ComponentConfig = { properties: {} };
 
 export interface SchemaFormProps {
   schema: LowCodeSchema;
@@ -83,7 +85,7 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
   readonly = false,
 }) => {
   const [form] = Form.useForm();
-  const { properties = {} } = schema?.component || {};
+  const { properties = {} } = schema?.component ?? EMPTY_COMPONENT;
   const { locale } = useContext(I18nContext);
 
   // 生成表单验证规则
@@ -94,7 +96,7 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
       if (property.required) {
         rules.push({
           required: true,
-          message: `${locale?.inputPlaceholder || '请输入'} ${property.title || property.description || ''}`,
+          message: `${locale?.inputPlaceholder || ''} ${property.title || property.description || ''}`.trim(),
         });
       }
 
@@ -164,7 +166,7 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
   // 获取通用输入框属性
   const getCommonInputProps = useCallback(
     (property: SchemaProperty) => ({
-      placeholder: `${locale?.inputPlaceholder || '请输入'} ${property.title || property.description}`,
+      placeholder: `${locale?.inputPlaceholder || ''} ${property.title || property.description || ''}`.trim(),
       readOnly: readonly,
       disabled: readonly,
     }),
@@ -204,7 +206,7 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
           return <Input {...commonProps} />;
       }
     },
-    [getCommonInputProps, locale],
+    [getCommonInputProps],
   );
 
   // 渲染数组项内容
@@ -218,7 +220,7 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
         return (
           <Form.Item name={name} style={{ margin: 0 }}>
             <Input
-              placeholder={locale?.inputPlaceholder || '请输入'}
+              placeholder={locale?.inputPlaceholder}
               readOnly={readonly}
               disabled={readonly}
             />
@@ -294,7 +296,8 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
                     block
                     icon={<Plus />}
                   >
-                    {locale?.['schemaForm.addItem'] || '添加'} {getPropertyTitle(property, key)}
+                    {locale?.['schemaForm.addItem']}{' '}
+                    {getPropertyTitle(property, key)}
                   </Button>
                 </Form.Item>
               )}
@@ -316,7 +319,7 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
       if (!property.properties) {
         return (
           <Input
-            placeholder={`${locale?.inputPlaceholder || '请输入'} ${property.title || property.description}`}
+            placeholder={`${locale?.inputPlaceholder || ''} ${property.title || property.description || ''}`.trim()}
             disabled
           />
         );
@@ -364,7 +367,9 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
 
   // 计算默认值
   const defaultValues = useMemo(() => {
-    return Object.entries(properties).reduce(
+    return (
+      Object.entries(properties) as Array<[string, SchemaProperty]>
+    ).reduce(
       (acc, [key, prop]) => {
         if (prop.default !== undefined) {
           acc[key] = prop.default;
@@ -383,25 +388,28 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
 
   // 生成表单项
   const formItems = useMemo(() => {
-    return Object.entries(properties).map(([key, property]) => {
-      const shouldUseFormItemName =
-        property.type !== 'object' && property.type !== 'array';
+    return (Object.entries(properties) as Array<[string, SchemaProperty]>).map(
+      ([key, property]) => {
+        const shouldUseFormItemName =
+          property.type !== 'object' && property.type !== 'array';
 
-      return (
-        <Form.Item
-          key={key}
-          label={getPropertyTitle(property, key)}
-          name={shouldUseFormItemName ? key : undefined}
-          rules={generateRules(property)}
-        >
-          {renderFormItem(key, property)}
-        </Form.Item>
-      );
-    });
+        return (
+          <Form.Item
+            key={key}
+            label={getPropertyTitle(property, key)}
+            name={shouldUseFormItemName ? key : undefined}
+            rules={generateRules(property)}
+          >
+            {renderFormItem(key, property)}
+          </Form.Item>
+        );
+      },
+    );
   }, [properties, getPropertyTitle, generateRules, renderFormItem]);
 
   return (
     <Form
+      data-testid="schema-form"
       form={form}
       layout="vertical"
       initialValues={defaultValues}
@@ -411,9 +419,9 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
       style={{
         maxWidth: 400,
         padding: 24,
-        background: '#fff',
+        background: 'var(--color-gray-bg-card-white, #fff)',
         borderRadius: 8,
-        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+        boxShadow: 'var(--shadow-popover-base, 0 2px 8px rgba(0,0,0,0.15))',
       }}
     >
       {formItems}

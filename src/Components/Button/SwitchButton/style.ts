@@ -1,10 +1,11 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token: ChatTokenType) => {
+const genStyle: GenStyleFn<'SwitchButton'> = (token) => {
+  const { antCls } = token;
+  const btn = `${antCls}-btn`;
+  const btnVariantOutlined = `${antCls}-btn-variant-outlined`;
+  const btnDisabled = `${antCls}-btn-disabled`;
+
   return {
     [token.componentCls]: {
       padding: '5px 12px',
@@ -20,7 +21,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token: ChatTokenType) => {
       letterSpacing: 'var(--letter-spacing-body-base, normal)',
       color: 'var(--color-gray-text-default)',
 
-      '&.ant-btn': {
+      [`&${btn}`]: {
         borderRadius: '200px',
         gap: 0,
       },
@@ -65,21 +66,20 @@ const genStyle: GenerateStyle<ChatTokenType> = (token: ChatTokenType) => {
       },
 
       // 与 antd 变体类（outlined）组合时的 active 覆盖（按下）
-      '&.ant-btn-variant-outlined:not(:disabled):not(.ant-btn-disabled):active':
-        {
-          background: 'var(--color-primary-bg-card-light)',
-          borderColor: 'var(--color-primary-border-light)',
+      [`&${btnVariantOutlined}:not(:disabled):not(${btnDisabled}):active`]: {
+        background: 'var(--color-primary-bg-card-light)',
+        borderColor: 'var(--color-primary-border-light)',
+        color: 'var(--color-blue-text-secondary)',
+        [`${token.componentCls}-text, ${token.componentCls}-icon`]: {
           color: 'var(--color-blue-text-secondary)',
-          [`${token.componentCls}-text, ${token.componentCls}-icon`]: {
-            color: 'var(--color-blue-text-secondary)',
-          },
-          [`${token.componentCls}-icon svg`]: {
-            fill: 'currentColor',
-            color: 'currentColor',
-          },
         },
+        [`${token.componentCls}-icon svg`]: {
+          fill: 'currentColor',
+          color: 'currentColor',
+        },
+      },
       // 与 antd 变体类（outlined）组合时的受控 active 常驻覆盖
-      '&.ant-btn-variant-outlined&-active': {
+      [`&${btnVariantOutlined}&-active`]: {
         background: 'var(--color-primary-bg-card-light)',
         borderColor: 'var(--color-primary-border-light)',
         color: 'var(--color-blue-text-secondary)',
@@ -138,12 +138,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token: ChatTokenType) => {
   };
 };
 
+const useGenStyle = genStyleHooks('SwitchButton', genStyle);
+
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('switch-button', (token: any) => {
-    const buttonToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    } as ChatTokenType;
-    return [genStyle(buttonToken)];
-  });
+  const [, hashId] = useGenStyle(prefixCls ?? 'switch-button');
+  return { hashId };
 }

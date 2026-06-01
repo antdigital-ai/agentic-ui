@@ -29,5 +29,5 @@
     "docs/pure.tsx",
     "home/**/*"
   ],
-  "exclude": ["home/demo-components", "**/__tests__/**", "**/*.test.ts", "**/*.test.tsx", "tests/**"]
+  "exclude": ["home/demo-components", "**/__tests__/**", "_test_helpers", "**/*.test.ts", "**/*.test.tsx"]
 }

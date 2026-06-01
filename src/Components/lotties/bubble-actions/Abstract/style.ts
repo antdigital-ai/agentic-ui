@@ -1,10 +1,9 @@
 import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
+  genStyleHooks,
+  type GenStyleFn,
 } from '@ant-design/agentic-ui/Hooks/useStyle';
 
-const genAbstractLottieStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genAbstractLottieStyle: GenStyleFn<'Abstract'> = (token) => {
   return {
     [token.componentCls]: {
       'svg, svg path': {
@@ -15,12 +14,9 @@ const genAbstractLottieStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
+const useGenStyle = genStyleHooks('Abstract', genAbstractLottieStyle);
+
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('bubble-actions-lottie', (token) => {
-    const abstractLottieToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [genAbstractLottieStyle(abstractLottieToken)];
-  });
+  const [, hashId] = useGenStyle(prefixCls ?? 'bubble-actions-lottie');
+  return { hashId };
 }

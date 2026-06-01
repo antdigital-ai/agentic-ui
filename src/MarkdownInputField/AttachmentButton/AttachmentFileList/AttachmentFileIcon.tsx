@@ -1,6 +1,7 @@
 import { Eye, FileFailed, FileUploadingSpin, Play } from '@sofa-design/icons';
 import { Image, Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react';
+import { useAdaptiveTooltipProps } from '../../../Hooks/useAdaptiveTooltipProps';
 import { getFileTypeIcon } from '../../../Workspace/File/utils';
 import { FileType } from '../../../Workspace/types';
 import { AttachmentFile } from '../types';
@@ -125,8 +126,9 @@ export const FileMetaPlaceholder: React.FC<{
     ? (rawFormat.split('/').pop() ?? '').toUpperCase()
     : rawFormat.toUpperCase();
   const formatText = formatSuffix || '-';
+  const adaptiveTooltip = useAdaptiveTooltipProps('informational');
   return (
-    <Tooltip title={file.name}>
+    <Tooltip title={file.name} {...adaptiveTooltip}>
       <div
         data-testid="file-meta-placeholder"
         className={className}
@@ -214,15 +216,18 @@ export const AttachmentFileIcon: React.FC<{
 
   // 图片文件预览
   if (isImageFile(file)) {
-    return (
-      <Image
-        src={file.url}
-        style={IMAGE_STYLE}
-        rootClassName={className}
-        preview={IMAGE_PREVIEW_CONFIG}
-        alt={file.name}
-      />
-    );
+    const imageUrl = file.previewUrl || file.url;
+    if (imageUrl) {
+      return (
+        <Image
+          src={imageUrl}
+          style={IMAGE_STYLE}
+          rootClassName={className}
+          preview={IMAGE_PREVIEW_CONFIG}
+          alt={file.name}
+        />
+      );
+    }
   }
 
   // 视频文件缩略图预览（与图片类似，带播放按钮）
@@ -237,7 +242,7 @@ export const AttachmentFileIcon: React.FC<{
         />
       );
     }
-    if (file.size) {
+    if (file.size && file instanceof File) {
       return (
         <VideoThumbnailFromBlob
           key={`${file.name}-${file.size}-${file.lastModified || 0}`}

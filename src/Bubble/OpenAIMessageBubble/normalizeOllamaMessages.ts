@@ -1,5 +1,5 @@
-import type { OpenAIChatMessage } from './types';
 import type { OllamaChatMessage } from './ollamaTypes';
+import type { OpenAIChatMessage } from './types';
 
 function buildDisplayContent(
   msg: OllamaChatMessage,
@@ -38,7 +38,9 @@ export function normalizeOllamaMessageToOpenAI(
       ...base,
       role: 'assistant',
       content,
-      ...(msg.tool_calls?.length ? { tool_calls: msg.tool_calls as unknown[] } : {}),
+      ...(msg.tool_calls?.length
+        ? { tool_calls: msg.tool_calls as unknown[] }
+        : {}),
     };
   }
 

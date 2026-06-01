@@ -1,12 +1,7 @@
 import { ConfigProvider } from 'antd';
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 
+import { useRefFunction } from '../Hooks/useRefFunction';
 import { cnLabels, enLabels } from './locales';
 
 export { cnLabels, enLabels };
@@ -31,24 +26,7 @@ export function detectUserLanguage(): 'zh-CN' | 'en-US' {
     }
   }
 
-  // 2. 检查 Ant Design ConfigProvider 的 locale
-  try {
-    const antdLocale = document
-      .querySelector('[data-antd-locale]')
-      ?.getAttribute('data-antd-locale');
-    if (antdLocale) {
-      if (antdLocale.toLowerCase().includes('zh')) {
-        return 'zh-CN';
-      }
-      if (antdLocale.toLowerCase().includes('en')) {
-        return 'en-US';
-      }
-    }
-  } catch (error) {
-    // 忽略错误，继续其他检测方式
-  }
-
-  // 3. 检测浏览器语言
+  // 2. 检测浏览器语言
   if (typeof navigator !== 'undefined') {
     const browserLanguages = navigator.languages || [navigator.language];
 
@@ -198,23 +176,20 @@ export const I18nProvide: React.FC<{
         saveUserLanguage(newLanguage);
       }
     }
-  }, [antdContext?.locale, autoDetect, language]);
+  }, [antdContext?.locale?.locale, autoDetect, language]);
 
   // 语言切换处理函数
-  const setLanguage = useCallback((newLanguage: 'zh-CN' | 'en-US') => {
+  const setLanguage = useRefFunction((newLanguage: 'zh-CN' | 'en-US') => {
     setLanguageState(newLanguage);
     saveUserLanguage(newLanguage);
-  }, []);
+  });
 
   // 兼容旧的 setLocale 接口
-  const setLocale = useCallback(
-    (newLocale: typeof cnLabels) => {
-      // 根据传入的 locale 对象判断语言
-      const newLanguage = newLocale === cnLabels ? 'zh-CN' : 'en-US';
-      setLanguage(newLanguage);
-    },
-    [setLanguage],
-  );
+  const setLocale = useRefFunction((newLocale: typeof cnLabels) => {
+    // 根据传入的 locale 对象判断语言
+    const newLanguage = newLocale === cnLabels ? 'zh-CN' : 'en-US';
+    setLanguage(newLanguage);
+  });
 
   const contextValue = useMemo(
     () => ({

@@ -1,7 +1,8 @@
-import SkeletonList from './SkeletonList';
+﻿import SkeletonList from './SkeletonList';
 
 import { MutableRefObject, useContext, useMemo, useRef } from 'react';
 
+import type { RoleType } from '../../Types/common';
 import type {
   BubbleImperativeHandle,
   BubbleMetaData,
@@ -90,7 +91,7 @@ export interface PureBubbleListProps {
         type: string;
         index: number;
         total: number;
-        role?: 'user' | 'assistant';
+        role?: RoleType;
       };
     }) => React.ReactNode;
     /**
@@ -136,7 +137,7 @@ export const PureBubbleList = React.memo<PureBubbleListProps>((props) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const { compact } = useContext(BubbleConfigContext) || {};
   const prefixClass = getPrefixCls('agentic-bubble-list');
-  const { wrapSSR, hashId } = useStyle(prefixClass);
+  const { hashId } = useStyle(prefixClass);
 
   const deps = useMemo(() => [props.style], [props.style]);
 
@@ -250,7 +251,7 @@ export const PureBubbleList = React.memo<PureBubbleListProps>((props) => {
                 elementInfo: lazyProps.elementInfo
                   ? {
                       ...lazyProps.elementInfo,
-                      role: item.role as 'user' | 'assistant',
+                      role: item.role as RoleType,
                     }
                   : undefined,
               });
@@ -276,10 +277,35 @@ export const PureBubbleList = React.memo<PureBubbleListProps>((props) => {
 
       return bubbleElement;
     });
-  }, [bubbleList, props.style, props.lazy]);
+  }, [
+    bubbleList,
+    props.style,
+    props.lazy,
+    bubbleListRef,
+    bubbleRenderConfig,
+    classNames,
+    props.bubbleRef,
+    markdownRenderConfig,
+    docListProps,
+    styles,
+    props.readonly,
+    onReply,
+    onDislike,
+    onDisLike,
+    onLike,
+    onLikeCancel,
+    onCancelLike,
+    onAvatarClick,
+    onDoubleClick,
+    shouldShowCopy,
+    shouldShowVoice,
+    userMeta,
+    assistantMeta,
+    deps,
+  ]);
 
   if (isLoading) {
-    return wrapSSR(
+    return (
       <div
         className={clsx(
           prefixClass,
@@ -287,23 +313,25 @@ export const PureBubbleList = React.memo<PureBubbleListProps>((props) => {
           className,
           hashId,
         )}
+        data-testid={prefixClass}
         ref={bubbleListRef}
         style={{
           padding: 24,
         }}
       >
         <SkeletonList />
-      </div>,
+      </div>
     );
   }
 
-  return wrapSSR(
+  return (
     <div
       className={clsx(`${prefixClass}`, className, hashId, {
         [`${prefixClass}-readonly`]: props.readonly,
         [`${prefixClass}-compact`]: compact,
       })}
       data-chat-list={bubbleList.length}
+      data-testid={prefixClass}
       style={style}
       ref={bubbleListRef}
       onScroll={onScroll}
@@ -313,7 +341,7 @@ export const PureBubbleList = React.memo<PureBubbleListProps>((props) => {
       }
     >
       {listDom}
-    </div>,
+    </div>
   );
 });
 

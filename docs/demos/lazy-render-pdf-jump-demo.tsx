@@ -89,7 +89,9 @@ const CustomPlaceholder: React.FC<{
       className="pml-item pml-placeholder"
     >
       {isLoading ? (
-        <Spin tip="强制加载中..." />
+        <Spin tip="强制加载中...">
+          <div style={{ minHeight: 48 }} aria-hidden />
+        </Spin>
       ) : (
         <>
           <div

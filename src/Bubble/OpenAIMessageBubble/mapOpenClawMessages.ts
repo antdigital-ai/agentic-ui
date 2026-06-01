@@ -1,11 +1,11 @@
 import type { MessageBubbleData } from '../../Types/message';
 import { mapOpenAIMessagesToMessageBubbleData } from './mapOpenAIMessages';
 import { normalizeOpenClawMessagesToOpenAI } from './normalizeOpenClawMessages';
-import type { OpenAIMessagesMapMessage } from './types';
 import type {
   OpenClawChatMessage,
   OpenClawMessagesMapOptions,
 } from './openClawTypes';
+import type { OpenAIMessagesMapMessage } from './types';
 
 /**
  * 将 OpenClaw 会话 / transcript 风格的 `messages` 转为 `MessageBubbleData[]`

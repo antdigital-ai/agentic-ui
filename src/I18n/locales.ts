@@ -5,7 +5,6 @@
  * 提供完整的用户界面文本本地化。
  */
 export const cnLabels = {
-  attachmentSingleMax: '单个最大',
   table: '表格',
   column: '分栏',
   quote: '引用',
@@ -42,6 +41,9 @@ export const cnLabels = {
   columnChart: '柱状图',
   areaChart: '面积图',
   descriptions: '定义列表',
+  docCards: '卡片列表',
+  docCardsTags: '标签列表',
+  quadrantChart: '四象限图',
   dataTime: '数据时间',
   columns: '列',
   all: '全部',
@@ -60,8 +62,6 @@ export const cnLabels = {
   'font-color': '字体颜色',
   collapse: '收起',
   fullScreen: '全屏',
-  taskFinished: '任务完成',
-  taskCost: '共耗时',
   taskComplete: '任务完成',
   taskAborted: '任务已取消',
   inProgressTask: '正在进行${taskName}任务',
@@ -184,6 +184,12 @@ export const cnLabels = {
   'chat.task.search.placeholder': '搜索任务',
   'chat.history.empty.chat.title': '找不到相关结果',
   'chat.history.empty.chat.description': '换个关键词试试吧',
+  'chat.history.empty.task.title': '暂无历史任务',
+  'chat.history.empty.task.description': '完成的任务会出现在这里',
+  // 历史时间分组标签：用于 formatTime 的 i18n 文案覆盖
+  'chat.history.time.today': '今日',
+  'chat.history.time.yesterday': '昨日',
+  'chat.history.time.withinWeek': '一周内',
   // TaskList 组件相关
   'taskList.expand': '展开',
   'taskList.collapse': '收起',
@@ -263,6 +269,7 @@ export const cnLabels = {
   'workspace.browser': '浏览器',
   'workspace.task': '任务',
   'workspace.file': '文件',
+  'workspace.fileTree': '文件树',
   'workspace.custom': '自定义',
   'workspace.terminalExecution': '终端执行',
   'workspace.createHtmlFile': '创建 HTML 文件',
@@ -287,7 +294,12 @@ export const cnLabels = {
   // 新增：Workspace 标题与搜索相关
   'workspace.title': '工作空间',
   'workspace.searchPlaceholder': '搜索文件名',
+  'workspace.fileTreeSearchPlaceholder': '搜索已展开目录下的文件名',
   'workspace.noResultsFor': '未找到与「${keyword}」匹配的结果',
+  'workspace.treeFilterNoMatchVisibleRoots':
+    '当前可见列表中未找到与「${keyword}」匹配的文件',
+  'workspace.treeFilterNoMatchInExpanded':
+    '已在展开目录的已加载内容中查找，未找到与「${keyword}」匹配的结果',
   // 新增：文件预览相关
   'workspace.file.generating': '正在生成',
   'workspace.file.processing': '正在处理文件...',
@@ -347,6 +359,8 @@ export const cnLabels = {
   'input.sendButtonTooltip.newline': '按 Shift+Enter 键换行',
   'input.sendButtonTooltip.send.mod': '按 Cmd/Ctrl+Enter 键发送',
   'input.sendButtonTooltip.newline.mod': '按 Enter 键换行',
+  'input.sendButtonAriaLabel.send': '发送消息',
+  'input.sendButtonAriaLabel.stop': '停止生成',
   'input.typing.hint': 'AI 正在回复中，请稍候...',
   // Other translations
   'common.name': '名称',
@@ -380,7 +394,6 @@ export const cnLabels = {
   'browser.totalResults': '共${count}个结果',
   'browser.searching': '搜索中...',
   'layout.header.title': 'AI 助手',
-  theme: '主题',
   localPreview: '本地预览',
   expandCollapse: '展开/收起',
   moreActions: '更多操作',
@@ -452,10 +465,28 @@ export const cnLabels = {
   'fileType.powerpoint': 'PowerPoint 演示文稿',
   // PreviewComponent messages
   'workspace.file.unsupportedPreview': '此文件无法预览，请下载查看。',
+  'workspace.file.unsupportedPreviewNoDownload': '此文件无法预览。',
   'workspace.file.downloadButton': '下载',
   'workspace.file.videoNotSupported': '您的浏览器不支持视频播放',
   'workspace.file.audioNotSupported': '您的浏览器不支持音频播放',
   'workspace.file.fileType': '文件类型：',
+  enlarge: '放大',
+  shrink: '缩小',
+  'skillMode.region': '技能模式',
+  'skillMode.close': '关闭技能模式',
+  // ChatBootPage 组件相关
+  'chatBootPage.caseReply.viewReplay': '查看回放',
+  'chatBootPage.tabIconAction': '标签页图标操作',
+  // Editor 相关
+  'editor.embedMediaLinks': '嵌入媒体链接',
+  'editor.pasteMediaLink': '粘贴媒体链接',
+  'editor.embed': '嵌入',
+  'editor.local': '本地',
+  'editor.chooseFile': '选择文件',
+  'editor.embedLink': '嵌入链接',
+  'editor.pasteAttachmentLink': '粘贴附件链接',
+  // Code 相关
+  'code.searchLanguage': '搜索语言',
 };
 
 /**
@@ -465,7 +496,6 @@ export const cnLabels = {
  * 提供完整的用户界面文本本地化。
  */
 export const enLabels: typeof cnLabels = {
-  attachmentSingleMax: 'Single max',
   undo: 'Undo',
   redo: 'Redo',
   switchLanguage: 'Switch Language',
@@ -475,8 +505,6 @@ export const enLabels: typeof cnLabels = {
   clearFormatting: 'Clear Formatting',
   queryKeyWords: 'Query Keywords',
   searchResults: 'Search Results',
-  taskFinished: 'Task Finished',
-  taskCost: 'Time Used',
   taskComplete: 'Task Complete',
   taskAborted: 'Task Aborted',
   executionResult: 'Execution Result',
@@ -540,6 +568,9 @@ export const enLabels: typeof cnLabels = {
   columns: 'Columns',
   all: 'All',
   descriptions: 'Definition List',
+  docCards: 'Card List',
+  docCardsTags: 'Tags',
+  quadrantChart: 'Quadrant Chart',
   preview: 'Preview',
   copy: 'Copy',
   expand: 'Expand',
@@ -644,6 +675,12 @@ export const enLabels: typeof cnLabels = {
   'chat.task.search.placeholder': 'Search Task',
   'chat.history.empty.chat.title': 'No related results found',
   'chat.history.empty.chat.description': 'Try a different keyword',
+  'chat.history.empty.task.title': 'No history tasks',
+  'chat.history.empty.task.description': 'Completed tasks will show up here',
+  // History time group labels: i18n overrides for formatTime
+  'chat.history.time.today': 'Today',
+  'chat.history.time.yesterday': 'Yesterday',
+  'chat.history.time.withinWeek': 'Within a week',
   // TaskList component related
   'taskList.expand': 'Expand',
   'taskList.collapse': 'Collapse',
@@ -728,6 +765,7 @@ export const enLabels: typeof cnLabels = {
   'workspace.browser': 'Browser',
   'workspace.task': 'Task',
   'workspace.file': 'File',
+  'workspace.fileTree': 'File tree',
   'workspace.custom': 'Custom',
   'workspace.terminalExecution': 'Terminal execution',
   'workspace.createHtmlFile': 'Create HTML file',
@@ -752,7 +790,13 @@ export const enLabels: typeof cnLabels = {
   // New: Workspace title & search
   'workspace.title': 'Workspace',
   'workspace.searchPlaceholder': 'Search file name',
+  'workspace.fileTreeSearchPlaceholder':
+    'Search loaded files under expanded folders',
   'workspace.noResultsFor': 'No results for "${keyword}"',
+  'workspace.treeFilterNoMatchVisibleRoots':
+    'No matching files in the current visible list for "${keyword}"',
+  'workspace.treeFilterNoMatchInExpanded':
+    'Searched loaded content under expanded folders; no match for "${keyword}"',
   // New: File preview related
   'workspace.file.generating': 'Generating',
   'workspace.file.processing': 'Processing file...',
@@ -814,6 +858,8 @@ export const enLabels: typeof cnLabels = {
   'input.sendButtonTooltip.newline': 'Press Shift+Enter for new line',
   'input.sendButtonTooltip.send.mod': 'Press Cmd/Ctrl+Enter to send',
   'input.sendButtonTooltip.newline.mod': 'Press Enter for new line',
+  'input.sendButtonAriaLabel.send': 'Send message',
+  'input.sendButtonAriaLabel.stop': 'Stop generating',
   'input.typing.hint': 'AI is replying, please wait...',
   // Other translations
   'common.name': 'Name',
@@ -847,7 +893,6 @@ export const enLabels: typeof cnLabels = {
   'browser.totalResults': 'Total ${count} results',
   'browser.searching': 'Searching...',
   'layout.header.title': 'AI Assistant',
-  theme: 'Theme',
   localPreview: 'Local Preview',
   expandCollapse: 'Expand/Collapse',
   moreActions: 'More Actions',
@@ -919,9 +964,31 @@ export const enLabels: typeof cnLabels = {
   'fileType.config': 'Configuration file',
   'fileType.powerpoint': 'PowerPoint presentation',
   // PreviewComponent messages
-  'workspace.file.unsupportedPreview': 'This file cannot be previewed, please download to view.',
+  'workspace.file.unsupportedPreview':
+    'This file cannot be previewed, please download to view.',
+  'workspace.file.unsupportedPreviewNoDownload':
+    'This file cannot be previewed.',
   'workspace.file.downloadButton': 'Download',
-  'workspace.file.videoNotSupported': 'Your browser does not support video playback',
-  'workspace.file.audioNotSupported': 'Your browser does not support audio playback',
+  'workspace.file.videoNotSupported':
+    'Your browser does not support video playback',
+  'workspace.file.audioNotSupported':
+    'Your browser does not support audio playback',
   'workspace.file.fileType': 'File type: ',
+  enlarge: 'Enlarge',
+  shrink: 'Shrink',
+  'skillMode.region': 'Skill mode',
+  'skillMode.close': 'Close skill mode',
+  // ChatBootPage component related
+  'chatBootPage.caseReply.viewReplay': 'View Replay',
+  'chatBootPage.tabIconAction': 'Tab icon action',
+  // Editor related
+  'editor.embedMediaLinks': 'Embed media links',
+  'editor.pasteMediaLink': 'Paste media link',
+  'editor.embed': 'Embed',
+  'editor.local': 'Local',
+  'editor.chooseFile': 'Choose a file',
+  'editor.embedLink': 'Embed Link',
+  'editor.pasteAttachmentLink': 'Paste attachment link',
+  // Code related
+  'code.searchLanguage': 'Search',
 };

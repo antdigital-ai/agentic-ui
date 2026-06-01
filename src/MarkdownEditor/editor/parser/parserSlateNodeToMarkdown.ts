@@ -5,12 +5,23 @@
 import { Node, Text } from 'slate';
 import stringWidth from 'string-width';
 import { debugInfo } from '../../../Utils/debugUtils';
-import { ChartNode } from '../../el';
+import type { ChartNode, CustomLeaf } from '../../el';
 import type { MarkdownEditorPlugin } from '../../plugin';
 import { getMediaType } from '../utils/dom';
 import { JINJA_DOLLAR_PLACEHOLDER } from './constants';
 
 const inlineNode = new Set(['break']);
+
+/**
+ * 转义 HTML 属性值，避免用户输入里的 `"`、`<`、`&` 破坏标签结构。
+ * 仅在需要把任意字符串拼到 `attr="..."` 里时使用。
+ */
+const escapeHtmlAttr = (value: string): string =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
 
 /**
  * 尝试使用插件转换节点
@@ -726,7 +737,7 @@ export const parserSlateNodeToMarkdown = (
 export const isMix = (t: Text) => {
   return (
     Object.keys(t).filter((key) =>
-      ['bold', 'code', 'italic', 'strikethrough'].includes(key),
+      ['bold', 'code', 'italic', 'strikethrough', 'mark'].includes(key),
     ).length > 1
   );
 };
@@ -754,6 +765,17 @@ const textHtml = (t: Text) => {
   if (t.strikethrough) str = `<del>${str}</del>`;
   if (t?.url) str = `<a href="${t?.url}">${str}</a>`;
   if (t?.identifier || t?.fnc) str = `[^${str}]`;
+  if ((t as CustomLeaf).mark) {
+    const attrs: string[] = [];
+    if ((t as CustomLeaf).markColor)
+      attrs.push(`color="${escapeHtmlAttr((t as CustomLeaf).markColor!)}"`);
+    if ((t as CustomLeaf).markBg)
+      attrs.push(`bg="${escapeHtmlAttr((t as CustomLeaf).markBg!)}"`);
+    if ((t as CustomLeaf).markLabel)
+      attrs.push(`label="${escapeHtmlAttr((t as CustomLeaf).markLabel!)}"`);
+    const attrStr = attrs.length ? ` ${attrs.join(' ')}` : '';
+    str = `<mark${attrStr}>${str}</mark>`;
+  }
   return str;
 };
 
@@ -866,6 +888,7 @@ const composeText = (t: Text, parent: any[]) => {
   if (!t.text && !t.tag) return '';
   if (
     t.highColor ||
+    (t as CustomLeaf).mark ||
     t.identifier ||
     t.fnc ||
     (t.strikethrough && (t.bold || t.italic || t.code))

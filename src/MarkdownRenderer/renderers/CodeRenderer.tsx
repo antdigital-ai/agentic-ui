@@ -1,46 +1,65 @@
-import { ChevronsUpDown, Copy, Moon } from '@sofa-design/icons';
-import copy from 'copy-to-clipboard';
-import React, { useCallback, useContext, useMemo, useState } from 'react';
-import { ActionIconBox } from '../../Components/ActionIconBox';
-import { I18nContext } from '../../I18n';
-import { CodeContainer } from '../../Plugins/code/components/CodeContainer';
-import { LoadImage } from '../../Plugins/code/components/LoadImage';
-import { langIconMap } from '../../Plugins/code/langIconMap';
+﻿import copy from 'copy-to-clipboard';
+import React, { useMemo, useState } from 'react';
+import { useRefFunction } from '../../Hooks/useRefFunction';
+import type { CodeNode } from '../../MarkdownEditor/el';
 import type { MarkdownEditorProps } from '../../MarkdownEditor/types';
+import { useDetectTheme } from '../../Plugins/chart/hooks';
+import { CodeContainer } from '../../Plugins/code/components/CodeContainer';
 import { debugInfo } from '../../Utils/debugUtils';
+import { extractBlockTextContent } from '../extractBlockTextContent';
 import type { RendererBlockProps } from '../types';
-
-const extractTextContent = (children: React.ReactNode): string => {
-  if (typeof children === 'string') return children;
-  if (typeof children === 'number') return String(children);
-  if (Array.isArray(children)) return children.map(extractTextContent).join('');
-  if (React.isValidElement(children) && children.props?.children) {
-    return extractTextContent(children.props.children);
-  }
-  return '';
-};
+import { CodeBlockToolbar } from './CodeBlockToolbar';
 
 /**
  * 代码块渲染器——复用 MarkdownEditor 的 CodeContainer 和样式体系。
  * 不依赖 Slate 上下文，提供与 CodeRenderer readonly 模式一致的视觉效果。
  */
+
+const CONTENT_OUTER_BASE_STYLE: React.CSSProperties = {
+  borderBottomLeftRadius: 'inherit',
+  borderBottomRightRadius: 'inherit',
+};
+
+const CONTENT_INNER_STYLE: React.CSSProperties = {
+  height: '100%',
+  width: '100%',
+  borderRadius: 'inherit',
+  padding: '12px 16px',
+  overflow: 'auto',
+  fontSize: '0.9em',
+  lineHeight: 1.6,
+  fontFamily:
+    "'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace",
+  whiteSpace: 'pre-wrap',
+  wordBreak: 'break-all',
+};
+
+/**
+ * 计算代码内容外层容器样式：通过 display: none 实现折叠态。
+ * 提取为函数以避免 inline 表达式让 React diff 失稳。
+ */
+const buildContentOuterStyle = (expanded: boolean): React.CSSProperties => ({
+  ...CONTENT_OUTER_BASE_STYLE,
+  display: expanded ? 'block' : 'none',
+});
+
 export const CodeBlockRenderer: React.FC<
   RendererBlockProps & {
     editorCodeProps?: MarkdownEditorProps['codeProps'];
   }
 > = (props) => {
   const { language, children, editorCodeProps } = props;
-  const [theme, setTheme] = useState(
-    () => (editorCodeProps?.theme as string) || 'github',
-  );
+  const detectedTheme = useDetectTheme();
+  const theme =
+    (editorCodeProps?.theme as string) ||
+    (detectedTheme === 'dark' ? 'chaos' : 'github');
   const [isExpanded, setIsExpanded] = useState(true);
-  const i18n = useContext(I18nContext);
 
-  const code = useMemo(() => extractTextContent(children), [children]);
+  const code = useMemo(() => extractBlockTextContent(children), [children]);
 
-  const fakeElement = useMemo(
+  const fakeElement = useMemo<CodeNode>(
     () => ({
-      type: 'code' as const,
+      type: 'code',
       language: language || '',
       value: code,
       children: [{ text: code }],
@@ -48,139 +67,39 @@ export const CodeBlockRenderer: React.FC<
     [language, code],
   );
 
-  const handleCopy = useCallback(() => {
+  const handleCopy = useRefFunction(() => {
     try {
       copy(code);
     } catch (error) {
-      console.error('复制失败:', error);
+      debugInfo('CodeBlockRenderer - 复制失败', {
+        error: (error as Error)?.message || String(error),
+      });
     }
-  }, [code]);
+  });
 
-  const langIcon = langIconMap.get(language?.toLowerCase() || '');
+  const handleToggleExpanded = useRefFunction(() => {
+    setIsExpanded((prev) => !prev);
+  });
 
   const defaultDom = (
     <CodeContainer
-      element={fakeElement as any}
+      element={fakeElement}
       showBorder={false}
       hide={false}
       onEditorClick={() => {}}
-      theme={theme}
     >
-      <div
-        data-testid="code-toolbar"
-        contentEditable={false}
-        style={{
-          borderTopLeftRadius: 'inherit',
-          borderTopRightRadius: 'inherit',
-          backgroundColor: 'transparent',
-          paddingLeft: '0.25em',
-          paddingRight: '0.25em',
-          width: '100%',
-          position: 'sticky',
-          left: 0,
-          top: 0,
-          fontSize: '1em',
-          font: 'var(--font-text-h6-base)',
-          color: 'inherit',
-          justifyContent: 'space-between',
-          zIndex: 50,
-          height: '38px',
-          display: 'flex',
-          alignItems: 'center',
-          padding: '9px 12px',
-          gap: '16px',
-          alignSelf: 'stretch',
-          boxSizing: 'border-box',
-          userSelect: 'none',
-          borderBottom: isExpanded
-            ? theme === 'chaos'
-              ? '1px solid #161616'
-              : '1px solid var(--color-gray-border-light)'
-            : 'none',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              cursor: 'pointer',
-              gap: 4,
-              font: 'inherit',
-              color: 'inherit',
-              userSelect: 'none',
-            }}
-          >
-            {langIcon && (
-              <div
-                style={{
-                  height: '1em',
-                  width: '1em',
-                  fontSize: '16px',
-                  display: 'flex',
-                }}
-              >
-                <LoadImage
-                  style={{ height: '1em', width: '1em' }}
-                  src={langIcon}
-                />
-              </div>
-            )}
-            <span>{language || 'plain text'}</span>
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
-          <ActionIconBox
-            title={i18n?.locale?.theme || '主题'}
-            theme={theme === 'chaos' ? 'dark' : 'light'}
-            onClick={() => setTheme(theme === 'github' ? 'chaos' : 'github')}
-          >
-            <Moon />
-          </ActionIconBox>
-          <ActionIconBox
-            theme={theme === 'chaos' ? 'dark' : 'light'}
-            title={i18n?.locale?.copy || '复制'}
-            style={{
-              fontSize: '1em',
-              lineHeight: '1.75em',
-              marginLeft: '0.125em',
-            }}
-            onClick={handleCopy}
-          >
-            <Copy />
-          </ActionIconBox>
-          <ActionIconBox
-            title={i18n?.locale?.expandCollapse || '展开/收起'}
-            theme={theme === 'chaos' ? 'dark' : 'light'}
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            <ChevronsUpDown />
-          </ActionIconBox>
-        </div>
-      </div>
+      <CodeBlockToolbar
+        language={language}
+        expanded={isExpanded}
+        theme={theme === 'chaos' ? 'dark' : 'light'}
+        onCopy={handleCopy}
+        onToggleExpanded={handleToggleExpanded}
+      />
       <div
         className="code-editor-content"
-        style={{
-          borderBottomLeftRadius: 'inherit',
-          borderBottomRightRadius: 'inherit',
-          display: isExpanded ? 'block' : 'none',
-        }}
+        style={buildContentOuterStyle(isExpanded)}
       >
-        <div
-          style={{
-            height: '100%',
-            width: '100%',
-            borderRadius: 'inherit',
-            padding: '12px 16px',
-            overflow: 'auto',
-            fontSize: '0.9em',
-            lineHeight: 1.6,
-            fontFamily:
-              "'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace",
-            whiteSpace: 'pre-wrap',
-            wordBreak: 'break-all',
-          }}
-        >
+        <div style={CONTENT_INNER_STYLE}>
           <code className={language ? `language-${language}` : undefined}>
             {children}
           </code>
@@ -195,11 +114,14 @@ export const CodeBlockRenderer: React.FC<
   }
 
   try {
+    // customRender 接受 Slate-like 结构。MarkdownRenderer 不依赖 Slate，
+    // 构造一个形状兼容的对象即可；因 customRender 的 `props` 类型为 `CustomLeaf<...> & { children }`，
+    // 与此处 `element` 字段类型并不严格匹配，故在调用边界保留一次必要的类型断言。
     const renderElementProps = {
       attributes: {},
       children: null,
       element: fakeElement,
-    } as any;
+    } as unknown as Parameters<typeof customRender>[0];
     const rendered = customRender(
       renderElementProps,
       defaultDom,

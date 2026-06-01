@@ -1,5 +1,4 @@
-import type { ChatTokenType, GenerateStyle } from '../../Hooks/useStyle';
-import { useEditorStyleRegister } from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
 const THINKING_DOT_SIZE = 4;
 const THINKING_DOT_GAP = 4;
@@ -13,7 +12,7 @@ const THINKING_LOADING_PADDING = {
   paddingBottom: 'var(--padding-2x)',
 };
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'BubbleMessages'> = (token) => {
   return {
     // 加载状态容器（compact模式）
     [`${token.componentCls}-messages-content-loading`]: {
@@ -62,7 +61,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
     // 用户消息文本颜色
     [`${token.componentCls}-messages-content-user-text`]: {
-      color: '#343A45',
+      color: 'var(--color-gray-text-default)',
     },
 
     // Popover 标题容器
@@ -107,7 +106,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       padding: 'var(--padding-2x) var(--padding-3x)',
       gap: 'var(--padding-2x)',
       alignSelf: 'stretch',
-      background: '#FBFCFD',
+      background: 'var(--color-gray-bg-page-light)',
       cursor: 'pointer',
       zIndex: 1,
     },
@@ -136,15 +135,26 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         opacity: 1,
       },
     },
+
+    // BubbleExtra 操作区入场动画：替代 framer-motion 的 fade-in
+    // 原实现 staggerChildren 对子组件无效（子组件并非 motion.*），故直接 fade
+    [`${token.componentCls}-action-box`]: {
+      animationName: `${token.componentCls}-actionBoxFadeIn`,
+      animationDuration: '0.3s',
+      animationTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      animationDelay: '0.5s',
+      animationFillMode: 'both',
+    },
+    [`@keyframes ${token.componentCls}-actionBoxFadeIn`]: {
+      from: { opacity: 0 },
+      to: { opacity: 1 },
+    },
   };
 };
 
+const useGenStyle = genStyleHooks('BubbleMessages', genStyle);
+
 export function useMessagesContentStyle(componentCls: string) {
-  return useEditorStyleRegister('BubbleMessageDisplay', (token) => {
-    const chatToken: ChatTokenType = {
-      ...token,
-      componentCls: `.${componentCls}`,
-    };
-    return genStyle(chatToken);
-  });
+  const [, hashId] = useGenStyle(componentCls);
+  return { hashId };
 }

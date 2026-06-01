@@ -5,32 +5,17 @@ import { BaseEditor, Editor, Selection } from 'slate';
 import { HistoryEditor } from 'slate-history';
 import { ReactEditor, RenderElementProps } from 'slate-react';
 import type {
-  CharacterQueueOptions,
+  ContentThrottleOptions,
   RenderMode,
 } from '../MarkdownRenderer/types';
+import type { FormulaConfig } from '../Config/formulaConfig';
 import { TagPopupProps } from './editor/elements/TagPopup';
-import { EditorStore } from './editor/store';
+import type { EditorStore } from './editor/store';
 import { InsertAutocompleteProps } from './editor/tools/InsertAutocomplete';
+import type { ToolsKeyType } from './editor/tools/ToolBar/config/toolsConfig';
 import type { MarkdownToHtmlOptions } from './editor/utils/markdownToHtml';
 import { CustomLeaf, Elements } from './el';
 
-/**
- * @typedef CommentDataType
- * @description 表示评论数据的类型。
- *
- * @property {Selection} selection - 用户选择的文本范围。
- * @property {number[]} path - 文档中选择路径的数组。
- * @property {number} anchorOffset - 选择范围的起始偏移量。
- * @property {number} focusOffset - 选择范围的结束偏移量。
- * @property {string} refContent - 参考内容。
- * @property {string} commentType - 评论的类型。
- * @property {string} content - 评论的内容。
- * @property {number} time - 评论的时间戳。
- * @property {string | number} id - 评论的唯一标识符。
- * @property {Object} [user] - 用户信息（可选）。
- * @property {string} user.name - 用户名。
- * @property {string} [user.avatar] - 用户头像（可选）。
- */
 export type CommentDataType = {
   selection: Selection;
   path: number[];
@@ -55,156 +40,62 @@ export type JinjaTemplateItem = {
   template: string;
 };
 
-/** 模板列表：静态数组或异步加载（与 TagPopupProps.items 一致） */
+/** 模板列表：静态数组或异步加载 */
 export type JinjaTemplatePanelItems =
   | JinjaTemplateItem[]
   | ((params?: { editor?: Editor }) => Promise<JinjaTemplateItem[]>);
 
-/** 模板面板配置（与 tag 配置做成一样，支持 items 异步） */
 export interface JinjaTemplatePanelConfig {
-  /** 是否开启 {} 触发与模板面板，默认 true */
+  /** 默认 true */
   enable?: boolean;
   /** 触发符，默认 '{}' */
   trigger?: string;
-  /**
-   * 模板列表：静态数组或异步加载
-   * 不传时使用内置 JINJA_TEMPLATE_DATA
-   */
+  /** 不传时使用内置 JINJA_TEMPLATE_DATA */
   items?: JinjaTemplatePanelItems;
-  /** 无数据时展示，同 TagPopupProps.notFoundContent */
   notFoundContent?: React.ReactNode;
 }
 
-/** Jinja 配置：总开关、使用说明链接、模板面板 */
 export interface JinjaConfig {
-  /** 总开关：为 true 时启用 Jinja 语法高亮；同时若未关闭 templatePanel 则启用模板面板 */
+  /** 总开关：语法高亮 + 模板面板 */
   enable: boolean;
-  /** 使用说明链接，供模板面板「使用说明」使用 */
+  /** 使用说明链接 */
   docLink?: string;
-  /** 模板面板配置（与 tag 配置做成一样，支持 items 异步） */
   templatePanel?: boolean | JinjaTemplatePanelConfig;
 }
 
-/**
- * 编辑器接口定义
- * @interface IEditor
- *
- * @property {IEditor[]} [children] - 子编辑器列表
- * @property {boolean} [expand] - 是否展开
- * @property {any[]} [schema] - 编辑器模式配置
- * @property {any} [history] - 编辑器历史记录
- */
 export type IEditor = {
   children?: IEditor[];
   expand?: boolean;
 };
 
-/**
- * MarkdownEditor 实例
- */
 export interface MarkdownEditorInstance {
   range?: any;
   store: EditorStore;
   markdownContainerRef: React.MutableRefObject<HTMLDivElement | null>;
   markdownEditorRef: React.MutableRefObject<
     BaseEditor & ReactEditor & HistoryEditor
-  >;
+  > | React.MutableRefObject<null>;
   exportHtml: (filename?: string) => void;
+  /** renderMode=markdown 时可用 */
+  getDisplayedContent?: () => string;
 }
 
-/**
- * MarkdownEditor 的 props
- * @param props
- */
 export type MarkdownEditorProps = {
-  /**
-   * 自定义 CSS 类名
-   * @description 用于为编辑器根容器添加自定义类名
-   * @example "my-markdown-editor"
-   */
   className?: string;
-  /**
-   * 编辑器宽度
-   * @description 支持字符串（如 '100%', '500px'）或数字（像素值）
-   * @example "100%" | 800
-   */
   width?: string | number;
-  /**
-   * 编辑器高度
-   * @description 支持字符串（如 '100%', '500px'）或数字（像素值）
-   * @example "100%" | 600
-   */
   height?: string | number;
-  /**
-   * 标签输入配置
-   * @description 配置标签输入组件的显示和行为
-   * @property {boolean} [enable] - 是否启用标签输入功能
-   * @property {string} [placeholder] - 标签输入框的占位符文本
-   * @property {'panel' | 'dropdown'} [type] - 标签输入组件的显示类型，'panel' 为面板模式，'dropdown' 为下拉模式
-   * @example
-   * ```tsx
-   * tagInputProps={{
-   *   enable: true,
-   *   placeholder: '输入标签...',
-   *   type: 'dropdown'
-   * }}
-   * ```
-   */
   tagInputProps?: {
     enable?: boolean;
     placeholder?: string;
     type?: 'panel' | 'dropdown';
   } & TagPopupProps;
-
-  /**
-   * 编辑器样式
-   * @description 自定义编辑器容器的内联样式
-   * @example { padding: '10px', backgroundColor: '#f5f5f5' }
-   */
   editorStyle?: React.CSSProperties;
-
-  /**
-   * 功能属性配置
-   * @description 提供自定义渲染和事件处理的能力
-   * @property {Function} render - 自定义节点渲染函数，用于覆盖默认的节点渲染逻辑
-   * @property {Function} [onOriginUrlClick] - 点击原文链接时的回调函数
-   * @property {Function} [onFootnoteDefinitionChange] - 脚注定义变更时的回调函数
-   * @example
-   * ```tsx
-   * fncProps={{
-   *   render: (props, defaultDom) => {
-   *     // 自定义渲染逻辑
-   *     return <CustomNode {...props} />;
-   *   },
-   *   onOriginUrlClick: (url) => {
-   *     window.open(url);
-   *   },
-   *   onFootnoteDefinitionChange: (data) => {
-   *     console.log('脚注定义变更:', data);
-   *   }
-   * }}
-   * ```
-   */
   fncProps?: {
-    /**
-     * 自定义节点渲染函数
-     * @param props - 包含节点属性和子节点的对象
-     * @param defaultDom - 默认的 DOM 渲染结果
-     * @returns 自定义渲染的 React 节点
-     */
     render: (
       props: CustomLeaf<Record<string, any>> & { children: React.ReactNode },
       defaultDom: React.ReactNode,
     ) => React.ReactNode;
-    /**
-     * 点击原文链接的回调函数
-     * @param url - 原文链接地址
-     */
     onOriginUrlClick?: (url?: string) => void;
-    /**
-     * 脚注定义变更的回调函数
-     * @param data - 脚注定义数据数组，包含 id、placeholder、origin_text、url、origin_url 等信息
-     */
     onFootnoteDefinitionChange?: (
       data: {
         id: any;
@@ -215,44 +106,10 @@ export type MarkdownEditorProps = {
       }[],
     ) => void;
   };
-
   /**
-   * 代码编辑器配置
+   * 代码块配置，基于 Ace Editor
    *
-   * 支持配置代码块的显示和编辑行为，基于 Ace Editor。
-   *
-   * @example
-   * ```tsx
-   * <MarkdownEditor
-   *   codeProps={{
-   *     theme: 'monokai', // 代码编辑器主题
-   *     fontSize: 14,
-   *     hideToolBar: false,
-   *     Languages: ['javascript', 'python', 'typescript'],
-   *     showLineNumbers: true,
-   *     wrap: true,
-   *     disableHtmlPreview: true, // 禁用 HTML 预览
-   *     viewModeLabels: {
-   *       preview: 'Preview', // 自定义预览标签
-   *       code: 'Code', // 自定义代码标签
-   *     },
-   *   }}
-   * />
-   * ```
-   *
-   * @property {string[]} [Languages] - 支持的编程语言列表
-   * @property {boolean} [hideToolBar] - 是否隐藏代码块工具栏
-   * @property {boolean} [alwaysExpandedDeepThink] - 是否始终展开深度思考块
-   * @property {boolean} [disableHtmlPreview] - 是否禁用 HTML 代码块的预览功能，禁用后只显示代码模式
-   * @property {Object} [viewModeLabels] - 预览/代码切换按钮的标签配置
-   * @property {string} [viewModeLabels.preview] - 预览模式的标签文本，默认为 '预览'
-   * @property {string} [viewModeLabels.code] - 代码模式的标签文本，默认为 '代码'
-   * @property {string} [theme] - 代码编辑器主题，如 'chrome', 'monokai', 'github', 'dracula' 等
-   * @property {number} [fontSize] - 代码字体大小，默认 12
-   * @property {number} [tabSize] - Tab 缩进大小，默认 4
-   * @property {boolean} [showLineNumbers] - 是否显示行号，默认 true
-   * @property {boolean} [showGutter] - 是否显示代码栏，默认 true
-   * @property {boolean} [wrap] - 是否自动换行，默认 true
+   * `render` 返回 `undefined` 时回退到默认渲染；返回 `null` 时不渲染。
    */
   codeProps?: {
     render?: (
@@ -260,30 +117,25 @@ export type MarkdownEditorProps = {
       defaultDom: React.ReactNode,
       codeProps?: MarkdownEditorProps['codeProps'],
     ) => React.ReactNode;
-    /**
-     * 自定义节点渲染函数
-     *
-     * 约定：当 `render` 返回 `undefined` 时，表示“不覆盖默认渲染”，组件会回退到内部默认的卡片/渲染逻辑；
-     * 若需要“不渲染任何内容”，请显式返回 `null`。
-     */
     Languages?: string[];
     hideToolBar?: boolean;
     alwaysExpandedDeepThink?: boolean;
-    /** 是否禁用 HTML 代码块的预览功能，禁用后只显示代码模式 */
+    /**
+     * 深度思考块展开时是否将组件滚动到视窗内。
+     * 传入 `true` 时使用默认参数 `{ behavior: 'smooth', block: 'nearest' }`，
+     * 也可直接传入 `ScrollIntoViewOptions` 自定义滚动行为。
+     */
+    scrollDeepThinkIntoViewOnExpand?: boolean | ScrollIntoViewOptions;
     disableHtmlPreview?: boolean;
-    /** 预览/代码切换按钮的标签配置 */
     viewModeLabels?: {
-      /** 预览模式的标签文本，默认为 '预览' */
+      /** 默认 '预览' */
       preview?: string;
-      /** 代码模式的标签文本，默认为 '代码' */
+      /** 默认 '代码' */
       code?: string;
     };
   } & Partial<Ace.EditorOptions>;
 
   anchorProps?: AnchorProps;
-  /**
-   * 配置图片数据
-   */
   image?: {
     upload?: (file: File[] | string[]) => Promise<string[] | string>;
     render?: (
@@ -299,100 +151,39 @@ export type MarkdownEditorProps = {
   ) => React.ReactNode;
   initValue?: string;
   /**
-   * 只读模式
+   * 只读时是否仍挂载完整 Slate 取决于 `renderMode`：
+   * - 与 `renderMode: 'markdown'` 联用：走轻量 `MarkdownRenderer`，不加载 Slate（首包与运行时最小）
+   * - 默认或 `renderMode: 'slate'`：只读仍以 Slate 渲染（可选中、与编辑态 DOM 一致），但会包含 Slate 与相关依赖
    */
   readonly?: boolean;
-  /**
-   * 懒加载渲染配置
-   * 启用后，每个元素都会被包裹在一个使用 IntersectionObserver 的容器中
-   * 只有当元素进入视口时才会真正渲染，以提升大型文档的性能
-   *
-   * @example
-   * ```tsx
-   * // 基本懒加载配置
-   * lazy={{
-   *   enable: true,
-   *   placeholderHeight: 100,
-   *   rootMargin: '200px'
-   * }}
-   *
-   * // 自定义占位符渲染
-   * lazy={{
-   *   enable: true,
-   *   placeholderHeight: 120,
-   *   rootMargin: '300px',
-   *   renderPlaceholder: ({ height, style, isIntersecting }) => (
-   *     <div style={style}>
-   *       <div>加载中... {isIntersecting ? '(即将显示)' : ''}</div>
-   *     </div>
-   *   )
-   * }}
-   * ```
-   */
+
+  /** 懒加载，只有进入视口才渲染 */
   lazy?: {
-    /**
-     * 是否启用懒加载，默认 false
-     */
     enable?: boolean;
-    /**
-     * 占位符高度（单位：px），默认 25
-     */
+    /** 单位 px，默认 25 */
     placeholderHeight?: number;
-    /**
-     * 提前加载的距离，默认 '200px'
-     * 支持所有 IntersectionObserver rootMargin 的值
-     */
+    /** IntersectionObserver rootMargin，默认 '200px' */
     rootMargin?: string;
-    /**
-     * 自定义占位符渲染函数
-     * 允许开发者自定义懒加载时的占位符显示内容
-     */
     renderPlaceholder?: (props: {
-      /** 占位符高度 */
       height: number;
-      /** 占位符样式 */
       style: React.CSSProperties;
-      /** 元素是否即将进入视口 */
       isIntersecting: boolean;
-      /** 元素在文档中的位置信息（可选） */
-      elementInfo?: {
-        /** 元素类型 */
-        type: string;
-        /** 元素在文档中的索引 */
-        index: number;
-        /** 元素总数量 */
-        total: number;
-      };
+      elementInfo?: { type: string; index: number; total: number };
     }) => React.ReactNode;
   };
+
   /**
-   * 样式
-   * @description 支持通过 CSS 变量自定义表格等渲染样式，可覆盖的变量包括：
-   * - `--agentic-ui-table-border-radius` 表格圆角，默认 8px
-   * - `--agentic-ui-table-border-color` 表格边框颜色，默认 #E7E9E8
-   * - `--agentic-ui-table-header-bg` 表头背景色，默认 #f7f7f9
-   * - `--agentic-ui-table-hover-bg` 行悬停背景色，默认 rgba(0,0,0,0.04)
-   * - `--agentic-ui-table-cell-bg` 单元格背景色，默认 #ffffff
-   * - `--agentic-ui-table-cell-min-width` 单元格最小宽度，默认 40px
-   * - `--agentic-ui-table-cell-padding` 单元格内边距，默认 16px 12px
-   * @example style={{ ['--agentic-ui-table-border-color']: '#ddd', ['--agentic-ui-table-header-bg']: '#f0f0f0' } as React.CSSProperties}
+   * 支持 CSS 变量自定义表格样式：
+   * `--agentic-ui-table-border-radius`、`--agentic-ui-table-border-color`、
+   * `--agentic-ui-table-header-bg`、`--agentic-ui-table-hover-bg` 等
    */
   style?: React.CSSProperties;
-  /**
-   * 内容样式
-   * @description 支持 `--agentic-ui-content-padding` 等 CSS 变量
-   */
   contentStyle?: React.CSSProperties;
-  /**
-   * 工具栏配置
-   */
+
   toolbarConfig?: {
     show?: boolean;
     items?: string[];
   };
-  /**
-   * 表格配置
-   */
   tableConfig?: {
     minColumn?: number;
     minRows?: number;
@@ -403,83 +194,60 @@ export type MarkdownEditorProps = {
     };
     pure?: boolean;
     previewTitle?: string;
-    /**
-     * 表格 CSS 变量覆盖，支持通过配置自定义表格样式
-     * @example
-     * ```tsx
-     * tableConfig={{
-     *   cssVariables: {
-     *     '--agentic-ui-table-border-color': '#d9d9d9',
-     *     '--agentic-ui-table-header-bg': '#fafafa',
-     *     '--agentic-ui-table-cell-min-width': '150px',
-     *   },
-     * }}
-     * ```
-     */
     cssVariables?: Record<`--${string}`, string>;
   };
-  /**
-   * 粘贴配置
-   */
   pasteConfig?: {
     enabled?: boolean;
     allowedTypes?: string[];
-    /**
-     * 仅插入纯文本，不解析 HTML/Markdown/链接等
-     * @default false
-     */
+    /** @default false */
     plainTextOnly?: boolean;
+    /**
+     * 粘 text/plain 时是否启发式识别 markdown 并解析。
+     * 默认 true（保留旧行为）；关掉后含 `**bold**` `[x](y)` 等的纯文本会原样插入。
+     */
+    parseMarkdownInPlainText?: boolean;
+    /**
+     * text/html 单次粘贴体积上限（字节）。超过时降级为 text/plain，避免主线程被巨型
+     * Word/Excel 文档卡死。默认 1MB；设为 0 关闭限制。
+     * @default 1_048_576
+     */
+    htmlMaxBytes?: number;
+    /**
+     * 检测到 Word / Office 系列 HTML 时，先把 HTML 转成 markdown 再走 markdown 解析
+     * 流水线（更稳定的格式映射），失败时回退到 insertParsedHtmlNodes。
+     * 默认 true；设为 false 走旧的 docxDeserializer 路径。
+     * @default true
+     */
+    convertWordToMarkdown?: boolean;
   };
-  /**
-   * Jinja 配置：语法高亮与模板面板（输入 `{}` 触发）
-   */
+
   jinja?: JinjaConfig;
-  /**
-   * 插件配置
-   */
+  /** 公式解析与 KaTeX 渲染配置；可通过 AgenticConfigProvide 全局设置 */
+  formula?: FormulaConfig;
   plugins?: any[];
-  /**
-   * 变更回调
-   */
   onChange?: (value: string, schema: Elements[]) => void;
   /**
-   * 选择变更回调
-   * @param selection - Slate 选区对象
-   * @param selectedMarkdown - 选中内容的 markdown 文本
-   * @param selectedNodes - 选中的节点数组
+   * onChange 去抖等待毫秒数。连续输入会合并为一次回调，默认 150ms。
+   * 设为 0 时仍会去掉同帧重复（rAF 级别）；设大值可进一步降低 setState 频率。
    */
+  onChangeDebounceWait?: number;
   onSelectionChange?: (
     selection: Selection | null,
     selectedMarkdown: string,
     selectedNodes: Elements[],
   ) => void;
   comment?: {
-    /**
-     * 是否启用评论功能
-     */
     enable?: boolean;
-    /**
-     * 评论数据
-     */
     commentList?: CommentDataType[];
     loadMentions?: (text: string) => Promise<{ name: string }[]>;
-    /**
-     * 添加评论的回调函数
-     */
     onSubmit?: (id: string | number, comment: CommentDataType) => void;
-    /**
-     * 删除评论的回调函数
-     */
     onDelete?: (id: string | number, comment: CommentDataType) => void;
     editorRender?: (dom: React.ReactNode) => React.ReactNode;
     onClick?: (id: string | number, comment: CommentDataType) => void;
     onEdit?: (id: string | number, comment: CommentDataType) => void;
     deleteConfirmText?: string;
     mentionsPlaceholder?: string;
-    /**
-     * 评论输入框占位符
-     * @description 评论输入框的占位符文本，如果不提供则使用 titlePlaceholderContent
-     */
+    /** 未提供时回退到 titlePlaceholderContent */
     placeholder?: string;
     listItemRender?: (
       defaultDom: {
@@ -505,57 +273,22 @@ export type MarkdownEditorProps = {
     schema: Elements[],
     e: React.MouseEvent<HTMLDivElement, Element>,
   ) => void;
-
   onPaste?: (e: React.ClipboardEvent<HTMLDivElement>) => boolean | void;
 
-  /**
-   * 自定义 markdown 转 HTML 的 remark 插件配置，格式类似 Babel 插件数组
-   */
+  /** 自定义 remark 插件，格式同 Babel 插件数组 */
   markdownToHtmlOptions?: MarkdownToHtmlOptions;
 
   linkConfig?: {
-    /** 是否在新标签页打开链接 */
     openInNewTab?: boolean;
-    /** 自定义链接渲染函数 */
     onClick?: (url?: string) => boolean | void;
   };
 
-  /**
-   * MarkdownRenderer 字符队列（仅 `renderMode: 'markdown'` 只读预览时生效）
-   * @description 默认关闭逐字 RAF；需要打字机时再设 `{ animate: true, animateTailChars: 50 }` 等
-   */
-  queueOptions?: CharacterQueueOptions;
+  /** 流式限流（仅 renderMode: 'markdown'），默认 streaming 时开启 */
+  throttleOptions?: ContentThrottleOptions;
 
-  /**
-   * 流式 Markdown 末段淡入（仅 `renderMode: 'markdown'` 时传给 MarkdownRenderer）
-   * @description 默认 false；设为 true 时末段使用 AnimationText 入场，可能在高频更新时产生闪动
-   */
-  streamingParagraphAnimation?: boolean;
-
-  /**
-   * 依赖数组
-   * @description 用于控制 MElement 组件是否刷新的依赖数组。当 deps 数组内容发生变化时，MElement 会重新渲染
-   * @example ['user-id', 'theme', 'locale']
-   */
+  /** MElement 刷新依赖 */
   deps?: string[];
 
-  /**
-   * Apaasify 自定义渲染配置
-   * @description 用于自定义渲染 apaasify 代码块的内容
-   * @property {boolean} enable - 是否启用自定义渲染
-   * @property {Function} render - 自定义渲染函数，接收 Schema 组件的 props 和 originData，返回 React 节点
-   * @example
-   * ```tsx
-   * <MarkdownEditor
-   *   apaasify={{
-   *     enable: true,
-   *     render: (props, originData) => {
-   *       return <CustomSchemaRenderer schema={props.element.value} />;
-   *     }
-   *   }}
-   * />
-   * ```
-   */
   apaasify?: {
     enable?: boolean;
     render?: (
@@ -563,12 +296,7 @@ export type MarkdownEditorProps = {
       originData?: import('../Bubble/type').MessageBubbleData,
     ) => React.ReactNode;
   };
-
-  /**
-   * Apassify 自定义渲染配置（兼容旧版本）
-   * @description 与 apaasify 功能相同，用于向后兼容
-   * @deprecated @since 2.29.0 请使用 apaasify 代替
-   */
+  /** @deprecated 请使用 apaasify */
   apassify?: {
     enable?: boolean;
     render?: (
@@ -578,173 +306,75 @@ export type MarkdownEditorProps = {
   };
 
   children?: React.ReactNode;
-
-  /**
-   * 编辑器实例引用
-   * @description 用于获取编辑器实例，可调用 store、exportHtml 等方法
-   */
   editorRef?: React.Ref<MarkdownEditorInstance | undefined>;
-
-  /**
-   * 报告模式
-   * @description 启用后将使用报告模式样式
-   */
   reportMode?: boolean;
-
-  /**
-   * 是否显示目录
-   * @default false
-   */
+  /** @default false */
   toc?: boolean;
-
-  /**
-   * 工具栏配置
-   * @description 配置编辑器顶部的工具栏
-   */
   toolBar?: {
     enable?: boolean;
     min?: boolean;
-    hideTools?: (
-      | 'bold'
-      | 'italic'
-      | 'underline'
-      | 'strikethrough'
-      | 'code'
-      | 'heading'
-      | 'link'
-      | 'color'
-      | 'clearFormat'
-      | 'undo'
-      | 'redo'
-      | string
-    )[];
+    /** 需要隐藏的工具栏选项，键名见 toolsConfig.tsx 中的 ToolsKeyType */
+    hideTools?: ToolsKeyType[];
     extra?: React.ReactNode[];
   };
-
-  /**
-   * 编辑器唯一标识
-   */
   id?: string;
-
-  /**
-   * 初始 Schema 值
-   * @description 直接传入 Slate schema 格式的数据，优先级高于 initValue
-   */
+  /** 直接传入 Slate schema，优先级高于 initValue */
   initSchemaValue?: Elements[];
-
-  /**
-   * 自定义叶子节点渲染函数
-   * @description 用于自定义文本节点的渲染方式
-   * @param props - 叶子节点属性
-   * @param defaultDom - 默认渲染 DOM
-   * @returns 自定义渲染结果
-   */
   leafRender?: (
     props: Record<string, any> & { children: React.ReactNode },
     defaultDom: React.ReactNode,
   ) => React.ReactNode;
 
+  /** 流式输出模式，同时传入时优先于 typewriter */
+  streaming?: boolean;
+  /** 流式是否完成（仅 renderMode: 'markdown'），未传入时回退到 !streaming */
+  isFinished?: boolean;
   /**
-   * 打字机效果
-   * @description 启用后编辑器将具有打字机效果的滚动行为
+   * streaming 的别名，向下兼容
+   * @deprecated 请使用 streaming
    */
   typewriter?: boolean;
 
-  /**
-   * 根容器引用
-   * @description 编辑器根容器的 DOM 引用
-   */
   rootContainer?: React.MutableRefObject<HTMLDivElement | undefined>;
-
-  /**
-   * 幻灯片模式
-   * @description 启用后编辑器将使用幻灯片模式样式
-   */
   slideMode?: boolean;
-
-  /**
-   * 容器自定义类名
-   * @description 编辑器内容容器的类名
-   */
   containerClassName?: string;
-
-  /**
-   * 浮动工具栏配置
-   */
-  floatBar?: {
-    enable?: boolean;
-  };
-
-  /**
-   * 文本区域配置
-   */
-  textAreaProps?: {
-    enable?: boolean;
-    placeholder?: string;
-  };
-
-  /**
-   * 标题占位符文本
-   */
+  floatBar?: { enable?: boolean };
+  textAreaProps?: { enable?: boolean; placeholder?: string };
   titlePlaceholderContent?: string;
+  /** IME 组合开始/结束时回调，用于关闭与 `/`、`@` 冲突的浮动面板 */
+  onCompositionActiveChange?: (active: boolean) => void;
 
-  /**
-   * Markdown 输入配置
-   */
   markdown?: {
     matchLeaf?: boolean;
     matchInputToNode?: boolean;
+    /**
+     * 输入 `/` 时是否打开「插入元素」菜单（含表格等）。
+     * 聊天输入框等场景应设为 `false`，避免与 `/` 快捷命令冲突。
+     * @default true
+     */
+    enableInsertCompletion?: boolean;
   };
-
-  /**
-   * 拖拽配置
-   */
-  drag?: {
-    enable?: boolean;
-  };
-
-  /**
-   * 紧凑模式
-   * @description 启用后编辑器将使用更紧凑的间距
-   */
+  drag?: { enable?: boolean };
   compact?: boolean;
-
-  /**
-   * 附件配置
-   * @description 配置附件上传功能
-   */
   attachment?: Record<string, unknown>;
 
   /**
-   * 渲染模式
-   * @description 仅在 readonly 模式下生效
-   * - 'slate': 使用 Slate 编辑器渲染（默认，向后兼容）
-   * - 'markdown': 使用轻量 MarkdownRenderer 渲染（无 Slate 实例，性能更优）
-   * @default 'slate'
+   * 只读渲染模式，默认 `'slate'`。仅在 `readonly` 为 true 时与只读分支强相关。
+   * - `'slate'`：Slate 文档树（与编辑态一致，体积含 Slate）
+   * - `'markdown'`：仅 `Markdown → hast → React`，无 Slate，仅当 `readonly` 时生效
    */
   renderMode?: RenderMode;
   /**
-   * 与 `renderMode` 等价，兼容部分协议或查询参数命名（如 `renderType=markdown`）
-   * @description 当同时传入时，`renderMode` 优先
+   * `renderMode` 的别名，同时传入时以 `renderMode` 为准。
    */
   renderType?: RenderMode;
   /**
-   * 自定义元素渲染函数（仅 `renderMode: 'markdown'` 时生效）
-   * @description 拦截并自定义 MarkdownRenderer 中任意块级/行内元素的渲染结果。
-   * 与 Slate 模式的 `eleItemRender` 对应，允许替换段落、标题、列表、图片等元素。
-   * 返回 `undefined` 时回退到默认渲染。
-   * @param props - 元素属性（tagName、node、children 等）
-   * @param defaultDom - 默认渲染结果
-   * @returns 自定义渲染节点，或 undefined 时回退到 defaultDom
+   * 自定义元素渲染（仅 renderMode: 'markdown'），返回 undefined 回退默认渲染
    */
   eleRender?: (
     props: import('../MarkdownRenderer/types').MarkdownRendererEleProps,
     defaultDom: React.ReactNode,
   ) => React.ReactNode;
-  /**
-   * FileMapView 配置（仅 `renderMode: 'markdown'` 时生效）
-   * @description 透传给 agentic-ui-filemap 代码块渲染器，
-   * 统一配置图片/视频条目的 onPreview 拦截和 itemRender 自定义回显。
-   */
+  /** FileMapView 配置（仅 renderMode: 'markdown'） */
   fileMapConfig?: import('../MarkdownRenderer/types').FileMapConfig;
 };

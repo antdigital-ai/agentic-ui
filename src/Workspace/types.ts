@@ -1,4 +1,4 @@
-import React, { type ReactNode } from 'react';
+﻿import React, { type ReactNode } from 'react';
 import type { MarkdownEditorProps } from '../MarkdownEditor';
 import type { BrowserProps as InternalBrowserProps } from './Browser';
 import type { RealtimeFollowData } from './RealtimeFollow';
@@ -14,6 +14,17 @@ export interface TabConfiguration {
   count?: number;
 }
 
+/**
+ * 工作区内置子面板类型，与 `Workspace.Realtime` / `Workspace.File` 等一一对应
+ */
+export type WorkspacePanelType =
+  | 'realtime'
+  | 'browser'
+  | 'task'
+  | 'file'
+  | 'fileTree'
+  | 'custom';
+
 // 标签页数据结构
 export interface TabItem {
   key: string;
@@ -21,18 +32,45 @@ export interface TabItem {
   title?: ReactNode;
   icon?: ReactNode;
   content?: ReactNode;
-  componentType?: string; // 组件类型，用于判断是否在特定组件后插入分隔符
+  /** 子面板类型，用于分割线与内容策略 */
+  componentType?: WorkspacePanelType;
 }
 
 // 工作空间主组件属性
 export interface WorkspaceProps {
+  /**
+   * 当前激活的标签页 key（受控）
+   * @description 未传则为非受控。非法 key 时界面回退到有效项；`notifyOnInvalidActiveTabKey` 为 true 时会 `onTabChange` 建议值
+   */
   activeTabKey?: string;
+  /**
+   * 非受控模式下的初始激活标签 key
+   * @description 须与某个子面板的 `tab.key` 或默认 key 一致；未传则取第一个有效标签
+   */
+  defaultActiveTabKey?: string;
+  /**
+   * 切换标签页回调（用户点击 Segmented 或受控非法 key 回退时）
+   * @description 受控模式下应同步更新 `activeTabKey`
+   */
   onTabChange?: (tabKey: string) => void;
+  /**
+   * 受控模式下 `activeTabKey` 不在当前标签列表时，是否通过 `onTabChange` 通知父组件回退到有效 key
+   * @default true
+   */
+  notifyOnInvalidActiveTabKey?: boolean;
+  /**
+   * 切换标签时是否保留 File / FileTree 的预览态（离开文件类标签再返回时不重置）
+   * @default false
+   */
+  preserveFilePreviewOnTabChange?: boolean;
   style?: React.CSSProperties;
   className?: string;
   title?: ReactNode;
   onClose?: () => void;
+  /** 子面板：`Workspace.Realtime` 等内置子组件；支持 memo 包裹（需保留面板标记）或通过 `panelType` 显式声明 */
   children?: React.ReactNode;
+  /** 无有效子面板时的占位内容；未传则渲染 `null` */
+  emptyContent?: ReactNode;
   /** 纯净模式，关闭阴影和边框 */
   pure?: boolean;
   /** 自定义 header 右侧区域内容 */
@@ -42,6 +80,11 @@ export interface WorkspaceProps {
 // 子组件基础属性
 export interface BaseChildProps {
   tab?: TabConfiguration;
+  /**
+   * 显式声明子面板类型
+   * @description 使用 HOC 包裹且无法自动识别时传入；一般无需设置
+   */
+  panelType?: WorkspacePanelType;
 }
 
 // 具体子组件属性
@@ -111,7 +154,17 @@ export const FILE_TYPES: Record<string, FileTypeDefinition> = {
   },
   video: {
     category: FileCategory.Video,
-    extensions: ['mp4', 'webm', 'ogv', 'mov', 'avi', 'mkv', 'flv', '3gp', 'm4v'],
+    extensions: [
+      'mp4',
+      'webm',
+      'ogv',
+      'mov',
+      'avi',
+      'mkv',
+      'flv',
+      '3gp',
+      'm4v',
+    ],
     mimeTypes: [
       'video/mp4',
       'video/webm',
@@ -441,7 +494,10 @@ export interface FileProps extends BaseChildProps {
   onToggleGroup?: (groupType: FileType, collapsed: boolean) => void;
   /** Group 子组件切换事件 */
   onGroupToggle?: (groupType: FileType, collapsed: boolean) => void;
-  /** 重置标识，用于重置预览状态（内部使用） */
+  /**
+   * 重置标识：切换工作区标签时 `Workspace` 会递增，仅在**当前激活**的 `Workspace.File` 上注入，用于关闭预览等；非激活页不接收以避免隐藏面板重复重置
+   * @internal
+   */
   resetKey?: number;
   onPreview?: (
     file: FileNode,
@@ -507,14 +563,163 @@ export interface FileProps extends BaseChildProps {
   onChange?: (keyword: string) => void;
   /** 是否显示搜索框（默认不显示） */
   showSearch?: boolean;
-  /** 搜索框占位符 */
+  /** 搜索框占位符（平铺列表模式；未配置 `fileTreeSwitch` 时两种模式均用此项） */
   searchPlaceholder?: string;
+  /**
+   * 文件树模式下的搜索框占位符
+   * @description 仅在与 `fileTreeSwitch` 并存且当前为树视图时生效；未传时依次回退 `workspace.fileTreeSearchPlaceholder`、`searchPlaceholder`、`workspace.searchPlaceholder`
+   */
+  searchPlaceholderTree?: string;
+  /**
+   * 列表与文件树视图切换：传入后在搜索框旁展示段选择器；未传入时不展示
+   * @description 与 `showSearch` 并存时，树模式仍显示搜索框；树内筛选仅匹配已展开目录下的已加载子节点（由 `Workspace.File` 注入 `filterKeyword`）
+   */
+  fileTreeSwitch?: FileTreeSwitchConfig;
   /**
    * 是否在文件项根元素上绑定 DOM id
    * @default false
    * @description 置为 false 时，不会向元素写入 id 属性（不影响 React key）
    */
   bindDomId?: boolean;
+}
+
+/**
+ * 工作区文件树节点（用于 {@link FileTreeProps}，与 `antd` Tree 的 `key` 对齐）
+ */
+export interface FileTreeNode {
+  /** 树节点唯一 key，与 Ant Design Tree 一致 */
+  key: string;
+  /** 展示名称 */
+  name: string;
+  /**
+   * 叶子节点对应的文件数据（可选）
+   * @description 未传时由 `name` 与 `id`/`key` 合成与平铺列表一致的 {@link FileNode}，预览/下载按钮与选中行为与 {@link FileItem} 对齐；传入后与 {@link FileTreeProps} 的 `onPreview` / `onDownload` 等配合
+   */
+  file?: FileNode;
+  /**
+   * 是否叶子（文件）节点
+   * @description
+   * - 懒加载**目录**必须 `isLeaf: false`；若未传 `isLeaf` 且也无 `children` 时视为**文件**（`isLeaf: true`），与「仅省略 `isLeaf` 表示普通文件」一致
+   * - 已有子节点时视为目录
+   */
+  isLeaf?: boolean;
+  /** 子节点；懒加载目录为 `isLeaf: false` 时可为 `[]` 或省略，展开后由 `onLoadChildren` 填充；返回空数组时节点会标记为叶子且不可再展开 */
+  children?: FileTreeNode[];
+  /** 节点图标 */
+  icon?: ReactNode;
+  /** 是否禁用 */
+  disabled?: boolean;
+  /** 业务 id，可选，便于与接口字段对应 */
+  id?: string;
+}
+
+/**
+ * Workspace 文件树：懒加载目录子项
+ */
+export interface FileTreeProps extends BaseChildProps {
+  className?: string;
+  style?: React.CSSProperties;
+  /**
+   * 根级树数据
+   * @description 子目录可在展开时通过 `onLoadChildren` 拉取并注入
+   */
+  treeData: FileTreeNode[];
+  /**
+   * 展开非叶子节点时拉取子节点
+   * @param node 当前被展开的节点
+   * @returns 子节点列表，可同步或异步
+   */
+  onLoadChildren: (
+    node: FileTreeNode,
+  ) => FileTreeNode[] | Promise<FileTreeNode[]>;
+  /** 选中节点（点击标题区域）时触发 */
+  onSelect?: (node: FileTreeNode) => void;
+  /**
+   * 叶子节点带 `file` 时，点击行（选中）优先触发；未传且存在 `onPreview` 时选中叶子会打开预览
+   * @description 与平铺 {@link FileProps.onFileClick} 一致
+   */
+  onFileClick?: (file: FileNode) => void;
+  /** 下载；未传时对有下载源的叶子仍可使用内置 `handleFileDownload` */
+  onDownload?: (file: FileNode) => void;
+  /** 预览；语义同 {@link FileProps.onPreview} */
+  onPreview?: FileProps['onPreview'];
+  /** 分享 */
+  onShare?: FileProps['onShare'];
+  /** 定位 */
+  onLocate?: (file: FileNode) => void;
+  /** 是否显示连接线，透传 antd Tree */
+  showLine?: boolean;
+  /**
+   * 由 `Workspace` 在激活项上透传，与 `Workspace.File` 的 `resetKey` 同槽位；不用于清空已懒加载的树状态（树以 `treeData` 为唯一数据源同步）
+   * @internal
+   */
+  resetKey?: number;
+  /**
+   * 无数据时展示
+   * @description 与 File 的 `emptyRender` 行为一致
+   */
+  emptyRender?: ReactNode | (() => ReactNode);
+  /**
+   * 名称筛选关键字（`Workspace.File` 内嵌树时注入）
+   * @description 仅匹配已展开目录下的已加载子节点；未传或空不筛选。无匹配时：未展开任何目录为 `workspace.treeFilterNoMatchVisibleRoots`，已展开过为 `workspace.treeFilterNoMatchInExpanded`
+   */
+  filterKeyword?: string;
+  /**
+   * 是否整行可点选（antd Tree `blockNode`），默认 `true`
+   */
+  blockNode?: boolean;
+  /**
+   * 与平铺列表共用的 {@link FileItem} 样式前缀（由 `Workspace.File` 注入）
+   * @internal
+   */
+  fileItemPrefixCls?: string;
+  /**
+   * 与平铺列表共用的 {@link FileItem} hashId（由 `Workspace.File` 注入）
+   * @internal
+   */
+  fileItemHashId?: string;
+  /**
+   * 按工作区相对路径索引的平铺 {@link FileNode}
+   * @description `Workspace.File` 在同时传入 `nodes` 与 `fileTreeSwitch` 时会根据 `nodes` 自动构建并注入，使树视图 `onDownload` / `onPreview` 等与列表收到同一 `FileNode`（如 `workspace:` 与 `file:` 前缀）
+   * @internal
+   */
+  fileNodeByRelativePath?: Map<string, FileNode>;
+}
+
+/** 文件面板在「列表」与「文件树」之间的视图模式 */
+export type FilePanelViewMode = 'list' | 'tree';
+
+/**
+ * 在 {@link FileProps} 上启用「列表 / 文件树」段选择器时的配置
+ * @description 配置后搜索行右侧展示切换；开启 `showSearch` 时树模式仍显示搜索框，筛选仅作用于已展开分支（`filterKeyword` 由 `Workspace.File` 注入）。`treeProps` 与独立使用 `Workspace.FileTree` 时一致（`tab`、`resetKey`、`filterKeyword` 由 `Workspace.File` 注入；`onDownload`、`onPreview`、`onShare`、`onLocate`、`onFileClick` 由 `Workspace.File` 与列表共用，勿在 `treeProps` 中重复传入）
+ */
+export interface FileTreeSwitchConfig {
+  treeProps: Omit<
+    FileTreeProps,
+    | 'tab'
+    | 'resetKey'
+    | 'filterKeyword'
+    | 'onDownload'
+    | 'onPreview'
+    | 'onShare'
+    | 'onLocate'
+    | 'onFileClick'
+  >;
+  /** 非受控时的初始视图，默认 `list` */
+  defaultView?: FilePanelViewMode;
+  /** 受控当前视图 */
+  view?: FilePanelViewMode;
+  onViewChange?: (view: FilePanelViewMode) => void;
+  /**
+   * 平铺视图的无障碍名称与浏览器 `title`（段控件为图标时使用）
+   * @default 取 `locale['workspace.file']`
+   */
+  listLabel?: React.ReactNode;
+  /**
+   * 文件树视图的无障碍名称与浏览器 `title`（段控件为图标时使用）
+   * @default 取 `locale['workspace.fileTree']`
+   */
+  treeLabel?: React.ReactNode;
 }
 
 export interface CustomProps extends BaseChildProps {

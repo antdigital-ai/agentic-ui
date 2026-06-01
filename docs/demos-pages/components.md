@@ -44,3 +44,11 @@ group:
 ## 文件映射视图
 
 <code src="../demos/fileMapView.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+## 加载组件
+
+<code src="../demos/loading-demo.tsx" background="var(--main-bg-color)" iframe=600></code>
+
+## 输入框
+
+<code src="../demos/markdown-input-field-demo.tsx" background="var(--main-bg-color)" iframe=600></code>

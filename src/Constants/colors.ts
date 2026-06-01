@@ -3,7 +3,6 @@
  * 集中管理所有颜色值，避免重复定义
  */
 
-// 主要颜色
 export const COLORS = {
   // 蓝色系
   blue: {
@@ -71,24 +70,3 @@ export const COLORS = {
     warning: '#fff7e6',
   },
 } as const;
-
-// 导出常用颜色的别名，保持向后兼容
-export const { blue, gray, red, green, orange, status, border, background } =
-  COLORS;
-
-// 导出单个颜色值，方便直接使用
-export const {
-  primary: PRIMARY_COLOR,
-  light: LIGHT_BLUE,
-  border: BORDER_COLOR,
-  dark: DARK_BLUE,
-  contrast: CONTRAST_COLOR,
-} = blue;
-
-export const { text: TEXT_COLOR, light: LIGHT_GRAY, card: CARD_COLOR } = gray;
-
-export const { error: ERROR_COLOR, light: ERROR_LIGHT } = red;
-
-export const { success: SUCCESS_COLOR, light: SUCCESS_LIGHT } = green;
-
-export const { warning: WARNING_COLOR, light: WARNING_LIGHT } = orange;

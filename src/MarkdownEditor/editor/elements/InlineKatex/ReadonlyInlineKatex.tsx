@@ -1,5 +1,6 @@
 import React from 'react';
 import { RenderElementProps } from 'slate-react';
+import { INLINE_KATEX_READONLY_STYLE } from '../../../../Plugins/katex/inlineKatexReadonlyStyle';
 
 /**
  * ReadonlyInlineKatex 组件 - 只读行内数学公式预览组件
@@ -31,20 +32,9 @@ import { RenderElementProps } from 'slate-react';
  * - 保持预览模式的视觉效果
  */
 export const ReadonlyInlineKatex: React.FC<RenderElementProps> = React.memo(
-  ({ attributes, children, element }) => {
+  ({ attributes, children }) => {
     return (
-      <code
-        {...attributes}
-        style={{
-          background: 'rgb(242, 241, 241)',
-          color: 'rgb(27, 27, 27)',
-          padding: '0.2em 0.4em',
-          borderRadius: '0.25em',
-          fontSize: '0.9em',
-          fontFamily: 'monospace',
-        }}
-      >
-        {element.value}
+      <code {...attributes} style={INLINE_KATEX_READONLY_STYLE}>
         {children}
       </code>
     );

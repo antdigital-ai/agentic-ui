@@ -1,1 +1,1 @@
-export { default } from '../markdownInputField-onFocus-demo';
+export { default } from '../markdownInputField/on-focus';

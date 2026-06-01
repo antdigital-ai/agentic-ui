@@ -1,4 +1,4 @@
-﻿import { Editor, Transforms } from 'slate';
+import { Editor, Transforms } from 'slate';
 import { MarkdownEditorPlugin } from '../../plugin';
 import { parserMdToSchema } from '../parser/parserMdToSchema';
 

@@ -2,11 +2,15 @@ import { toJsxRuntime } from 'hast-util-to-jsx-runtime';
 import React from 'react';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
 
-import { JINJA_DOLLAR_PLACEHOLDER, preprocessNormalizeLeafToContainerDirective } from '../MarkdownEditor/editor/parser/constants';
+import {
+  JINJA_DOLLAR_PLACEHOLDER,
+  preprocessNormalizeLeafToContainerDirective,
+} from '../MarkdownEditor/editor/parser/constants';
 import type {
   MarkdownRemarkPlugin,
   MarkdownToHtmlConfig,
 } from '../MarkdownEditor/editor/utils/markdownToHtml';
+import { debugInfo } from '../Utils/debugUtils';
 import {
   buildEditorAlignedComponents,
   createHastProcessor,
@@ -26,11 +30,17 @@ export const markdownToReactSync = (
   components?: Record<string, React.ComponentType<RendererBlockProps>>,
   remarkPlugins?: MarkdownRemarkPlugin[],
   htmlConfig?: MarkdownToHtmlConfig,
+  rehypePlugins?: import('unified').Plugin[],
 ): React.ReactNode => {
   if (!content) return null;
 
   try {
-    const processor = createHastProcessor(remarkPlugins, htmlConfig);
+    const processor = createHastProcessor(
+      remarkPlugins,
+      htmlConfig,
+      htmlConfig?.formula,
+      rehypePlugins,
+    );
     const preprocessed = preprocessNormalizeLeafToContainerDirective(
       content.replace(new RegExp(JINJA_DOLLAR_PLACEHOLDER, 'g'), '$'),
     );
@@ -45,7 +55,6 @@ export const markdownToReactSync = (
       false,
       undefined,
       undefined,
-      false,
     );
 
     return toJsxRuntime(hast as any, {
@@ -56,7 +65,9 @@ export const markdownToReactSync = (
       passNode: true,
     });
   } catch (error) {
-    console.error('Failed to render markdown:', error);
+    debugInfo('[MarkdownRenderer] markdownToReactSync failed', {
+      error: (error as Error)?.message || String(error),
+    });
     return null;
   }
 };

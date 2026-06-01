@@ -1,23 +1,19 @@
+﻿import React, { memo, useMemo, useRef } from 'react';
 import type { Processor } from 'unified';
-import React, { memo, useMemo, useRef } from 'react';
 
 import { renderMarkdownBlock } from '../markdownReactShared';
-import { StreamingAnimationContext } from '../StreamingAnimationContext';
-
 import { shouldReparseLastBlock } from './lastBlockThrottle';
 
 export interface MarkdownBlockPieceProps {
-  /** 末块为 tail（生长中）；一旦其后出现新块，同一段内容变为 sealed，保持同一 React key 可避免重组件卸载 */
   variant: 'sealed' | 'tail';
   blockSource: string;
   processor: Processor;
   components: Record<string, any>;
-  /** 仅末块且处于流式模式时为 true，用于节流与末段动画 */
   streaming: boolean;
 }
 
 /**
- * 统一的块级渲染：封版与末块使用同一组件类型；按 blockSource 缓存解析结果引用，使 tail→sealed 时与旧 Map 缓存一样复用同一棵 React 子树。
+ * 块级渲染单元：sealed 块缓存不动，tail 块节流重解析。
  */
 export const MarkdownBlockPiece = memo(function MarkdownBlockPiece({
   variant,
@@ -30,29 +26,45 @@ export const MarkdownBlockPiece = memo(function MarkdownBlockPiece({
     source: string;
     node: React.ReactNode;
   } | null>(null);
-
-  /** 完整 parse 结果缓存：键为 block 源串，供 sealed 与 tail 晋升时复用同一引用 */
-  const parseBySourceRef = useRef<Map<string, React.ReactNode>>(new Map());
+  const cacheRef = useRef<Map<string, React.ReactNode>>(new Map());
+  const processorRef = useRef<Processor | null>(null);
+  /**
+   * 宿主常把 `components: { __codeBlock: X }` 内联在每次 render，引用恒变。
+   * 若列入 useMemo 依赖，末块晋升为 sealed 时会误触发重 parse，子树卸载重挂。
+   * 密封命中缓存时故意不随 components 引用抖动；需重算时由 variant / blockSource / processor 驱动。
+   */
+  const componentsRef = useRef(components);
+  componentsRef.current = components;
 
   const node = useMemo(() => {
-    const cached = parseBySourceRef.current.get(blockSource);
-    if (cached && variant === 'sealed') {
-      return cached;
+    if (processorRef.current !== processor) {
+      processorRef.current = processor;
+      cacheRef.current.clear();
+      lastParsedRef.current = null;
     }
 
+    const comps = componentsRef.current;
+
     if (variant === 'sealed') {
-      const el = renderMarkdownBlock(blockSource, processor, components, {
-        markStreamingTailParagraph: false,
-      });
-      parseBySourceRef.current.set(blockSource, el);
+      const cached = cacheRef.current.get(blockSource);
+      if (cached) return cached;
+      // 末块刚晋升为 sealed 时 cacheRef 通常未命中（tail 路径只写 lastParsedRef）。
+      // 直接复用 lastParsedRef 上一次 parse 的结果，避免再走一次 renderMarkdownBlock
+      // 触发不必要的子树替换（chart / agentar-card 等重组件依赖 React 同位置同
+      // 类型 reconciliation 来保留实例）。
+      if (lastParsedRef.current?.source === blockSource) {
+        const el = lastParsedRef.current.node;
+        cacheRef.current.set(blockSource, el);
+        return el;
+      }
+      const el = renderMarkdownBlock(blockSource, processor, comps);
+      cacheRef.current.set(blockSource, el);
       return el;
     }
 
+    // tail 块：不写入 cacheRef，仅用 lastParsedRef
     if (!streaming) {
-      const el = renderMarkdownBlock(blockSource, processor, components, {
-        markStreamingTailParagraph: false,
-      });
-      parseBySourceRef.current.set(blockSource, el);
+      const el = renderMarkdownBlock(blockSource, processor, comps);
       lastParsedRef.current = { source: blockSource, node: el };
       return el;
     }
@@ -62,21 +74,12 @@ export const MarkdownBlockPiece = memo(function MarkdownBlockPiece({
       return prev.node;
     }
 
-    const el = renderMarkdownBlock(blockSource, processor, components, {
-      markStreamingTailParagraph: true,
-    });
-    parseBySourceRef.current.set(blockSource, el);
+    const el = renderMarkdownBlock(blockSource, processor, comps);
     lastParsedRef.current = { source: blockSource, node: el };
     return el;
-  }, [variant, blockSource, processor, components, streaming]);
+  }, [variant, blockSource, processor, streaming]);
 
-  const animateBlock = variant === 'tail' && streaming;
-
-  return (
-    <StreamingAnimationContext.Provider value={{ animateBlock }}>
-      {node}
-    </StreamingAnimationContext.Provider>
-  );
+  return <>{node}</>;
 });
 
 MarkdownBlockPiece.displayName = 'MarkdownBlockPiece';

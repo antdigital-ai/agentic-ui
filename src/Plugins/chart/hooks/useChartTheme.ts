@@ -15,9 +15,11 @@ import { useMemo } from 'react';
  *
  * @since 1.0.0
  */
-export const useChartTheme = (theme: 'light' | 'dark' = 'light') => {
+export const useChartTheme = (
+  theme: 'light' | 'dark' | undefined = 'light',
+) => {
   return useMemo(() => {
-    const isLight = theme === 'light';
+    const isLight = (theme ?? 'light') === 'light';
     const axisTextColor = isLight
       ? 'rgba(0, 25, 61, 0.3255)'
       : 'rgba(255, 255, 255, 0.8)';

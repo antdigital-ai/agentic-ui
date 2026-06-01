@@ -14,12 +14,16 @@ import React, { lazy, Suspense, useContext, useMemo, useState } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { Loading } from '../../Components/Loading';
 import { I18nContext } from '../../I18n';
+import { DocCards, type DocCardsFieldMap } from './DocCards';
+import { QuadrantChart } from './QuadrantChart';
 import { loadChartRuntime, type ChartRuntime } from './loadChartRuntime';
 import {
   debounce,
   getDataHash,
   isConfigEqual,
   isNotEmpty,
+  parseSortByValue,
+  resolveChartSortByField,
   toNumber,
 } from './utils';
 
@@ -111,11 +115,21 @@ const getChartMap = (i18n: any) => ({
       'funnel',
       'boxplot',
       'histogram',
+      'docCards',
+      'quadrant',
     ],
   },
   descriptions: {
     title: i18n?.locale?.descriptions || '定义列表',
     changeData: ['column', 'line', 'area', 'pie', 'donut', 'table'],
+  },
+  docCards: {
+    title: i18n?.locale?.docCards || '卡片列表',
+    changeData: ['table'],
+  },
+  quadrant: {
+    title: i18n?.locale?.quadrantChart || '四象限图',
+    changeData: ['table'],
   },
 });
 
@@ -157,6 +171,7 @@ const ChartRuntimeRendererImpl: React.FC<{
   convertDonutData,
   convertFlatData,
   config,
+  renderKey,
   title,
   dataTime,
   toolBar,
@@ -185,7 +200,7 @@ const ChartRuntimeRendererImpl: React.FC<{
     const pieSize = config?.height || 400;
     return (
       <DonutChart
-        key={`${config?.index}-pie`}
+        key={`${config?.index}-pie-${renderKey}`}
         data={convertDonutData}
         configs={[{ chartStyle: 'pie', showLegend: true }]}
         width={pieSize}
@@ -202,7 +217,7 @@ const ChartRuntimeRendererImpl: React.FC<{
   if (chartType === 'donut') {
     return (
       <DonutChart
-        key={`${config?.index}-donut`}
+        key={`${config?.index}-donut-${renderKey}`}
         data={convertDonutData}
         configs={[{ chartStyle: 'donut', showLegend: true }]}
         height={config?.height || 400}
@@ -218,7 +233,7 @@ const ChartRuntimeRendererImpl: React.FC<{
   if (chartType === 'bar') {
     return (
       <BarChart
-        key={`${config?.index}-bar`}
+        key={`${config?.index}-bar-${renderKey}`}
         data={convertFlatData}
         height={config?.height || 400}
         title={title || ''}
@@ -236,7 +251,7 @@ const ChartRuntimeRendererImpl: React.FC<{
   if (chartType === 'line') {
     return (
       <LineChart
-        key={`${config?.index}-line`}
+        key={`${config?.index}-line-${renderKey}`}
         data={convertFlatData}
         height={config?.height || 400}
         title={title || ''}
@@ -252,7 +267,7 @@ const ChartRuntimeRendererImpl: React.FC<{
   if (chartType === 'column') {
     return (
       <BarChart
-        key={`${config?.index}-column`}
+        key={`${config?.index}-column-${renderKey}`}
         data={convertFlatData}
         height={config?.height || 400}
         title={title || ''}
@@ -270,7 +285,7 @@ const ChartRuntimeRendererImpl: React.FC<{
   if (chartType === 'area') {
     return (
       <AreaChart
-        key={`${config?.index}-area`}
+        key={`${config?.index}-area-${renderKey}`}
         data={convertFlatData}
         height={config?.height || 400}
         title={title || ''}
@@ -292,8 +307,11 @@ const ChartRuntimeRendererImpl: React.FC<{
       const xValue = getFieldValue(row, config?.x);
       const yValue = getFieldValue(row, config?.y);
       return {
-        label: xValue ? String(xValue) : String(i + 1),
-        score: yValue ? Number(yValue) : undefined,
+        x: xValue ? String(xValue) : String(i + 1),
+        y:
+          yValue !== null && yValue !== undefined && yValue !== ''
+            ? Number(yValue)
+            : 0,
         ...(category ? { category } : {}),
         ...(type ? { type } : {}),
         ...(filterLabel ? { filterLabel } : {}),
@@ -302,7 +320,7 @@ const ChartRuntimeRendererImpl: React.FC<{
 
     return (
       <RadarChart
-        key={`${config?.index}-radar`}
+        key={`${config?.index}-radar-${renderKey}`}
         data={radarData}
         height={config?.height || 400}
         title={title || ''}
@@ -332,7 +350,7 @@ const ChartRuntimeRendererImpl: React.FC<{
 
     return (
       <ScatterChart
-        key={`${config?.index}-scatter`}
+        key={`${config?.index}-scatter-${renderKey}`}
         data={scatterData}
         height={config?.height || 400}
         title={title || ''}
@@ -363,7 +381,7 @@ const ChartRuntimeRendererImpl: React.FC<{
 
     return (
       <FunnelChart
-        key={`${config?.index}-funnel`}
+        key={`${config?.index}-funnel-${renderKey}`}
         data={funnelData}
         height={config?.height || 400}
         title={title || ''}
@@ -427,7 +445,7 @@ const ChartRuntimeRendererImpl: React.FC<{
 
     return (
       <BoxPlotChart
-        key={`${config?.index}-boxplot`}
+        key={`${config?.index}-boxplot-${renderKey}`}
         data={boxplotData}
         height={config?.height || 400}
         title={title || ''}
@@ -483,7 +501,7 @@ const ChartRuntimeRendererImpl: React.FC<{
 
     return (
       <HistogramChart
-        key={`${config?.index}-histogram`}
+        key={`${config?.index}-histogram-${renderKey}`}
         data={histogramData}
         height={config?.height || 400}
         title={title || ''}
@@ -629,13 +647,17 @@ export const ChartRender: React.FC<{
     | 'boxplot'
     | 'histogram'
     | 'descriptions'
-    | 'table';
+    | 'table'
+    | 'docCards'
+    | 'quadrant';
   chartData: Record<string, any>[];
   config: {
     height: any;
     x: any;
     y: any;
     rest: any;
+    /** 排序列名；未配置时若表格含 index 列会自动使用 */
+    sortBy?: string;
     index?: any;
     chartData?: any;
     columns?: any;
@@ -665,6 +687,8 @@ export const ChartRender: React.FC<{
     | 'funnel'
     | 'boxplot'
     | 'histogram'
+    | 'docCards'
+    | 'quadrant'
   >(() => props.chartType);
   const {
     chartData,
@@ -726,6 +750,8 @@ export const ChartRender: React.FC<{
   const shouldLoadRuntime =
     chartType !== 'table' &&
     chartType !== 'descriptions' &&
+    chartType !== 'docCards' &&
+    chartType !== 'quadrant' &&
     !renderDescriptionsFallback;
 
   // 获取国际化的图表类型映射
@@ -807,6 +833,11 @@ export const ChartRender: React.FC<{
   const convertFlatData = useMemo(() => {
     const { xTitle, yTitle } = getAxisTitles();
     const xIndexer = buildXIndexer();
+    const sortByField = resolveChartSortByField(
+      chartData,
+      config?.sortBy ?? config?.rest?.sortBy,
+      getFieldValueSafely,
+    );
 
     return (chartData || []).map((row: any, i: number) => {
       const rawX = getFieldValueSafely(row, config?.x);
@@ -814,6 +845,11 @@ export const ChartRender: React.FC<{
       const category = getFieldValue(row, groupBy);
       const type = getFieldValue(row, colorLegend);
       const filterLabel = getFieldValue(row, filterBy);
+      const rawSortBy = getFieldValueSafely(row, sortByField);
+      const sortBy =
+        sortByField && isNotEmpty(rawSortBy)
+          ? parseSortByValue(rawSortBy)
+          : null;
       const x =
         typeof rawX === 'number'
           ? rawX
@@ -832,6 +868,7 @@ export const ChartRender: React.FC<{
         ...(type ? { type } : {}),
         ...(category ? { category } : {}),
         ...(filterLabel ? { filterLabel } : {}),
+        ...(sortBy !== null ? { sortBy } : {}),
       };
     });
   }, [
@@ -845,6 +882,8 @@ export const ChartRender: React.FC<{
     config?.rest?.stacked,
     config?.rest?.showLegend,
     config?.rest?.showGrid,
+    config?.sortBy,
+    config?.rest?.sortBy,
     title,
     groupBy,
     colorLegend,
@@ -1071,10 +1110,10 @@ export const ChartRender: React.FC<{
               }}
               initialValues={config}
               onFinish={(values) => {
-                setConfig({
-                  ...props.config,
+                setConfig((prev) => ({
+                  ...prev,
                   ...values,
-                });
+                }));
                 setRenderKey((k) => k + 1);
               }}
             >
@@ -1267,6 +1306,47 @@ export const ChartRender: React.FC<{
               }
             />
           ))}
+        </div>
+      );
+    }
+
+    if (chartType === 'docCards') {
+      const restCfg = (config?.rest ?? {}) as {
+        cardColumns?: number;
+        fieldMap?: DocCardsFieldMap;
+      };
+      // toolbar 直接交给 DocCards 头部排布，避免内外两层 header 错位
+      return (
+        <div
+          key={config?.index}
+          className={`${prefixCls}__doc-cards`}
+          style={{ margin: 12, width: 'calc(100% - 24px)' }}
+        >
+          <DocCards
+            title={title}
+            toolbar={toolBar.length > 0 ? <>{toolBar}</> : undefined}
+            columns={config?.columns || []}
+            data={chartData}
+            cardColumns={restCfg?.cardColumns}
+            fieldMap={restCfg?.fieldMap}
+          />
+        </div>
+      );
+    }
+
+    if (chartType === 'quadrant') {
+      return (
+        <div
+          key={config?.index}
+          className={`${prefixCls}__quadrant-chart`}
+          style={{ margin: 12, width: 'calc(100% - 24px)' }}
+        >
+          <QuadrantChart
+            title={title}
+            toolbar={toolBar.length > 0 ? <>{toolBar}</> : undefined}
+            columns={config?.columns || []}
+            data={chartData}
+          />
         </div>
       );
     }

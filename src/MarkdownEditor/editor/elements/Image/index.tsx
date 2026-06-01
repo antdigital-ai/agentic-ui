@@ -14,10 +14,10 @@ import React, {
 } from 'react';
 import { useRefFunction } from '../../../../Hooks/useRefFunction';
 
-import { useDebounceFn } from '@ant-design/pro-components';
 import { Rnd } from 'react-rnd';
 import { Path, Transforms } from 'slate';
 import { ActionIconBox } from '../../../../Components/ActionIconBox';
+import { useDebounceFn } from '../../../../Hooks/useDebounceFn';
 import { I18nContext } from '../../../../I18n';
 import { debugInfo } from '../../../../Utils/debugUtils';
 import { ElementProps, MediaNode } from '../../../el';
@@ -61,7 +61,8 @@ export const ReadonlyImage: React.FC<ReadonlyImageProps> = ({
   const imageProps: ImageProps = {
     src,
     alt: alt || 'image',
-    width: width ? Number(width) || width : 400,
+    // 未传 width 时不设默认值，宽度交给 CSS（与 MarkdownRenderer img 渲染保持一致）
+    width: width ? Number(width) || width : undefined,
     height,
     preview: {
       getContainer: () => document.body,
@@ -125,8 +126,7 @@ export const ResizeImage = ({
   });
   const imgRef = useRef<HTMLImageElement>(null);
 
-  //@ts-expect-error
-  const resize = useDebounceFn((size) => {
+  const resize = useDebounceFn((size: { width: number; height?: number }) => {
     setSize({
       width: size.width,
       height: size.width / radio.current,

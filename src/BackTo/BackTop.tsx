@@ -1,4 +1,5 @@
-import React, { forwardRef, memo, useCallback } from 'react';
+import React, { forwardRef, memo } from 'react';
+import { useRefFunction } from '../Hooks/useRefFunction';
 import scrollTo from '../Utils/scrollTo';
 import {
   ScrollVisibleButton,
@@ -28,6 +29,13 @@ const getShouldVisible = (
 export interface BackTopProps extends ScrollVisibleButtonProps {
   /** 滚动到顶部的持续时间 @default 450 */
   duration?: number;
+  /**
+   * 按钮显示条件：数值表示距顶部超过该像素时显示，函数则自定义判断逻辑
+   * @default 400
+   */
+  shouldVisible?:
+    | number
+    | ((scrollTop: number, container: HTMLElement | Window) => boolean);
 }
 
 /**
@@ -88,8 +96,8 @@ const BackTopComponent = forwardRef<ScrollVisibleButtonRef, BackTopProps>(
 
     const shouldVisible = getShouldVisible(propsShouldVisible);
 
-    // 使用 useCallback 优化点击处理函数
-    const handleClick = useCallback(
+    // 使用 useRefFunction 优化点击处理函数，保持引用稳定
+    const handleClick = useRefFunction(
       (
         e: React.MouseEvent<HTMLButtonElement> | undefined,
         container: HTMLElement | Window,
@@ -97,14 +105,18 @@ const BackTopComponent = forwardRef<ScrollVisibleButtonRef, BackTopProps>(
         scrollTo(0, { container, duration });
         onClick?.(e, container);
       },
-      [duration, onClick],
     );
+
+    // shouldVisible 是 ScrollVisibleButton 的内部 prop，通过类型断言注入
+    const scrollVisibleProps = {
+      ...rest,
+      shouldVisible,
+    } as ScrollVisibleButtonProps;
 
     return (
       <ScrollVisibleButton
-        {...rest}
+        {...scrollVisibleProps}
         ref={ref}
-        shouldVisible={shouldVisible}
         onClick={handleClick}
       >
         <TopIcon />

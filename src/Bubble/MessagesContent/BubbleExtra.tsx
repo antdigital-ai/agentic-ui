@@ -8,7 +8,6 @@ import { DislikeFilled, LikeFilled } from '@ant-design/icons';
 import { ConfigProvider, Divider } from 'antd';
 import classNames from 'clsx';
 import copy from 'copy-to-clipboard';
-import { motion } from 'framer-motion';
 
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
@@ -161,7 +160,8 @@ export const BubbleExtra = ({
       originalData?.isFinished,
       typing,
       feedbackLoading,
-      props.onLikeCancel || props.onCancelLike,
+      props.onLikeCancel,
+      props.onCancelLike,
     ],
   );
 
@@ -301,31 +301,14 @@ export const BubbleExtra = ({
   const dom = useMemo(
     () =>
       voiceDom || copyDom || like || disLike ? (
-        <motion.div
+        // 入场 fade-in 动画由 CSS 控制（参见 Bubble/MessagesContent/style.ts
+        // 中的 `-action-box` + `@keyframes -actionBoxFadeIn`）
+        <div
           style={{
             display: 'flex',
             gap: 8,
             alignItems: 'center',
           }}
-          variants={{
-            visible: {
-              opacity: 1,
-              transition: {
-                when: 'beforeChildren',
-                staggerChildren: 0.1,
-                delayChildren: 0.5,
-              },
-            },
-            hidden: {
-              opacity: 0,
-              transition: {
-                when: 'afterChildren',
-              },
-            },
-          }}
-          whileInView="visible"
-          initial="hidden"
-          animate="visible"
           className={classNames(`${prefixCls}-action-box`)}
         >
           {voiceDom ? voiceDom : null}
@@ -340,7 +323,7 @@ export const BubbleExtra = ({
           )}
           {like ? like : null}
           {disLike ? disLike : null}
-        </motion.div>
+        </div>
       ) : null,
     [voiceDom, copyDom, like, disLike, prefixCls],
   );
@@ -382,7 +365,7 @@ export const BubbleExtra = ({
 
   useEffect(() => {
     props.onRenderExtraNull?.(!dom && !reSend);
-  }, [dom]);
+  }, [dom, reSend, props.onRenderExtraNull]);
 
   // 检查是否有任何内容需要渲染
   const hasLeftContent = (typing && originalData.content !== '...') || reSend;

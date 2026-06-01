@@ -1,6 +1,7 @@
 import classNames from 'clsx';
 import React, { startTransition, useEffect, useRef, useState } from 'react';
 import { useGetSetState } from 'react-use';
+import { getSlateElementPlainText } from '../../MarkdownEditor/editor/utils/codeBlockPlainText';
 import { CodeNode } from '../../MarkdownEditor/el';
 import { loadKatex } from './loadKatex';
 
@@ -47,6 +48,7 @@ export const Katex = (props: { el: CodeNode }) => {
   const katexRef = useRef<typeof import('katex').default | null>(null);
   const divRef = useRef<HTMLDivElement>(null);
   const timer = useRef(0);
+  const katexSource = getSlateElementPlainText(props.el);
 
   // 异步加载 Katex 库和 CSS
   useEffect(() => {
@@ -75,7 +77,7 @@ export const Katex = (props: { el: CodeNode }) => {
   useEffect(() => {
     if (!katexLoaded || !katexRef.current) return;
 
-    const code = props.el.value || '';
+    const code = katexSource || '';
     clearTimeout(timer.current);
     timer.current = window.setTimeout(
       () => {
@@ -103,7 +105,7 @@ export const Katex = (props: { el: CodeNode }) => {
       !state().code ? 0 : 300,
     );
     return () => window.clearTimeout(timer.current);
-  }, [props.el, katexLoaded, state]);
+  }, [katexSource, props.el, katexLoaded, state]);
   return (
     <div
       style={{

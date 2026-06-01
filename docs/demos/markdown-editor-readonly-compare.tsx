@@ -87,6 +87,7 @@ export default () => {
           width="100%"
           height="500px"
           readonly
+          renderMode="markdown"
           editorRef={readonlyEditorRef}
           initValue={value}
         />

@@ -1,4 +1,4 @@
-import { ConfigProvider } from 'antd';
+﻿import { ConfigProvider } from 'antd';
 import { ChartData, Chart as ChartJS, ChartOptions } from 'chart.js';
 import classNames from 'clsx';
 import React, { useContext, useLayoutEffect, useMemo, useRef } from 'react';
@@ -16,6 +16,7 @@ import {
   useChartDataFilter,
   useChartStatistics,
   useChartTheme,
+  useResolvedChartTheme,
   useResponsiveSize,
 } from '../hooks';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
@@ -104,7 +105,7 @@ const LineChart: React.FC<LineChartProps> = ({
   className,
   classNames: classNamesProp,
   dataTime,
-  theme = 'light',
+  theme,
   color,
   showLegend = true,
   legendPosition = 'bottom',
@@ -134,7 +135,7 @@ const LineChart: React.FC<LineChartProps> = ({
   // 样式注册
   const context = useContext(ConfigProvider.ConfigContext);
   const baseClassName = context?.getPrefixCls('line-chart-container');
-  const { wrapSSR, hashId } = useStyle(baseClassName);
+  const { hashId } = useStyle(baseClassName);
 
   const chartRef = useRef<ChartJS<'line'>>(null);
 
@@ -153,8 +154,8 @@ const LineChart: React.FC<LineChartProps> = ({
     filteredDataByFilterLabel,
   } = useChartDataFilter(data);
 
-  // 主题颜色
-  const { axisTextColor, gridColor, isLight } = useChartTheme(theme);
+  const { resolvedTheme, autoDetectTheme } = useResolvedChartTheme(theme);
+  const { axisTextColor, gridColor, isLight } = useChartTheme(resolvedTheme);
 
   // 从数据中提取唯一的类型
   const types = useMemo(() => {
@@ -346,18 +347,19 @@ const LineChart: React.FC<LineChartProps> = ({
   const toolbarClassName = classNames(classNamesProp?.toolbar);
   const toolbarStyle = props.styles?.toolbar;
 
-  return wrapSSR(
+  return (
     <ChartContainer
       baseClassName={baseClassName}
       className={rootClassName}
-      theme={theme}
+      theme={resolvedTheme}
+      autoDetectTheme={autoDetectTheme}
       isMobile={isMobile}
       variant={props.variant}
       style={rootStyle}
     >
       <ChartToolBar
         title={title}
-        theme={theme}
+        theme={resolvedTheme}
         className={toolbarClassName}
         style={toolbarStyle}
         onDownload={handleDownload}
@@ -375,7 +377,7 @@ const LineChart: React.FC<LineChartProps> = ({
                 selectedCustomSelection: selectedFilterLabel,
                 onSelectionChange: setSelectedFilterLabel,
               })}
-              theme={theme}
+              theme={resolvedTheme}
               variant="compact"
             />
           ) : undefined
@@ -387,7 +389,7 @@ const LineChart: React.FC<LineChartProps> = ({
           className={classNames(`${baseClassName}-statistic-container`, hashId)}
         >
           {statistics.map((config, index) => (
-            <ChartStatistic key={index} {...config} theme={theme} />
+            <ChartStatistic key={index} {...config} theme={resolvedTheme} />
           ))}
         </div>
       )}
@@ -402,7 +404,7 @@ const LineChart: React.FC<LineChartProps> = ({
             selectedCustomSelection: selectedFilterLabel,
             onSelectionChange: setSelectedFilterLabel,
           })}
-          theme={theme}
+          theme={resolvedTheme}
         />
       )}
 
@@ -412,7 +414,7 @@ const LineChart: React.FC<LineChartProps> = ({
       >
         <Line ref={chartRef} data={processedData} options={options} />
       </div>
-    </ChartContainer>,
+    </ChartContainer>
   );
 };
 

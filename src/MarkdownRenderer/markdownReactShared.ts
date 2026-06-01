@@ -1,321 +1,45 @@
 import { Checkbox, Image } from 'antd';
 import { toJsxRuntime } from 'hast-util-to-jsx-runtime';
-import React, { useContext } from 'react';
+import React from 'react';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
-import rehypeKatex from 'rehype-katex';
-import rehypeRaw from 'rehype-raw';
-import remarkFrontmatter from 'remark-frontmatter';
-import remarkGfm from 'remark-gfm';
-import remarkMath from 'remark-math';
-import remarkParse from 'remark-parse';
-import remarkRehype from 'remark-rehype';
-import type { Plugin, Processor } from 'unified';
-import { unified } from 'unified';
-import { visit } from 'unist-util-visit';
-import { remarkDirectiveContainer } from '../MarkdownEditor/editor/parser/remarkDirectiveContainer';
-import remarkDirectiveContainersOnly from '../MarkdownEditor/editor/parser/remarkDirectiveContainersOnly';
-import {
-  convertParagraphToImage,
-  fixStrongWithSpecialChars,
-  protectJinjaDollarInText,
-} from '../MarkdownEditor/editor/parser/remarkParse';
-import {
-  REMARK_REHYPE_DIRECTIVE_HANDLERS,
-  type MarkdownRemarkPlugin,
-  type MarkdownToHtmlConfig,
+import type { Processor, Plugin } from 'unified';
+
+import type {
+  MarkdownRemarkPlugin,
+  MarkdownToHtmlConfig,
 } from '../MarkdownEditor/editor/utils/markdownToHtml';
+import type { FormulaConfig } from '../Config/formulaConfig';
 import type { MarkdownEditorProps } from '../MarkdownEditor/types';
-import { parseChineseCurrencyToNumber } from '../Plugins/chart/utils';
 import { ToolUseBarThink } from '../ToolUseBarThink';
-import AnimationText from './AnimationText';
+import { debugInfo } from '../Utils/debugUtils';
 import {
-  FncRefForMarkdown,
+  shouldRenderUrlAsPlainText,
+  UNSAFE_URL_PLAIN_TEXT_STYLE,
+} from '../Utils/htmlUrlSafety';
+import {
   extractFootnoteRefFromSupChildren,
+  FncRefForMarkdown,
 } from './FncRefForMarkdown';
-import { StreamingAnimationContext } from './StreamingAnimationContext';
+import { createHastProcessor } from './processor';
+import {
+  INITIAL_FENCE_STATE,
+  updateFenceStateForLine,
+} from './streaming/fenceTracker';
 import type { MarkdownRendererEleProps, RendererBlockProps } from './types';
+import {
+  extractChildrenText,
+  extractLanguageFromClassName,
+} from './utils/astExtract';
 
-const INLINE_MATH_WITH_SINGLE_DOLLAR = { singleDollarTextMath: true };
-const FRONTMATTER_LANGUAGES: readonly string[] = ['yaml'];
-const REMARK_DIRECTIVE_CONTAINER_OPTIONS = {
-  className: 'markdown-container',
-  titleElement: { className: ['markdown-container__title'] },
+const THINK_BLOCK_STYLES = {
+  root: {
+    boxSizing: 'border-box' as const,
+    maxWidth: '680px',
+    marginTop: 8,
+  },
 };
 
-const remarkRehypePlugin = remarkRehype as unknown as Plugin;
-
-const FOOTNOTE_REF_PATTERN = /\[\^([^\]]+)\]/g;
-
-const CHART_COMMENT_PATTERN = /^<!--\s*(\[[\s\S]*\]|\{[\s\S]*\})\s*-->$/;
-
-const extractCellText = (cell: any): string => {
-  if (!cell?.children) return '';
-  return cell.children
-    .map((child: any) => {
-      if (child.type === 'text') return child.value || '';
-      if (child.children) return extractCellText(child);
-      return '';
-    })
-    .join('')
-    .trim();
-};
-
-/**
- * 从 mdast table 节点提取列名和数据
- */
-const extractTableData = (
-  tableNode: any,
-): {
-  columns: { title: string; dataIndex: string }[];
-  dataSource: Record<string, any>[];
-} | null => {
-  if (!tableNode.children?.length) return null;
-
-  const headerRow = tableNode.children[0];
-  if (!headerRow?.children?.length) return null;
-
-  const columns = headerRow.children.map((cell: any) => {
-    const text = extractCellText(cell);
-    return { title: text, dataIndex: text, key: text };
-  });
-
-  const dataSource: Record<string, any>[] = [];
-  for (let i = 1; i < tableNode.children.length; i++) {
-    const row = tableNode.children[i];
-    if (!row?.children) continue;
-    const record: Record<string, any> = { key: `row-${i}` };
-    row.children.forEach((cell: any, j: number) => {
-      if (j < columns.length) {
-        const val = extractCellText(cell);
-        if (val === '') {
-          record[columns[j].dataIndex] = val;
-        } else {
-          const num = Number(val);
-          if (Number.isFinite(num)) {
-            record[columns[j].dataIndex] = num;
-          } else {
-            const cn = parseChineseCurrencyToNumber(val);
-            record[columns[j].dataIndex] = cn !== null ? cn : val;
-          }
-        }
-      }
-    });
-    dataSource.push(record);
-  }
-
-  return { columns, dataSource };
-};
-
-/**
- * remark 插件：将 "HTML 注释（图表配置）+ 表格" 组合转为 chart 代码块。
- *
- * 在 MarkdownEditor 中，parseTableOrChart 负责此逻辑。
- * 在 MarkdownRenderer 中，此插件在 mdast 层面完成等价转换。
- *
- * 匹配模式：
- * ```
- * <!-- [{"chartType":"line","x":"month","y":"value",...}] -->
- * | month | value |
- * |-------|-------|
- * | 2024  | 100   |
- * ```
- */
-const remarkChartFromComment = () => {
-  return (tree: any) => {
-    const children = tree.children;
-    if (!children || !Array.isArray(children)) return;
-
-    const toRemove: number[] = [];
-
-    for (let i = 0; i < children.length - 1; i++) {
-      const node = children[i];
-      const next = children[i + 1];
-
-      if (node.type !== 'html' || next.type !== 'table') continue;
-
-      const match = node.value?.match(CHART_COMMENT_PATTERN);
-      if (!match) continue;
-
-      let chartConfig: any;
-      try {
-        chartConfig = JSON.parse(match[1]);
-      } catch {
-        continue;
-      }
-
-      if (!Array.isArray(chartConfig)) chartConfig = [chartConfig];
-      const hasChartType = chartConfig.some(
-        (c: any) => c.chartType && c.chartType !== 'table',
-      );
-      if (!hasChartType) continue;
-
-      const tableData = extractTableData(next);
-      if (!tableData) continue;
-
-      const chartJson = JSON.stringify({
-        config: chartConfig,
-        columns: tableData.columns,
-        dataSource: tableData.dataSource,
-      });
-
-      children[i] = {
-        type: 'code',
-        lang: 'chart',
-        value: chartJson,
-      };
-      toRemove.push(i + 1);
-      i++;
-    }
-
-    for (let j = toRemove.length - 1; j >= 0; j--) {
-      children.splice(toRemove[j], 1);
-    }
-  };
-};
-
-/**
- * rehype 插件：将文本中残留的 [^N] 模式转为 fnc 标记元素。
- *
- * remark-gfm 只在有对应 footnoteDefinition 时才会转换 footnoteReference，
- * 但 AI 对话场景中 [^1] 常用作内联引用（无底部定义）。
- * 此插件在 hast 层面补充处理这些"裸引用"。
- */
-const rehypeFootnoteRef = () => {
-  return (tree: any) => {
-    visit(tree, 'text', (node: any, index: number | undefined, parent: any) => {
-      if (!parent || index === undefined) return;
-      const value = node.value as string;
-      if (!FOOTNOTE_REF_PATTERN.test(value)) return;
-
-      FOOTNOTE_REF_PATTERN.lastIndex = 0;
-      const children: any[] = [];
-      let lastIndex = 0;
-      let match: RegExpExecArray | null;
-
-      while ((match = FOOTNOTE_REF_PATTERN.exec(value)) !== null) {
-        if (match.index > lastIndex) {
-          children.push({
-            type: 'text',
-            value: value.slice(lastIndex, match.index),
-          });
-        }
-        children.push({
-          type: 'element',
-          tagName: 'span',
-          properties: {
-            'data-fnc': 'fnc',
-            'data-fnc-name': match[1],
-          },
-          children: [{ type: 'text', value: match[1] }],
-        });
-        lastIndex = match.index + match[0].length;
-      }
-
-      if (lastIndex < value.length) {
-        children.push({ type: 'text', value: value.slice(lastIndex) });
-      }
-
-      if (children.length > 0) {
-        parent.children.splice(index, 1, ...children);
-        return index + children.length;
-      }
-    });
-  };
-};
-
-const createHastProcessor = (
-  extraRemarkPlugins?: MarkdownRemarkPlugin[],
-  config?: MarkdownToHtmlConfig,
-): Processor => {
-  const processor = unified() as Processor & {
-    use: (plugin: Plugin, ...args: unknown[]) => Processor;
-  };
-
-  (processor as any)
-    .use(remarkParse)
-    .use(remarkGfm, { singleTilde: false })
-    .use(fixStrongWithSpecialChars)
-    .use(convertParagraphToImage)
-    .use(protectJinjaDollarInText)
-    .use(remarkMath, INLINE_MATH_WITH_SINGLE_DOLLAR)
-    .use(remarkFrontmatter, FRONTMATTER_LANGUAGES)
-    .use(remarkDirectiveContainersOnly)
-    .use(remarkDirectiveContainer, REMARK_DIRECTIVE_CONTAINER_OPTIONS)
-    .use(remarkChartFromComment)
-    .use(remarkRehypePlugin, {
-      allowDangerousHtml: true,
-      handlers: REMARK_REHYPE_DIRECTIVE_HANDLERS,
-    })
-    .use(rehypeRaw)
-    .use(rehypeKatex, { strict: 'ignore' } as any)
-    .use(rehypeFootnoteRef);
-
-  if (extraRemarkPlugins) {
-    extraRemarkPlugins.forEach((entry) => {
-      if (Array.isArray(entry)) {
-        const [plugin, ...pluginOptions] = entry as unknown as [
-          Plugin,
-          ...unknown[],
-        ];
-        processor.use(plugin, ...pluginOptions);
-      } else {
-        processor.use(entry as Plugin);
-      }
-    });
-  }
-
-  if (config?.markedConfig) {
-    config.markedConfig.forEach((entry) => {
-      if (Array.isArray(entry)) {
-        const [plugin, ...pluginOptions] = entry as unknown as [
-          Plugin,
-          ...unknown[],
-        ];
-        processor.use(plugin, ...pluginOptions);
-      } else {
-        processor.use(entry as Plugin);
-      }
-    });
-  }
-
-  return processor as Processor;
-};
-
-const extractLanguageFromClassName = (
-  className: string | string[] | undefined,
-): string | undefined => {
-  if (!className) return undefined;
-  const flat =
-    typeof className === 'string' ? className : className.map(String).join(' ');
-  const classes = flat.split(/\s+/).filter(Boolean);
-  for (const cls of classes) {
-    const match = cls.match(/^language-(.+)$/);
-    if (match) return match[1];
-  }
-  return undefined;
-};
-
-/**
- * 提取 React children 的文本内容
- */
-const extractChildrenText = (children: React.ReactNode): string => {
-  if (typeof children === 'string') return children;
-  if (typeof children === 'number') return String(children);
-  if (Array.isArray(children))
-    return children.map(extractChildrenText).join('');
-  if (React.isValidElement(children) && children.props?.children) {
-    return extractChildrenText(children.props.children);
-  }
-  return '';
-};
-
-/**
- * <think> 标签渲染组件——使用 ToolUseBarThink 替代原生 DOM。
- * 在 MarkdownEditor 中，<think> 被预处理为 ```think 代码块，
- * 然后由 ThinkBlock 组件（依赖 Slate 上下文）渲染为 ToolUseBarThink。
- * 在 MarkdownRenderer 中，<think> 通过 rehypeRaw 保留为 hast 元素，
- * 这里直接渲染为 ToolUseBarThink，无需 Slate 上下文。
- */
+/** <think> 标签 → ToolUseBarThink（MarkdownRenderer 无 Slate 上下文，直接渲染） */
 const ThinkBlockRendererComponent = (props: any) => {
   const { children } = props;
   const content = extractChildrenText(children);
@@ -323,25 +47,14 @@ const ThinkBlockRendererComponent = (props: any) => {
 
   return React.createElement(ToolUseBarThink, {
     testId: 'think-block-renderer',
-    styles: {
-      root: {
-        boxSizing: 'border-box',
-        maxWidth: '680px',
-        marginTop: 8,
-      },
-    },
+    styles: THINK_BLOCK_STYLES,
     toolName: isLoading ? '深度思考...' : '深度思考',
     thinkContent: content,
     status: isLoading ? 'loading' : 'success',
   });
 };
 
-/**
- * 构建与 MarkdownEditor Readonly 组件对齐的 hast→React 组件映射。
- *
- * MarkdownEditor 的 Slate 元素使用 data-be 属性和 prefixCls 类名，
- * 这里为原生 HTML 标签添加相同的属性，使共用的 CSS 能正确命中。
- */
+/** hast → React 组件映射，与 MarkdownEditor Readonly 的 data-be / prefixCls 对齐 */
 const buildEditorAlignedComponents = (
   prefixCls: string,
   userComponents: Record<string, React.ComponentType<RendererBlockProps>>,
@@ -351,7 +64,6 @@ const buildEditorAlignedComponents = (
     onClick?: (url?: string) => boolean | void;
   },
   fncProps?: MarkdownEditorProps['fncProps'],
-  streamingParagraphAnimation?: boolean,
   eleRender?: (
     props: MarkdownRendererEleProps,
     defaultDom: React.ReactNode,
@@ -360,18 +72,6 @@ const buildEditorAlignedComponents = (
   const listCls = `${prefixCls}-list`;
   const tableCls = `${prefixCls}-content-table`;
   const contentCls = prefixCls; // e.g. ant-agentic-md-editor-content
-
-  /** 仅当 streaming、末块动画上下文允许且显式开启段落动画时包 AnimationText */
-  const StreamAnimWrap = ({ children }: { children: any }) => {
-    const ctx = useContext(StreamingAnimationContext);
-    const animateBlock = ctx?.animateBlock ?? true;
-    const allow = !!streaming && animateBlock && !!streamingParagraphAnimation;
-    if (!allow) return children;
-    return jsx(AnimationText as any, { children });
-  };
-  StreamAnimWrap.displayName = 'StreamAnimWrap';
-
-  const wrapAnimation = (children: any) => jsx(StreamAnimWrap, { children });
 
   /**
    * 应用 eleRender 拦截：若用户返回非 undefined 值则使用，否则使用 defaultDom。
@@ -382,9 +82,8 @@ const buildEditorAlignedComponents = (
     tagName: string,
     props: any,
     defaultDom: React.ReactNode,
-    skip = false,
   ): React.ReactNode => {
-    if (!eleRender || skip) return defaultDom;
+    if (!eleRender) return defaultDom;
     const result = eleRender({ tagName, ...props }, defaultDom);
     return result !== undefined ? result : defaultDom;
   };
@@ -400,7 +99,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-be': 'paragraph',
         'data-testid': 'markdown-paragraph',
-        children: wrapAnimation(children),
+        children,
       });
       return applyEleRender('p', { node, children, ...rest }, defaultDom);
     },
@@ -616,7 +315,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-testid': 'markdown-th',
         style: { whiteSpace: 'normal', maxWidth: '20%' },
-        children: wrapAnimation(children),
+        children,
       });
     },
     td: (props: any) => {
@@ -625,7 +324,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-testid': 'markdown-td',
         style: { whiteSpace: 'normal', maxWidth: '20%' },
-        children: wrapAnimation(children),
+        children,
       });
     },
 
@@ -648,6 +347,14 @@ const buildEditorAlignedComponents = (
 
     a: (props: any) => {
       const { node, href, onClick: _origOnClick, ...rest } = props;
+      if (shouldRenderUrlAsPlainText(href || '')) {
+        return jsx('span' as any, {
+          ...rest,
+          'data-testid': 'markdown-unsafe-url-plain-text',
+          style: UNSAFE_URL_PLAIN_TEXT_STYLE,
+          children: href,
+        });
+      }
       const openInNewTab = linkConfig?.openInNewTab !== false;
       const defaultDom = jsx('a' as any, {
         ...rest,
@@ -657,7 +364,7 @@ const buildEditorAlignedComponents = (
         'data-testid': 'markdown-link',
         target: openInNewTab ? '_blank' : undefined,
         rel: openInNewTab ? 'noopener noreferrer' : undefined,
-        onClick: (e: MouseEvent) => {
+        onClick: (e: React.MouseEvent<HTMLAnchorElement>) => {
           if (linkConfig?.onClick) {
             const res = linkConfig.onClick(href);
             if (res === false) {
@@ -716,16 +423,24 @@ const buildEditorAlignedComponents = (
     },
 
     mark: (props: any) => {
-      const { node, children, ...rest } = props;
+      const { node, children, color, bg, label, ...rest } = props;
+      const markStyle: Record<string, string> = {};
+      if (color) markStyle.color = color;
+      if (bg) markStyle.backgroundColor = bg;
+      const labelNode =
+        label &&
+        jsx('span' as any, {
+          'data-testid': 'markdown-mark-label',
+          style: { marginInlineEnd: 4, fontSize: '0.85em', opacity: 0.75 },
+          children: label,
+        });
       const defaultDom = jsx('mark' as any, {
         ...rest,
         'data-testid': 'markdown-mark',
-        style: {
-          background: '#f59e0b',
-          padding: '0.1em 0.2em',
-          borderRadius: 2,
-        },
-        children,
+        style: Object.keys(markStyle).length
+          ? { ...rest.style, ...markStyle }
+          : rest.style,
+        children: labelNode ? [labelNode, children] : children,
       });
       return applyEleRender('mark', { node, children, ...rest }, defaultDom);
     },
@@ -800,7 +515,15 @@ const buildEditorAlignedComponents = (
 
     img: (props: any) => {
       const { node, src, alt, width, height, ...rest } = props;
-      const imgWidth = width ? Number(width) || width : 400;
+      if (shouldRenderUrlAsPlainText(src || '')) {
+        return jsx('span' as any, {
+          ...rest,
+          'data-testid': 'markdown-unsafe-url-plain-text',
+          style: UNSAFE_URL_PLAIN_TEXT_STYLE,
+          children: src,
+        });
+      }
+      // width 若未提供，不设置默认值，完全由 CSS 控制宽度
       const defaultDom = jsx('div' as any, {
         'data-be': 'image',
         'data-testid': 'markdown-image',
@@ -826,7 +549,7 @@ const buildEditorAlignedComponents = (
           children: jsx(Image as any, {
             src,
             alt: alt || 'image',
-            width: imgWidth,
+            width: width ? Number(width) || width : undefined,
             height,
             preview: { getContainer: () => document.body },
             referrerPolicy: 'no-referrer',
@@ -993,6 +716,7 @@ const buildEditorAlignedComponents = (
     },
 
     think: ThinkBlockRendererComponent,
+    thinking: ThinkBlockRendererComponent,
 
     answer: (props: any) => {
       const { node: _node, children } = props;
@@ -1004,39 +728,27 @@ const buildEditorAlignedComponents = (
   };
 };
 
-/**
- * 在 hast 上标记「最后一个 p」，用于流式时仅该段落播放入场（单块长文时避免全页 p 一起闪）
- */
-const markLastParagraphStreamingTail = (hast: any) => {
-  const paragraphs: any[] = [];
-  visit(hast, 'element', (node: any) => {
-    if (node.tagName === 'p') {
-      paragraphs.push(node);
-    }
-  });
-  const last = paragraphs[paragraphs.length - 1];
-  if (last) {
-    last.properties = last.properties || {};
-    last.properties.dataStreamingTail = true;
-  }
+const ERROR_FALLBACK_STYLE: React.CSSProperties = {
+  margin: '0.5em 0',
+  padding: '0.5em 0.75em',
+  background: 'var(--ant-color-error-bg, #fff2f0)',
+  border: '1px solid var(--ant-color-error-border, #ffccc7)',
+  borderRadius: 4,
+  fontSize: '0.85em',
+  whiteSpace: 'pre-wrap',
+  wordBreak: 'break-word',
 };
 
-/**
- * 将单个 markdown 片段转为 React 元素（内部函数）
- */
+/** markdown 片段 → React 元素；解析失败时降级为原文 <pre> 兜底，避免内容静默丢失。 */
 const renderMarkdownBlock = (
   blockContent: string,
   processor: Processor,
   components: Record<string, any>,
-  blockOpts?: { markStreamingTailParagraph?: boolean },
 ): React.ReactNode => {
   if (!blockContent.trim()) return null;
   try {
     const mdast = processor.parse(blockContent);
     const hast = processor.runSync(mdast);
-    if (blockOpts?.markStreamingTailParagraph) {
-      markLastParagraphStreamingTail(hast);
-    }
     return toJsxRuntime(hast as any, {
       Fragment,
       jsx: jsx as any,
@@ -1044,74 +756,118 @@ const renderMarkdownBlock = (
       components: components as any,
       passNode: true,
     });
-  } catch {
-    return null;
+  } catch (error) {
+    debugInfo('[MarkdownRenderer] renderMarkdownBlock failed', {
+      error: (error as Error)?.message || String(error),
+      blockContent,
+    });
+    return jsx('pre' as any, {
+      'data-testid': 'markdown-block-error-fallback',
+      style: ERROR_FALLBACK_STYLE,
+      children: blockContent,
+    });
   }
 };
 
-/**
- * 将 markdown 按块（双换行）拆分，尊重代码围栏边界。
- * 返回的每个块是一个独立的 markdown 片段，可单独解析。
- */
+const LIST_ITEM_PATTERN = /^(\s*)([-+*]|\d+[.)]) /;
+const BLOCKQUOTE_PATTERN = /^\s*>/;
+const HTML_COMMENT_PATTERN = /^\s*<!--/;
+const FOOTNOTE_DEF_PATTERN = /^\s*\[\^/;
+
+/** 按单空行拆块，保留围栏代码块、列表、blockquote、HTML 注释+表格、脚注定义、GFM 表格的连续性 */
 const splitMarkdownBlocks = (content: string): string[] => {
   const lines = content.split('\n');
   const blocks: string[] = [];
   let current: string[] = [];
-  let inFence = false;
+  let fenceState = { ...INITIAL_FENCE_STATE };
+  let inList = false;
+  let inBlockquote = false;
+  let pendingBlankLines = 0;
+
+  const lastNonEmptyLine = (): string => {
+    for (let i = current.length - 1; i >= 0; i--) {
+      if (current[i] !== '') return current[i];
+    }
+    return '';
+  };
 
   for (const line of lines) {
-    const trimmed = line.trimStart();
-    if (trimmed.startsWith('```') || trimmed.startsWith('~~~')) {
-      inFence = !inFence;
-    }
-    if (!inFence && line === '' && current.length > 0) {
-      const prev = current[current.length - 1];
-      if (prev === '') {
-        // 触发分割的是「第二个连续空行」，不应并入上一块末尾，否则与单块解析结果字符串不一致、缓存失效
-        const withoutTrailingBlank = current.slice(0, -1);
-        blocks.push(withoutTrailingBlank.join('\n'));
-        current = [];
-        continue;
+    fenceState = updateFenceStateForLine(fenceState, line);
+
+    if (fenceState.inFenced) {
+      if (pendingBlankLines > 0) {
+        for (let i = 0; i < pendingBlankLines; i++) current.push('');
+        pendingBlankLines = 0;
       }
+      current.push(line);
+      continue;
     }
+
+    if (line === '') {
+      if (current.length > 0) {
+        pendingBlankLines++;
+      }
+      continue;
+    }
+
+    if (pendingBlankLines > 0) {
+      const nextIsListItem = LIST_ITEM_PATTERN.test(line);
+      const nextIsBlockquote = BLOCKQUOTE_PATTERN.test(line);
+      const nextIsContinuation =
+        (inList && (nextIsListItem || /^\s+\S/.test(line))) ||
+        (inBlockquote && nextIsBlockquote);
+
+      const prevIsHtmlComment = HTML_COMMENT_PATTERN.test(lastNonEmptyLine());
+      const nextIsFootnoteDef = FOOTNOTE_DEF_PATTERN.test(line);
+
+      // GFM 中空行终止表格，所以两张相邻表格必须切成两块——若仍合并，
+      // 后表格每次增长都会拖累前表格的 memo 命中
+      if (
+        current.length > 0 &&
+        !nextIsContinuation &&
+        !prevIsHtmlComment &&
+        !nextIsFootnoteDef
+      ) {
+        blocks.push(current.join('\n'));
+        current = [];
+        inList = false;
+        inBlockquote = false;
+      } else {
+        for (let i = 0; i < pendingBlankLines; i++) current.push('');
+      }
+      pendingBlankLines = 0;
+    }
+
+    inList = LIST_ITEM_PATTERN.test(line) || (inList && /^\s+\S/.test(line));
+    inBlockquote = BLOCKQUOTE_PATTERN.test(line);
+
     current.push(line);
   }
   if (current.length > 0) {
     blocks.push(current.join('\n'));
+  }
+  if (blocks.length === 0) {
+    blocks.push('');
   }
   return blocks;
 };
 
 export interface UseMarkdownToReactOptions {
   remarkPlugins?: MarkdownRemarkPlugin[];
+  rehypePlugins?: Plugin[];
   htmlConfig?: MarkdownToHtmlConfig;
+  formula?: FormulaConfig;
   components?: Record<string, React.ComponentType<RendererBlockProps>>;
-  /** MarkdownEditor 的 CSS 前缀，用于生成对齐的 className */
   prefixCls?: string;
-  /** 链接配置：onClick 拦截、openInNewTab 控制 */
   linkConfig?: {
     openInNewTab?: boolean;
     onClick?: (url?: string) => boolean | void;
   };
-  /** 脚注：与只读 Slate 路径 FncLeaf / fncProps 对齐 */
   fncProps?: MarkdownEditorProps['fncProps'];
-  /** 是否处于流式状态，用于最后一个块的打字动画 */
   streaming?: boolean;
-  /**
-   * 流式时是否对「生长中的末段」启用段落淡入（AnimationText）。
-   * 默认 false：重解析时频繁触发动画易导致整页闪动；需要时再显式传入 true。
-   */
-  streamingParagraphAnimation?: boolean;
-  /**
-   * 单调增长的原始流字符串，仅用于判断是否应保留分块缓存。
-   * 与 `content`（常为 useStreaming 输出的可解析串）分离，避免占位符与正文切换时误判为非前缀修订。
-   */
+  /** 原始流字符串，与 useStreaming 输出分离避免缓存误判 */
   contentRevisionSource?: string;
-  /**
-   * 自定义元素渲染拦截函数（markdown 渲染模式）。
-   * 允许在默认渲染结果基础上包装、替换任意元素。
-   * 返回 undefined 时回退到默认渲染。
-   */
+  /** 返回 undefined 回退默认渲染 */
   eleRender?: (
     props: MarkdownRendererEleProps,
     defaultDom: React.ReactNode,
@@ -1121,7 +877,6 @@ export interface UseMarkdownToReactOptions {
 export {
   buildEditorAlignedComponents,
   createHastProcessor,
-  markLastParagraphStreamingTail,
   renderMarkdownBlock,
   splitMarkdownBlocks,
 };

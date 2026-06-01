@@ -19,7 +19,7 @@ export default function Home() {
             category: 'TableSql',
             info: '查看 ${tableName} 数据',
             input: {
-              sql: "SELECT user_name, order_count FROM orders LIMIT 2",
+              sql: 'SELECT user_name, order_count FROM orders LIMIT 2',
             },
             meta: {
               data: {

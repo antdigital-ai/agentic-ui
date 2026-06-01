@@ -1,10 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'DonutChart'> = (token) => {
   return {
     [token.componentCls]: {
       display: 'flex',
@@ -113,7 +109,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
       '&-legend-label': {
         flex: 1,
-        color: '#767E8B',
+        color: 'var(--color-gray-text-secondary)',
         fontSize: 13,
         whiteSpace: 'nowrap',
         overflow: 'hidden',
@@ -126,7 +122,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
 
       '&-legend-value': {
-        color: '#343A45',
+        color: 'var(--color-gray-text-default)',
         fontSize: 13,
         fontWeight: 500,
         marginLeft: 15,
@@ -143,7 +139,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       '&-legend-percent': {
         marginLeft: 8,
         fontSize: 12,
-        color: '#343A45',
+        color: 'var(--color-gray-text-default)',
         [`@media (max-width: 768px)`]: {
           marginLeft: 0,
           fontSize: 10,
@@ -182,13 +178,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('DonutChart', (token) => {
-    const donutToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('DonutChart', genStyle);
 
-    return [genStyle(donutToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [, hashId] = useGenStyle(prefixCls ?? 'DonutChart');
+  return { hashId };
 }

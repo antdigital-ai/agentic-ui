@@ -1,3 +1,5 @@
+.cursor/debug-*.log
+
 node_modules
 /dist
 .dumi/tmp
@@ -6,6 +8,7 @@ node_modules
 .DS_Store
 /docs-dist
 tsconfig.tsbuildinfo
+tsconfig.test.tsbuildinfo
 coverage/**
 playwright-report/*
 test-results/*

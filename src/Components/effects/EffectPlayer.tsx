@@ -41,8 +41,6 @@ function EffectPlayer({
   sceneUrl,
   downgradeImage,
   autoplay = true,
-  // TODO: 添加禁止循环播放功能
-  // loop = true,
   size = '1em',
   style,
   ...attrs
@@ -90,6 +88,8 @@ function EffectPlayer({
         playerRef.current = null;
       }
     };
+    // 仅在挂载时创建一次 Player；sceneUrl/autoplay 变化由下方 effect 处理
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ==================== State Effects ====================

@@ -12,7 +12,7 @@ import React, {
 } from 'react';
 import { BaseEditor } from 'slate';
 import { ReactEditor, useSlate } from 'slate-react';
-import { SuggestionConnext } from '../../../../MarkdownInputField/Suggestion';
+import { SuggestionContext } from '../../../../MarkdownInputField/Suggestion/SuggestionContext';
 
 type TagPopupItem = Array<{
   label: string;
@@ -20,7 +20,7 @@ type TagPopupItem = Array<{
   onClick?: (v: string) => void;
 }>;
 
-type SuggestionContextValue = React.ContextType<typeof SuggestionConnext>;
+type SuggestionContextValue = React.ContextType<typeof SuggestionContext>;
 
 type RenderProps = TagPopupProps & {
   text?: string;
@@ -172,7 +172,7 @@ const getNodePath = (
 const updateNodeContext = (
   editor: BaseEditor & ReactEditor,
   domRef: React.RefObject<HTMLDivElement>,
-  suggestionConnext: SuggestionContextValue,
+  suggestionContext: SuggestionContextValue,
   props: RenderProps,
   onSelect: RenderProps['onSelect'],
   pathRef: React.MutableRefObject<number[] | undefined>,
@@ -182,18 +182,18 @@ const updateNodeContext = (
 
   pathRef.current = path;
 
-  if (suggestionConnext?.triggerNodeContext) {
-    suggestionConnext.triggerNodeContext.current = {
+  if (suggestionContext?.triggerNodeContext) {
+    suggestionContext.triggerNodeContext.current = {
       ...props,
       text: props.text,
     };
   }
 
-  if (suggestionConnext?.onSelectRef) {
-    suggestionConnext.onSelectRef.current = (newValue: string) => {
+  if (suggestionContext?.onSelectRef) {
+    suggestionContext.onSelectRef.current = (newValue: string) => {
       const currentPath = getNodePath(editor, domRef);
       onSelect?.(newValue, currentPath || path || []);
-      suggestionConnext?.setOpen?.(false);
+      suggestionContext?.setOpen?.(false);
     };
   }
 };
@@ -221,7 +221,7 @@ const initializeAutoOpen = (
   autoOpen: boolean | undefined,
   type: string | undefined,
   setOpen: (open: boolean) => void,
-  suggestionConnext: SuggestionContextValue,
+  suggestionContext: SuggestionContextValue,
 ) => {
   if (!autoOpen) return;
 
@@ -230,7 +230,7 @@ const initializeAutoOpen = (
     return;
   }
 
-  suggestionConnext?.setOpen?.(true);
+  suggestionContext?.setOpen?.(true);
 };
 
 const handleMouseEnter = (domRef: React.RefObject<HTMLDivElement>) => {
@@ -308,26 +308,26 @@ const getRenderDom = (
 };
 
 const handlePanelClick = (
-  suggestionConnext: SuggestionContextValue,
+  suggestionContext: SuggestionContextValue,
   props: RenderProps,
   onSelect: RenderProps['onSelect'],
   currentNodePath: React.MutableRefObject<number[] | undefined>,
 ) => {
-  if (suggestionConnext?.triggerNodeContext) {
-    suggestionConnext.triggerNodeContext.current = {
+  if (suggestionContext?.triggerNodeContext) {
+    suggestionContext.triggerNodeContext.current = {
       ...props,
       text: props.text,
     };
   }
 
-  if (suggestionConnext?.onSelectRef) {
-    suggestionConnext.onSelectRef.current = (newValue: string) => {
+  if (suggestionContext?.onSelectRef) {
+    suggestionContext.onSelectRef.current = (newValue: string) => {
       onSelect?.(newValue?.trim() || '', currentNodePath.current || []);
-      suggestionConnext?.setOpen?.(false);
+      suggestionContext?.setOpen?.(false);
     };
   }
 
-  suggestionConnext?.setOpen?.(true);
+  suggestionContext?.setOpen?.(true);
 };
 
 const canOpen = (
@@ -348,7 +348,7 @@ const handleClick = (
   props: RenderProps,
   placeholder: string | undefined,
   type: string | undefined,
-  suggestionConnext: SuggestionContextValue,
+  suggestionContext: SuggestionContextValue,
   onSelect: RenderProps['onSelect'],
   currentNodePath: React.MutableRefObject<number[] | undefined>,
 ) => {
@@ -358,16 +358,16 @@ const handleClick = (
   if (!canOpen(props, placeholder)) return;
   if (type === 'dropdown') return;
 
-  handlePanelClick(suggestionConnext, props, onSelect, currentNodePath);
+  handlePanelClick(suggestionContext, props, onSelect, currentNodePath);
 };
 
 export const TagPopup = (props: RenderProps) => {
-  const { onSelect, items, children, type } = props || {};
+  const { onSelect, items, children, type } = props;
   const editor = useSlate();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = React.useState(false);
   const domRef = useRef<HTMLDivElement>(null);
-  const suggestionConnext = useContext(SuggestionConnext);
+  const suggestionContext = useContext(SuggestionContext);
   const antdContext = useContext(ConfigProvider.ConfigContext);
   const baseCls = antdContext?.getPrefixCls('agentic-md-editor-tag-popup');
   const currentNodePath = useRef<number[]>();
@@ -383,7 +383,7 @@ export const TagPopup = (props: RenderProps) => {
     updateNodeContext(
       editor,
       domRef,
-      suggestionConnext,
+      suggestionContext,
       props,
       onSelect,
       currentNodePath,
@@ -391,7 +391,7 @@ export const TagPopup = (props: RenderProps) => {
   }, [props.text]);
 
   const [selectedItems, setSelectedItems] = useState(() => {
-    return typeof items === 'function' ? [] : items || [];
+    return typeof items === 'function' ? [] : (items ?? []);
   });
 
   useEffect(() => {
@@ -406,14 +406,14 @@ export const TagPopup = (props: RenderProps) => {
         onSelect?.(value?.trim() || '', currentNodePath.current || []);
       },
     });
-  }, [props.text, suggestionConnext?.open]);
+  }, [props.text, suggestionContext?.open]);
 
   useEffect(() => {
-    initializeAutoOpen(props.autoOpen, type, setOpen, suggestionConnext);
+    initializeAutoOpen(props.autoOpen, type, setOpen, suggestionContext);
   }, []);
 
   const placeholder = props.placeholder;
-  const isOpen = type === 'dropdown' ? open : suggestionConnext?.open || false;
+  const isOpen = type === 'dropdown' ? open : suggestionContext?.open || false;
   const defaultDom = createDefaultDom(
     domRef,
     baseCls,
@@ -454,7 +454,7 @@ export const TagPopup = (props: RenderProps) => {
       props,
       placeholder,
       type,
-      suggestionConnext,
+      suggestionContext,
       onSelect,
       currentNodePath,
     );
@@ -465,7 +465,7 @@ export const TagPopup = (props: RenderProps) => {
     items: selectedItems as MenuProps['items'],
     onClick: (e: any) => {
       onSelect?.(e.key?.trim() || '', currentNodePath.current || []);
-      suggestionConnext?.setOpen?.(false);
+      suggestionContext?.setOpen?.(false);
     },
   } as MenuProps;
 

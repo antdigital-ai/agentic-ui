@@ -1,4 +1,4 @@
-﻿---
+---
 nav:
   title: Demo
   order: 5
@@ -35,7 +35,7 @@ group:
 
 ### 文本框输入
 
-<code src="../demos/markdownInputField.tsx"  background="var(--main-bg-color)" iframe=540 ></code>
+<code src="../demos/markdownInputField/basic.tsx" background="var(--main-bg-color)" iframe=540></code>
 
 ### Jinja 模板（`{}` 触发 + 语法高亮）
 

@@ -12,29 +12,35 @@ group:
 
 ## 代码演示
 
+### API Playground
+
+通过控制面板串联调试三栏开关、宽度、折叠（受控 / 非受控）、`header.showShare` 与典型布局组合。
+
+<code src="../demos/agentic-layout-playground.tsx" iframe=720>API Playground - 全部核心 props</code>
+
 ### 基础用法
 
 最简用法：只传 `center`，即可获得一个带圆角阴影的内容容器。
 
-<code src="../demos/agentic-layout-basic.tsx" iframe=460>基础用法</code>
+<code src="../demos/agentic-layout-basic.tsx" iframe=520>基础用法</code>
 
 ### 三栏布局与侧边栏宽度
 
 通过 `left`、`center`、`right` 填充三栏内容，`leftWidth` 和 `rightWidth` 控制侧边栏宽度。
 
-<code src="../demos/agentic-layout-sidebar.tsx" iframe=560>三栏布局 + leftWidth / rightWidth</code>
+<code src="../demos/agentic-layout-sidebar.tsx" iframe=580>三栏布局 + leftWidth / rightWidth</code>
 
 ### 受控折叠
 
 通过 `header.leftCollapsed` / `header.rightCollapsed` 与对应回调受控管理折叠状态，可在外部完全控制折叠逻辑（例如根据窗口宽度自动折叠）。
 
-<code src="../demos/agentic-layout-collapse.tsx" iframe=520>受控折叠</code>
+<code src="../demos/agentic-layout-collapse.tsx" iframe=560>受控折叠</code>
 
 ### 非受控折叠
 
 使用 `header.leftDefaultCollapsed` / `header.rightDefaultCollapsed` 设置初始值，折叠状态由组件内部自动管理，无需外部 state。
 
-<code src="../demos/agentic-layout-uncontrolled.tsx" iframe=480>非受控折叠</code>
+<code src="../demos/agentic-layout-uncontrolled.tsx" iframe=540>非受控折叠</code>
 
 ### header 扩展内容
 
@@ -42,11 +48,11 @@ group:
 
 <code src="../demos/agentic-layout-header-extra.tsx" iframe=1020>header 扩展内容</code>
 
-### minHeight、style 与右侧栏拖拽
+### style 与右侧栏拖拽
 
-`minHeight` 控制组件最小高度，`className` / `style` 自定义根容器样式，右侧栏内置拖拽手柄可动态调整宽度。
+`className` / `style` 自定义根容器样式，右侧栏内置拖拽手柄可动态调整宽度。组件默认 `minHeight: 600px`，可通过 `style={{ minHeight: 0 }}` 覆盖。
 
-<code src="../demos/agentic-layout-style.tsx" iframe=1100>minHeight、style 与拖拽调整宽度</code>
+<code src="../demos/agentic-layout-style.tsx" iframe=1100>style 与拖拽调整宽度</code>
 
 ### 完整示例
 
@@ -58,36 +64,35 @@ group:
 
 ### AgenticLayoutProps
 
-| 属性 | 说明 | 类型 | 默认值 | 版本 |
-| --- | --- | --- | --- | --- |
-| center | 中间内容区域（必填） | `ReactNode` | - | - |
-| left | 左侧边栏内容 | `ReactNode` | - | - |
-| right | 右侧边栏内容 | `ReactNode` | - | - |
-| header | 头部配置，包含折叠控制等（详见 [LayoutHeader](/components/layout-header)） | `LayoutHeaderConfig` | - | - |
-| leftWidth | 左侧边栏宽度（px） | `number` | `256` | - |
-| rightWidth | 右侧边栏初始宽度（px），可通过拖拽调整，最小 400px，最大窗口宽度的 70% | `number` | `540` | - |
-| minHeight | 组件最小高度 | `string \| number` | `'600px'` | - |
-| className | 根容器自定义类名 | `string` | - | - |
-| style | 根容器自定义样式 | `React.CSSProperties` | - | - |
+| 属性       | 说明                                                                       | 类型                  | 默认值 | 版本 |
+| ---------- | -------------------------------------------------------------------------- | --------------------- | ------ | ---- |
+| center     | 中间内容区域（必填）                                                       | `ReactNode`           | -      | -    |
+| left       | 左侧边栏内容                                                               | `ReactNode`           | -      | -    |
+| right      | 右侧边栏内容                                                               | `ReactNode`           | -      | -    |
+| header     | 头部配置，包含折叠控制等（详见 [LayoutHeader](/components/layout-header)） | `LayoutHeaderConfig`  | -      | -    |
+| leftWidth  | 左侧边栏宽度（px）                                                         | `number`              | `256`  | -    |
+| rightWidth | 右侧边栏初始宽度（px），可通过拖拽调整，最小 400px，最大窗口宽度的 70%     | `number`              | `540`  | -    |
+| className  | 根容器自定义类名                                                           | `string`              | -      | -    |
+| style      | 根容器自定义样式                                                           | `React.CSSProperties` | -      | -    |
 
 ### header 配置（LayoutHeaderConfig）
 
-| 属性 | 说明 | 类型 | 默认值 | 版本 |
-| --- | --- | --- | --- | --- |
-| title | 标题，支持文本或自定义 ReactNode | `ReactNode` | - | - |
-| showShare | 是否显示分享按钮 | `boolean` | `false` | - |
-| leftCollapsible | 是否显示左侧折叠按钮（传入 `left` 时自动为 `true`） | `boolean` | - | - |
-| rightCollapsible | 是否显示右侧折叠按钮（传入 `right` 时自动为 `true`） | `boolean` | - | - |
-| leftCollapsed | 左侧折叠状态（受控） | `boolean` | - | - |
-| rightCollapsed | 右侧折叠状态（受控） | `boolean` | - | - |
-| leftDefaultCollapsed | 左侧默认折叠状态（非受控） | `boolean` | `false` | - |
-| rightDefaultCollapsed | 右侧默认折叠状态（非受控） | `boolean` | `false` | - |
-| onLeftCollapse | 左侧折叠按钮点击回调 | `(collapsed: boolean) => void` | - | - |
-| onRightCollapse | 右侧折叠按钮点击回调 | `(collapsed: boolean) => void` | - | - |
-| onShare | 分享按钮点击回调 | `() => void` | - | - |
-| leftExtra | 标题右侧自定义内容（折叠按钮和分隔线之后） | `ReactNode` | - | - |
-| rightExtra | 右侧操作区自定义内容（折叠按钮之后） | `ReactNode` | - | - |
-| className | 头部自定义类名 | `string` | - | - |
+| 属性                  | 说明                                                 | 类型                           | 默认值  | 版本 |
+| --------------------- | ---------------------------------------------------- | ------------------------------ | ------- | ---- |
+| title                 | 标题，支持文本或自定义 ReactNode                     | `ReactNode`                    | -       | -    |
+| showShare             | 是否显示分享按钮                                     | `boolean`                      | `false` | -    |
+| leftCollapsible       | 是否显示左侧折叠按钮（传入 `left` 时自动为 `true`）  | `boolean`                      | -       | -    |
+| rightCollapsible      | 是否显示右侧折叠按钮（传入 `right` 时自动为 `true`） | `boolean`                      | -       | -    |
+| leftCollapsed         | 左侧折叠状态（受控）                                 | `boolean`                      | -       | -    |
+| rightCollapsed        | 右侧折叠状态（受控）                                 | `boolean`                      | -       | -    |
+| leftDefaultCollapsed  | 左侧默认折叠状态（非受控）                           | `boolean`                      | `false` | -    |
+| rightDefaultCollapsed | 右侧默认折叠状态（非受控）                           | `boolean`                      | `false` | -    |
+| onLeftCollapse        | 左侧折叠按钮点击回调                                 | `(collapsed: boolean) => void` | -       | -    |
+| onRightCollapse       | 右侧折叠按钮点击回调                                 | `(collapsed: boolean) => void` | -       | -    |
+| onShare               | 分享按钮点击回调                                     | `() => void`                   | -       | -    |
+| leftExtra             | 标题右侧自定义内容（折叠按钮和分隔线之后）           | `ReactNode`                    | -       | -    |
+| rightExtra            | 右侧操作区自定义内容（折叠按钮之后）                 | `ReactNode`                    | -       | -    |
+| className             | 头部自定义类名                                       | `string`                       | -       | -    |
 
 ## 折叠状态说明
 
@@ -107,3 +112,4 @@ group:
 - `center` 属性是必填的，左右侧栏为可选
 - 传入 `left` / `right` 内容时，对应折叠按钮会自动显示（无需手动设置 `leftCollapsible` / `rightCollapsible`）
 - 建议在外层容器设置明确的高度，避免布局塌陷
+- 组件默认 `minHeight: 600px`（CSS），可通过 `style={{ minHeight: 0 }}` 或 `style={{ minHeight: 400 }}` 覆盖

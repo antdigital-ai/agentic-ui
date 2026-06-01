@@ -7,7 +7,7 @@ import { useEditorStore } from '../../MarkdownEditor/editor/store';
 import { DragHandle } from '../../MarkdownEditor/editor/tools/DragHandle';
 import { useMEditor } from '../../MarkdownEditor/hooks/editor';
 import { ChartRender } from './ChartRender';
-import { getDataHash } from './utils';
+import { getDataHash, sortChartDataRowsByXField } from './utils';
 
 /**
  * @fileoverview 图表插件主入口文件
@@ -33,6 +33,26 @@ export * from './ChartMark';
 // 图表渲染组件
 export { ChartRender } from './ChartRender';
 
+// 文档卡片栅格
+export {
+  DocCards,
+  DEFAULT_FIELD_ALIASES as DocCardsDefaultFieldAliases,
+  formatDisplayUrl as formatDocCardsDisplayUrl,
+  isSafeHref as isDocCardsSafeHref,
+  resolveDocCardsFields,
+  splitTags as splitDocCardsTags,
+} from './DocCards';
+export type {
+  DocCardsField,
+  DocCardsFieldMap,
+  DocCardsProps,
+  ResolvedDocCardsFields,
+} from './DocCards';
+
+// 四象限图
+export { QuadrantChart } from './QuadrantChart';
+export type { QuadrantChartProps } from './QuadrantChart';
+
 // 图表组件导出
 export { default as AreaChart } from './AreaChart';
 export { default as BarChart } from './BarChart';
@@ -56,10 +76,7 @@ export type {
   BarChartDataItem,
   BarChartProps,
 } from './BarChart';
-export type {
-  BoxPlotChartDataItem,
-  BoxPlotChartProps,
-} from './BoxPlotChart';
+export type { BoxPlotChartDataItem, BoxPlotChartProps } from './BoxPlotChart';
 export type {
   ChartStatisticClassNames,
   ChartStatisticProps,
@@ -441,20 +458,14 @@ export const ChartElement = (props: RenderElementProps) => {
                       );
                     }
 
-                    chartData = chartData
-                      .map((item: any) => {
-                        return {
-                          ...item,
-                          [x]: numberString(item[x]),
-                          [y]: numberString(item[y]),
-                        };
-                      })
-                      .sort((a: any, b: any) => {
-                        if (dayjs(a[x]).isValid() && dayjs(b[x]).isValid()) {
-                          return dayjs(a[x]).valueOf() - dayjs(b[x]).valueOf();
-                        }
-                        return 0;
-                      });
+                    chartData = sortChartDataRowsByXField(
+                      chartData.map((item: any) => ({
+                        ...item,
+                        [x]: numberString(item[x]),
+                        [y]: numberString(item[y]),
+                      })),
+                      x,
+                    );
 
                     const subgraphBy = rest?.subgraphBy;
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { RenderElementProps } from 'slate-react';
 import { debugInfo } from '../../../../Utils/debugUtils';
+import { getSlateElementPlainText } from '../../utils/codeBlockPlainText';
 
 export const Katex = ({
   attributes,
@@ -28,7 +29,7 @@ export const Katex = ({
         wordWrap: 'break-word',
       }}
     >
-      <code>{element.value}</code>
+      <code>{getSlateElementPlainText(element)}</code>
       <div
         style={{
           display: 'none',

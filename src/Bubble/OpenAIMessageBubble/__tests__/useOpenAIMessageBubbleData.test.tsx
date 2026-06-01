@@ -1,8 +1,8 @@
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { useOpenAIMessageBubbleData } from '../useOpenAIMessageBubbleData';
 import type { OpenAIChatMessage } from '../types';
+import { useOpenAIMessageBubbleData } from '../useOpenAIMessageBubbleData';
 
 describe('useOpenAIMessageBubbleData', () => {
   it('returns mapped bubble list', () => {

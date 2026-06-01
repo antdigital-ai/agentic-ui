@@ -1,13 +1,12 @@
 import {
-  ChatTokenType,
-  GenerateStyle,
+  genStyleHooks,
   resetComponent,
-  useEditorStyleRegister,
+  type GenStyleFn,
 } from '../../../../Hooks/useStyle';
 
 export const JINJA_PANEL_PREFIX_CLS = 'agentic-md-editor-jinja-panel';
 
-const genJinjaPanelStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genJinjaPanelStyle: GenStyleFn<'JinjaTemplatePanel'> = (token) => {
   return {
     [token.componentCls]: {
       boxSizing: 'border-box',
@@ -108,16 +107,15 @@ const genJinjaPanelStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
+const useGenStyle = genStyleHooks('JinjaTemplatePanel', (token, info) => [
+  resetComponent(token),
+  genJinjaPanelStyle(token, info),
+]);
+
 export function useJinjaTemplatePanelStyle(prefixCls?: string) {
-  const componentCls = '.' + (prefixCls || JINJA_PANEL_PREFIX_CLS);
-  return useEditorStyleRegister(
-    'JinjaTemplatePanel-' + (prefixCls || JINJA_PANEL_PREFIX_CLS),
-    (token) => {
-      const editorToken: ChatTokenType = {
-        ...token,
-        componentCls,
-      };
-      return [resetComponent(editorToken), genJinjaPanelStyle(editorToken)];
-    },
-  );
+  // 缺省 prefixCls 时回退到 JINJA_PANEL_PREFIX_CLS，与组件内
+  // `getPrefixCls('agentic-md-editor-jinja-panel') ?? JINJA_PANEL_PREFIX_CLS`
+  // 保持一致
+  const [, hashId] = useGenStyle(prefixCls ?? JINJA_PANEL_PREFIX_CLS);
+  return { hashId };
 }

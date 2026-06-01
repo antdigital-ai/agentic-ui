@@ -1,7 +1,6 @@
-import type { ChatTokenType, GenerateStyle } from '../../Hooks/useStyle';
-import { useEditorStyleRegister } from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'WorkspaceRealtimeFollow'> = (token) => {
   return {
     [`${token.componentCls}`]: {
       [`&-container`]: {
@@ -29,13 +28,13 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           border: 'none',
           background: 'none',
           cursor: 'pointer',
-          color: '#767e8b',
+          color: 'var(--color-gray-text-secondary)',
           transition: 'all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
           borderRadius: 'var(--radius-control-base)',
           backdropFilter: 'blur(20px)',
 
           '&:hover': {
-            background: '#f0f0f0',
+            background: 'var(--color-gray-control-fill-active)',
           },
         },
 
@@ -83,7 +82,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           [`&--html`]: {
             width: '40px',
             height: '40px',
-            color: '#00B5FD',
+            color: 'var(--color-blue-text-default)',
             background:
               'linear-gradient(180deg, rgba(0, 181, 253, 0.15), rgba(0, 181, 253, 0.08))',
           },
@@ -91,7 +90,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           [`&--md`]: {
             width: '40px',
             height: '40px',
-            color: '#FF7A00',
+            color: 'var(--color-orange-text-default)',
             background:
               'linear-gradient(180deg, rgba(35, 214, 220, 0.15), rgba(35, 214, 220, 0.08))',
           },
@@ -99,7 +98,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           [`&--default`]: {
             width: '40px',
             height: '40px',
-            background: 'linear-gradient(180deg, #EAEEF4, #F4F6F9)',
+            background:
+              'linear-gradient(180deg, var(--color-gray-bg-page-light), var(--color-gray-bg-page))',
           },
         },
 
@@ -207,7 +207,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             background: 'transparent',
           },
           '.ace-tm .ace_gutter-active-line': {
-            color: '#FFFFFF',
+            color: 'var(--color-gray-bg-card-white)',
             background: 'transparent',
           },
 
@@ -216,15 +216,15 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           },
 
           '.ace-tm .ace_keyword': {
-            color: '#E873BB',
+            color: 'var(--color-sub5-text-default)',
           },
 
           '.ace_identifier, .ace_paren': {
-            color: '#FFFFFF',
+            color: 'var(--color-gray-bg-card-white)',
           },
 
           '.ace-tm .ace_constant.ace_numeric': {
-            color: '#84DC18',
+            color: 'var(--color-green-text-default)',
           },
 
           '.code-editor-container': {
@@ -242,18 +242,19 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           },
 
           [`${token.antCls}-empty-description`]: {
-            color: '#d9d9d9',
+            color: 'var(--color-gray-text-light)',
           },
         },
       },
 
       [`&--markdown`]: {
-        [`${token.antCls}-agentic-md-editor-content div[data-be="paragraph"]:last-child`]: {
-          paddingBottom: '16px',
-          color: 'var(--color-gray-text-light)',
-          font: 'var(--font-text-code-base)',
-          letterSpacing: 'var(--letter-spacing-code-base, normal)',
-        },
+        [`${token.antCls}-agentic-md-editor-content div[data-be="paragraph"]:last-child`]:
+          {
+            paddingBottom: '16px',
+            color: 'var(--color-gray-text-light)',
+            font: 'var(--font-text-code-base)',
+            letterSpacing: 'var(--letter-spacing-code-base, normal)',
+          },
       },
 
       [`&-content`]: {
@@ -334,7 +335,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
         [`&--error`]: {
           background: 'rgba(255, 245, 245, 0.6)',
-          color: '#cb1e1e',
+          color: 'var(--color-red-text-default)',
         },
       },
 
@@ -351,13 +352,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
-export function useRealtimeFollowStyle(prefixCls?: string) {
-  return useEditorStyleRegister('WorkspaceRealtimeFollow', (token) => {
-    const realtimeToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('WorkspaceRealtimeFollow', genStyle);
 
-    return [genStyle(realtimeToken)];
-  });
+export function useRealtimeFollowStyle(prefixCls?: string) {
+  const [, hashId] = useGenStyle(prefixCls ?? 'WorkspaceRealtimeFollow');
+  return { hashId };
 }

@@ -1,6 +1,6 @@
 import React from 'react';
-import AbstractLottie, { AbstractLottieProps } from '../Abstract';
-import refreshAnimation from './lottie.json';
+import { AbstractLottieProps } from '../Abstract';
+import { createBubbleActionLottie } from '../createBubbleActionLottie';
 
 export type RefreshLottieProps = Omit<AbstractLottieProps, 'animationData'>;
 
@@ -43,8 +43,10 @@ export type RefreshLottieProps = Omit<AbstractLottieProps, 'animationData'>;
  * @param props.size - 动画尺寸（宽度和高度），默认为 '1em'
  * @returns 渲染的刷新操作动画组件
  */
-export const RefreshLottie: React.FC<RefreshLottieProps> = (props) => (
-  <AbstractLottie {...props} animationData={refreshAnimation} />
-);
+export const RefreshLottie: React.FC<RefreshLottieProps> =
+  createBubbleActionLottie({
+    loadJson: () => import('./lottie.json'),
+    displayName: 'RefreshLottie',
+  });
 
 export default RefreshLottie;

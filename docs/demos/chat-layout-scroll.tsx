@@ -26,7 +26,9 @@ const MessageList = ({ count }: { count: number }) => (
 
 const ScrollApiDemo = () => {
   const chatRef = useRef<ChatLayoutRef>(null);
-  const [scrollBehavior, setScrollBehavior] = useState<'smooth' | 'auto'>('smooth');
+  const [scrollBehavior, setScrollBehavior] = useState<'smooth' | 'auto'>(
+    'smooth',
+  );
 
   const handleScrollToBottom = () => {
     chatRef.current?.scrollToBottom();
@@ -34,7 +36,10 @@ const ScrollApiDemo = () => {
   };
 
   const handleScrollToTop = () => {
-    chatRef.current?.scrollContainer?.scrollTo({ top: 0, behavior: scrollBehavior });
+    chatRef.current?.scrollContainer?.scrollTo({
+      top: 0,
+      behavior: scrollBehavior,
+    });
   };
 
   return (
@@ -44,7 +49,15 @@ const ScrollApiDemo = () => {
         <Tag color="blue" style={{ marginBottom: 8 }}>
           scrollBehavior + ChatLayoutRef.scrollToBottom
         </Tag>
-        <div style={{ marginBottom: 8, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+        <div
+          style={{
+            marginBottom: 8,
+            display: 'flex',
+            gap: 8,
+            alignItems: 'center',
+            flexWrap: 'wrap',
+          }}
+        >
           <span style={{ fontSize: 13, color: '#666' }}>scrollBehavior:</span>
           <Segmented
             options={['smooth', 'auto']}
@@ -58,7 +71,13 @@ const ScrollApiDemo = () => {
             header={{ title: '滚动行为演示' }}
             scrollBehavior={scrollBehavior}
             footer={
-              <div style={{ padding: '12px 16px', display: 'flex', justifyContent: 'center' }}>
+              <div
+                style={{
+                  padding: '12px 16px',
+                  display: 'flex',
+                  justifyContent: 'center',
+                }}
+              >
                 <Space>
                   <Button onClick={handleScrollToTop}>滚动到顶部</Button>
                   <Button type="primary" onClick={handleScrollToBottom}>
@@ -83,12 +102,23 @@ const ScrollApiDemo = () => {
             ref={chatRef}
             header={{ title: '访问 scrollContainer' }}
             footer={
-              <div style={{ padding: '12px 16px', display: 'flex', justifyContent: 'center' }}>
+              <div
+                style={{
+                  padding: '12px 16px',
+                  display: 'flex',
+                  justifyContent: 'center',
+                }}
+              >
                 <Button
                   onClick={() => {
                     const el = chatRef.current?.scrollContainer;
                     if (el) {
-                      console.log('scrollTop:', el.scrollTop, 'scrollHeight:', el.scrollHeight);
+                      console.log(
+                        'scrollTop:',
+                        el.scrollTop,
+                        'scrollHeight:',
+                        el.scrollHeight,
+                      );
                       alert(
                         `scrollTop: ${el.scrollTop}\nscrollHeight: ${el.scrollHeight}\nclientHeight: ${el.clientHeight}`,
                       );

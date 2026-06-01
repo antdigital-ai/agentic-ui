@@ -84,7 +84,7 @@ export const UserBubble: React.FC<
   const { compact, standalone, extraShowOnHover } = context || {};
 
   const prefixClass = getPrefixCls('agentic');
-  const { wrapSSR, hashId } = useStyle(prefixClass, classNames);
+  const { hashId } = useStyle(prefixClass, classNames);
 
   const time = originData?.createAt || props.time;
   const placement = USER_PLACEMENT;
@@ -93,9 +93,7 @@ export const UserBubble: React.FC<
   const rawContent = originData?.content as string | undefined;
   const { blocks: filemapBlocks, stripped: strippedContent } = useMemo(
     () =>
-      extractFilemapBlocks(
-        typeof rawContent === 'string' ? rawContent : '',
-      ),
+      extractFilemapBlocks(typeof rawContent === 'string' ? rawContent : ''),
     [rawContent],
   );
 
@@ -123,9 +121,7 @@ export const UserBubble: React.FC<
       bubbleListRef={props.bubbleListRef}
       bubbleListItemExtraStyle={styles?.bubbleListItemExtraStyle}
       bubbleRef={props.bubbleRef}
-      content={
-        filemapBlocks.length > 0 ? strippedContent : originData?.content
-      }
+      content={filemapBlocks.length > 0 ? strippedContent : originData?.content}
       key={originData?.id}
       data-id={originData?.id}
       avatar={originData?.meta as BubbleMetaData}
@@ -176,7 +172,7 @@ export const UserBubble: React.FC<
   // 用户气泡默认 hover 展示复制等操作，父级可透传覆盖
   const effectiveExtraShowOnHover = extraShowOnHover ?? true;
 
-  const itemDom = wrapSSR(
+  const itemDom = (
     <BubbleConfigContext.Provider
       value={{
         compact,
@@ -299,7 +295,7 @@ export const UserBubble: React.FC<
           />
         )}
       </Flex>
-    </BubbleConfigContext.Provider>,
+    </BubbleConfigContext.Provider>
   );
 
   if (bubbleRenderConfig?.render === false) return null;

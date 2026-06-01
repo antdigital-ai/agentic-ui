@@ -1,6 +1,9 @@
-import { MarkdownInputField } from '@ant-design/agentic-ui';
+import {
+  MarkdownInputField,
+  type ActionsSlotState,
+} from '@ant-design/agentic-ui';
 import { SendOutlined, SettingOutlined } from '@ant-design/icons';
-import { Button, Space, Tooltip } from 'antd';
+import { Button, Tooltip } from 'antd';
 import React, { useState } from 'react';
 
 /**
@@ -25,8 +28,8 @@ const CustomSendButtonDemo: React.FC = () => {
   };
 
   // 自定义操作按钮渲染函数
-  const customActionsRender = (props: any) => {
-    const { isHover, isLoading, disabled } = props;
+  const customActionsRender = (state: ActionsSlotState) => {
+    const { isHover, isLoading, disabled } = state;
 
     return [
       // 添加设置按钮
@@ -74,48 +77,19 @@ const CustomSendButtonDemo: React.FC = () => {
         这个示例展示了如何使用 <code>actionsRender</code> 属性来自定义发送按钮。
       </p>
 
-      <Space direction="vertical" size="large" style={{ width: '100%' }}>
-        <MarkdownInputField
-          value={value}
-          onChange={setValue}
-          onSend={handleSend}
-          placeholder="请输入消息内容..."
-          disabled={loading}
-          typing={loading}
-          actionsRender={customActionsRender}
-          style={{
-            minHeight: '120px',
-            maxHeight: '300px',
-          }}
-        />
-
-        <div
-          style={{
-            padding: '16px',
-            background: '#f5f5f5',
-            borderRadius: '8px',
-            fontSize: '13px',
-          }}
-        >
-          <h4 style={{ margin: '0 0 8px 0' }}>功能说明：</h4>
-          <ul style={{ margin: 0, paddingLeft: '20px' }}>
-            <li>
-              🎯 <strong>自定义发送按钮</strong>
-              ：替换默认的发送图标为带文字的按钮
-            </li>
-            <li>
-              ⚙️ <strong>添加设置按钮</strong>：在发送区域添加额外的操作按钮
-            </li>
-            <li>
-              🎨 <strong>状态响应</strong>：按钮会根据 hover、loading、disabled
-              状态变化
-            </li>
-            <li>
-              💡 <strong>提示信息</strong>：每个按钮都有相应的 Tooltip 提示
-            </li>
-          </ul>
-        </div>
-      </Space>
+      <MarkdownInputField
+        value={value}
+        onChange={setValue}
+        onSend={handleSend}
+        placeholder="请输入消息内容..."
+        disabled={loading}
+        typing={loading}
+        actionsRender={customActionsRender}
+        style={{
+          minHeight: '120px',
+          maxHeight: '300px',
+        }}
+      />
     </div>
   );
 };

@@ -1,27 +1,7 @@
 /**
- * 上传响应对象类型
+ * 附件相关的类型已统一收敛到 `src/MarkdownInputField/types/attachment.ts`。
+ *
+ * 此处保留 re-export 以维持既有的 `from '../AttachmentButton/types'` 导入路径
+ * 不变（包含 `src/index.ts`、各 `__tests__` 与子模块）。
  */
-export type UploadResponse = {
-  contentId?: string | null;
-  errorMessage?: string | null;
-  fileId: string;
-  fileName: string;
-  fileSize?: number | null;
-  fileType: string;
-  fileUrl: string;
-  uploadStatus: 'SUCCESS' | 'FAIL' | string;
-};
-
-export type AttachmentFile = File & {
-  url?: string;
-  status?: 'error' | 'uploading' | 'pending' | 'done';
-  uuid?: string;
-  size?: number | null;
-  previewUrl?: string;
-  /** 错误信息（如文件超限、上传失败等），在 status 为 error 时展示 */
-  errorMessage?: string | null;
-  /** 错误类型，如 FILE_SIZE_EXCEEDED 表示因大小超限不可重试 */
-  errorCode?: string | null;
-  /** 上传响应数据（使用 uploadWithResponse 时会填充此字段） */
-  uploadResponse?: UploadResponse;
-};
+export type { AttachmentFile, UploadResponse } from '../types/attachment';

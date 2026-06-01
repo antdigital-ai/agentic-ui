@@ -7,6 +7,24 @@ import type { AttachmentFile } from '../AttachmentButton/types';
 import Enlargement from '../Enlargement';
 import { RefinePromptButton } from '../RefinePromptButton';
 import { MARKDOWN_INPUT_FIELD_TEST_IDS } from '../testIds';
+import type { FileUploadStatus } from '../types/shared';
+
+/**
+ * `quickActionRender` 入参的派生子集类型。
+ *
+ * 公开 API（`MarkdownInputFieldProps.quickActionRender`）的入参是
+ * `MarkdownInputFieldProps & attachment & { ... }` 的「上帝接口」类型，下游
+ * `QuickActions` 内部实际只透传以下稳定字段；用此命名子集替代历史 `props: any`，
+ * 既保持运行时行为不变，又恢复编辑器侧的类型提示。
+ */
+export interface QuickActionRenderProps {
+  value?: string;
+  fileMap?: Map<string, AttachmentFile>;
+  onFileMapChange?: (fileMap?: Map<string, AttachmentFile>) => void;
+  isHover: boolean;
+  isLoading: boolean;
+  fileUploadStatus: FileUploadStatus;
+}
 
 export interface QuickActionsProps {
   /** 当前输入值 */
@@ -28,7 +46,7 @@ export interface QuickActionsProps {
   disabled?: boolean;
 
   /** 文件上传状态 */
-  fileUploadStatus?: 'uploading' | 'done' | 'error';
+  fileUploadStatus?: FileUploadStatus;
 
   /** 提示词优化配置 */
   refinePrompt?: {
@@ -42,8 +60,8 @@ export interface QuickActionsProps {
   /** 值变化回调 */
   onValueChange?: (value: string) => void;
 
-  /** 自定义渲染函数 */
-  quickActionRender?: (props: any) => React.ReactNode[];
+  /** 自定义渲染函数（与公开 API `MarkdownInputFieldProps.quickActionRender` 同签名） */
+  quickActionRender?: (props: QuickActionRenderProps) => React.ReactNode[];
 
   /** CSS 类名前缀 */
   prefixCls?: string;
@@ -183,7 +201,9 @@ export const QuickActions = React.forwardRef<HTMLDivElement, QuickActionsProps>(
                   isHover,
                   isLoading,
                   fileUploadStatus,
-                })
+                  // 仅透传子集字段；公开类型为 `MarkdownInputFieldProps & attachment & ...`，
+                  // 这里的实际可用字段在 JSDoc 中已说明，类型层用 `as` 收敛而非 `as any`。
+                } as QuickActionRenderProps)
               : []),
             // 提示词优化按钮（有 refinePrompt 即渲染，enable 由 handleRefine 内校验）
             ...(refinePrompt

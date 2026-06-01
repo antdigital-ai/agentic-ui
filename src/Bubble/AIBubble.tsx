@@ -9,12 +9,11 @@ import { BubbleAvatar } from './Avatar';
 import { BubbleBeforeNode } from './BubbleBeforeNode';
 import { BubbleConfigContext } from './BubbleConfigProvide';
 import { ContentFilemapView } from './ContentFilemapView';
-import { BubbleFileView } from './FileView';
-import { BubbleMessageDisplay } from './MessagesContent';
-import { MessagesContext } from './MessagesContent/BubbleContext';
-import { LOADING_FLAT } from './MessagesContent';
-import { BubbleExtra } from './MessagesContent/BubbleExtra';
 import { extractFilemapBlocks } from './extractFilemapBlocks';
+import { BubbleFileView } from './FileView';
+import { BubbleMessageDisplay, LOADING_FLAT } from './MessagesContent';
+import { MessagesContext } from './MessagesContent/BubbleContext';
+import { BubbleExtra } from './MessagesContent/BubbleExtra';
 import { useStyle } from './style';
 import { BubbleTitle } from './Title';
 import type { BubbleMetaData, BubbleProps } from './type';
@@ -27,7 +26,14 @@ export const runRender = (
   defaultDom: React.ReactNode,
   ...rest: undefined[]
 ) => {
-  return render ? render(props, defaultDom, ...rest) : defaultDom;
+  // WithFalse：显式 false 表示关闭该插槽，不得回退到 defaultDom
+  if (render === false) {
+    return null;
+  }
+  if (typeof render === 'function') {
+    return render(props, defaultDom, ...rest);
+  }
+  return defaultDom;
 };
 
 const isSameRoleAsPrevious = (preMessage: any, originData: any) => {
@@ -95,7 +101,7 @@ export const AIBubble: React.FC<
   const { compact, standalone, extraShowOnHover } = context || {};
 
   const prefixClass = getPrefixCls('agentic');
-  const { wrapSSR, hashId } = useStyle(prefixClass);
+  const { hashId } = useStyle(prefixClass);
 
   const preMessageSameRole = isSameRoleAsPrevious(preMessage, originData);
   const time = originData?.createAt || props.time;
@@ -136,15 +142,15 @@ export const AIBubble: React.FC<
       messageDisplayKeyRef.current = nanoid();
     }
   }
-  const messageDisplayKey =
-    messageDisplayKeyRef.current ?? id ?? nanoid();
+  if (!messageDisplayKeyRef.current && !id) {
+    messageDisplayKeyRef.current = nanoid();
+  }
+  const messageDisplayKey = messageDisplayKeyRef.current ?? id!;
 
   const rawContent = props?.originData?.content as string | undefined;
   const { blocks: filemapBlocks, stripped: strippedContent } = useMemo(
     () =>
-      extractFilemapBlocks(
-        typeof rawContent === 'string' ? rawContent : '',
-      ),
+      extractFilemapBlocks(typeof rawContent === 'string' ? rawContent : ''),
     [rawContent],
   );
 
@@ -244,7 +250,7 @@ export const AIBubble: React.FC<
     null,
   );
 
-  const itemDom = wrapSSR(
+  const itemDom = (
     <BubbleConfigContext.Provider
       value={{
         compact,
@@ -369,7 +375,7 @@ export const AIBubble: React.FC<
           />
         )}
       </Flex>
-    </BubbleConfigContext.Provider>,
+    </BubbleConfigContext.Provider>
   );
 
   if (bubbleRenderConfig?.render === false) return null;

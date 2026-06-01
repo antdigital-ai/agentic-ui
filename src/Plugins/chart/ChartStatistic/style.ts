@@ -1,11 +1,10 @@
 import {
-  ChatTokenType,
-  GenerateStyle,
+  genStyleHooks,
   resetComponent,
-  useEditorStyleRegister,
+  type GenStyleFn,
 } from '../../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'ChartStatistic'> = (token) => {
   return {
     [token.componentCls]: {
       display: 'flex',
@@ -36,7 +35,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           fontFamily: 'PingFang SC',
           fontSize: '13px',
           fontWeight: 500,
-          color: '#2C3E5D',
+          color: 'var(--color-gray-text-default)',
           margin: 0,
         },
 
@@ -44,14 +43,14 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           fontFamily: 'PingFang SC',
           fontSize: '12px',
           fontWeight: 400,
-          color: '#8C8C8C',
+          color: 'var(--color-gray-text-light)',
           margin: 0,
           lineHeight: 1.4,
         },
 
         [`${token.componentCls}-question-icon`]: {
           fontSize: '14px',
-          color: '#B3B9C4',
+          color: 'var(--color-gray-text-secondary)',
           fontWeight: 500,
         },
       },
@@ -61,13 +60,13 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         fontSize: '24px',
         fontWeight: 500,
         lineHeight: 1,
-        color: '#2C3E5D',
+        color: 'var(--color-gray-text-default)',
 
         [`${token.componentCls}-value-prefix`]: {
           fontFamily: 'PingFang SC',
           fontSize: '13px',
           fontWeight: 'normal',
-          color: '#2C3E5D',
+          color: 'var(--color-gray-text-default)',
           marginRight: '4px',
         },
 
@@ -75,7 +74,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           fontFamily: 'PingFang SC',
           fontSize: '13px',
           fontWeight: 'normal',
-          color: '#2C3E5D',
+          color: 'var(--color-gray-text-default)',
           marginLeft: '4px',
         },
       },
@@ -101,12 +100,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         },
 
         [`${token.componentCls}-value`]: {
-          color: '#fff',
+          color: 'var(--color-gray-bg-card-white)',
           [`${token.componentCls}-value-prefix`]: {
-            color: '#fff',
+            color: 'var(--color-gray-bg-card-white)',
           },
           [`${token.componentCls}-value-suffix`]: {
-            color: '#fff',
+            color: 'var(--color-gray-bg-card-white)',
           },
         },
       },
@@ -177,13 +176,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * @param prefixCls
  * @returns
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('Statistic', (token) => {
-    const statisticToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('ChartStatistic', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+]);
 
-    return [resetComponent(statisticToken), genStyle(statisticToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [, hashId] = useGenStyle(prefixCls ?? 'Statistic');
+  return { hashId };
 }

@@ -109,10 +109,7 @@ describe('normalizeFileMapPropsFromJson', () => {
 
   it('uuid 和 id 均缺失时，自动生成 file-{index}', () => {
     const input = {
-      fileList: [
-        { name: 'first.txt' },
-        { name: 'second.txt' },
-      ],
+      fileList: [{ name: 'first.txt' }, { name: 'second.txt' }],
     };
     const result = normalizeFileMapPropsFromJson(input);
     expect(result.fileList[0].uuid).toBe('file-0');
@@ -204,12 +201,7 @@ describe('normalizeFileMapPropsFromJson', () => {
 
   it('fileList 中含非对象项时过滤掉（null、字符串、数字）', () => {
     const input = {
-      fileList: [
-        null,
-        'not-an-object',
-        42,
-        { name: 'valid.txt', uuid: 'v' },
-      ],
+      fileList: [null, 'not-an-object', 42, { name: 'valid.txt', uuid: 'v' }],
     };
     const result = normalizeFileMapPropsFromJson(input);
     expect(result.fileList).toHaveLength(1);

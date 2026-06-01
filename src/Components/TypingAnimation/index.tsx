@@ -1,12 +1,28 @@
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
-import { motion, MotionProps, useInView } from 'framer-motion';
 import { isString } from 'lodash-es';
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  memo,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { resolveSegments } from '../TextAnimate';
 import { useTypingAnimationStyle } from './style';
 
-export interface TypingAnimationProps extends MotionProps {
+/**
+ * TypingAnimation 组件 props。
+ *
+ * 历史上继承自 framer-motion `MotionProps`，去除 framer-motion 后改为继承
+ * 原生 HTML 属性子集（仅保留实际使用的 className/style 等），并允许任意
+ * 透传到底层元素，避免破坏外部调用。
+ */
+export interface TypingAnimationProps extends Omit<
+  React.HTMLAttributes<HTMLElement>,
+  'children'
+> {
   children?: React.ReactNode;
   words?: string[];
   className?: string;
@@ -23,7 +39,54 @@ export interface TypingAnimationProps extends MotionProps {
   cursorStyle?: 'line' | 'block' | 'underscore';
 }
 
-export function TypingAnimation({
+/**
+ * 等价 framer-motion 的 useInView({ amount: 0.3, once: true })。
+ *
+ * 使用原生 IntersectionObserver 实现：
+ * - threshold: 0.3 → 元素至少 30% 可见时触发
+ * - once: true → 触发后立即断开 observer，不再回退为 false
+ * - SSR/无 IntersectionObserver 环境下默认返回 true（与原行为兼容，
+ *   避免在测试或老旧环境中动画永不开始）
+ */
+function useInViewOnce(ref: React.RefObject<Element>, amount: number): boolean {
+  const [inView, setInView] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true;
+    if (typeof IntersectionObserver === 'undefined') return true;
+    return false;
+  });
+
+  useEffect(() => {
+    if (typeof IntersectionObserver === 'undefined') {
+      // 环境不支持时直接置为 true，等价 framer-motion 的 fallback 行为
+      setInView(true);
+      return;
+    }
+    const target = ref.current;
+    if (!target) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setInView(true);
+            observer.disconnect();
+            break;
+          }
+        }
+      },
+      { threshold: amount },
+    );
+
+    observer.observe(target);
+    return () => {
+      observer.disconnect();
+    };
+  }, [ref, amount]);
+
+  return inView;
+}
+
+const TypingAnimationBase = ({
   children,
   words,
   className,
@@ -39,24 +102,18 @@ export function TypingAnimation({
   blinkCursor = true,
   cursorStyle = 'line',
   ...props
-}: TypingAnimationProps) {
-  const MotionComponent = motion(Component, {
-    forwardMotionProps: true,
-  });
-
+}: TypingAnimationProps) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('typing-animation');
-  const { wrapSSR, hashId } = useTypingAnimationStyle(prefixCls);
+  const { hashId } = useTypingAnimationStyle(prefixCls);
 
   const [displayedText, setDisplayedText] = useState<React.ReactNode[]>([]);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [currentCharIndex, setCurrentCharIndex] = useState(0);
   const [phase, setPhase] = useState<'typing' | 'pause' | 'deleting'>('typing');
   const elementRef = useRef<HTMLElement | null>(null);
-  const isInView = useInView(elementRef, {
-    amount: 0.3,
-    once: true,
-  });
+  // 等价 framer-motion 的 useInView({ amount: 0.3, once: true })
+  const isInView = useInViewOnce(elementRef, 0.3);
 
   const wordsToAnimate = useMemo(
     () => words || [resolveSegments(children, 'character')],
@@ -163,24 +220,33 @@ export function TypingAnimation({
     }
   };
 
-  return wrapSSR(
-    <MotionComponent
-      ref={elementRef}
-      className={classNames(prefixCls, hashId, className)}
-      {...props}
-    >
-      {displayedText}
-      {shouldShowCursor && (
-        <span
-          className={classNames(
-            `${prefixCls}-cursor`,
-            hashId,
-            blinkCursor && `${prefixCls}-cursor-blinking`,
-          )}
-        >
-          {getCursorChar()}
-        </span>
-      )}
-    </MotionComponent>,
+  // 替代 framer-motion 的 motion(Component) HOC：
+  // 由于 TypingAnimation 仅用 motion 作为 ref 容器（无 variants/animate 等动画属性），
+  // 直接 createElement(Component) 即可，行为完全等价。
+  return React.createElement(
+    Component,
+    {
+      ref: elementRef,
+      className: classNames(prefixCls, hashId, className),
+      'data-testid': prefixCls,
+      ...props,
+    },
+    displayedText,
+    shouldShowCursor && (
+      <span
+        key="__typing-cursor__"
+        className={classNames(
+          `${prefixCls}-cursor`,
+          hashId,
+          blinkCursor && `${prefixCls}-cursor-blinking`,
+        )}
+      >
+        {getCursorChar()}
+      </span>
+    ),
   );
-}
+};
+
+TypingAnimationBase.displayName = 'TypingAnimation';
+
+export const TypingAnimation = memo(TypingAnimationBase);

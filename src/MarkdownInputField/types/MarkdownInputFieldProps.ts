@@ -4,10 +4,13 @@ import {
   MarkdownEditorInstance,
   MarkdownEditorProps,
 } from '../../MarkdownEditor';
-import type { AttachmentButtonProps } from '../AttachmentButton';
 import type { SendButtonCustomizationProps } from '../SendButton';
 import type { SkillModeConfig } from '../SkillModeBar';
 import type { CreateRecognizer } from '../VoiceInput';
+import type { AttachmentConfig } from './attachment';
+import type { ActionsSlotState, SlotRenderState } from './slots';
+
+export type { ActionsSlotState, SlotRenderState };
 
 /**
  * Markdown 输入字段的属性接口
@@ -125,42 +128,43 @@ export type MarkdownInputFieldProps = {
   bgColorList?: string[];
   borderRadius?: number;
 
-  beforeToolsRender?: (
-    props: MarkdownInputFieldProps & {
-      isHover: boolean;
-      isLoading: boolean;
-    },
-  ) => React.ReactNode;
+  /**
+   * 在工具区上方插入自定义节点
+   *
+   * @param state Slot 渲染状态（{@link SlotRenderState}）。
+   * @returns 要渲染的节点（单个 ReactNode）。
+   *
+   * **Breaking change（v2.32.0）**：入参类型从
+   * `MarkdownInputFieldProps & { isHover, isLoading }` 收敛为 {@link SlotRenderState}。
+   * 不再可访问完整 props，请通过 `state.attachment` / `state.value` 等显式字段访问。
+   *
+   * @example
+   * ```tsx
+   * <MarkdownInputField
+   *   beforeToolsRender={(state) => state.isHover ? <Tip /> : null}
+   * />
+   * ```
+   */
+  beforeToolsRender?: (state: SlotRenderState) => React.ReactNode;
 
   /**
    * 附件配置
-   * @description 配置附件功能，可以启用或禁用附件上传，并自定义附件按钮的属性
-   * @default { enable: false } 默认关闭文件上传
+   * @description 配置附件功能，可以启用或禁用附件上传，并自定义附件按钮的属性。
+   *              默认 `enable: false`，需显式开启文件上传。
+   * @default { enable: false }
    * @example
    * ```tsx
-   * <BubbleChat
+   * <MarkdownInputField
    *   attachment={{
    *     enable: true,
    *     accept: '.pdf,.doc,.docx',
    *     maxFileSize: 10 * 1024 * 1024, // 10MB（字节）
-   *     onUpload: async (file) => {
-   *       const url = await uploadFile(file);
-   *       return { url };
-   *     }
+   *     upload: async (file) => URL.createObjectURL(file),
    *   }}
    * />
    * ```
    */
-  /**
-   * 附件配置，默认 enable 为 false，需显式开启文件上传
-   */
-  attachment?: {
-    /**
-     * 是否启用文件上传（包含粘贴图片上传）
-     * @default false
-     */
-    enable?: boolean;
-  } & AttachmentButtonProps;
+  attachment?: AttachmentConfig;
 
   /**
    * 语音输入配置
@@ -171,87 +175,73 @@ export type MarkdownInputFieldProps = {
   voiceRecognizer?: CreateRecognizer;
 
   /**
-   * 自定义操作按钮渲染函数
-   * @description 用于自定义渲染输入框右侧的操作按钮区域
-   * @param {Object} props - 包含组件所有属性以及当前状态的对象
-   * @param {boolean} props.isHover - 当前是否处于悬停状态
-   * @param {boolean} props.isLoading - 当前是否处于加载状态
-   * @param {'uploading' | 'done' | 'error'} props.fileUploadStatus - 文件上传状态
-   * @param {React.ReactNode[]} defaultActions - 默认的操作按钮列表
-   * @returns {React.ReactNode[]} 返回要渲染的操作按钮节点数组
+   * 自定义发送区操作按钮渲染函数（输入框右下角）
+   *
+   * @param state Slot 渲染状态（{@link ActionsSlotState}），含 `collapseSendActions`。
+   * @param defaultActions 默认按钮列表（附件 / 语音 / 发送）。
+   * @returns 要渲染的按钮节点数组。
+   *
+   * **Breaking change（v2.32.0）**：入参类型从「上帝接口」
+   * `MarkdownInputFieldProps & MarkdownInputFieldProps['attachment'] & {...}` 收敛为
+   * {@link ActionsSlotState}。请将 `props.xxx`（来自 attachment）改为
+   * `state.attachment?.xxx`，将 `props.value` 等改为 `state.value`。
+   *
    * @example
    * ```tsx
    * <MarkdownInputField
-   *   actionsRender={(props, defaultActions) => [
-   *     <CustomButton key="custom" />,
-   *     ...defaultActions
+   *   actionsRender={(state, defaultActions) => [
+   *     <CustomButton key="custom" disabled={state.isLoading} />,
+   *     ...defaultActions,
    *   ]}
    * />
    * ```
    */
   actionsRender?: (
-    props: MarkdownInputFieldProps &
-      MarkdownInputFieldProps['attachment'] & {
-        isHover: boolean;
-        isLoading: boolean;
-        collapseSendActions?: boolean;
-        fileUploadStatus: 'uploading' | 'done' | 'error';
-      },
+    state: ActionsSlotState,
     defaultActions: React.ReactNode[],
   ) => React.ReactNode[];
 
   /**
-   * 自定义工具栏渲染函数
-   * @description 用于自定义渲染输入框左侧的工具栏区域
-   * @param {Object} props - 包含组件所有属性以及当前状态的对象
-   * @param {boolean} props.isHover - 当前是否处于悬停状态
-   * @param {boolean} props.isLoading - 当前是否处于加载状态
-   * @param {'uploading' | 'done' | 'error'} props.fileUploadStatus - 文件上传状态
-   * @returns {React.ReactNode[]} 返回要渲染的工具栏节点数组
+   * 自定义工具栏渲染函数（输入框底部独占一行）
+   *
+   * @param state Slot 渲染状态（{@link SlotRenderState}）。
+   * @returns 要渲染的工具栏节点数组。
+   *
+   * **Breaking change（v2.32.0）**：入参类型从「上帝接口」收敛为 {@link SlotRenderState}。
+   * 详见 {@link actionsRender} 的迁移说明。
+   *
    * @example
    * ```tsx
    * <MarkdownInputField
-   *   toolsRender={(props) => [
-   *     <FormatButton key="format" />,
-   *     <EmojiPicker key="emoji" />
+   *   toolsRender={(state) => [
+   *     <FormatButton key="format" disabled={state.disabled} />,
+   *     <EmojiPicker key="emoji" />,
    *   ]}
    * />
    * ```
    */
-  toolsRender?: (
-    props: MarkdownInputFieldProps &
-      MarkdownInputFieldProps['attachment'] & {
-        isHover: boolean;
-        isLoading: boolean;
-        fileUploadStatus: 'uploading' | 'done' | 'error';
-      },
-  ) => React.ReactNode[];
+  toolsRender?: (state: SlotRenderState) => React.ReactNode[];
 
   /**
    * 自定义右上操作按钮渲染函数
-   * @description 在编辑区域右上角、贴靠右侧渲染一组操作按钮，组件会根据其宽度为编辑区域自动预留右侧内边距，避免遮挡文本。
-   * @param {Object} props - 包含组件所有属性以及当前状态的对象
-   * @param {boolean} props.isHover - 当前是否处于悬停状态
-   * @param {boolean} props.isLoading - 当前是否处于加载状态
-   * @param {'uploading' | 'done' | 'error'} props.fileUploadStatus - 文件上传状态
-   * @returns {React.ReactNode[]} 返回要渲染的操作按钮节点数组
+   *
+   * 在编辑区域右上角、贴靠右侧渲染一组操作按钮，组件会根据其宽度自动为编辑区
+   * 预留右侧内边距以避免遮挡文本。
+   *
+   * @param state Slot 渲染状态（{@link SlotRenderState}）。
+   * @returns 要渲染的按钮节点数组。
+   *
+   * **Breaking change（v2.32.0）**：入参类型从「上帝接口」收敛为 {@link SlotRenderState}。
+   * 详见 {@link actionsRender} 的迁移说明。
+   *
    * @example
    * ```tsx
    * <MarkdownInputField
-   *   quickActionRender={(props) => [
-   *     <MyQuickAction key="quick-action" />,
-   *   ]}
+   *   quickActionRender={(state) => [<MyQuickAction key="qa" />]}
    * />
    * ```
    */
-  quickActionRender?: (
-    props: MarkdownInputFieldProps &
-      MarkdownInputFieldProps['attachment'] & {
-        isHover: boolean;
-        isLoading: boolean;
-        fileUploadStatus: 'uploading' | 'done' | 'error';
-      },
-  ) => React.ReactNode[];
+  quickActionRender?: (state: SlotRenderState) => React.ReactNode[];
 
   /**
    * 提示词优化配置
@@ -517,4 +507,15 @@ export type MarkdownInputFieldProps = {
    * ```
    */
   disableHoverAnimation?: boolean;
+
+  /**
+   * 主题模式
+   * @description 控制组件的明暗主题样式
+   * @default 'light'
+   * @example
+   * ```tsx
+   * <MarkdownInputField theme="dark" />
+   * ```
+   */
+  theme?: 'light' | 'dark';
 };

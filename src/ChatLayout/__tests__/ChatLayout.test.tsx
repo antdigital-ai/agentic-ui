@@ -139,9 +139,7 @@ describe('ChatLayout', () => {
       </ChatLayout>,
     );
 
-    expect(container.firstChild).toHaveStyle(
-      'background-color: rgb(255, 0, 0)',
-    );
+    expect(container.firstChild).toHaveStyle({ backgroundColor: 'red' });
   });
 
   it('applies custom footerHeight to footer', () => {
@@ -177,9 +175,8 @@ describe('ChatLayout', () => {
       '.ant-chat-layout-content-scrollable',
     );
     const spacer = scrollable?.lastElementChild as HTMLElement;
-    // spacer 高度由 useElementSize 钩子测量的实际 footer 高度决定
-    // 在测试环境中由于 ResizeObserver 被 mock，高度为 0
-    expect(spacer).toHaveStyle('height: 0px');
+    // 测量未完成时回退到 footerHeight，避免内容被底部遮挡
+    expect(spacer).toHaveStyle('height: 150px');
   });
 
   it('sets spacer height to 0 when footer is not provided', () => {
@@ -257,8 +254,7 @@ describe('ChatLayout', () => {
       expect(typeof ref.current?.scrollToBottom).toBe('function');
     });
 
-    it('scrollToBottom method can be called', () => {
-      vi.useFakeTimers();
+    it('scrollToBottom method can be called and scrolls container to bottom', () => {
       const ref = createRef<ChatLayoutRef>();
       const { container } = render(
         <ChatLayout ref={ref}>
@@ -269,10 +265,6 @@ describe('ChatLayout', () => {
       const scrollable = container.querySelector(
         '.ant-chat-layout-content-scrollable',
       ) as HTMLDivElement;
-
-      // Mock scrollTo method
-      const scrollToSpy = vi.fn();
-      scrollable.scrollTo = scrollToSpy;
 
       // Set up scroll properties
       Object.defineProperty(scrollable, 'scrollHeight', {
@@ -286,18 +278,44 @@ describe('ChatLayout', () => {
         value: 500,
       });
 
+      // 默认 'auto' 模式：直接设置 scrollTop 到底
       act(() => {
         ref.current?.scrollToBottom();
       });
 
-      // Fast-forward timers to trigger the throttled function
-      act(() => {
-        vi.runAllTimers();
+      expect(scrollable.scrollTop).toBe(1000);
+    });
+
+    it('exposes isAtBottom getter through ref', () => {
+      const ref = createRef<ChatLayoutRef>();
+      const { container } = render(
+        <ChatLayout ref={ref}>
+          <div>Test content</div>
+        </ChatLayout>,
+      );
+
+      const scrollable = container.querySelector(
+        '.ant-chat-layout-content-scrollable',
+      ) as HTMLDivElement;
+
+      Object.defineProperty(scrollable, 'scrollHeight', {
+        writable: true,
+        configurable: true,
+        value: 1000,
+      });
+      Object.defineProperty(scrollable, 'clientHeight', {
+        writable: true,
+        configurable: true,
+        value: 500,
       });
 
-      expect(scrollToSpy).toHaveBeenCalled();
+      // 初始 scrollTop = 0，距底 500，明显未贴底
+      scrollable.scrollTop = 0;
+      expect(ref.current?.isAtBottom()).toBe(false);
 
-      vi.useRealTimers();
+      // 滚到底
+      scrollable.scrollTop = 500;
+      expect(ref.current?.isAtBottom()).toBe(true);
     });
   });
 

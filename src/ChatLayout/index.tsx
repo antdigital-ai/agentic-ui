@@ -4,9 +4,7 @@ import React, {
   forwardRef,
   memo,
   useContext,
-  useEffect,
   useImperativeHandle,
-  useRef,
 } from 'react';
 import { LayoutHeader } from '../Components/LayoutHeader';
 import useAutoScroll from '../Hooks/useAutoScroll';
@@ -93,33 +91,36 @@ const ChatLayoutComponent = forwardRef<ChatLayoutRef, ChatLayoutProps>(
       classNames,
       styles,
       showFooterBackground = true,
+      onScrollStateChange,
     },
     ref,
   ) => {
     const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
     const prefixCls = getPrefixCls('chat-layout');
-    const { wrapSSR, hashId } = useStyle(prefixCls);
-    const { containerRef, scrollToBottom } = useAutoScroll({
+    const { hashId } = useStyle(prefixCls);
+    const { containerRef, scrollToBottom, isAtBottom } = useAutoScroll({
       SCROLL_TOLERANCE: 30,
-      onResize: () => {},
-      timeout: 200,
       scrollBehavior,
+      onScrollStateChange,
     });
 
-    const footerRef = useRef<HTMLDivElement>(null);
-    const { height: actualFooterHeight } = useElementSize(footerRef);
+    const { ref: footerRef, height: measuredFooterHeight } =
+      useElementSize<HTMLDivElement>();
+    const footerSpacerHeight =
+      measuredFooterHeight > 0 ? measuredFooterHeight : footerHeight;
 
-    useImperativeHandle(ref, () => ({
-      scrollContainer: containerRef.current,
-      scrollToBottom,
-    }));
-
-    // footer 实际高度变化时（spacer 随之调整），保持列表贴底
-    useEffect(() => {
-      if (actualFooterHeight > 0) {
-        scrollToBottom();
-      }
-    }, [actualFooterHeight]);
+    useImperativeHandle(
+      ref,
+      () => ({
+        // 用 getter 实时返回最新 DOM，避免首次渲染拿到 null
+        get scrollContainer() {
+          return containerRef.current;
+        },
+        scrollToBottom,
+        isAtBottom,
+      }),
+      [scrollToBottom, isAtBottom],
+    );
 
     const rootClassName = clsx(prefixCls, className, classNames?.root, hashId);
     const contentClassName = clsx(
@@ -143,19 +144,26 @@ const ChatLayoutComponent = forwardRef<ChatLayoutRef, ChatLayoutProps>(
       hashId,
     );
 
-    return wrapSSR(
-      <div className={rootClassName} style={{ ...styles?.root, ...style }}>
+    return (
+      <div
+        className={rootClassName}
+        data-testid={prefixCls}
+        style={{ ...styles?.root, ...style }}
+      >
         {header && <LayoutHeader {...header} />}
         <div className={contentClassName} style={styles?.content}>
           <div
             className={scrollableClassName}
             ref={containerRef}
             style={styles?.scrollable}
+            // tabIndex 让 div 可获取焦点，否则 keydown 事件不会派发到该容器，
+            // 自动滚动 hook 内的键盘上滑判定将无法生效
+            tabIndex={-1}
           >
             {children}
             {footer && (
               <div
-                style={{ height: actualFooterHeight, width: '100%' }}
+                style={{ height: footerSpacerHeight, width: '100%' }}
                 aria-hidden="true"
               />
             )}
@@ -173,7 +181,7 @@ const ChatLayoutComponent = forwardRef<ChatLayoutRef, ChatLayoutProps>(
             {footer}
           </div>
         )}
-      </div>,
+      </div>
     );
   },
 );
@@ -185,4 +193,8 @@ export const ChatLayout = memo(ChatLayoutComponent);
 // 保持向后兼容，导出 ChatFlowHeader 作为 LayoutHeader 的别名
 export { LayoutHeader as ChatFlowHeader } from '../Components/LayoutHeader';
 export type { LayoutHeaderProps as ChatFlowHeaderProps } from '../Components/LayoutHeader';
-export type { ChatLayoutProps, ChatLayoutRef } from './types';
+export type {
+  ChatLayoutProps,
+  ChatLayoutRef,
+  ChatLayoutScrollState,
+} from './types';

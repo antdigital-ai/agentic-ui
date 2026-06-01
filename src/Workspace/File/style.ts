@@ -1,7 +1,6 @@
-import type { ChatTokenType, GenerateStyle } from '../../Hooks/useStyle';
-import { useEditorStyleRegister } from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
   return {
     // 定位高亮动画关键帧
     '@keyframes flash-shadow': {
@@ -18,8 +17,18 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
     // 文件组件样式
     [`${token.componentCls}-container`]: {
       height: '100%',
+      minWidth: 0,
+      overflowX: 'hidden',
       display: 'flex',
       flexDirection: 'column',
+
+      [`${token.componentCls}-panel-loading`]: {
+        flex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: 0,
+      },
 
       // 分组展示模式
       [`&--group`]: {
@@ -44,7 +53,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           // 展开收起图标
           [`&-toggle-icon`]: {
             fontSize: 'var(--font-size-sm)',
-            color: '#6c757d',
+            color: token.colorTextTertiary || token.colorTextSecondary,
             transition: 'transform 0.2s ease',
           },
 
@@ -91,57 +100,39 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             cursor: 'pointer',
             transition: 'all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
           },
-          // 分组内容区域
+          // 分组内容外壳：使用 grid-template-rows: 0fr ↔ 1fr 实现纯 CSS 折叠动画
+          // 不依赖 framer-motion，浏览器原生过渡 grid 行高，避免写死 max-height
+          [`&-content-wrapper`]: {
+            display: 'grid',
+            gridTemplateRows: '1fr',
+            opacity: 1,
+            transition:
+              'grid-template-rows 0.26s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s linear',
+
+            '&[data-collapsed="true"]': {
+              gridTemplateRows: '0fr',
+              opacity: 0,
+              // 折叠完成前后避免触发焦点/点击
+              pointerEvents: 'none',
+            },
+          },
+
+          // 分组内容区域：作为 grid 子项，min-height: 0 让 0fr 能真正坍缩
           [`&-content`]: {
+            minHeight: 0,
+            overflow: 'hidden',
             paddingLeft: '12px',
           },
         },
       },
     },
 
-    // 文件项样式
+    // 文件项共用子元素（平铺 / 树通过 --list、--tree 区分布局）
     [`${token.componentCls}-item`]: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '4px',
-      marginBottom: '4px',
-      padding: '4px',
-      borderRadius: 'var(--radius-control-base)',
-      cursor: 'pointer',
-      transition: 'all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
       boxSizing: 'border-box',
-
-      // 定位高亮动画
-      '&:target': {
-        animationName: 'flash-shadow',
-        animationDuration: '3s',
-        animationTimingFunction: 'ease-in-out',
-        animationIterationCount: 1,
-      },
-
-      '&:last-child': {
-        marginBottom: 0,
-      },
-
-      '&:hover': {
-        background: 'var(--color-gray-control-fill-hover)',
-
-        // 鼠标悬浮时显示操作区
-        [`${token.componentCls}-item-actions`]: {
-          opacity: 1,
-          visibility: 'visible',
-          pointerEvents: 'auto',
-        },
-      },
-
-      // 键盘聚焦时也显示操作区，提升可访问性
-      '&:focus-within': {
-        [`${token.componentCls}-item-actions`]: {
-          opacity: 1,
-          visibility: 'visible',
-          pointerEvents: 'auto',
-        },
-      },
+      borderRadius: 'var(--radius-control-base)',
+      transition: 'all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
+      maxWidth: '100%',
 
       // 文件图标
       [`&-icon`]: {
@@ -164,7 +155,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       // 文件名
       [`&-name`]: {
         fontSize: '13px',
-        color: '#343a40',
+        color: token.colorText,
         fontWeight: 400,
         lineHeight: 1.4,
         wordBreak: 'break-all',
@@ -197,14 +188,23 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       // 分割符
       [`&-separator`]: {
         fontSize: 'var(--font-size-xs)',
-        color: 'rgba(20, 22, 28, 0.07)',
+        color: token.colorSplit,
         margin: '0 4px',
       },
 
       [`&-actions`]: {
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        bottom: 0,
+        zIndex: 1,
         display: 'flex',
         alignItems: 'center',
         gap: '4px',
+        padding: 0,
+        borderStartEndRadius: 'var(--radius-control-base)',
+        borderEndEndRadius: 'var(--radius-control-base)',
+        background: 'var(--color-gray-bg-card-white)',
         // 默认隐藏，仅在 hover/focus 时显示
         opacity: 0,
         visibility: 'hidden',
@@ -212,10 +212,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         transition: 'opacity 0.2s ease, visibility 0.2s ease',
 
         // 保持图标按钮颜色一致
-        [`${token.antCls}-btn, ${token.antCls}-btn .anticon`]: {
+        [`${token.antCls}-btn, ${token.antCls}-btn ${token.iconCls}`]: {
           color: 'var(--color-gray-text-light)',
         },
-        [`${token.antCls}-btn:hover, ${token.antCls}-btn:focus, ${token.antCls}-btn:active, ${token.antCls}-btn:hover .anticon, ${token.antCls}-btn:focus .anticon, ${token.antCls}-btn:active .anticon`]:
+        [`${token.antCls}-btn:hover, ${token.antCls}-btn:focus, ${token.antCls}-btn:active, ${token.antCls}-btn:hover ${token.iconCls}, ${token.antCls}-btn:focus ${token.iconCls}, ${token.antCls}-btn:active ${token.iconCls}`]:
           {
             color: 'var(--color-gray-text-light)',
           },
@@ -223,12 +223,106 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
       // 文件项动作按钮（预览/下载等）图标颜色保持一致
       [`&-action-btn`]: {
-        [`.anticon`]: {
+        [token.iconCls]: {
           color: 'var(--color-gray-text-light)',
         },
-        ['&:hover .anticon, &:focus .anticon, &:active .anticon']: {
-          color: 'var(--color-gray-text-light)',
+        [`&:hover ${token.iconCls}, &:focus ${token.iconCls}, &:active ${token.iconCls}`]:
+          {
+            color: 'var(--color-gray-text-light)',
+          },
+      },
+    },
+
+    // 平铺列表行
+    [`${token.componentCls}-item--list`]: {
+      position: 'relative',
+      display: 'flex',
+      width: '100%',
+      alignItems: 'center',
+      gap: '4px',
+      marginBottom: '4px',
+      padding: '4px',
+      cursor: 'pointer',
+
+      '&:target': {
+        animationName: 'flash-shadow',
+        animationDuration: '3s',
+        animationTimingFunction: 'ease-in-out',
+        animationIterationCount: 1,
+      },
+
+      '&:last-child': {
+        marginBottom: 0,
+      },
+
+      '&:hover': {
+        background: 'var(--color-gray-control-fill-hover)',
+
+        [`${token.componentCls}-item-actions`]: {
+          opacity: 1,
+          visibility: 'visible',
+          pointerEvents: 'auto',
+          background: 'var(--color-gray-control-fill-hover)',
         },
+      },
+
+      '&:focus-within': {
+        [`${token.componentCls}-item-actions`]: {
+          opacity: 1,
+          visibility: 'visible',
+          pointerEvents: 'auto',
+          background: 'var(--color-gray-control-fill-hover)',
+        },
+      },
+    },
+
+    // 文件树叶子行
+    [`${token.componentCls}-item--tree`]: {
+      position: 'relative',
+      display: 'inline-flex',
+      width: '100%',
+      maxWidth: 'none',
+      alignItems: 'center',
+      gap: '4px',
+      marginBottom: 0,
+      padding: 0,
+      cursor: 'default',
+      background: 'transparent',
+
+      '&:hover': {
+        background: 'transparent',
+      },
+
+      [`${token.componentCls}-item-icon`]: {
+        display: 'none',
+      },
+
+      [`${token.componentCls}-item-details`]: {
+        display: 'none',
+      },
+
+      [`${token.componentCls}-item-info`]: {
+        flex: 1,
+        minWidth: 0,
+      },
+
+      [`${token.componentCls}-item-name`]: {
+        minWidth: 0,
+        overflow: 'hidden',
+        wordBreak: 'normal',
+      },
+
+      [`${token.componentCls}-item-name-text`]: {
+        display: 'block',
+        overflow: 'hidden',
+        whiteSpace: 'nowrap',
+        textOverflow: 'ellipsis',
+      },
+
+      [`${token.componentCls}-item-actions`]: {
+        opacity: 1,
+        visibility: 'visible',
+        pointerEvents: 'auto',
       },
     },
 
@@ -249,9 +343,11 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       display: 'flex',
       flexDirection: 'column',
       height: '100%',
+      minWidth: 0,
+      overflowX: 'hidden',
       marginLeft: '-12px',
       marginRight: '-12px',
-      background: '#fff',
+      background: token.colorBgContainer,
       position: 'relative',
 
       // 预览头部
@@ -259,9 +355,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         display: 'flex',
         alignItems: 'center',
         gap: '4px',
+        minWidth: 0,
         padding: '8px 12px',
-        borderBottom: '1px solid rgba(20, 22, 28, 0.07)',
-        background: '#fff',
+        borderBottom: `1px solid ${token.colorBorderSecondary || token.colorBorder}`,
+        background: token.colorBgContainer,
         flexShrink: 0,
         position: 'sticky',
         top: 0,
@@ -278,12 +375,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         border: 'none',
         background: 'none',
         cursor: 'pointer',
-        color: '#767e8b',
+        color: token.colorTextTertiary || token.colorTextSecondary,
         transition: 'all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
-        borderRadius: '4px',
+        borderRadius: token.borderRadiusSM || 4,
 
         '&:hover': {
-          background: '#f0f0f0',
+          background: token.colorFillTertiary || token.colorFillSecondary,
         },
       },
 
@@ -328,7 +425,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       // 生成时间
       [`&-generate-time`]: {
         fontSize: '12px',
-        color: '#767e8b',
+        color: token.colorTextTertiary || token.colorTextSecondary,
       },
 
       // 操作按钮容器
@@ -338,12 +435,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         gap: '8px',
 
         // 保持预览头部操作按钮的图标颜色一致
-        [`${token.antCls}-btn, ${token.antCls}-btn .anticon`]: {
-          color: '#767E8B',
+        [`${token.antCls}-btn, ${token.antCls}-btn ${token.iconCls}`]: {
+          color: token.colorTextTertiary || token.colorTextSecondary,
         },
-        [`${token.antCls}-btn:hover, ${token.antCls}-btn:focus, ${token.antCls}-btn:active, ${token.antCls}-btn:hover .anticon, ${token.antCls}-btn:focus .anticon, ${token.antCls}-btn:active .anticon`]:
+        [`${token.antCls}-btn:hover, ${token.antCls}-btn:focus, ${token.antCls}-btn:active, ${token.antCls}-btn:hover ${token.iconCls}, ${token.antCls}-btn:focus ${token.iconCls}, ${token.antCls}-btn:active ${token.iconCls}`]:
           {
-            color: '#767E8B',
+            color: token.colorTextTertiary || token.colorTextSecondary,
           },
       },
 
@@ -352,7 +449,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'auto',
+        minWidth: 0,
+        overflowX: 'hidden',
+        overflowY: 'auto',
         minHeight: 0, // 确保 flex 子项可以收缩
         padding: '16px',
       },
@@ -394,8 +493,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             left: 0,
             height: 48,
             right: 0,
-            background:
-              'linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0) 100%)',
+            background: `linear-gradient(to bottom, ${token.colorBgContainer}, transparent)`,
             zIndex: 1,
             pointerEvents: 'none',
           },
@@ -406,8 +504,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             left: 0,
             height: 48,
             right: 0,
-            background:
-              'linear-gradient(to top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0) 100%)',
+            background: `linear-gradient(to top, ${token.colorBgContainer}, transparent)`,
             zIndex: 1,
             pointerEvents: 'none',
           },
@@ -434,7 +531,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       // 占位符内容
       [`&-placeholder-content`]: {
         textAlign: 'center',
-        color: '#8c8c8c',
+        color: token.colorTextTertiary || token.colorTextSecondary,
 
         p: {
           margin: '8px 0',
@@ -474,8 +571,66 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
     },
 
+    [`${token.componentCls}-toolbar`]: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: token.marginXS ?? 8,
+      flexShrink: 0,
+      minWidth: 0,
+      maxWidth: '100%',
+      marginBottom: 8,
+    },
+
+    [`${token.componentCls}-toolbar-search`]: {
+      flex: 1,
+      minWidth: 0,
+      [`${token.componentCls}-search ${token.antCls}-input-outlined`]: {
+        marginBottom: 0,
+      },
+    },
+
+    [`${token.componentCls}-toolbar-switch`]: {
+      flexShrink: 0,
+      [`${token.antCls}-segmented-item-label`]: {
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minWidth: 28,
+        minHeight: 24,
+      },
+    },
+
+    [`${token.componentCls}-toolbar-switch-icon`]: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: token.colorText,
+      lineHeight: 0,
+    },
+
+    [`${token.componentCls}-toolbar-switch--trailing`]: {
+      marginInlineStart: 'auto',
+    },
+
+    [`${token.componentCls}-tree-panel`]: {
+      flex: 1,
+      minHeight: 0,
+      minWidth: 0,
+      display: 'flex',
+      flexDirection: 'column',
+      overflow: 'hidden',
+    },
+
     // 搜索框样式
     [`${token.componentCls}-search`]: {
+      width: '100%',
+      minWidth: 0,
+      boxSizing: 'border-box',
+      [`${token.antCls}-input-affix-wrapper`]: {
+        width: '100%',
+        maxWidth: '100%',
+        minWidth: 0,
+      },
       [`${token.antCls}-input-outlined`]: {
         borderRadius: 'var(--radius-control-base)',
         borderColor: 'transparent',
@@ -496,7 +651,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
 
       // 搜索图标样式
-      '.anticon': {
+      [token.iconCls]: {
         color: 'var(--color-gray-text-secondary)',
         fontSize: 16,
       },
@@ -551,13 +706,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
-export function useFileStyle(prefixCls?: string) {
-  return useEditorStyleRegister('WorkspaceFile', (token) => {
-    const fileToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('WorkspaceFile', genStyle);
 
-    return [genStyle(fileToken)];
-  });
+export function useFileStyle(prefixCls?: string) {
+  const [, hashId] = useGenStyle(prefixCls ?? 'WorkspaceFile');
+  return { hashId };
 }

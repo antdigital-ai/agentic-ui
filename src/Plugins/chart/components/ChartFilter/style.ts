@@ -1,11 +1,10 @@
 import {
-  ChatTokenType,
-  GenerateStyle,
+  genStyleHooks,
   resetComponent,
-  useEditorStyleRegister,
+  type GenStyleFn,
 } from '../../../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'ChartFilter'> = (token) => {
   return {
     [token.componentCls]: {
       padding: '12px 0',
@@ -21,10 +20,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         gap: '8px',
 
         [`${token.componentCls}-region-dropdown-btn`]: {
-          border: '1px solid #d9d9d9',
+          border: '1px solid var(--color-gray-border-light)',
           borderRadius: '6px',
-          backgroundColor: '#fff',
-          color: '#666',
+          backgroundColor: 'var(--color-gray-bg-card-white)',
+          color: 'var(--color-gray-text-secondary)',
           fontSize: '14px',
           display: 'flex',
           alignItems: 'center',
@@ -35,62 +34,18 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           padding: '0 12px',
 
           '&:hover': {
-            borderColor: '#8c8c8c',
-            color: '#343a45',
-            backgroundColor: '#f9f9f9',
+            borderColor: 'var(--color-gray-text-light)',
+            color: 'var(--color-gray-text-default)',
+            backgroundColor: 'var(--color-gray-bg-page-light)',
 
             [`${token.componentCls}-dropdown-icon`]: {
-              color: '#8c8c8c',
+              color: 'var(--color-gray-text-light)',
             },
           },
 
           [`${token.componentCls}-dropdown-icon`]: {
             fontSize: '12px',
-            color: '#666',
-          },
-        },
-      },
-
-      [`${token.componentCls}-segmented-filter`]: {
-        backgroundColor: '#f5f5f5',
-        height: '32px',
-        display: 'flex',
-        alignItems: 'center',
-        borderRadius: '8px',
-
-        '&.custom-segmented': {
-          '.ant-segmented-item': {
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            '.ant-segmented-item-label': {
-              fontFamily: 'PingFang SC',
-              fontSize: '13px',
-              fontWeight: 'normal',
-              lineHeight: '22px',
-              letterSpacing: '0em',
-            },
-          },
-          '.ant-segmented-group': {
-            height: '30px',
-          },
-          '.ant-segmented-item-selected': {
-            borderRadius: '8px',
-            backgroundColor: '#fff !important',
-            border: '1px solid #d9d9d9 !important',
-            boxShadow:
-              '0px 0px 1px 0px rgba(0, 19, 41, 0.2), 0px 1.5px 4px -1px rgba(0, 19, 41, 0.04)',
-            '.ant-segmented-item-label': {
-              fontFamily: 'PingFang SC',
-              fontSize: '13px',
-              fontWeight: 600,
-              lineHeight: '20px',
-              letterSpacing: '0em',
-              fontVariationSettings: '"opsz" auto',
-              /* gray/gray-文本-默认 */
-              /* 样式描述：--gray-a12 */
-              color: '#343a45 !important',
-            },
+            color: 'var(--color-gray-text-secondary)',
           },
         },
       },
@@ -99,14 +54,14 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       '&-dark': {
         [`${token.componentCls}-region-filter`]: {
           [`${token.componentCls}-region-dropdown-btn`]: {
-            border: '1px solid #434343',
-            backgroundColor: '#1a1a1a',
+            border: '1px solid var(--color-gray-border-dark)',
+            backgroundColor: 'var(--color-gray-bg-page-dark)',
             color: 'rgba(255, 255, 255, 0.85)',
 
             '&:hover': {
-              borderColor: '#595959',
-              color: '#fff',
-              backgroundColor: '#262626',
+              borderColor: 'var(--color-gray-text-light)',
+              color: 'var(--color-gray-bg-card-white)',
+              backgroundColor: 'var(--color-gray-bg-page-dark)',
 
               [`${token.componentCls}-dropdown-icon`]: {
                 color: 'rgba(255, 255, 255, 0.8)',
@@ -115,29 +70,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
             [`${token.componentCls}-dropdown-icon`]: {
               color: 'rgba(255, 255, 255, 0.65)',
-            },
-          },
-        },
-
-        [`${token.componentCls}-segmented-filter`]: {
-          backgroundColor: '#262626',
-
-          '&.custom-segmented': {
-            '.ant-segmented-item': {
-              '.ant-segmented-item-label': {
-                color: 'rgba(255, 255, 255, 0.65)',
-              },
-            },
-            '.ant-segmented-item-selected': {
-              backgroundColor: '#fff !important',
-              border: '1px solid #434343 !important',
-
-              '.ant-segmented-item-label': {
-                color: '#343a45 !important',
-              },
-            },
-            '.ant-segmented-thumb': {
-              backgroundColor: '#343a45 !important',
             },
           },
         },
@@ -157,13 +89,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * @param prefixCls
  * @returns
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('ChartFilter', (token) => {
-    const chartFilterToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('ChartFilter', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+]);
 
-    return [resetComponent(chartFilterToken), genStyle(chartFilterToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [, hashId] = useGenStyle(prefixCls ?? 'ChartFilter');
+  return { hashId };
 }

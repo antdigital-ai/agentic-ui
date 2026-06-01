@@ -1,29 +1,31 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'ChatBootCaseReply'> = (token) => {
   return {
     [token.componentCls]: {
       maxWidth: '322px',
-      background: '#fdfdfd',
+      background: token.colorFillQuaternary,
       borderRadius: 'var(--radius-card-base)',
       boxShadow: 'inset 0 0 1px 0 rgba(0, 0, 0, 0.15)',
       position: 'relative',
       overflow: 'hidden',
-      cursor: 'pointer',
+      // cursor 由组件按需注入：有 onClick 时注入 data-clickable="true"
+      cursor: 'default',
       transition: 'all 0.3s ease-in-out',
 
-      '&:hover': {
-        backgroundColor: '#ffffff',
-        boxShadow: '0 2px 12px 0 rgba(0, 0, 0, 0.08)',
-        transform: 'scale(1.02)',
-      },
+      // 可点击态：组件存在 onClick 时注入 data-clickable="true"
+      '&[data-clickable="true"]': {
+        cursor: 'pointer',
 
-      '&:active': {
-        transform: 'scale(0.95)',
+        '&:hover': {
+          backgroundColor: token.colorBgElevated,
+          boxShadow: '0 2px 12px 0 rgba(0, 0, 0, 0.08)',
+          transform: 'scale(1.02)',
+        },
+
+        '&:active': {
+          transform: 'scale(0.95)',
+        },
       },
 
       // cover 区域
@@ -52,10 +54,13 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         transform: 'rotate(0deg) translateY(0)',
       },
 
-      // coverContent 悬停状态
-      '&-cover-content-hovered': {
-        transform: 'rotate(8deg) translateY(16px)',
-      },
+      // P1-1：原本通过 React state 切换 `&-cover-content-hovered` 类来驱动该动画，
+      // 这会让每次 hover 进出都触发整组件 rerender。改为 CSS :hover 直驱，
+      // hovered 类名仍保留作为程序化触发钩子（与 :hover 等价）。
+      [`&:hover ${token.componentCls}-cover-content, &-cover-content-hovered`]:
+        {
+          transform: 'rotate(8deg) translateY(16px)',
+        },
 
       // 引号图标
       '&-quote-icon': {
@@ -130,8 +135,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
         // buttonBar 内的按钮样式
         '& button': {
-          backgroundColor: '#000000',
-          color: '#ffffff',
+          backgroundColor: token.colorText,
+          color: token.colorBgContainer,
           borderRadius: '36px',
           padding: '8px 16px',
           cursor: 'pointer',
@@ -173,13 +178,18 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         },
       },
 
-      // 按钮悬停时箭头动画
-      '&-button-bar button:hover &-arrow-icon': {
+      // P1-7：原写法 '&-button-bar button:hover &-arrow-icon' 在 cssinjs 嵌套上下文里，
+      // 第二个 `&` 仍然是 componentCls 自身，会被展开成
+      // `${prefix}-button-bar button:hover ${prefix}-button-bar-arrow-icon`
+      // （因为本块此时仍位于 `&-button-bar` 的上层），实际 DOM 类名是 `${prefix}-arrow-icon`，
+      // 因此 hover 平移动画完全失效。改写为顶层规则并显式拼出 componentCls 与子修饰符：
+      [`&-button-bar button:hover ${token.componentCls}-arrow-icon`]: {
         transform: 'translateX(4px)',
       },
 
-      // buttonBar 显示状态
-      '&-button-bar-visible': {
+      // P1-1：buttonBar 显示状态原来由 React state 切类驱动，改用 CSS :hover 直驱；
+      // 同时保留 `-visible` 修饰符作为程序化触发钩子。
+      [`&:hover ${token.componentCls}-button-bar, &-button-bar-visible`]: {
         opacity: 1,
         transform: 'translateY(0)',
         pointerEvents: 'auto',
@@ -188,16 +198,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
+const useGenStyle = genStyleHooks('ChatBootCaseReply', genStyle);
+
 /**
  * CaseReply 组件样式
  */
 export const useStyle = (prefixCls?: string) => {
-  return useEditorStyleRegister('ChatBootCaseReply', (token) => {
-    const caseReplyToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-
-    return [genStyle(caseReplyToken)];
-  });
+  const [, hashId] = useGenStyle(prefixCls ?? 'ChatBootCaseReply');
+  return { hashId };
 };

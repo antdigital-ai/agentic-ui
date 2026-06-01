@@ -1,6 +1,7 @@
 import { FieldTimeOutlined } from '@ant-design/icons';
 import { Tooltip } from 'antd';
-import React, { useContext, useMemo } from 'react';
+import React, { useContext } from 'react';
+import { useAdaptiveTooltipProps } from '../Hooks/useAdaptiveTooltipProps';
 import { I18nContext, LocalKeys } from '../I18n';
 
 /**
@@ -94,36 +95,40 @@ export const msToTimes = (ms: number | undefined | null, locale: LocalKeys) => {
  */
 export const CostMillis = (props: { costMillis?: number }) => {
   const { locale } = useContext(I18nContext);
+  const adaptiveTooltip = useAdaptiveTooltipProps('informational');
 
-  return useMemo(() => {
-    if (props.costMillis === undefined || props.costMillis === null) {
-      return null;
-    }
-    return (
-      <Tooltip mouseEnterDelay={0.3} title={props.costMillis + 'ms'}>
-        <span
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            padding: '1px 10px',
-            gap: '6px',
-            borderRadius: '12px',
-            height: '2em',
-            minHeight: '28px',
-            fontSize: '0.9em',
-            wordBreak: 'break-all',
-            wordWrap: 'break-word',
-            maxWidth: '100%',
-            background:
-              'radial-gradient(22% 66% at 96% 113%, rgba(255, 255, 245, 0.52) 0%, rgba(230, 238, 255, 0) 100%), radial-gradient(14% 234% at 100% 50%, rgba(162, 255, 255, 0.28) 0%, rgba(153, 202, 255, 0.1193) 13%, rgba(229, 189, 255, 0.0826) 38%, rgba(235, 255, 245, 0) 100%), #FFFFFF',
-            border: '1px solid rgba(227, 230, 234, 0.65)',
-          }}
-        >
-          <FieldTimeOutlined />
-          {msToTimes(props.costMillis, locale)}
-        </span>
-      </Tooltip>
-    );
-  }, [props.costMillis, locale]);
+  if (props.costMillis === undefined || props.costMillis === null) {
+    return null;
+  }
+
+  return (
+    <Tooltip
+      mouseEnterDelay={0.3}
+      title={props.costMillis + 'ms'}
+      {...adaptiveTooltip}
+    >
+      <span
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: '1px 10px',
+          gap: '6px',
+          borderRadius: '12px',
+          height: '2em',
+          minHeight: '28px',
+          fontSize: '0.9em',
+          wordBreak: 'break-all',
+          wordWrap: 'break-word',
+          maxWidth: '100%',
+          background:
+            'radial-gradient(22% 66% at 96% 113%, rgba(255, 255, 245, 0.52) 0%, rgba(230, 238, 255, 0) 100%), radial-gradient(14% 234% at 100% 50%, rgba(162, 255, 255, 0.28) 0%, rgba(153, 202, 255, 0.1193) 13%, rgba(229, 189, 255, 0.0826) 38%, rgba(235, 255, 245, 0) 100%), #FFFFFF',
+          border: '1px solid rgba(227, 230, 234, 0.65)',
+        }}
+      >
+        <FieldTimeOutlined />
+        {msToTimes(props.costMillis, locale)}
+      </span>
+    </Tooltip>
+  );
 };

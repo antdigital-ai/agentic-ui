@@ -1,11 +1,10 @@
 import {
-  ChatTokenType,
-  GenerateStyle,
+  genStyleHooks,
   resetComponent,
-  useEditorStyleRegister,
+  type GenStyleFn,
 } from '../../../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'ToolBar'> = (token) => {
   return {
     [token.componentCls]: {
       borderTopLeftRadius: '0.5em',
@@ -46,13 +45,13 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * @param prefixCls
  * @returns
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('ToolBar-' + prefixCls, (token) => {
-    const editorToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('ToolBar', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+]);
 
-    return [resetComponent(editorToken), genStyle(editorToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  // 与 ToolBar 组件内 `getPrefixCls('agentic-md-editor-toolbar')` 对齐
+  const [, hashId] = useGenStyle(prefixCls ?? 'agentic-md-editor-toolbar');
+  return { hashId };
 }

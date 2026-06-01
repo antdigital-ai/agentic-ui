@@ -9,7 +9,6 @@ import {
   Transforms,
 } from 'slate';
 import { Elements, ListNode } from '../../el';
-import { TrNode } from '../elements/Table';
 import { decodeURIComponentUrl } from '../parser/parse/parseHtml';
 import { EditorUtils } from '../utils/editorUtils';
 
@@ -37,6 +36,8 @@ export type CheckMdParams = {
 interface MdNode {
   reg: RegExp;
   matchKey?: string | RegExp;
+  /** 为 true 时仅在 `markdown.matchInputToNode === true` 时参与匹配（避免首段 `- ` 误转列表） */
+  gatedByMatchInputToNode?: boolean;
   checkAllow?: (ctx: {
     editor: Editor;
     node: NodeEntry<Element>;
@@ -73,39 +74,6 @@ const matchText = (
 };
 
 export const MdElements: Record<string, MdNode> = {
-  table: {
-    reg: /^\s*\|((?:[^|\n]+\|?)+)\|\s*$/,
-    run: ({ editor, path, match }) => {
-      const columns = match[1].split('|');
-      Transforms.delete(editor, { at: path });
-      Transforms.insertNodes(
-        editor,
-        EditorUtils.wrapperCardNode({
-          type: 'table',
-          children: [
-            {
-              type: 'table-row',
-              children: columns.map((c) => ({
-                type: 'table-cell',
-                title: true,
-                children: [{ text: c }],
-              })),
-            },
-            {
-              type: 'table-row',
-              children: columns.map(() => ({
-                type: 'table-cell',
-                children: [{ text: '' }],
-              })),
-            },
-          ] as TrNode[],
-        }),
-
-        { at: path },
-      );
-      Transforms.select(editor, [...path, 1, 0, 0]);
-    },
-  },
   code: {
     matchKey: ' ',
     reg: /^\s*(```|···)([\w#\-+*]{1,30})?\s*$/,
@@ -220,6 +188,7 @@ export const MdElements: Record<string, MdNode> = {
   task: {
     reg: /^\s*\[(x|\s)]\s+/,
     matchKey: ' ',
+    gatedByMatchInputToNode: true,
     checkAllow: (ctx) => {
       if (ctx.node?.[0]?.type === 'paragraph') {
         const list =
@@ -253,6 +222,7 @@ export const MdElements: Record<string, MdNode> = {
   },
   list: {
     matchKey: ' ',
+    gatedByMatchInputToNode: true,
     reg: /^\s*(\d+\.|-|\*|\+)\s+?/,
     checkAllow: (ctx) => {
       if (Editor.parent(ctx.editor, ctx.node[1])[0].type === 'list-item') {
@@ -299,8 +269,7 @@ export const MdElements: Record<string, MdNode> = {
   hr: {
     matchKey: ' ',
     reg: /^\s*(\*\*\*|___|---)\s*$/,
-    checkAllow: (ctx) =>
-      ctx.node?.[0]?.type === 'paragraph' && ctx.node[1][0] !== 0,
+    checkAllow: (ctx) => ctx.node?.[0]?.type === 'paragraph',
     run: ({ editor, path }) => {
       Transforms.delete(editor, { at: path });
       Transforms.insertNodes(
@@ -315,8 +284,7 @@ export const MdElements: Record<string, MdNode> = {
   hrSpace: {
     matchKey: ' ',
     reg: /^\s*(\*\*\*|___|---)\s*/,
-    checkAllow: (ctx) =>
-      ctx.node?.[0]?.type === 'paragraph' && ctx.node[1][0] !== 0,
+    checkAllow: (ctx) => ctx.node?.[0]?.type === 'paragraph',
     run: ({ editor, path }) => {
       Transforms.delete(editor, { at: path });
       Transforms.insertNodes(

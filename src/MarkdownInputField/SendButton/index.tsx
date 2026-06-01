@@ -1,10 +1,19 @@
-import { ConfigProvider, Tooltip } from 'antd';
+import { ConfigProvider, Tooltip, theme as antdTheme } from 'antd';
 import classNames from 'clsx';
-import { motion } from 'framer-motion';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useMemo } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { StopIcon } from '../../AgentRunBar/icons';
+import {
+  STOP_ICON_DISK_FILL,
+  STOP_ICON_HALO_FILL,
+  StopIcon,
+} from '../../AgentRunBar/icons';
 import { I18nContext } from '../../I18n';
+import type { FileUploadManagerReturn } from '../FileUploadManager';
+import {
+  getSendButtonPalette,
+  resolveSendButtonDisplayColors,
+  type SendButtonResolvedColors,
+} from './sendButtonPalette';
 import { useStyle } from './style';
 
 /**
@@ -27,41 +36,48 @@ export type SendButtonColors = {
 export type SendButtonCustomizationProps = {
   compact?: boolean;
   colors?: SendButtonColors;
+  disabled?: boolean;
 };
 
-const DEFAULT_SEND_BUTTON_COLORS = {
-  icon: '#00183D',
-  iconHover: '#fff',
-  background: '#001C39',
-  backgroundHover: '#14161C',
-};
+/**
+ * 解析发送按钮的最终禁用状态：用户显式传入优先，否则按上传状态判断
+ */
+export function resolveSendDisabled(
+  sendButtonProps: SendButtonCustomizationProps | undefined,
+  fileUploadStatus: FileUploadManagerReturn['fileUploadStatus'] | undefined,
+): boolean {
+  return sendButtonProps?.disabled ?? fileUploadStatus === 'uploading';
+}
 
 function SendIcon(
   props: React.SVGProps<SVGSVGElement> & {
-    hover?: boolean;
+    /** 可发送且非禁用 */
+    isActive: boolean;
+    /** 业务禁用（仍渲染弱态，与 !isActive 一致） */
     disabled?: boolean;
     typing?: boolean;
-    onInit?: () => void;
-    colors?: SendButtonColors;
+    displayColors: SendButtonResolvedColors;
   },
 ) {
-  const { hover, typing, onInit, colors, ...rest } = props;
-
-  useEffect(() => {
-    onInit?.();
-  }, []);
+  const { isActive, disabled, typing, displayColors, ...rest } = props;
 
   if (typing) {
-    return <StopIcon {...rest} />;
+    return (
+      <StopIcon
+        {...rest}
+        diskFill={STOP_ICON_DISK_FILL}
+        haloFill={STOP_ICON_HALO_FILL}
+      />
+    );
   }
 
-  const currentColors = {
-    icon: colors?.icon ?? DEFAULT_SEND_BUTTON_COLORS.icon,
-    iconHover: colors?.iconHover ?? DEFAULT_SEND_BUTTON_COLORS.iconHover,
-    background: colors?.background ?? DEFAULT_SEND_BUTTON_COLORS.background,
-    backgroundHover:
-      colors?.backgroundHover ?? DEFAULT_SEND_BUTTON_COLORS.backgroundHover,
-  };
+  const useActive = isActive && !disabled;
+  const circleFill = useActive
+    ? displayColors.backgroundActive
+    : displayColors.backgroundMuted;
+  const arrowFill = useActive
+    ? displayColors.iconActive
+    : displayColors.iconMuted;
 
   return (
     <svg
@@ -72,36 +88,28 @@ function SendIcon(
       viewBox="0 0 32 32"
       {...rest}
     >
-      <motion.circle
+      {/* 替代 framer-motion 的 motion.circle/motion.path fill 颜色过渡：
+          通过 CSS transition + inline fill 触发等价过渡（duration 与原值保持一致）。 */}
+      <circle
         cx="50%"
         cy="50%"
         r="0.5em"
-        initial={false}
-        animate={{
-          fill: hover
-            ? currentColors.backgroundHover
-            : currentColors.background,
-          fillOpacity: hover ? 1 : 0.03530000150203705,
+        fill={circleFill}
+        fillOpacity={1}
+        style={{
+          transition: 'fill 0.6s ease-in-out, fill-opacity 0.6s ease-in-out',
         }}
-        transition={{
-          duration: 0.6,
-          ease: 'easeInOut',
-        }}
-      ></motion.circle>
+      />
       <g>
-        <motion.path
+        <path
           d="M16.667 12.943l3.528 3.528a.667.667 0 00.943-.942l-4.666-4.667a.665.665 0 00-.943 0l-4.667 4.667a.667.667 0 10.943.942l3.528-3.528v7.724a.667.667 0 101.334 0v-7.724z"
           fillRule="evenodd"
-          initial={false}
-          animate={{
-            fill: hover ? currentColors.iconHover : currentColors.icon,
-            fillOpacity: hover ? 1 : 0.24709999561309814,
+          fill={arrowFill}
+          fillOpacity={1}
+          style={{
+            transition: 'fill 0.2s ease-in-out, fill-opacity 0.2s ease-in-out',
           }}
-          transition={{
-            duration: 0.2,
-            ease: 'easeInOut',
-          }}
-        ></motion.path>
+        />
       </g>
     </svg>
   );
@@ -174,7 +182,7 @@ type SendButtonProps = {
  * @component
  * @description 发送按钮组件，支持多种状态和动画效果
  * @param {SendButtonProps} props - 组件属性
- * @param {boolean} props.isHover - 指示鼠标是否悬停在按钮上
+ * @param {boolean} props.isSendable - 是否处于可发送状态
  * @param {boolean} props.disabled - 指示按钮是否禁用
  * @param {boolean} props.typing - 指示是否处于输入状态
  * @param {() => void} props.onClick - 点击按钮时的回调函数
@@ -186,7 +194,7 @@ type SendButtonProps = {
  * @example
  * ```tsx
  * <SendButton
- *   isHover={false}
+ *   isSendable
  *   disabled={false}
  *   typing={false}
  *   onClick={() => console.log('发送消息')}
@@ -221,11 +229,46 @@ export const SendButton: React.FC<SendButtonProps> = (props) => {
   } = props;
   useEffect(() => {
     props.onInit?.();
+    // 仅在挂载时触发一次，避免引用变化导致重复打点
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- onInit intentionally once on mount
   }, []);
+  const { token } = antdTheme.useToken();
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const { locale } = useContext(I18nContext);
   const baseCls = getPrefixCls('agentic-md-input-field-send-button');
-  const { wrapSSR, hashId } = useStyle(baseCls);
+  const { hashId } = useStyle(baseCls);
+
+  const displayColors = useMemo(
+    () =>
+      resolveSendButtonDisplayColors(
+        getSendButtonPalette({
+          colorPrimary: token.colorPrimary,
+          colorBgContainer: token.colorBgContainer,
+          colorTextLightSolid: token.colorTextLightSolid,
+          colorTextTertiary: token.colorTextTertiary,
+          colorFillTertiary: token.colorFillTertiary,
+          colorText: token.colorText,
+        }),
+        colors,
+        {
+          colorPrimary: token.colorPrimary,
+          colorBgContainer: token.colorBgContainer,
+          colorTextLightSolid: token.colorTextLightSolid,
+          colorTextTertiary: token.colorTextTertiary,
+          colorFillTertiary: token.colorFillTertiary,
+          colorText: token.colorText,
+        },
+      ),
+    [
+      colors,
+      token.colorBgContainer,
+      token.colorFillTertiary,
+      token.colorPrimary,
+      token.colorText,
+      token.colorTextLightSolid,
+      token.colorTextTertiary,
+    ],
+  );
 
   if (
     typeof window === 'undefined' ||
@@ -259,10 +302,18 @@ export const SendButton: React.FC<SendButtonProps> = (props) => {
     </div>
   );
 
-  return wrapSSR(
+  const ariaLabelSend =
+    locale?.['input.sendButtonAriaLabel.send'] ?? '发送消息';
+  const ariaLabelStop =
+    locale?.['input.sendButtonAriaLabel.stop'] ?? '停止生成';
+  const sendButtonAriaLabel = typing ? ariaLabelStop : ariaLabelSend;
+
+  return (
     <Tooltip arrow={false} title={tooltipTitle} mouseEnterDelay={0.5}>
       <div
         data-testid="send-button"
+        aria-label={sendButtonAriaLabel}
+        aria-disabled={disabled ? true : undefined}
         onClick={() => {
           if (!disabled) {
             onClick();
@@ -280,19 +331,19 @@ export const SendButton: React.FC<SendButtonProps> = (props) => {
         style={style}
         className={classNames(baseCls, hashId, {
           [`${baseCls}-compact`]: props.compact,
-          [`${baseCls}-disabled`]: disabled,
+          [`${baseCls}-disabled`]: disabled || !isSendable,
           [`${baseCls}-typing`]: typing,
         })}
       >
         <ErrorBoundary fallback={<div />}>
           <SendIcon
-            hover={isSendable && !disabled}
+            isActive={isSendable}
             disabled={disabled}
             typing={typing}
-            colors={colors}
+            displayColors={displayColors}
           />
         </ErrorBoundary>
       </div>
-    </Tooltip>,
+    </Tooltip>
   );
 };

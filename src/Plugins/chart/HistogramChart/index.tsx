@@ -1,4 +1,4 @@
-import { ConfigProvider } from 'antd';
+﻿import { ConfigProvider } from 'antd';
 import {
   BarElement,
   CategoryScale,
@@ -21,7 +21,7 @@ import {
   downloadChart,
 } from '../components';
 import { defaultColorList } from '../const';
-import { StatisticConfigType } from '../hooks/useChartStatistic';
+import { StatisticConfigType, useResolvedChartTheme } from '../hooks';
 import type { ChartClassNames, ChartStyles } from '../types/classNames';
 import { hexToRgba, resolveCssVariable } from '../utils';
 import { useStyle } from './style';
@@ -163,7 +163,7 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
   style,
   styles,
   dataTime,
-  theme = 'light',
+  theme,
   color,
   showLegend = true,
   legendPosition = 'bottom',
@@ -196,7 +196,7 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
 
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('histogram-chart');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   // 处理 ChartStatistic 组件配置
   const statistics = useMemo(() => {
@@ -314,16 +314,17 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
       const sorted = [...filteredData].sort(
         (a, b) => (a.left as number) - (b.left as number),
       );
-      const uniqueEdgePairs = sorted.reduce<
-        { left: number; right: number }[]
-      >((acc, item) => {
-        const l = item.left as number;
-        const r = item.right as number;
-        if (!acc.some((p) => p.left === l && p.right === r)) {
-          acc.push({ left: l, right: r });
-        }
-        return acc;
-      }, []);
+      const uniqueEdgePairs = sorted.reduce<{ left: number; right: number }[]>(
+        (acc, item) => {
+          const l = item.left as number;
+          const r = item.right as number;
+          if (!acc.some((p) => p.left === l && p.right === r)) {
+            acc.push({ left: l, right: r });
+          }
+          return acc;
+        },
+        [],
+      );
 
       const edges = [
         ...uniqueEdgePairs.map((p) => p.left),
@@ -453,7 +454,8 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
     };
   }, [histogramData, types, binning, color, stacked]);
 
-  const isLight = theme === 'light';
+  const { resolvedTheme, autoDetectTheme } = useResolvedChartTheme(theme);
+  const isLight = resolvedTheme === 'light';
   const axisTextColor = isLight
     ? 'rgba(0, 25, 61, 0.3255)'
     : 'rgba(255, 255, 255, 0.8)';
@@ -560,10 +562,11 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
 
   // 空数据处理
   if (safeData.length === 0 || filteredData.length === 0) {
-    return wrapSSR(
+    return (
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`, hashId)}
-        theme={theme}
+        theme={resolvedTheme}
+        autoDetectTheme={autoDetectTheme}
         className={classNames(classNamesProp?.root, className)}
         isMobile={isMobile}
         variant={props.variant}
@@ -594,14 +597,15 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
         >
           暂无有效数据
         </div>
-      </ChartContainer>,
+      </ChartContainer>
     );
   }
 
-  return wrapSSR(
+  return (
     <ChartContainer
       baseClassName={classNames(`${prefixCls}-container`, hashId)}
-      theme={theme}
+      theme={resolvedTheme}
+      autoDetectTheme={autoDetectTheme}
       className={classNames(classNamesProp?.root, className)}
       isMobile={isMobile}
       variant={props.variant}
@@ -614,7 +618,7 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
     >
       <ChartToolBar
         title={title || '直方图'}
-        theme={theme}
+        theme={resolvedTheme}
         onDownload={handleDownload}
         extra={toolbarExtra}
         dataTime={dataTime}
@@ -630,7 +634,7 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
                 selectedCustomSelection: selectedFilterLabel,
                 onSelectionChange: setSelectedFilterLabel,
               })}
-              theme={theme}
+              theme={resolvedTheme}
               variant="compact"
             />
           ) : undefined
@@ -646,7 +650,7 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
           style={styles?.statisticContainer}
         >
           {statistics.map((config, index) => (
-            <ChartStatistic key={index} {...config} theme={theme} />
+            <ChartStatistic key={index} {...config} theme={resolvedTheme} />
           ))}
         </div>
       )}
@@ -661,7 +665,7 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
             selectedCustomSelection: selectedFilterLabel,
             onSelectionChange: setSelectedFilterLabel,
           })}
-          theme={theme}
+          theme={resolvedTheme}
         />
       )}
 
@@ -674,7 +678,7 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
       >
         <Bar ref={chartRef} data={processedData} options={options} />
       </div>
-    </ChartContainer>,
+    </ChartContainer>
   );
 };
 

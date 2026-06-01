@@ -6,12 +6,14 @@ import React from 'react';
 import { BaseMarkdownEditor } from '../MarkdownEditor/BaseMarkdownEditor';
 import { runRender } from './AIBubble';
 import { BubbleAvatar } from './Avatar';
+import type { ChatConfigType } from './BubbleConfigProvide';
 import { BubbleConfigContext } from './BubbleConfigProvide';
 import { MessagesContext } from './MessagesContent/BubbleContext';
 import { BubbleExtra } from './MessagesContent/BubbleExtra';
 import { useStyle } from './style';
 import { BubbleTitle } from './Title';
-import type { BubbleProps } from './type';
+import type { BubbleProps, MessageBubbleData } from './type';
+import type { BubbleExtraProps } from './types/BubbleExtra';
 
 export const PureBubble: React.FC<
   BubbleProps & {
@@ -33,10 +35,11 @@ export const PureBubble: React.FC<
 
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const context = useContext(BubbleConfigContext);
-  const { compact, standalone, extraShowOnHover } = context || {};
+  const { compact, standalone, extraShowOnHover } =
+    context || ({} as ChatConfigType);
 
   const prefixClass = getPrefixCls('agentic');
-  const { wrapSSR, hashId } = useStyle(prefixClass);
+  const { hashId } = useStyle(prefixClass);
 
   const placement = (props.placement ?? 'left') as 'left' | 'right';
   const isRightPlacement = placement === 'right';
@@ -125,11 +128,18 @@ export const PureBubble: React.FC<
           props.onDisLike
             ? async () => {
                 try {
-                  await props.onDisLike?.(props.originData as any);
-                  props.bubbleRef?.current?.setMessageItem?.(props.id!, {
-                    feedback: 'thumbsDown',
-                  } as any);
-                } catch (error) {}
+                  await props.onDisLike?.(
+                    props.originData as MessageBubbleData<Record<string, any>>,
+                  );
+                  if (props.id) {
+                    props.bubbleRef?.current?.setMessageItem?.(props.id, {
+                      feedback: 'thumbsDown',
+                    });
+                  }
+                } catch (error) {
+                  // 业务回调失败时不更新 feedback，保持与后端一致
+                  console.error('[Bubble] onDisLike failed:', error);
+                }
               }
             : undefined
         }
@@ -137,37 +147,52 @@ export const PureBubble: React.FC<
           props.onDislike
             ? async () => {
                 try {
-                  await props.onDislike?.(props.originData as any);
-                  props.bubbleRef?.current?.setMessageItem?.(props.id!, {
-                    feedback: 'thumbsDown',
-                  } as any);
-                } catch (error) {}
+                  await props.onDislike?.(
+                    props.originData as MessageBubbleData<Record<string, any>>,
+                  );
+                  if (props.id) {
+                    props.bubbleRef?.current?.setMessageItem?.(props.id, {
+                      feedback: 'thumbsDown',
+                    });
+                  }
+                } catch (error) {
+                  console.error('[Bubble] onDislike failed:', error);
+                }
               }
             : undefined
         }
-        bubble={props as any}
+        bubble={props as BubbleExtraProps['bubble']}
         onLike={
           props.onLike
             ? async () => {
                 try {
-                  await props.onLike?.(props.originData as any);
-                  props.bubbleRef?.current?.setMessageItem?.(props.id!, {
-                    feedback: 'thumbsUp',
-                  } as any);
-                } catch (error) {}
+                  await props.onLike?.(
+                    props.originData as MessageBubbleData<Record<string, any>>,
+                  );
+                  if (props.id) {
+                    props.bubbleRef?.current?.setMessageItem?.(props.id, {
+                      feedback: 'thumbsUp',
+                    });
+                  }
+                } catch (error) {
+                  console.error('[Bubble] onLike failed:', error);
+                }
               }
             : undefined
         }
       />
     );
 
-  const itemDom = wrapSSR(
+  const itemDom = (
     <BubbleConfigContext.Provider
       value={{
+        // 保留上游 BubbleConfigProvide 提供的非冲突字段（如 thoughtChain / agentId / sessionId 等），
+        // 仅在本气泡作用域内覆盖与渲染相关的 compact / standalone / extraShowOnHover / bubble
+        ...context,
         compact,
         standalone: !!standalone,
         extraShowOnHover,
-        bubble: props as any,
+        bubble: props as ChatConfigType['bubble'],
       }}
     >
       <Flex
@@ -259,7 +284,7 @@ export const PureBubble: React.FC<
           </div>
         </div>
       </Flex>
-    </BubbleConfigContext.Provider>,
+    </BubbleConfigContext.Provider>
   );
 
   if (bubbleRenderConfig?.render === false) return null;

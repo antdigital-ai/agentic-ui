@@ -96,7 +96,7 @@ vi.mock('slate', () => ({
   },
 }));
 
-vi.mock('../../../I18n', () => ({
+vi.mock('../../../../I18n', () => ({
   I18nContext: React.createContext({
     locale: {
       table: '表格',
@@ -146,7 +146,6 @@ vi.mock('../../utils/media', () => ({
 
 vi.mock('../insertAutocompleteStyle', () => ({
   useStyle: () => ({
-    wrapSSR: (component: React.ReactNode) => component,
     hashId: 'test-hash-id',
   }),
 }));

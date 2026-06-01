@@ -1,7 +1,6 @@
-import type { ChatTokenType, GenerateStyle } from '../../Hooks/useStyle';
-import { useEditorStyleRegister } from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'WorkspaceHtmlPreview'> = (token) => {
   return {
     [`${token.componentCls}`]: {
       display: 'flex',
@@ -25,7 +24,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         height: '100%',
         minHeight: '240px',
         border: 'none',
-        background: '#fff',
+        background: token.colorBgContainer,
       },
 
       [`${token.componentCls}-overlay`]: {
@@ -37,12 +36,13 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         zIndex: 1,
 
         [`&--loading`]: {
-          background: 'rgba(255, 255, 255, 0.6)',
+          // 与 antd 遮罩一致，随亮/暗主题变化
+          background: token.colorBgMask,
         },
 
         [`&--error`]: {
-          background: 'rgba(255, 245, 245, 0.6)',
-          color: '#cb1e1e',
+          background: token.colorErrorBg,
+          color: token.colorError,
         },
       },
 
@@ -59,13 +59,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
-export function useHtmlPreviewStyle(prefixCls?: string) {
-  return useEditorStyleRegister('WorkspaceHtmlPreview', (token) => {
-    const htmlPreviewToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('WorkspaceHtmlPreview', genStyle);
 
-    return [genStyle(htmlPreviewToken)];
-  });
+export function useHtmlPreviewStyle(prefixCls?: string) {
+  const [, hashId] = useGenStyle(prefixCls ?? 'WorkspaceHtmlPreview');
+  return { hashId };
 }

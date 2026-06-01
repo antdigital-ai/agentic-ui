@@ -39,6 +39,7 @@ describe('LayoutHeader', () => {
 
     fireEvent.click(screen.getByLabelText('折叠左侧边栏'));
     expect(onLeftCollapse).toHaveBeenCalledWith(true, false);
+    expect(onLeftCollapse).toHaveBeenCalledTimes(1);
   });
 
   it('handles right collapse click', () => {
@@ -52,6 +53,7 @@ describe('LayoutHeader', () => {
 
     fireEvent.click(screen.getByLabelText('折叠右侧边栏'));
     expect(onRightCollapse).toHaveBeenCalledWith(true, false);
+    expect(onRightCollapse).toHaveBeenCalledTimes(1);
   });
 
   it('handles share click', () => {

@@ -1,9 +1,9 @@
-import dayjs from 'dayjs';
 import React from 'react';
+import { MIN_GROUP_SIZE } from '../constants';
 import { MenuItemType } from '../menu';
 import { HistoryDataType } from '../types/HistoryData';
 import { HistoryListConfig } from '../types/HistoryList';
-import { formatTime, groupByCategory } from '../utils';
+import { formatTime, getItemTimestamp, groupByCategory } from '../utils';
 import { HistoryItem } from './HistoryItem';
 
 /**
@@ -70,6 +70,7 @@ export const generateHistoryItems = ({
   runningId,
   customOperationExtra,
   itemDateFormatter,
+  formatTimeLocale,
 }: HistoryListConfig): MenuItemType[] => {
   const groupList = groupByCategory(
     filteredList || [],
@@ -77,18 +78,27 @@ export const generateHistoryItems = ({
       if (groupBy) {
         return groupBy(item);
       }
-      return formatTime(item.gmtCreate as number);
+      return formatTime(getItemTimestamp(item), formatTimeLocale);
     },
   );
 
-  const groupMaxTimes = Object.fromEntries(
-    Object.entries(groupList).map(([key, list]) => [
-      key,
-      Math.max(...list.map((item) => dayjs(item.gmtCreate).valueOf())),
-    ]),
-  );
-
-  const MIN_GROUP_SIZE = 3;
+  // 计算每个分组的最大时间戳，用于跨分组排序。
+  // 之前实现是 `Object.fromEntries(... Math.max(...list.map(...)))`：
+  // 1) `list.map` 拷贝出一份新数组
+  // 2) `Math.max(...spread)` 在 V8 里会把每个元素当独立参数压栈，长 list 下有栈帧消耗
+  // 3) `Object.entries` + `Object.fromEntries` 又转两次 — 总共 O(3n)
+  // 改成一次 reduce + 内部 for 循环，单遍 O(n) 不分配中间数组。
+  const groupMaxTimes: Record<string, number> = {};
+  for (const key in groupList) {
+    if (!Object.prototype.hasOwnProperty.call(groupList, key)) continue;
+    const list = groupList[key];
+    let max = 0;
+    for (let i = 0; i < list.length; i += 1) {
+      const t = getItemTimestamp(list[i]);
+      if (t > max) max = t;
+    }
+    groupMaxTimes[key] = max;
+  }
 
   // 按照时间顺序对分组进行排序：今日 > 昨日 > 一周内 > 其他
   const sortedGroupKeys = Object.keys(groupList).sort(
@@ -96,14 +106,15 @@ export const generateHistoryItems = ({
   );
 
   const buildItemNodes = (list: HistoryDataType[]) =>
-    list
+    // 用副本排序，避免就地修改 props 传入的数组从而污染外层 chatList state
+    [...list]
       .sort((a, b) => {
         if (sessionSort === false) return 0;
         if (sessionSort) {
           const result = sessionSort(a, b);
           return typeof result === 'boolean' ? 0 : result;
         }
-        return dayjs(b.gmtCreate).valueOf() - dayjs(a.gmtCreate).valueOf();
+        return getItemTimestamp(b) - getItemTimestamp(a);
       })
       .map((item) => ({
         key: item.sessionId || `item-${item.id}`,
@@ -130,29 +141,31 @@ export const generateHistoryItems = ({
         ),
       }));
 
-  const items: MenuItemType[] = sortedGroupKeys.flatMap((key): MenuItemType[] => {
-    const list = groupList[key];
+  const items: MenuItemType[] = sortedGroupKeys.flatMap(
+    (key): MenuItemType[] => {
+      const list = groupList[key];
 
-    // 少于最小数量时，直接平铺为普通条目，不展示分组标题
-    if (list.length < MIN_GROUP_SIZE) {
-      return buildItemNodes(list);
-    }
+      // 少于最小数量时，直接平铺为普通条目，不展示分组标题
+      if (list.length < MIN_GROUP_SIZE) {
+        return buildItemNodes(list);
+      }
 
-    const firstItem = list.at(0);
-    const label =
-      customDateFormatter && firstItem?.gmtCreate
-        ? customDateFormatter(firstItem.gmtCreate)
-        : formatTime(firstItem?.gmtCreate as number);
+      const firstItem = list.at(0);
+      const label =
+        customDateFormatter && firstItem?.gmtCreate
+          ? customDateFormatter(firstItem.gmtCreate)
+          : formatTime(getItemTimestamp(firstItem ?? {}), formatTimeLocale);
 
-    return [
-      {
-        key: `group-${key}`,
-        type: 'group' as const,
-        label: groupLabelRender ? groupLabelRender(key, list, label) : label,
-        children: buildItemNodes(list),
-      },
-    ];
-  });
+      return [
+        {
+          key: `group-${key}`,
+          type: 'group' as const,
+          label: groupLabelRender ? groupLabelRender(key, list, label) : label,
+          children: buildItemNodes(list),
+        },
+      ];
+    },
+  );
 
   return items;
 };

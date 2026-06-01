@@ -1,34 +1,10 @@
 import React, { useMemo } from 'react';
-import partialParse from '../../MarkdownEditor/editor/parser/json-parse';
 import type { MarkdownEditorProps } from '../../MarkdownEditor/types';
-import { SchemaRenderer } from '../../Schema';
+import { SchemaRenderer, type LowCodeSchema } from '../../Schema';
 import { debugInfo } from '../../Utils/debugUtils';
+import { extractBlockTextContent } from '../extractBlockTextContent';
 import type { RendererBlockProps } from '../types';
-
-const extractTextContent = (children: React.ReactNode): string => {
-  if (typeof children === 'string') return children;
-  if (typeof children === 'number') return String(children);
-  if (Array.isArray(children)) return children.map(extractTextContent).join('');
-  if (React.isValidElement(children) && children.props?.children) {
-    return extractTextContent(children.props.children);
-  }
-  return '';
-};
-
-/**
- * 解析 schema/apaasify JSON 内容，与 Slate parseCode 的 processSchemaLanguage 对齐
- */
-const parseSchemaValue = (code: string): any => {
-  try {
-    return JSON.parse(code);
-  } catch {
-    try {
-      return partialParse(code || '[]');
-    } catch {
-      return null;
-    }
-  }
-};
+import { parseSchemaJson } from './utils/parseJsonBody';
 
 /**
  * Schema / Apaasify 渲染器
@@ -40,23 +16,53 @@ const parseSchemaValue = (code: string): any => {
  * - ```apassify   → 同 apaasify（兼容旧版）
  * - ```agentar-card → SchemaRenderer
  */
+/**
+ * schema / apaasify 解析后的 JSON 形态由用户决定，无法静态收敛。
+ * 此处用 `Record<string, unknown>` 表示"任意键的对象"，比 any 更安全：
+ * - 调用方读取 `initialValues` 等已知字段时仍需做存在性检查
+ * - 下游 `SchemaRenderer` 接收 `LowCodeSchema` 类型，由其内部做更严格校验
+ */
+type SchemaValue = Record<string, unknown> | unknown[] | null;
+
+/** 从 schemaValue 安全提取 `initialValues`（仅当为对象且字段存在时返回） */
+const extractInitialValues = (value: SchemaValue): Record<string, unknown> => {
+  if (
+    value &&
+    !Array.isArray(value) &&
+    typeof (value as Record<string, unknown>).initialValues === 'object' &&
+    (value as Record<string, unknown>).initialValues !== null
+  ) {
+    return (value as Record<string, unknown>).initialValues as Record<
+      string,
+      unknown
+    >;
+  }
+  return {};
+};
+
 export const SchemaBlockRenderer: React.FC<
   RendererBlockProps & {
-    apaasifyRender?: (value: any) => React.ReactNode;
+    apaasifyRender?: (value: SchemaValue) => React.ReactNode;
     editorCodeProps?: MarkdownEditorProps['codeProps'];
   }
 > = (props) => {
   const { children, language, apaasifyRender, editorCodeProps } = props;
-  const code = extractTextContent(children);
+  const code = extractBlockTextContent(children);
 
-  const schemaValue = useMemo(() => parseSchemaValue(code), [code]);
+  const schemaValue = useMemo<SchemaValue>(
+    () => parseSchemaJson(code) as SchemaValue,
+    [code],
+  );
 
   const applyCodeRender = (
     defaultDom: React.ReactNode,
-    valueForElement: any,
+    valueForElement: unknown,
   ): React.ReactNode => {
     const customRender = editorCodeProps?.render;
     if (!customRender) return defaultDom;
+    // customRender 接收 Slate-like 结构。MarkdownRenderer 不依赖 Slate，构造一个
+    // 形状兼容的对象即可；因 customRender 的 `props` 类型为 `CustomLeaf<...> & { children }`，
+    // 与此处 `element` 字段类型并不严格匹配，故在调用边界保留一次必要的类型断言。
     const slateLike = {
       attributes: {},
       children: null,
@@ -65,7 +71,7 @@ export const SchemaBlockRenderer: React.FC<
         value: valueForElement,
         language,
       },
-    } as any;
+    } as unknown as Parameters<typeof customRender>[0];
     try {
       const rendered = customRender(slateLike, defaultDom, editorCodeProps);
       if (rendered === undefined) return defaultDom;
@@ -144,8 +150,8 @@ export const SchemaBlockRenderer: React.FC<
         data-agentar-card="true"
       >
         <SchemaRenderer
-          schema={schemaValue}
-          values={schemaValue?.initialValues || {}}
+          schema={schemaValue as LowCodeSchema}
+          values={extractInitialValues(schemaValue) as Record<string, any>}
           useDefaultValues={false}
           debug={false}
           fallbackContent={null}
@@ -158,8 +164,8 @@ export const SchemaBlockRenderer: React.FC<
   const schemaDom = (
     <div data-testid="schema-renderer" style={{ padding: '0.5em' }}>
       <SchemaRenderer
-        schema={schemaValue}
-        values={schemaValue?.initialValues || {}}
+        schema={schemaValue as LowCodeSchema}
+        values={extractInitialValues(schemaValue) as Record<string, any>}
         useDefaultValues={false}
         debug={false}
         fallbackContent={null}

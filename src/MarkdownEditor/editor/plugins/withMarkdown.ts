@@ -4,6 +4,7 @@ import { withCodeTagPlugin } from './withCodeTagPlugin';
 import { withInlineNodes } from './withInlineNodes';
 import { withLinkAndMediaPlugin } from './withLinkAndMediaPlugin';
 import { withListsPlugin } from './withListsPlugin';
+import { withSanitizeInvalidChildren } from './withSanitizeInvalidChildren';
 import { withSchemaPlugin } from './withSchemaPlugin';
 import { withVoidNodes } from './withVoidNodes';
 
@@ -25,10 +26,14 @@ import { withVoidNodes } from './withVoidNodes';
  * 插件按顺序应用，每个插件都会增强编辑器的特定功能。
  */
 export const withMarkdown = (editor: Editor) => {
-  return withCodeTagPlugin(
-    withSchemaPlugin(
-      withLinkAndMediaPlugin(
-        withCardPlugin(withListsPlugin(withVoidNodes(withInlineNodes(editor)))),
+  return withSanitizeInvalidChildren(
+    withCodeTagPlugin(
+      withSchemaPlugin(
+        withLinkAndMediaPlugin(
+          withCardPlugin(
+            withListsPlugin(withVoidNodes(withInlineNodes(editor))),
+          ),
+        ),
       ),
     ),
   );

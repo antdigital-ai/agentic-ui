@@ -1,6 +1,6 @@
 import React from 'react';
-import AbstractLottie, { AbstractLottieProps } from '../Abstract';
-import copyAnimation from './lottie.json';
+import { AbstractLottieProps } from '../Abstract';
+import { createBubbleActionLottie } from '../createBubbleActionLottie';
 
 export type CopyLottieProps = Omit<AbstractLottieProps, 'animationData'>;
 
@@ -43,8 +43,9 @@ export type CopyLottieProps = Omit<AbstractLottieProps, 'animationData'>;
  * @param props.size - 动画尺寸（宽度和高度），默认为 '1em'
  * @returns 渲染的复制操作动画组件
  */
-export const CopyLottie: React.FC<CopyLottieProps> = (props) => (
-  <AbstractLottie {...props} animationData={copyAnimation} />
-);
+export const CopyLottie: React.FC<CopyLottieProps> = createBubbleActionLottie({
+  loadJson: () => import('./lottie.json'),
+  displayName: 'CopyLottie',
+});
 
 export default CopyLottie;

@@ -1,11 +1,10 @@
 import {
-  ChatTokenType,
-  GenerateStyle,
+  genStyleHooks,
   resetComponent,
-  useEditorStyleRegister,
+  type GenStyleFn,
 } from '../../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'AttachmentFileList'> = (token) => {
   return {
     [`${token.componentCls}`]: {
       maxWidth: '100%',
@@ -37,7 +36,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           height: 'var(--padding-1x)',
         },
         '&::-webkit-scrollbar-thumb': {
-          background: 'var(--color-gray-border-default, var(--color-gray-border-light))',
+          background:
+            'var(--color-gray-border-default, var(--color-gray-border-light))',
           borderRadius: 'var(--radius-base, var(--radius-control-xs, 4px))',
         },
         '&::-webkit-scrollbar-track': {
@@ -109,8 +109,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             border: 'none',
             overflow: 'hidden',
             img: {
-              maxWidth: '100%',
-              maxHeight: '100%',
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
               borderRadius: 'inherit',
               transition: 'transform 0.3s',
             },
@@ -163,10 +164,18 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           display: 'flex',
           alignItems: 'center',
           gap: 4,
+          minWidth: 0,
+          maxWidth: '100%',
+          overflow: 'hidden',
+          whiteSpace: 'nowrap',
+          textOverflow: 'ellipsis',
           '&-error': {
             color: 'var(--color-red-a10)',
+            minWidth: 0,
             maxWidth: '100%',
-            overflow: 'auto',
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
           },
           '&-item:not(:last-child)': {
             lineHeight: '9px',
@@ -219,22 +228,62 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         },
       },
       '&-item-meta-placeholder': {
-        background: 'var(--color-fill-quaternary, rgba(0,0,0,0.04))',
+        background: 'var(--color-gray-bg-card-light) !important',
         [`${token.componentCls}-item-file-name-text`]: {
-          color: 'var(--color-text-tertiary, rgba(0,0,0,0.45))',
+          color:
+            'var(--color-gray-text-light, rgba(80, 94, 119, 0.53)) !important',
         },
         [`${token.componentCls}-item-file-size`]: {
-          color: 'var(--color-text-tertiary, rgba(0,0,0,0.45))',
+          color:
+            'var(--color-gray-text-light, rgba(80, 94, 119, 0.53)) !important',
         },
       },
     },
     [`${token.componentCls}-container`]: {
       position: 'relative',
       background: 'var(--color-gray-bg-page)',
-      borderBottom: '1px solid rgba(0, 16, 64, 0.0627)',
       '&-empty': {
         border: 'none',
       },
+    },
+
+    // 列表整体入场淡入（替代 framer-motion variants opacity 动画）
+    // 原 framer-motion 父级 `staggerChildren: 0.1` 通过子项的 inline
+    // `--attachment-item-delay` 等价实现，行为完全保留。
+    [`${token.componentCls}-motion-fade-in`]: {
+      animationName: `${token.componentCls}-attachmentFadeIn`,
+      animationDuration: '0.3s',
+      animationTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      animationFillMode: 'both',
+    },
+    // 单个文件项的入场/退出动画，由父组件通过 data-state="enter"|"exit" 切换。
+    // 等价于 framer-motion 的 variants={hidden:{y:20,opacity:0}, visible:{y:0,opacity:1}, exit:{y:-20,opacity:0}}。
+    // 退出动画通过父组件维护"正在退出"的影子状态 + setTimeout 延迟卸载实现，
+    // 等价于 AnimatePresence 的退出延时卸载。
+    [`${token.componentCls}-item-motion`]: {
+      animationDuration: '0.25s',
+      animationTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      animationFillMode: 'both',
+      '&[data-state="enter"]': {
+        animationName: `${token.componentCls}-attachmentItemSlideInUp`,
+        animationDelay: 'var(--attachment-item-delay, 0s)',
+      },
+      '&[data-state="exit"]': {
+        animationName: `${token.componentCls}-attachmentItemSlideOutUp`,
+        pointerEvents: 'none',
+      },
+    },
+    [`@keyframes ${token.componentCls}-attachmentFadeIn`]: {
+      from: { opacity: 0 },
+      to: { opacity: 1 },
+    },
+    [`@keyframes ${token.componentCls}-attachmentItemSlideInUp`]: {
+      from: { transform: 'translateY(20px)', opacity: 0 },
+      to: { transform: 'translateY(0)', opacity: 1 },
+    },
+    [`@keyframes ${token.componentCls}-attachmentItemSlideOutUp`]: {
+      from: { transform: 'translateY(0)', opacity: 1 },
+      to: { transform: 'translateY(-20px)', opacity: 0 },
     },
   };
 };
@@ -243,13 +292,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * @param prefixCls
  * @returns
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('md-editor-attachment-file-list', (token) => {
-    const proChatToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('AttachmentFileList', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+]);
 
-    return [resetComponent(proChatToken), genStyle(proChatToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [, hashId] = useGenStyle(prefixCls ?? 'md-editor-attachment-file-list');
+  return { hashId };
 }

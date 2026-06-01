@@ -1,1 +1,1 @@
-﻿declare module 'quicklink';
+declare module 'quicklink';

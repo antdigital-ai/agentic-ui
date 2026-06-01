@@ -35,7 +35,10 @@ export const extractFootnoteRefFromSupChildren = (
   if (childArray.length !== 1) return undefined;
   const only = childArray[0];
   if (!React.isValidElement(only)) return undefined;
-  const el = only as React.ReactElement<{ href?: string; children?: React.ReactNode }>;
+  const el = only as React.ReactElement<{
+    href?: string;
+    children?: React.ReactNode;
+  }>;
   if (typeof el.type !== 'string' || el.type !== 'a') return undefined;
   const href = el.props?.href;
   const labelText = extractSingleChildText(el.props?.children);

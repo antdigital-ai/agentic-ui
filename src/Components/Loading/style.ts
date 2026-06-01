@@ -1,9 +1,5 @@
 import { Keyframes } from '@ant-design/cssinjs';
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
 const beforeAnimation = new Keyframes('beforeAnimation', {
   '0%, 100%': { transform: 'translate(0, 0)' },
@@ -19,7 +15,7 @@ const afterAnimation = new Keyframes('afterAnimation', {
   '75%': { transform: 'translate(-15%, -10%)' },
 });
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'Loading'> = (token) => {
   return {
     [token.componentCls]: {
       position: 'relative',
@@ -48,7 +44,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       position: 'relative',
 
       [`&${token.componentCls}-spinning`]: {
-        background: 'var(--color-primary-bg-page, #f5f9ff)',
+        background: 'var(--color-primary-bg-page)',
         borderRadius: 'var(--radius-card-lg, 22px)',
         overflow: 'hidden',
 
@@ -66,7 +62,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           top: '-30%',
           left: '-40%',
           background:
-            'radial-gradient(ellipse 70% 60% at 50% 50%, var(--color-sub2-2, #f0fbfe) 0%, transparent 70%)',
+            'radial-gradient(ellipse 70% 60% at 50% 50%, var(--color-sub2-2) 0%, transparent 70%)',
           animationName: beforeAnimation,
           animationDuration: '6s',
           animationTimingFunction: 'ease-in-out',
@@ -79,7 +75,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           top: '-30%',
           right: '-40%',
           background:
-            'radial-gradient(ellipse 70% 60% at 50% 50%, var(--color-sub1-2, #f1f0ff) 0%, transparent 60%)',
+            'radial-gradient(ellipse 70% 60% at 50% 50%, var(--color-sub1-2) 0%, transparent 60%)',
           filter: 'blur(60px)',
           animationName: afterAnimation,
           animationDuration: '7s',
@@ -101,18 +97,36 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           height: '100%',
         },
       },
+
+      // Dark theme
+      '&-dark': {
+        [`&${token.componentCls}-spinning`]: {
+          background: 'var(--color-gray-bg-page-dark)',
+
+          '&::before': {
+            background:
+              'radial-gradient(ellipse 70% 60% at 50% 50%, rgba(22, 96, 255, 0.15) 0%, transparent 70%)',
+          },
+
+          '&::after': {
+            background:
+              'radial-gradient(ellipse 70% 60% at 50% 50%, rgba(135, 87, 255, 0.15) 0%, transparent 60%)',
+          },
+        },
+
+        [`${token.componentCls}-tip`]: {
+          color: 'var(--color-gray-text-light)',
+        },
+      },
     },
   };
 };
 
 export const prefixCls = 'loading';
 
+const useGenStyle = genStyleHooks('Loading', genStyle);
+
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('loading', (token) => {
-    const badgeToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [genStyle(badgeToken)];
-  });
+  const [, hashId] = useGenStyle(prefixCls ?? 'loading');
+  return { hashId };
 }

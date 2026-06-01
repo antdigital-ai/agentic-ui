@@ -52,10 +52,6 @@ export default function SchemaEditorDemo() {
     console.log('Values变更:', newValues);
   };
 
-  const handleError = (error: Error) => {
-    console.error('SchemaEditor错误:', error);
-  };
-
   // 预设的示例schema
   const examples = [
     {
@@ -206,7 +202,6 @@ export default function SchemaEditorDemo() {
         initialValues={values}
         height={700}
         onChange={handleChange}
-        onError={handleError}
         showPreview={true}
         previewConfig={{
           ALLOWED_TAGS: [

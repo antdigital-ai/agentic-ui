@@ -1,4 +1,4 @@
-﻿# agentic-ui - LLMs Semantic Map
+# agentic-ui - LLMs Semantic Map
 
 - 本文件以 Ant Design 的组织方式为参考，整理当前项目的语义与导航，方便 LLM/协作成员理解与检索。
  - 官网：https://agentic.antdigital.ai/

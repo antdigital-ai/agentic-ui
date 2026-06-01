@@ -17,11 +17,31 @@ import {
 
 const STATUS_CONFIG: Record<
   string,
-  { color: string; badgeStatus: 'success' | 'processing' | 'error'; label: string; icon: React.ReactNode }
+  {
+    color: string;
+    badgeStatus: 'success' | 'processing' | 'error';
+    label: string;
+    icon: React.ReactNode;
+  }
 > = {
-  success: { color: 'green', badgeStatus: 'success', label: '已完成', icon: <CheckCircleOutlined /> },
-  in_progress: { color: 'blue', badgeStatus: 'processing', label: '进行中', icon: <ClockCircleOutlined /> },
-  default: { color: 'orange', badgeStatus: 'error', label: '待处理', icon: <ExclamationCircleOutlined /> },
+  success: {
+    color: 'green',
+    badgeStatus: 'success',
+    label: '已完成',
+    icon: <CheckCircleOutlined />,
+  },
+  in_progress: {
+    color: 'blue',
+    badgeStatus: 'processing',
+    label: '进行中',
+    icon: <ClockCircleOutlined />,
+  },
+  default: {
+    color: 'orange',
+    badgeStatus: 'error',
+    label: '待处理',
+    icon: <ExclamationCircleOutlined />,
+  },
 };
 
 const getStatusConfig = (status?: string) =>
@@ -53,11 +73,10 @@ titleRender 允许你完全自定义消息气泡的标题区域，可以：
       },
     },
   ),
-  createUserMessage(
-    '2',
-    '请帮我优化这段代码的性能，有什么建议吗？',
-    { createAt: Date.now() - 60000, updateAt: Date.now() - 60000 },
-  ),
+  createUserMessage('2', '请帮我优化这段代码的性能，有什么建议吗？', {
+    createAt: Date.now() - 60000,
+    updateAt: Date.now() - 60000,
+  }),
   createAssistantMessage(
     '3',
     `## 代码优化建议
@@ -94,20 +113,30 @@ const handleClick = useCallback(() => {
 
 type TitleStyle = 'default' | 'status' | 'priority' | 'enhanced';
 
-const TITLE_STYLE_LABELS: Record<TitleStyle, { label: string; desc: string }> = {
-  default: { label: '默认样式', desc: '使用默认标题渲染' },
-  status: { label: '状态标签', desc: '显示状态标签（成功、进行中、错误）' },
-  priority: { label: '优先级标签', desc: '显示优先级标签和自定义标签' },
-  enhanced: { label: '增强样式', desc: '显示完整信息（状态、耗时、置信度、时间）' },
-};
+const TITLE_STYLE_LABELS: Record<TitleStyle, { label: string; desc: string }> =
+  {
+    default: { label: '默认样式', desc: '使用默认标题渲染' },
+    status: { label: '状态标签', desc: '显示状态标签（成功、进行中、错误）' },
+    priority: { label: '优先级标签', desc: '显示优先级标签和自定义标签' },
+    enhanced: {
+      label: '增强样式',
+      desc: '显示完整信息（状态、耗时、置信度、时间）',
+    },
+  };
 
 export default () => {
   const bubbleRef = useRef<any>();
   const [titleStyle, setTitleStyle] = useState<TitleStyle>('default');
 
-  const defaultTitleRender = (_props: BubbleProps, defaultDom: React.ReactNode) => defaultDom;
+  const defaultTitleRender = (
+    _props: BubbleProps,
+    defaultDom: React.ReactNode,
+  ) => defaultDom;
 
-  const statusTitleRender = (props: BubbleProps, defaultDom: React.ReactNode) => {
+  const statusTitleRender = (
+    props: BubbleProps,
+    defaultDom: React.ReactNode,
+  ) => {
     const { originData } = props;
     const isAssistant = originData?.role === 'assistant';
 
@@ -117,15 +146,23 @@ export default () => {
           {isAssistant ? <RobotOutlined /> : <UserOutlined />}
         </span>
         <span style={{ flex: 1 }}>{defaultDom}</span>
-        {originData?.extra?.status && (() => {
-          const cfg = getStatusConfig(originData.extra.status);
-          return <Tag color={cfg.color} icon={cfg.icon}>{cfg.label}</Tag>;
-        })()}
+        {originData?.extra?.status &&
+          (() => {
+            const cfg = getStatusConfig(originData.extra.status);
+            return (
+              <Tag color={cfg.color} icon={cfg.icon}>
+                {cfg.label}
+              </Tag>
+            );
+          })()}
       </div>
     );
   };
 
-  const priorityTitleRender = (props: BubbleProps, defaultDom: React.ReactNode) => {
+  const priorityTitleRender = (
+    props: BubbleProps,
+    defaultDom: React.ReactNode,
+  ) => {
     const { originData } = props;
     const isAssistant = originData?.role === 'assistant';
 
@@ -141,19 +178,33 @@ export default () => {
           </Tag>
         )}
         {originData?.extra?.customTags?.map((tag: string) => (
-          <Tag key={tag} color="blue" style={{ fontSize: 12 }}>{tag}</Tag>
+          <Tag key={tag} color="blue" style={{ fontSize: 12 }}>
+            {tag}
+          </Tag>
         ))}
       </div>
     );
   };
 
-  const enhancedTitleRender = (props: BubbleProps, defaultDom: React.ReactNode) => {
+  const enhancedTitleRender = (
+    props: BubbleProps,
+    defaultDom: React.ReactNode,
+  ) => {
     const { originData } = props;
     const isAssistant = originData?.role === 'assistant';
-    const timeStr = new Date(originData?.createAt || Date.now()).toLocaleTimeString();
+    const timeStr = new Date(
+      originData?.createAt || Date.now(),
+    ).toLocaleTimeString();
 
     return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          flexWrap: 'wrap',
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <Avatar
             size="small"
@@ -164,10 +215,15 @@ export default () => {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           {originData?.extra?.status && (
-            <Badge status={getStatusConfig(originData.extra.status).badgeStatus} text={originData.extra.status} />
+            <Badge
+              status={getStatusConfig(originData.extra.status).badgeStatus}
+              text={originData.extra.status}
+            />
           )}
           {originData?.extra?.duration && (
-            <span style={{ fontSize: 12, color: '#666' }}>⏱️ {originData.extra.duration}ms</span>
+            <span style={{ fontSize: 12, color: '#666' }}>
+              ⏱️ {originData.extra.duration}ms
+            </span>
           )}
           {originData?.extra?.confidence && (
             <span style={{ fontSize: 12, color: '#666' }}>
@@ -180,7 +236,10 @@ export default () => {
     );
   };
 
-  const titleRenders: Record<TitleStyle, (props: BubbleProps, dom: React.ReactNode) => React.ReactNode> = {
+  const titleRenders: Record<
+    TitleStyle,
+    (props: BubbleProps, dom: React.ReactNode) => React.ReactNode
+  > = {
     default: defaultTitleRender,
     status: statusTitleRender,
     priority: priorityTitleRender,
@@ -205,8 +264,17 @@ export default () => {
             ))}
           </Space>
         </div>
-        <div style={{ padding: 12, background: '#f8f9fa', borderRadius: 6, fontSize: 14, color: '#666' }}>
-          <strong>当前样式：</strong>{TITLE_STYLE_LABELS[titleStyle].desc}
+        <div
+          style={{
+            padding: 12,
+            background: '#f8f9fa',
+            borderRadius: 6,
+            fontSize: 14,
+            color: '#666',
+          }}
+        >
+          <strong>当前样式：</strong>
+          {TITLE_STYLE_LABELS[titleStyle].desc}
         </div>
       </div>
 

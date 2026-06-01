@@ -3,10 +3,12 @@ import classNames from 'clsx';
 import React, {
   isValidElement,
   memo,
-  useCallback,
   useContext,
+  useEffect,
+  useRef,
   useState,
 } from 'react';
+import { useRefFunction } from '../Hooks/useRefFunction';
 import { CloseIcon } from './components/CloseIcon';
 import { ErrorIcon } from './components/ErrorIcon';
 import { InfoIcon } from './components/InfoIcon';
@@ -14,6 +16,23 @@ import { LoaderIcon } from './components/LoaderIcon';
 import { SuccessIcon } from './components/SuccessIcon';
 import { WarningIcon } from './components/WarningIcon';
 import { useStyle } from './style';
+
+/**
+ * AnswerAlert 所有可选 type 值的列表（运行时可枚举）。
+ *
+ * 使用 `as const` 元组而非 `enum`，与项目 TypeScript 规范一致：
+ * 类型 {@link AnswerAlertType} 由该数组派生，新增 type 只需在此一处维护。
+ */
+export const ANSWER_ALERT_TYPES = [
+  'success',
+  'error',
+  'warning',
+  'info',
+  'gray',
+] as const;
+
+/** AnswerAlert 类型联合，由 {@link ANSWER_ALERT_TYPES} 派生 */
+export type AnswerAlertType = (typeof ANSWER_ALERT_TYPES)[number];
 
 /**
  * AnswerAlert 组件的属性接口
@@ -31,13 +50,22 @@ export interface AnswerAlertProps {
   /** 是否显示辅助图标 */
   showIcon?: boolean;
   /** 指定指示器的样式 */
-  type?: 'success' | 'error' | 'warning' | 'info' | 'gray';
+  type?: AnswerAlertType;
   /** 自定义操作项 */
   action?: React.ReactNode;
   /** 可关闭配置 */
   closable?: boolean;
   /** 关闭时触发的回调函数 */
   onClose?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  /**
+   * 是否启用进入 / 关闭动画。
+   * - `true`（默认）：mount 时 fade-in + 轻微下滑；点击关闭时 fade-out + 高度收起，动画结束才真正卸载
+   * - `false`：禁用所有动画，立即 mount / unmount，对 SSR、性能敏感场景或测试更友好
+   *
+   * 当用户系统开启「减少动态效果」（`prefers-reduced-motion: reduce`）时，
+   * 即使 `motion = true`，CSS 层面也会自动退化为无动画，无需手动处理。
+   */
+  motion?: boolean;
 }
 
 const iconMapFilled = {
@@ -48,12 +76,28 @@ const iconMapFilled = {
   gray: LoaderIcon,
 };
 
+/**
+ * 类型对应的 ARIA role：
+ * - `error` / `warning` 使用 `alert`（高优先级，立即打断屏幕阅读器）
+ * - 其余使用 `status`（低优先级，礼貌播报）
+ *
+ * 无 `type` 时返回 undefined，由调用方决定是否落 role。
+ */
+function getAriaRole(type?: AnswerAlertType): 'alert' | 'status' | undefined {
+  if (!type) return undefined;
+  if (type === 'error' || type === 'warning') return 'alert';
+  return 'status';
+}
+
 interface IconNodeProps {
   type: AnswerAlertProps['type'];
   icon: AnswerAlertProps['icon'];
   prefixCls: string;
   hashId: string;
 }
+
+/** 自定义 icon 元素允许携带的最小 props 集合（仅约束 className） */
+type IconElementProps = { className?: string };
 
 const IconNode: React.FC<IconNodeProps> = memo((props) => {
   const { icon, prefixCls, type, hashId } = props;
@@ -66,8 +110,14 @@ const IconNode: React.FC<IconNodeProps> = memo((props) => {
         <span className={classNames(`${prefixCls}-icon`, hashId)}>{icon}</span>
       );
     }
-    return React.cloneElement(icon as React.ReactElement<any>, {
-      className: classNames(`${prefixCls}-icon`, hashId, icon.props.className),
+    // 只读取 className，避免 `as any` 丢失类型
+    const iconElement = icon as React.ReactElement<IconElementProps>;
+    return React.cloneElement(iconElement, {
+      className: classNames(
+        `${prefixCls}-icon`,
+        hashId,
+        iconElement.props.className,
+      ),
     });
   }
 
@@ -136,21 +186,64 @@ const AnswerAlertComponent: React.FC<AnswerAlertProps> = ({
   action,
   closable,
   onClose,
+  motion = true,
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('answer-alert');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
+  // 关闭流程为两阶段，避免动画被截断：
+  // - `closing`：用户已点击关闭，正在播放退出动画，DOM 仍在
+  // - `closed`：动画结束（或 motion=false 时立即），节点真正从树上移除
+  const [closing, setClosing] = useState(false);
   const [closed, setClosed] = useState(false);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
   // 使用 useCallback 优化关闭处理函数
-  const handleClose = useCallback(
+  const handleClose = useRefFunction(
     (e: React.MouseEvent<HTMLButtonElement>) => {
-      setClosed(true);
+      // 已经在退出流程中，忽略后续点击，确保 onClose 只触发一次
+      if (closing || closed) return;
       onClose?.(e);
+      if (motion) {
+        // 进入退出动画阶段，等 animationend / transitionend 后再 unmount
+        setClosing(true);
+      } else {
+        setClosed(true);
+      }
     },
-    [onClose],
   );
+
+  // 监听退出动画结束 → 真正卸载
+  // 用 animationend + transitionend 双重兜底（不同浏览器对 keyframes / transition 触发差异）
+  useEffect(() => {
+    if (!closing) return;
+    const node = containerRef.current;
+    if (!node) {
+      // 极端兜底：拿不到节点就直接 unmount，避免卡在 closing 态
+      setClosed(true);
+      return;
+    }
+
+    const finish = (e: AnimationEvent | TransitionEvent) => {
+      // 仅响应容器自身的动画/过渡，避免子元素冒泡误触发
+      if (e.target !== node) return;
+      setClosed(true);
+    };
+
+    node.addEventListener('animationend', finish);
+    node.addEventListener('transitionend', finish);
+
+    // 兜底超时：动画意外被打断（如父级 display:none）也能正常卸载
+    const fallback = window.setTimeout(() => setClosed(true), 400);
+
+    return () => {
+      node.removeEventListener('animationend', finish);
+      node.removeEventListener('transitionend', finish);
+      window.clearTimeout(fallback);
+    };
+  }, [closing]);
 
   // 使用提前返回优化
   if (closed) {
@@ -163,12 +256,23 @@ const AnswerAlertComponent: React.FC<AnswerAlertProps> = ({
     {
       [`${prefixCls}-${type}`]: !!type,
       [`${prefixCls}-with-description`]: !!description,
+      [`${prefixCls}-motion`]: motion,
+      [`${prefixCls}-closing`]: closing,
     },
     hashId,
   );
 
-  return wrapSSR(
-    <div className={alertCls} style={style}>
+  return (
+    <div
+      ref={containerRef}
+      className={alertCls}
+      data-testid={prefixCls}
+      style={style}
+      role={getAriaRole(type)}
+      aria-live={
+        type === 'error' || type === 'warning' ? 'assertive' : 'polite'
+      }
+    >
       <div className={classNames(`${prefixCls}-content`, hashId)}>
         {showIcon ? (
           <IconNode
@@ -191,16 +295,19 @@ const AnswerAlertComponent: React.FC<AnswerAlertProps> = ({
             type="button"
             className={classNames(`${prefixCls}-close-icon`, hashId)}
             tabIndex={0}
+            aria-label="Close"
             onClick={handleClose}
           >
             <CloseIcon />
           </button>
         )}
       </div>
-      <div className={classNames(`${prefixCls}-description`, hashId)}>
-        {description}
-      </div>
-    </div>,
+      {description ? (
+        <div className={classNames(`${prefixCls}-description`, hashId)}>
+          {description}
+        </div>
+      ) : null}
+    </div>
   );
 };
 
@@ -208,3 +315,7 @@ AnswerAlertComponent.displayName = 'AnswerAlert';
 
 // 使用 React.memo 优化性能，避免不必要的重新渲染
 export const AnswerAlert = memo(AnswerAlertComponent);
+
+// memo 包装会丢失内部组件 displayName，显式补回，便于 DevTools / 测试 snapshot 识别
+(AnswerAlert as unknown as { displayName?: string }).displayName =
+  'AnswerAlert';

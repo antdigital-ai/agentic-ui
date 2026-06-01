@@ -2,8 +2,8 @@
  * title: 多系列箱线图
  * description: 支持多系列分组显示，便于对比不同组别的数据分布
  */
-import React from 'react';
 import { BoxPlotChart } from '@ant-design/agentic-ui';
+import React from 'react';
 
 export default () => {
   const data = [

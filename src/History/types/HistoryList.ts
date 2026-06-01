@@ -1,3 +1,4 @@
+import { FormatTimeLocale } from '../utils';
 import { HistoryDataType } from './HistoryData';
 
 /**
@@ -60,4 +61,9 @@ export interface HistoryListConfig {
   runningId?: string[];
   /** 自定义操作区域 */
   customOperationExtra?: React.ReactNode;
+  /**
+   * 用于覆盖默认 formatTime 输出（"今日/昨日/一周内"）的 i18n 文案。
+   * 一般由外层 History 组件从 I18nContext 组装后传入，generateHistoryItems 自身不读 React Context。
+   */
+  formatTimeLocale?: FormatTimeLocale;
 }

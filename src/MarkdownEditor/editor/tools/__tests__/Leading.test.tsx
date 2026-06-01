@@ -154,9 +154,9 @@ describe('TocHeading Component', () => {
     );
     const anchor = container.querySelector('.ant-anchor');
     expect(anchor).toBeDefined();
-    expect(
-      container.querySelectorAll('.ant-anchor-link-title'),
-    ).toHaveLength(10);
+    expect(container.querySelectorAll('.ant-anchor-link-title')).toHaveLength(
+      10,
+    );
   });
 });
 

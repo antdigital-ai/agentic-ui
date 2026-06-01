@@ -1,71 +1,67 @@
-﻿import { useEffect } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 
-const EVENT = 'mousedown';
+/** 触发外部点击判定的事件名（同时覆盖鼠标 + 触屏，避免移动端不响应） */
+const MOUSE_EVENT = 'mousedown';
+const TOUCH_EVENT = 'touchstart';
+
+/** 外部点击事件的联合类型，兼容鼠标与触屏 */
+export type ClickAwayEvent = MouseEvent | TouchEvent;
+/** 外部点击回调签名 */
+export type ClickAwayCallback = (event: ClickAwayEvent) => void;
 
 /**
- * useClickAway Hook - 点击外部区域检测 Hook
+ * useClickAway Hook - 点击/触屏外部区域检测 Hook
  *
- * 该 Hook 用于检测用户是否点击了指定元素外部的区域，常用于实现下拉菜单、
- * 弹出层等组件的自动关闭功能。
+ * 检测用户是否点击/触摸了指定元素**外部**的区域，常用于下拉菜单、弹出层等的自动关闭。
  *
- * @description 点击外部区域检测 Hook，用于实现组件外部点击关闭功能
- * @param {Function} callback - 点击外部区域时的回调函数
- * @param {React.RefObject<HTMLDivElement>} ref - 被监听的元素引用
+ * @description 监听 `mousedown` + `touchstart` 全局事件，命中外部时触发回调
+ * @param callback - 点击外部区域时的回调函数
+ * @param ref - 被监听的元素引用
  *
  * @example
  * ```tsx
  * const ref = useRef<HTMLDivElement>(null);
- *
- * useClickAway(() => {
- *   console.log('点击了外部区域');
- *   setOpen(false);
- * }, ref);
- *
- * return (
- *   <div ref={ref}>
- *     <button onClick={() => setOpen(true)}>打开菜单</button>
- *     {open && <div>菜单内容</div>}
- *   </div>
- * );
+ * useClickAway((e) => setOpen(false), ref);
+ * return <div ref={ref}>...</div>;
  * ```
  *
  * @remarks
- * - 自动监听全局 mousedown 事件
- * - 智能判断点击目标是否在指定元素内部
- * - 支持父节点包含检测
+ * - 同时监听 `mousedown` + `touchstart`，移动端 / 桌面端均可工作
+ * - 通过 `ref.current.contains` 判断点击目标是否在容器内部；切勿用 `parentNode.contains`，
+ *   否则点击同级兄弟节点会被误判为内部，导致"点外面关闭"的关闭逻辑失效
+ * - callback 通过 ref 持有最新引用，listener 不会因 callback 引用变化而频繁重绑
  * - 组件卸载时自动清理事件监听
- * - 适用于下拉菜单、弹出层等场景
  */
 export const useClickAway = (
-  callback: any,
-  ref: React.RefObject<HTMLDivElement>,
+  callback: ClickAwayCallback,
+  ref: React.RefObject<HTMLElement | null>,
 ) => {
+  // 用 ref 持有最新 callback，避免 listener 因 callback 引用变化频繁解绑/重绑
+  // useLayoutEffect 在 commit 阶段同步写，确保事件触发时拿到的一定是最新版本
+  const callbackRef = useRef(callback);
+  useLayoutEffect(() => {
+    callbackRef.current = callback;
+  });
+
   useEffect(() => {
-    /**
-     * 鼠标点击事件的监听函数
-     *
-     * @param event - 鼠标点击事件对象
-     */
-    const listener = (event: { target: any }) => {
-      // 如果ref为null或ref.current为null，或者ref.current包含事件目标元素，则不做任何操作
-      if (
-        !ref ||
-        !ref.current ||
-        ref.current.contains(event.target) ||
-        ref.current.parentNode?.contains(event.target)
-      ) {
+    const listener = (event: ClickAwayEvent) => {
+      const target = event.target as Node | null;
+      // 仅当点击目标在 ref 容器内部时跳过
+      if (!ref?.current || !target || ref.current.contains(target)) {
         return;
       }
-      // 执行回调函数，并传递事件对象
-      callback(event);
+      callbackRef.current(event);
     };
-    // 监听全局鼠标点击事件，并执行listener函数
-    document.addEventListener(EVENT, listener);
-    // 在组件卸载时，移除鼠标点击事件监听
+
+    // passive: true 表明不会调用 preventDefault，让浏览器走快速滚动通道
+    document.addEventListener(MOUSE_EVENT, listener);
+    document.addEventListener(TOUCH_EVENT, listener, { passive: true });
     return () => {
-      document.removeEventListener(EVENT, listener);
+      document.removeEventListener(MOUSE_EVENT, listener);
+      document.removeEventListener(TOUCH_EVENT, listener);
     };
-  }, [ref, callback]);
+    // 仅依赖 ref，callback 通过 ref 持有，避免 listener 反复重绑
+  }, [ref]);
 };
 
 export default useClickAway;

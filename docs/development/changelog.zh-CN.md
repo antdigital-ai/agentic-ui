@@ -9,9 +9,272 @@ group:
 
 # Changelog
 
+## v2.32.31
+
+- MarkdownRenderer
+  - 🛠 移除全部流式动画与字符队列（段落淡入、分帧渐进淡入、`CharacterQueue` 打字机及 `AnimationText`），流式内容改为经 `useStreaming` 缓存后即时渲染；删除 `queueOptions`、`streamingParagraphAnimation`、`isFinished` 等已无作用的 API 与导出。
+  - 🆕 新增 `ContentThrottle` + `useContentThrottle`，将一次性到达的大段 SSE 文本按帧顺序推进展示，缓解整页突变；`isFinished` / `throttleOptions` 透出至 `MarkdownPreview` 与 `ReadonlyMarkdownEditorView`。
+- TaskList
+  - 💄 simple 变体 wrapper 使用 `fit-content` 避免撑满整行。
+- ToolUseBar
+  - 💄 工具容器改用 `grid 0fr/1fr` 过渡替代 `max-height`，并注册 `--tool-rotate` 自定义属性以稳定旋转动画。
+- Workspace
+  - 🆕 `FileTree`：仅预览模式下支持合成树叶子节点绑定。
+- 🛠 样式系统
+  - 🛠 移除 `useGenStyle` 返回的废弃 `wrapSSR` 包装函数，`useStyle` 不再返回 `wrapSSR`。
+  - 🛠 全量移除 70+ 组件中的 `wrapSSR(...)` 包裹调用，组件直接返回 JSX。
+
+## 未发布
+
+- TaskList
+  - 🛠 `simple` 模式移除摘要条下方 2px 细线进度条；`showProgress` 现仅控制摘要内「已完成/总数」计数文本是否展示。
+  - 🆕 新增 `scrollIntoViewOnExpand` 属性（`boolean | ScrollIntoViewOptions`，默认 `false`）：`simple` 模式下展开摘要条时将组件滚动到视窗内；传 `true` 走默认 `{ behavior: 'smooth', block: 'nearest' }`，初次挂载不触发。
+
+- ToolUseBarThink
+  - 💄 移除底部 `content-expand`（展开/收起）按钮的默认背景与 hover 背景填充，仅保留文字颜色变化；hover 整个卡片时不再叠加另一层灰色，与根容器背景统一为单一灰。
+  - 🆕 新增 `scrollIntoViewOnExpand` 属性（`boolean | ScrollIntoViewOptions`，默认 `false`）：展开时将组件滚动到视窗内，初次挂载不触发；行为与 `TaskList` 一致。
+  - 🆕 `MarkdownEditor.codeProps` 新增 `scrollDeepThinkIntoViewOnExpand`，透传至深度思考块的 `ToolUseBarThink.scrollIntoViewOnExpand`，使编辑器内 ` ```think ` 代码块也能配置展开滚动。
+
+- 🛠 样式系统
+  - 🛠 `Hooks/useStyle` 重写为基于 `@ant-design/cssinjs-utils` 的 `genStyleUtils`，与 antd 上游 `theme/util/genStyleUtils` 同源；新增导出 `genStyleHooks` / `genComponentStyleHook` / `genSubStyleComponent` 及类型 `AgenticComponentTokenMap` / `FullToken` / `GenStyleFn`，组件可通过模块声明扩展自己的 `ComponentToken`。
+  - 🛠 全量迁移 70+ 组件的 `style.ts` 至 `genStyleHooks('ComponentName', genStyle)` 模式（`AILabel` / `TaskList` / `ToolUseBar` / `Workspace` / `Plugins/chart/*` / `MarkdownEditor` 主样式 等）；`useEditorStyleRegister` 作为兼容入口保留，少数动态 token / 动态 classNames 场景（`Bubble` 主样式、`MarkdownInputField` 主样式、`MarkdownEditor/editor` content 样式）继续走该入口，其内部已改由 `@ant-design/cssinjs` 的 `useStyleRegister` 直接驱动。
+  - 🛠 移除对 `@ant-design/theme-token` `createStyleRegister` 的依赖；组件库统一保持 `hashId=''`，避免与宿主 antd 主题哈希叠加导致选择器失效。
+  - ⚡️ `useStyle` 返回的 `wrapSSR` 改为 identity 函数：样式注入由 cssinjs `useGlobalCache` → `updateCSS` 副作用完成，与 `wrapSSR` 无关；浏览器 CSR 下 `wrapSSR(node)` 此前一直等于 `<><Empty/>{node}</>`，组件库也未使用 `<StyleProvider ssrInline>`，因此该层 Fragment + `<Empty/>` 元素纯属无用开销。改造后每个组件每次渲染少一层 React 元素分配；组件文件继续 `return wrapSSR(<jsx/>)` 仍兼容（identity 透传），新组件可以直接 `return <jsx/>`。
+
+- Workspace
+  - 💄 `FileTree`：文件夹与叶子节点名称通过 CSS 单行省略，悬停 `title` 展示完整名称。
+  - 🆕 新增 `defaultActiveTabKey`：非受控模式下指定初始激活的标签 key。
+  - 🆕 新增 `notifyOnInvalidActiveTabKey`（默认 `true`）：受控且 `activeTabKey` 不在当前标签列表时，是否通过 `onTabChange` 回传有效 key；设为 `false` 时仅界面回退、不触发回调。
+  - 🆕 新增 `preserveFilePreviewOnTabChange`（默认 `false`）：为 `true` 时离开文件类标签再返回可保留 `Workspace.File` / `Workspace.FileTree` 的预览态。
+  - 🆕 新增 `emptyContent`：无任何有效子面板时的占位内容（未传仍渲染 `null`）。
+  - 🆕 子组件 `BaseChildProps.panelType` 可显式声明面板类型；包入口导出 `markWorkspacePanel`、`WORKSPACE_PANEL_TYPE`，内置 `Workspace.*` 子组件带面板标记，支持识别 `React.memo(Workspace.File)` 及沿 `type` 链解析的 `forwardRef` / `memo` 包裹。
+  - 🛠 切换标签时仅在**离开** `file` / `fileTree` 面板，或在两个文件类 Tab 之间切换时递增 `resetKey` 重置预览；切换到非文件类 Tab 不再对隐藏中的文件面板无意义递增。
+  - 💄 `Workspace.File` 的 `fileTreeSwitch` 分段控件：平铺 `BarsOutlined`、文件树 `ApartmentOutlined`；`Workspace` 默认「文件」「文件树」Tab 图标与上述语义对齐（`@ant-design/icons`）。
+  - 📖 `workspace.md` 补充 `Workspace` 新属性表、子面板识别（`panelType` / `markWorkspacePanel`）、受控标签与预览行为、最佳实践。
+  - ✅ 补充 `Workspace` 与 `workspacePanel` 单测（`defaultActiveTabKey`、`emptyContent`、`memo` 识别、`notifyOnInvalidActiveTabKey` 等）。
+  - 🛠 防御性处理：展开 `Fragment` 子节点、去重 `tab.key`、忽略 Segmented 分隔项与非法切换 key、校验 `panelType` / `tab.count`、`normalizeTabKey`、限制 `type` 链遍历深度。
+
+- 📖 文档
+  - 📖 新增 `MarkdownRenderer` 组件文档（流式 Markdown 渲染、`CharacterQueueOptions`、内置代码块渲染器路由表、`MarkdownRendererRef` 命令式接口）。
+  - 📖 新增 `ToolUseBarThink` 独立组件文档；同步修正 `ToolUseBar` 中 `ToolUseBarThink` 的 API 表（移除已废弃 / 不存在的 `id` / `isThinkLoading` / `isActive` / `onActiveChange` 等字段，对齐实际 props）。
+  - 📖 新增 `GradientText`、`TextAnimate`、`TypingAnimation` 组件文档与对应 demo。
+  - 📖 为 `MarkdownRenderer` / `GradientText` / `TextAnimate` / `ToolUseBarThink` 各补充一份「API Playground」综合 demo，单一演示串联调试各组件的核心 props 与行为。
+  - 📖 为布局组件 `AgenticLayout` / `ChatLayout` / `LayoutHeader` 各补充一份「API Playground」综合 demo，覆盖三栏开关、宽度、受控/非受控折叠、`scrollBehavior`、命令式 ref（`scrollToBottom` / `isAtBottom`）、`onScrollStateChange`、`leftExtra` / `rightExtra` 等核心 props。
+  - 🛠 `task-running.md` 改写为 `AgentRunBar 任务运行状态`，标注 `TaskRunning` / `TaskRunningProps` / `TaskRunningVariant` / `TaskRunningActionsRender` 为已废弃别名；同步将 `docs/demos/task-running.tsx` 中的 `TaskRunning` 替换为 `AgentRunBar`。
+
+## v2.33.0
+
+- MarkdownEditor / Plugins.chart
+  - 🆕 新增 `chartType: "docCards"` 支持「Markdown 表格 → 卡片栅格」展示，与现有图表共用同一套「HTML 注释 + GFM 表格」数据契约。表头按 `名称`/`标题`、`地址`/`链接`/`URL`、`简介`/`描述`、`亮点`/`标签` 别名解析为 `title` / `url` / `description` / `tags`，支持「逻辑名 + 中英文括号单位」的宽松匹配；`cardColumns` 控制每行卡片数（取值 `1`~`4`，默认 `2`，超出自动 clamp），`fieldMap` 可显式覆盖字段映射。
+  - 🐞 **安全**：`isSafeHref` 显式拒绝 protocol-relative URL（`//evil.com`）。原实现以 `startsWith('/')` 放行站内绝对路径时会同时放行 `//host`，等价于绕过协议白名单。
+  - 🛠 **包体积**：抽出 `src/Utils/columnMatching.ts` 零依赖共享模块，承载 `columnKeyMatchesConfiguredField` / `resolveChartAxisFieldToColumnKey` / `DOC_CARDS_FIELD_ALIASES` / `resolveDocCardsFields` 等纯字符串工具。`DocCards/utils.ts` 不再 import `parseTable`，消费侧 `import { DocCards }` 不再被传递性带入完整 markdown 解析栈（remark / rehype / sanitize / katex 等）。`parseTable.ts` 与 `DocCards/utils.ts` 仍 re-export 原符号保持向后兼容。
+  - 💄 站内链接（`/foo`、`./foo`、`../foo`、`#anchor`）不再强制 `target="_blank"`，避免锚点跳转开新 tab；外部链接（http(s)/mailto/tel）仍开新 tab 并带 `rel="noopener noreferrer"`。
+  - 🌐 标签胶囊容器 `aria-label` 改为 `docCardsTags`（中文「标签列表」/英文「Tags」）专用 i18n 键，原先用 `docCards` 会被屏幕阅读器误读为「卡片列表」。
+  - 🆕 `@ant-design/agentic-ui` 主入口同步导出 `DocCards` 组件与 `resolveDocCardsFields` / `splitDocCardsTags` / `isDocCardsSafeHref` / `formatDocCardsDisplayUrl` / `DocCardsDefaultFieldAliases` 等工具，方便消费侧复用。
+  - 💄 卡片链接展示 hostname + path（`https://tailwindcss.com/docs` → `tailwindcss.com/docs`），`href` 与 `title` attribute 仍是原始 URL；超长 URL 单行省略。
+  - 💄 移动端适配：`< 480px` viewport 强制单列；卡片 `:hover` 用 `@media (hover: hover)` 包裹避免 first-tap 残留；链接最小触摸高度 24px（WCAG 2.5.5 AA）；标签胶囊用 padding 而非固定 height，避免在手机端被压扁。
+  - ⚡️ `gridTemplateColumns` 用 `useMemo` 缓存；header 节点抽到 `useMemo`；`cardColumns` 走 `repeat(N, minmax(0, 1fr))` 精确控制最多 N 列，避免 `auto-fit` 在宽容器塞超过用户期望的列数。
+  - 🛠 `parseTable`：`docCards` 在解析阶段做主标题列校验，命中失败整表降级为普通 Markdown 表格，避免输出空白卡片栅格；不影响其它 `chartType` 行为。
+
+- 🐞 修复 React Hooks 依赖项导致的死循环与过度渲染问题
+  - SchemaRenderer：`schema || {}` 每次渲染产生新引用导致 `useMemo([safeSchema])` 失效，改用模块级常量 `EMPTY_SCHEMA`
+  - SchemaForm：`schema?.component || {}` 每次渲染产生新引用导致 `useMemo([properties])` 失效，改用模块级常量 `EMPTY_COMPONENT`
+  - ButtonTabGroup：默认参数 `items = []` 导致 `useEffect([items])` 每次渲染触发，改用模块级常量 `EMPTY_ITEMS`
+  - useChartDataFilter：`Array.isArray(data) ? data : []` 导致 `useMemo([safeData])` 失效，改用模块级常量 `EMPTY_DATA`
+  - TagPopup：`props || {}` 解构出的 `items` 引用不稳定，移除多余的 `|| {}` 回退
+  - I18n：`antdContext?.locale`（对象引用）作为依赖导致 effect 过度触发，改为 `antdContext?.locale?.locale`（字符串）
+  - AgenticLayout：`currentRightWidth` 同时作为依赖和 `setCurrentRightWidth` 的目标导致 resize listener 反复重建，改用 ref 持有
+  - BaseMarkdownEditorSlate：`isEditorFocused` 同时作为依赖和 setter 目标导致 mousedown listener 反复重建，改用 ref + `useRefFunction`
+  - Workspace：受控模式下 `setInternalActiveTab` 无条件执行导致 effect 二次触发，增加 `currentKey !== internalActiveTab` 守卫
+  - ActionItemContainer：`props.children` 作为依赖导致 effect 每次父渲染都触发，改用 `useMemo` 提取 `childrenKeys`
+  - keyboard：空依赖 `[]` 但使用了 `props.readonly`/`store`/`keydown`，补全依赖
+  - ThoughtChainList/MarkdownEditor：`useEffect` 缺少 `props.plugins` 和 `props.initValue` 依赖，补全
+  - AceEditorWrapper：`onChange` 闭包捕获初始值导致后续变化不生效，改用 `onChangeRef` 模式
+  - BubbleExtra：`useEffect` 缺少 `props.onRenderExtraNull` 依赖，补全
+  - FileComponent：`useEffect` 缺少 `previewFile` 依赖，补全
+  - Editor：`ref.current` 作为依赖不可靠，移除并加 eslint-disable 注释
+  - useAutoScroll：无依赖 `useEffect` 同步 ref 改为 `useLayoutEffect`
+- 🛠 SchemaRenderer / SchemaForm：`EMPTY_COMPONENT` 补充 `ComponentConfig` 类型标注
+- 🛠 BaseMarkdownEditorSlate：`setEditorFocused` 由 `useCallback` 改为 `useRefFunction`，移除多余的 `isEditorFocused` state
+- 📖 开发指南新增「React Hooks 依赖陷阱」章节，记录 7 类常见模式及修复方案
+
+## v2.32.0
+
+- MarkdownInputField
+  - 💥 **Breaking change**：`actionsRender` / `toolsRender` / `quickActionRender` / `beforeToolsRender` 入参类型由「上帝接口」`MarkdownInputFieldProps & MarkdownInputFieldProps['attachment'] & {...}` 收敛为稳定派生类型 `SlotRenderState`（`actionsRender` 用 `ActionsSlotState` 含 `collapseSendActions`）。新入参字段：`value` / `isHover` / `isLoading` / `fileMap` / `onFileMapChange` / `fileUploadStatus` / `fileUploadSummary` / `attachment` / `disabled` / `typing`。**迁移**：将 `props.upload` 等附件字段访问改为 `state.attachment?.upload`；其他字段改名 `props` → `state` 即可。
+  - 🛠 `MarkdownInputFieldProps['attachment']` 由内联结构 `{ enable?: boolean } & AttachmentButtonProps` 改为命名类型 `AttachmentConfig`，行为完全等价。
+  - 🆕 新增对外类型导出：`SlotRenderState`、`ActionsSlotState`，便于在自定义 slot 实现中获得类型提示。
+
+## v2.31.5
+
+- 🛠 将部分导出类型从值导出改为类型导出，优化打包体积。
+- 🛠 移除未使用的 locale key 和修复 lint 错误。
+- ✅ 移除测试中不再使用的动画 mock 文件。
+- 🛠 清理 MarkdownEditor 工具函数并优化导入路径。
+
+## v2.31.4
+
+- 🐞 修正任务进行中状态的文本显示逻辑。
+- ⚡️ 优化 tree-shaking — 消除反向 barrel 引用、具名导出第三方 SDK、补充 sideEffects。
+- 🐞 修复暗色主题下代码块的样式问题。
+- 🛠 移除已废弃的 theme 国际化 key（代码块主题切换按钮已移除）。
+
+## v2.31.3
+
+- ✅ 添加 rehypeSanitizeUserHtml 插件的单元测试。
+- 🛠 代码块主题跟随全局主题，移除独立月亮图标切换。
+- 🐞 添加 rehypeSanitizeUserHtml 插件，过滤用户输入中的危险 HTML 防止页面布局错乱。
+- 🛠 将硬编码颜色值替换为 CSS 变量。
+
+## v2.31.2
+
+- ⚡️ 减包体与首屏 - Lottie 直引、只读 markdown 拆组件、Renderer 懒加载。
+
+## v2.31.1
+
+- 🛠 使用 token 变量替换硬编码颜色值以支持主题切换。
+
+## v2.31.0
+
+- 📖 添加 MarkdownInputField 组件 demo。
+- 📖 添加 Loading 组件 demo。
+- 💄 为 Loading 组件添加暗色主题支持。
+- 🛠 移除 prepublishOnly 中的 test 步骤。
+- 💄 合并下载和复制按钮样式，使用统一样式。
+- 💄 为表格和图表工具栏复制按钮添加暗色主题支持。
+
+## v2.30.35
+
+- 🛠 修复 eqeqeq 规则错误和未使用的 import。
+- 🐞 修复 FileTree 和 FilePreview 组件的多个问题。
+- 🛠 移除 Paragraph 中的 MutationObserver，改用 composition 事件监听。
+- 🐞 修复动线生成动画的多个问题。
+- ⚡️ 优化 useDetectTheme 为单例模式，避免重复 MutationObserver。
+- 🐞 图表组件支持 html[data-theme="dark"] 自动切换暗色主题。
+- ✅ 将 Robot 组件测试改为异步并添加 Lottie 加载等待逻辑。
+
+## v2.30.33
+
+- 🆕 为 ChartContainer 添加自动主题检测功能。
+- ✅ 修复 onLoadChildren 重试用例的异步时序。
+- 🆕 添加 ThreeThinkingLottie 按需加载动画组件并移除用户消息多余间距。
+
+## v2.30.32
+
+- 🆕 为多个组件添加 data-testid 属性以支持自动化测试。
+- 🛠 调整 BubbleList 代码格式与缩进。
+
+## v2.30.31
+
+- 🐞 移除 MarkdownEditor 内容区 margin 变量覆盖。[#513](https://github.com/ant-design/agentic-ui/pull/513)
+- 🐞 无 onClick 时不再阻止 ActionIconBox 事件冒泡。
+- 🆕 为 Workspace 添加 FileTree 组件，支持懒加载子节点。[#510](https://github.com/ant-design/agentic-ui/pull/510)
+- 🐞 修复 Bubble useMemo/useEffect 依赖缺失与性能问题。
+- 🐞 提升 ToolUseBarThink light 变体在 success 后的样式优先级。[#511](https://github.com/ant-design/agentic-ui/pull/511)
+- 💄 优化 TaskList 缓动曲线，demo 改为自动循环播放。
+- 💄 降低 TaskList simple 模式 demo 动效速度。
+- 💄 TaskList simple 模式 demo 支持动态变化演示。
+- 💄 移除 TaskList progress 元素，文字变化时添加模糊渐入动效。
+- 💄 TaskList Simple 模式展开收起添加 CSS 过渡动画。
+- 🐞 TaskList Simple 模式去背景色、始终显示最后任务、清理冗余。
+- 🐞 修复 MarkdownInputField 发送按钮按主题实色保障对比度。[#509](https://github.com/ant-design/agentic-ui/pull/509)
+- ⚡️ 移除 ToolUseBarThink framer-motion，全 CSS 动画 + 性能优化。
+- 🐞 修复 MarkdownInputField tools 栏固定高度与内边距冲突导致的纵向错位。[#508](https://github.com/ant-design/agentic-ui/pull/508)
+- 🆕 支持 thinking 标签作为思考块的别名。
+- ⚡️ 流式渲染性能与正确性全面改进。
+- 🛠 移除文件中的 BOM 字符。
+
+## v2.30.30
+
+- 🛠 抽取 MarkdownEditor 样式清理函数并支持自定义属性。
+- 📖 更新 bubble 示例为文件理解场景。
+
+## v2.30.29
+
+- 🛠 无重大变更。
+
+## v2.30.28
+
+- 🛠 无重大变更。
+
+## v2.30.27
+
+- 🐞 修正 Bubble 代码块选择器并改进 SendButton 无障碍。[#507](https://github.com/ant-design/agentic-ui/pull/507)
+- 🐞 流式 JSON 代码块避免 Ace 反复 setValue 闪动。[#504](https://github.com/ant-design/agentic-ui/pull/504)
+- 💄 内置 Agentic UI 业务层 CSS 覆盖。[#506](https://github.com/ant-design/agentic-ui/pull/506)
+- 🐞 规范化 redacted_thinking 别名使嵌套 JSON 保持在思考块内。[#505](https://github.com/ant-design/agentic-ui/pull/505)
+- 🐞 附件列表文件大小与错误文案单行省略显示。[#503](https://github.com/ant-design/agentic-ui/pull/503)
+- ⚡️ 减少 ThoughtChainList 流式更新时深度思考相关重渲染。[#501](https://github.com/ant-design/agentic-ui/pull/501)
+- ✅ 默认套件排除大体积目录，用例约 5000 条。[#500](https://github.com/ant-design/agentic-ui/pull/500)
+- ✅ 减少 ace 和 elements 测试中的重复 mocks。[#498](https://github.com/ant-design/agentic-ui/pull/498)
+- 🐞 图表 x/y 与表头带单位列名宽松匹配并补充 RFC。[#499](https://github.com/ant-design/agentic-ui/pull/499)
+
+## v2.30.26
+
+- 🐞 修复 MarkdownEditor IME 与根级双空段、initSchema 同步问题。
+
+## v2.30.25
+
+- 🐞 改进加载指示器并增强 Markdown 渲染。
+- 🆕 增强 Bubble Markdown 渲染，支持稳定的 fncProps 和缓存改进。
+- 🐞 懒加载行避免 display:contents 导致 LazyElement 永不显示。[#494](https://github.com/ant-design/agentic-ui/pull/494)
+- 🐞 段落可见性依据 Slate 子节点而非 React children。[#493](https://github.com/ant-design/agentic-ui/pull/493)
+- 🛠 移除 todo.md 文件。
+- 🐞 停止修改 list items 使流式更新不重新渲染所有气泡。[#492](https://github.com/ant-design/agentic-ui/pull/492)
+- 🐞 修正 Mermaid SVG 尺寸与适配画布缩放冲突导致图表过小。[#487](https://github.com/ant-design/agentic-ui/pull/487)
+- 🛠 移除 todo.md 并更新 clean-code 规则不再要求该文件。[#491](https://github.com/ant-design/agentic-ui/pull/491)
+- 🐞 空 initValue 不再重复追加段落以恢复占位符。[#490](https://github.com/ant-design/agentic-ui/pull/490)
+- 📖 rerender 演示支持左侧 Markdown 手动编辑。[#488](https://github.com/ant-design/agentic-ui/pull/488)
+- 📖 优化 MarkdownInputField demos。[#486](https://github.com/ant-design/agentic-ui/pull/486)
+- 📖 格式化组件文档中的 Props 表格。
+- 🐞 修复 MarkdownEditor 稀疏 children 导致 Slate renderLeaf 读取 undefined。[#485](https://github.com/ant-design/agentic-ui/pull/485)
+- 🛠 移除文档 BOM 头并优化 MarkdownInputField 导入顺序。
+
+## v2.30.24
+
+- 🐞 修复 MarkdownEditor 空 markdown 内容处理及 Node 方法安全调用。
+- 🐞 增强 MarkdownEditor sanitize normalizer 对抗无效 Slate trees。[#484](https://github.com/ant-design/agentic-ui/pull/484)
+
+## v2.30.23
+
+- 🐞 规范化时剔除 MarkdownEditor 非法子节点避免 Node.string 崩溃。[#483](https://github.com/ant-design/agentic-ui/pull/483)
+
 ## v2.30.22
 
+- 🛠 恢复 demo 检查与报告脚本。[#482](https://github.com/ant-design/agentic-ui/pull/482)
+- 📖 优化 MarkdownInputField 文档 Demo 布局并修复示例问题。
+- 🆕 支持 Bubble OpenAI/OpenClaw/Ollama 消息格式适配器。[#481](https://github.com/ant-design/agentic-ui/pull/481)
+- 🐞 修复 MarkdownEditor 空段落退格误触全选清空。[#479](https://github.com/ant-design/agentic-ui/pull/479)
+- 🐞 流式段落动画默认开启与 E2E/单测稳定化。[#478](https://github.com/ant-design/agentic-ui/pull/478)
+- 🐞 流式文本更新结束时 ChatLayout 自动滚动到底部。[#480](https://github.com/ant-design/agentic-ui/pull/480)
+- 🐞 修复 MarkdownRenderer 流动画失效并新增流式闪烁光标。[#477](https://github.com/ant-design/agentic-ui/pull/477)
+- ✅ 添加 MarkdownEditor 过期选区处理回归用例。[#476](https://github.com/ant-design/agentic-ui/pull/476)
+- ✅ 补充 MarkdownEditor 无效选区路径回归用例。[#475](https://github.com/ant-design/agentic-ui/pull/475)
+- ✅ 添加 Mermaid 工具栏交互回归用例。[#471](https://github.com/ant-design/agentic-ui/pull/471)
+- 🛠 Slate.js 规范化使用改进 (P0-P3 全部修复 + 覆盖率达标)。[#474](https://github.com/ant-design/agentic-ui/pull/474)
+- 🐞 修复 MarkdownEditor isElement 崩溃读取 undefined.children。[#472](https://github.com/ant-design/agentic-ui/pull/472)
+- 🆕 SendButton 文件上传中禁用发送按钮，支持 sendButtonProps.disabled 外部控制。[#470](https://github.com/ant-design/agentic-ui/pull/470)
+- ✅ 添加 attachment preview 透传回归用例。[#467](https://github.com/ant-design/agentic-ui/pull/467)
+- ✅ 补充 MarkdownInputField attachment onPreview 透传与容错回归用例。[#468](https://github.com/ant-design/agentic-ui/pull/468)
+- ✅ 补充 AttachmentFileListItem 重试的单测。[#465](https://github.com/ant-design/agentic-ui/pull/465)
+- 🐞 修复不规范 Demo 代码的 Lint 错误。[#466](https://github.com/ant-design/agentic-ui/pull/466)
+
+## v2.30.22
+
+- Workspace
+  - 📖 补充 `Workspace.FileTree` 懒加载文件树文档演示 `workspace-file-tree-demo`。
+  - 🐞 `FileTree`：空目录或加载失败时不再将目录误标为叶子；`onLoadChildren` 失败时 `Promise` 正确 reject 以符合 rc-tree 重试；`toDataNode` 对未传 `isLeaf` 的节点按「无子项则文件」处理；`resetKey` 不再清空已懒加载状态。
+  - 🛠 `FileTreeProps` 懒加载回调命名为 `onLoadChildren`，与事件回调 `on` 前缀规范一致。
+  - 🛠 `resetKey` 仅注入**当前激活**的 `Workspace.File` / `Workspace.FileTree` 子项，非激活页不再随切换递增，减少隐藏面板的无效更新。
+  - ⚡️ 标签栏构建时预计算 Segmented 选项、首个 `Realtime` 索引，避免 O(n²) 的 `findIndex` 重复扫描。
+  - 🛠 `FileTree` 中 `onLoadChildren` 经 `useRefFunction` 归一，减轻 Tree `loadData` 对回调引用变化的敏感抖动。
+  - 🛠 新增导出类型 `WorkspacePanelType`；`TabItem.componentType` 收窄为该联合类型（文档补充 `TabItem` 说明）。
+- MarkdownRenderer
+  - 🐞 修复流式 Markdown 未传 `streamingParagraphAnimation` 时段落不应用淡入动画的问题；未传时默认开启，仅 `streamingParagraphAnimation: false` 关闭。[#478](https://github.com/antdigital-ai/agentic-ui/pull/478)
+- MarkdownEditor
+  - 🛠 `streamingParagraphAnimation` 与 MarkdownRenderer 语义对齐（默认开启，显式 `false` 关闭）。[#478](https://github.com/antdigital-ai/agentic-ui/pull/478)
 - Bubble
+  - 📖 文档与流式演示补充 `markdownRenderConfig.streamingParagraphAnimation: false` 迁移示例（与旧版「未传即无段落动画」行为一致）。[#478](https://github.com/antdigital-ai/agentic-ui/pull/478)
   - 🆕 新增 `useOpenAIMessageBubbleData` Hook 与 `mapOpenAIMessagesToMessageBubbleData`，支持将 OpenAI Chat Completions 风格的 `messages` 转为 `MessageBubbleData[]`，便于接入 `BubbleList` 与 SSE 流式内容。
   - 🆕 新增 `useOpenClawMessageBubbleData`、`mapOpenClawMessagesToMessageBubbleData` 与 `normalizeOpenClawMessagesToOpenAI`，支持 OpenClaw 会话 / transcript 风格（`timestamp`、`toolResult` 等）。
   - 🆕 新增 `useOllamaMessageBubbleData`、`mapOllamaMessagesToMessageBubbleData` 与 `normalizeOllamaMessagesToOpenAI`，支持 Ollama `/api/chat` 的 `messages`（`images`、`tool_calls`、`thinking` 等）。

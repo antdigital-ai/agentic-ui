@@ -9,9 +9,272 @@ group:
 
 # Changelog
 
+## v2.32.31
+
+- MarkdownRenderer
+  - 🛠 Removed all streaming animations and character queues (paragraph fade-in, progressive fade-in, `CharacterQueue` typewriter, and `AnimationText`). Streaming content is now rendered immediately after `useStreaming` caching; removed obsolete APIs and exports including `queueOptions`, `streamingParagraphAnimation`, and `isFinished`.
+  - 🆕 Added `ContentThrottle` + `useContentThrottle` to progressively render large SSE text chunks frame-by-frame, mitigating full-page flashes. `isFinished` / `throttleOptions` are now exposed to `MarkdownPreview` and `ReadonlyMarkdownEditorView`.
+- TaskList
+  - 💄 Simple variant wrapper now uses `fit-content` to avoid stretching full width.
+- ToolUseBar
+  - 💄 Tool container uses `grid 0fr/1fr` transition instead of `max-height`, and registers `--tool-rotate` custom property for stable rotation animation.
+- Workspace
+  - 🆕 `FileTree`: support synthetic tree leaf node binding in preview-only mode.
+- 🛠 Styling
+  - 🛠 Removed the deprecated `wrapSSR` wrapper from `useGenStyle`; `useStyle` no longer returns `wrapSSR`.
+  - 🛠 Removed `wrapSSR(...)` wrapper calls from 70+ components; components now return JSX directly.
+
+## Unreleased
+
+- TaskList
+  - 🛠 `simple` variant drops the 2px progress bar underneath the summary; `showProgress` now only toggles the inline "completed/total" count text.
+  - 🆕 Added `scrollIntoViewOnExpand` (`boolean | ScrollIntoViewOptions`, default `false`): when the `simple` summary expands, scroll the component into the viewport. `true` resolves to `{ behavior: 'smooth', block: 'nearest' }`; the initial mount does not trigger it.
+
+- ToolUseBarThink
+  - 💄 Removed the default and hover background fills on the bottom `content-expand` (expand/collapse) button — only the text color changes on hover. Hovering the whole card no longer stacks a second grey on top of the root background.
+  - 🆕 Added `scrollIntoViewOnExpand` (`boolean | ScrollIntoViewOptions`, default `false`): scroll the component into the viewport on expand (skips the initial mount), mirroring `TaskList`.
+  - 🆕 `MarkdownEditor.codeProps` gains `scrollDeepThinkIntoViewOnExpand`, forwarded to the deep-think block's `ToolUseBarThink.scrollIntoViewOnExpand` so in-editor ` ```think ` blocks can opt into the scroll-on-expand behavior.
+
+- 🛠 Styling
+  - 🛠 Rewrote `Hooks/useStyle` on top of `@ant-design/cssinjs-utils`'s `genStyleUtils`, mirroring antd's own `theme/util/genStyleUtils`. Exposes `genStyleHooks` / `genComponentStyleHook` / `genSubStyleComponent` plus `AgenticComponentTokenMap` / `FullToken` / `GenStyleFn` types; components can declare their own `ComponentToken` via module augmentation.
+  - 🛠 Migrated 70+ `style.ts` files to the `genStyleHooks('ComponentName', genStyle)` pattern (`AILabel` / `TaskList` / `ToolUseBar` / `Workspace` / `Plugins/chart/*` / `MarkdownEditor` root, etc.). `useEditorStyleRegister` remains as a thin compatibility entry for cases that need a dynamic token / dynamic classNames (`Bubble`, `MarkdownInputField`, `MarkdownEditor/editor` content), and is now backed directly by `@ant-design/cssinjs`'s `useStyleRegister`.
+  - 🛠 Dropped runtime dependency on `@ant-design/theme-token`'s `createStyleRegister`. The component library keeps `hashId=''` to prevent host antd theme hash from breaking selectors.
+  - ⚡️ `useStyle` now returns an identity `wrapSSR`. Style injection happens through cssinjs's `useGlobalCache` → `updateCSS` side effect during the hook call and never depended on `wrapSSR`. In our CSR-only config `wrapSSR(node)` was always `<><Empty/>{node}</>`, so we drop that Fragment + `<Empty/>` allocation. Existing `return wrapSSR(<jsx/>)` callers continue to work (identity passthrough); new code can simply `return <jsx/>`.
+
+- Workspace
+  - 💄 `FileTree`: folder and leaf names use CSS single-line ellipsis; full name via native `title` on hover.
+  - 🆕 Added `defaultActiveTabKey` to set the initial active tab in uncontrolled mode.
+  - 🆕 Added `notifyOnInvalidActiveTabKey` (default `true`): when controlled `activeTabKey` is not in the tab list, whether to call `onTabChange` with a valid key; `false` falls back in the UI only.
+  - 🆕 Added `preserveFilePreviewOnTabChange` (default `false`): when `true`, leaving and returning to a file panel keeps `Workspace.File` / `Workspace.FileTree` preview state.
+  - 🆕 Added `emptyContent` placeholder when there are no valid child panels (otherwise still `null`).
+  - 🆕 Child `BaseChildProps.panelType` for explicit panel typing; package exports `markWorkspacePanel` and `WORKSPACE_PANEL_TYPE`. Built-in `Workspace.*` children are marked; `React.memo(Workspace.File)` and `memo` / `forwardRef` chains are resolved via the `type` walk.
+  - 🛠 `resetKey` now increments only when **leaving** a `file` / `fileTree` panel or switching between two file panels, instead of on every tab change (avoids pointless bumps for hidden file panes).
+  - 💄 `Workspace.File` `fileTreeSwitch` icons: list `BarsOutlined`, tree `ApartmentOutlined`; default Workspace File / FileTree tab icons aligned (`@ant-design/icons`).
+  - 📖 Updated `workspace.md` with new props, panel recognition, controlled tabs, preview behavior, and best practices.
+  - ✅ Added `Workspace` and `workspacePanel` unit tests (`defaultActiveTabKey`, `emptyContent`, `memo` recognition, `notifyOnInvalidActiveTabKey`, etc.).
+  - 🛠 Defensive guards: flatten `Fragment` children, dedupe `tab.key`, ignore segmented divider / invalid tab keys, validate `panelType` / `tab.count`, `normalizeTabKey`, cap `type`-chain walk depth.
+
+- 📖 Docs
+  - 📖 Added `MarkdownRenderer` component documentation (streaming Markdown rendering, `CharacterQueueOptions`, built-in code-block renderer routing, `MarkdownRendererRef` imperative API).
+  - 📖 Added a dedicated `ToolUseBarThink` doc; corrected the `ToolUseBarThink` API table inside `tool-use-bar.md` (removed deprecated/non-existent props such as `id`, `isThinkLoading`, `isActive`, `onActiveChange`, etc., aligned with actual props).
+  - 📖 Added `GradientText`, `TextAnimate`, and `TypingAnimation` component docs with demos.
+  - 📖 Added an "API Playground" comprehensive demo for `MarkdownRenderer` / `GradientText` / `TextAnimate` / `ToolUseBarThink`, showcasing each component's core props and behavior in a single interactive demo.
+  - 📖 Added an "API Playground" comprehensive demo for layout components `AgenticLayout` / `ChatLayout` / `LayoutHeader`, covering three-column toggles, widths, controlled/uncontrolled collapse, `scrollBehavior`, imperative ref (`scrollToBottom` / `isAtBottom`), `onScrollStateChange`, and `leftExtra` / `rightExtra` slots.
+  - 🛠 Rewrote `task-running.md` as `AgentRunBar 任务运行状态`, marking `TaskRunning` / `TaskRunningProps` / `TaskRunningVariant` / `TaskRunningActionsRender` as deprecated aliases; updated `docs/demos/task-running.tsx` to use `AgentRunBar` instead of `TaskRunning`.
+
+## v2.33.0
+
+- MarkdownEditor / Plugins.chart
+  - 🆕 New `chartType: "docCards"` renders a Markdown table as a card grid (one row → one card), reusing the existing `<!-- {chartType: ...} --> + GFM table` data contract. Header columns are matched by aliases (`名称`/`标题`/`name`/`title`, `地址`/`链接`/`URL`, `简介`/`描述`/`description`, `亮点`/`标签`/`tags`) with the same `logical name + (unit)` loose matching used by chart `x`/`y`. `cardColumns` controls the per-row card count (`1`–`4`, default `2`, values out of range are clamped); `fieldMap` overrides the alias resolution.
+  - 🐞 **Security**: `isSafeHref` now explicitly rejects protocol-relative URLs (`//evil.com`). The previous `startsWith('/')` allowance for site-internal absolute paths inadvertently let `//host` through, bypassing the protocol allowlist.
+  - 🛠 **Bundle**: Extracted `src/Utils/columnMatching.ts` as a zero-dependency shared module hosting `columnKeyMatchesConfiguredField` / `resolveChartAxisFieldToColumnKey` / `DOC_CARDS_FIELD_ALIASES` / `resolveDocCardsFields`. `DocCards/utils.ts` no longer imports from `parseTable`, so `import { DocCards }` no longer transitively pulls the full Markdown parser stack (remark / rehype / sanitize / katex). `parseTable.ts` and `DocCards/utils.ts` still re-export the same symbols for backward compatibility.
+  - 💄 In-page links (`/foo`, `./foo`, `../foo`, `#anchor`) no longer force `target="_blank"`, so anchor jumps stay in the current tab; external links (http(s)/mailto/tel) still open in a new tab with `rel="noopener noreferrer"`.
+  - 🌐 The tag pill container `aria-label` now uses a dedicated `docCardsTags` key (English "Tags"); previously it reused `docCards` which read as "Card List" to screen readers.
+  - 🆕 The `@ant-design/agentic-ui` entry now exports the `DocCards` component along with `resolveDocCardsFields` / `splitDocCardsTags` / `isDocCardsSafeHref` / `formatDocCardsDisplayUrl` / `DocCardsDefaultFieldAliases` for downstream reuse.
+  - 💄 Card links render as `host + path` (e.g. `https://tailwindcss.com/docs` → `tailwindcss.com/docs`); `href` and the `title` tooltip keep the original URL. Overlong URLs are truncated to a single line with ellipsis.
+  - 💄 Mobile / touch readiness: viewport `< 480px` is forced to a single column; card `:hover` is wrapped in `@media (hover: hover)` so it no longer "sticks" after first tap on touch devices; link min touch height is 24px (WCAG 2.5.5 AA); tag pills use `padding` instead of a fixed height so they don't get squashed.
+  - ⚡️ `gridTemplateColumns` and the header node are memoized; `cardColumns` uses `repeat(N, minmax(0, 1fr))` so the column count strictly matches user intent (instead of `auto-fit` over-packing a wide container).
+  - 🛠 `parseTable`: `docCards` now validates that a primary title column is resolvable; if not, the whole table downgrades to a plain Markdown table to avoid rendering an empty card grid. Behavior of other `chartType`s is unchanged.
+
+- 🐞 Fix React Hooks dependency issues causing infinite loops and excessive re-renders
+  - SchemaRenderer: `schema || {}` creates a new reference each render, invalidating `useMemo([safeSchema])`. Fixed with module-level constant `EMPTY_SCHEMA`
+  - SchemaForm: `schema?.component || {}` creates a new reference each render, invalidating `useMemo([properties])`. Fixed with module-level constant `EMPTY_COMPONENT`
+  - ButtonTabGroup: default param `items = []` causes `useEffect([items])` to fire every render. Fixed with module-level constant `EMPTY_ITEMS`
+  - useChartDataFilter: `Array.isArray(data) ? data : []` invalidates `useMemo([safeData])`. Fixed with module-level constant `EMPTY_DATA`
+  - TagPopup: `props || {}` destructured `items` has unstable reference. Removed unnecessary `|| {}` fallback
+  - I18n: `antdContext?.locale` (object reference) as dependency causes excessive effect firing. Changed to `antdContext?.locale?.locale` (string)
+  - AgenticLayout: `currentRightWidth` as both dependency and `setCurrentRightWidth` target causes resize listener to rebuild repeatedly. Fixed with ref
+  - BaseMarkdownEditorSlate: `isEditorFocused` as both dependency and setter target causes mousedown listener to rebuild repeatedly. Fixed with ref + `useRefFunction`
+  - Workspace: uncontrolled `setInternalActiveTab` in else-if branch causes double effect firing. Added `currentKey !== internalActiveTab` guard
+  - ActionItemContainer: `props.children` as dependency causes effect to fire on every parent render. Fixed with `useMemo` extracting `childrenKeys`
+  - keyboard: empty deps `[]` but uses `props.readonly`/`store`/`keydown`. Added missing dependencies
+  - ThoughtChainList/MarkdownEditor: `useEffect` missing `props.plugins` and `props.initValue` dependencies. Added
+  - AceEditorWrapper: `onChange` closure captures initial value, later changes ignored. Fixed with `onChangeRef` pattern
+  - BubbleExtra: `useEffect` missing `props.onRenderExtraNull` dependency. Added
+  - FileComponent: `useEffect` missing `previewFile` dependency. Added
+  - Editor: `ref.current` as dependency is unreliable. Removed and added eslint-disable comment
+  - useAutoScroll: no-deps `useEffect` for ref sync changed to `useLayoutEffect`
+- 🛠 SchemaRenderer / SchemaForm: add `ComponentConfig` type annotation to `EMPTY_COMPONENT`
+- 🛠 BaseMarkdownEditorSlate: change `setEditorFocused` from `useCallback` to `useRefFunction`, remove redundant `isEditorFocused` state
+- 📖 Add "React Hooks Dependency Pitfalls" section to development guide, documenting 7 common patterns and fixes
+
+## v2.32.0
+
+- MarkdownInputField
+  - 💥 **Breaking change**: `actionsRender` / `toolsRender` / `quickActionRender` / `beforeToolsRender` arg type narrowed from the god-object `MarkdownInputFieldProps & MarkdownInputFieldProps['attachment'] & {...}` to the stable derived type `SlotRenderState` (`actionsRender` uses `ActionsSlotState` which adds `collapseSendActions`). New arg fields: `value` / `isHover` / `isLoading` / `fileMap` / `onFileMapChange` / `fileUploadStatus` / `fileUploadSummary` / `attachment` / `disabled` / `typing`. **Migration**: change `props.upload` and other attachment fields to `state.attachment?.upload`; rename `props` to `state` for the rest.
+  - 🛠 `MarkdownInputFieldProps['attachment']` switched from the inline shape `{ enable?: boolean } & AttachmentButtonProps` to the named type `AttachmentConfig`. Behaviour is identical.
+  - 🆕 New public type exports: `SlotRenderState`, `ActionsSlotState`, for typing custom slot implementations.
+
+## v2.31.5
+
+- 🛠 Change some exported types from value exports to type exports, optimize bundle size.
+- 🛠 Remove unused locale keys and fix lint errors.
+- ✅ Remove animation mock files no longer used in tests.
+- 🛠 Clean up MarkdownEditor utility functions and optimize import paths.
+
+## v2.31.4
+
+- 🐞 Fix text display logic for tasks in progress.
+- ⚡️ Optimize tree-shaking — eliminate reverse barrel references, named exports for third-party SDKs, add sideEffects.
+- 🐞 Fix code block styles in dark theme.
+- 🛠 Remove deprecated theme i18n key (code block theme toggle button removed).
+
+## v2.31.3
+
+- ✅ Add unit tests for rehypeSanitizeUserHtml plugin.
+- 🛠 Code block theme follows global theme, remove independent moon icon toggle.
+- 🐞 Add rehypeSanitizeUserHtml plugin to filter dangerous HTML from user input and prevent layout issues.
+- 🛠 Replace hardcoded color values with CSS variables.
+
+## v2.31.2
+
+- ⚡️ Reduce bundle size and improve first screen — direct Lottie imports, split readonly markdown components, lazy load Renderer.
+
+## v2.31.1
+
+- 🛠 Replace hardcoded color values with token variables to support theme switching.
+
+## v2.31.0
+
+- 📖 Add MarkdownInputField component demo.
+- 📖 Add Loading component demo.
+- 💄 Add dark theme support for Loading component.
+- 🛠 Remove test step from prepublishOnly.
+- 💄 Merge download and copy button styles, use unified styles.
+- 💄 Add dark theme support for table and chart toolbar copy buttons.
+
+## v2.30.35
+
+- 🛠 Fix eqeqeq rule errors and unused imports.
+- 🐞 Fix multiple issues in FileTree and FilePreview components.
+- 🛠 Remove MutationObserver from Paragraph, use composition event listener instead.
+- 🐞 Fix multiple issues in animation generation.
+- ⚡️ Optimize useDetectTheme to singleton mode, avoid duplicate MutationObserver.
+- 🐞 Chart components support html[data-theme="dark"] for automatic dark theme switching.
+- ✅ Change Robot component tests to async and add Lottie loading wait logic.
+
+## v2.30.33
+
+- 🆕 Add automatic theme detection for ChartContainer.
+- ✅ Fix async timing in onLoadChildren retry test cases.
+- 🆕 Add ThreeThinkingLottie on-demand loading animation component and remove extra spacing in user messages.
+
+## v2.30.32
+
+- 🆕 Add data-testid attributes to multiple components for automated testing support.
+- 🛠 Adjust BubbleList code formatting and indentation.
+
+## v2.30.31
+
+- 🐞 Remove MarkdownEditor content area margin variable override. [#513](https://github.com/ant-design/agentic-ui/pull/513)
+- 🐞 ActionIconBox no longer prevents event bubbling when there is no onClick.
+- 🆕 Add FileTree component to Workspace with lazy-loaded children support. [#510](https://github.com/ant-design/agentic-ui/pull/510)
+- 🐞 Fix Bubble useMemo/useEffect dependency issues and performance problems.
+- 🐞 Increase ToolUseBarThink light variant style priority after success. [#511](https://github.com/ant-design/agentic-ui/pull/511)
+- 💄 Optimize TaskList easing curves, change demo to auto-loop playback.
+- 💄 Reduce TaskList simple mode demo animation speed.
+- 💄 TaskList simple mode demo supports dynamic change demonstration.
+- 💄 Remove TaskList progress element, add blur fade-in animation when text changes.
+- 💄 Add CSS transition animation for TaskList Simple mode expand/collapse.
+- 🐞 TaskList Simple mode removes background color, always shows last task, cleans up redundancy.
+- 🐞 Fix MarkdownInputField send button solid color by theme to ensure contrast. [#509](https://github.com/ant-design/agentic-ui/pull/509)
+- ⚡️ Remove ToolUseBarThink framer-motion, full CSS animations + performance optimization.
+- 🐞 Fix MarkdownInputField tools bar fixed height and padding conflict causing vertical misalignment. [#508](https://github.com/ant-design/agentic-ui/pull/508)
+- 🆕 Support thinking tag as an alias for think block.
+- ⚡️ Comprehensive improvements to streaming rendering performance and correctness.
+- 🛠 Remove BOM characters from files.
+
+## v2.30.30
+
+- 🛠 Extract MarkdownEditor style cleanup function and support custom properties.
+- 📖 Update bubble examples to file understanding scenarios.
+
+## v2.30.29
+
+- 🛠 No major changes.
+
+## v2.30.28
+
+- 🛠 No major changes.
+
+## v2.30.27
+
+- 🐞 Fix Bubble code block selector and improve SendButton accessibility. [#507](https://github.com/ant-design/agentic-ui/pull/507)
+- 🐞 Streaming JSON code blocks avoid Ace repeated setValue flickering. [#504](https://github.com/ant-design/agentic-ui/pull/504)
+- 💄 Built-in Agentic UI business layer CSS overrides. [#506](https://github.com/ant-design/agentic-ui/pull/506)
+- 🐞 Normalize redacted_thinking alias so nested JSON stays in think block. [#505](https://github.com/ant-design/agentic-ui/pull/505)
+- 🐞 Attachment list file size and error text single-line ellipsis display. [#503](https://github.com/ant-design/agentic-ui/pull/503)
+- ⚡️ Reduce ThoughtChainList deep thinking related re-renders during streaming updates. [#501](https://github.com/ant-design/agentic-ui/pull/501)
+- ✅ Default suite excludes large directories, approximately 5000 test cases. [#500](https://github.com/ant-design/agentic-ui/pull/500)
+- ✅ Reduce duplicate mocks in ace and elements tests. [#498](https://github.com/ant-design/agentic-ui/pull/498)
+- 🐞 Chart x/y and header with unit column names loose matching and supplement RFC. [#499](https://github.com/ant-design/agentic-ui/pull/499)
+
+## v2.30.26
+
+- 🐞 Fix MarkdownEditor IME and root-level double empty paragraph, initSchema sync issues.
+
+## v2.30.25
+
+- 🐞 Improve loading indicators and enhance Markdown rendering.
+- 🆕 Enhance Bubble Markdown rendering with stable fncProps and caching improvements.
+- 🐞 Lazy load rows to avoid display:contents causing LazyElement to never display. [#494](https://github.com/ant-design/agentic-ui/pull/494)
+- 🐞 Paragraph visibility based on Slate children rather than React children. [#493](https://github.com/ant-design/agentic-ui/pull/493)
+- 🛠 Remove todo.md file.
+- 🐞 Stop mutating list items so streaming updates do not rerender all bubbles. [#492](https://github.com/ant-design/agentic-ui/pull/492)
+- 🐞 Fix Mermaid SVG size and adapt canvas scaling conflict causing charts to be too small. [#487](https://github.com/ant-design/agentic-ui/pull/487)
+- 🛠 Remove todo.md and update clean-code rule to no longer require that file. [#491](https://github.com/ant-design/agentic-ui/pull/491)
+- 🐞 Empty initValue no longer repeatedly appends paragraphs to restore placeholder. [#490](https://github.com/ant-design/agentic-ui/pull/490)
+- 📖 rerender demo supports left-side Markdown manual editing. [#488](https://github.com/ant-design/agentic-ui/pull/488)
+- 📖 Optimize MarkdownInputField demos. [#486](https://github.com/ant-design/agentic-ui/pull/486)
+- 📖 Format Props tables in component documentation.
+- 🐞 Fix MarkdownEditor sparse children causing Slate renderLeaf to read undefined. [#485](https://github.com/ant-design/agentic-ui/pull/485)
+- 🛠 Remove document BOM header and optimize MarkdownInputField import order.
+
+## v2.30.24
+
+- 🐞 Fix MarkdownEditor empty markdown content handling and Node method safe calls.
+- 🐞 Harden MarkdownEditor sanitize normalizer against invalid Slate trees. [#484](https://github.com/ant-design/agentic-ui/pull/484)
+
+## v2.30.23
+
+- 🐞 Remove illegal children during MarkdownEditor normalization to avoid Node.string crash. [#483](https://github.com/ant-design/agentic-ui/pull/483)
+
 ## v2.30.22
 
+- 🛠 Restore demo check and report scripts. [#482](https://github.com/ant-design/agentic-ui/pull/482)
+- 📖 Optimize MarkdownInputField documentation Demo layout and fix example issues.
+- 🆕 Support Bubble OpenAI/OpenClaw/Ollama message format adapters. [#481](https://github.com/ant-design/agentic-ui/pull/481)
+- 🐞 Fix MarkdownEditor empty paragraph backspace accidentally triggering select-all clear. [#479](https://github.com/ant-design/agentic-ui/pull/479)
+- 🐞 Streaming paragraph animation enabled by default and E2E/unit test stabilization. [#478](https://github.com/ant-design/agentic-ui/pull/478)
+- 🐞 ChatLayout auto-scroll to bottom when streaming text update ends. [#480](https://github.com/ant-design/agentic-ui/pull/480)
+- 🐞 Fix MarkdownRenderer animation failure and add streaming blinking cursor. [#477](https://github.com/ant-design/agentic-ui/pull/477)
+- ✅ Add MarkdownEditor stale selection handling regression coverage. [#476](https://github.com/ant-design/agentic-ui/pull/476)
+- ✅ Add MarkdownEditor invalid selection path regression coverage. [#475](https://github.com/ant-design/agentic-ui/pull/475)
+- ✅ Add Mermaid toolbar interaction regression coverage. [#471](https://github.com/ant-design/agentic-ui/pull/471)
+- 🛠 Slate.js normalized usage improvements (P0-P3 all fixed + coverage met). [#474](https://github.com/ant-design/agentic-ui/pull/474)
+- 🐞 Fix MarkdownEditor isElement crash reading undefined.children. [#472](https://github.com/ant-design/agentic-ui/pull/472)
+- 🆕 SendButton disabled during file upload, support sendButtonProps.disabled external control. [#470](https://github.com/ant-design/agentic-ui/pull/470)
+- ✅ Add attachment preview passthrough regression coverage. [#467](https://github.com/ant-design/agentic-ui/pull/467)
+- ✅ Add MarkdownInputField attachment onPreview passthrough and error handling regression coverage. [#468](https://github.com/ant-design/agentic-ui/pull/468)
+- ✅ Add AttachmentFileListItem retry unit tests. [#465](https://github.com/ant-design/agentic-ui/pull/465)
+- 🐞 Fix Lint errors in non-compliant Demo code. [#466](https://github.com/ant-design/agentic-ui/pull/466)
+
+## v2.30.22
+
+- Workspace
+  - 📖 Add `Workspace.FileTree` lazy file tree doc demo `workspace-file-tree-demo`.
+  - 🐞 `FileTree`: empty dirs / failed loads no longer force `isLeaf`; `onLoadChildren` rejection propagates for rc-tree retry; `toDataNode` defaults missing `isLeaf` with no children to a file; `resetKey` no longer wipes lazy-loaded state.
+  - 🛠 Rename lazy-load callback on `FileTreeProps` to `onLoadChildren` (aligns with `on` prefix for callbacks).
+  - 🛠 `resetKey` is only passed to the **active** `Workspace.File` / `Workspace.FileTree` tab, avoiding redundant updates in hidden panes.
+  - ⚡️ Precompute `Segmented` options and the first `Realtime` index in one pass, avoiding repeated O(n) `findIndex` scans in the options reducer.
+  - 🛠 Stabilize `onLoadChildren` in `FileTree` via `useRefFunction` to keep Tree `loadData` from churning on parent re-renders.
+  - 🛠 Export `WorkspacePanelType` and narrow `TabItem.componentType` to that union; docs add a `TabItem` blurb.
+- MarkdownRenderer
+  - 🐞 Fix missing paragraph fade-in when `streamingParagraphAnimation` is omitted in streaming markdown mode; default is now on, set `streamingParagraphAnimation: false` to disable. [#478](https://github.com/antdigital-ai/agentic-ui/pull/478)
+- MarkdownEditor
+  - 🛠 Align `streamingParagraphAnimation` semantics with MarkdownRenderer (on by default, pass `false` to disable). [#478](https://github.com/antdigital-ai/agentic-ui/pull/478)
 - Bubble
+  - 📖 Docs and streaming demo add `markdownRenderConfig.streamingParagraphAnimation: false` migration example (matches legacy “omit means no paragraph animation”). [#478](https://github.com/antdigital-ai/agentic-ui/pull/478)
   - 🆕 Add `useOpenAIMessageBubbleData` hook and `mapOpenAIMessagesToMessageBubbleData` to convert OpenAI Chat Completions-style `messages` into `MessageBubbleData[]` for `BubbleList` and SSE streaming.
   - 🆕 Add `useOpenClawMessageBubbleData`, `mapOpenClawMessagesToMessageBubbleData`, and `normalizeOpenClawMessagesToOpenAI` for OpenClaw session/transcript-style messages (`timestamp`, `toolResult`, etc.).
   - 🆕 Add `useOllamaMessageBubbleData`, `mapOllamaMessagesToMessageBubbleData`, and `normalizeOllamaMessagesToOpenAI` for Ollama `/api/chat` `messages` (`images`, `tool_calls`, `thinking`, etc.).

@@ -5,6 +5,14 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
+import {
+  canRenderQuadrantChart,
+  canResolveDocCardsTitleColumn,
+  columnKeyMatchesConfiguredField as sharedColumnKeyMatchesConfiguredField,
+  resolveChartAxisFieldToColumnKey as sharedResolveChartAxisFieldToColumnKey,
+  type DocCardsFieldMap,
+} from '../../../../Utils/columnMatching';
+import { rehypeSanitizeUserHtml } from '../../../../Utils/rehypeSanitizeUserHtml';
 import { ChartTypeConfig } from '../../../el';
 import {
   convertParagraphToImage,
@@ -37,6 +45,7 @@ const stringifyObj = remark()
     handlers: REMARK_REHYPE_DIRECTIVE_HANDLERS,
   })
   .use(rehypeRaw)
+  .use(rehypeSanitizeUserHtml as any)
   .use(rehypeKatex as any)
   .use(remarkGfm, { singleTilde: false }) // 禁用单波浪线删除线
   .use(remarkFrontmatter, ['yaml']);
@@ -111,6 +120,27 @@ export const normalizeFieldName = (fieldName: string): string => {
     .replace(/\\(?=")/g, '') // 移除转义的双引号
     .trim();
 };
+
+/**
+ * 列名宽松匹配工具：转发自 `src/Utils/columnMatching.ts` 的零依赖实现。
+ *
+ * 历史上这两个工具内联在本文件并被外部直接 import；为了避免给 `Plugins/chart/DocCards`
+ * 等渲染层带去整套 markdown 解析栈（remark/rehype/sanitize/katex 等），核心算法已下沉到
+ * `Utils/columnMatching.ts`，本处仅做 re-export 以保持 import 路径向后兼容。
+ */
+export const columnKeyMatchesConfiguredField =
+  sharedColumnKeyMatchesConfiguredField;
+export const resolveChartAxisFieldToColumnKey =
+  sharedResolveChartAxisFieldToColumnKey;
+
+const normalizeChartConfigAxisFields = (
+  cfg: ChartTypeConfig,
+  columnKeys: string[],
+): ChartTypeConfig => ({
+  ...cfg,
+  x: resolveChartAxisFieldToColumnKey(cfg.x, columnKeys),
+  y: resolveChartAxisFieldToColumnKey(cfg.y, columnKeys),
+});
 
 /**
  * 获取列对齐方式
@@ -224,6 +254,8 @@ export const parseTableOrChart = (
         };
       }) || [];
 
+  const columnDataIndexList = columns.map((c) => c.dataIndex);
+
   const dataSource =
     table?.children?.slice(1)?.map((row) => {
       return row.children?.reduce((acc, cell, index) => {
@@ -284,6 +316,17 @@ export const parseTableOrChart = (
   // 如果 chartConfig 是对象且键都是数字（如 {0: {...}}），转换为数组
   chartConfig = convertObjectToArray(chartConfig);
 
+  if (chartConfig) {
+    chartConfig = Array.isArray(chartConfig)
+      ? (chartConfig as ChartTypeConfig[]).map((c) =>
+          normalizeChartConfigAxisFields(c, columnDataIndexList),
+        )
+      : normalizeChartConfigAxisFields(
+          chartConfig as ChartTypeConfig,
+          columnDataIndexList,
+        );
+  }
+
   // 获取 chartType，支持多种配置格式
   const getChartType = (): string | undefined => {
     return (
@@ -303,14 +346,23 @@ export const parseTableOrChart = (
   let isChart = chartType && chartType !== 'table';
 
   // 图表的 x、y 必须在表格列中存在，否则降级为表格渲染
+  // docCards 不需要 x/y，但要求至少能解析出主标题列（名称/标题/name/title）
   if (isChart && chartConfig) {
     const columnKeys = new Set(columns.map((c) => c.dataIndex));
+    const columnKeyList = columns.map((c) => c.dataIndex);
     const configsToValidate = Array.isArray(chartConfig)
       ? chartConfig
       : [chartConfig];
 
     const isChartConfigValid = (cfg: ChartTypeConfig): boolean => {
       if (!cfg || cfg.chartType === 'table') return true;
+      if (cfg.chartType === 'docCards') {
+        const fieldMap = (cfg as { fieldMap?: DocCardsFieldMap })?.fieldMap;
+        return canResolveDocCardsTitleColumn(columnKeyList, fieldMap?.title);
+      }
+      if (cfg.chartType === 'quadrant') {
+        return canRenderQuadrantChart(columnKeyList, dataSource.length);
+      }
       if (cfg.x && !columnKeys.has(cfg.x)) return false;
       if (cfg.y && !columnKeys.has(cfg.y)) return false;
       return true;

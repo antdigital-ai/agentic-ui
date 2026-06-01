@@ -2,13 +2,7 @@ import { ChatLayout } from '@ant-design/agentic-ui';
 import { Badge, Button, Space, Tag } from 'antd';
 import React, { useState } from 'react';
 
-const MessageList = ({
-  prefix,
-  count,
-}: {
-  prefix: string;
-  count: number;
-}) => (
+const MessageList = ({ prefix, count }: { prefix: string; count: number }) => (
   <div style={{ padding: 16 }}>
     {Array.from({ length: count }, (_, i) => (
       <div

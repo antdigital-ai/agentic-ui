@@ -1,5 +1,6 @@
 import { Tooltip } from 'antd';
 import React from 'react';
+import { useRefFunction } from '../../../../../Hooks/useRefFunction';
 
 export interface ToolBarItemProps {
   title?: string;
@@ -27,22 +28,16 @@ export const ToolBarItem = React.memo<ToolBarItemProps>(
     tabIndex,
     children,
   }) => {
-    const handleClick = React.useCallback(
-      (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        onClick?.(e);
-      },
-      [onClick],
-    );
+    const handleClick = useRefFunction((e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      onClick?.(e);
+    });
 
-    const handleMouseDown = React.useCallback(
-      (e: React.MouseEvent) => {
-        e.preventDefault();
-        onMouseDown?.(e);
-      },
-      [onMouseDown],
-    );
+    const handleMouseDown = useRefFunction((e: React.MouseEvent) => {
+      e.preventDefault();
+      onMouseDown?.(e);
+    });
 
     const content = (
       <div

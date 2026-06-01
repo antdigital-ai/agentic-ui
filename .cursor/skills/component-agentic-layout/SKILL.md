@@ -67,7 +67,7 @@ description: Develop AgenticLayout (left-center-right layout with header) in @an
 - 右侧栏：`${prefixCls}-sidebar`、`${prefixCls}-sidebar-right`，折叠时加 `${prefixCls}-sidebar-right-collapsed`
 - 侧栏内容区：`${prefixCls}-sidebar-content`
 
-样式通过 `useAgenticLayoutStyle(prefixCls)` 注册，使用项目内 `useEditorStyleRegister` 与 token（如 `componentCls`）。根节点在样式中设 `minHeight: 600px`。
+样式通过 `useAgenticLayoutStyle(prefixCls)` 注册，使用项目内 `genStyleHooks` 与 token（如 `componentCls`）。根节点在样式中设 `minHeight: 600px`。
 
 ### LayoutHeader（头部子组件）
 

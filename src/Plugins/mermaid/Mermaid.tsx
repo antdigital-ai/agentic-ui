@@ -1,4 +1,5 @@
 import React, { lazy, Suspense } from 'react';
+import { getSlateElementPlainText } from '../../MarkdownEditor/editor/utils/codeBlockPlainText';
 import { CodeNode } from '../../MarkdownEditor/el';
 import { isBrowser } from './env';
 import { MermaidCodePreview } from './MermaidFallback';
@@ -29,15 +30,14 @@ export const Mermaid = (props: { element: CodeNode }) => {
     return null;
   }
 
+  const source = getSlateElementPlainText(props.element);
   const isUnfinished = props.element.otherProps?.finished === false;
   if (isUnfinished) {
-    return <MermaidCodePreview code={props.element.value || ''} />;
+    return <MermaidCodePreview code={source} />;
   }
 
   return (
-    <Suspense
-      fallback={<MermaidCodePreview code={props.element.value || ''} />}
-    >
+    <Suspense fallback={<MermaidCodePreview code={source} />}>
       <MermaidRenderer element={props.element} />
     </Suspense>
   );

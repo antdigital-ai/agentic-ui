@@ -5,8 +5,10 @@ import {
   type GetEditableTableColWidthsParams,
 } from './editableTableWidth';
 
-export interface UseEditableTableColWidthsParams
-  extends Omit<GetEditableTableColWidthsParams, 'element'> {
+export interface UseEditableTableColWidthsParams extends Omit<
+  GetEditableTableColWidthsParams,
+  'element'
+> {
   element?: TableNode;
 }
 

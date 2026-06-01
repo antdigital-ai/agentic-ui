@@ -9,8 +9,16 @@ import {
   Text,
   Transforms,
 } from 'slate';
+import {
+  escapeRegExp,
+  normalizeMarkdownSearchText,
+} from './markdownSearchText';
+import {
+  findTextInReadonlyMarkdownDom,
+  isReadonlyMarkdownSearchEditor,
+} from '../../readonly/findTextInReadonlyMarkdownDom';
 import { DOMNode } from 'slate-dom';
-import { History } from 'slate-history';
+import { History, HistoryEditor } from 'slate-history';
 import { ReactEditor } from 'slate-react';
 import {
   CardNode,
@@ -24,6 +32,81 @@ import { getMediaType } from './dom';
 export class EditorUtils {
   static get p() {
     return { type: 'paragraph', children: [{ text: '' }] } as const;
+  }
+
+  /**
+   * 当根节点全部为「仅空白」的段落时，合并为单个空段。
+   * 避免解析 `\\n\\n` 或外部 schema 产生多个空段，导致 Slate/占位与双 DOM。
+   * 仅一个根块时原样返回，以保留单空段上的 align 等段落级字段。
+   */
+  static coalesceRootAllEmptyParagraphs(nodes: Node[]): Node[] {
+    if (!nodes?.length) {
+      return [JSON.parse(JSON.stringify(EditorUtils.p)) as ParagraphNode];
+    }
+    if (nodes.length === 1) {
+      return nodes;
+    }
+    const onlyEmptyParagraphs = nodes.every(
+      (n) =>
+        Element.isElement(n) &&
+        n.type === 'paragraph' &&
+        Node.string(n).trim() === '',
+    );
+    if (onlyEmptyParagraphs) {
+      return [JSON.parse(JSON.stringify(EditorUtils.p)) as ParagraphNode];
+    }
+    return nodes;
+  }
+
+  /**
+   * 通过 Slate Transforms API 安全替换编辑器全部内容。
+   * 避免直接赋值 editor.children，确保 Operation/History/Normalizer 管线正常运行。
+   *
+   * @param editor - 编辑器实例
+   * @param nodes - 新的节点列表
+   * @param options.withoutHistory - 是否跳过 History 记录（默认 true，适用于外部数据同步场景）
+   */
+  static replaceEditorContent(
+    editor: Editor,
+    nodes: Node[],
+    options?: { withoutHistory?: boolean },
+  ) {
+    const { withoutHistory = true } = options || {};
+
+    const doReplace = () => {
+      const normalized = EditorUtils.coalesceRootAllEmptyParagraphs(nodes);
+      Editor.withoutNormalizing(editor, () => {
+        EditorUtils.safeDeselect(editor);
+        const totalChildren = editor.children.length;
+        for (let i = totalChildren - 1; i >= 0; i--) {
+          Transforms.removeNodes(editor, { at: [i] });
+        }
+        Transforms.insertNodes(editor, normalized, { at: [0] });
+      });
+    };
+
+    if (withoutHistory && HistoryEditor.isHistoryEditor(editor)) {
+      HistoryEditor.withoutSaving(editor, doReplace);
+    } else {
+      doReplace();
+    }
+  }
+
+  /**
+   * 安全取消 Slate 选区，避免 IME 过渡态下 DOM Selection 为空时
+   * slate-react 同步触发 collapseToEnd 的 InvalidStateError。
+   */
+  static safeDeselect(editor: Editor) {
+    if (!editor.selection) return;
+    try {
+      Transforms.deselect(editor);
+    } catch {
+      try {
+        editor.selection = null;
+      } catch {
+        // 编辑器销毁或只读态下忽略
+      }
+    }
   }
 
   static hasPath(editor: Editor, path: Path) {
@@ -63,6 +146,7 @@ export class EditorUtils {
       leaf.code ||
       leaf.italic ||
       leaf.strikethrough ||
+      leaf.mark ||
       !!leaf?.url ||
       leaf.fnd ||
       leaf.fnc ||
@@ -162,6 +246,7 @@ export class EditorUtils {
     'italic',
     'code',
     'bold',
+    'mark',
     'color',
     'textColor',
     'highColor',
@@ -389,17 +474,16 @@ export class EditorUtils {
     insertNodes?: Elements[],
     force?: boolean | History,
   ) {
-    const nodesToInsert = insertNodes || [EditorUtils.p];
+    const nodesToInsert = JSON.parse(
+      JSON.stringify(insertNodes || [EditorUtils.p]),
+    );
 
-    // 深克隆节点以避免引用问题
-    editor.children = JSON.parse(JSON.stringify(nodesToInsert));
+    EditorUtils.replaceEditorContent(editor, nodesToInsert);
 
-    if (force) {
+    if (force && HistoryEditor.isHistoryEditor(editor)) {
       editor.history =
         typeof force === 'boolean' ? { redos: [], undos: [] } : force;
     }
-
-    editor.onChange();
   }
 
   /**
@@ -1166,64 +1250,10 @@ export function findLeafPath(editor: Editor, path: Path) {
  * @returns 转义后的字符串
  * @private
  */
-export function escapeRegExp(string: string): string {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-/**
- * 清理和标准化 Markdown 搜索文本
- *
- * @param searchText - 原始搜索文本，可能包含 Markdown 语法
- * @returns 包含原文本和清理后文本的数组
- * @public
- */
-export function normalizeMarkdownSearchText(searchText: string): string[] {
-  if (!searchText.trim()) return [];
-
-  const searchVariants: Set<string> = new Set();
-
-  // 添加原始文本
-  searchVariants.add(searchText.trim());
-
-  // 移除常见的 Markdown 语法
-  let cleanText = searchText
-    // 移除图片语法 ![alt](url) -> alt (必须在链接语法之前处理)
-    .replace(/!\[([^\]]*)\]\([^)]+\)/g, '$1')
-    // 移除链接语法 [text](url) -> text
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-    // 移除粗体语法 **text** 或 __text__ -> text
-    .replace(/\*\*(.*?)\*\*/g, '$1')
-    .replace(/__(.*?)__/g, '$1')
-    // 移除斜体语法 *text* 或 _text_ -> text
-    .replace(/\*(.*?)\*/g, '$1')
-    .replace(/_(.*?)_/g, '$1')
-    // 移除行内代码语法 `code` -> code
-    .replace(/`([^`]+)`/g, '$1')
-    // 移除删除线语法 ~~text~~ -> text
-    .replace(/~~(.*?)~~/g, '$1')
-    // 移除标题语法 # text -> text
-    .replace(/^#+\s+(.*)$/gm, '$1')
-    // 移除引用语法 > text -> text
-    .replace(/^>\s*(.*)$/gm, '$1')
-    // 移除列表标记 - text 或 * text 或 + text -> text
-    .replace(/^[\s]*[-*+]\s+(.*)$/gm, '$1')
-    // 移除有序列表标记 1. text -> text
-    .replace(/^\s*\d+\.\s+(.*)$/gm, '$1')
-    .trim();
-
-  if (cleanText && cleanText !== searchText.trim()) {
-    searchVariants.add(cleanText);
-  }
-
-  // 如果清理后的文本包含多个单词，也添加每个单词
-  const words = cleanText.split(/\s+/).filter((word) => word.length > 1);
-  if (words.length > 1) {
-    words.forEach((word) => searchVariants.add(word));
-  }
-
-  // 移除空字符串
-  return Array.from(searchVariants).filter((text) => text.length > 0);
-}
+export {
+  escapeRegExp,
+  normalizeMarkdownSearchText,
+} from './markdownSearchText';
 
 /**
  * 在编辑器中按路径和文本搜索内容，支持 Markdown 文本的智能处理
@@ -1275,6 +1305,33 @@ export function findByPathAndText(
   } = options;
 
   if (!searchText.trim()) return [];
+
+  if (isReadonlyMarkdownSearchEditor(editor)) {
+    const container = editor.__readonlyMarkdownContainer;
+    if (container) {
+      return findTextInReadonlyMarkdownDom(
+        container,
+        pathDescription,
+        searchText,
+        options,
+      ).map((match) => ({
+        path: match.path as Path,
+        range: {
+          anchor: { path: match.path as Path, offset: match.offset.start },
+          focus: { path: match.path as Path, offset: match.offset.end },
+        },
+        node: { text: match.lineContent } as Node,
+        matchedText: match.matchedText,
+        offset: match.offset,
+        lineContent: match.lineContent,
+        nodeType: match.nodeType,
+        searchVariant: match.searchVariant,
+        isLink: match.isLink,
+        linkUrl: match.linkUrl,
+      }));
+    }
+    return [];
+  }
 
   const results: Array<{
     path: Path;

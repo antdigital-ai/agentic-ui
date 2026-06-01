@@ -1,9 +1,10 @@
 import { DeleteOutlined } from '@ant-design/icons';
 import { ConfigProvider, Tooltip } from 'antd';
-import React, { useContext, useRef } from 'react';
 import clsx from 'clsx';
+import React, { useContext, useRef } from 'react';
 import { NodeEntry, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
+import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { I18nContext } from '../../../I18n';
 import { ChartNode, EditorUtils } from '../../../MarkdownEditor';
 import { useEditorStore } from '../../../MarkdownEditor/editor/store';
@@ -67,7 +68,7 @@ export const ChartAttrToolBar: React.FC<{
 
   const chartNodeRef = useRef<NodeEntry<ChartNode>>();
 
-  const remove = React.useCallback(() => {
+  const remove = useRefFunction(() => {
     const chart = props.node;
     if (!chart) return;
 
@@ -76,13 +77,13 @@ export const ChartAttrToolBar: React.FC<{
     });
     chartNodeRef.current = undefined;
     ReactEditor.focus(markdownEditorRef.current);
-  }, [markdownEditorRef.current]);
+  });
 
   const context = useContext(ConfigProvider.ConfigContext);
   const baseClassName = context?.getPrefixCls(`chart-attr-toolbar`);
 
-  const { wrapSSR, hashId } = useStyle(baseClassName);
-  return wrapSSR(
+  const { hashId } = useStyle(baseClassName);
+  return (
     <div
       className={clsx(baseClassName, hashId)}
       style={{
@@ -133,13 +134,11 @@ export const ChartAttrToolBar: React.FC<{
       })}
       {readonly ? null : (
         <Tooltip mouseEnterDelay={0.3} title={i18n?.locale?.delete || '删除'}>
-          <div
-            className={clsx(`${baseClassName}-item`, hashId)}
-          >
+          <div className={clsx(`${baseClassName}-item`, hashId)}>
             <DeleteOutlined onClick={remove} />
           </div>
         </Tooltip>
       )}
-    </div>,
+    </div>
   );
 };

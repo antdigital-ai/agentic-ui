@@ -1,12 +1,15 @@
 import {
-  ChatTokenType,
-  GenerateStyle,
+  genStyleHooks,
   resetComponent,
-  useEditorStyleRegister,
+  type GenStyleFn,
 } from '../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'ThoughtChainList'> = (token) => {
   return {
+    '@keyframes thoughtChainSpin': {
+      '0%': { transform: 'rotate(0deg)' },
+      '100%': { transform: 'rotate(360deg)' },
+    },
     [token.componentCls]: {
       padding: '12px',
       '*': {
@@ -43,14 +46,15 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             backgroundSize: '150%',
             backgroundPosition: '0 0',
             backgroundImage: `conic-gradient(
-    from var(--angle, 0deg) at 50% 50%,
     rgba(46, 255, 127, 0.7) 0deg,
     rgba(120, 133, 255, 1) 90deg,
     rgba(255, 0, 153, 0.4) 180deg,
     rgba(0, 221, 255, 0.62) 270deg,
     rgba(46, 255, 127, 0.7) 360deg
   )`,
-            animationName: 'spin',
+            transformOrigin: 'center center',
+            willChange: 'transform',
+            animationName: 'thoughtChainSpin',
             animationDuration: '2s',
             animationTimingFunction: 'linear',
             animationIterationCount: 'infinite',
@@ -80,7 +84,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         '&-icon': {
           width: 15,
           height: 15,
-          color: token.colorSuccess || '#0CE0AD',
+          color: 'var(--color-green-text-default)',
         },
         '&&-collapse': {
           borderRadius: '6px 12px 12px 12px',
@@ -114,7 +118,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         },
       },
       '&-content-wrapper': {
-        backgroundColor: token.colorBgContainer || '#FFF',
+        backgroundColor: 'var(--color-gray-bg-card-white)',
         position: 'relative',
         borderRadius: '6px 12px 12px 12px',
         zIndex: 9,
@@ -164,7 +168,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             },
             '& code[class*="language-"], pre[class*="language-"]': {
               whiteSpace: 'break-spaces!important',
-              color: 'rgb(102, 111, 141)',
+              color: 'var(--color-gray-a9)',
               fontFamily:
                 'SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif, Segoe UI-MONOSPACE',
             },
@@ -184,7 +188,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
               '&-tag': {
                 padding: '0px 6px',
                 background:
-                  'radial-gradient(22% 66% at 96% 113%, rgba(255, 255, 245, 0.52) 0%, rgba(230, 238, 255, 0) 100%), radial-gradient(14% 234% at 100% 50%, rgba(162, 255, 255, 0.28) 0%, rgba(153, 202, 255, 0.1193) 13%, rgba(229, 189, 255, 0.0826) 38%, rgba(235, 255, 245, 0) 100%), #FFFFFF',
+                  'radial-gradient(22% 66% at 96% 113%, rgba(255, 255, 245, 0.52) 0%, rgba(230, 238, 255, 0) 100%), radial-gradient(14% 234% at 100% 50%, rgba(162, 255, 255, 0.28) 0%, rgba(153, 202, 255, 0.1193) 13%, rgba(229, 189, 255, 0.0826) 38%, rgba(235, 255, 245, 0) 100%), var(--color-gray-bg-card-white)',
                 border: '1px solid rgba(227, 230, 234, 0.65)',
                 lineHeight: '26px',
               },
@@ -205,7 +209,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
                 lineHeight: '2em',
                 flexWrap: 'wrap',
                 letterSpacing: '0px',
-                color: 'rgba(0, 0, 0, 0.85)',
+                color: 'var(--color-gray-text-default)',
               },
               '&-action': {
                 opacity: 0,
@@ -236,17 +240,39 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 };
 
 /**
+ * 思维链项入场动画样式：替代 framer-motion 的
+ * `variants={{ hidden:{y:8,opacity:0}, visible:{y:0,opacity:1, delay:0.1*i} }}`。
+ *
+ * 通过 CSS keyframes + inline `animation-delay` 实现按 index 的 stagger 入场，
+ * 在测试环境（process.env.NODE_ENV === 'test'）下由组件层禁用动画。
+ */
+const genMotionStyle: GenStyleFn<'ThoughtChainList'> = (token) => {
+  return {
+    [`${token.componentCls}-content-list-item-motion`]: {
+      animationName: `${token.componentCls}-thoughtChainItemFadeInUp`,
+      animationDuration: '0.3s',
+      animationTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      animationFillMode: 'both',
+    },
+    [`@keyframes ${token.componentCls}-thoughtChainItemFadeInUp`]: {
+      from: { transform: 'translateY(8px)', opacity: 0 },
+      to: { transform: 'translateY(0)', opacity: 1 },
+    },
+  };
+};
+
+/**
  * BubbleChat
  * @param prefixCls
  * @returns
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('ThoughtChainList', (token) => {
-    const proChatToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('ThoughtChainList', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+  genMotionStyle(token, info),
+]);
 
-    return [resetComponent(proChatToken), genStyle(proChatToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [, hashId] = useGenStyle(prefixCls ?? 'ThoughtChainList');
+  return { hashId };
 }

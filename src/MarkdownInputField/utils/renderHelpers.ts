@@ -1,10 +1,9 @@
 import React, { useMemo } from 'react';
-import type { AttachmentButtonProps } from '../AttachmentButton';
 import { AttachmentFileList } from '../AttachmentButton/AttachmentFileList';
 import type { AttachmentFile } from '../AttachmentButton/types';
-import { SendActions } from '../SendActions';
 import { MARKDOWN_INPUT_FIELD_TEST_IDS } from '../testIds';
 import type { MarkdownInputFieldProps } from '../types/MarkdownInputFieldProps';
+import type { FileUploadStatus, FileUploadSummary } from '../types/shared';
 
 interface UseAttachmentListParams {
   attachment?: MarkdownInputFieldProps['attachment'];
@@ -52,163 +51,72 @@ export const useAttachmentList = ({
 
 interface UseBeforeToolsParams {
   beforeToolsRender?: MarkdownInputFieldProps['beforeToolsRender'];
-  props: MarkdownInputFieldProps;
+  /** 当前 attachment 配置（透传到 SlotRenderState.attachment） */
+  attachment?: MarkdownInputFieldProps['attachment'];
+  /** 当前编辑器值 */
+  value?: string;
+  /** 当前附件文件映射 */
+  fileMap?: Map<string, AttachmentFile>;
+  /** 修改附件文件映射的回调 */
+  onFileMapChange?: (fileMap?: Map<string, AttachmentFile>) => void;
+  /** 文件上传状态 */
+  fileUploadStatus: FileUploadStatus;
+  /** 文件上传统计 */
+  fileUploadSummary?: FileUploadSummary;
+  /** 是否禁用 */
+  disabled?: boolean;
+  /** 是否 typing 中 */
+  typing?: boolean;
+  /** 鼠标悬停状态 */
   isHover: boolean;
+  /** 发送加载状态 */
   isLoading: boolean;
 }
 
 /**
  * BeforeTools 渲染 Hook
+ *
+ * 行为契约：依赖列表中任何字段变化都会触发重新渲染。`beforeToolsRender` 入参
+ * 类型已收敛为 `SlotRenderState`，不再需要 ref 透传完整 `props` 对象。
  */
 export const useBeforeTools = ({
   beforeToolsRender,
-  props,
+  attachment,
+  value,
+  fileMap,
+  onFileMapChange,
+  fileUploadStatus,
+  fileUploadSummary,
+  disabled,
+  typing,
   isHover,
   isLoading,
 }: UseBeforeToolsParams): React.ReactNode => {
   return useMemo(() => {
-    if (beforeToolsRender) {
-      return beforeToolsRender({
-        ...props,
-        isHover,
-        isLoading,
-      });
-    }
-    return null;
-  }, [beforeToolsRender, props, isHover, isLoading]);
-};
-
-interface UseSendActionsNodeParams {
-  props: Pick<
-    MarkdownInputFieldProps,
-    | 'attachment'
-    | 'voiceRecognizer'
-    | 'value'
-    | 'disabled'
-    | 'typing'
-    | 'allowEmptySubmit'
-    | 'actionsRender'
-    | 'toolsRender'
-    | 'sendButtonProps'
-    | 'triggerSendKey'
-  >;
-  fileMap?: Map<string, AttachmentFile>;
-  setFileMap?: (fileMap?: Map<string, AttachmentFile>) => void;
-  supportedFormat: AttachmentButtonProps['supportedFormat'];
-  fileUploadDone: boolean;
-  fileUploadStatus: 'uploading' | 'done' | 'error';
-  fileUploadSummary: {
-    totalCount: number;
-    doneCount: number;
-    uploadingCount: number;
-    errorCount: number;
-  };
-  recording: boolean;
-  isLoading: boolean;
-  collapseSendActions: boolean;
-  uploadImage: (forGallery?: boolean) => Promise<void>;
-  startRecording: () => Promise<void>;
-  stopRecording: () => Promise<void>;
-  sendMessage: () => Promise<void>;
-  setIsLoading: (loading: boolean) => void;
-  onStop?: () => void;
-  setRightPadding: (padding: number) => void;
-  baseCls: string;
-  hashId: string;
-}
-
-/**
- * SendActions 节点渲染 Hook
- */
-export const useSendActionsNode = ({
-  props: sendProps,
-  fileMap,
-  setFileMap,
-  supportedFormat,
-  fileUploadDone,
-  fileUploadStatus,
-  fileUploadSummary,
-  recording,
-  isLoading,
-  collapseSendActions,
-  uploadImage,
-  startRecording,
-  stopRecording,
-  sendMessage,
-  setIsLoading,
-  onStop,
-  setRightPadding,
-  baseCls,
-  hashId,
-}: UseSendActionsNodeParams): React.ReactElement => {
-  return useMemo(
-    () =>
-      React.createElement(SendActions, {
-        attachment: {
-          ...sendProps.attachment,
-          supportedFormat,
-          fileMap,
-          onFileMapChange: setFileMap,
-          upload: sendProps.attachment?.upload
-            ? (file: any) => sendProps.attachment!.upload!(file, 0)
-            : undefined,
-        },
-        voiceRecognizer: sendProps.voiceRecognizer,
-        value: sendProps.value,
-        disabled: sendProps.disabled,
-        typing: sendProps.typing,
-        isLoading,
-        fileUploadDone,
-        fileUploadStatus,
-        fileUploadSummary,
-        recording,
-        collapseSendActions,
-        allowEmptySubmit: sendProps.allowEmptySubmit,
-        uploadImage,
-        onStartRecording: startRecording,
-        onStopRecording: stopRecording,
-        onSend: sendMessage,
-        onStop: () => {
-          setIsLoading(false);
-          onStop?.();
-        },
-        actionsRender: sendProps.actionsRender,
-        prefixCls: baseCls,
-        hashId,
-        hasTools: !!sendProps.toolsRender,
-        onResize: setRightPadding,
-        sendButtonProps: sendProps.sendButtonProps,
-        triggerSendKey: sendProps.triggerSendKey,
-      }),
-    [
-      sendProps.attachment,
-      sendProps.voiceRecognizer,
-      sendProps.value,
-      sendProps.disabled,
-      sendProps.typing,
-      sendProps.allowEmptySubmit,
-      sendProps.actionsRender,
-      sendProps.toolsRender,
-      sendProps.sendButtonProps,
-      sendProps.triggerSendKey,
+    if (!beforeToolsRender) return null;
+    return beforeToolsRender({
+      attachment,
+      value,
       fileMap,
-      setFileMap,
-      supportedFormat,
-      fileUploadDone,
+      onFileMapChange,
       fileUploadStatus,
       fileUploadSummary,
-      recording,
+      disabled,
+      typing,
+      isHover,
       isLoading,
-      collapseSendActions,
-      uploadImage,
-      startRecording,
-      stopRecording,
-      sendMessage,
-      setIsLoading,
-      onStop,
-      setRightPadding,
-      baseCls,
-      hashId,
-    ],
-  );
+    });
+  }, [
+    beforeToolsRender,
+    attachment,
+    value,
+    fileMap,
+    onFileMapChange,
+    fileUploadStatus,
+    fileUploadSummary,
+    disabled,
+    typing,
+    isHover,
+    isLoading,
+  ]);
 };

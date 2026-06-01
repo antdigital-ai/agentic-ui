@@ -1,10 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'ChartAttrToolBar'> = (token) => {
   return {
     [token.componentCls]: {
       display: 'flex',
@@ -32,13 +28,11 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * @param prefixCls
  * @returns
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('ChartAttr-' + prefixCls, (token) => {
-    const editorToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('ChartAttrToolBar', genStyle);
 
-    return [genStyle(editorToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  // 与 ChartAttrToolBar 组件内 `getPrefixCls('chart-attr-toolbar')` 对齐，
+  // 即使 prefixCls 缺省也保证选择器仍能命中组件 DOM
+  const [, hashId] = useGenStyle(prefixCls ?? 'chart-attr-toolbar');
+  return { hashId };
 }

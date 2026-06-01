@@ -1,5 +1,5 @@
-import { PLAYWRIGHT_FIXTURE_DEMOS } from '../tests/constants/playwrightDemoRoutes';
-import { expect, test } from '../tests/fixtures/page-fixture';
+import { PLAYWRIGHT_FIXTURE_DEMOS } from '../_test_helpers/constants/playwrightDemoRoutes';
+import { expect, test } from '../_test_helpers/fixtures/page-fixture';
 
 test.describe('MarkdownInputField 交互功能', () => {
   test.describe('发送消息', () => {
@@ -38,7 +38,9 @@ test.describe('MarkdownInputField 交互功能', () => {
       await markdownInputFieldPage.typeText('Line 1');
 
       // 按 Shift+Enter
-      await markdownInputFieldPage.page.keyboard.press('Shift+Enter');
+      await markdownInputFieldPage.keyboardTargetPage.keyboard.press(
+        'Shift+Enter',
+      );
 
       // 输入第二行
       await markdownInputFieldPage.typeText('Line 2');

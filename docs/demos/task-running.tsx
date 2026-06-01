@@ -1,7 +1,7 @@
 import {
+  AgentRunBar,
   TASK_RUNNING_STATUS,
   TASK_STATUS,
-  TaskRunning,
 } from '@ant-design/agentic-ui';
 import React, { useState } from 'react';
 
@@ -161,7 +161,7 @@ export default () => {
         点击"新任务"按钮可以循环展示不同状态，运行中状态会在5秒后自动变为完成或错误状态
       </p>
 
-      <TaskRunning
+      <AgentRunBar
         title={currentStatusInfo.title}
         description={currentStatusInfo.description}
         taskStatus={taskStatus}
@@ -192,7 +192,7 @@ export default () => {
           <h4 style={{ margin: '0 0 12px 0', color: '#1890ff' }}>
             状态1: 任务运行中
           </h4>
-          <TaskRunning
+          <AgentRunBar
             title={`任务运行中, 已耗时${elapsedTime}。`}
             description="正在执行数据分析流水线，请耐心等待..."
             taskStatus={TASK_STATUS.RUNNING}
@@ -212,7 +212,7 @@ export default () => {
           <h4 style={{ margin: '0 0 12px 0', color: '#faad14' }}>
             状态2: 任务已暂停
           </h4>
-          <TaskRunning
+          <AgentRunBar
             title="任务已暂停"
             description="数据分析任务已暂停，点击继续按钮恢复执行"
             taskStatus={TASK_STATUS.PAUSE}
@@ -232,7 +232,7 @@ export default () => {
           <h4 style={{ margin: '0 0 12px 0', color: '#ff4d4f' }}>
             状态3: 任务已停止
           </h4>
-          <TaskRunning
+          <AgentRunBar
             title="任务已停止"
             description="任务已手动停止，如需继续请创建新任务"
             taskStatus={TASK_STATUS.STOPPED}
@@ -252,7 +252,7 @@ export default () => {
           <h4 style={{ margin: '0 0 12px 0', color: '#52c41a' }}>
             状态4: 任务已完成
           </h4>
-          <TaskRunning
+          <AgentRunBar
             title={`任务已完成, 耗时${totalTime}`}
             taskStatus={TASK_STATUS.SUCCESS}
             taskRunningStatus={TASK_RUNNING_STATUS.COMPLETE}
@@ -271,7 +271,7 @@ export default () => {
           <h4 style={{ margin: '0 0 12px 0', color: '#ff4d4f' }}>
             状态5: 任务出错
           </h4>
-          <TaskRunning
+          <AgentRunBar
             title="任务执行出错"
             description="数据源连接中断，请检查网络后重试"
             taskStatus={TASK_STATUS.ERROR}
@@ -291,7 +291,7 @@ export default () => {
           <h4 style={{ margin: '0 0 12px 0', color: '#999' }}>
             状态6: 任务已取消
           </h4>
-          <TaskRunning
+          <AgentRunBar
             title="任务已取消"
             description="任务已被用户取消，请创建新任务"
             taskStatus={TASK_STATUS.CANCELLED}
@@ -311,7 +311,7 @@ export default () => {
         设置 variant 属性，可以衍生出更多的主题变体样式
       </p>
 
-      <TaskRunning
+      <AgentRunBar
         title={`任务运行中, 已耗时${elapsedTime}。 ${progress}`}
         taskStatus={TASK_STATUS.RUNNING}
         taskRunningStatus={TASK_RUNNING_STATUS.RUNNING}

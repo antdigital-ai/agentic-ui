@@ -1,7 +1,6 @@
-import type { ChatTokenType, GenerateStyle } from '../Hooks/useStyle';
-import { useEditorStyleRegister } from '../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'Workspace'> = (token) => {
   return {
     [token.componentCls]: {
       height: '100%',
@@ -123,6 +122,49 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         backgroundColor: 'var(--color-gray-control-fill-active)',
         borderRadius: '200px',
         boxSizing: 'border-box',
+        '--workspace-tab-count-digit-distance': '8px',
+        '--workspace-tab-count-digit-blur': '2px',
+        '--workspace-tab-count-digit-dur': '500ms',
+        '--workspace-tab-count-digit-stagger': '70ms',
+        '--workspace-tab-count-digit-ease': 'cubic-bezier(0.34, 1.45, 0.64, 1)',
+      },
+
+      [`${token.componentCls}-tab-count-digits`]: {
+        display: 'inline-flex',
+        alignItems: 'baseline',
+      },
+
+      [`${token.componentCls}-tab-count-digit`]: {
+        display: 'inline-block',
+        willChange: 'transform, opacity, filter',
+      },
+
+      [`${token.componentCls}-tab-count-digits--animating ${token.componentCls}-tab-count-digit`]:
+        {
+          animationName: `${token.componentCls}-tabCountDigitPopIn`,
+          animationDuration: 'var(--workspace-tab-count-digit-dur)',
+          animationTimingFunction: 'var(--workspace-tab-count-digit-ease)',
+          animationFillMode: 'both',
+        },
+
+      [`@keyframes ${token.componentCls}-tabCountDigitPopIn`]: {
+        '0%': {
+          transform: 'translate(0, var(--workspace-tab-count-digit-distance))',
+          opacity: 0,
+          filter: 'blur(var(--workspace-tab-count-digit-blur))',
+        },
+        '100%': {
+          transform: 'translate(0, 0)',
+          opacity: 1,
+          filter: 'blur(0)',
+        },
+      },
+
+      '@media (prefers-reduced-motion: reduce)': {
+        [`${token.componentCls}-tab-count-digit`]: {
+          animation: 'none !important',
+          animationDelay: '0ms !important',
+        },
       },
 
       [`${token.componentCls}-content`]: {
@@ -139,13 +181,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
-export function useWorkspaceStyle(prefixCls?: string) {
-  return useEditorStyleRegister('Workspace', (token) => {
-    const workspaceToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('Workspace', genStyle);
 
-    return [genStyle(workspaceToken)];
-  });
+export function useWorkspaceStyle(prefixCls?: string) {
+  const [, hashId] = useGenStyle(prefixCls ?? 'Workspace');
+  return { hashId };
 }

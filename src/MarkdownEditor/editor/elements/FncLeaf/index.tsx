@@ -1,8 +1,9 @@
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
-import React, { CSSProperties, useCallback, useContext, useMemo } from 'react';
+import React, { CSSProperties, useContext, useMemo } from 'react';
 import { RenderLeafProps } from 'slate-react';
 
+import { useRefFunction } from '../../../../Hooks/useRefFunction';
 import { isMobileDevice } from '../../../../MarkdownInputField/AttachmentButton/utils';
 import { MarkdownEditorProps } from '../../../types';
 import { dragStart } from '../index';
@@ -74,39 +75,36 @@ export const FncLeaf = ({
     [leaf.fnc, style],
   );
 
-  // 使用 useCallback 优化 onClick 处理函数
-  const handleClick = useCallback(
-    (e: React.MouseEvent) => {
-      // 在手机上，如果是 fnc，阻止点击事件（使用长按代替）
-      if (isMobile && hasFnc) {
-        e.preventDefault();
-        return;
+  // 使用 useRefFunction 优化 onClick 处理函数（事件 handler，引用恒定）
+  const handleClick = useRefFunction((e: React.MouseEvent) => {
+    // 在手机上，如果是 fnc，阻止点击事件（使用长按代替）
+    if (isMobile && hasFnc) {
+      e.preventDefault();
+      return;
+    }
+    if (hasFnc) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (fncProps?.onOriginUrlClick) {
+        fncProps.onOriginUrlClick(leaf?.identifier);
       }
-      if (hasFnc) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (fncProps?.onOriginUrlClick) {
-          fncProps.onOriginUrlClick(leaf?.identifier);
-        }
-        // 如果同时有 URL，也要处理 URL 打开逻辑
-        if (leaf.url) {
-          if (linkConfig?.onClick) {
-            const res = linkConfig.onClick(leaf.url);
-            if (res === false) {
-              return false;
-            }
-          }
-          if (linkConfig?.openInNewTab !== false) {
-            window.open(leaf.url, '_blank');
-          } else {
-            window.location.href = leaf.url;
+      // 如果同时有 URL，也要处理 URL 打开逻辑
+      if (leaf.url) {
+        if (linkConfig?.onClick) {
+          const res = linkConfig.onClick(leaf.url);
+          if (res === false) {
+            return false;
           }
         }
-        return false;
+        if (linkConfig?.openInNewTab !== false) {
+          window.open(leaf.url, '_blank');
+        } else {
+          window.location.href = leaf.url;
+        }
       }
-    },
-    [isMobile, hasFnc, fncProps, leaf?.identifier, leaf?.url, linkConfig],
-  );
+      return false;
+    }
+  });
 
   // 使用 useMemo 优化自定义渲染的 children 计算
   const customRenderChildren = useMemo(

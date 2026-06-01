@@ -1,10 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'History'> = (token) => {
   return {
     [`${token.componentCls}-load-more`]: {
       height: '48px',
@@ -63,6 +59,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         userSelect: 'none',
         lineHeight: '20px',
         transition: 'all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
+        // 任务状态图标容器：之前同名 key 写了两份会被静默覆盖（后者胜出，丢失 padding:8px）。
+        // 合并为并集：保留 padding 控制内边距 + fontSize 控制图标字号。
         [`${token.componentCls}-task-icon`]: {
           width: '32px',
           height: '32px',
@@ -71,19 +69,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           justifyContent: 'center',
           alignItems: 'center',
           padding: '8px',
-          gap: '10px',
-          borderRadius: '50%',
-          background: 'var(--color-gray-bg-page-dark)',
-          color: 'var(--color-gray-text-secondary)',
-        },
-
-        [`${token.componentCls}-task-icon`]: {
-          width: '32px',
-          height: '32px',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
           gap: '10px',
           fontSize: '16px',
           borderRadius: '50%',
@@ -302,13 +287,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 /** @internal 供单测调用 genStyle 覆盖 token 回退分支 */
 export { genStyle };
 
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('history-group-menu', (token) => {
-    const groupMenuToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('History', genStyle);
 
-    return [genStyle(groupMenuToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [, hashId] = useGenStyle(prefixCls ?? 'history-group-menu');
+  return { hashId };
 }

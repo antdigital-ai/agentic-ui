@@ -2,8 +2,9 @@ import { HistoryOutlined } from '@ant-design/icons';
 import { ConfigProvider, Popover } from 'antd';
 import classNames from 'clsx';
 import React, { memo, useContext, useMemo, useRef } from 'react';
+import { ActionIconBox } from '../Components/ActionIconBox';
 import useClickAway from '../Hooks/useClickAway';
-import { ActionIconBox, I18nContext } from '../index';
+import { I18nContext } from '../I18n';
 import {
   HistoryEmpty,
   HistoryLoadMore,
@@ -11,6 +12,7 @@ import {
   HistorySearch,
   generateHistoryItems,
 } from './components';
+import { useFormatTimeLocale } from './hooks/useFormatTimeLocale';
 import { useHistory } from './hooks/useHistory';
 import GroupMenu from './menu';
 import { useStyle } from './style';
@@ -59,7 +61,7 @@ const HistoryComponent: React.FC<HistoryProps> = (props) => {
   const { locale } = useContext(I18nContext);
   const containerRef = useRef<HTMLDivElement>(null);
   // 注册样式
-  const { wrapSSR, hashId } = useStyle(menuPrefixCls);
+  const { hashId } = useStyle(menuPrefixCls);
 
   const {
     open,
@@ -78,6 +80,13 @@ const HistoryComponent: React.FC<HistoryProps> = (props) => {
   useClickAway(() => {
     setOpen(false);
   }, containerRef);
+
+  // 聚合 loading 状态：isLoading 是新名字，loading 已废弃但仍兼容；优先取 isLoading
+  const mergedLoading = props.isLoading ?? props.loading;
+
+  // generateHistoryItems 是普通函数，无法读 React Context；
+  // 通过 useFormatTimeLocale 拿到稳定的 i18n 文案对象再透传下去
+  const formatTimeLocale = useFormatTimeLocale();
 
   const items = generateHistoryItems({
     filteredList,
@@ -105,11 +114,12 @@ const HistoryComponent: React.FC<HistoryProps> = (props) => {
     sessionSort: props.sessionSort,
     type: props.type,
     runningId: props.agent?.runningId,
+    formatTimeLocale,
   });
 
   // 使用 useMemo 优化空组件渲染
   // 注意：只有在 items 为空时才需要渲染空组件
-  const shouldShowEmpty = items?.length === 0 && !props.loading;
+  const shouldShowEmpty = items?.length === 0 && !mergedLoading;
   const EmptyComponent = useMemo(() => {
     if (!shouldShowEmpty) {
       return null;
@@ -130,7 +140,7 @@ const HistoryComponent: React.FC<HistoryProps> = (props) => {
     }
 
     const shouldRender =
-      props.agent?.enabled && !!props.agent?.onLoadMore && !props.loading;
+      props.agent?.enabled && !!props.agent?.onLoadMore && !mergedLoading;
 
     if (!shouldRender) {
       return null;
@@ -149,7 +159,7 @@ const HistoryComponent: React.FC<HistoryProps> = (props) => {
     props.loadMoreRender,
     props.agent?.enabled,
     props.agent?.onLoadMore,
-    props.loading,
+    mergedLoading,
     handleLoadMore,
     props.type,
     menuPrefixCls,
@@ -157,8 +167,9 @@ const HistoryComponent: React.FC<HistoryProps> = (props) => {
   ]);
 
   if (props.standalone) {
-    return wrapSSR(
+    return (
       <div
+        data-testid="history-standalone"
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -204,13 +215,13 @@ const HistoryComponent: React.FC<HistoryProps> = (props) => {
                 inlineIndent={20}
                 items={items}
                 className={menuPrefixCls}
-                loading={props.loading}
+                loading={mergedLoading}
               />
               {LoadMoreComponent}
             </>
           )}
         </div>
-      </div>,
+      </div>
     );
   }
 
@@ -238,7 +249,7 @@ const HistoryComponent: React.FC<HistoryProps> = (props) => {
               inlineIndent={20}
               items={items}
               className={menuPrefixCls}
-              loading={props.loading}
+              loading={mergedLoading}
             />
           )}
           {LoadMoreComponent}

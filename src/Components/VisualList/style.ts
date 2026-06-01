@@ -1,10 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'VisualList'> = (token) => {
   return {
     [token.componentCls]: {
       display: 'flex',
@@ -42,7 +38,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         color: 'inherit',
 
         '&:focus': {
-          outline: '2px solid #007acc',
+          outline: '2px solid var(--color-primary-control-fill-primary)',
           outlineOffset: '2px',
         },
       },
@@ -62,7 +58,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: '40px',
-        color: '#666',
+        color: 'var(--color-gray-text-secondary)',
         fontSize: '14px',
       },
 
@@ -74,7 +70,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: '40px',
-        color: '#999',
+        color: 'var(--color-gray-text-disabled)',
         fontSize: '14px',
         fontStyle: 'italic',
       },
@@ -103,7 +99,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       gap: 6,
       width: 'max-content',
       padding: '0 8px',
-      background: '#FFFFFF',
+      background: 'var(--color-gray-bg-card-white)',
       boxShadow: 'var(--shadow-control-base)',
     },
 
@@ -113,17 +109,14 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       fontWeight: 'normal',
       lineHeight: '22px',
       letterSpacing: 'normal',
-      color: '#767E8B',
+      color: 'var(--color-gray-text-secondary)',
     },
   };
 };
 
+const useGenStyle = genStyleHooks('VisualList', genStyle);
+
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('visual-list', (token) => {
-    const visualListToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [genStyle(visualListToken)];
-  });
+  const [, hashId] = useGenStyle(prefixCls ?? 'visual-list');
+  return { hashId };
 }
