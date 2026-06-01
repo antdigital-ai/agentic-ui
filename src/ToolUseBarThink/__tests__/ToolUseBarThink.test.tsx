@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -111,6 +111,94 @@ describe('ToolUseBarThink', () => {
       </Wrapper>,
     );
     expect(screen.getByTestId('think-content')).toBeInTheDocument();
+  });
+
+  it('展开时应在折叠动画结束后滚动到组件容器', () => {
+    const scrollIntoViewSpy = vi.fn();
+    vi.useFakeTimers();
+    Element.prototype.scrollIntoView = scrollIntoViewSpy;
+
+    try {
+      render(
+        <Wrapper>
+          <ToolUseBarThink toolName="Test" scrollIntoViewOnExpand />
+        </Wrapper>,
+      );
+
+      fireEvent.click(screen.getByTestId('tool-use-bar-think-bar'));
+
+      expect(scrollIntoViewSpy).not.toHaveBeenCalled();
+      act(() => {
+        vi.advanceTimersByTime(350);
+      });
+
+      expect(scrollIntoViewSpy).toHaveBeenCalledWith({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
+    } finally {
+      vi.useRealTimers();
+      delete (Element.prototype as Partial<Element>).scrollIntoView;
+    }
+  });
+
+  it('初始展开不触发滚动，后续展开透传自定义滚动参数', () => {
+    const scrollIntoViewSpy = vi.fn();
+    vi.useFakeTimers();
+    Element.prototype.scrollIntoView = scrollIntoViewSpy;
+
+    try {
+      const scrollOptions: ScrollIntoViewOptions = {
+        behavior: 'auto',
+        block: 'center',
+      };
+      const { rerender } = render(
+        <Wrapper>
+          <ToolUseBarThink
+            toolName="Test"
+            expanded={true}
+            scrollIntoViewOnExpand={scrollOptions}
+          />
+        </Wrapper>,
+      );
+
+      act(() => {
+        vi.advanceTimersByTime(350);
+      });
+      expect(scrollIntoViewSpy).not.toHaveBeenCalled();
+
+      rerender(
+        <Wrapper>
+          <ToolUseBarThink
+            toolName="Test"
+            expanded={false}
+            scrollIntoViewOnExpand={scrollOptions}
+          />
+        </Wrapper>,
+      );
+      act(() => {
+        vi.advanceTimersByTime(350);
+      });
+
+      rerender(
+        <Wrapper>
+          <ToolUseBarThink
+            toolName="Test"
+            expanded={true}
+            scrollIntoViewOnExpand={scrollOptions}
+          />
+        </Wrapper>,
+      );
+      act(() => {
+        vi.advanceTimersByTime(350);
+      });
+
+      expect(scrollIntoViewSpy).toHaveBeenCalledTimes(1);
+      expect(scrollIntoViewSpy).toHaveBeenCalledWith(scrollOptions);
+    } finally {
+      vi.useRealTimers();
+      delete (Element.prototype as Partial<Element>).scrollIntoView;
+    }
   });
 
   it('内容溢出时显示展开/收起按钮并可点击', () => {
