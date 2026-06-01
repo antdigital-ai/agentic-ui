@@ -2,15 +2,24 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ContentThrottle } from '../ContentThrottle';
 import { installRafStub } from './installRafStub';
 
+const setDocumentVisibility = (visibilityState: DocumentVisibilityState) => {
+  Object.defineProperty(document, 'visibilityState', {
+    configurable: true,
+    value: visibilityState,
+  });
+};
+
 describe('ContentThrottle', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     installRafStub();
+    setDocumentVisibility('visible');
   });
 
   afterEach(() => {
     vi.useRealTimers();
     vi.unstubAllGlobals();
+    setDocumentVisibility('visible');
   });
 
   it('enabled 模式下按帧推进字符', () => {
@@ -76,6 +85,31 @@ describe('ContentThrottle', () => {
 
     vi.advanceTimersToNextTimer();
     expect(flushed.length).toBe(countAfterComplete);
+    throttle.dispose();
+  });
+
+  it('页面不可见时用后台批量推进，并在切回可见后改回 raf', () => {
+    const flushed: string[] = [];
+    setDocumentVisibility('hidden');
+    const throttle = new ContentThrottle((s) => flushed.push(s), {
+      backgroundBatchMultiplier: 4,
+      backgroundInterval: 50,
+      charsPerFrame: 2,
+    });
+
+    throttle.push('abcdefghij');
+
+    vi.advanceTimersByTime(49);
+    expect(flushed).toEqual([]);
+
+    vi.advanceTimersByTime(1);
+    expect(flushed.at(-1)).toBe('abcdefgh');
+
+    setDocumentVisibility('visible');
+    document.dispatchEvent(new Event('visibilitychange'));
+
+    vi.advanceTimersByTime(16);
+    expect(flushed.at(-1)).toBe('abcdefghij');
     throttle.dispose();
   });
 });
