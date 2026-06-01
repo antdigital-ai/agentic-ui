@@ -1,5 +1,11 @@
-import '@testing-library/jest-dom';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+﻿import '@testing-library/jest-dom';
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { TaskList } from '..';
@@ -13,6 +19,26 @@ vi.mock('../../Components/Loading', () => ({
     </div>
   ),
 }));
+
+// 折叠改为基于 CSS 的 grid 0fr/1fr 过渡：内容节点始终保留在 DOM 中，
+// 通过 `*-body-collapsed` class 区分展开/折叠态。
+const findBody = (contentText: string): HTMLElement => {
+  const node = screen.getByText(contentText);
+  let el: HTMLElement | null = node;
+  while (el && !/(^|\s)[\w-]*-body($|\s|-collapsed)/.test(el.className)) {
+    el = el.parentElement;
+  }
+  if (!el) throw new Error(`No body wrapper found for "${contentText}"`);
+  return el;
+};
+
+const expectBodyCollapsed = (contentText: string) => {
+  expect(findBody(contentText).className).toMatch(/-body-collapsed/);
+};
+
+const expectBodyExpanded = (contentText: string) => {
+  expect(findBody(contentText).className).not.toMatch(/-body-collapsed/);
+};
 
 describe('TaskList', () => {
   const mockItems = [
@@ -60,9 +86,8 @@ describe('TaskList', () => {
       );
       expect(taskItems).toHaveLength(3);
 
-      // 由于组件类型限制，loading状态不在mockItems中，所以没有loading组件
       const loadingComponents = screen.queryAllByTestId('task-list-loading');
-      expect(loadingComponents).toHaveLength(0);
+      expect(loadingComponents).toHaveLength(2);
     });
 
     it('应该正确渲染 loading 状态并传入 size', () => {
@@ -77,8 +102,8 @@ describe('TaskList', () => {
       ];
       render(<TaskList items={itemsWithLoading} />);
 
-      const loadingEl = screen.getByTestId('task-list-loading');
-      expect(loadingEl).toBeInTheDocument();
+      const loadingStatus = screen.getByTestId('task-list-status-loading');
+      const loadingEl = within(loadingStatus).getByTestId('task-list-loading');
       expect(loadingEl).toHaveAttribute('data-size', '16');
     });
 
@@ -130,16 +155,16 @@ describe('TaskList', () => {
       const successTask = screen.getByText('Success Task');
       const successContent = 'Success content';
 
-      expect(screen.getByText(successContent)).toBeInTheDocument();
+      expectBodyExpanded(successContent);
 
       fireEvent.click(successTask);
       await waitFor(() => {
-        expect(screen.queryByText(successContent)).not.toBeInTheDocument();
+        expectBodyCollapsed(successContent);
       });
 
       fireEvent.click(successTask);
       await waitFor(() => {
-        expect(screen.getByText(successContent)).toBeInTheDocument();
+        expectBodyExpanded(successContent);
       });
     });
 
@@ -151,21 +176,21 @@ describe('TaskList', () => {
 
       fireEvent.click(successTask);
       await waitFor(() => {
-        expect(screen.queryByText('Success content')).not.toBeInTheDocument();
+        expectBodyCollapsed('Success content');
       });
-      expect(screen.getByText('Pending content 1')).toBeInTheDocument();
+      expectBodyExpanded('Pending content 1');
 
       fireEvent.click(pendingTask);
       await waitFor(() => {
-        expect(screen.queryByText('Pending content 1')).not.toBeInTheDocument();
+        expectBodyCollapsed('Pending content 1');
       });
-      expect(screen.queryByText('Success content')).not.toBeInTheDocument();
+      expectBodyCollapsed('Success content');
 
       fireEvent.click(successTask);
       await waitFor(() => {
-        expect(screen.getByText('Success content')).toBeInTheDocument();
+        expectBodyExpanded('Success content');
       });
-      expect(screen.queryByText('Pending content 1')).not.toBeInTheDocument();
+      expectBodyCollapsed('Pending content 1');
     });
 
     it('应该为有内容的任务显示箭头图标', () => {
@@ -223,11 +248,14 @@ describe('TaskList', () => {
 
       render(<TaskList items={itemsWithEmptyContent} />);
 
-      expect(screen.getByText('Empty Content Task')).toBeInTheDocument();
+      expect(screen.getAllByText('Empty Content Task').length).toBeGreaterThan(
+        0,
+      );
       const arrowContainers = document.querySelectorAll(
         '[data-testid="task-list-arrowContainer"]',
       );
-      expect(arrowContainers).toHaveLength(0);
+      expect(arrowContainers).toHaveLength(1);
+      expect(screen.getAllByText('Empty Content Task')).toHaveLength(2);
     });
 
     it('应该处理null内容', () => {
@@ -241,7 +269,48 @@ describe('TaskList', () => {
       ];
 
       render(<TaskList items={itemsWithNullContent} />);
-      expect(screen.getByText('Null Content Task')).toBeInTheDocument();
+      expect(screen.getAllByText('Null Content Task')).toHaveLength(2);
+    });
+
+    it('应渲染序列化 pre 形态的 content 正文', () => {
+      const serializedContent = {
+        type: 'pre',
+        props: {
+          children: 'Validation failed for tool "web_search"',
+        },
+      };
+      const items = [
+        {
+          key: '1',
+          title: 'web_search · query',
+          content: serializedContent as any,
+          status: 'success' as const,
+        },
+      ];
+
+      render(<TaskList items={items} />);
+
+      expect(
+        screen.getByText('Validation failed for tool "web_search"'),
+      ).toBeInTheDocument();
+    });
+
+    it('content 为空时应以 title 作为正文并显示展开箭头', () => {
+      const items = [
+        {
+          key: '1',
+          title: 'web_search · latest news',
+          content: {} as any,
+          status: 'success' as const,
+        },
+      ];
+
+      render(<TaskList items={items} />);
+
+      expect(
+        document.querySelectorAll('[data-testid="task-list-arrowContainer"]'),
+      ).toHaveLength(1);
+      expect(screen.getAllByText('web_search · latest news')).toHaveLength(2);
     });
 
     it('应该处理空数组', () => {
@@ -305,7 +374,7 @@ describe('TaskList', () => {
       expect(successIcons.length).toBeGreaterThan(0);
     });
 
-    it('应该正确渲染pending状态图标', () => {
+    it('pending 状态应与 loading 使用同一进行中图标', () => {
       const pendingItems = [
         {
           key: '1',
@@ -317,10 +386,11 @@ describe('TaskList', () => {
 
       render(<TaskList items={pendingItems} />);
 
-      const pendingIcons = document.querySelectorAll(
-        '[data-testid="task-list-status-pending"]',
-      );
-      expect(pendingIcons.length).toBeGreaterThan(0);
+      const pendingRoot = screen.getByTestId('task-list-status-pending');
+      expect(pendingRoot).toHaveClass('ant-task-list-status-loading');
+      expect(
+        pendingRoot.querySelector('[data-testid="task-list-loading"]'),
+      ).toBeInTheDocument();
     });
 
     it('应该正确渲染loading状态图标', () => {
@@ -452,12 +522,12 @@ describe('TaskList', () => {
       // 测试点击事件，因为组件没有实现键盘导航
       fireEvent.click(successTask);
       await waitFor(() => {
-        expect(screen.queryByText('Success content')).not.toBeInTheDocument();
+        expectBodyCollapsed('Success content');
       });
 
       fireEvent.click(successTask);
       await waitFor(() => {
-        expect(screen.getByText('Success content')).toBeInTheDocument();
+        expectBodyExpanded('Success content');
       });
     });
   });
@@ -578,13 +648,13 @@ describe('TaskList', () => {
         />,
       );
 
-      // 检查展开的任务内容是否可见
-      expect(screen.getByText('Success content')).toBeVisible();
-      expect(screen.getByText('Pending content 1')).toBeVisible();
-      expect(screen.getByText('Pending content 2')).toBeVisible();
+      // 检查展开的任务 body 没有 collapsed class
+      expectBodyExpanded('Success content');
+      expectBodyExpanded('Pending content 1');
+      expectBodyExpanded('Pending content 2');
 
-      // 检查未展开的任务内容是否不可见
-      expect(screen.queryByText('Another pending content')).toBeNull();
+      // 检查未展开的任务 body 处于 collapsed 态（DOM 仍保留）
+      expectBodyCollapsed('Another pending content');
     });
 
     it('点击时应该调用 onExpandedKeysChange 回调', () => {
@@ -646,8 +716,8 @@ describe('TaskList', () => {
       );
 
       // 初始状态：只有第一个任务展开
-      expect(screen.getByText('Success content')).toBeVisible();
-      expect(screen.queryByText('Pending content 1')).not.toBeInTheDocument();
+      expectBodyExpanded('Success content');
+      expectBodyCollapsed('Pending content 1');
 
       // 更新 expandedKeys
       expandedKeys = ['1', '2'];
@@ -661,8 +731,8 @@ describe('TaskList', () => {
 
       // 现在两个任务都应该展开
       await waitFor(() => {
-        expect(screen.getByText('Success content')).toBeVisible();
-        expect(screen.getByText('Pending content 1')).toBeVisible();
+        expectBodyExpanded('Success content');
+        expectBodyExpanded('Pending content 1');
       });
     });
 
@@ -705,8 +775,8 @@ describe('TaskList', () => {
       render(<TaskList items={mockItems} />);
 
       // 初始状态：所有任务都应该是展开的（保持向后兼容）
-      expect(screen.getByText('Success content')).toBeVisible();
-      expect(screen.getByText('Pending content 1')).toBeVisible();
+      expectBodyExpanded('Success content');
+      expectBodyExpanded('Pending content 1');
 
       // 点击折叠第一个任务
       const firstTaskTitle = screen.getByText('Success Task');
@@ -714,10 +784,10 @@ describe('TaskList', () => {
 
       // 第一个任务应该折叠
       await waitFor(() => {
-        expect(screen.queryByText('Success content')).not.toBeInTheDocument();
+        expectBodyCollapsed('Success content');
       });
       // 其他任务仍然展开
-      expect(screen.getByText('Pending content 1')).toBeVisible();
+      expectBodyExpanded('Pending content 1');
     });
   });
 
@@ -826,6 +896,46 @@ describe('TaskList', () => {
       render(<TaskList items={allDoneItems} variant="simple" />);
 
       expect(screen.getByText('任务完成')).toBeInTheDocument();
+    });
+
+    it('全部 success 时即使 loading=true 也应显示任务完成', () => {
+      const allDoneItems = [
+        {
+          key: '1',
+          title: 'Task 1',
+          content: 'Content 1',
+          status: 'success' as const,
+        },
+        {
+          key: '2',
+          title: 'Task 2',
+          content: 'Content 2',
+          status: 'success' as const,
+        },
+      ];
+
+      render(<TaskList items={allDoneItems} variant="simple" loading={true} />);
+
+      expect(screen.getByText('任务完成')).toBeInTheDocument();
+      expect(screen.queryByText('正在进行任务')).not.toBeInTheDocument();
+    });
+
+    it('open=true 时应展示全部任务项', () => {
+      const sixItems = Array.from({ length: 6 }, (_, i) => ({
+        key: String(i + 1),
+        title: `Step ${i + 1}`,
+        content: `Body ${i + 1}`,
+        status: 'success' as const,
+      }));
+
+      render(<TaskList items={sixItems} variant="simple" open={true} />);
+
+      const taskItems = document.querySelectorAll(
+        '[data-testid="task-list-thoughtChainItem"]',
+      );
+      expect(taskItems).toHaveLength(6);
+      expect(screen.getByText('Step 1')).toBeInTheDocument();
+      expect(screen.getByText('Step 6')).toBeInTheDocument();
     });
 
     describe('taskCompleteText 自定义文案', () => {
@@ -962,7 +1072,10 @@ describe('TaskList', () => {
 
       render(<TaskList items={errorItems} variant="simple" />);
 
-      expect(screen.getByText('正在进行任务')).toBeInTheDocument();
+      expect(screen.getByText('任务已取消')).toBeInTheDocument();
+      expect(
+        screen.getByTestId('task-list-simple-summary-status-error'),
+      ).toBeInTheDocument();
     });
 
     it('loading 任务无标题时应优先显示进行中状态', () => {
@@ -1022,6 +1135,28 @@ describe('TaskList', () => {
       render(<TaskList items={errorItems} variant="simple" open={false} />);
 
       expect(screen.queryByText('Task 1')).not.toBeInTheDocument();
+      expect(screen.getByText('Error Task')).toBeInTheDocument();
+    });
+
+    it('展开后存在 error 项时仍展示全部任务（工具失败不等同于整任务取消）', async () => {
+      const errorItems = [
+        {
+          key: '1',
+          title: 'Task 1',
+          content: 'Content 1',
+          status: 'success' as const,
+        },
+        {
+          key: '2',
+          title: 'Error Task',
+          content: 'Error content',
+          status: 'error' as const,
+        },
+      ];
+
+      render(<TaskList items={errorItems} variant="simple" open={true} />);
+
+      expect(screen.getByText('Task 1')).toBeInTheDocument();
       expect(screen.getByText('Error Task')).toBeInTheDocument();
     });
 
