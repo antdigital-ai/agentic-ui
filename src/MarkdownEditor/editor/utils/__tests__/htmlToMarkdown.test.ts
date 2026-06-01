@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest';
 import {
   batchHtmlToMarkdown,
   cleanHtml,
+  cleanWordHtml,
   extractTextFromHtml,
   htmlToMarkdown,
   isHtml,
+  isWordHtml,
 } from '../htmlToMarkdown';
 
 describe('htmlToMarkdown', () => {
@@ -194,5 +196,76 @@ describe('batchHtmlToMarkdown', () => {
     expect(result.length).toBe(2);
     expect(result[0]).toContain('a');
     expect(result[1]).toContain('b');
+  });
+});
+
+describe('isWordHtml', () => {
+  it('空字符串返回 false', () => {
+    expect(isWordHtml('')).toBe(false);
+    expect(isWordHtml(null as any)).toBe(false);
+  });
+
+  it('普通 HTML 不识别为 Word', () => {
+    expect(isWordHtml('<p>hello</p>')).toBe(false);
+    expect(isWordHtml('<div class="content">x</div>')).toBe(false);
+  });
+
+  it('Microsoft Word generator meta 命中', () => {
+    const html = '<html><head><meta name="Generator" content="Microsoft Word 16"></head><body>x</body></html>';
+    expect(isWordHtml(html)).toBe(true);
+  });
+
+  it('Microsoft Office generator meta 命中', () => {
+    const html = '<meta name="Generator" content="Microsoft Office Word">';
+    expect(isWordHtml(html)).toBe(true);
+  });
+
+  it('Office xmlns 命名空间命中', () => {
+    const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office"><body>x</body></html>';
+    expect(isWordHtml(html)).toBe(true);
+  });
+
+  it('<o:p> 标签命中', () => {
+    expect(isWordHtml('<p><o:p>x</o:p></p>')).toBe(true);
+  });
+
+  it('Mso 类名命中', () => {
+    expect(isWordHtml('<p class="MsoNormal">x</p>')).toBe(true);
+  });
+});
+
+describe('cleanWordHtml', () => {
+  it('删除 <o:p> 等 Office 命名空间标签', () => {
+    expect(cleanWordHtml('<p>before<o:p>x</o:p>after</p>')).toBe(
+      '<p>beforexafter</p>',
+    );
+  });
+
+  it('删除 IE/Word 条件注释', () => {
+    expect(
+      cleanWordHtml('<!--[if !supportLists]><span>•</span><![endif]-->text'),
+    ).toBe('text');
+  });
+
+  it('删除 mso-* 内联样式', () => {
+    const out = cleanWordHtml(
+      '<p style="font-size:12pt;mso-bidi-font-size:10pt;color:red">x</p>',
+    );
+    expect(out).not.toContain('mso-');
+    expect(out).toContain('color:red');
+  });
+
+  it('删除 Mso 类名', () => {
+    expect(cleanWordHtml('<p class="MsoNormal" id="x">y</p>')).toBe(
+      '<p id="x">y</p>',
+    );
+  });
+
+  it('&nbsp; 替换为普通空格', () => {
+    expect(cleanWordHtml('a&nbsp;b')).toBe('a b');
+  });
+
+  it('普通 HTML 保持不变', () => {
+    expect(cleanWordHtml('<p>hello</p>')).toBe('<p>hello</p>');
   });
 });

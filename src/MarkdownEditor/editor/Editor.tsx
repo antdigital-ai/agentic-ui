@@ -41,12 +41,18 @@ import {
   handleTagNodePaste,
   shouldInsertTextDirectly,
 } from './plugins/handlePaste';
+import { parseMarkdownToNodesAndInsert } from './plugins/parseMarkdownToNodesAndInsert';
 import { useHighlight } from './plugins/useHighlight';
 import { useKeyboard } from './plugins/useKeyboard';
 import { useOnchange } from './plugins/useOnchange';
 import { useEditorStore } from './store';
 import { useStyle } from './style';
 import { MARKDOWN_EDITOR_EVENTS, parserSlateNodeToMarkdown } from './utils';
+import {
+  cleanWordHtml,
+  htmlToMarkdown,
+  isWordHtml,
+} from './utils/htmlToMarkdown';
 import {
   EditorUtils,
   findByPathAndText,
@@ -742,6 +748,8 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
       cachedSlateMd &&
       allowedTypes.includes('application/x-slate-md-fragment')
     ) {
+      // handleSlateMarkdownFragment 仍读 clipboardData（同步），保留兼容；
+      // 同时把字符串塞回 DataTransfer 风格的最小适配器，避免 Safari 跨 await 失效。
       const synthetic = {
         getData: (k: string) =>
           k === 'application/x-slate-md-fragment' ? cachedSlateMd : '',
@@ -765,6 +773,30 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
       !htmlOversize &&
       allowedTypes.includes('text/html')
     ) {
+      // 2a. Word/Office HTML：先 cleanWordHtml + htmlToMarkdown 转 markdown，
+      // 再走 markdown 解析流水线，比 docxDeserializer 直接 HTML→Slate 更稳。
+      const wordToMd = pasteConfig?.convertWordToMarkdown !== false;
+      if (wordToMd && isWordHtml(cachedHtml)) {
+        try {
+          const cleaned = cleanWordHtml(cachedHtml);
+          const md = htmlToMarkdown(cleaned).trim();
+          if (md) {
+            parseMarkdownToNodesAndInsert(
+              markdownEditorRef.current,
+              md,
+              plugins,
+            );
+            return;
+          }
+        } catch (err) {
+          console.error(
+            '[handlePaste] Word HTML→markdown 转换失败，回退到默认 HTML 解析:',
+            err,
+          );
+          // 失败时让下面的 handleHtmlPaste 接管
+        }
+      }
+
       const syntheticForHtml = {
         getData: (k: string) => {
           if (k === 'text/html') return cachedHtml;

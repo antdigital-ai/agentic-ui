@@ -212,6 +212,13 @@ export type MarkdownEditorProps = {
      * @default 1_048_576
      */
     htmlMaxBytes?: number;
+    /**
+     * 检测到 Word / Office 系列 HTML 时，先把 HTML 转成 markdown 再走 markdown 解析
+     * 流水线（更稳定的格式映射），失败时回退到 insertParsedHtmlNodes。
+     * 默认 true；设为 false 走旧的 docxDeserializer 路径。
+     * @default true
+     */
+    convertWordToMarkdown?: boolean;
   };
 
   jinja?: JinjaConfig;
