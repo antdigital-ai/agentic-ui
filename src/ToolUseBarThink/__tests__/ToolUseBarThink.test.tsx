@@ -15,6 +15,33 @@ const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <ConfigProvider>{children}</ConfigProvider>
 );
 
+const mockOverflowingContent = (scrollHeight = 250) => {
+  const originalResizeObserver = global.ResizeObserver;
+
+  global.ResizeObserver = class MockResizeObserver {
+    private readonly callback: () => void;
+
+    constructor(callback: () => void) {
+      this.callback = callback;
+    }
+
+    observe(el: HTMLElement) {
+      Object.defineProperty(el, 'scrollHeight', {
+        value: scrollHeight,
+        configurable: true,
+      });
+      this.callback();
+    }
+
+    disconnect() {}
+    unobserve() {}
+  };
+
+  return () => {
+    global.ResizeObserver = originalResizeObserver;
+  };
+};
+
 describe('ToolUseBarThink', () => {
   it('should render with time and show time element', () => {
     render(
@@ -316,5 +343,79 @@ describe('ToolUseBarThink', () => {
     }
     expect(screen.getByTestId('think-tall-3')).toBeInTheDocument();
     global.ResizeObserver = originalRO;
+  });
+
+  it('内容溢出展开后解除折叠父级和容器高度限制', () => {
+    const restoreResizeObserver = mockOverflowingContent();
+
+    try {
+      render(
+        <Wrapper>
+          <ToolUseBarThink
+            toolName="Test"
+            status="success"
+            thinkContent={<div data-testid="think-overflowing">Tall</div>}
+            defaultExpanded
+          />
+        </Wrapper>,
+      );
+
+      const container = screen.getByTestId('tool-use-bar-think-container');
+      const collapse = container.parentElement?.parentElement;
+
+      expect(screen.getByTestId('think-overflowing')).toBeInTheDocument();
+      expect(container.style.maxHeight).toBe('');
+      expect(collapse?.className).not.toContain(
+        'think-collapse-content-expanded',
+      );
+
+      fireEvent.click(
+        screen.getByTestId('tool-use-bar-think-content-expand'),
+      );
+
+      expect(container).toHaveStyle({
+        maxHeight: 'none',
+        overflowY: 'auto',
+      });
+      expect(collapse?.className).toContain(
+        'think-collapse-content-expanded',
+      );
+    } finally {
+      restoreResizeObserver();
+    }
+  });
+
+  it('loading 状态 floating 展开后解除长内容裁剪并保持按钮可见', () => {
+    render(
+      <Wrapper>
+        <ToolUseBarThink
+          toolName="Test"
+          status="loading"
+          thinkContent={<div data-testid="think-loading-long">Loading</div>}
+          defaultExpanded
+        />
+      </Wrapper>,
+    );
+
+    const container = screen.getByTestId('tool-use-bar-think-container');
+    const collapse = container.parentElement?.parentElement;
+
+    expect(container.style.maxHeight).toBe('');
+    expect(container.className).not.toContain('container-floating-expanded');
+    expect(collapse?.className).not.toContain(
+      'think-collapse-content-expanded',
+    );
+
+    fireEvent.click(screen.getByTestId('tool-use-bar-think-floating-expand'));
+
+    expect(container).toHaveStyle({
+      maxHeight: 'none',
+      overflowY: 'auto',
+    });
+    expect(container.className).toContain('container-floating-expanded');
+    expect(collapse?.className).toContain('think-collapse-content-expanded');
+    expect(
+      screen.getByTestId('tool-use-bar-think-floating-expand'),
+    ).toBeInTheDocument();
   });
 });
