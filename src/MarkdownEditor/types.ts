@@ -208,6 +208,11 @@ export type MarkdownEditorProps = {
   formula?: FormulaConfig;
   plugins?: any[];
   onChange?: (value: string, schema: Elements[]) => void;
+  /**
+   * onChange 去抖等待毫秒数。连续输入会合并为一次回调，默认 150ms。
+   * 设为 0 时仍会去掉同帧重复（rAF 级别）；设大值可进一步降低 setState 频率。
+   */
+  onChangeDebounceWait?: number;
   onSelectionChange?: (
     selection: Selection | null,
     selectedMarkdown: string,

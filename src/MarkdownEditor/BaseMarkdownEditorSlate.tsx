@@ -14,6 +14,7 @@ import { withHistory } from 'slate-history';
 import { withReact } from 'slate-react';
 import { resolveContainerContentStyle } from '../Constants/contentPaddingVars';
 import { useFormulaConfig } from '../Config';
+import { useDebounceFn } from '../Hooks/useDebounceFn';
 import { useRefFunction } from '../Hooks/useRefFunction';
 import { CommentList } from './editor/components/CommentList';
 import { SlateMarkdownEditor } from './editor/Editor';
@@ -257,6 +258,21 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
     setSchema(initSchemaValue);
   }, [initSchemaValue]);
 
+  // toc 关闭时无人消费 schema，无需 setState 触发整树 re-render；
+  // toc 开启时延迟到稳定后再更新，TOC 跟随节奏可接受地放慢。
+  const tocEnabled = toc !== false;
+  const setSchemaDebounce = useDebounceFn((next: Elements[]) => {
+    setSchema(next);
+  }, 200);
+  const handleChildChange = useRefFunction(
+    (value: string, s: Elements[]) => {
+      if (tocEnabled) {
+        setSchemaDebounce.run(s);
+      }
+      rest?.onChange?.(value, s);
+    },
+  );
+
   const [openInsertCompletion, setOpenInsertCompletion] = useState(false);
   const [refreshFloatBar, setRefreshFloatBar] = useState(false);
 
@@ -386,10 +402,7 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
                 prefixCls={baseClassName}
                 {...rest}
                 lazy={lazy}
-                onChange={(value, s) => {
-                  setSchema(s);
-                  rest?.onChange?.(value, s);
-                }}
+                onChange={handleChildChange}
                 initSchemaValue={initSchemaValue}
                 style={editorStyle}
                 instance={instance}

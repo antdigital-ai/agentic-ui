@@ -208,7 +208,16 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
   const plugins = useContext(PluginContext);
 
   const onKeyDown = useKeyboard(store, markdownEditorRef, props);
-  const onChange = useOnchange(markdownEditorRef.current, props.onChange);
+  // 选区跟踪开关：FloatBar 启用 或 提供了 onSelectionChange 才需要每次都跑 Editor.nodes/DOMRect
+  const selectionTrackingEnabled =
+    !!props.onSelectionChange ||
+    (readonly
+      ? !!props.reportMode && props.floatBar?.enable !== false
+      : props.floatBar?.enable !== false);
+  const onChange = useOnchange(markdownEditorRef.current, props.onChange, {
+    wait: props.onChangeDebounceWait,
+    selectionTrackingEnabled,
+  });
   const high = useHighlight(store, jinjaEnabled);
 
   const childrenIsEmpty = useMemo(() => {
