@@ -10,9 +10,9 @@ import {
 describe('htmlUrlSafety', () => {
   describe('shouldRenderUrlAsPlainText', () => {
     it('应将含 onerror 的 HTML 片段识别为纯文本', () => {
-      expect(
-        shouldRenderUrlAsPlainText('<img src=x onerror=alert(1)>'),
-      ).toBe(true);
+      expect(shouldRenderUrlAsPlainText('<img src=x onerror=alert(1)>')).toBe(
+        true,
+      );
     });
 
     it('应将含 onload 的字符串识别为纯文本', () => {
@@ -24,9 +24,9 @@ describe('htmlUrlSafety', () => {
     });
 
     it('应允许正常 https URL', () => {
-      expect(
-        shouldRenderUrlAsPlainText('https://example.com/img.png'),
-      ).toBe(false);
+      expect(shouldRenderUrlAsPlainText('https://example.com/img.png')).toBe(
+        false,
+      );
     });
   });
 

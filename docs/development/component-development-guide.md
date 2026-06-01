@@ -153,8 +153,8 @@ const useGenStyle = genStyleHooks('ComponentName', genStyle, () => ({
 }));
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'component-name');
-  return { wrapSSR, hashId };
+  const [hashId] = useGenStyle(prefixCls ?? 'component-name');
+  return { hashId };
 }
 ```
 
@@ -163,11 +163,6 @@ export function useStyle(prefixCls?: string) {
 >
 > 1. 使用 agentic-ui 自有的 `AgenticComponentTokenMap`（组件可自由扩展）
 > 2. `hashId` 始终为 `''`，避免组件库选择器随宿主 antd 主题哈希变化
-> 3. **`wrapSSR` 返回 identity**：样式注入由 `useGenStyle` 调用本身的副作用
->    （cssinjs `useGlobalCache` → `updateCSS`）完成；`wrapSSR` 在我们的 CSR
->    配置下原本只是 `<><Empty/>{node}</>` 这种无意义 Fragment 包装，因此被
->    替换为 `node => node`。新组件可以直接 `return <div/>` 而不必再包
->    `wrapSSR(...)`；旧调用方继续传入也不影响（identity 透传）。
 
 #### 何时使用 `resetComponent`
 
@@ -231,10 +226,10 @@ const Component: React.FC<ComponentProps> = ({
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('component-name');
 
-  // 注册样式并获取 wrapSSR 和 hashId
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  // 注册样式并获取 hashId
+  const { hashId } = useStyle(prefixCls);
 
-  return wrapSSR(
+  return (
     <div
       className={classNames(
         prefixCls,
@@ -250,7 +245,7 @@ const Component: React.FC<ComponentProps> = ({
       <div className={classNames(`${prefixCls}-content`, hashId)}>
         {children}
       </div>
-    </div>,
+    </div>
   );
 };
 ```
@@ -287,9 +282,9 @@ const Component: React.FC<ComponentProps> = ({
 ```tsx | pure
 const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
 const prefixCls = getPrefixCls('component-name');
-const { wrapSSR, hashId } = useStyle(prefixCls);
+const { hashId } = useStyle(prefixCls);
 
-return wrapSSR(
+return (
   <div
     className={classNames(
       prefixCls,
@@ -308,7 +303,6 @@ return wrapSSR(
 - [ ] 正确定义 `GenerateStyle` 函数
 - [ ] 使用 `ConfigProvider.ConfigContext` 获取 `prefixCls`
 - [ ] 使用 `classNames` 工具函数管理类名
-- [ ] 添加 `wrapSSR` 包装组件
 - [ ] 验证主题切换功能正常
 - [ ] 验证响应式样式工作正常
 - [ ] 检查编译错误并修复
@@ -541,7 +535,6 @@ docs/demos/
 - [ ] 更新组件中的样式引用（移除 `.less` 引用）
 - [ ] 使用 `ConfigProvider.ConfigContext` 获取 `prefixCls`
 - [ ] 使用 `classNames` 工具函数管理类名
-- [ ] 添加 `wrapSSR` 包装组件
 - [ ] 确保主题切换功能正常（`&-dark` 格式）
 - [ ] 验证响应式样式工作正常
 - [ ] 删除原有的 `.less` 文件

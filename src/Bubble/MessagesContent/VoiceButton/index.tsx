@@ -38,7 +38,7 @@ export const VoiceButton: React.FC<VoiceButtonProps> = ({
   const configContext = React.useContext(ConfigProvider.ConfigContext);
   const prefixCls =
     configContext?.getPrefixCls(`agent-voice-button`) || 'agent-voice-button';
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
   const [isPlayHover, setIsPlayHover] = useState<boolean>(false);
   const [isPlayingHovered, setIsPlayingHovered] = useState(false);
 
@@ -111,7 +111,7 @@ export const VoiceButton: React.FC<VoiceButtonProps> = ({
 
   const rateDisplay = useMemo(() => `${rate}x`, [rate]);
 
-  return wrapSSR(
+  return (
     <div
       style={{
         display: 'flex',
@@ -176,7 +176,7 @@ export const VoiceButton: React.FC<VoiceButtonProps> = ({
           </Dropdown>
         </div>
       )}
-    </div>,
+    </div>
   );
 };
 

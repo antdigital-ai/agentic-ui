@@ -31,7 +31,6 @@ export const RerenderMdDemo = () => {
       <MarkdownRenderer
         content={content}
         streaming={false}
-        isFinished
         style={{ width: '50%' }}
       />
     </div>

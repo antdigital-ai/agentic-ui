@@ -162,14 +162,14 @@ export const HtmlPreview: React.FC<HtmlPreviewProps> = (props) => {
     };
   };
 
-  const { wrapSSR, hashId } = useHtmlPreviewStyle(prefixCls);
+  const { hashId } = useHtmlPreviewStyle(prefixCls);
 
   const isEmpty = (html ?? '').trim() === '';
   const shouldShowEmpty = isEmpty && status !== 'loading' && status !== 'error';
   const emptyNode =
     typeof emptyRender === 'function' ? emptyRender() : emptyRender;
 
-  return wrapSSR(
+  return (
     <div className={classNames(prefixCls, className, hashId)} style={style}>
       {showSegmented && (
         <div className={classNames(`${prefixCls}-actions`, hashId)}>
@@ -222,7 +222,7 @@ export const HtmlPreview: React.FC<HtmlPreviewProps> = (props) => {
           />
         )}
       </div>
-    </div>,
+    </div>
   );
 };
 

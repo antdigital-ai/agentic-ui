@@ -1,5 +1,4 @@
 import { debugInfo } from '../../../../Utils/debugUtils';
-import { InlineKatexNode } from '../../../el';
 
 // 常量定义
 const INLINE_MATH_SUFFIX_PATTERN = '(?:%|[kKmMbB]|千|万|亿|兆|万亿|百万|亿万)?';
@@ -28,9 +27,8 @@ export const shouldTreatInlineMathAsText = (rawValue: string): boolean => {
 };
 
 /**
- * 处理内联数学公式
- * @param currentElement - 当前处理的内联数学公式元素
- * @returns 返回格式化的内联KaTeX节点对象
+ * 处理内联数学公式（单 $...$）
+ * 不生成 inline-katex；行内/块级公式仅支持 $$...$$
  */
 export const handleInlineMath = (currentElement: any) => {
   debugInfo('handleInlineMath - 处理内联数学公式', {
@@ -38,24 +36,11 @@ export const handleInlineMath = (currentElement: any) => {
   });
   const inlineMathValue =
     typeof currentElement?.value === 'string' ? currentElement.value : '';
-  const treatAsText = shouldTreatInlineMathAsText(inlineMathValue);
-  debugInfo('handleInlineMath - 判断结果', {
-    treatAsText,
-    value: inlineMathValue,
-  });
-  if (treatAsText) {
-    const result = {
-      type: 'paragraph',
-      children: [{ text: `$${inlineMathValue}$` }],
-    } as any;
-    debugInfo('handleInlineMath - 作为文本处理', { type: result.type });
-    return result;
-  }
   const result = {
-    type: 'inline-katex',
-    children: [{ text: inlineMathValue }],
-  } as InlineKatexNode;
-  debugInfo('handleInlineMath - 作为内联公式处理', { type: result.type });
+    type: 'paragraph',
+    children: [{ text: `$${inlineMathValue}$` }],
+  } as any;
+  debugInfo('handleInlineMath - 作为文本处理', { type: result.type });
   return result;
 };
 

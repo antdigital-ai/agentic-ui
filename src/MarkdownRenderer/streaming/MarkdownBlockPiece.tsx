@@ -1,8 +1,7 @@
-import React, { memo, useMemo, useRef } from 'react';
+﻿import React, { memo, useMemo, useRef } from 'react';
 import type { Processor } from 'unified';
 
 import { renderMarkdownBlock } from '../markdownReactShared';
-import { StreamingAnimationContext } from '../StreamingAnimationContext';
 import { shouldReparseLastBlock } from './lastBlockThrottle';
 
 export interface MarkdownBlockPieceProps {
@@ -80,13 +79,7 @@ export const MarkdownBlockPiece = memo(function MarkdownBlockPiece({
     return el;
   }, [variant, blockSource, processor, streaming]);
 
-  const animateBlock = variant === 'tail' && streaming;
-
-  return (
-    <StreamingAnimationContext.Provider value={{ animateBlock }}>
-      {node}
-    </StreamingAnimationContext.Provider>
-  );
+  return <>{node}</>;
 });
 
 MarkdownBlockPiece.displayName = 'MarkdownBlockPiece';

@@ -1,6 +1,71 @@
 import { HistoryDataType } from './HistoryData';
 import { HistoryListConfig } from './HistoryList';
 
+/**
+ * Agent 模式搜索框配置
+ */
+export interface AgentSearchOptions {
+  /** 搜索输入框 placeholder 文案 */
+  placeholder?: string;
+  /** 未展开时的默认文本 */
+  text?: string;
+  /** 搜索触发方式: 'change' - 实时搜索(默认), 'enter' - 回车触发 */
+  trigger?: 'change' | 'enter';
+}
+
+/**
+ * Agent 模式完整配置接口
+ *
+ * 各组件按需 Pick 子集，避免重复定义：
+ * - HistoryProps.agent → AgentModeConfig（全量）
+ * - HistoryListConfig.agent → AgentModeListConfig（不含 searchOptions）
+ * - HistoryActionsBoxProps.agent / HistoryItemProps.agent → AgentModeItemConfig（基础交互子集）
+ */
+export interface AgentModeConfig {
+  /** 是否启用 agent 模式 */
+  enabled?: boolean;
+  /** 搜索回调 */
+  onSearch?: (keyword: string) => void;
+  /** 收藏回调 */
+  onFavorite?: (sessionId: string, isFavorite: boolean) => void;
+  /** 多选回调 */
+  onSelectionChange?: (selectedIds: string[]) => void;
+  /** 查看更多回调 */
+  onLoadMore?: () => void;
+  /** 是否正在加载更多 */
+  loadingMore?: boolean;
+  /** 新对话回调 */
+  onNewChat?: () => void;
+  /** 正在运行的记录ID列表，这些记录将显示运行图标 */
+  runningId?: string[];
+  /** 搜索框配置 */
+  searchOptions?: AgentSearchOptions;
+}
+
+/** 列表级 Agent 配置（不含 searchOptions） */
+export type AgentModeListConfig = Pick<
+  AgentModeConfig,
+  | 'enabled'
+  | 'onSearch'
+  | 'onFavorite'
+  | 'onSelectionChange'
+  | 'onLoadMore'
+  | 'loadingMore'
+  | 'onNewChat'
+  | 'runningId'
+>;
+
+/** 项级 Agent 配置（基础交互子集） */
+export type AgentModeItemConfig = Pick<
+  AgentModeConfig,
+  | 'enabled'
+  | 'onSearch'
+  | 'onFavorite'
+  | 'onSelectionChange'
+  | 'onLoadMore'
+  | 'loadingMore'
+>;
+
 export interface HistoryProps {
   agentId: string;
   standalone?: boolean;
@@ -32,33 +97,7 @@ export interface HistoryProps {
     reload: () => void;
   } | null>;
   /** Agent 模式配置 */
-  agent?: {
-    /** 是否启用 agent 模式 */
-    enabled?: boolean;
-    /** 搜索回调 */
-    onSearch?: (keyword: string) => void;
-    /** 收藏回调 */
-    onFavorite?: (sessionId: string, isFavorite: boolean) => void;
-    /** 多选回调 */
-    onSelectionChange?: (selectedIds: string[]) => void;
-    /** 查看更多回调 */
-    onLoadMore?: () => void;
-    /** 是否正在加载更多 */
-    loadingMore?: boolean;
-    /** 新对话回调 */
-    onNewChat?: () => void;
-    /** 正在运行的记录ID列表，这些记录将显示运行图标 */
-    runningId?: string[];
-    /** 搜索框配置 */
-    searchOptions?: {
-      /** 搜索输入框 placeholder 文案 */
-      placeholder?: string;
-      /** 未展开时的默认文本 */
-      text?: string;
-      /** 搜索触发方式: 'change' - 实时搜索(默认), 'enter' - 回车触发 */
-      trigger?: 'change' | 'enter';
-    };
-  };
+  agent?: AgentModeConfig;
   /** 插槽 */
   slots?: {
     beforeHistoryList?: (list: HistoryDataType[]) => React.ReactNode;
@@ -83,20 +122,7 @@ export interface HistoryActionsBoxProps {
   onDeleteItem?: () => void;
   /** 收藏操作回调函数 */
   /** Agent模式配置 */
-  agent?: {
-    /** 是否启用 agent 模式 */
-    enabled?: boolean;
-    /** 搜索回调 */
-    onSearch?: (keyword: string) => void;
-    /** 收藏回调 */
-    onFavorite?: (sessionId: string, isFavorite: boolean) => void;
-    /** 多选回调 */
-    onSelectionChange?: (selectedIds: string[]) => void;
-    /** 查看更多回调 */
-    onLoadMore?: () => void;
-    /** 是否正在加载更多 */
-    loadingMore?: boolean;
-  };
+  agent?: AgentModeItemConfig;
   /** 历史数据项 */
   item?: HistoryDataType;
   /** 收藏操作回调函数 */

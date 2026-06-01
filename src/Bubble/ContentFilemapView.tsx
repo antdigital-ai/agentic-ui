@@ -62,7 +62,9 @@ const FilemapItem: React.FC<{
   let events: ReturnType<NonNullable<BubbleProps['fileViewEvents']>> = {};
   try {
     events = fileViewEvents?.(defaultHandlers) || {};
-  } catch {}
+  } catch (error) {
+    console.warn('fileViewEvents execution failed', error);
+  }
 
   if (parsed === null || fileMap.size === 0) return null;
 

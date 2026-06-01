@@ -82,7 +82,7 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = ({
   const { locale } = useContext(I18nContext);
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('layout-header');
-  const { wrapSSR, hashId } = useLayoutHeaderStyle(prefixCls);
+  const { hashId } = useLayoutHeaderStyle(prefixCls);
 
   // 使用 useMergedState 管理左侧折叠状态
   const [leftCollapsed, setLeftCollapsed] = useMergedState(
@@ -118,7 +118,7 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = ({
     onShare?.();
   };
 
-  return wrapSSR(
+  return (
     <div
       className={classNames(prefixCls, hashId, className)}
       data-testid={prefixCls}
@@ -169,7 +169,7 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = ({
         )}
         {rightExtra}
       </div>
-    </div>,
+    </div>
   );
 };
 

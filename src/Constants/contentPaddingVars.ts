@@ -7,7 +7,8 @@ export const CONTENT_PADDING_CSS_VAR = '--agentic-ui-content-padding';
 export const CONTENT_PADDING_MOBILE_CSS_VAR = '--agentic-ui-content-padding-sm';
 
 /** 宿主可覆盖：MarkdownEditor 容器移动端默认内边距 */
-export const MOBILE_CONTENT_PADDING_CSS_VAR = '--agentic-ui-mobile-content-padding';
+export const MOBILE_CONTENT_PADDING_CSS_VAR =
+  '--agentic-ui-mobile-content-padding';
 
 /** 宿主可覆盖：MarkdownInputField editor-content 移动端默认内边距 */
 export const MOBILE_INPUT_FIELD_EDITOR_CONTENT_PADDING_CSS_VAR =

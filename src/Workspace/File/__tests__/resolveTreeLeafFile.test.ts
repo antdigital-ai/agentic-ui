@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { resolveTreeLeafFile } from '../resolveTreeLeafFile';
 import type { FileTreeNode } from '../../types';
+import { resolveTreeLeafFile } from '../resolveTreeLeafFile';
 
 describe('resolveTreeLeafFile', () => {
   it('目录节点应返回 null', () => {

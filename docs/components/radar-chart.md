@@ -51,15 +51,15 @@ group:
 
 与 [LineChart](/components/line-chart)、[BarChart](/components/bar-chart) 等一致，采用扁平 `ChartDataItem` 字段（雷达图语义如下）：
 
-| 字段        | 说明                                       | 类型               | 默认值 | 版本 |
-| ----------- | ------------------------------------------ | ------------------ | ------ | ---- |
-| category    | 分类（工具栏筛选项，如团队 A / 团队 B）    | `string`           | -      | -    |
-| x           | 雷达轴维度名（如「产品」「技术」）         | `number \| string` | -      | -    |
-| y           | 分值                                       | `number \| string` | -      | -    |
+| 字段        | 说明                                        | 类型               | 默认值 | 版本 |
+| ----------- | ------------------------------------------- | ------------------ | ------ | ---- |
+| category    | 分类（工具栏筛选项，如团队 A / 团队 B）     | `string`           | -      | -    |
+| x           | 雷达轴维度名（如「产品」「技术」）          | `number \| string` | -      | -    |
+| y           | 分值                                        | `number \| string` | -      | -    |
 | type        | 图例序列名（映射为 dataset）；缺省为 `默认` | `string`           | -      | -    |
-| filterLabel | 二级筛选标签（可选）                       | `string`           | -      | -    |
-| xtitle      | X 轴标题（可选）                           | `string`           | -      | -    |
-| ytitle      | Y 轴标题（可选）                           | `string`           | -      | -    |
+| filterLabel | 二级筛选标签（可选）                        | `string`           | -      | -    |
+| xtitle      | X 轴标题（可选）                            | `string`           | -      | -    |
+| ytitle      | Y 轴标题（可选）                            | `string`           | -      | -    |
 
 兼容历史字段：`label` 等同 `x`，`score` 等同 `y`（不推荐新代码使用）。
 

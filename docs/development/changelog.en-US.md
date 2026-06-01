@@ -9,7 +9,31 @@ group:
 
 # Changelog
 
+## v2.32.31
+
+- MarkdownRenderer
+  - 🛠 Removed all streaming animations and character queues (paragraph fade-in, progressive fade-in, `CharacterQueue` typewriter, and `AnimationText`). Streaming content is now rendered immediately after `useStreaming` caching; removed obsolete APIs and exports including `queueOptions`, `streamingParagraphAnimation`, and `isFinished`.
+  - 🆕 Added `ContentThrottle` + `useContentThrottle` to progressively render large SSE text chunks frame-by-frame, mitigating full-page flashes. `isFinished` / `throttleOptions` are now exposed to `MarkdownPreview` and `ReadonlyMarkdownEditorView`.
+- TaskList
+  - 💄 Simple variant wrapper now uses `fit-content` to avoid stretching full width.
+- ToolUseBar
+  - 💄 Tool container uses `grid 0fr/1fr` transition instead of `max-height`, and registers `--tool-rotate` custom property for stable rotation animation.
+- Workspace
+  - 🆕 `FileTree`: support synthetic tree leaf node binding in preview-only mode.
+- 🛠 Styling
+  - 🛠 Removed the deprecated `wrapSSR` wrapper from `useGenStyle`; `useStyle` no longer returns `wrapSSR`.
+  - 🛠 Removed `wrapSSR(...)` wrapper calls from 70+ components; components now return JSX directly.
+
 ## Unreleased
+
+- TaskList
+  - 🛠 `simple` variant drops the 2px progress bar underneath the summary; `showProgress` now only toggles the inline "completed/total" count text.
+  - 🆕 Added `scrollIntoViewOnExpand` (`boolean | ScrollIntoViewOptions`, default `false`): when the `simple` summary expands, scroll the component into the viewport. `true` resolves to `{ behavior: 'smooth', block: 'nearest' }`; the initial mount does not trigger it.
+
+- ToolUseBarThink
+  - 💄 Removed the default and hover background fills on the bottom `content-expand` (expand/collapse) button — only the text color changes on hover. Hovering the whole card no longer stacks a second grey on top of the root background.
+  - 🆕 Added `scrollIntoViewOnExpand` (`boolean | ScrollIntoViewOptions`, default `false`): scroll the component into the viewport on expand (skips the initial mount), mirroring `TaskList`.
+  - 🆕 `MarkdownEditor.codeProps` gains `scrollDeepThinkIntoViewOnExpand`, forwarded to the deep-think block's `ToolUseBarThink.scrollIntoViewOnExpand` so in-editor ` ```think ` blocks can opt into the scroll-on-expand behavior.
 
 - 🛠 Styling
   - 🛠 Rewrote `Hooks/useStyle` on top of `@ant-design/cssinjs-utils`'s `genStyleUtils`, mirroring antd's own `theme/util/genStyleUtils`. Exposes `genStyleHooks` / `genComponentStyleHook` / `genSubStyleComponent` plus `AgenticComponentTokenMap` / `FullToken` / `GenStyleFn` types; components can declare their own `ComponentToken` via module augmentation.

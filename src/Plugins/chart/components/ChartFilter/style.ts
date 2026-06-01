@@ -5,8 +5,6 @@ import {
 } from '../../../../Hooks/useStyle';
 
 const genStyle: GenStyleFn<'ChartFilter'> = (token) => {
-  const { antCls } = token;
-
   return {
     [token.componentCls]: {
       padding: '12px 0',
@@ -52,50 +50,6 @@ const genStyle: GenStyleFn<'ChartFilter'> = (token) => {
         },
       },
 
-      [`${token.componentCls}-segmented-filter`]: {
-        backgroundColor: 'var(--color-gray-control-fill-hover)',
-        height: '32px',
-        display: 'flex',
-        alignItems: 'center',
-        borderRadius: '8px',
-
-        '&.custom-segmented': {
-          [`${antCls}-segmented-item`]: {
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            [`${antCls}-segmented-item-label`]: {
-              fontFamily: 'PingFang SC',
-              fontSize: '13px',
-              fontWeight: 'normal',
-              lineHeight: '22px',
-              letterSpacing: '0em',
-            },
-          },
-          [`${antCls}-segmented-group`]: {
-            height: '30px',
-          },
-          [`${antCls}-segmented-item-selected`]: {
-            borderRadius: '8px',
-            backgroundColor: 'var(--color-gray-bg-card-white) !important',
-            border: '1px solid var(--color-gray-border-light) !important',
-            boxShadow:
-              '0px 0px 1px 0px rgba(0, 19, 41, 0.2), 0px 1.5px 4px -1px rgba(0, 19, 41, 0.04)',
-            [`${antCls}-segmented-item-label`]: {
-              fontFamily: 'PingFang SC',
-              fontSize: '13px',
-              fontWeight: 600,
-              lineHeight: '20px',
-              letterSpacing: '0em',
-              fontVariationSettings: '"opsz" auto',
-              /* gray/gray-文本-默认 */
-              /* 样式描述：--gray-a12 */
-              color: 'var(--color-gray-text-default) !important',
-            },
-          },
-        },
-      },
-
       // Dark theme styles
       '&-dark': {
         [`${token.componentCls}-region-filter`]: {
@@ -116,29 +70,6 @@ const genStyle: GenStyleFn<'ChartFilter'> = (token) => {
 
             [`${token.componentCls}-dropdown-icon`]: {
               color: 'rgba(255, 255, 255, 0.65)',
-            },
-          },
-        },
-
-        [`${token.componentCls}-segmented-filter`]: {
-          backgroundColor: 'var(--color-gray-bg-page-dark)',
-
-          '&.custom-segmented': {
-            [`${antCls}-segmented-item`]: {
-              [`${antCls}-segmented-item-label`]: {
-                color: 'rgba(255, 255, 255, 0.65)',
-              },
-            },
-            [`${antCls}-segmented-item-selected`]: {
-              backgroundColor: 'var(--color-gray-bg-card-white) !important',
-              border: '1px solid var(--color-gray-border-dark) !important',
-
-              [`${antCls}-segmented-item-label`]: {
-                color: 'var(--color-gray-text-default) !important',
-              },
-            },
-            [`${antCls}-segmented-thumb`]: {
-              backgroundColor: 'var(--color-gray-bg-page-dark) !important',
             },
           },
         },
@@ -164,6 +95,6 @@ const useGenStyle = genStyleHooks('ChartFilter', (token, info) => [
 ]);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'ChartFilter');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'ChartFilter');
+  return { hashId };
 }

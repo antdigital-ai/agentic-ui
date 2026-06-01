@@ -101,7 +101,7 @@ export const AIBubble: React.FC<
   const { compact, standalone, extraShowOnHover } = context || {};
 
   const prefixClass = getPrefixCls('agentic');
-  const { wrapSSR, hashId } = useStyle(prefixClass);
+  const { hashId } = useStyle(prefixClass);
 
   const preMessageSameRole = isSameRoleAsPrevious(preMessage, originData);
   const time = originData?.createAt || props.time;
@@ -250,7 +250,7 @@ export const AIBubble: React.FC<
     null,
   );
 
-  const itemDom = wrapSSR(
+  const itemDom = (
     <BubbleConfigContext.Provider
       value={{
         compact,
@@ -375,7 +375,7 @@ export const AIBubble: React.FC<
           />
         )}
       </Flex>
-    </BubbleConfigContext.Provider>,
+    </BubbleConfigContext.Provider>
   );
 
   if (bubbleRenderConfig?.render === false) return null;

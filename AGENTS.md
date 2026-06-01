@@ -147,29 +147,29 @@ agentic-ui/
 
 #### Props 命名
 
-| 用途           | 命名规则                                | 示例                          |
-| -------------- | --------------------------------------- | ----------------------------- |
-| 初始化属性     | `default` + `PropName`                  | `defaultValue`、`defaultOpen` |
-| 强制渲染       | `forceRender`                           | `forceRender`                 |
-| 子组件渲染     | `SubComponentName` + `Render`           | `titleRender`、`footerRender` |
-| 数据源         | `dataSource`                            | `dataSource`                  |
-| 面板开启       | 使用 `open`，避免使用 `visible`         | `open`、`defaultOpen`         |
-| 显示相关       | `show` + `PropName`                     | `showSearch`、`showHeader`    |
-| 功能性         | `PropName` + `able`                     | `disabled`、`readable`       |
-| 禁用           | `disabled`                              | `disabled`                   |
-| 额外内容       | `extra`                                 | `extra`                       |
-| 图标           | `icon`                                  | `icon`、`prefixIcon`          |
-| 触发器         | `trigger`                               | `trigger`                     |
-| 配置属性       | `Config` 后缀                           | `toolbarConfig`               |
+| 用途       | 命名规则                        | 示例                          |
+| ---------- | ------------------------------- | ----------------------------- |
+| 初始化属性 | `default` + `PropName`          | `defaultValue`、`defaultOpen` |
+| 强制渲染   | `forceRender`                   | `forceRender`                 |
+| 子组件渲染 | `SubComponentName` + `Render`   | `titleRender`、`footerRender` |
+| 数据源     | `dataSource`                    | `dataSource`                  |
+| 面板开启   | 使用 `open`，避免使用 `visible` | `open`、`defaultOpen`         |
+| 显示相关   | `show` + `PropName`             | `showSearch`、`showHeader`    |
+| 功能性     | `PropName` + `able`             | `disabled`、`readable`        |
+| 禁用       | `disabled`                      | `disabled`                    |
+| 额外内容   | `extra`                         | `extra`                       |
+| 图标       | `icon`                          | `icon`、`prefixIcon`          |
+| 触发器     | `trigger`                       | `trigger`                     |
+| 配置属性   | `Config` 后缀                   | `toolbarConfig`               |
 
 #### 事件命名
 
-| 类型         | 命名规则                                | 示例                  |
-| ------------ | --------------------------------------- | --------------------- |
-| 触发事件     | `on` + `EventName`                      | `onClick`、`onChange` |
-| 子组件事件   | `on` + `SubComponentName` + `EventName` | `onPanelChange`       |
-| 前置事件     | `before` + `EventName`                  | `beforeUpload`        |
-| 后置事件     | `after` + `EventName`                   | `afterClose`          |
+| 类型       | 命名规则                                | 示例                  |
+| ---------- | --------------------------------------- | --------------------- |
+| 触发事件   | `on` + `EventName`                      | `onClick`、`onChange` |
+| 子组件事件 | `on` + `SubComponentName` + `EventName` | `onPanelChange`       |
+| 前置事件   | `before` + `EventName`                  | `beforeUpload`        |
+| 后置事件   | `after` + `EventName`                   | `afterClose`          |
 
 #### 组件引用（Ref）
 
@@ -228,15 +228,15 @@ ComponentName/
 
 #### API 表格格式
 
-| Property | Description | Type | Default | Version |
-| --- | --- | --- | --- | --- |
-| disabled | 是否禁用 | `boolean` | `false` | - |
-| defaultValue | 默认值 | `string` | - | - |
-| style | 自定义样式 | `React.CSSProperties` | - | - |
-| classNames | 自定义类名 | `ComponentClassNamesType` | - | - |
-| styles | 自定义内联样式 | `ComponentStylesType` | - | - |
-| placement | 消息布局位置 | `'left' \| 'right'` | `'left'` | - |
-| ~~onDisLike~~ | 已废弃，请使用 `onDislike` | `(bubble: MessageBubbleData) => void` | - | 2.29.0 |
+| Property      | Description                | Type                                  | Default  | Version |
+| ------------- | -------------------------- | ------------------------------------- | -------- | ------- |
+| disabled      | 是否禁用                   | `boolean`                             | `false`  | -       |
+| defaultValue  | 默认值                     | `string`                              | -        | -       |
+| style         | 自定义样式                 | `React.CSSProperties`                 | -        | -       |
+| classNames    | 自定义类名                 | `ComponentClassNamesType`             | -        | -       |
+| styles        | 自定义内联样式             | `ComponentStylesType`                 | -        | -       |
+| placement     | 消息布局位置               | `'left' \| 'right'`                   | `'left'` | -       |
+| ~~onDisLike~~ | 已废弃，请使用 `onDislike` | `(bubble: MessageBubbleData) => void` | -        | 2.29.0  |
 
 #### API 文档要求
 
@@ -287,9 +287,11 @@ interface ComponentNameProps {
 }
 
 // ✅ 正确：使用 ForwardRefRenderFunction 定义 ref
-const Component = React.forwardRef<ComponentRef, ComponentProps>((props, ref) => {
-  // ...
-});
+const Component = React.forwardRef<ComponentRef, ComponentProps>(
+  (props, ref) => {
+    // ...
+  },
+);
 ```
 
 ### 类型使用最佳实践
@@ -385,8 +387,8 @@ const useGenStyle = genStyleHooks(
 );
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'component-name');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'component-name');
+  return { hashId };
 }
 ```
 
@@ -402,13 +404,9 @@ import { useStyle } from './style';
 const Component = () => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('component-name');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
-  return wrapSSR(
-    <div className={classNames(prefixCls, hashId)}>
-      {/* 子内容 */}
-    </div>,
-  );
+  return <div className={classNames(prefixCls, hashId)}>{/* 子内容 */}</div>;
 };
 ```
 
@@ -431,11 +429,11 @@ const Component = () => {
 
 ### 工具配置
 
-| 工具     | 用途             | 配置文件    |
-| -------- | ---------------- | ----------- |
-| ESLint   | 代码质量检查     | `.eslintrc.js` |
-| Stylelint| 样式检查         | `.stylelintrc` |
-| Prettier | 代码格式化       | `.prettierrc.js` |
+| 工具      | 用途         | 配置文件         |
+| --------- | ------------ | ---------------- |
+| ESLint    | 代码质量检查 | `.eslintrc.js`   |
+| Stylelint | 样式检查     | `.stylelintrc`   |
+| Prettier  | 代码格式化   | `.prettierrc.js` |
 
 ### 格式化规范
 
@@ -486,19 +484,19 @@ import type { RefType } from './types';
 
 #### 测试文件类型
 
-| 测试类型   | 文件名                   | 用途                 |
-| ---------- | ------------------------ | -------------------- |
-| 主测试     | `ComponentName.test.tsx` | 组件功能测试         |
-| 分支测试   | `ComponentName.branches.test.tsx` | 分支覆盖测试（补洞） |
-| 场景测试   | `ComponentName.scenarios.test.tsx` | 场景测试             |
+| 测试类型   | 文件名                              | 用途                 |
+| ---------- | ----------------------------------- | -------------------- |
+| 主测试     | `ComponentName.test.tsx`            | 组件功能测试         |
+| 分支测试   | `ComponentName.branches.test.tsx`   | 分支覆盖测试（补洞） |
+| 场景测试   | `ComponentName.scenarios.test.tsx`  | 场景测试             |
 | 回归测试   | `ComponentName.regression.test.tsx` | 回归测试             |
-| 属性测试   | `ComponentName.props.test.tsx` | 属性测试             |
-| 渲染测试   | `ComponentName.render.test.tsx` | 渲染测试             |
-| 高级测试   | `ComponentName.advanced.test.tsx` | 高级功能测试         |
-| 基础测试   | `ComponentName.basic.test.tsx` | 基础功能测试         |
-| SSR 测试   | `ComponentName.ssr.test.tsx` | SSR 测试             |
-| 懒加载测试 | `ComponentName.lazy.test.tsx` | 懒加载测试           |
-| E2E 测试   | `e2e/*.spec.ts`          | 端到端流程测试       |
+| 属性测试   | `ComponentName.props.test.tsx`      | 属性测试             |
+| 渲染测试   | `ComponentName.render.test.tsx`     | 渲染测试             |
+| 高级测试   | `ComponentName.advanced.test.tsx`   | 高级功能测试         |
+| 基础测试   | `ComponentName.basic.test.tsx`      | 基础功能测试         |
+| SSR 测试   | `ComponentName.ssr.test.tsx`        | SSR 测试             |
+| 懒加载测试 | `ComponentName.lazy.test.tsx`       | 懒加载测试           |
+| E2E 测试   | `e2e/*.spec.ts`                     | 端到端流程测试       |
 
 #### 运行测试
 
@@ -554,12 +552,7 @@ import { MarkdownEditor } from '@ant-design/agentic-ui';
 const Demo: React.FC = () => {
   const [content, setContent] = useState('');
 
-  return (
-    <MarkdownEditor
-      value={content}
-      onChange={setContent}
-    />
-  );
+  return <MarkdownEditor value={content} onChange={setContent} />;
 };
 
 export default Demo;
@@ -575,7 +568,7 @@ export default Demo;
 
 #### 主组件模板（使用 React.memo）
 
-```tsx
+````tsx
 import React, { memo, useContext } from 'react';
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
@@ -604,15 +597,15 @@ import type { ComponentNameProps } from './types';
 const ComponentNameComponent: React.FC<ComponentNameProps> = (props) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('component-name');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
-  return wrapSSR(
+  return (
     <div
       className={classNames(prefixCls, hashId, props.className)}
       style={props.style}
     >
       {/* 子内容 */}
-    </div>,
+    </div>
   );
 };
 
@@ -620,7 +613,7 @@ ComponentNameComponent.displayName = 'ComponentName';
 
 // 使用 React.memo 优化性能，避免不必要的重新渲染
 export const ComponentName = memo(ComponentNameComponent);
-```
+````
 
 #### 主组件模板（使用 forwardRef）
 
@@ -631,19 +624,22 @@ import classNames from 'clsx';
 import { useStyle } from './style';
 import type { ComponentNameProps, ComponentNameRef } from './types';
 
-const InternalComponent = React.forwardRef<ComponentNameRef, ComponentNameProps>((props, ref) => {
+const InternalComponent = React.forwardRef<
+  ComponentNameRef,
+  ComponentNameProps
+>((props, ref) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('component-name');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
-  return wrapSSR(
+  return (
     <div
       ref={ref}
       className={classNames(prefixCls, hashId, props.className)}
       style={props.style}
     >
       {/* 子内容 */}
-    </div>,
+    </div>
   );
 });
 
@@ -656,10 +652,7 @@ export default InternalComponent;
 
 ```tsx
 export { ComponentName } from './ComponentName';
-export type {
-  ComponentNameProps,
-  ComponentNameRef,
-} from './types';
+export type { ComponentNameProps, ComponentNameRef } from './types';
 ```
 
 ---
@@ -700,17 +693,17 @@ export type {
 
 #### Emoji 规范
 
-| Emoji | 用途                 |
-| ----- | -------------------- |
-| 🐞    | 修复 Bug             |
-| 💄    | 样式更新             |
-| 🆕    | 新增特性/属性        |
-| 🌐    | 国际化改动           |
-| 📖 📝 | 文档改进             |
-| ✅    | 测试相关             |
-| 🛠    | 重构或工具链优化     |
-| ⚡️    | 性能提升             |
-| 📦    | 打包/发布相关        |
+| Emoji | 用途             |
+| ----- | ---------------- |
+| 🐞    | 修复 Bug         |
+| 💄    | 样式更新         |
+| 🆕    | 新增特性/属性    |
+| 🌐    | 国际化改动       |
+| 📖 📝 | 文档改进         |
+| ✅    | 测试相关         |
+| 🛠    | 重构或工具链优化 |
+| ⚡️    | 性能提升         |
+| 📦    | 打包/发布相关    |
 
 #### Changelog 示例
 
@@ -749,7 +742,6 @@ export type {
 - **PR 关联**: 尽量关联 PR 链接，便于追溯
 - **提交者标注**: 社区贡献的 PR 应标注提交者
 
-
 ---
 
 ## Git 和 Pull Request 规范
@@ -764,13 +756,13 @@ export type {
 
 ### 分支命名规范
 
-| 类型     | 格式                              | 示例                      |
-| -------- | --------------------------------- | ------------------------- |
-| 功能开发 | `feat/description`                | `feat/add-dark-mode`      |
-| 问题修复 | `fix/issue-number-or-description` | `fix/button-style-issue`  |
-| 文档更新 | `docs/what-is-changed`            | `docs/update-api-docs`    |
+| 类型     | 格式                              | 示例                        |
+| -------- | --------------------------------- | --------------------------- |
+| 功能开发 | `feat/description`                | `feat/add-dark-mode`        |
+| 问题修复 | `fix/issue-number-or-description` | `fix/button-style-issue`    |
+| 文档更新 | `docs/what-is-changed`            | `docs/update-api-docs`      |
 | 代码重构 | `refactor/what-is-changed`        | `refactor/button-component` |
-| 样式修改 | `style/what-is-changed`           | `style/fix-button-padding` |
+| 样式修改 | `style/what-is-changed`           | `style/fix-button-padding`  |
 
 ### Commit Message 格式
 
@@ -785,6 +777,7 @@ export type {
 ```
 
 **Type**:
+
 - `feat`: 新功能
 - `fix`: 修复 Bug
 - `docs`: 文档变更
@@ -850,26 +843,26 @@ export type {
 
 ### 构建工具
 
-| 工具     | 用途               |
-| -------- | ------------------ |
-| Father   | 组件编译（dist）   |
-| Dumi     | 文档站点构建       |
-| Vitest   | 单元测试           |
-| Playwright | E2E 测试        |
+| 工具       | 用途             |
+| ---------- | ---------------- |
+| Father     | 组件编译（dist） |
+| Dumi       | 文档站点构建     |
+| Vitest     | 单元测试         |
+| Playwright | E2E 测试         |
 
 ### 相关配置文件
 
-| 配置文件       | 说明             |
-| -------------- | ---------------- |
-| `package.json` | 项目配置和脚本   |
-| `tsconfig.json`| TypeScript 配置  |
-| `.eslintrc.js` | ESLint 配置      |
-| `.stylelintrc` | Stylelint 配置   |
-| `.prettierrc.js`| Prettier 配置   |
-| `vitest.config.ts` | Vitest 配置  |
+| 配置文件               | 说明            |
+| ---------------------- | --------------- |
+| `package.json`         | 项目配置和脚本  |
+| `tsconfig.json`        | TypeScript 配置 |
+| `.eslintrc.js`         | ESLint 配置     |
+| `.stylelintrc`         | Stylelint 配置  |
+| `.prettierrc.js`       | Prettier 配置   |
+| `vitest.config.ts`     | Vitest 配置     |
 | `playwright.config.ts` | Playwright 配置 |
-| `.dumirc.ts`   | Dumi 配置        |
-| `.fatherrc.ts` | Father 配置      |
+| `.dumirc.ts`           | Dumi 配置       |
+| `.fatherrc.ts`         | Father 配置     |
 
 ---
 

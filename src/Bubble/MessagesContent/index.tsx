@@ -84,7 +84,7 @@ export const BubbleMessageDisplay: React.FC<
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const chatCls = getPrefixCls('agentic-ui');
   const baseChatCls = `${chatCls}-display`;
-  const { hashId, wrapSSR } = useMessagesContentStyle(baseChatCls);
+  const { hashId } = useMessagesContentStyle(baseChatCls);
 
   const docTagTooltipProps = useAdaptiveTooltipProps('informational');
 
@@ -273,7 +273,7 @@ export const BubbleMessageDisplay: React.FC<
       (!props.originData?.isFinished && !content)
     ) {
       if (context?.thoughtChain?.alwaysRender !== true) {
-        return wrapSSR(
+        return (
           <div
             className={classNames(
               'agent-item-default-content',
@@ -308,7 +308,7 @@ export const BubbleMessageDisplay: React.FC<
                 />
               ))}
             </span>
-          </div>,
+          </div>
         );
       }
       return null;
@@ -378,7 +378,7 @@ export const BubbleMessageDisplay: React.FC<
         : defaultExtra;
 
     if (React.isValidElement(content)) {
-      return wrapSSR(
+      return (
         <div
           className={classNames(
             'agent-item-default-content',
@@ -392,17 +392,16 @@ export const BubbleMessageDisplay: React.FC<
           {content}
           {afterContent}
           {extra}
-        </div>,
+        </div>
       );
     }
 
     if (
-      content === '...' ||
       props.placement !== 'left' ||
       props?.originData?.extra?.tags?.includes?.('REJECT_TO_ANSWER') ||
       props.originData?.role === 'bot'
     ) {
-      return wrapSSR(
+      return (
         <div
           className={classNames(
             'agent-item-default-content',
@@ -426,7 +425,7 @@ export const BubbleMessageDisplay: React.FC<
             originData={props.originData}
             content={content as string}
           />
-        </div>,
+        </div>
       );
     }
     // answerStatus= 'EXCEPTION'时 一定是异常情况
@@ -434,12 +433,12 @@ export const BubbleMessageDisplay: React.FC<
       props.originData?.extra?.answerStatus === 'EXCEPTION' ||
       (props.originData?.extra?.answerStatus && !props.originData?.content)
     ) {
-      return wrapSSR(
+      return (
         <EXCEPTION
           content={props.originData.content as string}
           originData={props.originData}
           extra={isExtraNull ? null : extra}
-        />,
+        />
       );
     }
 
@@ -472,7 +471,7 @@ export const BubbleMessageDisplay: React.FC<
       );
     }
 
-    return wrapSSR(
+    return (
       <MarkdownPreview
         markdownRenderConfig={props.markdownRenderConfig}
         isFinished={props.originData?.isFinished}
@@ -493,7 +492,7 @@ export const BubbleMessageDisplay: React.FC<
             : (content as string) || ''
         }
         originData={props.originData}
-      />,
+      />
     );
   }, [
     content,

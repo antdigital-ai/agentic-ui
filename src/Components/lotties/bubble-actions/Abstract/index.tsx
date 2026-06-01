@@ -93,7 +93,7 @@ export const AbstractLottie: React.FC<AbstractLottieProps> = ({
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('bubble-actions-lottie');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   const lottieRef = useRef(null) as LottieRef;
 
@@ -114,7 +114,7 @@ export const AbstractLottie: React.FC<AbstractLottieProps> = ({
     }
   }, [active]);
 
-  return wrapSSR(
+  return (
     <Lottie
       style={containerStyle}
       lottieRef={lottieRef}
@@ -124,7 +124,7 @@ export const AbstractLottie: React.FC<AbstractLottieProps> = ({
       animationData={animationData}
       loop={loop}
       autoplay={autoplay}
-    />,
+    />
   );
 };
 

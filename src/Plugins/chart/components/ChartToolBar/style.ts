@@ -125,6 +125,6 @@ const useGenStyle = genStyleHooks('ChartToolBar', (token, info) => [
 ]);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'ChartToolBar');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'ChartToolBar');
+  return { hashId };
 }

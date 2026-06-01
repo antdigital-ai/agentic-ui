@@ -115,7 +115,7 @@ vi.mock('react-chartjs-2', () => ({
 }));
 
 vi.mock('../../RadarChart/style', () => ({
-  useStyle: () => ({ wrapSSR: (node: any) => node, hashId: 'test-hash' }),
+  useStyle: () => ({ hashId: 'test-hash' }),
 }));
 
 const mockDownloadChart = vi.fn();

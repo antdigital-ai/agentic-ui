@@ -127,6 +127,6 @@ export const prefixCls = 'loading';
 const useGenStyle = genStyleHooks('Loading', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'loading');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'loading');
+  return { hashId };
 }

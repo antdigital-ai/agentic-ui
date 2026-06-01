@@ -1,4 +1,4 @@
-﻿import '@testing-library/jest-dom';
+import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -135,7 +135,6 @@ vi.mock('../utils', () => ({
 
 vi.mock('../AreaChart/style', () => ({
   useStyle: () => ({
-    wrapSSR: (node: any) => node,
     hashId: 'hash',
   }),
 }));

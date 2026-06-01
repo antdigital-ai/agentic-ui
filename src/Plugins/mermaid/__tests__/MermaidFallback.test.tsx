@@ -7,7 +7,6 @@ import { MermaidCodePreview } from '../MermaidFallback';
 
 vi.mock('../style', () => ({
   useStyle: vi.fn(() => ({
-    wrapSSR: (node: React.ReactNode) => node,
     hashId: 'test-hash',
   })),
 }));

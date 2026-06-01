@@ -210,7 +210,7 @@ export const GroupMenu: React.FC<GroupMenuProps> = (props) => {
   const prefixCls = getPrefixCls('agentic-chat-history-menu');
 
   // 注册样式
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   // 确定当前选中的键
   const currentSelectedKey = selectedKeys && selectedKeys[0];
@@ -223,7 +223,7 @@ export const GroupMenu: React.FC<GroupMenuProps> = (props) => {
   });
 
   // 直接传递用户自定义的 classNames
-  return wrapSSR(
+  return (
     <div
       className={classNames(prefixCls, hashId, className)}
       style={style}
@@ -258,7 +258,7 @@ export const GroupMenu: React.FC<GroupMenuProps> = (props) => {
           />
         ))
       )}
-    </div>,
+    </div>
   );
 };
 

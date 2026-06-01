@@ -1,4 +1,4 @@
-# 流式 Markdown 只读渲染 — 规格摘要
+﻿# 流式 Markdown 只读渲染 — 规格摘要
 
 ## 修订模型
 
@@ -9,6 +9,7 @@
 ## 可解析串与修订源
 
 - **`content`（可解析串）**：经 token 门控后的 Markdown，可安全送入 `unified`；可能含占位（如不完整链接暂缓）。
+- **围栏代码块流式**：`useStreaming` 在 `inFenced` 时将 `completeMarkdown + pending` 作为可见串（围栏正文仍在 pending、不 commit，但须交给下游 parse，否则代码块 UI 冻结至闭合）。
 - **`contentRevisionSource`（修订源）**：用于判断「是否仍为同一次前缀流」的字符串，通常为原始 `displayedContent`。**不得**单独用可解析串做 `startsWith` 判断来保留缓存，否则占位符与正文切换会误判为非前缀。
 
 ## 块边界

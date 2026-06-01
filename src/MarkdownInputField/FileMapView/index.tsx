@@ -118,7 +118,7 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
   const { placement = 'left' } = props;
   const context = useContext(ConfigProvider.ConfigContext);
   const prefix = context?.getPrefixCls('agentic-md-editor-file-view-list');
-  const { wrapSSR, hashId } = useStyle(prefix);
+  const { hashId } = useStyle(prefix);
   const [showAllFiles, setShowAllFiles] = useState(false);
 
   const fileList = useMemo(() => {
@@ -197,7 +197,7 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
     height: IMAGE_THUMBNAIL_SIZE,
   });
 
-  return wrapSSR(
+  return (
     <div
       data-testid="file-view-list"
       style={{
@@ -454,6 +454,6 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
           ) : null}
         </div>
       )}
-    </div>,
+    </div>
   );
 };

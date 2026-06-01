@@ -27,7 +27,7 @@ interface ToolImageProps {
    * 是否禁用动画。
    *
    * 注：图标旋转动画完全由 CSS 驱动（参见 ToolUseBar/style.ts 中
-   * `&-tool-image-wrapper-loading::after` + `@keyframes -toolImageSpin`），
+   * `&-tool-image-wrapper-loading` + `@keyframes toolUseBarSpin`），
    * 此处保留参数仅用于与同级子组件保持 API 形状一致，避免父组件
    * `BarItem/index.tsx` 在解构传递时编译报错。
    */
@@ -44,7 +44,6 @@ const ToolImageComponent: React.FC<ToolImageProps> = ({
 }) => {
   const toolImageWrapperClassName = useMemo(() => {
     return classNames(`${prefixCls}-tool-image-wrapper`, hashId, {
-      [`${prefixCls}-tool-image-wrapper-rotating`]: tool.status === 'loading',
       [`${prefixCls}-tool-image-wrapper-loading`]: tool.status === 'loading',
     });
   }, [prefixCls, hashId, tool.status]);
@@ -59,7 +58,7 @@ const ToolImageComponent: React.FC<ToolImageProps> = ({
   }, [tool.icon]);
 
   // 旋转动画完全由 CSS 控制（参见 ToolUseBar/style.ts 中的
-  // `&-tool-image-wrapper-loading::after` + `@keyframes -toolImageSpin`），
+  // `&-tool-image-wrapper-loading` + `@keyframes toolUseBarSpin`），
   // 无需 JS 运行时；`disableAnimation` 仅控制是否挂载 loading 修饰类。
   return (
     <div className={toolImageWrapperClassName}>
@@ -418,7 +417,7 @@ const ToolContentComponent: React.FC<ToolContentProps> = ({
           data-testid="tool-user-item-tool-container"
           aria-hidden={!expanded}
         >
-          {innerContent}
+          <div>{innerContent}</div>
         </div>
       ) : null}
 

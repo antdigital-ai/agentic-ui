@@ -22,7 +22,7 @@ export interface ActionItemBoxProps {
 export const ActionItemBox = (props: ActionItemBoxProps) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const basePrefixCls = getPrefixCls('agentic-chat-action-item-box');
-  const { wrapSSR, hashId } = useStyle(basePrefixCls);
+  const { hashId } = useStyle(basePrefixCls);
 
   useEffect(() => {
     props?.onInit?.();
@@ -30,7 +30,7 @@ export const ActionItemBox = (props: ActionItemBoxProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return wrapSSR(
+  return (
     <div
       data-testid={basePrefixCls}
       className={classNames(`${basePrefixCls}-motion-slide-in-left`, hashId)}
@@ -140,7 +140,7 @@ export const ActionItemBox = (props: ActionItemBoxProps) => {
           </div>
         </div>
       </div>
-    </div>,
+    </div>
   );
 };
 

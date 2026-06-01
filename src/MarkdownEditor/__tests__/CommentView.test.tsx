@@ -58,7 +58,6 @@ vi.mock('../editor/store', async (importOriginal) => {
 // Mock useStyle hook
 vi.mock('../editor/elements/Comment/style', () => ({
   useStyle: vi.fn(() => ({
-    wrapSSR: (node: React.ReactElement) => node,
     hashId: 'test-hash-id',
   })),
 }));

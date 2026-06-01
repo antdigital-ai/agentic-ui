@@ -38,10 +38,7 @@ export function isImeComposing(
   if (inputComposition) return true;
   if (event.nativeEvent?.isComposing) return true;
   if (event.keyCode === IME_PROCESSING_KEY_CODE) return true;
-  if (
-    event.key === 'Enter' &&
-    Date.now() < imeEnterCommitGuardUntil
-  ) {
+  if (event.key === 'Enter' && Date.now() < imeEnterCommitGuardUntil) {
     return true;
   }
   return false;
@@ -51,9 +48,7 @@ export function isImeComposing(
  * 在 compositionend 之后推迟清除 inputComposition，
  * 确保 IME 确认选字的 Enter keydown 仍被识别为组合态。
  */
-export function scheduleClearInputComposition(
-  clear: () => void,
-): () => void {
+export function scheduleClearInputComposition(clear: () => void): () => void {
   let cancelled = false;
   const runClear = () => {
     if (!cancelled) clear();

@@ -184,6 +184,6 @@ const genStyle: GenStyleFn<'Workspace'> = (token) => {
 const useGenStyle = genStyleHooks('Workspace', genStyle);
 
 export function useWorkspaceStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'Workspace');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'Workspace');
+  return { hashId };
 }

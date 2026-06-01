@@ -7,7 +7,6 @@ import {
   renderMarkdownBlock,
   splitMarkdownBlocks,
 } from '../markdownReactShared';
-import { StreamingAnimationContext } from '../StreamingAnimationContext';
 
 describe('splitMarkdownBlocks', () => {
   it('splits on single blank line', () => {
@@ -91,6 +90,22 @@ describe('splitMarkdownBlocks', () => {
     expect(result.length).toBe(2);
     expect(result[0]).toBe('````\n```\ninner\n```\n````');
     expect(result[1]).toBe('after');
+  });
+
+  it('splits two adjacent tables separated by a blank line', () => {
+    const md =
+      '| a | b |\n| - | - |\n| 1 | 2 |\n\n| c | d |\n| - | - |\n| 3 | 4 |';
+    const result = splitMarkdownBlocks(md);
+    expect(result.length).toBe(2);
+    expect(result[0]).toBe('| a | b |\n| - | - |\n| 1 | 2 |');
+    expect(result[1]).toBe('| c | d |\n| - | - |\n| 3 | 4 |');
+  });
+
+  it('keeps chart comment glued to following table', () => {
+    const md =
+      '<!-- [{"chartType":"line"}] -->\n\n| month | value |\n|-------|-------|\n| Jan | 100 |';
+    const result = splitMarkdownBlocks(md);
+    expect(result.length).toBe(1);
   });
 });
 
@@ -180,7 +195,6 @@ describe('buildEditorAlignedComponents', () => {
       streaming?: boolean;
       linkConfig?: any;
       fncProps?: any;
-      streamingParagraphAnimation?: boolean;
       eleRender?: any;
       userComponents?: Record<string, any>;
     } = {},
@@ -191,7 +205,6 @@ describe('buildEditorAlignedComponents', () => {
       opts.streaming,
       opts.linkConfig,
       opts.fncProps,
-      opts.streamingParagraphAnimation,
       opts.eleRender,
     );
 
@@ -202,48 +215,12 @@ describe('buildEditorAlignedComponents', () => {
       expect(result).toBeDefined();
     });
 
-    it('wraps streaming paragraph with AnimationText when prop omitted', () => {
+    it('does not wrap streaming paragraph with fade-in animation', () => {
       const comps = buildComponents({ streaming: true });
-      render(
-        React.createElement(
-          StreamingAnimationContext.Provider,
-          { value: { animateBlock: true } },
-          comps.p({ node: {}, children: 'stream' }),
-        ),
-      );
-      const para = screen.getByTestId('markdown-paragraph');
-      const animated = para.querySelector('span[style*="animation"]');
-      expect(animated).toBeTruthy();
-      expect(animated).toHaveTextContent('stream');
-    });
-
-    it('does not wrap streaming paragraph when streamingParagraphAnimation is false', () => {
-      const comps = buildComponents({
-        streaming: true,
-        streamingParagraphAnimation: false,
-      });
-      render(
-        React.createElement(
-          StreamingAnimationContext.Provider,
-          { value: { animateBlock: true } },
-          comps.p({ node: {}, children: 'plain' }),
-        ),
-      );
+      render(comps.p({ node: {}, children: 'stream' }));
       const para = screen.getByTestId('markdown-paragraph');
       expect(para.querySelector('span[style*="animation"]')).toBeNull();
-    });
-
-    it('does not wrap when animateBlock context is false', () => {
-      const comps = buildComponents({ streaming: true });
-      render(
-        React.createElement(
-          StreamingAnimationContext.Provider,
-          { value: { animateBlock: false } },
-          comps.p({ node: {}, children: 'x' }),
-        ),
-      );
-      const para = screen.getByTestId('markdown-paragraph');
-      expect(para.querySelector('span[style*="animation"]')).toBeNull();
+      expect(para).toHaveTextContent('stream');
     });
 
     it('applies eleRender when provided', () => {
@@ -422,6 +399,43 @@ describe('buildEditorAlignedComponents', () => {
     it('renders mark', () => {
       const comps = buildComponents();
       expect(comps.mark({ node: {}, children: 'marked' })).toBeDefined();
+    });
+
+    it('renders mark with color and bg attributes', () => {
+      const comps = buildComponents();
+      const result = comps.mark({
+        node: {},
+        children: 'highlighted',
+        color: 'red',
+        bg: '#eee',
+      });
+      expect(result).toBeDefined();
+      expect(result.props.style).toMatchObject({
+        color: 'red',
+        backgroundColor: '#eee',
+      });
+    });
+
+    it('renders mark with label attribute', () => {
+      const comps = buildComponents();
+      const result = comps.mark({
+        node: {},
+        children: 'content',
+        label: '@qixian',
+      });
+      expect(result).toBeDefined();
+      // children should be array with label span + content
+      const children = result.props.children;
+      expect(Array.isArray(children)).toBe(true);
+      expect(children[0].props.children).toBe('@qixian');
+      expect(children[1]).toBe('content');
+    });
+
+    it('renders mark without custom attributes keeps default style', () => {
+      const comps = buildComponents();
+      const result = comps.mark({ node: {}, children: 'plain' });
+      expect(result.props.style).toBeUndefined();
+      expect(result.props.children).toBe('plain');
     });
 
     it('renders kbd', () => {

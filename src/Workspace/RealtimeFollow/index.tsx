@@ -532,10 +532,7 @@ export const RealtimeFollowList: React.FC<{
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('workspace-realtime');
   const styleResult = useRealtimeFollowStyle(prefixCls);
-  const { wrapSSR, hashId } = styleResult || {
-    wrapSSR: (node: any) => node,
-    hashId: '',
-  };
+  const { hashId } = styleResult || { hashId: '' };
 
   const rightContent = getRightContent(
     data,
@@ -549,7 +546,7 @@ export const RealtimeFollowList: React.FC<{
   const headerData: RealtimeFollowData = { ...data, rightContent };
   const hasBorder = data.type === 'html' || data.type === 'markdown';
 
-  return wrapSSR(
+  return (
     <div
       className={classNames(
         `${prefixCls}-container`,
@@ -572,6 +569,6 @@ export const RealtimeFollowList: React.FC<{
         prefixCls={prefixCls}
         hashId={hashId}
       />
-    </div>,
+    </div>
   );
 };

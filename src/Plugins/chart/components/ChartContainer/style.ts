@@ -80,6 +80,6 @@ const genStyle: GenStyleFn<'ChartContainer'> = (token) => {
 const useGenStyle = genStyleHooks('ChartContainer', genStyle);
 
 export const useStyle = (baseClassName: string) => {
-  const [wrapSSR, hashId] = useGenStyle(baseClassName);
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(baseClassName);
+  return { hashId };
 };

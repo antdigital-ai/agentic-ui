@@ -294,16 +294,16 @@ const genStyle: GenStyleFn<'AgentRunBar'> = (token) => {
  * - 动画效果
  *
  * @param prefixCls - 组件类名前缀
- * @returns 包含样式和 SSR 包装器的对象
+ * @returns 包含 `hashId` 的对象
  *
  * @example
  * ```tsx
- * const { wrapSSR, hashId } = useStyle('my-prefix');
+ * const { hashId } = useStyle('my-prefix');
  * ```
  */
 const useGenStyle = genStyleHooks('AgentRunBar', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'agent-run-bar');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'agent-run-bar');
+  return { hashId };
 }

@@ -8,7 +8,6 @@ import {
   parserMarkdownToSlateNode,
 } from '../parserMarkdownToSlateNode';
 import { parserMdToSchema } from '../parserMdToSchema';
-
 import { parserSlateNodeToMarkdown } from '../parserSlateNodeToMarkdown';
 
 describe('parserMarkdownToSlateNode', () => {
@@ -24,7 +23,7 @@ describe('parserMarkdownToSlateNode', () => {
       });
     });
 
-    it('should parse single dollar inline math into inline-katex node', () => {
+    it('should keep single dollar inline math as plain text by default', () => {
       const markdown = 'Inline math $a^2 + b^2 = c^2$ stays inline.';
       const { schema } = parserMarkdownToSlateNode(markdown);
 
@@ -35,15 +34,51 @@ describe('parserMarkdownToSlateNode', () => {
       const inlineKatexNode = paragraph.children.find(
         (child: any) => child?.type === 'inline-katex',
       );
-      expect(inlineKatexNode).toMatchObject({
-        type: 'inline-katex',
-        children: [{ text: 'a^2 + b^2 = c^2' }],
+      expect(inlineKatexNode).toBeUndefined();
+
+      const textContent = paragraph.children
+        .map((c: any) => c?.text ?? '')
+        .join('');
+      expect(textContent).toContain('$a^2 + b^2 = c^2$');
+    });
+
+    it('should parse single dollar inline math as plain text even when enabled', () => {
+      const markdown = 'Inline math $a^2 + b^2 = c^2$ stays inline.';
+      const { schema } = parserMarkdownToSlateNode(markdown, undefined, {
+        formula: { singleDollarTextMath: true },
       });
 
-      const numericTextNode = paragraph.children.find(
-        (child: any) => child?.text === '$a^2 + b^2 = c^2$',
+      expect(schema).toHaveLength(1);
+      const paragraph = schema[0] as any;
+
+      const inlineKatexNode = paragraph.children.find(
+        (child: any) => child?.type === 'inline-katex',
       );
-      expect(numericTextNode).toBeUndefined();
+      expect(inlineKatexNode).toBeUndefined();
+
+      const textContent = paragraph.children
+        .map((c: any) => c?.text ?? '')
+        .join('');
+      expect(textContent).toContain('$a^2 + b^2 = c^2$');
+    });
+
+    it('should keep $24.4B$ financial amounts as plain text', () => {
+      const markdown = '$24.4B$ 订单 / $18.2B$ 订单';
+      const { schema } = parserMarkdownToSlateNode(markdown, undefined, {
+        formula: { singleDollarTextMath: true },
+      });
+
+      const paragraph = schema[0] as any;
+      const inlineKatexNode = paragraph.children.find(
+        (child: any) => child?.type === 'inline-katex',
+      );
+      expect(inlineKatexNode).toBeUndefined();
+
+      const textContent = paragraph.children
+        .map((c: any) => c?.text ?? '')
+        .join('');
+      expect(textContent).toContain('$24.4B$');
+      expect(textContent).toContain('$18.2B$');
     });
 
     it('should keep $ inside Jinja {{ }} as plain text (system variable)', () => {
@@ -170,6 +205,69 @@ describe('parserMarkdownToSlateNode', () => {
         type: 'paragraph',
         children: [{ text: '/alipay-aipay-product-intro ', mark: true }],
       });
+    });
+
+    it('should decode HTML entities in mark color/bg/label (block-only)', () => {
+      const markdown =
+        '<mark color="red&quot;x" bg="a&amp;b" label="Note: &quot;重要&quot; &lt;hl&gt;">v</mark>';
+      const result = parserMarkdownToSlateNode(markdown);
+      const leaf = (result.schema[0] as any).children[0];
+      expect(leaf.markColor).toBe('red"x');
+      expect(leaf.markBg).toBe('a&b');
+      expect(leaf.markLabel).toBe('Note: "重要" <hl>');
+    });
+
+    it('should decode HTML entities in mark color/bg/label (inline)', () => {
+      const markdown =
+        'pre <mark color="red&quot;x" label="&amp;Note">v</mark> post';
+      const result = parserMarkdownToSlateNode(markdown);
+      const para: any = result.schema[0];
+      const marked = para.children.find((c: any) => c?.mark);
+      expect(marked.markColor).toBe('red"x');
+      expect(marked.markLabel).toBe('&Note');
+    });
+
+    it('应把 <div data-card="true"> 块还原为 card 节点（包 card-before/after）', () => {
+      const markdown = `<div data-card="true">\nHello inside card\n</div>`;
+      const result = parserMarkdownToSlateNode(markdown);
+      const cardNode = result.schema.find((n: any) => n?.type === 'card');
+      expect(cardNode).toBeDefined();
+      expect((cardNode as any).children[0]).toMatchObject({
+        type: 'card-before',
+      });
+      expect((cardNode as any).children.at(-1)).toMatchObject({
+        type: 'card-after',
+      });
+      const inner = (cardNode as any).children.find(
+        (c: any) => c.type !== 'card-before' && c.type !== 'card-after',
+      );
+      expect(inner.type).toBe('paragraph');
+    });
+
+    it('card → markdown → card 往返保持 image 内容', () => {
+      const original = {
+        type: 'card',
+        children: [
+          { type: 'card-before', children: [{ text: '' }] },
+          {
+            type: 'image',
+            url: 'https://example.com/x.png',
+            children: [{ text: '' }],
+          },
+          { type: 'card-after', children: [{ text: '' }] },
+        ],
+      };
+      const md = parserSlateNodeToMarkdown([original]);
+      expect(md).toContain('<div data-card="true">');
+      expect(md).toContain('https://example.com/x.png');
+
+      const back = parserMarkdownToSlateNode(md);
+      const card = back.schema.find((n: any) => n?.type === 'card');
+      expect(card).toBeDefined();
+      const urlFound = JSON.stringify(card).includes(
+        'https://example.com/x.png',
+      );
+      expect(urlFound).toBe(true);
     });
 
     it('should handle paragraph with inline code', () => {

@@ -29,6 +29,10 @@ group:
 
 <code src="../demos/markdown-renderer-streaming.tsx">流式 Markdown - 末段淡入</code>
 
+### Mark 标签颜色与 Label
+
+<code src="../demos/mark-color-label-demo.tsx">Mark 颜色定制与 Label 显示</code>
+
 ### 静态 Markdown
 
 ```tsx

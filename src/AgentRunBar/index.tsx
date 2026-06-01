@@ -562,7 +562,7 @@ const AgentRunBarComponent: React.FC<AgentRunBarProps> = (rest) => {
 
   const context = useContext(ConfigProvider.ConfigContext);
   const baseCls = context?.getPrefixCls('agent-run-bar');
-  const { wrapSSR, hashId } = useStyle(baseCls);
+  const { hashId } = useStyle(baseCls);
 
   // 从context获取国际化配置
   const { locale } = useContext(I18nContext);
@@ -597,7 +597,7 @@ const AgentRunBarComponent: React.FC<AgentRunBarProps> = (rest) => {
   //
   // 因此当前版本保留 framer-motion 依赖。如未来组件库整体去 framer-motion 化，
   // 可以替换为基于 ResizeObserver 的自定义 hook，逻辑等价但实现成本更高。
-  return wrapSSR(
+  return (
     <motion.div
       className={classNames(
         baseCls,
@@ -661,7 +661,7 @@ const AgentRunBarComponent: React.FC<AgentRunBarProps> = (rest) => {
         locale,
         variant,
       })}
-    </motion.div>,
+    </motion.div>
   );
 };
 

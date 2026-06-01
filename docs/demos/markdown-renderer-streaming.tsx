@@ -16,12 +16,11 @@ function greet(name: string) {
 }
 \`\`\`
 
-> 提示：流式过程中末段会有淡入动画。
+> 提示：流式过程中内容随 SSE 即时更新渲染。
 `;
 
 export default () => {
   const [content, setContent] = useState('');
-  const [isFinished, setIsFinished] = useState(false);
   const [running, setRunning] = useState(true);
   const indexRef = useRef(0);
 
@@ -32,7 +31,6 @@ export default () => {
       const next = FULL_CONTENT.slice(0, indexRef.current);
       setContent(next);
       if (indexRef.current >= FULL_CONTENT.length) {
-        setIsFinished(true);
         setRunning(false);
         clearInterval(timer);
       }
@@ -43,7 +41,6 @@ export default () => {
   const handleReplay = () => {
     indexRef.current = 0;
     setContent('');
-    setIsFinished(false);
     setRunning(true);
   };
 
@@ -65,12 +62,7 @@ export default () => {
           minHeight: 240,
         }}
       >
-        <MarkdownRenderer
-          content={content}
-          streaming={running}
-          isFinished={isFinished}
-          streamingParagraphAnimation
-        />
+        <MarkdownRenderer content={content} streaming={running} />
       </div>
     </div>
   );

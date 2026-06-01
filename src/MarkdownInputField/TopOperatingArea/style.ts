@@ -67,6 +67,6 @@ const genTopOperatingAreaStyle: GenStyleFn<'TopOperatingArea'> = (token) => {
 const useGenStyle = genStyleHooks('TopOperatingArea', genTopOperatingAreaStyle);
 
 export const useStyle = (customPrefixCls: string) => {
-  const [wrapSSR, hashId] = useGenStyle(customPrefixCls);
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(customPrefixCls);
+  return { hashId };
 };

@@ -81,10 +81,9 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
           content={content}
           streaming={isStreaming}
           isFinished={isFinished}
+          throttleOptions={rc?.throttleOptions}
           plugins={rc?.plugins}
           remarkPlugins={rc?.markdownToHtmlOptions}
-          queueOptions={rc?.queueOptions}
-          streamingParagraphAnimation={rc?.streamingParagraphAnimation}
           fncProps={fncProps}
           linkConfig={rc?.linkConfig}
           codeProps={rc?.codeProps}

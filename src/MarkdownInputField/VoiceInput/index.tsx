@@ -41,7 +41,7 @@ export const VoiceInputButton: React.FC<VoiceInputButtonProps> = (props) => {
   const { recording, disabled, onStart, onStop, style } = props;
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const baseCls = getPrefixCls('agentic-md-input-field-voice-button');
-  const { wrapSSR, hashId } = useStyle(baseCls);
+  const { hashId } = useStyle(baseCls);
   const dom = props.title ? (
     <div
       style={{
@@ -69,7 +69,7 @@ export const VoiceInputButton: React.FC<VoiceInputButtonProps> = (props) => {
 
   const { locale } = useContext(I18nContext);
 
-  return wrapSSR(
+  return (
     <Tooltip
       mouseEnterDelay={1}
       arrow={false}
@@ -99,7 +99,7 @@ export const VoiceInputButton: React.FC<VoiceInputButtonProps> = (props) => {
       >
         <ErrorBoundary fallback={<div />}>{dom}</ErrorBoundary>
       </div>
-    </Tooltip>,
+    </Tooltip>
   );
 };
 

@@ -30,11 +30,17 @@ export const markdownToReactSync = (
   components?: Record<string, React.ComponentType<RendererBlockProps>>,
   remarkPlugins?: MarkdownRemarkPlugin[],
   htmlConfig?: MarkdownToHtmlConfig,
+  rehypePlugins?: import('unified').Plugin[],
 ): React.ReactNode => {
   if (!content) return null;
 
   try {
-    const processor = createHastProcessor(remarkPlugins, htmlConfig);
+    const processor = createHastProcessor(
+      remarkPlugins,
+      htmlConfig,
+      htmlConfig?.formula,
+      rehypePlugins,
+    );
     const preprocessed = preprocessNormalizeLeafToContainerDirective(
       content.replace(new RegExp(JINJA_DOLLAR_PLACEHOLDER, 'g'), '$'),
     );
@@ -49,7 +55,6 @@ export const markdownToReactSync = (
       false,
       undefined,
       undefined,
-      false,
     );
 
     return toJsxRuntime(hast as any, {

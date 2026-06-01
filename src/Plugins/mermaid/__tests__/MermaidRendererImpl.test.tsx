@@ -24,7 +24,6 @@ vi.mock('../useMermaidRender', () => ({
 
 vi.mock('../style', () => ({
   useStyle: vi.fn(() => ({
-    wrapSSR: (node: React.ReactNode) => node,
     hashId: 'test-hash',
   })),
 }));

@@ -69,6 +69,6 @@ const genStyle: GenStyleFn<'BoxPlotChart'> = (token) => {
 const useGenStyle = genStyleHooks('BoxPlotChart', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'BoxPlotChart');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'BoxPlotChart');
+  return { hashId };
 }

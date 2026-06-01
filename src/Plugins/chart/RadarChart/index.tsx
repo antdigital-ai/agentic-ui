@@ -123,7 +123,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
 
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('radar-chart');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   const { resolvedTheme, autoDetectTheme } = useResolvedChartTheme(theme);
   const { axisTextColor, gridColor, isLight } = useChartTheme(resolvedTheme);
@@ -187,22 +187,25 @@ const RadarChart: React.FC<RadarChartProps> = ({
   );
 
   const datasetTypes = useMemo(
-    () =>
-      [
-        ...new Set(
-          filteredData
-            .map((item) => item.type)
-            .filter((type): type is string => Boolean(type)),
-        ),
-      ],
+    () => [
+      ...new Set(
+        filteredData
+          .map((item) => item.type)
+          .filter((type): type is string => Boolean(type)),
+      ),
+    ],
     [filteredData],
   );
 
   const classNamesObj = classNamesProp;
 
   // 如果没有有效数据，返回空状态
-  if (safeData.length === 0 || xValues.length === 0 || datasetTypes.length === 0) {
-    return wrapSSR(
+  if (
+    safeData.length === 0 ||
+    xValues.length === 0 ||
+    datasetTypes.length === 0
+  ) {
+    return (
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
         theme={resolvedTheme}
@@ -238,7 +241,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
         >
           暂无有效数据
         </div>
-      </ChartContainer>,
+      </ChartContainer>
     );
   }
 
@@ -565,119 +568,74 @@ const RadarChart: React.FC<RadarChartProps> = ({
     }
   };
 
-  // 最终渲染，包含错误边界
-  try {
-    return wrapSSR(
-      <ChartContainer
-        baseClassName={classNames(`${prefixCls}-container`)}
+  return (
+    <ChartContainer
+      baseClassName={classNames(`${prefixCls}-container`)}
+      theme={resolvedTheme}
+      autoDetectTheme={autoDetectTheme}
+      className={classNames(classNamesObj?.root, hashId, className)}
+      isMobile={isMobile}
+      variant={props.variant}
+      style={{
+        width: responsiveWidth,
+        height: responsiveHeight,
+        ...props.style,
+        ...props.styles?.root,
+      }}
+    >
+      <ChartToolBar
+        title={title || '雷达图'}
         theme={resolvedTheme}
-        autoDetectTheme={autoDetectTheme}
-        className={classNames(classNamesObj?.root, hashId, className)}
-        isMobile={isMobile}
-        variant={props.variant}
-        style={{
-          width: responsiveWidth,
-          height: responsiveHeight,
-          ...props.style,
-          ...props.styles?.root,
-        }}
-      >
-        <ChartToolBar
-          title={title || '雷达图'}
+        onDownload={handleDownload}
+        extra={toolbarExtra}
+        dataTime={dataTime}
+        loading={loading}
+        filter={
+          renderFilterInToolbar && filterOptions.length > 0 ? (
+            <ChartFilter
+              filterOptions={filterOptions}
+              selectedFilter={selectedFilter}
+              onFilterChange={setSelectedFilter}
+              {...(filterLabels && {
+                customOptions: filteredDataByFilterLabel,
+                selectedCustomSelection: selectedFilterLabel,
+                onSelectionChange: setSelectedFilterLabel,
+              })}
+              theme={resolvedTheme}
+              variant="compact"
+            />
+          ) : undefined
+        }
+      />
+
+      {!renderFilterInToolbar && filterOptions.length > 0 && (
+        <ChartFilter
+          filterOptions={filterOptions}
+          selectedFilter={selectedFilter}
+          onFilterChange={setSelectedFilter}
+          {...(filterLabels && {
+            customOptions: filteredDataByFilterLabel,
+            selectedCustomSelection: selectedFilterLabel,
+            onSelectionChange: setSelectedFilterLabel,
+          })}
           theme={resolvedTheme}
-          onDownload={handleDownload}
-          extra={toolbarExtra}
-          dataTime={dataTime}
-          loading={loading}
-          filter={
-            renderFilterInToolbar && filterOptions.length > 0 ? (
-              <ChartFilter
-                filterOptions={filterOptions}
-                selectedFilter={selectedFilter}
-                onFilterChange={setSelectedFilter}
-                {...(filterLabels && {
-                  customOptions: filteredDataByFilterLabel,
-                  selectedCustomSelection: selectedFilterLabel,
-                  onSelectionChange: setSelectedFilterLabel,
-                })}
-                theme={resolvedTheme}
-                variant="compact"
-              />
-            ) : undefined
-          }
         />
+      )}
 
-        {!renderFilterInToolbar && filterOptions.length > 0 && (
-          <ChartFilter
-            filterOptions={filterOptions}
-            selectedFilter={selectedFilter}
-            onFilterChange={setSelectedFilter}
-            {...(filterLabels && {
-              customOptions: filteredDataByFilterLabel,
-              selectedCustomSelection: selectedFilterLabel,
-              onSelectionChange: setSelectedFilterLabel,
-            })}
-            theme={resolvedTheme}
-          />
-        )}
-
-        {/* 统计数据组件 */}
-        {statistics && (
-          <div
-            className={classNames(`${prefixCls}-statistic-container`, hashId)}
-          >
-            {statistics.map((config, index) => (
-              <ChartStatistic key={index} {...config} theme={resolvedTheme} />
-            ))}
-          </div>
-        )}
-
-        <div className={classNames(`${prefixCls}-chart-wrapper`, hashId)}>
-          <Radar ref={chartRef} data={processedData} options={options} />
+      {/* 统计数据组件 */}
+      {statistics && (
+        <div className={classNames(`${prefixCls}-statistic-container`, hashId)}>
+          {statistics.map((config, index) => (
+            <ChartStatistic key={index} {...config} theme={resolvedTheme} />
+          ))}
         </div>
-      </ChartContainer>,
-    );
-  } catch (error) {
-    console.error('RadarChart 渲染错误:', error);
-    return wrapSSR(
-      <ChartContainer
-        baseClassName={classNames(`${prefixCls}-container`)}
-        theme={resolvedTheme}
-        autoDetectTheme={autoDetectTheme}
-        className={classNames(classNamesObj?.root, hashId, className)}
-        isMobile={isMobile}
-        variant={props.variant}
-        style={{
-          width: responsiveWidth,
-          height: responsiveHeight,
-          ...props.style,
-          ...props.styles?.root,
-        }}
-      >
-        <ChartToolBar
-          title={title || '雷达图'}
-          theme={resolvedTheme}
-          onDownload={() => {}}
-          extra={toolbarExtra}
-          dataTime={dataTime}
-          loading={loading}
-        />
-        <div
-          className={classNames(`${prefixCls}-error-wrapper`, hashId)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: responsiveHeight,
-            color: '#ff4d4f',
-            fontSize: '14px',
-          }}
-        >
-          图表渲染失败，请检查数据格式
-        </div>
-      </ChartContainer>,
-    );
-  }
+      )}
+
+      <div className={classNames(`${prefixCls}-chart-wrapper`, hashId)}>
+        <Radar ref={chartRef} data={processedData} options={options} />
+      </div>
+    </ChartContainer>
+  );
 };
 
 export default RadarChart;

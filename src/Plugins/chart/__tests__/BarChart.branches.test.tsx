@@ -487,7 +487,7 @@ vi.mock('../components', () => ({
 
 vi.mock('../BarChart/style', () => ({
   useStyle: () => ({
-    wrapSSR: (node: any) => node,
+    hashId: '',
   }),
 }));
 

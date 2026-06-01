@@ -99,22 +99,20 @@ describe('Markdown to HTML Utils', () => {
       expect(result).toContain('class="katex"');
     });
 
-    it('应该使用KaTeX渲染单美元内联数学公式', async () => {
+    it('不应将单美元内联数学公式渲染为 KaTeX', async () => {
       const markdown = '数学表达式 $a^2 + b^2 = c^2$ 内联展示';
       const result = await markdownToHtml(markdown);
 
-      expect(result).toContain('class="katex"');
-      expect(result).toContain('a^2 + b^2 = c^2');
+      expect(result).not.toContain('class="katex"');
+      expect(result).toContain('$a^2 + b^2 = c^2$');
     });
 
-    it('应该将包裹纯数值的单美元符号渲染为KaTeX', async () => {
+    it('应将包裹纯数值的单美元符号保留为普通文本', async () => {
       const markdown = '价格为 $100$ 元';
       const result = await markdownToHtml(markdown);
 
-      expect(result).toContain('class="katex"');
-      expect(result).toContain(
-        'annotation encoding="application/x-tex">100</annotation',
-      );
+      expect(result).not.toContain('class="katex"');
+      expect(result).toContain('$100$');
       expect(result).toContain('元');
     });
 
@@ -299,22 +297,20 @@ Logs: openclaw logs --follow
       expect(result).toContain('class="katex"');
     });
 
-    it('应该同步渲染单美元内联数学公式', () => {
+    it('不应同步渲染单美元内联数学公式', () => {
       const markdown = '数学表达式 $a^2 + b^2 = c^2$ 内联展示';
       const result = markdownToHtmlSync(markdown);
 
-      expect(result).toContain('class="katex"');
-      expect(result).toContain('a^2 + b^2 = c^2');
+      expect(result).not.toContain('class="katex"');
+      expect(result).toContain('$a^2 + b^2 = c^2$');
     });
 
-    it('应该同步渲染包裹纯数值的单美元文本', () => {
+    it('应将包裹纯数值的单美元文本保留为普通文本', () => {
       const markdown = '价格为 $100$ 元';
       const result = markdownToHtmlSync(markdown);
 
-      expect(result).toContain('class="katex"');
-      expect(result).toContain(
-        'annotation encoding="application/x-tex">100</annotation',
-      );
+      expect(result).not.toContain('class="katex"');
+      expect(result).toContain('$100$');
       expect(result).toContain('元');
     });
 
@@ -455,14 +451,22 @@ title: Test
   });
 
   describe('Plugin Configuration', () => {
-    it('应该默认启用单美元符号数学公式', async () => {
-      const markdown = '$E = mc^2$'; // 单美元符号
+    it('应该默认禁用单美元符号数学公式', async () => {
+      const markdown = '$E = mc^2$';
       const result = await markdownToHtml(markdown);
 
-      expect(result).toContain('class="katex"');
-      expect(result).toContain(
-        'annotation encoding="application/x-tex">E = mc^2</annotation',
-      );
+      expect(result).not.toContain('class="katex"');
+      expect(result).toContain('$E = mc^2$');
+    });
+
+    it('全局关闭公式时不应渲染 KaTeX', async () => {
+      const markdown = '$$E = mc^2$$';
+      const result = await markdownToHtml(markdown, undefined, {
+        formula: { enable: false },
+      });
+
+      expect(result).not.toContain('class="katex"');
+      expect(result).toContain('$$E = mc^2$$');
     });
 
     it('应该过滤危险HTML', async () => {

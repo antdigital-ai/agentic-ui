@@ -8,7 +8,6 @@ import ChartStatistic from '../ChartStatistic';
 // Mock useStyle hook
 vi.mock('../ChartStatistic/style', () => ({
   useStyle: vi.fn(() => ({
-    wrapSSR: (node: any) => node,
     hashId: 'test-hash-id',
   })),
 }));

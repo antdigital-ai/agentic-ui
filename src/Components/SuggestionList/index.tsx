@@ -153,7 +153,7 @@ export const SuggestionList: React.FC<SuggestionListProps> = ({
   const { locale } = useContext(I18nContext);
   const prefixCls = context?.getPrefixCls('follow-up');
 
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
   const [submitting, setSubmitting] = useState(false);
 
   const derivedItems: SuggestionItem[] = useMemo(() => {
@@ -170,7 +170,7 @@ export const SuggestionList: React.FC<SuggestionListProps> = ({
     `${prefixCls}-${type}`,
   );
 
-  return wrapSSR(
+  return (
     <div
       className={rootCls}
       data-testid={prefixCls}
@@ -287,7 +287,7 @@ export const SuggestionList: React.FC<SuggestionListProps> = ({
           })}
         </div>
       ) : null}
-    </div>,
+    </div>
   );
 };
 

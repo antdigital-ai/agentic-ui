@@ -107,14 +107,14 @@ export const handleSlateMarkdownFragment = (
 
     if (
       fragment.length === 1 &&
-      fragment?.at(0).type === 'paragraph' &&
+      (fragment[0] as any)?.type === 'paragraph' &&
       currentTextSelection
     ) {
-      const text = Node.string(fragment.at(0));
-      if (text) {
-        Transforms.insertText(editor, text, {
-          at: currentTextSelection.focus,
-        });
+      // 单段落用 insertFragment(children) 保留 marks（bold / italic / mark / 颜色等），
+      // 旧版本走 insertText 会丢全部叶子样式。
+      const children = (fragment[0] as any)?.children;
+      if (Array.isArray(children) && children.length) {
+        Transforms.insertFragment(editor, children);
         return true;
       }
       return true;
@@ -152,8 +152,43 @@ export const handleHtmlPaste = async (
   }
 };
 
+/** 根据 File.type / 文件名后缀判断目标节点类型 */
+const detectFileMediaType = (
+  file: File,
+): 'image' | 'video' | 'audio' | 'attachment' => {
+  const mime = (file.type || '').toLowerCase();
+  if (mime.startsWith('image/')) return 'image';
+  if (mime.startsWith('video/')) return 'video';
+  if (mime.startsWith('audio/')) return 'audio';
+  // 退到扩展名兜底（部分操作系统拷贝的 File.type 为空）
+  const ext = (file.name || '').toLowerCase().match(/\.([a-z0-9]+)$/)?.[1];
+  if (!ext) return 'attachment';
+  if (MEDIA_EXTENSIONS.image.some((e) => e === '.' + ext)) return 'image';
+  if (MEDIA_EXTENSIONS.video.some((e) => e === '.' + ext)) return 'video';
+  if (MEDIA_EXTENSIONS.audio.some((e) => e === '.' + ext)) return 'audio';
+  return 'attachment';
+};
+
+const buildAttachNode = (
+  url: string,
+  file: File,
+): {
+  type: 'attach';
+  name: string;
+  size: number;
+  url: string;
+  children: { text: string }[];
+} => ({
+  type: 'attach',
+  name: file.name,
+  size: file.size,
+  url,
+  children: [{ text: '' }],
+});
+
 /**
- * 处理粘贴的文件
+ * 处理粘贴的文件。按 mime / 扩展名分流到 image/video/audio/attach；
+ * 多文件一次性批量上传，避免拆成 N 次单文件请求。
  */
 export const handleFilesPaste = async (
   editor: Editor,
@@ -166,10 +201,14 @@ export const handleFilesPaste = async (
       return false;
     }
 
-    const uploadResults = await Promise.all(
-      Array.from(fileList).map((file) => editorProps.image!.upload!([file])),
-    );
-    const uploadedUrls = uploadResults.flat(1);
+    const files = Array.from(fileList);
+    // 一次批量上传；上传函数本身就接受 File[]
+    const uploadResult = await editorProps.image.upload(files);
+    const uploadedUrls = (
+      Array.isArray(uploadResult) ? uploadResult : [uploadResult]
+    ).filter((u): u is string => typeof u === 'string' && !!u);
+
+    if (uploadedUrls.length === 0) return false;
 
     const focusPath = editor?.selection?.focus?.path;
     const parentNode = focusPath
@@ -180,21 +219,22 @@ export const handleFilesPaste = async (
       ? EditorUtils.findNext(editor, focusPath)!
       : undefined;
 
-    uploadedUrls.forEach((uploadedUrl) => {
-      if (!uploadedUrl) return;
-      Transforms.insertNodes(
-        editor,
-        EditorUtils.createMediaNode(uploadedUrl, 'image'),
-        {
-          at: [
-            ...(parentNode && parentNode.type === 'table-cell'
-              ? focusPath!
-              : insertAt
-                ? insertAt
-                : [editor.children.length - 1]),
-          ],
-        },
-      );
+    uploadedUrls.forEach((uploadedUrl, idx) => {
+      const file = files[idx] || files[0];
+      const mediaType = detectFileMediaType(file);
+      const node =
+        mediaType === 'attachment'
+          ? buildAttachNode(uploadedUrl, file)
+          : EditorUtils.createMediaNode(uploadedUrl, mediaType);
+      Transforms.insertNodes(editor, node as any, {
+        at: [
+          ...(parentNode && parentNode.type === 'table-cell'
+            ? focusPath!
+            : insertAt
+              ? insertAt
+              : [editor.children.length - 1]),
+        ],
+      });
     });
     return true;
   } catch (error) {
@@ -300,15 +340,18 @@ export const handlePlainTextPaste = async (
   selection: BaseSelection,
   plugins: MarkdownEditorPlugin[],
   allowedTypes?: string[],
+  options?: { parseMarkdownInPlainText?: boolean },
 ) => {
-  if (isMarkdown(text)) {
+  // parseMarkdownInPlainText 默认 true，保留旧行为；显式关掉时走原样插入
+  const parseMd = options?.parseMarkdownInPlainText !== false;
+  if (parseMd && isMarkdown(text)) {
     await parseMarkdownToNodesAndInsert(editor, text, plugins);
     return true;
   }
   // 仅当 allowedTypes 允许 text/html 时才走 HTML 解析，
   // 避免绕过调用方对 pasteConfig.allowedTypes 的限制
   const htmlAllowed = !allowedTypes || allowedTypes.includes('text/html');
-  if (htmlAllowed && isHtml(text)) {
+  if (parseMd && htmlAllowed && isHtml(text)) {
     const success = await insertParsedHtmlNodes(editor, text, plugins, '');
     if (success) return true;
   }

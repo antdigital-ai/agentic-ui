@@ -108,6 +108,6 @@ const genStyle: GenStyleFn<'ToggleButton'> = (token) => {
 const useGenStyle = genStyleHooks('ToggleButton', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'toggle-button');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'toggle-button');
+  return { hashId };
 }

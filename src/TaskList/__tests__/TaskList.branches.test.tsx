@@ -1,4 +1,4 @@
-﻿import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -32,7 +32,6 @@ vi.mock('../../Components/ActionIconBox', () => ({
 // Mock 样式hook
 vi.mock('../style', () => ({
   useStyle: () => ({
-    wrapSSR: (node: React.ReactNode) => node,
     hashId: 'test-hash-id',
   }),
 }));
@@ -111,8 +110,9 @@ describe('TaskList Component', () => {
     );
 
     expect(screen.getByTestId('task-list-status-success')).toBeInTheDocument();
-    expect(screen.getByTestId('task-list-status-loading')).toBeInTheDocument();
+    expect(screen.getAllByTestId('task-list-status-loading')).toHaveLength(1);
     expect(screen.getAllByTestId('task-list-status-pending')).toHaveLength(2);
+    expect(screen.getAllByTestId('task-list-loading')).toHaveLength(3);
   });
 
   it('应该显示错误状态的任务', () => {
@@ -170,8 +170,9 @@ describe('TaskList Component', () => {
       </TestWrapper>,
     );
 
-    const loadingComponent = screen.getByTestId('task-list-loading');
-    expect(loadingComponent).toBeInTheDocument();
+    const loadingStatus = screen.getByTestId('task-list-status-loading');
+    const loadingComponent =
+      within(loadingStatus).getByTestId('task-list-loading');
     expect(loadingComponent).toHaveAttribute('data-size', '16');
   });
 
@@ -267,8 +268,7 @@ describe('TaskList Component', () => {
       </TestWrapper>,
     );
 
-    // 数组内容被直接渲染，所以文本是连续的
-    expect(screen.getByText('内容1内容2内容3')).toBeInTheDocument();
+    expect(screen.getByText(/内容1\s*内容2\s*内容3/)).toBeInTheDocument();
   });
 
   it('应该处理空内容', () => {
@@ -290,9 +290,8 @@ describe('TaskList Component', () => {
     expect(
       screen.getByTestId('task-list-thoughtChainItem'),
     ).toBeInTheDocument();
-    expect(
-      screen.queryByTestId('task-list-arrowContainer'),
-    ).not.toBeInTheDocument();
+    expect(screen.getByTestId('task-list-arrowContainer')).toBeInTheDocument();
+    expect(screen.getByText('任务1')).toBeInTheDocument();
   });
 
   it('应该处理空数组内容', () => {
@@ -314,9 +313,8 @@ describe('TaskList Component', () => {
     expect(
       screen.getByTestId('task-list-thoughtChainItem'),
     ).toBeInTheDocument();
-    expect(
-      screen.queryByTestId('task-list-arrowContainer'),
-    ).not.toBeInTheDocument();
+    expect(screen.getByTestId('task-list-arrowContainer')).toBeInTheDocument();
+    expect(screen.getByText('任务1')).toBeInTheDocument();
   });
 
   it('应该支持受控模式', () => {

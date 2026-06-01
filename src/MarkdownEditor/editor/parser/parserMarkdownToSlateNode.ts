@@ -28,13 +28,14 @@ import {
   preprocessNonStandardHtmlTags,
   preprocessThinkTags,
 } from './parse/parseHtml';
+import type { FormulaConfig } from '../../../Config/formulaConfig';
 import { handleInlineMath, handleMath } from './parse/parseMath';
 import { handleImage } from './parse/parseMedia';
 import {
   parseTableOrChart,
   preprocessMarkdownTableNewlines,
 } from './parse/parseTable';
-import mdastParser from './remarkParse';
+import { getMarkdownParser } from './remarkParse';
 
 // 全局解析缓存
 const parseCache = new Map<string, Elements[]>();
@@ -217,6 +218,8 @@ export interface ParserMarkdownToSlateNodeConfig {
   paragraphTag?: string;
   /** 是否正在输入中（打字机模式） */
   typing?: boolean;
+  /** 公式解析与 KaTeX 渲染配置 */
+  formula?: FormulaConfig;
 
   config?: ChartTypeConfig[];
 }
@@ -269,8 +272,9 @@ export class MarkdownToSlateParser {
 
   private buildMarkdownRoot(md: string): RootContent[] {
     const preprocessedMarkdown = this.preprocessMarkdown(md);
-    const ast = mdastParser.parse(preprocessedMarkdown) as any;
-    const processedMarkdown = mdastParser.runSync(ast) as any;
+    const parser = getMarkdownParser(this.config.formula);
+    const ast = parser.parse(preprocessedMarkdown) as any;
+    const processedMarkdown = parser.runSync(ast) as any;
     return processedMarkdown.children as RootContent[];
   }
 

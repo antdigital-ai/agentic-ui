@@ -143,7 +143,7 @@ const AILabelComponent = React.forwardRef<HTMLSpanElement, AILabelProps>(
 
     const context = useContext(ConfigProvider.ConfigContext);
     const baseCls = context?.getPrefixCls(prefixCls);
-    const { wrapSSR, hashId } = useStyle(baseCls);
+    const { hashId } = useStyle(baseCls);
 
     // 合并样式，处理偏移量
     // - 水平方向：通过 `insetInlineEnd: -offsetX` 实现 RTL 友好的右侧偏移
@@ -195,7 +195,7 @@ const AILabelComponent = React.forwardRef<HTMLSpanElement, AILabelProps>(
       return <AIGraphic />;
     }, [status, tooltipOpen]);
 
-    return wrapSSR(
+    return (
       <span
         ref={ref}
         {...restProps}
@@ -212,7 +212,7 @@ const AILabelComponent = React.forwardRef<HTMLSpanElement, AILabelProps>(
             {iconNode}
           </sup>
         </Tooltip>
-      </span>,
+      </span>
     );
   },
 );

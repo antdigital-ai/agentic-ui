@@ -1,16 +1,16 @@
 import { describe, expect, it, vi } from 'vitest';
+import type { FileNode } from '../../types';
 import {
   shouldShowFileDownloadAction,
   shouldShowFilePreviewAction,
 } from '../fileListRowActions';
-import type { FileNode } from '../../types';
 
 describe('fileListRowActions', () => {
   describe('shouldShowFileDownloadAction', () => {
     it('有 onDownload 时应展示', () => {
-      expect(
-        shouldShowFileDownloadAction({ name: 'a.txt' }, vi.fn()),
-      ).toBe(true);
+      expect(shouldShowFileDownloadAction({ name: 'a.txt' }, vi.fn())).toBe(
+        true,
+      );
     });
 
     it('有 url 无 onDownload 时应展示', () => {

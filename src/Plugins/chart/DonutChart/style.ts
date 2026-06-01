@@ -181,6 +181,6 @@ const genStyle: GenStyleFn<'DonutChart'> = (token) => {
 const useGenStyle = genStyleHooks('DonutChart', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'DonutChart');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'DonutChart');
+  return { hashId };
 }

@@ -103,7 +103,7 @@ const ChartToolBar: React.FC<ChartToolBarProps> = ({
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const i18n = useContext(I18nContext);
   const prefixCls = getPrefixCls('chart-toolbar');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   const handleDownload = () => {
     if (onDownload) {
@@ -133,7 +133,7 @@ const ChartToolBar: React.FC<ChartToolBarProps> = ({
     ...(Array.isArray(styles) ? Object.assign({}, ...styles) : styles || {}),
   };
 
-  return wrapSSR(
+  return (
     <div className={mergedClassName} style={mergedStyle}>
       {/* 左侧标题 */}
       <div className={clsx(`${prefixCls}-header-title`, hashId)}>
@@ -184,7 +184,7 @@ const ChartToolBar: React.FC<ChartToolBarProps> = ({
           </Tooltip>
         ) : null}
       </div>
-    </div>,
+    </div>
   );
 };
 

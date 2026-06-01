@@ -30,10 +30,7 @@ export const useKeyboardHandler = ({
   const handleKeyDown = useRefFunction(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (
-        isImeComposing(
-          e,
-          markdownEditorRef?.current?.store.inputComposition,
-        )
+        isImeComposing(e, markdownEditorRef?.current?.store.inputComposition)
       ) {
         // 阻止冒泡到外层，避免 IME 确认 Enter 误触发发送；勿 preventDefault，留给输入法提交
         if (e.key === 'Enter') {

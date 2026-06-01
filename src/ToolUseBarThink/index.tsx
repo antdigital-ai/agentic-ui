@@ -59,6 +59,11 @@ const CONTENT_CLAMPED_STYLE: React.CSSProperties = {
 };
 
 const CONTAINER_STYLE: React.CSSProperties = { overflow: 'hidden' };
+// 内容完全展开时移除所有高度限制，允许滚动查看全部内容
+const CONTAINER_CONTENT_EXPANDED_STYLE: React.CSSProperties = {
+  overflowY: 'auto',
+  maxHeight: 'none',
+};
 
 export interface ToolUseBarThinkProps {
   toolName: React.ReactNode;
@@ -75,6 +80,12 @@ export interface ToolUseBarThinkProps {
   floatingExpanded?: boolean;
   defaultFloatingExpanded?: boolean;
   onFloatingExpandedChange?: (floatingExpanded: boolean) => void;
+  /**
+   * 展开时是否将组件滚动到视窗内。
+   * 传入 `true` 时使用默认参数 `{ behavior: 'smooth', block: 'nearest' }`，
+   * 也可直接传入 `ScrollIntoViewOptions` 自定义滚动行为。初次挂载不触发。
+   */
+  scrollIntoViewOnExpand?: boolean | ScrollIntoViewOptions;
   classNames?: {
     root?: string;
     bar?: string;
@@ -120,10 +131,11 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
   classNames: customClassNames,
   styles,
   light = false,
+  scrollIntoViewOnExpand = false,
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-tool-use-bar-think');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
   const locale = useLocale();
 
   const [expandedState, setExpandedState] = useMergedState(defaultExpanded, {
@@ -143,6 +155,8 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
   const onMouseMove = useRefFunction(() => setHover(true));
   const onMouseLeave = useRefFunction(() => setHover(false));
 
+  const contentInnerRef = useRef<HTMLDivElement>(null);
+
   const handleToggleExpand = useRefFunction(() => {
     setExpandedState(!expandedState);
   });
@@ -159,9 +173,32 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
     }
   }, [isLoading, setExpandedState]);
 
+  const rootRef = useRef<HTMLDivElement>(null);
+  const didMountRef = useRef(false);
+
+  useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
+    }
+    if (!expandedState || !scrollIntoViewOnExpand) return;
+
+    const options: ScrollIntoViewOptions =
+      typeof scrollIntoViewOnExpand === 'object'
+        ? scrollIntoViewOnExpand
+        : { behavior: 'smooth', block: 'nearest' };
+
+    const timer = window.setTimeout(() => {
+      rootRef.current?.scrollIntoView(options);
+    }, CARD_RESIZE_DURATION_MS);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [expandedState, scrollIntoViewOnExpand]);
+
   // --- Container overflow detection ---
   // Only active when expanded AND not loading (overflow UI is hidden during loading)
-  const contentInnerRef = useRef<HTMLDivElement>(null);
   const [isContentOverflowing, setIsContentOverflowing] = useState(false);
   const [contentExpanded, setContentExpanded] = useState(false);
 
@@ -195,6 +232,8 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
       showContentExpand && !contentExpanded ? CONTENT_CLAMPED_STYLE : undefined,
     [showContentExpand, contentExpanded],
   );
+
+  const isContentFullyExpanded = contentExpanded || floatingExpandedState;
 
   // --- Class names (memoized) ---
   const cls = useMemo(() => {
@@ -299,8 +338,9 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
     floatingExpandedState,
   ]);
 
-  return wrapSSR(
+  return (
     <div
+      ref={rootRef}
       data-testid={testId || 'ToolUseBarThink'}
       className={classNames(cls.root, {
         [`${prefixCls}-root-think-collapsed`]:
@@ -371,6 +411,9 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
         <div
           className={classNames(`${prefixCls}-think-collapse`, hashId, {
             [`${prefixCls}-think-collapse-open`]: expandedState,
+            // 内容展开时解除父级 maxHeight 限制，使长内容可完整展示
+            [`${prefixCls}-think-collapse-content-expanded`]:
+              isContentFullyExpanded,
           })}
         >
           <div
@@ -379,7 +422,12 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
             <div
               className={cls.container}
               data-testid="tool-use-bar-think-container"
-              style={CONTAINER_STYLE}
+              // 展开时切换为无高度限制的样式，覆盖 CSS 中 maxHeight: 700 的约束
+              style={
+                isContentFullyExpanded
+                  ? CONTAINER_CONTENT_EXPANDED_STYLE
+                  : CONTAINER_STYLE
+              }
             >
               <div ref={contentInnerRef} style={contentInnerStyle}>
                 <div className={cls.content} style={styles?.content}>
@@ -440,7 +488,7 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
           {floatingExpandedState ? locale.collapse : locale.expand}
         </div>
       )}
-    </div>,
+    </div>
   );
 };
 

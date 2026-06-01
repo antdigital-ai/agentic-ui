@@ -179,6 +179,6 @@ const genStyle: GenStyleFn<'SuggestionList'> = (token) => {
 const useGenStyle = genStyleHooks('SuggestionList', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'follow-up');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'follow-up');
+  return { hashId };
 }

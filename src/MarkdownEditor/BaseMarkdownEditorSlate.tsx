@@ -12,6 +12,9 @@ import { Subject } from 'rxjs';
 import { createEditor, Editor, Selection } from 'slate';
 import { withHistory } from 'slate-history';
 import { withReact } from 'slate-react';
+import { resolveContainerContentStyle } from '../Constants/contentPaddingVars';
+import { useFormulaConfig } from '../Config';
+import { useDebounceFn } from '../Hooks/useDebounceFn';
 import { useRefFunction } from '../Hooks/useRefFunction';
 import { CommentList } from './editor/components/CommentList';
 import { SlateMarkdownEditor } from './editor/Editor';
@@ -42,7 +45,6 @@ import {
   MarkdownEditorProps,
 } from './types';
 import { exportHtml } from './utils/exportHtml';
-import { resolveContainerContentStyle } from '../Constants/contentPaddingVars';
 import { sanitizeEditorChromeStyle } from './utils/sanitizeChromeStyle';
 
 // 组合器函数
@@ -163,20 +165,28 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
     };
   }, []);
 
+  const formulaConfig = useFormulaConfig(props.formula);
+  const parserConfig = useMemo(
+    () => ({ formula: formulaConfig }),
+    [formulaConfig.enable, formulaConfig.singleDollarTextMath],
+  );
+
   const store = useMemo(
     () =>
       new EditorStore(
         markdownEditorRef,
         props.plugins,
         props.markdownToHtmlOptions,
+        parserConfig,
       ),
-    [props.plugins, props.markdownToHtmlOptions],
+    [props.plugins, props.markdownToHtmlOptions, parserConfig],
   );
 
   const initSchemaValue = useMemo(() => {
     const parseResult = parserMdToSchema(
       initValue || '',
       pluginsForInitParseRef.current || [],
+      parserConfig,
     );
     let list = parseResult?.schema || [];
 
@@ -238,7 +248,7 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
 
   const context = useContext(ConfigProvider.ConfigContext);
   const baseClassName = context?.getPrefixCls(`agentic-md-editor`);
-  const { wrapSSR, hashId } = useStyle(baseClassName);
+  const { hashId } = useStyle(baseClassName);
 
   const [showCommentList, setShowComment] = useState<CommentDataType[]>([]);
 
@@ -247,6 +257,21 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
   useEffect(() => {
     setSchema(initSchemaValue);
   }, [initSchemaValue]);
+
+  // toc 关闭时无人消费 schema，无需 setState 触发整树 re-render；
+  // toc 开启时延迟到稳定后再更新，TOC 跟随节奏可接受地放慢。
+  const tocEnabled = toc !== false;
+  const setSchemaDebounce = useDebounceFn((next: Elements[]) => {
+    setSchema(next);
+  }, 200);
+  const handleChildChange = useRefFunction(
+    (value: string, s: Elements[]) => {
+      if (tocEnabled) {
+        setSchemaDebounce.run(s);
+      }
+      rest?.onChange?.(value, s);
+    },
+  );
 
   const [openInsertCompletion, setOpenInsertCompletion] = useState(false);
   const [refreshFloatBar, setRefreshFloatBar] = useState(false);
@@ -289,7 +314,7 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
 
   const isStreaming = props.streaming ?? props.typewriter ?? false;
 
-  return wrapSSR(
+  return (
     <I18nBoundary>
       <PluginContext.Provider value={props.plugins || []}>
         <EditorStoreContext.Provider
@@ -377,10 +402,7 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
                 prefixCls={baseClassName}
                 {...rest}
                 lazy={lazy}
-                onChange={(value, s) => {
-                  setSchema(s);
-                  rest?.onChange?.(value, s);
-                }}
+                onChange={handleChildChange}
                 initSchemaValue={initSchemaValue}
                 style={editorStyle}
                 instance={instance}
@@ -437,7 +459,7 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
           </div>
         </EditorStoreContext.Provider>
       </PluginContext.Provider>
-    </I18nBoundary>,
+    </I18nBoundary>
   );
 };
 

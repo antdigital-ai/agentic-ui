@@ -41,6 +41,6 @@ const useGenStyle = genStyleHooks('BubbleList', (token, info) => [
 ]);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'BubbleItem');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'BubbleItem');
+  return { hashId };
 }

@@ -1,5 +1,6 @@
-import type { CSSProperties } from 'react';
+﻿import type { CSSProperties } from 'react';
 import type { AttachmentFile } from '../../../../MarkdownInputField/AttachmentButton/types';
+import { normalizeTaskContent } from '../../../../TaskList/normalizeTaskContent';
 import type {
   TaskItem,
   TaskListProps,
@@ -34,14 +35,7 @@ export function normalizeTaskListPropsFromJson(parsed: unknown): TaskListProps {
       const key = x.key !== undefined && x.key !== null ? String(x.key) : '';
       const title =
         x.title === undefined || x.title === null ? undefined : String(x.title);
-      let content: TaskItem['content'] = '';
-      if (x.content !== undefined && x.content !== null) {
-        if (Array.isArray(x.content)) {
-          content = x.content.map((line) => String(line)).join('\n');
-        } else {
-          content = String(x.content);
-        }
-      }
+      const content = normalizeTaskContent(x.content, title);
       return { key, title, content, status };
     })
     .filter((item) => item.key.length > 0);

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * TextSwap 组件、`textSwapEnter` keyframes（Markdown 表格 / 流式段落）共用一套数值。
  */
 

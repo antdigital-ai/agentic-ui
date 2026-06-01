@@ -1,4 +1,4 @@
-export interface FenceState {
+﻿export interface FenceState {
   inFenced: boolean;
   fenceChar: string;
   fenceLen: number;
@@ -35,4 +35,13 @@ export const updateFenceStateForLine = (
   }
 
   return state;
+};
+
+/** 流式末块是否落在未闭合的围栏代码块内（需每帧重 parse 以更新 code 内容） */
+export const endsInsideUnclosedFence = (content: string): boolean => {
+  let state = { ...INITIAL_FENCE_STATE };
+  for (const line of content.split('\n')) {
+    state = updateFenceStateForLine(state, line);
+  }
+  return state.inFenced;
 };

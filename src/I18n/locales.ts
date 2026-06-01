@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 中文标签映射对象
  *
  * 包含所有界面文本的中文翻译，用于国际化
@@ -476,6 +476,17 @@ export const cnLabels = {
   'skillMode.close': '关闭技能模式',
   // ChatBootPage 组件相关
   'chatBootPage.caseReply.viewReplay': '查看回放',
+  'chatBootPage.tabIconAction': '标签页图标操作',
+  // Editor 相关
+  'editor.embedMediaLinks': '嵌入媒体链接',
+  'editor.pasteMediaLink': '粘贴媒体链接',
+  'editor.embed': '嵌入',
+  'editor.local': '本地',
+  'editor.chooseFile': '选择文件',
+  'editor.embedLink': '嵌入链接',
+  'editor.pasteAttachmentLink': '粘贴附件链接',
+  // Code 相关
+  'code.searchLanguage': '搜索语言',
 };
 
 /**
@@ -969,4 +980,15 @@ export const enLabels: typeof cnLabels = {
   'skillMode.close': 'Close skill mode',
   // ChatBootPage component related
   'chatBootPage.caseReply.viewReplay': 'View Replay',
+  'chatBootPage.tabIconAction': 'Tab icon action',
+  // Editor related
+  'editor.embedMediaLinks': 'Embed media links',
+  'editor.pasteMediaLink': 'Paste media link',
+  'editor.embed': 'Embed',
+  'editor.local': 'Local',
+  'editor.chooseFile': 'Choose a file',
+  'editor.embedLink': 'Embed Link',
+  'editor.pasteAttachmentLink': 'Paste attachment link',
+  // Code related
+  'code.searchLanguage': 'Search',
 };
