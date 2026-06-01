@@ -1,11 +1,11 @@
-import { ConfigProvider } from 'antd';
+﻿import { ConfigProvider } from 'antd';
 import React, { useContext } from 'react';
 import { RenderElementProps } from 'slate-react';
 import { useEditorStore } from '../../store';
 import type { TableNode } from '../../types/Table';
 import { EditableTable } from './EditableTable';
 import { ReadonlyTableComponent } from './ReadonlyTableComponent';
-import { TablePropsContext } from './TableContext';
+import { TableStaticContext } from './TableContext';
 
 /**
  * 表格组
@@ -42,7 +42,7 @@ export const SlateTable = ({
   const { readonly, markdownContainerRef, editorProps } = useEditorStore();
   const tableCssVariables = editorProps?.tableConfig?.cssVariables;
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
-  const { tablePath } = useContext(TablePropsContext);
+  const { tablePath } = useContext(TableStaticContext);
 
   const baseCls = getPrefixCls('agentic-md-editor-content-table');
   if (readonly) {

@@ -1,4 +1,4 @@
-/* eslint-disable no-case-declarations */
+﻿/* eslint-disable no-case-declarations */
 import React from 'react';
 import {
   BaseSelection,
@@ -75,9 +75,10 @@ export class EnterKey {
         }
       }
       if (el.type === 'table-cell') {
-        const table = Editor.parent(this.editor, path);
-        if (table[0].type === 'table-row') {
-          this.table(table as NodeEntry<TableNode>, sel, e);
+        const row = Editor.parent(this.editor, path);
+        if (row[0].type === 'table-row') {
+          // 必须传入 table-cell 的 NodeEntry：列索引用 cell path 末位，下一行用 Path.next(rowPath)
+          this.table(node as NodeEntry<TableNode>, sel, e);
           e.preventDefault();
           return;
         }

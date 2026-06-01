@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom';
+﻿import '@testing-library/jest-dom';
 import { fireEvent, render } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
@@ -7,7 +7,7 @@ import { ReactEditor, Slate, withReact } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useClickAway } from '../../../../../Hooks/useClickAway';
 import { TableCellIndexSpacer } from '../../../../editor/elements/Table/TableCellIndexSpacer';
-import { TablePropsContext } from '../../../../editor/elements/Table/TableContext';
+import { TableContextTestProvider } from '../../../../editor/elements/Table/TableContext';
 import { NativeTableEditor } from '../../../../utils/native-table';
 // Mock dependencies
 vi.mock('../../../../editor/store');
@@ -129,7 +129,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
 
     return render(
       <ConfigProvider>
-        <TablePropsContext.Provider value={defaultContextValue}>
+        <TableContextTestProvider value={defaultContextValue}>
           <Slate editor={editor} initialValue={editor.children as any}>
             <table>
               <tbody>
@@ -139,7 +139,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
               </tbody>
             </table>
           </Slate>
-        </TablePropsContext.Provider>
+        </TableContextTestProvider>
       </ConfigProvider>,
     );
   };
@@ -430,7 +430,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
 
     render(
       <ConfigProvider>
-        <TablePropsContext.Provider
+        <TableContextTestProvider
           value={{
             deleteIconPosition: null,
             setDeleteIconPosition: mockSetDeleteIconPosition,
@@ -445,7 +445,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
               </tbody>
             </table>
           </Slate>
-        </TablePropsContext.Provider>
+        </TableContextTestProvider>
       </ConfigProvider>,
     );
 
@@ -606,7 +606,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
 
       render(
         <ConfigProvider>
-          <TablePropsContext.Provider
+          <TableContextTestProvider
             value={{
               deleteIconPosition: null,
               setDeleteIconPosition: mockSetDeleteIconPosition,
@@ -621,7 +621,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
                 </tbody>
               </table>
             </Slate>
-          </TablePropsContext.Provider>
+          </TableContextTestProvider>
         </ConfigProvider>,
       );
 
@@ -640,7 +640,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
 
       render(
         <ConfigProvider>
-          <TablePropsContext.Provider
+          <TableContextTestProvider
             value={{
               deleteIconPosition: null,
               setDeleteIconPosition: mockSetDeleteIconPosition,
@@ -655,7 +655,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
                 </tbody>
               </table>
             </Slate>
-          </TablePropsContext.Provider>
+          </TableContextTestProvider>
         </ConfigProvider>,
       );
 
@@ -693,7 +693,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
 
       render(
         <ConfigProvider>
-          <TablePropsContext.Provider
+          <TableContextTestProvider
             value={{
               deleteIconPosition: null,
               setDeleteIconPosition: mockSetDeleteIconPosition,
@@ -708,7 +708,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
                 </tbody>
               </table>
             </Slate>
-          </TablePropsContext.Provider>
+          </TableContextTestProvider>
         </ConfigProvider>,
       );
 
@@ -794,14 +794,14 @@ describe('TableCellIndexSpacer 组件测试', () => {
       render(
         <ConfigProvider>
           <Slate editor={editor} initialValue={tableChildren as any}>
-            <TablePropsContext.Provider
+            <TableContextTestProvider
               value={{
                 deleteIconPosition: null,
                 setDeleteIconPosition: mockSetDeleteIconPosition,
               }}
             >
               <TableCellIndexSpacer columnIndex={-1} tablePath={[0]} />
-            </TablePropsContext.Provider>
+            </TableContextTestProvider>
           </Slate>
         </ConfigProvider>,
       );
@@ -853,7 +853,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
 
       render(
         <ConfigProvider>
-          <TablePropsContext.Provider
+          <TableContextTestProvider
             value={{
               deleteIconPosition: null,
               setDeleteIconPosition: mockSetDeleteIconPosition,
@@ -868,7 +868,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
                 </tbody>
               </table>
             </Slate>
-          </TablePropsContext.Provider>
+          </TableContextTestProvider>
         </ConfigProvider>,
       );
 
@@ -920,7 +920,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
 
       render(
         <ConfigProvider>
-          <TablePropsContext.Provider
+          <TableContextTestProvider
             value={{
               deleteIconPosition: null,
               setDeleteIconPosition: mockSetDeleteIconPosition,
@@ -935,7 +935,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
                 </tbody>
               </table>
             </Slate>
-          </TablePropsContext.Provider>
+          </TableContextTestProvider>
         </ConfigProvider>,
       );
 
@@ -962,7 +962,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
 
       render(
         <ConfigProvider>
-          <TablePropsContext.Provider
+          <TableContextTestProvider
             value={{
               deleteIconPosition: null,
               setDeleteIconPosition: mockSetDeleteIconPosition,
@@ -977,7 +977,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
                 </tbody>
               </table>
             </Slate>
-          </TablePropsContext.Provider>
+          </TableContextTestProvider>
         </ConfigProvider>,
       );
 
@@ -1021,7 +1021,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
 
       render(
         <ConfigProvider>
-          <TablePropsContext.Provider
+          <TableContextTestProvider
             value={{
               deleteIconPosition: { columnIndex: 0 },
               setDeleteIconPosition: mockSetDeleteIconPosition,
@@ -1036,7 +1036,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
                 </tbody>
               </table>
             </Slate>
-          </TablePropsContext.Provider>
+          </TableContextTestProvider>
         </ConfigProvider>,
       );
 
@@ -1085,7 +1085,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
 
       render(
         <ConfigProvider>
-          <TablePropsContext.Provider
+          <TableContextTestProvider
             value={{
               deleteIconPosition: { columnIndex: 0 },
               setDeleteIconPosition: mockSetDeleteIconPosition,
@@ -1100,7 +1100,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
                 </tbody>
               </table>
             </Slate>
-          </TablePropsContext.Provider>
+          </TableContextTestProvider>
         </ConfigProvider>,
       );
 
@@ -1127,7 +1127,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
 
       render(
         <ConfigProvider>
-          <TablePropsContext.Provider
+          <TableContextTestProvider
             value={{
               deleteIconPosition: { columnIndex: 0 },
               setDeleteIconPosition: mockSetDeleteIconPosition,
@@ -1142,7 +1142,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
                 </tbody>
               </table>
             </Slate>
-          </TablePropsContext.Provider>
+          </TableContextTestProvider>
         </ConfigProvider>,
       );
 
@@ -1191,7 +1191,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
 
       render(
         <ConfigProvider>
-          <TablePropsContext.Provider
+          <TableContextTestProvider
             value={{
               deleteIconPosition: { columnIndex: 0 },
               setDeleteIconPosition: mockSetDeleteIconPosition,
@@ -1206,7 +1206,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
                 </tbody>
               </table>
             </Slate>
-          </TablePropsContext.Provider>
+          </TableContextTestProvider>
         </ConfigProvider>,
       );
 

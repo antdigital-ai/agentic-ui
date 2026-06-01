@@ -1,22 +1,25 @@
-import {
+﻿import {
   DeleteOutlined,
   InsertRowAboveOutlined,
   InsertRowBelowOutlined,
 } from '@ant-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
-import React, { useContext, useRef } from 'react';
-import { useSlate } from 'slate-react';
+import React, { memo, useContext, useRef } from 'react';
 import { useClickAway } from '../../../../../Hooks/useClickAway';
 import { useRefFunction } from '../../../../../Hooks/useRefFunction';
 import { I18nContext } from '../../../../../I18n';
+import { useEditorStore } from '../../../store';
 import {
   clearTableSelection,
   insertTableRow,
   removeTableRow,
   selectTableRow,
 } from '../commands/tableCommands';
-import { TablePropsContext } from '../TableContext';
+import {
+  useSetTableChromePosition,
+  useTableRowChromeActive,
+} from '../TableContext';
 
 /**
  * TableCellIndex 组件的属性接口
@@ -69,7 +72,7 @@ export interface TableCellIndexProps {
  * - 固定宽度和垂直对齐
  * - 支持点击选中整行功能
  */
-export const TableCellIndex: React.FC<TableCellIndexProps> = ({
+export const TableCellIndex: React.FC<TableCellIndexProps> = memo(({
   style,
   className,
   rowIndex,
@@ -80,10 +83,9 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
   const baseClassName = context?.getPrefixCls(
     'agentic-md-editor-table-cell-index',
   );
-  const editor = useSlate();
-  const tableContext = useContext(TablePropsContext);
-
-  const { deleteIconPosition, setDeleteIconPosition } = tableContext;
+  const { markdownEditorRef } = useEditorStore();
+  const setDeleteIconPosition = useSetTableChromePosition();
+  const shouldShowDeleteIcon = useTableRowChromeActive(rowIndex);
 
   /**
    * 清除表格中所有单元格的选中状态
@@ -91,13 +93,15 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
 
   const clearSelect = useRefFunction((clearIcon = true) => {
     if (clearIcon) {
-      setDeleteIconPosition?.(null);
+      setDeleteIconPosition(null);
     }
     if (!tablePath) {
       return;
     }
 
     try {
+      const editor = markdownEditorRef.current;
+      if (!editor) return;
       clearTableSelection(editor, tablePath);
     } catch (error) {
       console.warn('Failed to clear table selection:', error);
@@ -113,7 +117,7 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
 
     // 如果提供了行索引，显示删除图标
     if (rowIndex !== undefined) {
-      setDeleteIconPosition?.({
+      setDeleteIconPosition({
         rowIndex: rowIndex,
         columnIndex: undefined,
       });
@@ -125,6 +129,8 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
 
     try {
       clearSelect(false);
+      const editor = markdownEditorRef.current;
+      if (!editor) return;
       selectTableRow(editor, tablePath, rowIndex);
     } catch (error) {
       console.warn('Failed to select table row:', error);
@@ -142,6 +148,8 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
       if (!tablePath || rowIndex === undefined) {
         return;
       }
+      const editor = markdownEditorRef.current;
+      if (!editor) return;
       removeTableRow(editor, tablePath, rowIndex);
       clearSelect();
     } catch (error) {
@@ -160,6 +168,8 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
       if (!tablePath || rowIndex === undefined) {
         return;
       }
+      const editor = markdownEditorRef.current;
+      if (!editor) return;
       insertTableRow(editor, tablePath, rowIndex, 'before');
       clearSelect();
     } catch (error) {
@@ -178,6 +188,8 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
       if (!tablePath || rowIndex === undefined) {
         return;
       }
+      const editor = markdownEditorRef.current;
+      if (!editor) return;
       insertTableRow(editor, tablePath, rowIndex, 'after');
       clearSelect();
     } catch (error) {
@@ -187,21 +199,17 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
 
   const ref = useRef<HTMLTableDataCellElement>(null);
 
-  // 检查是否应该显示删除图标
-  const shouldShowDeleteIcon =
-    deleteIconPosition &&
-    deleteIconPosition.rowIndex === rowIndex &&
-    deleteIconPosition.columnIndex === undefined;
-
   useClickAway(() => {
-    if (
-      shouldShowDeleteIcon &&
-      deleteIconPosition &&
-      deleteIconPosition.rowIndex === rowIndex
-    ) {
+    if (shouldShowDeleteIcon) {
       clearSelect();
     }
   }, ref);
+
+  /** Slate 会在 mousedown 时抢焦点；void 单元格需阻止默认行为，操作按钮才能响应 click */
+  const stopEditorMouseDown = useRefFunction((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  });
 
   return (
     <td
@@ -218,6 +226,7 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
         ...style,
       }}
       onClick={handleClick}
+      onMouseDown={stopEditorMouseDown}
       title={
         rowIndex !== undefined
           ? locale?.['table.clickToShowActions'] || '点击显示操作按钮'
@@ -238,6 +247,7 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
               `${baseClassName}-insert-row-before`,
             )}
             onClick={handleInsertRowBefore}
+            onMouseDown={stopEditorMouseDown}
             title={locale?.['table.insertRowBefore'] || '在上面增加一行'}
           >
             <InsertRowAboveOutlined />
@@ -249,6 +259,7 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
             `${baseClassName}-delete-icon`,
           )}
           onClick={handleDeleteClick}
+          onMouseDown={stopEditorMouseDown}
           title={locale?.['table.deleteRow'] || '删除整行'}
         >
           <DeleteOutlined />
@@ -261,6 +272,7 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
               `${baseClassName}-insert-row-after`,
             )}
             onClick={handleInsertRowAfter}
+            onMouseDown={stopEditorMouseDown}
             title={locale?.['table.insertRowAfter'] || '在下面增加一行'}
           >
             <InsertRowBelowOutlined />
@@ -269,4 +281,6 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
       </div>
     </td>
   );
-};
+});
+
+TableCellIndex.displayName = 'TableCellIndex';
