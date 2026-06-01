@@ -1,4 +1,4 @@
-import { Element, Node, Text, type BaseEditor } from 'slate';
+﻿import { Element, Node, Text, type BaseEditor } from 'slate';
 
 const PLAIN_TEXT_BLOCK_TYPES = new Set(['paragraph', 'head']);
 
@@ -18,10 +18,6 @@ export function canUseSlateNativePlaceholder(editor: BaseEditor): boolean {
 
   if (Node.string(block).trim() !== '') {
     return false;
-  }
-
-  if (block.type === 'head') {
-    return true;
   }
 
   return block.children.every((child: (typeof block.children)[number]) => {

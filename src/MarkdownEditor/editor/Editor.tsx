@@ -852,53 +852,56 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
       allowedTypes.includes('text/plain')
     ) {
       const text = (cachedPlain || '').trim();
-      if (!text) return;
+      if (text) {
+        const selection = markdownEditorRef.current.selection;
 
-      const selection = markdownEditorRef.current.selection;
-
-      if (pasteConfig?.plainTextOnly) {
-        if (selection) {
-          Transforms.insertText(markdownEditorRef.current, text, {
-            at: selection,
-          });
-        } else {
-          Transforms.insertNodes(markdownEditorRef.current, [
-            { type: 'paragraph', children: [{ text }] },
-          ]);
-        }
-        return;
-      }
-
-      if (shouldInsertTextDirectly(markdownEditorRef.current, selection)) {
-        Transforms.insertText(markdownEditorRef.current, text);
-        return;
-      }
-
-      try {
-        if (
-          handleSpecialTextPaste(markdownEditorRef.current, text, selection)
-        ) {
+        if (pasteConfig?.plainTextOnly) {
+          if (selection) {
+            Transforms.insertText(markdownEditorRef.current, text, {
+              at: selection,
+            });
+          } else {
+            Transforms.insertNodes(markdownEditorRef.current, [
+              { type: 'paragraph', children: [{ text }] },
+            ]);
+          }
           return;
         }
-        if (
-          handleHttpLinkPaste(markdownEditorRef.current, text, selection, store)
-        ) {
+
+        if (shouldInsertTextDirectly(markdownEditorRef.current, selection)) {
+          Transforms.insertText(markdownEditorRef.current, text);
           return;
         }
-        if (
-          await handlePlainTextPaste(
-            markdownEditorRef.current,
-            text,
-            selection,
-            plugins,
-            allowedTypes,
-            { parseMarkdownInPlainText: pasteConfig?.parseMarkdownInPlainText },
-          )
-        ) {
-          return;
+
+        try {
+          if (
+            handleSpecialTextPaste(markdownEditorRef.current, text, selection)
+          ) {
+            return;
+          }
+          if (
+            handleHttpLinkPaste(markdownEditorRef.current, text, selection, store)
+          ) {
+            return;
+          }
+          if (
+            await handlePlainTextPaste(
+              markdownEditorRef.current,
+              text,
+              selection,
+              plugins,
+              allowedTypes,
+              {
+                parseMarkdownInPlainText:
+                  pasteConfig?.parseMarkdownInPlainText,
+              },
+            )
+          ) {
+            return;
+          }
+        } catch (e) {
+          console.error('[handlePaste] 处理纯文本粘贴失败:', e);
         }
-      } catch (e) {
-        console.error('[handlePaste] 处理纯文本粘贴失败:', e);
       }
     }
 
