@@ -59,6 +59,11 @@ const CONTENT_CLAMPED_STYLE: React.CSSProperties = {
 };
 
 const CONTAINER_STYLE: React.CSSProperties = { overflow: 'hidden' };
+// 内容完全展开时移除所有高度限制，允许滚动查看全部内容
+const CONTAINER_CONTENT_EXPANDED_STYLE: React.CSSProperties = {
+  overflowY: 'auto',
+  maxHeight: 'none',
+};
 
 export interface ToolUseBarThinkProps {
   toolName: React.ReactNode;
@@ -150,6 +155,8 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
   const onMouseMove = useRefFunction(() => setHover(true));
   const onMouseLeave = useRefFunction(() => setHover(false));
 
+  const contentInnerRef = useRef<HTMLDivElement>(null);
+
   const handleToggleExpand = useRefFunction(() => {
     setExpandedState(!expandedState);
   });
@@ -192,7 +199,6 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
 
   // --- Container overflow detection ---
   // Only active when expanded AND not loading (overflow UI is hidden during loading)
-  const contentInnerRef = useRef<HTMLDivElement>(null);
   const [isContentOverflowing, setIsContentOverflowing] = useState(false);
   const [contentExpanded, setContentExpanded] = useState(false);
 
@@ -226,6 +232,8 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
       showContentExpand && !contentExpanded ? CONTENT_CLAMPED_STYLE : undefined,
     [showContentExpand, contentExpanded],
   );
+
+  const isContentFullyExpanded = contentExpanded || floatingExpandedState;
 
   // --- Class names (memoized) ---
   const cls = useMemo(() => {
@@ -403,6 +411,9 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
         <div
           className={classNames(`${prefixCls}-think-collapse`, hashId, {
             [`${prefixCls}-think-collapse-open`]: expandedState,
+            // 内容展开时解除父级 maxHeight 限制，使长内容可完整展示
+            [`${prefixCls}-think-collapse-content-expanded`]:
+              isContentFullyExpanded,
           })}
         >
           <div
@@ -411,7 +422,12 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
             <div
               className={cls.container}
               data-testid="tool-use-bar-think-container"
-              style={CONTAINER_STYLE}
+              // 展开时切换为无高度限制的样式，覆盖 CSS 中 maxHeight: 700 的约束
+              style={
+                isContentFullyExpanded
+                  ? CONTAINER_CONTENT_EXPANDED_STYLE
+                  : CONTAINER_STYLE
+              }
             >
               <div ref={contentInnerRef} style={contentInnerStyle}>
                 <div className={cls.content} style={styles?.content}>
