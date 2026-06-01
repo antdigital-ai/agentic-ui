@@ -369,17 +369,13 @@ describe('ToolUseBarThink', () => {
         'think-collapse-content-expanded',
       );
 
-      fireEvent.click(
-        screen.getByTestId('tool-use-bar-think-content-expand'),
-      );
+      fireEvent.click(screen.getByTestId('tool-use-bar-think-content-expand'));
 
       expect(container).toHaveStyle({
         maxHeight: 'none',
         overflowY: 'auto',
       });
-      expect(collapse?.className).toContain(
-        'think-collapse-content-expanded',
-      );
+      expect(collapse?.className).toContain('think-collapse-content-expanded');
     } finally {
       restoreResizeObserver();
     }
