@@ -1140,18 +1140,49 @@ const table = (
  * @param plugins - 可选的插件数组
  * @returns 处理后的 Markdown 字符串
  */
+/**
+ * 这些内容类型在解析侧会被自动重新包装为 card（parseTable.ts 等），
+ * 序列化时不需要再额外输出 `<div data-card>` 包裹，避免双层 card 嵌套。
+ */
+const AUTO_RE_WRAPPED_IN_CARD = new Set(['table']);
+
 const handleCard = (
   node: any,
   preString: string,
   parent: any[],
   plugins?: MarkdownEditorPlugin[],
 ) => {
-  return parserSlateNodeToMarkdown(
+  const inner = parserSlateNodeToMarkdown(
     node?.children,
     preString,
     [...parent, node],
     plugins,
   );
+
+  // 找到 card 的实际内容节点（跳过 card-before / card-after 占位）
+  const contentNodes = Array.isArray(node?.children)
+    ? node.children.filter(
+        (c: any) => c?.type !== 'card-before' && c?.type !== 'card-after',
+      )
+    : [];
+
+  // 内容全部为"解析侧会自动重新包装"的类型时，跳过 div wrapper：
+  //   <table> → 重新 parse 时 parseTable 会再次 wrapperCardNode，
+  //   外层 div wrapper 会产生嵌套 card。
+  const allAutoRewrap =
+    contentNodes.length > 0 &&
+    contentNodes.every((c: any) => AUTO_RE_WRAPPED_IN_CARD.has(c?.type));
+
+  if (allAutoRewrap) {
+    return inner;
+  }
+
+  // 其余 card：包一层 <div data-card="true">…</div>，再 parse 时还原 card 包裹。
+  // CommonMark HTML block 在内部遇空行就会截断，所以 inner 不能含空行 ——
+  // 把内部连续换行折叠成单换行；适用于 image / link / 单段文本 等常见 card 内容。
+  // 多块组合 card（多段、列表+图）目前不保证完美往返，可后续用 preprocess 流水线扩展。
+  const compactInner = inner.trim().replace(/\n{2,}/g, '\n');
+  return `\n\n<div data-card="true">\n${compactInner}\n</div>\n\n`;
 };
 
 /**

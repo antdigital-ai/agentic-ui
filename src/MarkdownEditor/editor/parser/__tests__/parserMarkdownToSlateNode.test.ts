@@ -8,7 +8,6 @@ import {
   parserMarkdownToSlateNode,
 } from '../parserMarkdownToSlateNode';
 import { parserMdToSchema } from '../parserMdToSchema';
-
 import { parserSlateNodeToMarkdown } from '../parserSlateNodeToMarkdown';
 
 describe('parserMarkdownToSlateNode', () => {
@@ -226,6 +225,49 @@ describe('parserMarkdownToSlateNode', () => {
       const marked = para.children.find((c: any) => c?.mark);
       expect(marked.markColor).toBe('red"x');
       expect(marked.markLabel).toBe('&Note');
+    });
+
+    it('应把 <div data-card="true"> 块还原为 card 节点（包 card-before/after）', () => {
+      const markdown = `<div data-card="true">\nHello inside card\n</div>`;
+      const result = parserMarkdownToSlateNode(markdown);
+      const cardNode = result.schema.find((n: any) => n?.type === 'card');
+      expect(cardNode).toBeDefined();
+      expect((cardNode as any).children[0]).toMatchObject({
+        type: 'card-before',
+      });
+      expect((cardNode as any).children.at(-1)).toMatchObject({
+        type: 'card-after',
+      });
+      const inner = (cardNode as any).children.find(
+        (c: any) => c.type !== 'card-before' && c.type !== 'card-after',
+      );
+      expect(inner.type).toBe('paragraph');
+    });
+
+    it('card → markdown → card 往返保持 image 内容', () => {
+      const original = {
+        type: 'card',
+        children: [
+          { type: 'card-before', children: [{ text: '' }] },
+          {
+            type: 'image',
+            url: 'https://example.com/x.png',
+            children: [{ text: '' }],
+          },
+          { type: 'card-after', children: [{ text: '' }] },
+        ],
+      };
+      const md = parserSlateNodeToMarkdown([original]);
+      expect(md).toContain('<div data-card="true">');
+      expect(md).toContain('https://example.com/x.png');
+
+      const back = parserMarkdownToSlateNode(md);
+      const card = back.schema.find((n: any) => n?.type === 'card');
+      expect(card).toBeDefined();
+      const urlFound = JSON.stringify(card).includes(
+        'https://example.com/x.png',
+      );
+      expect(urlFound).toBe(true);
     });
 
     it('should handle paragraph with inline code', () => {

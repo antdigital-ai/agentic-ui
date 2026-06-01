@@ -905,13 +905,17 @@ export class EditorUtils {
   }
 
   /**
-   * 用卡片节点包装普通节点
+   * 用卡片节点包装内容节点
    *
-   * @param node - 要包装的节点
+   * @param node - 单个节点或节点数组（数组场景用于反序列化 `<div data-card>` 块）
    * @param props - 额外属性
    * @returns 包装后的卡片节点
    */
-  static wrapperCardNode(node: any, props: Record<string, any> = {}): CardNode {
+  static wrapperCardNode(
+    node: any | any[],
+    props: Record<string, any> = {},
+  ): CardNode {
+    const contentNodes = Array.isArray(node) ? node : [node];
     return {
       type: 'card',
       ...props,
@@ -920,7 +924,7 @@ export class EditorUtils {
           type: 'card-before',
           children: [{ text: '' }],
         },
-        node,
+        ...contentNodes,
         {
           type: 'card-after',
           children: [{ text: '' }],
