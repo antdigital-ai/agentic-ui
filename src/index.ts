@@ -281,7 +281,6 @@ export {
   ReadonlyCode,
   ReadonlyEditorImage,
   ReadonlyFootnoteDefinition,
-  ReadonlyFootnoteReference,
   ReadonlyHead,
   ReadonlyHr,
   ReadonlyInlineKatex,

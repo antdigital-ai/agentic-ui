@@ -1,4 +1,4 @@
-import { MOBILE_BREAKPOINT } from '../../Constants/mobile';
+﻿import { MOBILE_BREAKPOINT } from '../../Constants/mobile';
 import {
   ChatTokenType,
   GenerateStyle,
@@ -200,6 +200,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           color: 'var(--color-gray-text-disabled, rgba(20, 22, 28, 0.25)) !important',
           opacity: '1 !important',
         },
+      },
+      'div[data-composition] [data-slate-placeholder="true"]': {
+        display: 'none !important',
       },
 
       '&> *:first-child': {

@@ -1,4 +1,4 @@
-import type { Ace } from 'ace-builds';
+﻿import type { Ace } from 'ace-builds';
 import { AnchorProps, ImageProps } from 'antd';
 import React from 'react';
 import { BaseEditor, Editor, Selection } from 'slate';
@@ -14,7 +14,7 @@ import type { EditorStore } from './editor/store';
 import { InsertAutocompleteProps } from './editor/tools/InsertAutocomplete';
 import type { ToolsKeyType } from './editor/tools/ToolBar/config/toolsConfig';
 import type { MarkdownToHtmlOptions } from './editor/utils/markdownToHtml';
-import { CustomLeaf, Elements } from './el';
+import { CustomLeaf, Elements, FootnoteDefinitionNode } from './el';
 
 export type CommentDataType = {
   selection: Selection;
@@ -90,12 +90,21 @@ export type MarkdownEditorProps = {
     type?: 'panel' | 'dropdown';
   } & TagPopupProps;
   editorStyle?: React.CSSProperties;
+  /** 脚注引用（fnc）与脚注定义列表（`onFootnoteDefinitionChange`）的配置 */
   fncProps?: {
-    render: (
+    /** 自定义脚注角标渲染；未传时使用默认 `FncLeaf` */
+    render?: (
       props: CustomLeaf<Record<string, any>> & { children: React.ReactNode },
       defaultDom: React.ReactNode,
     ) => React.ReactNode;
-    onOriginUrlClick?: (url?: string) => void;
+    /** 移动端点击脚注角标时 Modal 内容；未传时使用脚注定义与来源链接 */
+    renderMobileModal?: (props: {
+      identifier?: string;
+      displayLabel: string;
+      definition?: FootnoteDefinitionNode;
+      defaultContent: React.ReactNode;
+    }) => React.ReactNode;
+    onOriginUrlClick?: (identifier?: string) => void;
     onFootnoteDefinitionChange?: (
       data: {
         id: any;

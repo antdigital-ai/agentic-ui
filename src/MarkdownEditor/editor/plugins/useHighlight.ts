@@ -1,12 +1,12 @@
-import { Editor, Element, Node, NodeEntry, Path, Range } from 'slate';
+﻿import { Editor, Element, Node, NodeEntry, Path, Range } from 'slate';
 import { EditorStore } from '../store';
 import { EditorUtils } from '../utils/editorUtils';
+import { FOOTNOTE_REF_REG } from '../utils/footnoteDisplay';
 
 // 预编译正则表达式，避免重复创建
 const HTML_REG = /<[a-z]+[\s"'=:;()\w\-[\]/.]*\/?>(.*<\/[a-z]+>:?)?/g;
 const LINK_REG =
   /(https?|ftp):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/gi;
-const FOOTNOTE_REG = /\[\^[^\]]+\]/g;
 const TABLE_ROW_REG = /^\|([^|]+\|)+$/;
 /** 至少一个非 } 字符，避免匹配 {{}}、{{ 等不完整表达式 */
 const JINJA_VARIABLE_REG = /\{\{[^}]+\}\}/g;
@@ -108,8 +108,8 @@ const processTextMatches = (
 
   // 匹配 footnote reference
   let match: RegExpMatchArray | null;
-  FOOTNOTE_REG.lastIndex = 0;
-  while ((match = FOOTNOTE_REG.exec(text)) !== null) {
+  FOOTNOTE_REF_REG.lastIndex = 0;
+  while ((match = FOOTNOTE_REF_REG.exec(text)) !== null) {
     const index = match.index;
     if (typeof index === 'number') {
       ranges.push(

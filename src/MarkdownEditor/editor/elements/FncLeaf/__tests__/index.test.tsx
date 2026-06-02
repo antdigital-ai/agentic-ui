@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom';
+﻿import '@testing-library/jest-dom';
 import { fireEvent, render } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
@@ -24,17 +24,20 @@ describe('FncLeaf', () => {
     vi.mocked(isMobileDevice).mockReturnValue(false);
   });
 
-  it('移动端且 hasFnc 时点击应 preventDefault 并 return', () => {
+  it('移动端点击脚注角标应打开 Modal', () => {
     vi.mocked(isMobileDevice).mockReturnValue(true);
-    const { container } = render(
+    render(
       <ConfigProvider>
-        <FncLeaf {...defaultProps} />
+        <FncLeaf
+          {...defaultProps}
+          leaf={{ ...defaultProps.leaf, text: '[^1]', identifier: '1' }}
+        />
       </ConfigProvider>,
     );
-    const span = container.querySelector('[data-fnc="fnc"]');
+    const span = document.querySelector('[data-fnc="fnc"]');
     expect(span).toBeTruthy();
     fireEvent.click(span!);
-    expect(span).toBeInTheDocument();
+    expect(document.body.querySelector('.ant-modal')).toBeInTheDocument();
   });
 
   it('linkConfig.onClick 返回 false 时应 return false', () => {
