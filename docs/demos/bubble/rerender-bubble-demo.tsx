@@ -52,14 +52,14 @@ const rerenderDemoMarkdown = `<think>
   {
     "name": "file_reader",
     "arguments": {
-      "file_url": "https://agents.ccic-net.com.cn/file/download/agent/attach/default/67c72361d9ba4242bb5ce37a29ba4b50?fileKey=%E6%B5%8B%E8%AF%95%E5%9B%BE%E7%89%87%E8%AF%86%E5%88%AB-8bfdacba-daa5-482a-a677-a98de2d0eee5.docx",
+      "file_url": "https://example.com/files/demo-image-recognition.docx",
       "file_type": "docx"
     }
   },
   {
     "name": "file_reader",
     "arguments": {
-      "file_url": "https://agents.ccic-net.com.cn/file/download/agent/attach/default/c9753c0da9e6481d8c0a1dca340b0147?fileKey=%E5%85%AC%E5%85%B1%E4%BD%93%E9%AA%8C%E7%A9%BA%E9%97%B4%E7%94%A8%E6%88%B7%E5%8F%8D%E9%A6%88%E6%95%B0%E6%8D%AE%E9%97%AE%E9%A2%98-1009ec59-c1ec-4482-a155-d955eb0b36df.docx",
+      "file_url": "https://example.com/files/demo-public-feedback.docx",
       "file_type": "docx"
     }
   }
@@ -97,14 +97,14 @@ const rerenderDemoMarkdown = `<think>
   {
     "name": "file_reader",
     "arguments": {
-      "file_url": "https://agents.ccic-net.com.cn/file/download/agent/attach/default/67c72361d9ba4242bb5ce37a29ba4b50?fileKey=%E6%B5%8B%E8%AF%95%E5%9B%BE%E7%89%87%E8%AF%86%E5%88%AB-8bfdacba-daa5-482a-a677-a98de2d0eee5.docx",
+      "file_url": "https://example.com/files/demo-image-recognition.docx",
       "file_type": "docx"
     }
   },
   {
     "name": "file_reader",
     "arguments": {
-      "file_url": "https://agents.ccic-net.com.cn/file/download/agent/attach/default/c9753c0da9e6481d8c0a1dca340b0147?fileKey=%E5%85%AC%E5%85%B1%E4%BD%93%E9%AA%8C%E7%A9%BA%E9%97%B4%E7%94%A8%E6%88%B7%E5%8F%8D%E9%A6%88%E6%95%B0%E6%8D%AE%E9%97%AE%E9%A2%98-1009ec59-c1ec-4482-a155-d955eb0b36df.docx",
+      "file_url": "https://example.com/files/demo-public-feedback.docx",
       "file_type": "docx"
     }
   }
