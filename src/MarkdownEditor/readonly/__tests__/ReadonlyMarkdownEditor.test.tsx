@@ -45,19 +45,23 @@ describe('applyReadonlyCommentHighlights', () => {
       '<div data-be="paragraph">Highlight me in markdown mode.</div>';
     document.body.appendChild(root);
 
-    applyReadonlyCommentHighlights(root, [
-      {
-        id: 'c1',
-        commentType: 'highlight',
-        content: 'note',
-        refContent: 'Highlight me',
-        time: Date.now(),
-        path: [],
-        anchorOffset: 0,
-        focusOffset: 12,
-        selection: null as any,
-      },
-    ], 'ant-agentic-md-editor-content');
+    applyReadonlyCommentHighlights(
+      root,
+      [
+        {
+          id: 'c1',
+          commentType: 'highlight',
+          content: 'note',
+          refContent: 'Highlight me',
+          time: Date.now(),
+          path: [],
+          anchorOffset: 0,
+          focusOffset: 12,
+          selection: null as any,
+        },
+      ],
+      'ant-agentic-md-editor-content',
+    );
 
     const mark = document.getElementById('comment-c1');
     expect(mark).toBeTruthy();
