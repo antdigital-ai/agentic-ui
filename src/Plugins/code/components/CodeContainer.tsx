@@ -5,6 +5,7 @@
 
 import classNames from 'clsx';
 import React, { ReactNode, useRef } from 'react';
+import '../../../MarkdownEditor/editor/code.css';
 import { CodeNode } from '../../../MarkdownEditor/el';
 
 interface CodeContainerProps {
@@ -49,26 +50,15 @@ export function CodeContainer({
           e.stopPropagation();
           onEditorClick();
         }}
-        style={{
-          padding: hide ? 1 : 1,
-          marginBottom: hide ? 0 : undefined,
-          boxShadow:
-            'var(--shadow-control-base, 0 1px 2px rgba(20, 22, 28, 0.06))',
-          borderRadius: 'var(--radius-card-base, 12px)',
-          backgroundColor: showBorder
-            ? 'rgba(59, 130, 246, 0.1)'
-            : hide
-              ? 'transparent'
-              : 'var(--color-gray-bg-page-light, #fafafa)',
-          color: 'var(--color-gray-text-default, rgba(20, 22, 28, 0.88))',
-          height: hide ? 0 : 'auto',
-          opacity: hide ? 0 : 1,
-        }}
         data-frontmatter={safeElement.frontmatter ? '' : undefined}
         className={classNames(
           'ace-container',
           'code-editor-container',
           'drag-el',
+          {
+            'code-editor-container--show-border': showBorder,
+            'code-editor-container--hide': hide,
+          },
         )}
       >
         {children}
