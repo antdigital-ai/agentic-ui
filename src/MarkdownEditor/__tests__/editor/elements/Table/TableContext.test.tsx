@@ -2,7 +2,7 @@
  * TableContext / TablePropsProvider 测试：覆盖 setDeleteIconPosition 回调
  */
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import React, { useContext } from 'react';
 import { describe, expect, it } from 'vitest';
 import {
@@ -18,7 +18,9 @@ const Consumer: React.FC = () => {
     <button
       type="button"
       data-testid="set-pos"
-      onClick={() => setDeleteIconPosition?.({ rowIndex: 1, columnIndex: undefined })}
+      onClick={() =>
+        setDeleteIconPosition?.({ rowIndex: 1, columnIndex: undefined })
+      }
     >
       Set
     </button>
@@ -54,7 +56,8 @@ describe('TableContext', () => {
     );
     expect(screen.getByTestId('row-active-0')).toHaveTextContent('no');
     expect(screen.getByTestId('row-active-1')).toHaveTextContent('no');
-    screen.getByTestId('set-pos').click();
+    // 用 fireEvent.click 包裹在 act 中，确保 useSyncExternalStore 的更新刷新到 DOM
+    fireEvent.click(screen.getByTestId('set-pos'));
     expect(screen.getByTestId('row-active-0')).toHaveTextContent('no');
     expect(screen.getByTestId('row-active-1')).toHaveTextContent('yes');
   });

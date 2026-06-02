@@ -11,7 +11,24 @@ import { TableRowIndex } from '../../../../editor/elements/Table/TableRowIndex';
 import { Td } from '../../../../editor/elements/Table/Td';
 
 // Mock dependencies
-vi.mock('../../../../editor/store');
+// 组件通过 useEditorStore() 读取 markdownEditorRef / editorProps 等字段；空 mock 会
+// 返回 undefined，导致 `Cannot destructure property 'markdownEditorRef'` 渲染崩溃。
+// 这里显式返回有效字段，markdownEditorRef.current 通过 getter 指向当前测试 editor。
+let currentTestEditor: any = null;
+vi.mock('../../../../editor/store', () => ({
+  useEditorStore: () => ({
+    markdownEditorRef: {
+      get current() {
+        return currentTestEditor;
+      },
+    },
+    markdownContainerRef: { current: null },
+    readonly: false,
+    typewriter: false,
+    editorProps: {},
+    store: {},
+  }),
+}));
 vi.mock('../../../../hooks/editor');
 vi.mock('../../../../../hooks/useClickAway', () => ({
   useClickAway: vi.fn(),
@@ -65,7 +82,11 @@ vi.mock('../../../../editor/elements/Table/Td/style', () => ({
 }));
 
 describe('Table 组件测试', () => {
-  const createTestEditor = () => withReact(createEditor());
+  const createTestEditor = () => {
+    const editor = withReact(createEditor());
+    currentTestEditor = editor;
+    return editor;
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
