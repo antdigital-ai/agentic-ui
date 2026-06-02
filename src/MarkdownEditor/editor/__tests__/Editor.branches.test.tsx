@@ -126,6 +126,10 @@ vi.mock('../plugins/handlePaste', () => ({
   handlePlainTextPaste: vi.fn(async () => false),
 }));
 
+vi.mock('../plugins/parseMarkdownToNodesAndInsert', () => ({
+  parseMarkdownToNodesAndInsert: vi.fn(() => true),
+}));
+
 vi.mock('../utils', () => ({
   MARKDOWN_EDITOR_EVENTS: { SELECTIONCHANGE: 'md-selectionchange' },
   parserSlateNodeToMarkdown: vi.fn(() => 'mock-md'),
@@ -177,6 +181,7 @@ import { ReactEditor } from 'slate-react';
 import { PluginContext } from '../../plugin';
 import { SlateMarkdownEditor } from '../Editor';
 import * as handlePasteModule from '../plugins/handlePaste';
+import { parseMarkdownToNodesAndInsert } from '../plugins/parseMarkdownToNodesAndInsert';
 import { parserSlateNodeToMarkdown } from '../utils';
 import {
   EditorUtils,
@@ -1015,6 +1020,80 @@ describe('Editor branches - handlePasteEvent', () => {
     editableProps.onPaste(event);
     await flushPromises();
 
+    expect(handlePasteModule.handleHtmlPaste).toHaveBeenCalled();
+  });
+
+  it('Word HTML paste converts through markdown before HTML fallback', async () => {
+    const { editor } = setupStore({ readonly: false });
+    const wordHtml = [
+      '<html><head>',
+      '<meta name="Generator" content="Microsoft Word 16">',
+      '</head><body>',
+      '<p class="MsoNormal">Word&nbsp;text<o:p></o:p></p>',
+      '</body></html>',
+    ].join('');
+
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
+    vi.mocked(Editor.hasPath).mockReturnValue(true);
+    vi.mocked(handlePasteModule.handleTagNodePaste).mockReturnValue(false);
+
+    renderEditor({});
+
+    const event = {
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      clipboardData: createClipboardData({
+        types: ['text/html'],
+        getData: (t: string) => (t === 'text/html' ? wordHtml : ''),
+      }),
+      target: document.createElement('div'),
+    } as any;
+
+    editableProps.onPaste(event);
+    await flushPromises();
+
+    expect(parseMarkdownToNodesAndInsert).toHaveBeenCalledWith(
+      editor,
+      'Word text',
+      [],
+    );
+    expect(handlePasteModule.handleHtmlPaste).not.toHaveBeenCalled();
+  });
+
+  it('Word HTML paste respects convertWordToMarkdown false', async () => {
+    const { editor } = setupStore({ readonly: false });
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
+    vi.mocked(Editor.hasPath).mockReturnValue(true);
+    vi.mocked(handlePasteModule.handleTagNodePaste).mockReturnValue(false);
+    vi.mocked(handlePasteModule.handleHtmlPaste).mockResolvedValue(true);
+
+    renderEditor({
+      pasteConfig: { convertWordToMarkdown: false },
+    });
+
+    const event = {
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      clipboardData: createClipboardData({
+        types: ['text/html'],
+        getData: (t: string) =>
+          t === 'text/html'
+            ? '<p class="MsoNormal">Fallback through HTML</p>'
+            : '',
+      }),
+      target: document.createElement('div'),
+    } as any;
+
+    editableProps.onPaste(event);
+    await flushPromises();
+
+    expect(parseMarkdownToNodesAndInsert).not.toHaveBeenCalled();
     expect(handlePasteModule.handleHtmlPaste).toHaveBeenCalled();
   });
 
