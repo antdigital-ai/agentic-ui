@@ -12,6 +12,8 @@ import {
 } from '@ant-design/icons';
 import { Button, InputNumber, Radio, Space, Switch } from 'antd';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { newEnergyFundContent } from '../shared/newEnergyFundContent';
+import { RERENDER_CARD_APPENDIX } from '../shared/rerenderCardAppendix';
 
 const DEFAULT_CHARS_PER_FRAME = 3;
 const DEFAULT_THROTTLE_SPEED = 1;
@@ -20,96 +22,8 @@ const CHARS_PER_FRAME_MAX = 50;
 const THROTTLE_SPEED_MIN = 0.25;
 const THROTTLE_SPEED_MAX = 4;
 
-const rerenderDemoMarkdown = `<think>
-我们注意到用户上传了两个附件，并要求调用文件理解工具总结两个文档内容。
- 根据工具列表，我们有file_reader工具可以用于读取文档内容。由于用户要求总结两个文档，我们需要分别调用两次file_reader工具。
- 但是，工具调用格式要求一次只能调用一个工具，因此我们需要分别调用两次，每次处理一个文件。
-
- 然而，由于用户要求同时总结两个文档，我们可能需要先调用第一个文件，再调用第二个文件。但注意，我们的回复中只能包含一次工具调用（因为格式要求一次只能调用一个工具？）。但实际上，我们可以连续两次调用工具吗？
-
- 观察工具调用格式说明，它要求我们使用以下格式：
- \`\`\`
- [
-   {
-     "name": "function_name",
-     "arguments": {...}
-   }
- ]
- \`\`\`
-
- 但实际上，我们可以在一个回复中连续调用多个工具吗？根据格式说明，它似乎允许在一个回复中调用多个工具，但格式要求是数组形式。
-
- 但是，我们目前的回复格式要求是：当我们调用工具时，必须使用指定的格式，且整个回复只包含工具调用。
-
- 因此，我们可以这样设计：
- 在同一个回复中，连续调用两个file_reader工具。将两个工具调用放在一个数组中。
-
- 但是，请注意：工具调用格式要求是使用一个数组，数组的每个元素是一个工具调用对象。
-
- 因此，我们可以这样写：
-\`\`\`json
-[
-  {
-    "name": "file_reader",
-    "arguments": {
-      "file_url": "https://agents.ccic-net.com.cn/file/download/agent/attach/default/67c72361d9ba4242bb5ce37a29ba4b50?fileKey=%E6%B5%8B%E8%AF%95%E5%9B%BE%E7%89%87%E8%AF%86%E5%88%AB-8bfdacba-daa5-482a-a677-a98de2d0eee5.docx",
-      "file_type": "docx"
-    }
-  },
-  {
-    "name": "file_reader",
-    "arguments": {
-      "file_url": "https://agents.ccic-net.com.cn/file/download/agent/attach/default/c9753c0da9e6481d8c0a1dca340b0147?fileKey=%E5%85%AC%E5%85%B1%E4%BD%93%E9%AA%8C%E7%A9%BA%E9%97%B4%E7%94%A8%E6%88%B7%E5%8F%8D%E9%A6%88%E6%95%B0%E6%8D%AE%E9%97%AE%E9%A2%98-1009ec59-c1ec-4482-a155-d955eb0b36df.docx",
-      "file_type": "docx"
-    }
-  }
-]
-\`\`\`
-
- 但是，请注意：工具调用的格式说明中并没有明确说明是否可以一次调用多个工具。然而，根据示例，每次调用一个工具，但如果我们一次调用多个，可能也是允许的。
-
- 不过，为了安全起见，我们也可以分两次回复，每次调用一个工具。但是，用户要求我们总结两个文档，我们希望在一个回复中完成两个文件的总结请求。
-
- 然而，实际上，我们无法在一个回复中同时返回两个文件的内容总结，因为工具调用后，工具会返回结果，然后我们才能根据结果进行总结。所以，我们需要先调用工具获取文件内容，然后才能总结。
-
- 因此，我们只能先调用工具，然后等待工具返回结果，再在后续的回复中总结。所以，我们无法在一个回复中同时完成两个文件的总结。
-
- 但是，我们可以先同时调用两个文件读取工具，这样工具会同时处理两个文件，然后返回两个结果。然后我们在后续的回复中再总结两个文档。
-
- 所以，我们决定在一个回复中同时调用两个file_reader工具。
-
- 注意：在调用工具时，我们不需要content_id，因为参数说明中content_id是可选的。我们只需要file_url和file_type。
-
- 因此，我们按照上述格式调用两个工具。</think>
-<thinking>
-用户上传了两个docx文件，要求调用文件理解工具总结两个文档的内容。根据用户的历史记录，用户之前也要求总结文档内容，可能是在进行某种文档分析工作。
-
-我需要使用file_reader工具分别读取这两个文件。工具要求提供file_url和file_type参数，content_id是可选的。两个文件都是docx格式，URL已经提供。
-
-由于用户要求同时总结两个文档，我会在同一个工具调用中处理两个文件。但工具设计似乎一次只能处理一个文件，所以需要分别调用两次。
-
-考虑到用户可能希望获得两个文档的独立总结，我会分别处理每个文件，然后在下一次回复中提供两个文档的总结内容。
-</thinking>
-
-
-\`\`\`json
-[
-  {
-    "name": "file_reader",
-    "arguments": {
-      "file_url": "https://agents.ccic-net.com.cn/file/download/agent/attach/default/67c72361d9ba4242bb5ce37a29ba4b50?fileKey=%E6%B5%8B%E8%AF%95%E5%9B%BE%E7%89%87%E8%AF%86%E5%88%AB-8bfdacba-daa5-482a-a677-a98de2d0eee5.docx",
-      "file_type": "docx"
-    }
-  },
-  {
-    "name": "file_reader",
-    "arguments": {
-      "file_url": "https://agents.ccic-net.com.cn/file/download/agent/attach/default/c9753c0da9e6481d8c0a1dca340b0147?fileKey=%E5%85%AC%E5%85%B1%E4%BD%93%E9%AA%8C%E7%A9%BA%E9%97%B4%E7%94%A8%E6%88%B7%E5%8F%8D%E9%A6%88%E6%95%B0%E6%8D%AE%E9%97%AE%E9%A2%98-1009ec59-c1ec-4482-a155-d955eb0b36df.docx",
-      "file_type": "docx"
-    }
-  }
-]
-\`\`\``;
+/** 与 rerender.tsx 同源，覆盖标题/表格/图表/Mermaid/代码块/提示块/脚注/Agentic 嵌入块等 */
+const rerenderDemoMarkdown = `${newEnergyFundContent}\n\n${RERENDER_CARD_APPENDIX.trim()}`;
 
 /** 非空占位，避免 isFinished=false 且 content 为空时走「思考中」骨架而非 Markdown */
 const STREAM_PLACEHOLDER = '\u200b';
@@ -404,7 +318,7 @@ const RerenderBubbleDemo = () => {
               id: 'rerender-bubble-stream',
               role: 'assistant',
               content:
-                '下面模拟 **流式追加**：未完成前保持 `isFinished: false`，结束时再置为 `true` 以配合队列与动画策略。',
+                '下面模拟 **流式追加**（与动态 render 演示同源 Markdown）：含标题、图片、链接、思考/回答标签、表格、内置 chart、Mermaid、代码块、提示块、任务列表、脚注、`agentic-ui-task` / `agentic-ui-toolusebar` 与文末 `agentar-card`。',
               createAt: Date.now(),
               updateAt: Date.now(),
               isFinished: false,
@@ -427,10 +341,13 @@ const RerenderBubbleDemo = () => {
 
       <div style={{ fontSize: 13, color: '#666', lineHeight: 1.6 }}>
         <p style={{ margin: '0 0 8px' }}>
-          与「动态 render」演示相同：模拟流式追加 Markdown；此处通过{' '}
+          与「动态 render」演示共用{' '}
+          <code>newEnergyFundContent</code> +{' '}
+          <code>RERENDER_CARD_APPENDIX</code>
+          ，流式过程中可观察多种 Markdown / Agentic 块在{' '}
           <code>Bubble</code> +{' '}
           <code>markdownRenderConfig.renderMode: &apos;markdown&apos;</code>{' '}
-          走轻量 <code>MarkdownRenderer</code>，无 Slate 实例。
+          下的渲染与限流表现（无 Slate 实例）。
         </p>
         <p style={{ margin: '0 0 8px' }}>
           流式进行中需保证 <code>originData.content</code>{' '}
