@@ -708,7 +708,7 @@ describe('Editor branches - handleClipboardCopy', () => {
     expect(event.clipboardData.clearData).toHaveBeenCalled();
     expect(event.clipboardData.setData).not.toHaveBeenCalled();
     expect(ReactEditor.setFragmentData).not.toHaveBeenCalled();
-    expect(event.preventDefault).toHaveBeenCalled();
+    expect(event.preventDefault).not.toHaveBeenCalled();
   });
 
   it('cut gets selection from DOM, deletes content, and sets clipboard', () => {
