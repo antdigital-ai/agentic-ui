@@ -1,4 +1,4 @@
-﻿import type { CSSInterpolation } from '@ant-design/cssinjs';
+import type { CSSInterpolation } from '@ant-design/cssinjs';
 import {
   DEFAULT_TEXT_SWAP_DURATION_MS,
   TEXT_SWAP_BLUR_PX,

@@ -197,6 +197,27 @@ describe('parserMarkdownToSlateNode', () => {
       });
     });
 
+    it('should preserve inline <mark> color, bg and label attributes on highlighted leaf', () => {
+      const markdown =
+        'prefix <mark color="red" bg="#eee" label="Note">highlighted</mark> suffix';
+      const result = parserMarkdownToSlateNode(markdown);
+      expect(result.schema).toHaveLength(1);
+      expect(result.schema[0]).toMatchObject({
+        type: 'paragraph',
+        children: [
+          { text: 'prefix ' },
+          {
+            text: 'highlighted',
+            mark: true,
+            markColor: 'red',
+            markBg: '#eee',
+            markLabel: 'Note',
+          },
+          { text: ' suffix' },
+        ],
+      });
+    });
+
     it('should parse block-only <mark>...</mark> as paragraph with mark', () => {
       const markdown = '<mark>/alipay-aipay-product-intro </mark>';
       const result = parserMarkdownToSlateNode(markdown);

@@ -243,7 +243,9 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     return !childrenIsEmpty ? 'focus' : '';
   }, [readonly, !childrenIsEmpty]);
 
-  const { wrapSSR, hashId } = useStyle(`${props.prefixCls}-content`, {});
+  const { hashId } = useStyle(`${props.prefixCls}-content`, {
+    placeholderContent: props?.textAreaProps?.placeholder || props?.placeholder,
+  });
 
   const commentMap = useMemo(() => {
     const map = new Map<string, Map<string, CommentDataType[]>>();
@@ -845,63 +847,62 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
       }
       return;
     }
-
     // 5. text/plain（含从 oversize HTML 降级过来的情形）
     if (
       (cachedPlain || htmlOversize) &&
       allowedTypes.includes('text/plain')
     ) {
       const text = (cachedPlain || '').trim();
-      if (text) {
-        const selection = markdownEditorRef.current.selection;
+      if (!text) return;
 
-        if (pasteConfig?.plainTextOnly) {
-          if (selection) {
-            Transforms.insertText(markdownEditorRef.current, text, {
-              at: selection,
-            });
-          } else {
-            Transforms.insertNodes(markdownEditorRef.current, [
-              { type: 'paragraph', children: [{ text }] },
-            ]);
-          }
+      const selection = markdownEditorRef.current.selection;
+
+      if (pasteConfig?.plainTextOnly) {
+        if (selection) {
+          Transforms.insertText(markdownEditorRef.current, text, {
+            at: selection,
+          });
+        } else {
+          Transforms.insertNodes(markdownEditorRef.current, [
+            { type: 'paragraph', children: [{ text }] },
+          ]);
+        }
+        return;
+      }
+
+      if (shouldInsertTextDirectly(markdownEditorRef.current, selection)) {
+        Transforms.insertText(markdownEditorRef.current, text);
+        return;
+      }
+
+      try {
+        if (
+          handleSpecialTextPaste(markdownEditorRef.current, text, selection)
+        ) {
           return;
         }
-
-        if (shouldInsertTextDirectly(markdownEditorRef.current, selection)) {
-          Transforms.insertText(markdownEditorRef.current, text);
+        if (
+          handleHttpLinkPaste(markdownEditorRef.current, text, selection, store)
+        ) {
           return;
         }
-
-        try {
-          if (
-            handleSpecialTextPaste(markdownEditorRef.current, text, selection)
-          ) {
-            return;
-          }
-          if (
-            handleHttpLinkPaste(markdownEditorRef.current, text, selection, store)
-          ) {
-            return;
-          }
-          if (
-            await handlePlainTextPaste(
-              markdownEditorRef.current,
-              text,
-              selection,
-              plugins,
-              allowedTypes,
-              {
-                parseMarkdownInPlainText:
-                  pasteConfig?.parseMarkdownInPlainText,
-              },
-            )
-          ) {
-            return;
-          }
-        } catch (e) {
-          console.error('[handlePaste] 处理纯文本粘贴失败:', e);
+        if (
+          await handlePlainTextPaste(
+            markdownEditorRef.current,
+            text,
+            selection,
+            plugins,
+            allowedTypes,
+            {
+              parseMarkdownInPlainText:
+                pasteConfig?.parseMarkdownInPlainText,
+            },
+          )
+        ) {
+          return;
         }
+      } catch (e) {
+        console.error('[handlePaste] 处理纯文本粘贴失败:', e);
       }
     }
 
@@ -1302,7 +1303,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     return [EditorUtils.p];
   }, [props.initSchemaValue]);
 
-  return wrapSSR(
+  return (
     <>
       <Slate
         editor={markdownEditorRef.current}
@@ -1365,6 +1366,6 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
           onKeyDown={handleKeyDown}
         />
       </Slate>
-    </>,
+    </>
   );
 });
