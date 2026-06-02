@@ -643,7 +643,7 @@ describe('Editor branches - handleClipboardCopy', () => {
     );
     expect(ReactEditor.setFragmentData).toHaveBeenCalled();
     // event.preventDefault called by handleClipboardCopy (line 552)
-    expect(event.preventDefault).not.toHaveBeenCalled();
+    expect(event.preventDefault).toHaveBeenCalled();
   });
 
   it('copy without editable target gets selection from DOM', () => {
