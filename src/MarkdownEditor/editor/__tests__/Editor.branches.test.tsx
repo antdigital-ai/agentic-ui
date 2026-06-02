@@ -638,16 +638,12 @@ describe('Editor branches - handleClipboardCopy', () => {
       expect.any(String),
     );
     expect(event.clipboardData.setData).toHaveBeenCalledWith(
-      'text/plain',
-      expect.any(String),
-    );
-    expect(event.clipboardData.setData).toHaveBeenCalledWith(
       'text/markdown',
       expect.any(String),
     );
     expect(ReactEditor.setFragmentData).toHaveBeenCalled();
     // event.preventDefault called by handleClipboardCopy (line 552)
-    expect(event.preventDefault).toHaveBeenCalled();
+    expect(event.preventDefault).not.toHaveBeenCalled();
   });
 
   it('copy without editable target gets selection from DOM', () => {
@@ -752,7 +748,7 @@ describe('Editor branches - handleClipboardCopy', () => {
     window.getSelection = origGetSelection;
   });
 
-  it('copy/cut with no selection returns false and calls preventDefault fallback', () => {
+  it('copy/cut with no selection lets native clipboard fallback run', () => {
     const { editor } = setupStore({ readonly: false });
     editor.selection = null;
     vi.mocked(isEventHandled).mockReturnValue(false);
@@ -771,11 +767,10 @@ describe('Editor branches - handleClipboardCopy', () => {
     } as any;
 
     editableProps.onCopy(event);
-    // handleClipboardCopy returns false → onCopy calls preventDefault
-    expect(event.preventDefault).toHaveBeenCalled();
+    expect(event.preventDefault).not.toHaveBeenCalled();
   });
 
-  it('copy/cut with isEventHandled returns false and calls preventDefault fallback', () => {
+  it('copy/cut with isEventHandled lets native clipboard fallback run', () => {
     setupStore({ readonly: false });
     vi.mocked(isEventHandled).mockReturnValue(true);
 
@@ -791,7 +786,7 @@ describe('Editor branches - handleClipboardCopy', () => {
     } as any;
 
     editableProps.onCopy(event);
-    expect(event.preventDefault).toHaveBeenCalled();
+    expect(event.preventDefault).not.toHaveBeenCalled();
   });
 
   it('clipboard inner error catch returns false', () => {
@@ -802,9 +797,8 @@ describe('Editor branches - handleClipboardCopy', () => {
     };
     vi.mocked(isEventHandled).mockReturnValue(false);
     vi.mocked(hasEditableTarget).mockReturnValue(true);
-    // Make toDOMRange throw
-    vi.mocked(ReactEditor.toDOMRange).mockImplementation(() => {
-      throw new Error('toDOMRange error');
+    vi.mocked(ReactEditor.setFragmentData).mockImplementation(() => {
+      throw new Error('setFragmentData error');
     });
 
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -1142,6 +1136,11 @@ describe('Editor branches - handlePasteEvent', () => {
       stopPropagation: vi.fn(),
       clipboardData: createClipboardData({
         types: ['Files'],
+        files: [
+          new File(['image'], 'pasted.png', {
+            type: 'image/png',
+          }),
+        ],
         getData: vi.fn(() => ''),
       }),
       target: document.createElement('div'),
