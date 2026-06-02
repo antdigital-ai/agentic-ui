@@ -74,9 +74,10 @@ vi.mock('../../../../MarkdownEditor/editor/utils/ace', () => ({
 }));
 
 const mockTransforms = vi.hoisted(() => ({
-  delete: vi.fn(),
+  removeNodes: vi.fn(),
   insertNodes: vi.fn(),
   select: vi.fn(),
+  setNodes: vi.fn(),
 }));
 const mockEditorStart = vi.hoisted(() =>
   vi.fn(() => ({ path: [0, 0], offset: 0 })),
@@ -375,7 +376,7 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     });
     textarea!.dispatchEvent(keydownEvent);
 
-    expect(mockTransforms.delete).toHaveBeenCalled();
+    expect(mockTransforms.removeNodes).toHaveBeenCalled();
     expect(mockTransforms.insertNodes).toHaveBeenCalled();
     expect(mockTransforms.select).toHaveBeenCalled();
   });

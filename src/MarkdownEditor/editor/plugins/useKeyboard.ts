@@ -13,6 +13,7 @@ import { HistoryEditor } from 'slate-history';
 import { ReactEditor } from 'slate-react';
 import { MarkdownEditorProps } from '../../BaseMarkdownEditor';
 import { EditorStore } from '../store';
+import { isCodeBlockAceInputTarget } from '../utils/codeBlockBehavior';
 import { EditorUtils } from '../utils/editorUtils';
 import { isImeComposing } from '../utils/isImeComposing';
 import { BackspaceKey } from './hotKeyCommands/backspace';
@@ -28,7 +29,6 @@ import { useEditorStore } from '../store';
 // incorrectly split the node into two nodes with Slate's default behavior.
 const SPECIAL_ENTER_BLOCK_TYPES = new Set([
   'list-item',
-  'code',
   'table-cell',
   'head',
   'blockquote',
@@ -120,6 +120,10 @@ export const useKeyboard = (
     return (e: React.KeyboardEvent) => {
       // 只读模式下跳过所有键盘处理，提升性能
       if (props.readonly) return;
+
+      if (isCodeBlockAceInputTarget(e.target)) {
+        return;
+      }
 
       const imeActive = isImeComposing(e, store.inputComposition);
 

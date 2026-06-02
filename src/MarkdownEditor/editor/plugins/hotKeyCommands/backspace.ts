@@ -1,5 +1,7 @@
 import { Editor, Element, Node, Path, Point, Range, Transforms } from 'slate';
-import { Elements } from '../../../el';
+import type { CodeNode, Elements } from '../../../el';
+import { setCodeBlockNodes } from '../../utils/codeBlockBehavior';
+import { getCodeBlockPlainText } from '../../utils/codeBlockPlainText';
 import { EditorUtils } from '../../utils/editorUtils';
 import { isListType } from '../withListsPlugin';
 
@@ -220,13 +222,16 @@ export class BackspaceKey {
                 Transforms.delete(this.editor, { at: path });
                 const text = Node.string(el);
                 if (text) {
-                  Transforms.insertNodes(
-                    this.editor,
-                    pre[0].type === 'code' ? [{ text }] : el.children,
-                    {
+                  if (pre[0].type === 'code') {
+                    setCodeBlockNodes(this.editor, pre[1], {
+                      value:
+                        getCodeBlockPlainText(pre[0] as CodeNode) + text,
+                    });
+                  } else {
+                    Transforms.insertNodes(this.editor, el.children, {
                       at: end,
-                    },
-                  );
+                    });
+                  }
                 }
                 Transforms.select(this.editor, end);
               });

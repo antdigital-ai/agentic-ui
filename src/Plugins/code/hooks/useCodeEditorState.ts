@@ -5,10 +5,10 @@
 
 import { useEffect } from 'react';
 import { useGetSetState } from 'react-use';
-import { Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
 import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { useEditorStore } from '../../../MarkdownEditor/editor/store';
+import { setCodeBlockNodes } from '../../../MarkdownEditor/editor/utils/codeBlockBehavior';
 import { getSlateElementPlainText } from '../../../MarkdownEditor/editor/utils/codeBlockPlainText';
 import { CodeNode } from '../../../MarkdownEditor/el';
 import { useSelStatus } from '../../../MarkdownEditor/hooks/editor';
@@ -34,7 +34,7 @@ export function useCodeEditorState(element: CodeNode) {
 
   // 更新代码节点数据
   const update = useRefFunction((data: Partial<CodeNode>) => {
-    Transforms.setNodes(store.editor, data, { at: path });
+    setCodeBlockNodes(store.editor, path, data);
   });
 
   // 处理编辑器选中状态的边框显示

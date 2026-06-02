@@ -68,18 +68,6 @@ export const Code = ({ attributes, children, element }: RenderElementProps) => {
         boxShadow: 'var(--shadow-control-base)',
         position: 'relative',
       }}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter') {
-          e.stopPropagation();
-          e.preventDefault();
-        }
-      }}
-      onKeyUp={(e) => {
-        if (e.key === 'Enter') {
-          e.stopPropagation();
-          e.preventDefault();
-        }
-      }}
     >
       <div style={{ width: '100%', height: '100%' }}>{children}</div>
     </div>
