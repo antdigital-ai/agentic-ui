@@ -1,4 +1,4 @@
----
+﻿---
 title: TaskList 任务列表
 atomId: TaskList
 group:
@@ -27,6 +27,7 @@ group:
 | 属性                 | 说明                                                                                     | 类型                                                                            | 默认值      | 版本   |
 | -------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ----------- | ------ |
 | items                | 任务列表数据                                                                             | `TaskItem[]`                                                                    | `[]`        | -      |
+| loading              | 外部加载状态；全部 item 为 `success` 时摘要显示完成态；流式结束后请置 `false`            | `boolean`                                                                       | `false`     | -      |
 | className            | 自定义类名                                                                               | `string`                                                                        | -           | -      |
 | expandedKeys         | 受控模式：当前展开的任务项 key 数组                                                      | `string[]`                                                                      | -           | -      |
 | onExpandedKeysChange | 受控模式：展开状态变化时的回调函数                                                       | `(expandedKeys: string[]) => void`                                              | -           | -      |
@@ -34,15 +35,31 @@ group:
 | open                 | `simple` 模式下摘要条是否展开（受控）                                                    | `boolean`                                                                       | -           | 2.31.0 |
 | onOpenChange         | `simple` 模式下摘要条展开状态变化回调                                                    | `(open: boolean) => void`                                                       | -           | 2.31.0 |
 | taskCompleteText     | 任务全部完成时摘要条的文案，未配置时回退到 i18n 默认值（仅在 `variant="simple"` 时渲染） | `` `React.ReactNode \| ((params: { items: TaskItem[] }) => React.ReactNode)` `` | -           | 2.31.0 |
+| showProgress         | `simple` 模式下摘要条内是否展示「已完成/总数」进度计数                                   | `boolean`                                                                       | `false`     | 2.32.33 |
+| scrollIntoViewOnExpand | `simple` 模式下展开摘要条时是否将组件滚动到视窗内；传 `true` 默认 `{ behavior: 'smooth', block: 'nearest' }`，也可传 `ScrollIntoViewOptions` 自定义；初次挂载不触发 | `boolean \| ScrollIntoViewOptions`                                              | `false`     | 2.32.33 |
 
 ### TaskItem
 
-| 属性    | 说明         | 类型                                             | 默认值 | 版本 |
-| ------- | ------------ | ------------------------------------------------ | ------ | ---- |
-| key     | 任务唯一标识 | `string`                                         | -      | -    |
-| title   | 任务标题     | `React.ReactNode`                                | -      | -    |
-| content | 任务内容     | `React.ReactNode \| React.ReactNode[]`           | -      | -    |
-| status  | 任务状态     | `'success' \| 'loading' \| 'pending' \| 'error'` | -      | -    |
+| 属性    | 说明                                                                                                                                                     | 类型                                             | 默认值 | 版本 |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ | ------ | ---- |
+| key     | 任务唯一标识                                                                                                                                             | `string`                                         | -      | -    |
+| title   | 任务标题                                                                                                                                                 | `React.ReactNode`                                | -      | -    |
+| content | 任务内容；支持字符串、React 节点；JSON/工具调用场景下的序列化元素（如 `{ type: 'pre', props: { children } }`）会在渲染前规范化；正文为空时回退为 `title` | `React.ReactNode \| React.ReactNode[]`           | -      | -    |
+| status  | 任务状态；`pending` 与 `loading` 展示一致（主色 + Loading 图标），摘要「进行中」逻辑相同                                                                 | `'success' \| 'loading' \| 'pending' \| 'error'` | -      | -    |
+
+### Simple 模式与摘要状态 {#simple-variant-summary}
+
+`variant="simple"` 将列表收成摘要条 + 可展开详情：
+
+- **收起（默认 `open=false`）**：详情区只展示**最后一项**任务（产品预期）；要看全部步骤请点击摘要条展开，或传入 `open={true}` / 使用 `variant="default"`。
+- **展开**：展示全部 `items`（含 `error` 项；单步工具失败时仍可查看完整步骤）。
+- **摘要文案优先级**（由高到低）：
+  1. 全部 item 为 `success` → 「任务完成」（或 `taskCompleteText`）；**不因** `loading={true}` 滞留为进行中。
+  2. 存在 `status: 'loading'` 或 `pending` 的 item → 「正在进行${title}任务」。
+  3. 存在 `error` 且无 loading item → 「任务已取消」。
+  4. `loading={true}` 或仅有 `pending` → 「正在进行任务」。
+
+工具调用时间线若需逐步 API 展示，可优先考虑 [ToolUseBar](/components/tool-use-bar)；继续用 TaskList simple 时请接受收起时仅显示最后一步，并保证流式结束后 `loading={false}`、item `status` 与内容字段正确。
 
 ### 自定义任务完成文案示例
 

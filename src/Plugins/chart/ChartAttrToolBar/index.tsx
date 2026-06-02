@@ -82,8 +82,8 @@ export const ChartAttrToolBar: React.FC<{
   const context = useContext(ConfigProvider.ConfigContext);
   const baseClassName = context?.getPrefixCls(`chart-attr-toolbar`);
 
-  const { wrapSSR, hashId } = useStyle(baseClassName);
-  return wrapSSR(
+  const { hashId } = useStyle(baseClassName);
+  return (
     <div
       className={clsx(baseClassName, hashId)}
       style={{
@@ -139,6 +139,6 @@ export const ChartAttrToolBar: React.FC<{
           </div>
         </Tooltip>
       )}
-    </div>,
+    </div>
   );
 };

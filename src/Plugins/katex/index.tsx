@@ -150,6 +150,8 @@ export function KatexElement(props: ElementProps<CodeNode>) {
 
 // 导出内联 KaTeX 组件
 export { InlineKatex } from './InlineKatex';
+export { InlineKatexFix } from './InlineKatexFix';
+export { INLINE_KATEX_READONLY_STYLE } from './inlineKatexReadonlyStyle';
 
 // 导出核心 Katex 渲染组件
 export { Katex } from './Katex';

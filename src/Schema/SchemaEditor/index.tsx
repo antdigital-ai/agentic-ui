@@ -86,7 +86,7 @@ const SchemaEditorComponent = forwardRef<SchemaEditorRef, SchemaEditorProps>(
     // 使用 ConfigProvider 获取前缀类名
     const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
     const prefixCls = getPrefixCls('schema-editor');
-    const { wrapSSR, hashId } = useStyle(prefixCls);
+    const { hashId } = useStyle(prefixCls);
     const { locale } = useContext(I18nContext);
     const [schema, setSchema] = useState<LowCodeSchema>(() => {
       return (
@@ -414,7 +414,7 @@ const SchemaEditorComponent = forwardRef<SchemaEditorRef, SchemaEditorProps>(
       prefixCls,
     ]);
 
-    return wrapSSR(
+    return (
       <div
         className={classNames(prefixCls, className, hashId)}
         data-testid={prefixCls}
@@ -429,7 +429,7 @@ const SchemaEditorComponent = forwardRef<SchemaEditorRef, SchemaEditorProps>(
             {renderJsonEditor}
           </div>
         </div>
-      </div>,
+      </div>
     );
   },
 );

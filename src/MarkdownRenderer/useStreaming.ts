@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+﻿import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   INITIAL_FENCE_STATE,
   updateFenceStateForLine,
@@ -206,10 +206,63 @@ const recognize = (
   }
 };
 
-const recognizeHandlers = Object.values(tokenRecognizerMap).map((rec) => ({
-  tokenType: rec!.tokenType,
-  recognize: (cache: StreamCache) => recognize(cache, rec!.tokenType),
-}));
+const recognizersInOrder: StreamCacheTokenType[] = Object.values(
+  tokenRecognizerMap,
+)
+  .filter((rec): rec is Recognizer => !!rec)
+  .map((rec) => rec.tokenType);
+
+// tokenType → recognize 函数：非 Text 分支用，O(1) 查表替代 switch/线性遍历
+const recognizerByType = new Map<
+  StreamCacheTokenType,
+  (cache: StreamCache) => void
+>(
+  recognizersInOrder.map((tokenType) => [
+    tokenType,
+    (cache: StreamCache) => recognize(cache, tokenType),
+  ]),
+);
+
+// 各 recognizer 启动字符，用于 Text 分支 O(1) 候选过滤
+const RECOGNIZER_START_CHARS: Partial<
+  Record<StreamCacheTokenType, readonly string[]>
+> = {
+  [StreamCacheTokenType.Link]: ['['],
+  [StreamCacheTokenType.Image]: ['!'],
+  [StreamCacheTokenType.Html]: ['<'],
+  [StreamCacheTokenType.Emphasis]: ['*', '_'],
+  [StreamCacheTokenType.List]: ['-', '+', '*'],
+  [StreamCacheTokenType.Table]: ['|'],
+  [StreamCacheTokenType.InlineCode]: ['`'],
+};
+
+// pending 首字符 → 候选 tokenType[]，保持原 Object.values 遍历序避免 `*`
+// 这种重叠首字符（Emphasis vs List）改变胜出方
+const recognizersByStartChar = (() => {
+  const map = new Map<string, StreamCacheTokenType[]>();
+  for (const tokenType of recognizersInOrder) {
+    const chars = RECOGNIZER_START_CHARS[tokenType];
+    if (!chars) continue;
+    for (const ch of chars) {
+      const list = map.get(ch);
+      if (list) list.push(tokenType);
+      else map.set(ch, [tokenType]);
+    }
+  }
+  return map;
+})();
+
+const tryRecognizeFromText = (cache: StreamCache): void => {
+  const firstChar = cache.pending.charAt(0);
+  if (!firstChar) return;
+  const candidates = recognizersByStartChar.get(firstChar);
+  if (!candidates) return;
+  for (const tokenType of candidates) {
+    recognize(cache, tokenType);
+    // recognize 在 Text 分支命中后会把 cache.token 切走；后续 candidate 必然 noop，可提前退出
+    if (cache.token !== StreamCacheTokenType.Text) return;
+  }
+};
 
 const getInitialCache = (): StreamCache => ({
   pending: '',
@@ -221,7 +274,11 @@ const getInitialCache = (): StreamCache => ({
 });
 
 const getStreamingOutput = (cache: StreamCache): string => {
-  if (cache.completeMarkdown) return cache.completeMarkdown;
+  // 围栏内正文留在 pending、不 commit，但仍需交给下游 parse，否则代码块流式阶段 frozen
+  const visible = cache.fenceState.inFenced
+    ? cache.completeMarkdown + cache.pending
+    : cache.completeMarkdown;
+  if (visible) return visible;
   if (cache.pending) return STREAMING_LOADING_PLACEHOLDER;
   return '';
 };
@@ -284,16 +341,14 @@ export const useStreaming = (input: string, enabled: boolean): string => {
         }
       }
       if (cache.token === StreamCacheTokenType.Text) {
-        for (const handler of recognizeHandlers) handler.recognize(cache);
+        tryRecognizeFromText(cache);
       } else {
-        const handler = recognizeHandlers.find(
-          (h) => h.tokenType === cache.token,
-        );
-        handler?.recognize(cache);
+        const recognizeForActive = recognizerByType.get(cache.token);
+        recognizeForActive?.(cache);
         if (
           (cache.token as StreamCacheTokenType) === StreamCacheTokenType.Text
         ) {
-          for (const h of recognizeHandlers) h.recognize(cache);
+          tryRecognizeFromText(cache);
         }
       }
       if (cache.token === StreamCacheTokenType.Text) {

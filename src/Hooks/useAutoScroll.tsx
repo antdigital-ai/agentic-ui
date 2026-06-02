@@ -307,13 +307,51 @@ export const useAutoScroll = <T extends HTMLDivElement>(
     }
 
     if (shrunk) {
-      // 内容缩小时立即贴底，无需平滑动画
-      jumpToBottom();
+      const maxScrollTop = Math.max(
+        0,
+        currentScrollHeight - container.clientHeight,
+      );
+      const distance =
+        currentScrollHeight - container.scrollTop - container.clientHeight;
+
+      // scrollTop 超出新区间时必须钳位，否则底部留白
+      if (container.scrollTop > maxScrollTop + ANIMATION_SNAP_DISTANCE) {
+        cancelAnimation();
+        beginProgrammaticScroll();
+        container.scrollTop = maxScrollTop;
+        notifyState();
+        return;
+      }
+
+      if (!isPinned.current) {
+        notifyState();
+        return;
+      }
+
+      // 仍跟随底部：仅在有明显距底空隙时再滚动。loading→finish 时思维链折叠等
+      // 会触发收缩，若一律 jumpToBottom 会打断 smooth 跟随造成消息跳动
+      if (distance > tolerance) {
+        const behavior = scrollBehaviorRef.current ?? 'smooth';
+        if (behavior === 'auto') {
+          jumpToBottom();
+        } else {
+          animateToBottom();
+        }
+      } else {
+        notifyState();
+      }
       return;
     }
 
     notifyState();
-  }, [animateToBottom, jumpToBottom, notifyState]);
+  }, [
+    animateToBottom,
+    beginProgrammaticScroll,
+    cancelAnimation,
+    jumpToBottom,
+    notifyState,
+    tolerance,
+  ]);
 
   /**
    * onContentChange 的对外入口：用 RAF 合并同一帧内多次回调。

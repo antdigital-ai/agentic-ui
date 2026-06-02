@@ -196,7 +196,7 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
 
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('histogram-chart');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   // 处理 ChartStatistic 组件配置
   const statistics = useMemo(() => {
@@ -562,7 +562,7 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
 
   // 空数据处理
   if (safeData.length === 0 || filteredData.length === 0) {
-    return wrapSSR(
+    return (
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`, hashId)}
         theme={resolvedTheme}
@@ -597,11 +597,11 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
         >
           暂无有效数据
         </div>
-      </ChartContainer>,
+      </ChartContainer>
     );
   }
 
-  return wrapSSR(
+  return (
     <ChartContainer
       baseClassName={classNames(`${prefixCls}-container`, hashId)}
       theme={resolvedTheme}
@@ -678,7 +678,7 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
       >
         <Bar ref={chartRef} data={processedData} options={options} />
       </div>
-    </ChartContainer>,
+    </ChartContainer>
   );
 };
 

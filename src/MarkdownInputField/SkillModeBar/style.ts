@@ -119,6 +119,6 @@ const useGenStyle = genStyleHooks('SkillModeBar', (token, info) => [
 ]);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'SkillModeBar');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'SkillModeBar');
+  return { hashId };
 }

@@ -1,8 +1,8 @@
-import { CircleDashed, SuccessFill, X } from '@sofa-design/icons';
+﻿import { SuccessFill, X } from '@sofa-design/icons';
 import classNames from 'clsx';
 import React, { memo, useMemo } from 'react';
 import { Loading } from '../../Components/Loading';
-import { LOADING_SIZE } from '../constants';
+import { getTaskStatusStyleKey, LOADING_SIZE } from '../constants';
 import type { TaskStatus } from '../types';
 
 interface StatusIconProps {
@@ -22,25 +22,24 @@ const StatusIconComponent: React.FC<StatusIconProps> = ({
   hashId,
   statusTestId,
 }) => {
+  const styleKey = getTaskStatusStyleKey(status);
+
   const statusContent = useMemo(() => {
-    const contentMap: Record<TaskStatus, React.ReactNode> = {
+    if (styleKey === 'loading') {
+      return <Loading size={LOADING_SIZE} />;
+    }
+    const contentMap: Record<'success' | 'error', React.ReactNode> = {
       success: <SuccessFill />,
-      loading: <Loading size={LOADING_SIZE} />,
-      pending: (
-        <div className={classNames(`${prefixCls}-status-idle`, hashId)}>
-          <CircleDashed />
-        </div>
-      ),
       error: <X />,
     };
-    return contentMap[status];
-  }, [status, prefixCls, hashId]);
+    return contentMap[styleKey as 'success' | 'error'];
+  }, [styleKey]);
 
   return (
     <div
       className={classNames(
         `${prefixCls}-status`,
-        `${prefixCls}-status-${status}`,
+        `${prefixCls}-status-${styleKey}`,
         hashId,
       )}
       data-testid={statusTestId ?? `task-list-status-${status}`}

@@ -71,7 +71,7 @@ const DocCardsComponent: React.FC<DocCardsProps> = ({
   const i18n = useContext(I18nContext);
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-doc-cards');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   const columnKeys = useMemo(
     () => columns.map((col) => col.dataIndex).filter(Boolean),
@@ -125,7 +125,7 @@ const DocCardsComponent: React.FC<DocCardsProps> = ({
   }, [title, toolbar, prefixCls, hashId]);
 
   if (!fields) {
-    return wrapSSR(
+    return (
       <div
         className={classNames(prefixCls, hashId, className)}
         style={style}
@@ -139,11 +139,11 @@ const DocCardsComponent: React.FC<DocCardsProps> = ({
         >
           {i18n?.locale?.docCards || '卡片列表'}
         </div>
-      </div>,
+      </div>
     );
   }
 
-  return wrapSSR(
+  return (
     <div
       className={classNames(prefixCls, hashId, className)}
       style={style}
@@ -247,7 +247,7 @@ const DocCardsComponent: React.FC<DocCardsProps> = ({
           );
         })}
       </div>
-    </div>,
+    </div>
   );
 };
 

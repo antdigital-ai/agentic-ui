@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  DEFAULT_CHART_DATASET_TYPE,
-  normalizeRadarChartData,
-} from '../utils';
+import { DEFAULT_CHART_DATASET_TYPE, normalizeRadarChartData } from '../utils';
 
 describe('normalizeRadarChartData', () => {
   it('应将 x/y/category 归一化为 ChartDataItem', () => {

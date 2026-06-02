@@ -15,9 +15,9 @@ const ToolBar = (props: {
 }) => {
   const context = useContext(ConfigProvider.ConfigContext);
   const baseClassName = context?.getPrefixCls(`agentic-md-editor-toolbar`);
-  const { wrapSSR, hashId } = useStyle(baseClassName);
+  const { hashId } = useStyle(baseClassName);
 
-  return wrapSSR(
+  return (
     <div
       onMouseDown={(e) => {
         e.preventDefault();
@@ -32,8 +32,8 @@ const ToolBar = (props: {
         hashId={hashId}
         {...props}
       />
-    </div>,
-  ) as React.ReactNode;
+    </div>
+  );
 };
 
 export default React.memo(ToolBar);

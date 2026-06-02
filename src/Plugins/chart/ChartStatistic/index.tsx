@@ -77,7 +77,7 @@ const ChartStatistic: React.FC<ChartStatisticProps> = ({
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('chart-statistic');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
   const informationalTooltip = useAdaptiveTooltipProps('informational');
 
   // 渲染数值
@@ -183,7 +183,7 @@ const ChartStatistic: React.FC<ChartStatisticProps> = ({
   );
   const rootStyle = { ...style, ...styles?.root };
 
-  return wrapSSR(
+  return (
     <div className={rootClassName} style={rootStyle}>
       {renderHeader()}
       <div
@@ -216,7 +216,7 @@ const ChartStatistic: React.FC<ChartStatisticProps> = ({
           </span>
         )}
       </div>
-    </div>,
+    </div>
   );
 };
 

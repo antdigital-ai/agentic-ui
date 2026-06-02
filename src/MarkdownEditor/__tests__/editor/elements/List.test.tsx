@@ -31,7 +31,6 @@ vi.mock('slate-react', () => ({
 
 vi.mock('../../../editor/elements/List/style', () => ({
   useStyle: vi.fn(() => ({
-    wrapSSR: (component: any) => component,
     hashId: 'test-hash',
   })),
 }));

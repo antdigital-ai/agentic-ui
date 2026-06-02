@@ -36,7 +36,7 @@ export const MermaidRendererImpl = (props: { element: CodeNode }) => {
   const { token } = theme.useToken();
   const baseCls =
     context?.getPrefixCls('agentic-plugin-mermaid') || 'plugin-mermaid';
-  const { wrapSSR, hashId } = useStyle(baseCls);
+  const { hashId } = useStyle(baseCls);
   const containerRef = useRef<HTMLDivElement>(null);
   const divRef = useRef<HTMLDivElement>(null);
   const id = useMemo(
@@ -135,7 +135,7 @@ export const MermaidRendererImpl = (props: { element: CodeNode }) => {
     URL.revokeObjectURL(url);
   });
 
-  return wrapSSR(
+  return (
     <div
       ref={containerRef}
       className={classNames(baseCls, hashId)}
@@ -199,6 +199,6 @@ export const MermaidRendererImpl = (props: { element: CodeNode }) => {
           <pre style={PRE_STYLE}>{code}</pre>
         </div>
       )}
-    </div>,
+    </div>
   );
 };

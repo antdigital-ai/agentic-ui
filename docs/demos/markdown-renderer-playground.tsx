@@ -3,7 +3,6 @@ import { MarkdownRenderer } from '@ant-design/agentic-ui';
 import {
   Button,
   Divider,
-  InputNumber,
   Select,
   Space,
   Switch,
@@ -38,9 +37,7 @@ function greet(name: string) {
 
 | 名称 | 含义 |
 | --- | --- |
-| streaming | 是否流式 |
-| isFinished | 是否完成 |
-| streamingParagraphAnimation | 末段淡入开关 |
+| streaming | 是否流式（启用 token 缓存，避免半截语法误解析） |
 
 \`\`\`mermaid
 graph LR
@@ -63,13 +60,6 @@ export default () => {
   const fullContent = PRESET_CONTENT[preset];
 
   const [streaming, setStreaming] = useState(true);
-  const [isFinished, setIsFinished] = useState(false);
-  const [streamingParagraphAnimation, setStreamingParagraphAnimation] =
-    useState(true);
-
-  const [charsPerFrame, setCharsPerFrame] = useState(4);
-  const [speed, setSpeed] = useState(1);
-  const [animateTailChars, setAnimateTailChars] = useState<number | null>(null);
 
   const [openInNewTab, setOpenInNewTab] = useState(true);
   const [interceptLink, setInterceptLink] = useState(false);
@@ -83,7 +73,6 @@ export default () => {
   useEffect(() => {
     indexRef.current = 0;
     setContent('');
-    setIsFinished(false);
     setStreaming(true);
   }, [preset]);
 
@@ -94,7 +83,6 @@ export default () => {
       const next = fullContent.slice(0, indexRef.current);
       setContent(next);
       if (indexRef.current >= fullContent.length) {
-        setIsFinished(true);
         setStreaming(false);
         clearInterval(timer);
       }
@@ -105,24 +93,13 @@ export default () => {
   const handleReplay = () => {
     indexRef.current = 0;
     setContent('');
-    setIsFinished(false);
     setStreaming(true);
   };
 
   const handleSnapshot = () => {
     const displayed = rendererRef.current?.getDisplayedContent();
-    message.info(`当前已渲染 ${displayed?.length ?? 0} 字符（含动画推进进度）`);
+    message.info(`当前已渲染 ${displayed?.length ?? 0} 字符`);
   };
-
-  const queueOptions = useMemo(
-    () => ({
-      charsPerFrame,
-      speed,
-      animate: true,
-      animateTailChars: animateTailChars ?? undefined,
-    }),
-    [charsPerFrame, speed, animateTailChars],
-  );
 
   const linkConfig = useMemo(
     () => ({
@@ -208,58 +185,11 @@ export default () => {
             <span>streaming</span>
             <Switch checked={streaming} onChange={setStreaming} />
           </Space>
-          <Space>
-            <span>isFinished</span>
-            <Switch checked={isFinished} onChange={setIsFinished} />
-          </Space>
-          <Space>
-            <span>streamingParagraphAnimation</span>
-            <Switch
-              checked={streamingParagraphAnimation}
-              onChange={setStreamingParagraphAnimation}
-            />
-          </Space>
         </Space>
       </div>
 
       <div style={SECTION_STYLE}>
-        <Typography.Text strong>3. queueOptions 字符队列</Typography.Text>
-        <Divider style={{ margin: '8px 0' }} />
-        <Space size="large" wrap>
-          <Space>
-            <span>charsPerFrame</span>
-            <InputNumber
-              min={1}
-              max={20}
-              value={charsPerFrame}
-              onChange={(v) => setCharsPerFrame(v ?? 1)}
-            />
-          </Space>
-          <Space>
-            <span>speed</span>
-            <InputNumber
-              min={0.1}
-              max={5}
-              step={0.1}
-              value={speed}
-              onChange={(v) => setSpeed(v ?? 1)}
-            />
-          </Space>
-          <Space>
-            <span>animateTailChars</span>
-            <InputNumber
-              min={0}
-              max={500}
-              value={animateTailChars ?? undefined}
-              placeholder="不限制"
-              onChange={(v) => setAnimateTailChars(v ?? null)}
-            />
-          </Space>
-        </Space>
-      </div>
-
-      <div style={SECTION_STYLE}>
-        <Typography.Text strong>4. linkConfig 链接行为</Typography.Text>
+        <Typography.Text strong>3. linkConfig 链接行为</Typography.Text>
         <Divider style={{ margin: '8px 0' }} />
         <Space size="large" wrap>
           <Space>
@@ -274,7 +204,7 @@ export default () => {
       </div>
 
       <div style={SECTION_STYLE}>
-        <Typography.Text strong>5. eleRender 自定义渲染</Typography.Text>
+        <Typography.Text strong>4. eleRender 自定义渲染</Typography.Text>
         <Divider style={{ margin: '8px 0' }} />
         <Space size="large" wrap>
           <Space>
@@ -298,9 +228,6 @@ export default () => {
           ref={rendererRef}
           content={content}
           streaming={streaming}
-          isFinished={isFinished}
-          streamingParagraphAnimation={streamingParagraphAnimation}
-          queueOptions={queueOptions}
           linkConfig={linkConfig}
           eleRender={eleRender}
         />

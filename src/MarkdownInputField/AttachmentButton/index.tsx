@@ -117,7 +117,7 @@ export const AttachmentButton: React.FC<
 > = ({ disabled, uploadImage, title, supportedFormat, locale, render }) => {
   const context = useContext(ConfigProvider.ConfigContext);
   const prefix = context?.getPrefixCls('agentic-md-editor-attachment-button');
-  const { wrapSSR, hashId } = useStyle(prefix);
+  const { hashId } = useStyle(prefix);
 
   const format = supportedFormat || SupportedFileFormats.image;
 
@@ -150,7 +150,7 @@ export const AttachmentButton: React.FC<
     </AttachmentButtonPopover>
   );
 
-  return wrapSSR(
+  return (
     <div
       className={classNames(`${prefix}`, hashId, {
         [`${prefix}-disabled`]: disabled,
@@ -159,6 +159,6 @@ export const AttachmentButton: React.FC<
       data-testid="attachment-button"
     >
       {wrapper}
-    </div>,
+    </div>
   );
 };

@@ -290,6 +290,43 @@ export function cleanHtml(html: string): string {
 }
 
 /**
+ * 检测 HTML 是否来自 Microsoft Word / Office 系。命中任意一个特征即视为 Word HTML：
+ * - `<meta name="Generator" content="Microsoft Word|Office...">`
+ * - Office XML 命名空间 `xmlns:o="urn:schemas-microsoft-com:office..."`
+ * - `<o:p>` / `<w:...>` / `<m:...>` 自定义标签
+ * - `class="MsoNormal"` 之类的 MSO 类
+ */
+export function isWordHtml(html: string): boolean {
+  if (!html) return false;
+  return (
+    /<meta\s+name="Generator"[^>]*content="[^"]*(?:Microsoft\s+Word|Microsoft\s+Office)/i.test(
+      html,
+    ) ||
+    /xmlns:[a-z]+="urn:schemas-microsoft-com:office/i.test(html) ||
+    /<o:p[\s>/]/i.test(html) ||
+    /class="Mso[A-Za-z]+/i.test(html)
+  );
+}
+
+/**
+ * 清理 Word/Office HTML 里 markdown 转换链不关心的噪声：
+ * - Office 命名空间标签（o:p / w:* / m:* / v:*）
+ * - IE/Word 条件注释（`<!--[if !supportLists]>...<![endif]-->`）
+ * - 内联 mso-* 样式片段
+ * - Mso* 类名
+ * - 把 `&nbsp;` 还原为普通空格，便于 markdown 解析
+ */
+export function cleanWordHtml(html: string): string {
+  if (!html) return '';
+  return html
+    .replace(/<\/?(?:o|w|m|v):[^>]*>/gi, '')
+    .replace(/<!--\[if[\s\S]*?<!\[endif\]-->/gi, '')
+    .replace(/(\s)?mso-[^:;"]+:[^;"]+;?/gi, '$1')
+    .replace(/\sclass="Mso[^"]*"/gi, '')
+    .replace(/&nbsp;/gi, ' ');
+}
+
+/**
  * 检测字符串是否为 HTML
  */
 export function isHtml(text: string): boolean {

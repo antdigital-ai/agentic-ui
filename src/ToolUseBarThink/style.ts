@@ -234,6 +234,14 @@ const genStyle: GenStyleFn<'ToolUseBarThink'> = (token) => {
         maxHeight: 800,
         pointerEvents: 'auto',
       },
+      // 内容完全展开时，解除 collapse 和 inner 的 maxHeight/overflow 限制
+      '&-think-collapse-content-expanded': {
+        maxHeight: 'none',
+        [`${token.componentCls}-think-collapse-inner`]: {
+          maxHeight: 'none',
+          overflow: 'visible',
+        },
+      },
       '&-think-collapse-inner': {
         minHeight: 0,
         maxHeight: '100%',
@@ -260,6 +268,13 @@ const genStyle: GenStyleFn<'ToolUseBarThink'> = (token) => {
           marginTop: -10,
           backdropFilter: LIGHT_MODE_BACKDROP_FILTER,
           WebkitBackdropFilter: LIGHT_MODE_BACKDROP_FILTER,
+        },
+        // floatingExpanded 展开时让收起按钮始终可见，而非仅 hover 时显示
+        '&-floating-expanded': {
+          [`${token.componentCls}-floating-expand`]: {
+            opacity: 1,
+            transform: 'translateY(0)',
+          },
         },
       },
       '&-container-loading': {
@@ -341,12 +356,11 @@ const genStyle: GenStyleFn<'ToolUseBarThink'> = (token) => {
         fontSize: 'var(--font-size-base)',
         cursor: 'pointer',
         borderRadius: 'var(--radius-control-base)',
-        background: 'var(--color-gray-control-fill-active)',
+        background: 'transparent',
         color: 'var(--color-gray-text-secondary)',
         font: 'var(--font-text-body-emphasized-sm)',
         flexShrink: 0,
         '&:hover': {
-          background: 'var(--color-gray-control-fill-hover)',
           color: 'var(--color-gray-text-default)',
         },
       },
@@ -399,6 +413,6 @@ const genStyle: GenStyleFn<'ToolUseBarThink'> = (token) => {
 const useGenStyle = genStyleHooks('ToolUseBarThink', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'tool-use-bar-think');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'tool-use-bar-think');
+  return { hashId };
 }

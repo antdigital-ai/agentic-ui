@@ -27,6 +27,7 @@ import { parserSlateNodeToMarkdown } from './parser/parserSlateNodeToMarkdown';
 import { getOffsetLeft, getOffsetTop } from './utils/dom';
 import { EditorUtils, findByPathAndText } from './utils/editorUtils';
 import { KeyboardTask, Methods } from './utils/keyboard';
+import type { ParserMarkdownToSlateNodeConfig } from './parser/parserMarkdownToSlateNode';
 import type { MarkdownToHtmlOptions } from './utils/markdownToHtml';
 import { markdownToHtmlSync } from './utils/markdownToHtml';
 const { createContext, useContext } = React;
@@ -186,6 +187,7 @@ export class EditorStore {
   /** 当前 setMDContent 操作的 AbortController */
   private _currentAbortController: AbortController | null = null;
   private markdownToHtmlOptions?: MarkdownToHtmlOptions;
+  private parserConfig?: ParserMarkdownToSlateNodeConfig;
 
   /**
    * 获取当前编辑器实例。
@@ -200,11 +202,13 @@ export class EditorStore {
     _editor: React.MutableRefObject<BaseEditor & ReactEditor & HistoryEditor>,
     plugins?: MarkdownEditorPlugin[],
     markdownToHtmlOptions?: MarkdownToHtmlOptions,
+    parserConfig?: ParserMarkdownToSlateNodeConfig,
   ) {
     this.dragStart = this.dragStart.bind(this);
     this._editor = _editor;
     this.plugins = plugins;
     this.markdownToHtmlOptions = markdownToHtmlOptions;
+    this.parserConfig = parserConfig;
   }
 
   /**
@@ -458,7 +462,7 @@ export class EditorStore {
     onProgress?: (progress: number) => void,
   ): void {
     try {
-      const nodeList = parserMdToSchema(md, plugins).schema;
+      const nodeList = parserMdToSchema(md, plugins, this.parserConfig).schema;
       this._editor.current.selection = null;
       this.setContent(nodeList);
       this._safeDeselect();
@@ -501,7 +505,7 @@ export class EditorStore {
     const allNodes: Node[] = [];
     for (const chunk of chunks) {
       if (chunk.trim()) {
-        const { schema } = parserMdToSchema(chunk, plugins);
+        const { schema } = parserMdToSchema(chunk, plugins, this.parserConfig);
         allNodes.push(...schema);
       }
     }
@@ -598,7 +602,7 @@ export class EditorStore {
             const chunk = chunks[i];
             if (chunk.trim()) {
               try {
-                const { schema } = parserMdToSchema(chunk, plugins);
+                const { schema } = parserMdToSchema(chunk, plugins, this.parserConfig);
 
                 if (schema.length > 0) {
                   if (isFirstBatch) {
@@ -865,7 +869,9 @@ export class EditorStore {
     if (options) {
       this.markdownToHtmlOptions = options;
     }
-    return markdownToHtmlSync(markdown, appliedOptions);
+    return markdownToHtmlSync(markdown, appliedOptions, {
+      formula: this.parserConfig?.formula,
+    });
   }
 
   /**

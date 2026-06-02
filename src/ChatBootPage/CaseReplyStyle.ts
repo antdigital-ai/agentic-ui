@@ -204,6 +204,6 @@ const useGenStyle = genStyleHooks('ChatBootCaseReply', genStyle);
  * CaseReply 组件样式
  */
 export const useStyle = (prefixCls?: string) => {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'ChatBootCaseReply');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'ChatBootCaseReply');
+  return { hashId };
 };

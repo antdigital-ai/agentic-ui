@@ -155,6 +155,6 @@ const genStyle: GenStyleFn<'TextAnimate'> = (token) => {
 const useGenStyle = genStyleHooks('TextAnimate', genStyle);
 
 export const useTextAnimateStyle = (prefixCls: string) => {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls);
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls);
+  return { hashId };
 };

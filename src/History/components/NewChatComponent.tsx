@@ -50,7 +50,7 @@ export const HistoryNewChat: React.FC<HistoryNewChatProps> = ({
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const menuPrefixCls = getPrefixCls('agentic-chat-history-menu');
-  const { wrapSSR, hashId } = useNewChatStyle(menuPrefixCls);
+  const { hashId } = useNewChatStyle(menuPrefixCls);
 
   const { locale } = useContext(I18nContext);
   const [loading, setLoading] = useState(false);
@@ -74,7 +74,7 @@ export const HistoryNewChat: React.FC<HistoryNewChatProps> = ({
     }
   });
 
-  return wrapSSR(
+  return (
     <div
       role="button"
       tabIndex={0}
@@ -91,7 +91,7 @@ export const HistoryNewChat: React.FC<HistoryNewChatProps> = ({
         }}
       />
       {locale?.['chat.history.newChat'] || '新对话'}
-    </div>,
+    </div>
   );
 };
 

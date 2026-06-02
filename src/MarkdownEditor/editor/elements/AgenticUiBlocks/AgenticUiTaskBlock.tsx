@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { RenderElementProps } from 'slate-react';
 import { TaskList } from '../../../../TaskList';
 import { normalizeTaskListPropsFromJson } from './agenticUiEmbedUtils';
@@ -8,7 +8,10 @@ export const AgenticUiTaskBlock: React.FC<RenderElementProps> = ({
   children,
   element,
 }) => {
-  const listProps = normalizeTaskListPropsFromJson((element as any).value);
+  const listProps = useMemo(
+    () => normalizeTaskListPropsFromJson((element as any).value),
+    [(element as any).value],
+  );
 
   return (
     <div

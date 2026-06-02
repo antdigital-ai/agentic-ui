@@ -77,8 +77,8 @@ export const CommentList: React.FC<{
   const context = useContext(ConfigProvider.ConfigContext);
   const { setShowComment } = useContext(EditorStoreContext) || {};
   const baseCls = context?.getPrefixCls('agentic-md-editor-comment-view');
-  const { wrapSSR, hashId } = useStyle(baseCls);
-  return wrapSSR(
+  const { hashId } = useStyle(baseCls);
+  return (
     <>
       {!props.pure ? (
         <div
@@ -267,6 +267,6 @@ export const CommentList: React.FC<{
           })}
         </div>
       </div>
-    </>,
+    </>
   );
 };

@@ -457,11 +457,15 @@ const MLeafComponent = (
                   },
                   { at: path },
                 );
+                // tag \u5904\u4E8E\u7236\u8282\u70B9\u9996\u4F4D\u65F6\u65E0 previous\uFF0C\u76F4\u63A5\u63D2\u5230\u5F53\u524D path\uFF0C
+                // \u7531 Slate \u628A\u5DF2\u6709\u7684 tag \u987A\u52BF\u540E\u79FB\uFF0C\u6548\u679C\u7B49\u4EF7\u4E8E"\u63D2\u5230 tag \u4E4B\u524D"\u3002
+                const lastIdx = path[path.length - 1];
+                const beforePath = lastIdx > 0 ? Path.previous(path) : path;
                 Transforms.insertNodes(
                   markdownEditorRef.current,
                   [{ text: '\uFEFF' }],
                   {
-                    at: Path.previous(path),
+                    at: beforePath,
                   },
                 );
               });
@@ -529,7 +533,32 @@ const MLeafComponent = (
     style.fontStyle = 'italic';
   }
   if (leaf.mark) {
-    children = <mark data-testid="markdown-mark">{children}</mark>;
+    const markStyle: React.CSSProperties = {};
+    if (leaf.markColor) markStyle.color = leaf.markColor;
+    if (leaf.markBg) markStyle.backgroundColor = leaf.markBg;
+    children = (
+      <mark
+        data-testid="markdown-mark"
+        style={Object.keys(markStyle).length ? markStyle : undefined}
+      >
+        {leaf.markLabel && (
+          <span
+            data-testid="markdown-mark-label"
+            // 装饰性前缀不属于 Slate 文本模型，避免编辑器把它当作 leaf 文本一部分。
+            contentEditable={false}
+            style={{
+              marginInlineEnd: 4,
+              fontSize: '0.85em',
+              opacity: 0.75,
+              userSelect: 'none',
+            }}
+          >
+            {leaf.markLabel}
+          </span>
+        )}
+        {children}
+      </mark>
+    );
   }
   if (leaf.html) {
     prefixClassName = classNames(mdEditorBaseClass + '-m-html');

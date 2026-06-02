@@ -51,11 +51,16 @@ const genStyle: GenStyleFn<'TaskList'> = (token) => {
         },
       },
 
-      '&-status-idle': {
-        height: 16,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+      '&-status-success': {
+        color: 'var(--color-green-control-fill-primary)',
+      },
+
+      '&-status-loading': {
+        color: 'var(--color-primary-control-fill-primary)',
+      },
+
+      '&-status-error': {
+        color: 'var(--color-red-control-fill-primary)',
       },
 
       '&-top': {
@@ -102,7 +107,11 @@ const genStyle: GenStyleFn<'TaskList'> = (token) => {
       },
 
       '&-body': {
-        display: 'flex',
+        overflow: 'hidden',
+        height: 'auto',
+        opacity: 1,
+        transition:
+          'height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease',
 
         [`${componentCls}-content`]: {
           font: 'var(--font-text-paragraph-sm)',
@@ -115,8 +124,14 @@ const genStyle: GenStyleFn<'TaskList'> = (token) => {
         },
       },
 
+      '&-body-collapsed': {
+        opacity: 0,
+      },
+
       // Simple variant - wrapper
       '&-simple-wrapper': {
+        width: 'fit-content',
+        maxWidth: '100%',
         borderRadius: 'var(--radius-control-base, 8px)',
         overflow: 'hidden',
       },
@@ -168,6 +183,14 @@ const genStyle: GenStyleFn<'TaskList'> = (token) => {
           alignItems: 'center',
           justifyContent: 'center',
         },
+
+        [`${componentCls}-simple-count`]: {
+          flexShrink: 0,
+          font: 'var(--font-text-paragraph-sm, 12px)',
+          color: 'var(--color-gray-text-secondary, rgba(0,3,9,0.45))',
+          letterSpacing: 'var(--letter-spacing-paragraph-sm, normal)',
+          lineHeight: 1,
+        },
       },
 
       // Simple variant - content area
@@ -214,6 +237,6 @@ const genStyle: GenStyleFn<'TaskList'> = (token) => {
 const useGenStyle = genStyleHooks('TaskList', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'task-list');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'task-list');
+  return { hashId };
 }

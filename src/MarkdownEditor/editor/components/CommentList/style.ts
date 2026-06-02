@@ -97,6 +97,6 @@ const genStyle: GenStyleFn<'CommentList'> = (token) => {
 const useGenStyle = genStyleHooks('CommentList', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'editor-content-column');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'editor-content-column');
+  return { hashId };
 }

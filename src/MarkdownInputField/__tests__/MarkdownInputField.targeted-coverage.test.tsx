@@ -36,7 +36,6 @@ vi.mock('../QuickActions', () => ({
 /* ---- Mock 其他子组件和 hooks 保持简洁 ---- */
 vi.mock('../style', () => ({
   useStyle: () => ({
-    wrapSSR: (node: any) => node,
     hashId: 'test-hash',
   }),
 }));

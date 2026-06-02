@@ -27,6 +27,6 @@ const genNewChatStyle: GenStyleFn<'NewChatComponent'> = (token) => {
 const useGenStyle = genStyleHooks('NewChatComponent', genNewChatStyle);
 
 export const useNewChatStyle = (prefixCls: string) => {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls);
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls);
+  return { hashId };
 };

@@ -1,4 +1,4 @@
-﻿import type { CSSObject } from '@ant-design/cssinjs';
+import type { CSSObject } from '@ant-design/cssinjs';
 
 import {
   TEXT_SWAP_BLUR_PX,

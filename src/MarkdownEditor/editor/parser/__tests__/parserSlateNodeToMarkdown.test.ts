@@ -3,13 +3,43 @@ import { parserSlateNodeToMarkdown } from '../parserSlateNodeToMarkdown';
 
 describe('parserSlateNodeToMarkdown', () => {
   describe('handleCard', () => {
-    it('should handle card node correctly', () => {
+    it('普通内容应包一层 <div data-card="true"> 保证 markdown 往返还原', () => {
       const node = {
         type: 'card',
-        children: [{ type: 'paragraph', children: [{ text: 'Card content' }] }],
+        children: [
+          { type: 'card-before', children: [{ text: '' }] },
+          { type: 'paragraph', children: [{ text: 'Card content' }] },
+          { type: 'card-after', children: [{ text: '' }] },
+        ],
       };
       const result = parserSlateNodeToMarkdown([node]);
-      expect(result).toBe('Card content');
+      expect(result).toContain('<div data-card="true">');
+      expect(result).toContain('Card content');
+      expect(result).toContain('</div>');
+    });
+
+    it('table 内容跳过 wrapper（parseTable 会自动重新包装为 card）', () => {
+      const node = {
+        type: 'card',
+        children: [
+          { type: 'card-before', children: [{ text: '' }] },
+          {
+            type: 'table',
+            children: [
+              {
+                type: 'table-row',
+                children: [
+                  { type: 'table-cell', children: [{ text: 'A' }] },
+                ],
+              },
+            ],
+          },
+          { type: 'card-after', children: [{ text: '' }] },
+        ],
+      };
+      const result = parserSlateNodeToMarkdown([node]);
+      expect(result).not.toContain('<div data-card');
+      expect(result).toContain('| A |');
     });
   });
 
@@ -1438,6 +1468,27 @@ describe('parserSlateNodeToMarkdown - coverage', () => {
     };
     const result = parserSlateNodeToMarkdown([node]);
     expect(result).toBe('<mark>/alipay </mark>');
+  });
+
+  it('should escape special characters in mark color/bg/label attrs', () => {
+    const node = {
+      type: 'paragraph',
+      children: [
+        {
+          text: 'note',
+          mark: true,
+          markColor: 'red"x',
+          markBg: 'a&b',
+          markLabel: 'Note: "重要" <hl>',
+        } as any,
+      ],
+    };
+    const result = parserSlateNodeToMarkdown([node]);
+    expect(result).toContain('color="red&quot;x"');
+    expect(result).toContain('bg="a&amp;b"');
+    expect(result).toContain('label="Note: &quot;重要&quot; &lt;hl&gt;"');
+    // 原始未转义字符不应直接出现在 attr 内
+    expect(result).not.toMatch(/color="red"x"/);
   });
 
   it('should handle mixed format text with no space then next word (isMix space)', () => {

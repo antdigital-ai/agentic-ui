@@ -40,8 +40,8 @@ const useGenStyle = genStyleHooks('InsertAutocomplete', (token, info) => [
 export function useStyle(prefixCls?: string) {
   // 与 InsertAutocomplete 组件内
   // `getPrefixCls('agentic-md-editor-insert-autocomplete')` 对齐
-  const [wrapSSR, hashId] = useGenStyle(
+  const [, hashId] = useGenStyle(
     prefixCls ?? 'agentic-md-editor-insert-autocomplete',
   );
-  return { wrapSSR, hashId };
+  return { hashId };
 }

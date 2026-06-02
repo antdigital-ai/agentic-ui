@@ -50,13 +50,13 @@ export const DocInfoList: React.FC<DocInfoListProps> = ({
   const baseCls = configContext?.getPrefixCls(`agent-doc-info`);
   const chatContext = useContext(BubbleConfigContext);
   const { locale } = useContext(I18nContext);
-  const { wrapSSR, hashId } = useStyle(baseCls);
+  const { hashId } = useStyle(baseCls);
 
   const docInfoList = props.options?.filter((item) => item) || [];
 
   const [docMeta, setDocMeta] = React.useState<DocMeta | null>(null);
 
-  return wrapSSR(
+  return (
     <>
       <Drawer
         title={locale?.['chat.message.preview'] || '预览' + docMeta?.doc_name}
@@ -381,6 +381,6 @@ export const DocInfoList: React.FC<DocInfoListProps> = ({
           })}
         </div>
       </div>
-    </>,
+    </>
   );
 };

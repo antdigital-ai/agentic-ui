@@ -113,7 +113,6 @@ vi.mock('../plugins/useHighlight', () => ({
 
 vi.mock('../style', () => ({
   useStyle: () => ({
-    wrapSSR: (node: React.ReactNode) => node,
     hashId: 'test-hash',
   }),
 }));
@@ -1876,13 +1875,16 @@ describe('Editor branches - mouseup effect', () => {
     editableProps = {};
   });
 
-  it('mouseup on container calls handleSelectionChange.run', async () => {
+  it('mouseup/touchend on container register selection sync listeners', async () => {
     const { container } = setupStore({ readonly: false });
     const addSpy = vi.spyOn(container, 'addEventListener');
 
     renderEditor({});
 
     expect(addSpy).toHaveBeenCalledWith('mouseup', expect.any(Function));
+    expect(addSpy).toHaveBeenCalledWith('touchend', expect.any(Function), {
+      passive: true,
+    });
     addSpy.mockRestore();
   });
 

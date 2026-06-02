@@ -52,8 +52,6 @@ const useGenStyle = genStyleHooks('FloatBar', (token, info) => [
 
 export function useStyle(prefixCls?: string) {
   // 与 FloatBar 组件内 `getPrefixCls('agentic-md-editor-float-bar')` 对齐
-  const [wrapSSR, hashId] = useGenStyle(
-    prefixCls ?? 'agentic-md-editor-float-bar',
-  );
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'agentic-md-editor-float-bar');
+  return { hashId };
 }

@@ -102,7 +102,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
   const attachment = { ...DEFAULT_ATTACHMENT, ...props.attachment };
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const baseCls = getPrefixCls('agentic-md-input-field');
-  const { wrapSSR, hashId } = useStyle(baseCls, props.disableHoverAnimation);
+  const { hashId } = useStyle(baseCls, props.disableHoverAnimation);
   const locale = useLocale();
 
   // 状态管理
@@ -314,7 +314,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
     />
   );
 
-  return wrapSSR(
+  return (
     <>
       {isShowTopOperatingArea && (
         <div
@@ -559,7 +559,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
           sendActionsNode
         )}
       </div>
-    </>,
+    </>
   );
 };
 

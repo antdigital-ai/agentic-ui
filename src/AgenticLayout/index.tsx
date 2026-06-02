@@ -139,7 +139,7 @@ const AgenticLayoutComponent: React.FC<AgenticLayoutProps> = ({
 }) => {
   const { getPrefixCls, direction } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-layout');
-  const { wrapSSR, hashId } = useAgenticLayoutStyle(prefixCls);
+  const { hashId } = useAgenticLayoutStyle(prefixCls);
   // RTL 下拖拽方向取反：在 RTL 中，鼠标向右移动应等同于扩大右侧栏。
   const isRTL = direction === 'rtl';
 
@@ -319,7 +319,7 @@ const AgenticLayoutComponent: React.FC<AgenticLayoutProps> = ({
   const ariaValueMax = Math.round(getMaxRightWidth());
   const ariaValueNow = Math.round(currentRightWidth);
 
-  return wrapSSR(
+  return (
     <div
       className={classNames(prefixCls, className, hashId)}
       data-testid={AGENTIC_LAYOUT_TEST_ID}
@@ -431,7 +431,7 @@ const AgenticLayoutComponent: React.FC<AgenticLayoutProps> = ({
           </div>
         </div>
       )}
-    </div>,
+    </div>
   );
 };
 

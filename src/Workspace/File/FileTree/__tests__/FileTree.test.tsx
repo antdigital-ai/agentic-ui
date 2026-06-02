@@ -67,7 +67,7 @@ describe('Workspace.FileTree', () => {
     });
   });
 
-  it('keeps an empty directory as a directory (empty onLoadChildren)', async () => {
+  it('marks directory as leaf when onLoadChildren returns no children', async () => {
     const onLoadChildren = vi.fn().mockResolvedValue([] as any);
 
     render(
@@ -91,9 +91,14 @@ describe('Workspace.FileTree', () => {
     fireEvent.click(document.querySelector('.ant-tree-switcher')!);
     await waitFor(() => expect(onLoadChildren).toHaveBeenCalledTimes(1));
 
-    const sw = document.querySelector('.ant-tree-switcher')!;
-    fireEvent.click(sw);
-    fireEvent.click(sw);
+    await waitFor(() => {
+      expect(
+        document.querySelector('.ant-tree-switcher_open'),
+      ).not.toBeInTheDocument();
+      expect(
+        document.querySelector('.ant-tree-switcher_close'),
+      ).not.toBeInTheDocument();
+    });
     expect(onLoadChildren).toHaveBeenCalledTimes(1);
   });
 

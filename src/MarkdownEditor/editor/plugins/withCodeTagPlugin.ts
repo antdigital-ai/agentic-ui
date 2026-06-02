@@ -98,7 +98,7 @@ const handleCodeTagOperation = (
  * 该插件重写编辑器的 `apply` 和 `deleteBackward` 方法，添加对代码和标签节点的特殊处理逻辑。
  */
 export const withCodeTagPlugin = (editor: Editor) => {
-  const { apply, deleteBackward } = editor;
+  const { apply, deleteBackward, insertBreak } = editor;
 
   editor.apply = (operation: Operation) => {
     // 尝试处理代码和标签相关操作
@@ -108,6 +108,34 @@ export const withCodeTagPlugin = (editor: Editor) => {
 
     // 否则执行原始操作
     apply(operation);
+  };
+
+  editor.insertBreak = () => {
+    const { selection } = editor;
+    // 光标在 tag/code leaf 内时，先把光标移出节点，再交给原 insertBreak。
+    // split_node 会被 handleCodeTagOperation 拦下导致按 Enter 完全静默；
+    // 这里前置移动光标，让 Enter 在 tag/code 之外正常换行。
+    if (selection && Range.isCollapsed(selection)) {
+      try {
+        const node = Node.get(editor, selection.anchor.path);
+        if (node?.tag || node?.code) {
+          const path = selection.anchor.path;
+          const nextPath = Path.next(path);
+          if (Editor.hasPath(editor, nextPath)) {
+            Transforms.select(editor, Editor.start(editor, nextPath));
+          } else {
+            Transforms.insertNodes(
+              editor,
+              { text: '' },
+              { at: nextPath, select: true },
+            );
+          }
+        }
+      } catch {
+        // 节点已不存在或路径失效时退回默认行为
+      }
+    }
+    insertBreak();
   };
 
   editor.deleteBackward = (unit: any) => {

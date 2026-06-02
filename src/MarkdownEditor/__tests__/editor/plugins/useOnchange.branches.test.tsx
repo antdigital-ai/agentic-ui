@@ -1,7 +1,10 @@
 import { renderHook } from '@testing-library/react';
 import { Editor } from 'slate';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { useOnchange } from '../../../editor/plugins/useOnchange';
+import {
+  selChange$,
+  useOnchange,
+} from '../../../editor/plugins/useOnchange';
 
 const mockCancel = vi.fn();
 const mockRun = vi.fn();
@@ -74,13 +77,13 @@ describe('useOnchange targeted coverage', () => {
     });
   }
 
-  it('覆盖 onChangeDebounce: 无 onChange 时直接 return（39）', () => {
+  it('覆盖 onChangeDebounce: 无 onChange 时跳过 run，仍跑选区跟踪', () => {
     const editor = createEditor();
     const nodesSpy = mockNodes();
     const { result } = renderHook(() => useOnchange(editor));
     result.current(editor.children, [{ type: 'insert_text' } as any]);
-    expect(mockCancel).toHaveBeenCalled();
-    expect(mockRun).toHaveBeenCalled();
+    // 无 onChange 时不再触发 debounce.run，避免无谓 setTimeout
+    expect(mockRun).not.toHaveBeenCalled();
     expect(nodesSpy).toHaveBeenCalled();
   });
 
@@ -187,5 +190,44 @@ describe('useOnchange targeted coverage', () => {
     const { result } = renderHook(() => useOnchange(editor));
     result.current(editor.children, [{ type: 'set_selection' } as any]);
     expect(mockSetDomRect).toHaveBeenCalledWith(null);
+  });
+
+  it('selectionTrackingEnabled=false + 仅选区变化时整体早返', () => {
+    const editor = createEditor();
+    const nodesSpy = vi.spyOn(Editor, 'nodes');
+    const onChange = vi.fn();
+    const { result } = renderHook(() =>
+      useOnchange(editor, onChange, { selectionTrackingEnabled: false }),
+    );
+    result.current(editor.children, [{ type: 'set_selection' } as any]);
+    expect(nodesSpy).not.toHaveBeenCalled();
+    expect(mockRun).not.toHaveBeenCalled();
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('selectionTrackingEnabled=false + 内容变化仍触发 onChange，但跳过选区追踪', () => {
+    const editor = createEditor();
+    const nodesSpy = vi.spyOn(Editor, 'nodes');
+    const onChange = vi.fn();
+    const { result } = renderHook(() =>
+      useOnchange(editor, onChange, { selectionTrackingEnabled: false }),
+    );
+    result.current(editor.children, [{ type: 'insert_text' } as any]);
+    expect(mockRun).toHaveBeenCalled();
+    expect(nodesSpy).not.toHaveBeenCalled();
+    expect(mockSetDomRect).not.toHaveBeenCalled();
+  });
+
+  it('selChange$ 每次仅推送一次（旧版本会推送两次）', () => {
+    const editor = createEditor();
+    mockNodes('paragraph');
+    const onChange = vi.fn();
+    const { result } = renderHook(() => useOnchange(editor, onChange));
+    const spy = vi.spyOn(selChange$, 'next');
+    result.current(editor.children, [{ type: 'insert_text' } as any]);
+    vi.runAllTimers();
+    // 旧版本会调用两次，修复后仅一次
+    expect(spy).toHaveBeenCalledTimes(1);
+    spy.mockRestore();
   });
 });

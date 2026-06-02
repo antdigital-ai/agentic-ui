@@ -85,7 +85,7 @@ export const JinjaTemplatePanel: React.FC = () => {
   const prefixCls =
     context?.getPrefixCls?.('agentic-md-editor-jinja-panel') ??
     JINJA_PANEL_PREFIX_CLS;
-  const { wrapSSR, hashId } = useJinjaTemplatePanelStyle(prefixCls);
+  const { hashId } = useJinjaTemplatePanelStyle(prefixCls);
 
   const close = useRefFunction(() => {
     setOpenJinjaTemplate?.(false);
@@ -209,7 +209,7 @@ export const JinjaTemplatePanel: React.FC = () => {
 
   if (!openJinjaTemplate) return null;
 
-  const panel = wrapSSR(
+  const panel = (
     <div
       ref={domRef}
       role="listbox"
@@ -307,7 +307,7 @@ export const JinjaTemplatePanel: React.FC = () => {
           )}
         </div>
       </div>
-    </div>,
+    </div>
   );
 
   return ReactDOM.createPortal(panel, document.body);

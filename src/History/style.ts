@@ -290,6 +290,6 @@ export { genStyle };
 const useGenStyle = genStyleHooks('History', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'history-group-menu');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'history-group-menu');
+  return { hashId };
 }

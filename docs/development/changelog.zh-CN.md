@@ -9,7 +9,31 @@ group:
 
 # Changelog
 
+## v2.32.31
+
+- MarkdownRenderer
+  - 🛠 移除全部流式动画与字符队列（段落淡入、分帧渐进淡入、`CharacterQueue` 打字机及 `AnimationText`），流式内容改为经 `useStreaming` 缓存后即时渲染；删除 `queueOptions`、`streamingParagraphAnimation`、`isFinished` 等已无作用的 API 与导出。
+  - 🆕 新增 `ContentThrottle` + `useContentThrottle`，将一次性到达的大段 SSE 文本按帧顺序推进展示，缓解整页突变；`isFinished` / `throttleOptions` 透出至 `MarkdownPreview` 与 `ReadonlyMarkdownEditorView`。
+- TaskList
+  - 💄 simple 变体 wrapper 使用 `fit-content` 避免撑满整行。
+- ToolUseBar
+  - 💄 工具容器改用 `grid 0fr/1fr` 过渡替代 `max-height`，并注册 `--tool-rotate` 自定义属性以稳定旋转动画。
+- Workspace
+  - 🆕 `FileTree`：仅预览模式下支持合成树叶子节点绑定。
+- 🛠 样式系统
+  - 🛠 移除 `useGenStyle` 返回的废弃 `wrapSSR` 包装函数，`useStyle` 不再返回 `wrapSSR`。
+  - 🛠 全量移除 70+ 组件中的 `wrapSSR(...)` 包裹调用，组件直接返回 JSX。
+
 ## 未发布
+
+- TaskList
+  - 🛠 `simple` 模式移除摘要条下方 2px 细线进度条；`showProgress` 现仅控制摘要内「已完成/总数」计数文本是否展示。
+  - 🆕 新增 `scrollIntoViewOnExpand` 属性（`boolean | ScrollIntoViewOptions`，默认 `false`）：`simple` 模式下展开摘要条时将组件滚动到视窗内；传 `true` 走默认 `{ behavior: 'smooth', block: 'nearest' }`，初次挂载不触发。
+
+- ToolUseBarThink
+  - 💄 移除底部 `content-expand`（展开/收起）按钮的默认背景与 hover 背景填充，仅保留文字颜色变化；hover 整个卡片时不再叠加另一层灰色，与根容器背景统一为单一灰。
+  - 🆕 新增 `scrollIntoViewOnExpand` 属性（`boolean | ScrollIntoViewOptions`，默认 `false`）：展开时将组件滚动到视窗内，初次挂载不触发；行为与 `TaskList` 一致。
+  - 🆕 `MarkdownEditor.codeProps` 新增 `scrollDeepThinkIntoViewOnExpand`，透传至深度思考块的 `ToolUseBarThink.scrollIntoViewOnExpand`，使编辑器内 ` ```think ` 代码块也能配置展开滚动。
 
 - 🛠 样式系统
   - 🛠 `Hooks/useStyle` 重写为基于 `@ant-design/cssinjs-utils` 的 `genStyleUtils`，与 antd 上游 `theme/util/genStyleUtils` 同源；新增导出 `genStyleHooks` / `genComponentStyleHook` / `genSubStyleComponent` 及类型 `AgenticComponentTokenMap` / `FullToken` / `GenStyleFn`，组件可通过模块声明扩展自己的 `ComponentToken`。

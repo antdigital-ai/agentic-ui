@@ -105,7 +105,9 @@ export const serializeHastElement = (node: {
     .map((child) => {
       if (child.type === 'text') return child.value ?? '';
       if (child.type === 'element' && child.tagName) {
-        return serializeHastElement(child as Parameters<typeof serializeHastElement>[0]);
+        return serializeHastElement(
+          child as Parameters<typeof serializeHastElement>[0],
+        );
       }
       return '';
     })

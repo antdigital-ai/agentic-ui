@@ -14,6 +14,8 @@ export * from './el';
 export * from './types';
 
 export { ReadonlyMarkdownEditorView };
+export { ReadonlyMarkdownEditorStore } from './readonly/ReadonlyMarkdownEditorStore';
+export { findTextInReadonlyMarkdownDom } from './readonly/findTextInReadonlyMarkdownDom';
 
 /**
  * 按只读模式与 renderMode 分流：

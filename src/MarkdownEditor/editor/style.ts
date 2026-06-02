@@ -561,6 +561,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         padding: '2px 4px',
         borderRadius: 4,
       },
+      '& mark[data-readonly-comment="true"]': {
+        color: 'inherit',
+        padding: 0,
+        borderRadius: 0,
+        backgroundColor: 'transparent',
+      },
       '& &-comment-comment': {
         display: 'inline-block',
         background: `linear-gradient(transparent 65%, ${COMMENT_HIGHLIGHT_COLOR})`,

@@ -68,8 +68,8 @@ const useGenStyle = genStyleHooks('BubbleTitle', (token, info) => [
 ]);
 
 const useStyle = (prefixCls?: string) => {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'BubbleTitle');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'BubbleTitle');
+  return { hashId };
 };
 
 /**
@@ -96,7 +96,7 @@ export const BubbleTitle: React.FC<TitleProps> = ({
   quote,
   title,
 }) => {
-  const { wrapSSR, hashId } = useStyle(prefixClass);
+  const { hashId } = useStyle(prefixClass);
 
   const flexStyle: React.CSSProperties = {
     flexDirection: getFlexDirection(placement),
@@ -105,7 +105,7 @@ export const BubbleTitle: React.FC<TitleProps> = ({
     ...style,
   };
 
-  return wrapSSR(
+  return (
     <>
       <Flex
         className={classNames(hashId, prefixClass, className)}
@@ -124,6 +124,6 @@ export const BubbleTitle: React.FC<TitleProps> = ({
         )}
       </Flex>
       {quote}
-    </>,
+    </>
   );
 };

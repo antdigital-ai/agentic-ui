@@ -84,7 +84,7 @@ export const UserBubble: React.FC<
   const { compact, standalone, extraShowOnHover } = context || {};
 
   const prefixClass = getPrefixCls('agentic');
-  const { wrapSSR, hashId } = useStyle(prefixClass, classNames);
+  const { hashId } = useStyle(prefixClass, classNames);
 
   const time = originData?.createAt || props.time;
   const placement = USER_PLACEMENT;
@@ -172,7 +172,7 @@ export const UserBubble: React.FC<
   // 用户气泡默认 hover 展示复制等操作，父级可透传覆盖
   const effectiveExtraShowOnHover = extraShowOnHover ?? true;
 
-  const itemDom = wrapSSR(
+  const itemDom = (
     <BubbleConfigContext.Provider
       value={{
         compact,
@@ -295,7 +295,7 @@ export const UserBubble: React.FC<
           />
         )}
       </Flex>
-    </BubbleConfigContext.Provider>,
+    </BubbleConfigContext.Provider>
   );
 
   if (bubbleRenderConfig?.render === false) return null;

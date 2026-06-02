@@ -1,6 +1,6 @@
 import { ChartElement } from './chart';
 import { CodeElement } from './code';
-import { InlineKatex, KatexElement } from './katex';
+import { InlineKatexFix, KatexElement } from './katex';
 import { Mermaid } from './mermaid/Mermaid';
 
 export const standardPlugins = [
@@ -10,7 +10,7 @@ export const standardPlugins = [
       chart: ChartElement,
       katex: KatexElement,
       mermaid: Mermaid,
-      'inline-katex': InlineKatex,
+      'inline-katex': InlineKatexFix,
     },
   },
 ];

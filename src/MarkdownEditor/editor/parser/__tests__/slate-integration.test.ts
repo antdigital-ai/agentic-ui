@@ -73,9 +73,9 @@ describe('Slate Integration Tests', () => {
     const boldTexts = paragraph.children.filter((child: any) => child.bold);
     expect(boldTexts.length).toBe(2);
     const [firstBold, secondBold] = boldTexts;
-    expect(firstBold?.type).toBe('inline-katex');
-    expect(firstBold?.children?.[0]?.text).toContain('9.698M');
-    expect(secondBold?.text).toBe('2.5M');
+    expect(firstBold?.type).not.toBe('inline-katex');
+    expect(firstBold?.text).toBe('$9.698M');
+    expect(secondBold?.text).toBe('$2.5M');
   });
 
   it('should ensure all nodes have proper children arrays', () => {

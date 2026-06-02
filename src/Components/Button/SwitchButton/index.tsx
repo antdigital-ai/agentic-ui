@@ -36,7 +36,7 @@ export const SwitchButton = forwardRef<HTMLButtonElement, SwitchButtonProps>(
     const context = useContext(ConfigProvider.ConfigContext);
     const prefixCls = context?.getPrefixCls('switch-button');
 
-    const { wrapSSR, hashId } = useStyle(prefixCls);
+    const { hashId } = useStyle(prefixCls);
 
     const isControlled = typeof active === 'boolean';
     const [innerActive, setInnerActive] = useState<boolean>(
@@ -70,7 +70,7 @@ export const SwitchButton = forwardRef<HTMLButtonElement, SwitchButtonProps>(
       return effectiveActive ? <ChevronUp /> : <ChevronDown />;
     };
 
-    return wrapSSR(
+    return (
       <Button
         ref={ref}
         disabled={disabled}
@@ -86,7 +86,7 @@ export const SwitchButton = forwardRef<HTMLButtonElement, SwitchButtonProps>(
         <span className={`${prefixCls}-trigger-icon`}>
           {renderTriggerIcon()}
         </span>
-      </Button>,
+      </Button>
     );
   },
 );

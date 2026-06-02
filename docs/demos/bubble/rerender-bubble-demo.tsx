@@ -1,13 +1,24 @@
 /* eslint-disable @typescript-eslint/no-loop-func */
-import { BubbleList, MessageBubbleData } from '@ant-design/agentic-ui';
+import {
+  BubbleList,
+  MessageBubbleData,
+  type ContentThrottleOptions,
+} from '@ant-design/agentic-ui';
 import {
   ClearOutlined,
   PauseCircleOutlined,
   PlayCircleOutlined,
   ReloadOutlined,
 } from '@ant-design/icons';
-import { Button, Radio, Space } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import { Button, InputNumber, Radio, Space, Switch } from 'antd';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+
+const DEFAULT_CHARS_PER_FRAME = 3;
+const DEFAULT_THROTTLE_SPEED = 1;
+const CHARS_PER_FRAME_MIN = 1;
+const CHARS_PER_FRAME_MAX = 50;
+const THROTTLE_SPEED_MIN = 0.25;
+const THROTTLE_SPEED_MAX = 4;
 
 const rerenderDemoMarkdown = `<think>
 我们注意到用户上传了两个附件，并要求调用文件理解工具总结两个文档内容。
@@ -156,12 +167,26 @@ const RerenderBubbleDemo = () => {
   const [message, setMessage] =
     useState<MessageBubbleData>(createInitialMessage);
   const [speed, setSpeed] = useState<SpeedType>('fast');
+  const [throttleEnabled, setThrottleEnabled] = useState(true);
+  const [charsPerFrame, setCharsPerFrame] = useState(DEFAULT_CHARS_PER_FRAME);
+  const [throttleSpeed, setThrottleSpeed] = useState(DEFAULT_THROTTLE_SPEED);
   const [isPaused, setIsPaused] = useState(false);
   const pauseRef = useRef(false);
   const currentIndexRef = useRef(0);
   const speedRef = useRef<SpeedType>('fast');
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [restartKey, setRestartKey] = useState(0);
+
+  const throttleOptions = useMemo<ContentThrottleOptions>(() => {
+    if (!throttleEnabled) {
+      return { enabled: false };
+    }
+    return {
+      enabled: true,
+      charsPerFrame,
+      speed: throttleSpeed,
+    };
+  }, [throttleEnabled, charsPerFrame, throttleSpeed]);
 
   useEffect(() => {
     speedRef.current = speed;
@@ -334,6 +359,42 @@ const RerenderBubbleDemo = () => {
             再来一次
           </Button>
         </Space>
+        <Space wrap align="center">
+          <span>流式限流：</span>
+          <Switch
+            checked={throttleEnabled}
+            onChange={setThrottleEnabled}
+            checkedChildren="开"
+            unCheckedChildren="关"
+          />
+          {throttleEnabled && (
+            <>
+              <span>每帧字符</span>
+              <InputNumber
+                min={CHARS_PER_FRAME_MIN}
+                max={CHARS_PER_FRAME_MAX}
+                value={charsPerFrame}
+                onChange={(v) =>
+                  setCharsPerFrame(
+                    typeof v === 'number' ? v : DEFAULT_CHARS_PER_FRAME,
+                  )
+                }
+              />
+              <span>速度倍率</span>
+              <InputNumber
+                min={THROTTLE_SPEED_MIN}
+                max={THROTTLE_SPEED_MAX}
+                step={0.25}
+                value={throttleSpeed}
+                onChange={(v) =>
+                  setThrottleSpeed(
+                    typeof v === 'number' ? v : DEFAULT_THROTTLE_SPEED,
+                  )
+                }
+              />
+            </>
+          )}
+        </Space>
       </div>
 
       <div style={{ background: '#fff', borderRadius: 8, padding: 16 }}>
@@ -358,9 +419,7 @@ const RerenderBubbleDemo = () => {
           ]}
           markdownRenderConfig={{
             renderMode: 'markdown',
-            queueOptions: { animate: false },
-            // 与旧版一致：未传时曾无末段段落淡入；若需关闭请显式 false
-            streamingParagraphAnimation: false,
+            throttleOptions,
           }}
           shouldShowCopy={false}
         />
@@ -377,10 +436,16 @@ const RerenderBubbleDemo = () => {
           流式进行中需保证 <code>originData.content</code>{' '}
           非空（此处用零宽占位），否则气泡会显示「思考中」加载态。
         </p>
+        <p style={{ margin: '0 0 8px' }}>
+          通过 <code>markdownRenderConfig.throttleOptions</code>{' '}
+          配置流式限流：关闭（<code>enabled: false</code>
+          ）时内容随 <code>originData.content</code> 即时渲染；开启后由{' '}
+          <code>charsPerFrame</code>、<code>speed</code> 控制每帧推进节奏（消息{' '}
+          <code>isFinished: false</code> 时自动视为流式）。
+        </p>
         <p style={{ margin: 0 }}>
-          当前演示通过{' '}
-          <code>markdownRenderConfig.streamingParagraphAnimation: false</code>{' '}
-          关闭末段段落淡入；若需默认淡入，去掉该字段或设为 <code>true</code>。
+          与 Slate 打字机动画不同；末段段落淡入由{' '}
+          <code>streamingParagraphAnimation</code> 单独控制（未传时默认开启）。
         </p>
       </div>
     </div>

@@ -81,7 +81,7 @@ const ToolUseBarComponent: React.FC<ToolUseBarProps> = ({
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-tool-use-bar');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   const [activeKeys, setActiveKeys] = useMergedState(
     props.defaultActiveKeys || [],
@@ -184,14 +184,14 @@ const ToolUseBarComponent: React.FC<ToolUseBarProps> = ({
       />
     );
 
-  return wrapSSR(
+  return (
     <div
       className={containerClassName}
       data-testid={testId ?? 'ToolUse'}
       style={style}
     >
       {toolItems}
-    </div>,
+    </div>
   );
 };
 

@@ -113,7 +113,7 @@ const SkillModeBarInner: React.FC<SkillModeBarProps> = ({
   const prefixCls = getPrefixCls('agentic-skill-mode');
 
   // 注册样式
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   // 国际化
   const locale = useLocale();
@@ -178,7 +178,7 @@ const SkillModeBarInner: React.FC<SkillModeBarProps> = ({
     };
   }, [isOpen, isTestEnv]);
 
-  return wrapSSR(
+  return (
     <>
       {shouldRender && (
         <div
@@ -240,7 +240,7 @@ const SkillModeBarInner: React.FC<SkillModeBarProps> = ({
           </div>
         </div>
       )}
-    </>,
+    </>
   );
 };
 

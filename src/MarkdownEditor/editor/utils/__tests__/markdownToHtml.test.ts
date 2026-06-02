@@ -89,8 +89,8 @@ describe('markdownToHtml', () => {
   });
 
   it('converts math blocks', () => {
-    const html = markdownToHtmlSync('$x^2$');
-    expect(html).toBeTruthy();
+    const html = markdownToHtmlSync('$$x^2$$');
+    expect(html).toContain('class="katex"');
   });
 
   it('handles GFM table rendering', () => {

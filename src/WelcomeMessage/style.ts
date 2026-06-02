@@ -31,6 +31,6 @@ const genStyle: GenStyleFn<'WelcomeMessage'> = (token) => {
 const useGenStyle = genStyleHooks('WelcomeMessage', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'welcome');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'welcome');
+  return { hashId };
 }

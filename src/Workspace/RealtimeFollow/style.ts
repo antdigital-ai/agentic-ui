@@ -355,6 +355,6 @@ const genStyle: GenStyleFn<'WorkspaceRealtimeFollow'> = (token) => {
 const useGenStyle = genStyleHooks('WorkspaceRealtimeFollow', genStyle);
 
 export function useRealtimeFollowStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'WorkspaceRealtimeFollow');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'WorkspaceRealtimeFollow');
+  return { hashId };
 }

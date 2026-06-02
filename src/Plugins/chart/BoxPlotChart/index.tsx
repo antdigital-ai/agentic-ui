@@ -191,7 +191,7 @@ const BoxPlotChart: React.FC<BoxPlotChartProps> = ({
 
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('boxplot-chart');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   // 处理 ChartStatistic 组件配置
   const statistics = useMemo(() => {
@@ -498,7 +498,7 @@ const BoxPlotChart: React.FC<BoxPlotChartProps> = ({
 
   // 空数据处理
   if (safeData.length === 0 || labels.length === 0) {
-    return wrapSSR(
+    return (
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`, hashId)}
         theme={resolvedTheme}
@@ -533,11 +533,11 @@ const BoxPlotChart: React.FC<BoxPlotChartProps> = ({
         >
           暂无有效数据
         </div>
-      </ChartContainer>,
+      </ChartContainer>
     );
   }
 
-  return wrapSSR(
+  return (
     <ChartContainer
       baseClassName={classNames(`${prefixCls}-container`, hashId)}
       theme={resolvedTheme}
@@ -619,7 +619,7 @@ const BoxPlotChart: React.FC<BoxPlotChartProps> = ({
           options={options}
         />
       </div>
-    </ChartContainer>,
+    </ChartContainer>
   );
 };
 

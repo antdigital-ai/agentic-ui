@@ -14,7 +14,7 @@ const TopOperatingArea: React.FC<TopOperatingAreaProps> = (props) => {
 
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-top-operating-area');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   const renderOperationButtons = () => {
     if (!operationBtnRender) return null;
@@ -26,7 +26,7 @@ const TopOperatingArea: React.FC<TopOperatingAreaProps> = (props) => {
     );
   };
 
-  return wrapSSR(
+  return (
     <div className={classNames(prefixCls, hashId)}>
       <div className={classNames(`${prefixCls}-left`, hashId)}></div>
       <div className={classNames(`${prefixCls}-center`, hashId)}>
@@ -68,7 +68,7 @@ const TopOperatingArea: React.FC<TopOperatingAreaProps> = (props) => {
           )}
         </div>
       </div>
-    </div>,
+    </div>
   );
 };
 export default TopOperatingArea;

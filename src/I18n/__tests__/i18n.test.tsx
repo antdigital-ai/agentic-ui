@@ -136,24 +136,6 @@ describe('detectUserLanguage', () => {
     }
   });
 
-  it('应从 data-antd-locale 读取 zh 返回 zh-CN (40-41)', () => {
-    vi.spyOn(originalLocalStorage, 'getItem').mockReturnValue(null);
-    const el = document.createElement('div');
-    el.setAttribute('data-antd-locale', 'zh-CN');
-    document.body.appendChild(el);
-    expect(detectUserLanguage()).toBe('zh-CN');
-    el.remove();
-  });
-
-  it('应从 data-antd-locale 读取 en 返回 en-US (43-44)', () => {
-    vi.spyOn(originalLocalStorage, 'getItem').mockReturnValue(null);
-    const el = document.createElement('div');
-    el.setAttribute('data-antd-locale', 'en-US');
-    document.body.appendChild(el);
-    expect(detectUserLanguage()).toBe('en-US');
-    el.remove();
-  });
-
   it('应从 navigator 语言 zh 返回 zh-CN (60-61)', () => {
     const originalNavigator = window.navigator;
     vi.spyOn(originalLocalStorage, 'getItem').mockReturnValue(null);

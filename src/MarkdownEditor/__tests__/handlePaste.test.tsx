@@ -150,6 +150,38 @@ describe('handlePaste utilities', () => {
       expect(EditorUtils.replaceSelectedNode).toHaveBeenCalled();
     });
 
+    it('单段路径应保留 marks 而不是退化成纯文本', () => {
+      const fragment = [
+        {
+          type: 'paragraph',
+          children: [
+            { text: 'plain ' },
+            { text: 'bold', bold: true },
+            { text: ' more' },
+          ],
+        },
+      ];
+      mockClipboardData.getData.mockReturnValue(JSON.stringify(fragment));
+      const insertFragmentSpy = vi.spyOn(Transforms, 'insertFragment');
+
+      const result = handleSlateMarkdownFragment(
+        editor,
+        mockClipboardData as unknown as DataTransfer,
+        {
+          anchor: { path: [0, 0], offset: 0 },
+          focus: { path: [0, 0], offset: 0 },
+        },
+      );
+
+      expect(result).toBe(true);
+      expect(insertFragmentSpy).toHaveBeenCalled();
+      // 透传的 fragment 应包含 bold leaf
+      const inserted = insertFragmentSpy.mock.calls[0]?.[1] as any[];
+      const boldLeaf = inserted?.find((c) => c?.bold);
+      expect(boldLeaf).toMatchObject({ text: 'bold', bold: true });
+      insertFragmentSpy.mockRestore();
+    });
+
     it('should handle text area mode', () => {
       const fragment = [
         {
@@ -469,6 +501,42 @@ describe('handlePaste utilities', () => {
       expect(mockUpload).toHaveBeenCalledWith([mockFile]);
     });
 
+    it('非图片文件应作为 attach 节点插入（不再误走 image 分支）', async () => {
+      const pdfFile = new File(['pdf-bytes'], 'doc.pdf', {
+        type: 'application/pdf',
+      });
+      const mockDataTransfer = {
+        ...mockClipboardData,
+        files: [pdfFile],
+      };
+      const mockUpload = vi
+        .fn()
+        .mockResolvedValue(['https://example.com/doc.pdf']);
+
+      Transforms.select(editor, { path: [0, 0], offset: 0 });
+
+      const insertNodesSpy = vi.spyOn(Transforms, 'insertNodes');
+
+      const result = await handleFilesPaste(
+        editor,
+        mockDataTransfer as unknown as DataTransfer,
+        {
+          image: { upload: mockUpload },
+        },
+      );
+
+      expect(result).toBe(true);
+      expect(mockUpload).toHaveBeenCalledTimes(1);
+      // 第一个 insertNodes 调用应得到 attach 节点
+      const insertedNode = insertNodesSpy.mock.calls[0]?.[1];
+      expect(insertedNode).toMatchObject({
+        type: 'attach',
+        name: 'doc.pdf',
+        url: 'https://example.com/doc.pdf',
+      });
+      insertNodesSpy.mockRestore();
+    });
+
     it('should handle multiple files paste', async () => {
       const mockFiles = [
         new File(['test'], 'test.png', { type: 'image/png' }),
@@ -481,7 +549,10 @@ describe('handlePaste utilities', () => {
 
       const mockUpload = vi
         .fn()
-        .mockResolvedValue('https://example.com/image.png');
+        .mockResolvedValue([
+          'https://example.com/image.png',
+          'https://example.com/image2.png',
+        ]);
 
       // 设置选择范围
       Transforms.select(editor, { path: [0, 0], offset: 0 });
@@ -495,7 +566,9 @@ describe('handlePaste utilities', () => {
       );
 
       expect(result).toBe(true);
-      expect(mockUpload).toHaveBeenCalledTimes(2);
+      // 多文件改为单次批量上传，避免 N 次单文件请求
+      expect(mockUpload).toHaveBeenCalledTimes(1);
+      expect(mockUpload).toHaveBeenCalledWith(mockFiles);
     });
 
     it('should handle upload failure', async () => {
@@ -722,6 +795,27 @@ describe('handlePaste utilities', () => {
       const result = await handlePlainTextPaste(editor, plainText, null, []);
 
       expect(result).toBe(true);
+    });
+
+    it('parseMarkdownInPlainText=false 时即便文本看起来像 markdown 也不解析', async () => {
+      const markdownText = '**bold** but should stay literal';
+      Transforms.select(editor, { path: [0, 0], offset: 0 });
+      const result = await handlePlainTextPaste(
+        editor,
+        markdownText,
+        { path: [0, 0], offset: 0 } as any,
+        [],
+        undefined,
+        { parseMarkdownInPlainText: false },
+      );
+
+      expect(result).toBe(true);
+      // 文本应原样进入第一段，没有 bold leaf
+      const root: any = editor.children[0];
+      const flatText = (root.children || [])
+        .map((c: any) => c?.text || '')
+        .join('');
+      expect(flatText).toContain('**bold**');
     });
   });
 

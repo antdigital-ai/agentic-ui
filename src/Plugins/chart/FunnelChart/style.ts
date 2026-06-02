@@ -47,6 +47,6 @@ const genStyle: GenStyleFn<'FunnelChart'> = (token) => {
 const useGenStyle = genStyleHooks('FunnelChart', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'FunnelChart');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'FunnelChart');
+  return { hashId };
 }

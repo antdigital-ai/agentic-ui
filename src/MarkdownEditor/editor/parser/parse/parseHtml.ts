@@ -70,6 +70,18 @@ export function normalizeThinkTagAliases(markdown: string): string {
 }
 
 /**
+ * 反向解码 HTML 属性常见实体，与 parserSlateNodeToMarkdown 的 escapeHtmlAttr 配对，
+ * 保证 mark 颜色/背景/label 的往返一致。
+ */
+const decodeHtmlAttr = (value: string): string =>
+  value
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&');
+
+/**
  * 解码 URI 组件，处理错误情况
  */
 export const decodeURIComponentUrl = (url: string) => {
@@ -465,14 +477,25 @@ const handleBlockHtml = (
 
   const blockOnlyMarkMatch =
     typeof currentElement?.value === 'string' &&
-    currentElement.value.match(
-      /^\s*<mark(?:\s[^>]*)?>([\s\S]*?)<\/mark>\s*$/i,
-    );
+    currentElement.value.match(/^\s*<mark(?:\s[^>]*)?>([\s\S]*?)<\/mark>\s*$/i);
   if (blockOnlyMarkMatch) {
     const innerMd = blockOnlyMarkMatch[1];
+    // 提取 mark 标签属性：color、bg、label
+    const tagAttrs = currentElement.value.match(
+      /^<mark([^>]*)>/i,
+    );
+    const attrStr = tagAttrs?.[1] || '';
+    const colorMatch = attrStr.match(/\bcolor\s*=\s*["']([^"']*)["']/i);
+    const bgMatch = attrStr.match(/\bbg\s*=\s*["']([^"']*)["']/i);
+    const labelMatch = attrStr.match(/\blabel\s*=\s*["']([^"']*)["']/i);
+    const markProps: Record<string, any> = { mark: true };
+    if (colorMatch?.[1]) markProps.markColor = decodeHtmlAttr(colorMatch[1]);
+    if (bgMatch?.[1]) markProps.markBg = decodeHtmlAttr(bgMatch[1]);
+    if (labelMatch?.[1]) markProps.markLabel = decodeHtmlAttr(labelMatch[1]);
+
     const applyMarkRecursive = (node: any): any => {
       if (node && typeof node.text === 'string') {
-        return { ...node, mark: true };
+        return { ...node, ...markProps };
       }
       if (node?.children && Array.isArray(node.children)) {
         return {
@@ -490,8 +513,30 @@ const handleBlockHtml = (
     }
     return {
       type: 'paragraph',
-      children: [{ text: innerMd, mark: true }],
+      children: [{ text: innerMd, ...markProps }],
     };
+  }
+
+  // 块级 `<div data-card="true">…</div>` —— 与 handleCard 的序列化对称，
+  // 还原 card 包裹。内部用 parseMarkdownFn 递归解析后塞回 wrapperCardNode。
+  const blockOnlyCardMatch =
+    typeof currentElement?.value === 'string' &&
+    currentElement.value.match(
+      /^\s*<div[^>]*\bdata-card\s*=\s*["']true["'][^>]*>([\s\S]*?)<\/div>\s*$/i,
+    );
+  if (blockOnlyCardMatch) {
+    const innerMd = blockOnlyCardMatch[1].trim();
+    if (parseMarkdownFn && innerMd) {
+      const { schema: cardSchema } = parseMarkdownFn(innerMd);
+      if (cardSchema?.length) {
+        return EditorUtils.wrapperCardNode(cardSchema);
+      }
+    }
+    // fallback：把原文当一段文本放进 card
+    return EditorUtils.wrapperCardNode({
+      type: 'paragraph',
+      children: [{ text: innerMd }],
+    });
   }
 
   if (currentElement.value === '<br/>') {
@@ -697,6 +742,20 @@ const processFontTag = (str: string, tag: string, htmlTag: any[]): any[] => {
 };
 
 /**
+ * 处理 mark 标签的 color/bg/label 属性（纯函数版本）
+ */
+const processMarkTag = (str: string, tag: string, htmlTag: any[]): any[] => {
+  const colorMatch = str.match(/\bcolor\s*=\s*["']([^"']*)["']/i);
+  const bgMatch = str.match(/\bbg\s*=\s*["']([^"']*)["']/i);
+  const labelMatch = str.match(/\blabel\s*=\s*["']([^"']*)["']/i);
+  const entry: Record<string, any> = { tag };
+  if (colorMatch?.[1]) entry.markColor = decodeHtmlAttr(colorMatch[1]);
+  if (bgMatch?.[1]) entry.markBg = decodeHtmlAttr(bgMatch[1]);
+  if (labelMatch?.[1]) entry.markLabel = decodeHtmlAttr(labelMatch[1]);
+  return [...htmlTag, entry];
+};
+
+/**
  * HTML 标签处理器映射表
  */
 const htmlTagProcessors: Record<
@@ -706,6 +765,7 @@ const htmlTagProcessors: Record<
   span: processSpanTag,
   a: processATag,
   font: processFontTag,
+  mark: processMarkTag,
 };
 
 /**

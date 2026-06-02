@@ -200,6 +200,9 @@ export function ThinkBlock(props: ThinkBlockProps) {
       toolName={toolNameText}
       thinkContent={content}
       status={isLoading ? 'loading' : 'success'}
+      scrollIntoViewOnExpand={
+        editorProps?.codeProps?.scrollDeepThinkIntoViewOnExpand
+      }
     />
   );
 }

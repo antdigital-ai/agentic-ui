@@ -261,7 +261,7 @@ const BarChart: React.FC<BarChartProps> = ({
   // 样式注册
   const context = useContext(ConfigProvider.ConfigContext);
   const baseClassName = context?.getPrefixCls('bar-chart-container');
-  const { wrapSSR } = useStyle(baseClassName);
+  useStyle(baseClassName);
 
   const chartRef = useRef<ChartJS<'bar'>>(null);
 
@@ -1009,7 +1009,7 @@ const BarChart: React.FC<BarChartProps> = ({
     ...styles?.wrapper,
   };
 
-  return wrapSSR(
+  return (
     <ChartContainer
       baseClassName={baseClassName}
       className={rootClassName}
@@ -1083,7 +1083,7 @@ const BarChart: React.FC<BarChartProps> = ({
           plugins={[ChartDataLabels]}
         />
       </div>
-    </ChartContainer>,
+    </ChartContainer>
   );
 };
 

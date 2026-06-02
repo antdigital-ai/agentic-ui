@@ -1,12 +1,9 @@
-﻿import type { CSSInterpolation } from '@ant-design/cssinjs';
+import type { CSSInterpolation } from '@ant-design/cssinjs';
 import {
   DEFAULT_TEXT_SWAP_DURATION_MS,
+  TEXT_SWAP_BLUR_PX,
   TEXT_SWAP_EASING,
 } from '../Components/TextSwap/constants';
-import {
-  textSwapEnterAnimationBoth,
-  textSwapEnterKeyframes,
-} from '../Components/TextSwap/textSwapMotion';
 import {
   CONTENT_PADDING_CSS_VAR,
   CONTENT_PADDING_MOBILE_CSS_VAR,
@@ -144,10 +141,7 @@ const genTableStyle = (
         'tr td:first-child:not(.config-td)': { fontWeight: 600 },
 
         'tbody tr:not(.config-tr)': {
-          animation: textSwapEnterAnimationBoth(
-            DEFAULT_TEXT_SWAP_DURATION_MS,
-            TEXT_SWAP_EASING,
-          ),
+          animation: `agenticMdBlurFadeIn ${DEFAULT_TEXT_SWAP_DURATION_MS}ms ${TEXT_SWAP_EASING} both`,
         },
         'tbody tr:not(.config-tr):hover': {
           background:
@@ -308,7 +302,16 @@ const genTableStyle = (
       },
     },
 
-    ...textSwapEnterKeyframes,
+    '@keyframes agenticMdBlurFadeIn': {
+      from: {
+        opacity: 0,
+        filter: `blur(${TEXT_SWAP_BLUR_PX}px)`,
+      },
+      to: {
+        opacity: 1,
+        filter: 'blur(0)',
+      },
+    },
 
     '@media (prefers-reduced-motion: reduce)': {
       [`${tableCls} table tbody tr:not(.config-tr)`]: {
@@ -691,6 +694,6 @@ const useGenStyle = genStyleHooks('MarkdownEditor', (token, info) => [
 ]);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'MarkdownEditor');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'MarkdownEditor');
+  return { hashId };
 }

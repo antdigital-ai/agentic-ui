@@ -30,7 +30,6 @@ vi.mock('../BaseBar', () => ({
 // Mock useStyle hook
 vi.mock('../toolBarStyle', () => ({
   useStyle: () => ({
-    wrapSSR: (component: React.ReactNode) => component,
     hashId: 'test-hash-id',
   }),
 }));

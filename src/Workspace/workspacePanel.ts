@@ -60,7 +60,11 @@ export function resolveWorkspacePanelType(
   let current: unknown = type;
   let depth = 0;
 
-  while (current && !visited.has(current) && depth < MAX_PANEL_TYPE_WALK_DEPTH) {
+  while (
+    current &&
+    !visited.has(current) &&
+    depth < MAX_PANEL_TYPE_WALK_DEPTH
+  ) {
     visited.add(current);
     depth += 1;
     const marked = (current as WorkspacePanelComponent)[WORKSPACE_PANEL_TYPE];

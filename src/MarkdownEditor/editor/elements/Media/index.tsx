@@ -15,16 +15,16 @@ import { Transforms } from 'slate';
 import { ActionIconBox } from '../../../../Components/ActionIconBox';
 import { useDebounceFn } from '../../../../Hooks/useDebounceFn';
 import { I18nContext } from '../../../../I18n';
+import {
+  shouldRenderUrlAsPlainText,
+  UNSAFE_URL_PLAIN_TEXT_STYLE,
+} from '../../../../Utils/htmlUrlSafety';
 import { ElementProps, MediaNode } from '../../../el';
 import { useSelStatus } from '../../../hooks/editor';
 import { AvatarList } from '../../components/ContributorAvatar';
 import { MediaErrorLink } from '../../components/MediaErrorLink';
 import { useEditorStore } from '../../store';
 import { useGetSetState } from '../../utils';
-import {
-  shouldRenderUrlAsPlainText,
-  UNSAFE_URL_PLAIN_TEXT_STYLE,
-} from '../../../../Utils/htmlUrlSafety';
 import { getMediaType } from '../../utils/dom';
 import { ReadonlyImage } from '../Image';
 

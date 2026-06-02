@@ -146,7 +146,6 @@ vi.mock('../../utils/media', () => ({
 
 vi.mock('../insertAutocompleteStyle', () => ({
   useStyle: () => ({
-    wrapSSR: (component: React.ReactNode) => component,
     hashId: 'test-hash-id',
   }),
 }));

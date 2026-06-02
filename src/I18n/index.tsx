@@ -26,24 +26,7 @@ export function detectUserLanguage(): 'zh-CN' | 'en-US' {
     }
   }
 
-  // 2. 检查 Ant Design ConfigProvider 的 locale
-  try {
-    const antdLocale = document
-      .querySelector('[data-antd-locale]')
-      ?.getAttribute('data-antd-locale');
-    if (antdLocale) {
-      if (antdLocale.toLowerCase().includes('zh')) {
-        return 'zh-CN';
-      }
-      if (antdLocale.toLowerCase().includes('en')) {
-        return 'en-US';
-      }
-    }
-  } catch (error) {
-    // 忽略错误，继续其他检测方式
-  }
-
-  // 3. 检测浏览器语言
+  // 2. 检测浏览器语言
   if (typeof navigator !== 'undefined') {
     const browserLanguages = navigator.languages || [navigator.language];
 

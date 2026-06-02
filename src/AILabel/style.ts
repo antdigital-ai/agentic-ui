@@ -111,13 +111,13 @@ const useGenStyle = genStyleHooks<'AILabel'>('AILabel', genStyle, () => ({
 }));
 
 /**
- * AILabel 样式 hook。返回结构与旧版一致（`{ wrapSSR, hashId }`），保持调用方零改动。
+ * AILabel 样式 hook。返回 `{ hashId }`。
  *
  * @param customPrefixCls 实际拼接的类名前缀（通常为
  *   `ConfigProvider.getPrefixCls(prefixCls)` 的返回值，例如 `ant-ai-label`）。
  *   未传时回退到 {@link prefixCls}。
  */
 export function useStyle(customPrefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(customPrefixCls ?? prefixCls);
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(customPrefixCls ?? prefixCls);
+  return { hashId };
 }

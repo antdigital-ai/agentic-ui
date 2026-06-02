@@ -92,7 +92,6 @@ vi.mock('../ChartStatistic', () => ({
 // Mock style hook
 vi.mock('../RadarChart/style', () => ({
   useStyle: vi.fn(() => ({
-    wrapSSR: (node: any) => node,
     hashId: 'test-hash-id',
   })),
 }));
@@ -209,11 +208,7 @@ describe('RadarChart', () => {
       ];
 
       render(
-        <RadarChart
-          data={xyData}
-          title="x/y 数据"
-          renderFilterInToolbar
-        />,
+        <RadarChart data={xyData} title="x/y 数据" renderFilterInToolbar />,
       );
 
       expect(screen.getByTestId('radar-chart')).toBeInTheDocument();
