@@ -9,8 +9,24 @@ import { useClickAway } from '../../../../../Hooks/useClickAway';
 import { TableCellIndexSpacer } from '../../../../editor/elements/Table/TableCellIndexSpacer';
 import { TableContextTestProvider } from '../../../../editor/elements/Table/TableContext';
 import { NativeTableEditor } from '../../../../utils/native-table';
+// 全局测试 editor 引用：既用于 useSlate mock，也用于注入 useEditorStore 的
+// markdownEditorRef.current。需在 vi.mock 工厂之前声明，避免 no-use-before-define。
+let testEditorInstance: any = null;
+
 // Mock dependencies
-vi.mock('../../../../editor/store');
+// 组件通过 useEditorStore() 读取 markdownEditorRef，并以 markdownEditorRef.current
+// 作为执行表格命令的 editor。空 mock 会让 useEditorStore() 返回 undefined，
+// 导致 `Cannot destructure property 'markdownEditorRef'` 渲染崩溃，这里显式返回
+// 指向当前测试 editor 的 ref。
+vi.mock('../../../../editor/store', () => ({
+  useEditorStore: () => ({
+    markdownEditorRef: { current: testEditorInstance },
+    store: {},
+    readonly: false,
+    typewriter: false,
+    editorProps: {},
+  }),
+}));
 vi.mock('../../../../hooks/editor');
 vi.mock('../../../../../Hooks/useClickAway', () => ({
   useClickAway: vi.fn(),
@@ -32,9 +48,6 @@ vi.mock('../../../../editor/elements/Table/TableCellIndexSpacer/style', () => ({
     hashId: 'test-hash',
   })),
 }));
-
-// 创建一个全局的 editor 引用，用于 useSlate mock
-let testEditorInstance: any = null;
 
 vi.mock('slate-react', async () => {
   const actual: any = await vi.importActual('slate-react');
