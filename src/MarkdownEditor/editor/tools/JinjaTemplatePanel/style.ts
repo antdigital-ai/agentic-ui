@@ -116,6 +116,6 @@ export function useJinjaTemplatePanelStyle(prefixCls?: string) {
   // 缺省 prefixCls 时回退到 JINJA_PANEL_PREFIX_CLS，与组件内
   // `getPrefixCls('agentic-md-editor-jinja-panel') ?? JINJA_PANEL_PREFIX_CLS`
   // 保持一致
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? JINJA_PANEL_PREFIX_CLS);
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? JINJA_PANEL_PREFIX_CLS);
+  return { hashId };
 }

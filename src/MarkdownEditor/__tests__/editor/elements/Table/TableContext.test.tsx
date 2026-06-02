@@ -1,4 +1,4 @@
-/**
+﻿/**
  * TableContext / TablePropsProvider 测试：覆盖 setDeleteIconPosition 回调
  */
 import '@testing-library/jest-dom';
@@ -8,7 +8,9 @@ import { describe, expect, it } from 'vitest';
 import {
   TablePropsContext,
   TablePropsProvider,
+  useTableRowChromeActive,
 } from '../../../../editor/elements/Table/TableContext';
+import { createTableChromeStore } from '../../../../editor/elements/Table/tableChromeStore';
 
 const Consumer: React.FC = () => {
   const { setDeleteIconPosition } = useContext(TablePropsContext);
@@ -16,10 +18,17 @@ const Consumer: React.FC = () => {
     <button
       type="button"
       data-testid="set-pos"
-      onClick={() => setDeleteIconPosition?.({ rowIndex: 1, columnIndex: 0 })}
+      onClick={() => setDeleteIconPosition?.({ rowIndex: 1, columnIndex: undefined })}
     >
       Set
     </button>
+  );
+};
+
+const RowActiveProbe: React.FC<{ rowIndex: number }> = ({ rowIndex }) => {
+  const active = useTableRowChromeActive(rowIndex);
+  return (
+    <span data-testid={`row-active-${rowIndex}`}>{active ? 'yes' : 'no'}</span>
   );
 };
 
@@ -33,5 +42,31 @@ describe('TableContext', () => {
     const btn = screen.getByTestId('set-pos');
     expect(btn).toBeInTheDocument();
     btn.click();
+  });
+
+  it('useTableRowChromeActive 仅激活匹配行', () => {
+    render(
+      <TablePropsProvider>
+        <Consumer />
+        <RowActiveProbe rowIndex={0} />
+        <RowActiveProbe rowIndex={1} />
+      </TablePropsProvider>,
+    );
+    expect(screen.getByTestId('row-active-0')).toHaveTextContent('no');
+    expect(screen.getByTestId('row-active-1')).toHaveTextContent('no');
+    screen.getByTestId('set-pos').click();
+    expect(screen.getByTestId('row-active-0')).toHaveTextContent('no');
+    expect(screen.getByTestId('row-active-1')).toHaveTextContent('yes');
+  });
+
+  it('createTableChromeStore 相同 position 不重复通知', () => {
+    const store = createTableChromeStore(null);
+    let calls = 0;
+    store.subscribe(() => {
+      calls += 1;
+    });
+    store.setPosition({ rowIndex: 2, columnIndex: undefined });
+    store.setPosition({ rowIndex: 2, columnIndex: undefined });
+    expect(calls).toBe(1);
   });
 });

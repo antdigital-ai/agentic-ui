@@ -158,7 +158,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
   // 样式注册
   const context = useContext(ConfigProvider.ConfigContext);
   const baseClassName = context?.getPrefixCls('funnel-chart-container');
-  const { wrapSSR } = useStyle(baseClassName);
+  useStyle(baseClassName);
 
   const chartRef = useRef<ChartJS<'bar'>>(null);
   const [showTrapezoid, setShowTrapezoid] = useState(true);
@@ -747,7 +747,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
 
   const classNamesObj = classNamesProp;
 
-  return wrapSSR(
+  return (
     <ChartContainer
       baseClassName={baseClassName}
       className={classNames(classNamesObj?.root, className, containerClassName)}
@@ -835,7 +835,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
           plugins={[trapezoidPlugin, rightLabelPlugin]}
         />
       </div>
-    </ChartContainer>,
+    </ChartContainer>
   );
 };
 

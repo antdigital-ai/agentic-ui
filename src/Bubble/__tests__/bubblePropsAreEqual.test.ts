@@ -44,14 +44,12 @@ describe('bubblePropsAreEqual', () => {
       originData: baseOrigin(),
       markdownRenderConfig: {
         renderMode: 'markdown',
-        queueOptions: { animate: false },
       },
     };
     const b: BubbleProps = {
       ...a,
       markdownRenderConfig: {
         renderMode: 'markdown',
-        queueOptions: { animate: false },
       },
     };
     expect(bubblePropsAreEqual(a, b)).toBe(true);

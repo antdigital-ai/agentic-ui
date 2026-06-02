@@ -154,7 +154,7 @@ export const LanguageSelector = (props: LanguageSelectorProps) => {
             }}
             className={'lang-select'}
           >
-            <Input prefix={<SearchOutlined />} placeholder={'Search'} />
+            <Input prefix={<SearchOutlined />} placeholder={i18n.locale['code.searchLanguage']} />
           </AutoComplete>
         </div>
       }

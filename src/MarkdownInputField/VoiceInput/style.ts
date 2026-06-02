@@ -39,6 +39,6 @@ const useGenStyle = genStyleHooks('VoiceInput', (token, info) => [
 ]);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'VoiceInputButton');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'VoiceInputButton');
+  return { hashId };
 }

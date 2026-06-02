@@ -8,6 +8,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { ActionIconBox } from '../Components/ActionIconBox';
@@ -16,7 +17,7 @@ import { useRefFunction } from '../Hooks/useRefFunction';
 import { I18nContext } from '../I18n';
 import { StatusIcon } from './components/StatusIcon';
 import { TaskListItem } from './components/TaskListItem';
-import { getArrowRotation } from './constants';
+import { getArrowRotation, isTaskInProgress } from './constants';
 import { useStyle } from './style';
 import type { TaskItem, TaskListProps, TaskStatus } from './types';
 
@@ -40,10 +41,12 @@ export const TaskList = memo(
     open,
     onOpenChange,
     taskCompleteText,
+    showProgress = false,
+    scrollIntoViewOnExpand = false,
   }: TaskListProps) => {
     const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
     const prefixCls = getPrefixCls('task-list');
-    const { wrapSSR, hashId } = useStyle(prefixCls);
+    const { hashId } = useStyle(prefixCls);
     const { locale } = useContext(I18nContext);
 
     const isControlled = expandedKeys !== undefined;
@@ -72,6 +75,9 @@ export const TaskList = memo(
 
     const [shouldRenderContent, setShouldRenderContent] = useState(true);
 
+    const simpleWrapperRef = useRef<HTMLDivElement>(null);
+    const didMountRef = useRef(false);
+
     const handleSimpleToggle = useRefFunction(() => {
       setSimpleExpanded((prev: boolean) => !prev);
     });
@@ -91,59 +97,87 @@ export const TaskList = memo(
       };
     }, [simpleExpanded]);
 
-    const { summaryStatus, summaryText, summarySwapKey, lastItem } =
-      useMemo(() => {
-        const completedCount = items.filter(
-          (i) => i.status === 'success',
-        ).length;
-        const loadingItem = items.find((i) => i.status === 'loading');
-        const allDone =
-          !externalLoading &&
-          completedCount === items.length &&
-          items.length > 0;
+    useEffect(() => {
+      if (!didMountRef.current) {
+        didMountRef.current = true;
+        return;
+      }
+      if (!simpleExpanded || !scrollIntoViewOnExpand) return;
 
-        let status: TaskStatus = 'pending';
-        let text: React.ReactNode = locale?.['taskList.taskList'] || '任务列表';
-        let swapKey = `idle:${items.map((i) => `${i.key}:${i.status}`).join('|')}`;
+      const options: ScrollIntoViewOptions =
+        typeof scrollIntoViewOnExpand === 'object'
+          ? scrollIntoViewOnExpand
+          : { behavior: 'smooth', block: 'nearest' };
 
-        if (allDone) {
-          status = 'success';
-          const customCompleteText =
-            typeof taskCompleteText === 'function'
-              ? taskCompleteText({ items })
-              : taskCompleteText;
-          text =
-            customCompleteText ??
-            locale?.['taskList.taskComplete'] ??
-            '任务完成';
-          swapKey = `done:${items.map((i) => i.key).join(',')}`;
-        } else if (loadingItem) {
-          status = 'loading';
-          const tpl =
-            locale?.['taskList.taskInProgress'] || '正在进行${taskName}任务';
-          const title = loadingItem.title;
-          const taskName =
-            typeof title === 'string' || typeof title === 'number'
-              ? String(title)
-              : '';
-          text = tpl.replace('${taskName}', taskName);
-          swapKey = `loading:${loadingItem.key}:${taskName}`;
-        } else if (externalLoading || items.length > 0) {
-          // 外部 loading 或内部未全部成功 → 视为进行中
-          status = 'loading';
-          const tpl =
-            locale?.['taskList.taskInProgress'] || '正在进行${taskName}任务';
-          text = tpl.replace('${taskName}', '');
-          swapKey = `in-progress:${externalLoading}:${items.map((i) => `${i.key}:${i.status}`).join('|')}`;
-        }
+      const timer = window.setTimeout(() => {
+        simpleWrapperRef.current?.scrollIntoView(options);
+      }, SIMPLE_COLLAPSE_DURATION_MS);
 
-        return {
-          summaryStatus: status,
-          summaryText: text,
-          summarySwapKey: swapKey,
-          lastItem: items[items.length - 1] as TaskItem | undefined,
-        };
-      }, [items, locale, taskCompleteText, externalLoading]);
+      return () => {
+        window.clearTimeout(timer);
+      };
+    }, [simpleExpanded, scrollIntoViewOnExpand]);
+
+    const {
+      summaryStatus,
+      summaryText,
+      summarySwapKey,
+      lastItem,
+      completedCount,
+      totalCount,
+    } = useMemo(() => {
+      const completedCount = items.filter((i) => i.status === 'success').length;
+      const inProgressItem = items.find((i) => isTaskInProgress(i.status));
+      const hasError = items.some((i) => i.status === 'error');
+      const allSuccess = completedCount === items.length && items.length > 0;
+      // 全部 item 已为 success 时展示完成态；不因 loading prop 滞留为「进行中」
+      const allDone = allSuccess;
+
+      let status: TaskStatus = 'pending';
+      let text: React.ReactNode = locale?.['taskList.taskList'] || '任务列表';
+      let swapKey = `idle:${items.map((i) => `${i.key}:${i.status}`).join('|')}`;
+
+      if (allDone) {
+        status = 'success';
+        const customCompleteText =
+          typeof taskCompleteText === 'function'
+            ? taskCompleteText({ items })
+            : taskCompleteText;
+        text =
+          customCompleteText ?? locale?.['taskList.taskComplete'] ?? '任务完成';
+        swapKey = `done:${items.map((i) => i.key).join(',')}`;
+      } else if (inProgressItem) {
+        status = 'loading';
+        const tpl =
+          locale?.['taskList.taskInProgress'] || '正在进行${taskName}任务';
+        const title = inProgressItem.title;
+        const taskName =
+          typeof title === 'string' || typeof title === 'number'
+            ? String(title)
+            : '';
+        text = tpl.replace('${taskName}', taskName);
+        swapKey = `loading:${inProgressItem.key}:${taskName}`;
+      } else if (hasError) {
+        status = 'error';
+        text = locale?.['taskList.taskAborted'] || '任务已取消';
+        swapKey = `error:${items.map((i) => `${i.key}:${i.status}`).join('|')}`;
+      } else if (externalLoading || items.length > 0) {
+        status = 'loading';
+        const tpl =
+          locale?.['taskList.taskInProgress'] || '正在进行${taskName}任务';
+        text = tpl.replace('${taskName}', '');
+        swapKey = `in-progress:${externalLoading}:${items.map((i) => `${i.key}:${i.status}`).join('|')}`;
+      }
+
+      return {
+        summaryStatus: status,
+        summaryText: text,
+        summarySwapKey: swapKey,
+        lastItem: items[items.length - 1] as TaskItem | undefined,
+        completedCount,
+        totalCount: items.length,
+      };
+    }, [items, locale, taskCompleteText, externalLoading]);
 
     // 注意：此处必须用 useCallback 而非 useRefFunction。
     // renderItems 在父组件渲染期被同步调用（`{renderItems(items)}`），
@@ -167,10 +201,10 @@ export const TaskList = memo(
     );
 
     if (variant !== 'simple') {
-      return wrapSSR(
+      return (
         <div className={className} data-testid={prefixCls}>
           {renderItems(items)}
-        </div>,
+        </div>
       );
     }
 
@@ -179,10 +213,15 @@ export const TaskList = memo(
       ? locale?.['taskList.collapse'] || '收起'
       : locale?.['taskList.expand'] || '展开';
 
-    const visibleItems = simpleExpanded ? items : lastItem ? [lastItem] : [];
+    const visibleItems = simpleExpanded
+      ? items
+      : lastItem
+        ? [lastItem]
+        : [];
 
-    return wrapSSR(
+    return (
       <div
+        ref={simpleWrapperRef}
         className={classNames(`${simpleCls}-wrapper`, hashId, className)}
         data-testid="task-list-simple-wrapper"
       >
@@ -206,6 +245,14 @@ export const TaskList = memo(
           <div className={classNames(`${simpleCls}-text`, hashId)}>
             <TextSwap swapKey={summarySwapKey}>{summaryText}</TextSwap>
           </div>
+          {showProgress && totalCount > 0 && (
+            <div
+              className={classNames(`${simpleCls}-count`, hashId)}
+              data-testid="task-list-simple-progress-count"
+            >
+              {completedCount}/{totalCount}
+            </div>
+          )}
           <div className={classNames(`${simpleCls}-arrow`, hashId)}>
             <ActionIconBox
               title={simpleArrowTitle}
@@ -231,7 +278,7 @@ export const TaskList = memo(
             </div>
           ) : null}
         </div>
-      </div>,
+      </div>
     );
   },
 );

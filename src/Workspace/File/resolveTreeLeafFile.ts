@@ -1,6 +1,41 @@
-import type { FileNode, FileTreeNode } from '../types';
+﻿import type { FileNode, FileTreeNode } from '../types';
 import { ensureNodeWithId } from './handlers';
 import { fileIdOrTreeKeyToRelativePath } from './workspaceFileId';
+
+const TREE_LEAF_FILE_FIELD_KEYS = [
+  'url',
+  'content',
+  'canPreview',
+  'canDownload',
+  'type',
+  'size',
+] as const;
+
+export interface HasTreeLeafFileBindingOptions {
+  /** 为 true 时，无显式 file 的叶子也可合成 FileNode（如树行下载/预览） */
+  allowSyntheticLeaf?: boolean;
+}
+
+/** 叶子是否应绑定为可预览/下载/点击的 {@link FileNode} */
+export const hasTreeLeafFileBinding = (
+  node: FileTreeNode,
+  options?: HasTreeLeafFileBindingOptions,
+): boolean => {
+  if (node.file === null) {
+    return false;
+  }
+  if (node.file && typeof node.file === 'object') {
+    return true;
+  }
+  const nodeRecord = node as FileTreeNode & Partial<FileNode>;
+  const hasTopLevelFileFields = TREE_LEAF_FILE_FIELD_KEYS.some(
+    (key) => nodeRecord[key] !== undefined,
+  );
+  if (hasTopLevelFileFields) {
+    return true;
+  }
+  return options?.allowSyntheticLeaf === true;
+};
 
 export interface ResolveTreeLeafFileOptions {
   /**

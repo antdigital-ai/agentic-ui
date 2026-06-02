@@ -39,7 +39,7 @@ export const PureBubble: React.FC<
     context || ({} as ChatConfigType);
 
   const prefixClass = getPrefixCls('agentic');
-  const { wrapSSR, hashId } = useStyle(prefixClass);
+  const { hashId } = useStyle(prefixClass);
 
   const placement = (props.placement ?? 'left') as 'left' | 'right';
   const isRightPlacement = placement === 'right';
@@ -183,7 +183,7 @@ export const PureBubble: React.FC<
       />
     );
 
-  const itemDom = wrapSSR(
+  const itemDom = (
     <BubbleConfigContext.Provider
       value={{
         // 保留上游 BubbleConfigProvide 提供的非冲突字段（如 thoughtChain / agentId / sessionId 等），
@@ -284,7 +284,7 @@ export const PureBubble: React.FC<
           </div>
         </div>
       </Flex>
-    </BubbleConfigContext.Provider>,
+    </BubbleConfigContext.Provider>
   );
 
   if (bubbleRenderConfig?.render === false) return null;

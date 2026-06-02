@@ -47,6 +47,7 @@ group:
 | floatingExpanded         | Loading 状态下浮动展开按钮的受控值 | `boolean`                             | -                   | -    |
 | defaultFloatingExpanded  | 浮动展开按钮的默认值               | `boolean`                             | `false`             | -    |
 | onFloatingExpandedChange | 浮动展开状态变化回调               | `(floatingExpanded: boolean) => void` | -                   | -    |
+| scrollIntoViewOnExpand   | 展开时是否将组件滚动到视窗内；传 `true` 默认 `{ behavior: 'smooth', block: 'nearest' }`，也可传 `ScrollIntoViewOptions` 自定义；初次挂载不触发 | `boolean \| ScrollIntoViewOptions`    | `false`             | 2.32.33 |
 | testId                   | 测试 ID                            | `string`                              | `'ToolUseBarThink'` | -    |
 | classNames               | Semantic 类名（按区域控制）        | `ToolUseBarThinkClassNames`           | -                   | -    |
 | styles                   | Semantic 样式（按区域控制）        | `ToolUseBarThinkStyles`               | -                   | -    |

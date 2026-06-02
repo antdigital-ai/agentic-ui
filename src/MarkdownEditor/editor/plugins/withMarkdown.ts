@@ -1,6 +1,7 @@
-import { Editor } from 'slate';
+﻿import { Editor } from 'slate';
 import { withCardPlugin } from './withCardPlugin';
 import { withCodeTagPlugin } from './withCodeTagPlugin';
+import { withFootnoteReferenceNormalize } from './withFootnoteReferenceNormalize';
 import { withInlineNodes } from './withInlineNodes';
 import { withLinkAndMediaPlugin } from './withLinkAndMediaPlugin';
 import { withListsPlugin } from './withListsPlugin';
@@ -27,11 +28,13 @@ import { withVoidNodes } from './withVoidNodes';
  */
 export const withMarkdown = (editor: Editor) => {
   return withSanitizeInvalidChildren(
-    withCodeTagPlugin(
-      withSchemaPlugin(
-        withLinkAndMediaPlugin(
-          withCardPlugin(
-            withListsPlugin(withVoidNodes(withInlineNodes(editor))),
+    withFootnoteReferenceNormalize(
+      withCodeTagPlugin(
+        withSchemaPlugin(
+          withLinkAndMediaPlugin(
+            withCardPlugin(
+              withListsPlugin(withVoidNodes(withInlineNodes(editor))),
+            ),
           ),
         ),
       ),

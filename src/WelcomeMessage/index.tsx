@@ -116,9 +116,9 @@ const WelcomeMessageComponent: React.FC<WelcomeMessageProps> = ({
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-welcome');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
-  return wrapSSR(
+  return (
     <div
       className={clsx(prefixCls, hashId, classNames?.root, rootClassName)}
       data-testid={prefixCls}
@@ -148,7 +148,7 @@ const WelcomeMessageComponent: React.FC<WelcomeMessageProps> = ({
           {description}
         </TextAnimate>
       )}
-    </div>,
+    </div>
   );
 };
 

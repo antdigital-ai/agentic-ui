@@ -709,6 +709,6 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
 const useGenStyle = genStyleHooks('WorkspaceFile', genStyle);
 
 export function useFileStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'WorkspaceFile');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'WorkspaceFile');
+  return { hashId };
 }

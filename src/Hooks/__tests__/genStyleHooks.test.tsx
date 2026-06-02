@@ -16,7 +16,7 @@ declare module '../useStyle' {
 }
 
 describe('genStyleHooks 基础设施', () => {
-  it('应返回 [wrapSSR, hashId, cssVarCls] 三元组', () => {
+  it('应返回 [hashId, cssVarCls] 二元组', () => {
     const genStyle: GenStyleFn<'TestBubble'> = (token) => ({
       [token.componentCls]: {
         padding: token.padding,
@@ -32,8 +32,7 @@ describe('genStyleHooks 基础设施', () => {
       wrapper: ({ children }) => <ConfigProvider>{children}</ConfigProvider>,
     });
 
-    const [wrapSSR, hashId, cssVarCls] = result.current;
-    expect(typeof wrapSSR).toBe('function');
+    const [, hashId, cssVarCls] = result.current;
     expect(hashId).toBe('');
     // 未启用 cssVar 时返回 undefined，启用时为字符串；此处只校验类型兼容
     expect(['string', 'undefined']).toContain(typeof cssVarCls);
@@ -58,7 +57,7 @@ describe('genStyleHooks 基础设施', () => {
     expect(typeof captured?.calc).toBe('function');
   });
 
-  it('genComponentStyleHook 返回 [wrapSSR, hashId]', () => {
+  it('genComponentStyleHook 返回 [_, hashId]', () => {
     const useStyle = genComponentStyleHook('TestSubComp' as any, (token) => ({
       [token.componentCls]: { color: token.colorText },
     }));
@@ -67,7 +66,6 @@ describe('genStyleHooks 基础设施', () => {
       wrapper: ({ children }) => <ConfigProvider>{children}</ConfigProvider>,
     });
 
-    expect(typeof result.current[0]).toBe('function');
     expect(result.current[1]).toBe('');
   });
 
@@ -78,22 +76,7 @@ describe('genStyleHooks 基础设施', () => {
     expect(typeof SubStyle).toBe('function');
   });
 
-  it('wrapSSR 应为 identity 函数：不包 Fragment、不动节点', () => {
-    const useStyle = genStyleHooks('TestIdentityWrap' as any, (token) => ({
-      [token.componentCls]: { color: token.colorText },
-    }));
-
-    const { result } = renderHook(() => useStyle('agentic-identity'), {
-      wrapper: ({ children }) => <ConfigProvider>{children}</ConfigProvider>,
-    });
-
-    const [wrapSSR] = result.current;
-    const node = <div data-testid="payload" />;
-    // 严格相等：identity 不应创建新的 React 元素
-    expect(wrapSSR(node)).toBe(node);
-  });
-
-  it('useStyle 调用本身已注入样式到 document.head，无需 wrapSSR 触发', () => {
+  it('useStyle 调用本身已注入样式到 document.head', () => {
     const styleId = 'agentic-side-effect-injection';
     const useStyle = genStyleHooks('TestSideEffect' as any, (token) => ({
       [token.componentCls]: {

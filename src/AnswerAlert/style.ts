@@ -232,6 +232,6 @@ const genStyle: GenStyleFn<'AnswerAlert'> = (token) => {
 const useGenStyle = genStyleHooks('AnswerAlert', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'answer-alert');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'answer-alert');
+  return { hashId };
 }

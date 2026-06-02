@@ -25,6 +25,7 @@ const transformResult = (result: ParserResult) => {
 export const parserMdToSchema = (
   code: string,
   plugins?: MarkdownEditorPlugin[],
+  config?: import('./parserMarkdownToSlateNode').ParserMarkdownToSlateNodeConfig,
 ): ParserResult => {
-  return transformResult(parserMarkdownToSlateNode(code, plugins));
+  return transformResult(parserMarkdownToSlateNode(code, plugins, config));
 };

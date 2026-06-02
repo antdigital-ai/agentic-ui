@@ -31,11 +31,11 @@ export const ToggleButton = forwardRef<HTMLDivElement, ToggleButtonProps>(
     const context = useContext(ConfigProvider.ConfigContext);
     const prefixCls = context?.getPrefixCls('toggle-button');
 
-    const { wrapSSR, hashId } = useStyle(prefixCls);
+    const { hashId } = useStyle(prefixCls);
 
     const rootCls = classNames(prefixCls, className, hashId);
 
-    return wrapSSR(
+    return (
       <div
         ref={ref}
         className={classNames(rootCls, {
@@ -81,7 +81,7 @@ export const ToggleButton = forwardRef<HTMLDivElement, ToggleButtonProps>(
             )}
           </Button>
         </ConfigProvider>
-      </div>,
+      </div>
     );
   },
 );

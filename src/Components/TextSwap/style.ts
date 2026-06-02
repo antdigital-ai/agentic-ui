@@ -1,4 +1,4 @@
-﻿import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
 import {
   DEFAULT_TEXT_SWAP_DURATION_MS,
@@ -56,6 +56,6 @@ const genStyle: GenStyleFn<'TextSwap'> = (token) => {
 const useGenStyle = genStyleHooks('TextSwap', genStyle);
 
 export function useTextSwapStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'text-swap');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'text-swap');
+  return { hashId };
 }

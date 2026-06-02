@@ -31,6 +31,6 @@ const useGenStyle = genStyleHooks('DotAni', genStyle);
  * @returns 样式对象
  */
 export function useDotAniStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'DotAni');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'DotAni');
+  return { hashId };
 }

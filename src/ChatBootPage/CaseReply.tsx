@@ -113,7 +113,7 @@ const CaseReplyComponent: React.FC<CaseReplyProps> = ({
     'agentic-chatboot-case-reply',
     customPrefixCls,
   );
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
   const locale = useLocale();
 
   // P1-1：hover 状态从 React state 改为 CSS :hover 直驱（见 CaseReplyStyle.ts），
@@ -144,7 +144,7 @@ const CaseReplyComponent: React.FC<CaseReplyProps> = ({
   // P1-9：testid 与 prefixCls 解耦，避免外层 ConfigProvider 改 prefix 时测试失效。
   const testId = 'agentic-chatboot-case-reply';
 
-  return wrapSSR(
+  return (
     <div
       className={containerCls}
       data-testid={testId}
@@ -197,7 +197,7 @@ const CaseReplyComponent: React.FC<CaseReplyProps> = ({
           </div>
         )}
       </div>
-    </div>,
+    </div>
   );
 };
 

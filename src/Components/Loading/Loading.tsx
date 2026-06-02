@@ -158,7 +158,7 @@ export const Loading = ({
 }: LoadingProps) => {
   const context = useContext(ConfigProvider.ConfigContext);
   const baseCls = context?.getPrefixCls(prefixCls);
-  const { wrapSSR, hashId } = useStyle(baseCls);
+  const { hashId } = useStyle(baseCls);
 
   const isNestedPattern = !!children;
 
@@ -207,7 +207,7 @@ export const Loading = ({
   );
 
   if (isNestedPattern) {
-    return wrapSSR(
+    return (
       <div
         className={classNames(
           `${baseCls}-nested-pattern`,
@@ -222,9 +222,9 @@ export const Loading = ({
         <div className={classNames(`${baseCls}-container`, hashId)}>
           {children}
         </div>
-      </div>,
+      </div>
     );
   }
 
-  return wrapSSR(loadingElement);
+  return loadingElement;
 };

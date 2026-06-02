@@ -44,11 +44,11 @@ export const IconButton = forwardRef<HTMLDivElement, IconButtonProps>(
     const context = useContext(ConfigProvider.ConfigContext);
     const prefixCls = context?.getPrefixCls('icon-button');
 
-    const { wrapSSR, hashId } = useStyle(prefixCls);
+    const { hashId } = useStyle(prefixCls);
 
     const rootCls = classNames(prefixCls, className, hashId);
 
-    return wrapSSR(
+    return (
       <div ref={ref} className={rootCls} data-testid={prefixCls} style={style}>
         <Tooltip title={tooltip}>
           <Button
@@ -66,7 +66,7 @@ export const IconButton = forwardRef<HTMLDivElement, IconButtonProps>(
             })}
           />
         </Tooltip>
-      </div>,
+      </div>
     );
   },
 );

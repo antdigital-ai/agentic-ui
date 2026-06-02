@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom';
+﻿import '@testing-library/jest-dom';
 import { fireEvent, render } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
@@ -6,7 +6,7 @@ import { createEditor, Editor, Transforms } from 'slate';
 import { Slate, withReact } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TableCellIndex } from '../../../../editor/elements/Table/TableCellIndex';
-import { TablePropsContext } from '../../../../editor/elements/Table/TableContext';
+import { TableContextTestProvider } from '../../../../editor/elements/Table/TableContext';
 
 // Mock dependencies
 vi.mock('../../../../editor/store');
@@ -31,7 +31,6 @@ vi.mock('../../../../utils/native-table', () => ({
 
 vi.mock('../../../../editor/elements/Table/TableCellIndex/style', () => ({
   useStyle: vi.fn(() => ({
-    wrapSSR: (component: any) => component,
     hashId: 'test-hash',
   })),
 }));
@@ -122,7 +121,7 @@ describe('TableCellIndex 组件测试', () => {
 
     return render(
       <ConfigProvider>
-        <TablePropsContext.Provider value={defaultContextValue}>
+        <TableContextTestProvider value={defaultContextValue}>
           <Slate editor={editor} initialValue={editor.children as any}>
             <table>
               <tbody>
@@ -132,7 +131,7 @@ describe('TableCellIndex 组件测试', () => {
               </tbody>
             </table>
           </Slate>
-        </TablePropsContext.Provider>
+        </TableContextTestProvider>
       </ConfigProvider>,
     );
   };
@@ -435,7 +434,7 @@ describe('TableCellIndex 组件测试', () => {
 
     render(
       <ConfigProvider>
-        <TablePropsContext.Provider
+        <TableContextTestProvider
           value={{
             deleteIconPosition: null,
             setDeleteIconPosition: mockSetDeleteIconPosition,
@@ -454,7 +453,7 @@ describe('TableCellIndex 组件测试', () => {
               </tbody>
             </table>
           </Slate>
-        </TablePropsContext.Provider>
+        </TableContextTestProvider>
       </ConfigProvider>,
     );
 
@@ -489,7 +488,7 @@ describe('TableCellIndex 组件测试', () => {
 
     render(
       <ConfigProvider>
-        <TablePropsContext.Provider
+        <TableContextTestProvider
           value={{
             deleteIconPosition: { rowIndex: 0 },
             setDeleteIconPosition: mockSetDeleteIconPosition,
@@ -508,7 +507,7 @@ describe('TableCellIndex 组件测试', () => {
               </tbody>
             </table>
           </Slate>
-        </TablePropsContext.Provider>
+        </TableContextTestProvider>
       </ConfigProvider>,
     );
 
@@ -731,7 +730,7 @@ describe('TableCellIndex 组件测试', () => {
 
       render(
         <ConfigProvider>
-          <TablePropsContext.Provider
+          <TableContextTestProvider
             value={{
               deleteIconPosition: null,
               setDeleteIconPosition: mockSetDeleteIconPosition,
@@ -740,7 +739,7 @@ describe('TableCellIndex 组件测试', () => {
             <Slate editor={editor} initialValue={editor.children as any}>
               <TableCellIndex targetRow={{}} tablePath={[0]} rowIndex={0} />
             </Slate>
-          </TablePropsContext.Provider>
+          </TableContextTestProvider>
         </ConfigProvider>,
       );
 
@@ -759,7 +758,7 @@ describe('TableCellIndex 组件测试', () => {
 
       render(
         <ConfigProvider>
-          <TablePropsContext.Provider
+          <TableContextTestProvider
             value={{
               deleteIconPosition: null,
               setDeleteIconPosition: mockSetDeleteIconPosition,
@@ -768,7 +767,7 @@ describe('TableCellIndex 组件测试', () => {
             <Slate editor={editor} initialValue={editor.children as any}>
               <TableCellIndex targetRow={{}} tablePath={[0]} rowIndex={0} />
             </Slate>
-          </TablePropsContext.Provider>
+          </TableContextTestProvider>
         </ConfigProvider>,
       );
 
@@ -802,7 +801,7 @@ describe('TableCellIndex 组件测试', () => {
 
       render(
         <ConfigProvider>
-          <TablePropsContext.Provider
+          <TableContextTestProvider
             value={{
               deleteIconPosition: null,
               setDeleteIconPosition: mockSetDeleteIconPosition,
@@ -821,7 +820,7 @@ describe('TableCellIndex 组件测试', () => {
                 </tbody>
               </table>
             </Slate>
-          </TablePropsContext.Provider>
+          </TableContextTestProvider>
         </ConfigProvider>,
       );
 
@@ -843,7 +842,7 @@ describe('TableCellIndex 组件测试', () => {
 
       render(
         <ConfigProvider>
-          <TablePropsContext.Provider
+          <TableContextTestProvider
             value={{
               deleteIconPosition: null,
               setDeleteIconPosition: mockSetDeleteIconPosition,
@@ -862,7 +861,7 @@ describe('TableCellIndex 组件测试', () => {
                 </tbody>
               </table>
             </Slate>
-          </TablePropsContext.Provider>
+          </TableContextTestProvider>
         </ConfigProvider>,
       );
 
@@ -886,7 +885,7 @@ describe('TableCellIndex 组件测试', () => {
 
       render(
         <ConfigProvider>
-          <TablePropsContext.Provider
+          <TableContextTestProvider
             value={{
               deleteIconPosition: null,
               setDeleteIconPosition: mockSetDeleteIconPosition,
@@ -905,7 +904,7 @@ describe('TableCellIndex 组件测试', () => {
                 </tbody>
               </table>
             </Slate>
-          </TablePropsContext.Provider>
+          </TableContextTestProvider>
         </ConfigProvider>,
       );
 
@@ -944,7 +943,7 @@ describe('TableCellIndex 组件测试', () => {
 
       render(
         <ConfigProvider>
-          <TablePropsContext.Provider
+          <TableContextTestProvider
             value={{
               deleteIconPosition: null,
               setDeleteIconPosition: mockSetDeleteIconPosition,
@@ -963,7 +962,7 @@ describe('TableCellIndex 组件测试', () => {
                 </tbody>
               </table>
             </Slate>
-          </TablePropsContext.Provider>
+          </TableContextTestProvider>
         </ConfigProvider>,
       );
 
@@ -1006,7 +1005,7 @@ describe('TableCellIndex 组件测试', () => {
 
       render(
         <ConfigProvider>
-          <TablePropsContext.Provider
+          <TableContextTestProvider
             value={{
               deleteIconPosition: null,
               setDeleteIconPosition: mockSetDeleteIconPosition,
@@ -1025,7 +1024,7 @@ describe('TableCellIndex 组件测试', () => {
                 </tbody>
               </table>
             </Slate>
-          </TablePropsContext.Provider>
+          </TableContextTestProvider>
         </ConfigProvider>,
       );
 
@@ -1081,7 +1080,7 @@ describe('TableCellIndex 组件测试', () => {
 
       render(
         <ConfigProvider>
-          <TablePropsContext.Provider
+          <TableContextTestProvider
             value={{
               deleteIconPosition: null,
               setDeleteIconPosition: mockSetDeleteIconPosition,
@@ -1100,7 +1099,7 @@ describe('TableCellIndex 组件测试', () => {
                 </tbody>
               </table>
             </Slate>
-          </TablePropsContext.Provider>
+          </TableContextTestProvider>
         </ConfigProvider>,
       );
 
@@ -1128,7 +1127,7 @@ describe('TableCellIndex 组件测试', () => {
 
       render(
         <ConfigProvider>
-          <TablePropsContext.Provider
+          <TableContextTestProvider
             value={{
               deleteIconPosition: { rowIndex: 0 },
               setDeleteIconPosition: mockSetDeleteIconPosition,
@@ -1147,7 +1146,7 @@ describe('TableCellIndex 组件测试', () => {
                 </tbody>
               </table>
             </Slate>
-          </TablePropsContext.Provider>
+          </TableContextTestProvider>
         </ConfigProvider>,
       );
 
@@ -1197,7 +1196,7 @@ describe('TableCellIndex 组件测试', () => {
 
       render(
         <ConfigProvider>
-          <TablePropsContext.Provider
+          <TableContextTestProvider
             value={{
               deleteIconPosition: { rowIndex: 0 },
               setDeleteIconPosition: mockSetDeleteIconPosition,
@@ -1216,7 +1215,7 @@ describe('TableCellIndex 组件测试', () => {
                 </tbody>
               </table>
             </Slate>
-          </TablePropsContext.Provider>
+          </TableContextTestProvider>
         </ConfigProvider>,
       );
 
@@ -1254,7 +1253,7 @@ describe('TableCellIndex 组件测试', () => {
 
       render(
         <ConfigProvider>
-          <TablePropsContext.Provider
+          <TableContextTestProvider
             value={{
               deleteIconPosition: { rowIndex: 0 },
               setDeleteIconPosition: mockSetDeleteIconPosition,
@@ -1273,7 +1272,7 @@ describe('TableCellIndex 组件测试', () => {
                 </tbody>
               </table>
             </Slate>
-          </TablePropsContext.Provider>
+          </TableContextTestProvider>
         </ConfigProvider>,
       );
 

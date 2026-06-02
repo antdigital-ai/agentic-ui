@@ -1,7 +1,7 @@
-import type { RootContent } from 'mdast';
+﻿import type { RootContent } from 'mdast';
 import { CustomLeaf } from '../../../el';
+import { handleFootnoteReference } from './parseFootnote';
 import { handleInlineCode } from './parseElements';
-import { shouldTreatInlineMathAsText } from './parseMath';
 
 /**
  * 设置节点的 finished 属性
@@ -115,15 +115,12 @@ export const parseText = (
     if (n.type === 'inlineMath') {
       const inlineMathValue =
         typeof (n as any).value === 'string' ? (n as any).value : '';
-      if (shouldTreatInlineMathAsText(inlineMathValue)) {
-        leafs.push({ ...leaf, text: `$${inlineMathValue}$` });
-      } else {
-        leafs.push({
-          ...leaf,
-          type: 'inline-katex',
-          children: [{ text: inlineMathValue }],
-        } as any);
-      }
+      leafs.push({ ...leaf, text: `$${inlineMathValue}$` });
+      continue;
+    }
+
+    if (n.type === 'footnoteReference') {
+      leafs.push({ ...leaf, ...handleFootnoteReference(n as any) });
       continue;
     }
 
@@ -174,6 +171,9 @@ export const applyHtmlTagsToElement = (el: any, htmlTag: any[]): any => {
     }
     if (t.tag === 'mark') {
       result.mark = true;
+      if (t.markColor) result.markColor = t.markColor;
+      if (t.markBg) result.markBg = t.markBg;
+      if (t.markLabel) result.markLabel = t.markLabel;
     }
   }
 
@@ -223,6 +223,20 @@ export const handleTextAndInlineElementsPure = (
     const leafWithHtmlTags = applyHtmlTagsToElement(formattedLeaf, htmlTag);
     const inlineCodeResult = handleInlineCode(currentElement);
     return { ...leafWithHtmlTags, ...inlineCodeResult };
+  }
+
+  if (elementType === 'footnoteReference') {
+    const finished = (currentElement as any).finished;
+    const baseLeaf: CustomLeaf = {
+      ...(finished === false && {
+        otherProps: {
+          finished,
+        },
+      }),
+    };
+    const formattedLeaf = applyInlineFormattingFn(baseLeaf, currentElement);
+    const leafWithHtmlTags = applyHtmlTagsToElement(formattedLeaf, htmlTag);
+    return { ...leafWithHtmlTags, ...handleFootnoteReference(currentElement) };
   }
 
   // remark-directive 的 textDirective/leafDirective，递归解析其 children

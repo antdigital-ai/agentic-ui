@@ -155,7 +155,7 @@ export const ActionIconBox: React.FC<ActionIconBoxProps> = (props) => {
   const keepNativeTitleFallback = useNativeTitleTooltipFallback();
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-md-editor-action-icon-box');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   useEffect(() => {
     onInit?.();
@@ -245,18 +245,11 @@ export const ActionIconBox: React.FC<ActionIconBoxProps> = (props) => {
     </span>
   );
 
-  return wrapSSR(
-    title ? (
-      <Tooltip
-        title={title}
-        arrow={false}
-        mouseEnterDelay={1}
-        {...tooltipProps}
-      >
-        {renderInner({ 'data-title': titleText })}
-      </Tooltip>
-    ) : (
-      renderInner()
-    ),
+  return title ? (
+    <Tooltip title={title} arrow={false} mouseEnterDelay={1} {...tooltipProps}>
+      {renderInner({ 'data-title': titleText })}
+    </Tooltip>
+  ) : (
+    renderInner()
   );
 };

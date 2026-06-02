@@ -378,6 +378,6 @@ const useGenStyle = genStyleHooks('ActionItemBox', (token, info) => [
 ]);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'ActionItemBox');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'ActionItemBox');
+  return { hashId };
 }

@@ -42,7 +42,7 @@ const QuadrantChartComponent: React.FC<QuadrantChartProps> = ({
   const i18n = useContext(I18nContext);
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-quadrant-chart');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   const quadrants = useMemo(
     () => parseQuadrantsFromRows(data, columns),
@@ -77,7 +77,7 @@ const QuadrantChartComponent: React.FC<QuadrantChartProps> = ({
   }, [title, toolbar, prefixCls, hashId]);
 
   if (!data.length || !columns.length) {
-    return wrapSSR(
+    return (
       <div
         className={classNames(prefixCls, hashId, className)}
         style={style}
@@ -91,11 +91,11 @@ const QuadrantChartComponent: React.FC<QuadrantChartProps> = ({
         >
           {i18n?.locale?.quadrantChart || '四象限图'}
         </div>
-      </div>,
+      </div>
     );
   }
 
-  return wrapSSR(
+  return (
     <div
       className={classNames(prefixCls, hashId, className)}
       style={style}
@@ -148,7 +148,7 @@ const QuadrantChartComponent: React.FC<QuadrantChartProps> = ({
           </div>
         ))}
       </div>
-    </div>,
+    </div>
   );
 };
 

@@ -56,6 +56,6 @@ const useGenStyle = genStyleHooks('SendButton', (token, info) => [
 ]);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'SendButton');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'SendButton');
+  return { hashId };
 }

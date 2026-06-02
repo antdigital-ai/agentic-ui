@@ -392,12 +392,11 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
     const context = useContext(ConfigProvider.ConfigContext);
     const [collapse, setCollapse] = React.useState<boolean>(false);
     const prefixCls = context?.getPrefixCls('thought-chain-list');
-    const { wrapSSR, hashId } = useStyle(prefixCls);
+    const { hashId } = useStyle(prefixCls);
     const { ...restStyle } = customStyle || {};
     const [docMeta, setDocMeta] = React.useState<Partial<DocMeta> | null>(null);
 
-    // 为组件实例生成唯一ID，避免多个实例间的key冲突
-    const instanceId = 'ThoughtChainList';
+    const instanceId = React.useId();
 
     useEffect(() => {
       if (bubble?.isFinished && finishAutoCollapse !== false) {
@@ -473,7 +472,7 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
       locale,
     ]);
 
-    return wrapSSR(
+    return (
       <>
         <DocumentDrawer
           docMeta={docMeta}
@@ -527,7 +526,7 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
             </div>
           </div>
         </div>
-      </>,
+      </>
     );
   },
 );

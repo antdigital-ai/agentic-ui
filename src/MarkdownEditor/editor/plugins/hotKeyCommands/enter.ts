@@ -1,4 +1,4 @@
-/* eslint-disable no-case-declarations */
+﻿/* eslint-disable no-case-declarations */
 import React from 'react';
 import {
   BaseSelection,
@@ -46,8 +46,12 @@ export class EnterKey {
       let [el, path] = node;
 
       if (el.type === 'card-before') {
+        // 在 card 之前插入空段落：path 是 [card, 0]，Path.parent(path) 即 card 自身路径。
+        // insertNodes(at: cardPath) 会把新节点放在该 index 位置，把 card 顺势后移，
+        // 等价于"在 card 之前插入"。
+        const cardPath = Path.parent(path);
         Transforms.insertNodes(this.editor, EditorUtils.p, {
-          at: Path.parent(path),
+          at: cardPath,
           select: true,
         });
         e.preventDefault();
@@ -55,8 +59,11 @@ export class EnterKey {
       }
 
       if (el.type === 'card-after') {
+        // 在 card 之后插入空段落：path 是 [card, N-1]，Path.next(Path.parent(path))
+        // 是 card 的下一个兄弟位置；若 card 是末位，越界时 Slate insertNodes 自动 append。
+        const afterCardPath = Path.next(Path.parent(path));
         Transforms.insertNodes(this.editor, EditorUtils.p, {
-          at: Path.next(Path.parent(path)),
+          at: afterCardPath,
           select: true,
         });
         e.preventDefault();
@@ -75,9 +82,10 @@ export class EnterKey {
         }
       }
       if (el.type === 'table-cell') {
-        const table = Editor.parent(this.editor, path);
-        if (table[0].type === 'table-row') {
-          this.table(table as NodeEntry<TableNode>, sel, e);
+        const row = Editor.parent(this.editor, path);
+        if (row[0].type === 'table-row') {
+          // 必须传入 table-cell 的 NodeEntry：列索引用 cell path 末位，下一行用 Path.next(rowPath)
+          this.table(node as NodeEntry<TableNode>, sel, e);
           e.preventDefault();
           return;
         }

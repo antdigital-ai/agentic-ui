@@ -33,6 +33,6 @@ const useGenStyle = genStyleHooks('ChartAttrToolBar', genStyle);
 export function useStyle(prefixCls?: string) {
   // 与 ChartAttrToolBar 组件内 `getPrefixCls('chart-attr-toolbar')` 对齐，
   // 即使 prefixCls 缺省也保证选择器仍能命中组件 DOM
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'chart-attr-toolbar');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'chart-attr-toolbar');
+  return { hashId };
 }

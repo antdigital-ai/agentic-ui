@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { useGradientTextStyle } from '../style';
 
 describe('GradientText style', () => {
-  it('useGradientTextStyle 应返回 wrapSSR 与 hashId', () => {
+  it('useGradientTextStyle 应返回 hashId', () => {
     const { result } = renderHook(
       () => useGradientTextStyle('ant-agentic-gradient-text'),
       {
@@ -14,8 +14,6 @@ describe('GradientText style', () => {
     );
 
     expect(result.current).toBeDefined();
-    expect(result.current).toHaveProperty('wrapSSR');
     expect(result.current).toHaveProperty('hashId');
-    expect(typeof result.current.wrapSSR).toBe('function');
   });
 });

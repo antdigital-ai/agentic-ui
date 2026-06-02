@@ -48,6 +48,6 @@ const genStyle: GenStyleFn<'LayoutHeader'> = (token) => {
 const useGenStyle = genStyleHooks('LayoutHeader', genStyle);
 
 export const useLayoutHeaderStyle = (prefixCls: string) => {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls);
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls);
+  return { hashId };
 };

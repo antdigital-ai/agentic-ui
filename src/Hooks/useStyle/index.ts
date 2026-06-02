@@ -132,28 +132,13 @@ const styleUtils = genStyleUtils<
 });
 
 /**
- * `wrapSSR` 在我们的配置下是死代码：
- *
- * - 浏览器（CSR）里 cssinjs 的 `wrapSSR` 永远等价于 `<><Empty/>{node}</>`
- *   （`Empty` 是 `() => null`），样式注入靠 `useGlobalCache` 内的 `updateCSS`
- *   副作用完成，与 `wrapSSR` 无关；
- * - 我们的 `hashId` 强制为空，`wrapSSR` 也不会在节点上注入任何 className；
- * - 仅在 `<StyleProvider ssrInline>` 这种 SSR 内联模式下 `wrapSSR` 才会真正
- *   emit `<style>` 标签，但组件库从未承诺该模式，整个仓库也没有相关入口。
- *
- * 因此对外暴露的 `wrapSSR` 直接返回 identity，避免每次渲染白白创建一层
- * Fragment + `<Empty/>`。保留在返回元组里仅为兼容旧调用方
- * `const { wrapSSR, hashId } = useStyle(...); return wrapSSR(<jsx/>)`。
- */
-const identityWrapSSR = <T extends React.ReactElement>(node: T): T => node;
-
-/**
  * 注册组件样式（含 antCls / iconCls / 计算工具），返回 `useStyle(prefixCls)`。
  *
  * 与 antd `genStyleHooks` 行为一致：
- *   - 顶层调用一次，签名 `(prefixCls, rootCls?) => [wrapSSR, hashId, cssVarCls]`
+ *   - 顶层调用一次，签名 `(prefixCls, rootCls?) => [_, hashId, cssVarCls]`
  *   - styleFn 接收的 token 含 `componentCls`、`prefixCls`、`antCls` 等
- *   - **wrapSSR 为 identity 函数**（见 {@link identityWrapSSR} 说明）
+ *   - 元组第 0 位为 identity 占位（保持上游类型兼容），调用方使用
+ *     `const [, hashId] = useStyle(...)` 跳过它。
  *
  * @example
  * ```ts
@@ -166,49 +151,16 @@ const identityWrapSSR = <T extends React.ReactElement>(node: T): T => node;
  * export const useStyle = genStyleHooks('Bubble', genStyle);
  * ```
  */
-export const genStyleHooks: typeof styleUtils.genStyleHooks = ((
-  component: Parameters<typeof styleUtils.genStyleHooks>[0],
-  styleFn: Parameters<typeof styleUtils.genStyleHooks>[1],
-  getDefaultToken?: Parameters<typeof styleUtils.genStyleHooks>[2],
-  options?: Parameters<typeof styleUtils.genStyleHooks>[3],
-) => {
-  const inner = styleUtils.genStyleHooks(
-    component,
-    styleFn,
-    getDefaultToken,
-    options,
-  );
-  // 仍然调用原 hook 触发样式注册副作用（updateCSS 注入 document.head），
-  // 但用 identityWrapSSR 替换其返回的 wrapSSR。
-  return (prefixCls: string, rootCls?: string) => {
-    const [, hashId, cssVarCls] = inner(prefixCls, rootCls);
-    return [identityWrapSSR, hashId, cssVarCls] as const;
-  };
-}) as typeof styleUtils.genStyleHooks;
+export const genStyleHooks: typeof styleUtils.genStyleHooks =
+  styleUtils.genStyleHooks;
 
 /**
- * 同 antd `genComponentStyleHook`：与 `genStyleHooks` 类似，但不接管 CSS Var 注册，
- * 返回 `[wrapSSR, hashId]`。在子样式 / 不需要 CSS Var 的场景使用。
- *
- * 同样把 `wrapSSR` 替换为 identity。
+ * 同 antd `genComponentStyleHook`：与 `genStyleHooks` 类似，但不接管 CSS Var 注册。
+ * 元组第 0 位为 identity 占位（保持上游类型兼容），调用方使用
+ * `const [, hashId] = useStyle(...)` 跳过它。
  */
-export const genComponentStyleHook: typeof styleUtils.genComponentStyleHook = ((
-  component: Parameters<typeof styleUtils.genComponentStyleHook>[0],
-  styleFn: Parameters<typeof styleUtils.genComponentStyleHook>[1],
-  getDefaultToken?: Parameters<typeof styleUtils.genComponentStyleHook>[2],
-  options?: Parameters<typeof styleUtils.genComponentStyleHook>[3],
-) => {
-  const inner = styleUtils.genComponentStyleHook(
-    component,
-    styleFn,
-    getDefaultToken,
-    options,
-  );
-  return (prefixCls: string, rootCls?: string) => {
-    const [, hashId] = inner(prefixCls, rootCls);
-    return [identityWrapSSR, hashId] as const;
-  };
-}) as typeof styleUtils.genComponentStyleHook;
+export const genComponentStyleHook: typeof styleUtils.genComponentStyleHook =
+  styleUtils.genComponentStyleHook;
 
 /**
  * 同 antd `genSubStyleComponent`：返回一个 SubStyle 组件，用于在父组件内挂载子样式。
@@ -237,9 +189,8 @@ export function useEditorStyleRegister(
     antCls: `.${getPrefixCls()}`,
   };
 
-  // 调用 useStyleRegister 是为了触发 cssinjs 的样式注册副作用（updateCSS
-  // 注入到 document.head）；返回的 wrapSSR 在我们的配置下是无意义 Fragment 包装
-  // （详见 identityWrapSSR 注释），故直接丢弃，对外暴露 identity 维持 API 形状。
+  // 调用 useStyleRegister 触发 cssinjs 的样式注册副作用（updateCSS 注入到
+  // document.head）；返回值不使用，对外只暴露 hashId。
   useStyleRegister(
     {
       theme: theme as any,
@@ -253,5 +204,5 @@ export function useEditorStyleRegister(
     () => styleFn(chatToken),
   );
 
-  return { wrapSSR: identityWrapSSR, hashId: '' };
+  return { hashId: '' };
 }

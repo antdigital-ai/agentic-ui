@@ -30,6 +30,6 @@ const genStyle: GenStyleFn<'TypingAnimation'> = (token) => {
 const useGenStyle = genStyleHooks('TypingAnimation', genStyle);
 
 export const useTypingAnimationStyle = (prefixCls: string) => {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls);
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls);
+  return { hashId };
 };

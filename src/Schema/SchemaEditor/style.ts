@@ -246,6 +246,6 @@ const genStyle: GenStyleFn<'SchemaEditor'> = (token) => {
 const useGenStyle = genStyleHooks('SchemaEditor', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'SchemaEditor');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'SchemaEditor');
+  return { hashId };
 }

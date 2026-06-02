@@ -31,7 +31,6 @@ import type {
   WorkspacePanelType,
   WorkspaceProps,
 } from './types';
-import { WorkspaceTabCountDigits } from './WorkspaceTabCountDigits';
 import {
   isFileWorkspacePanel,
   isWorkspacePanelType,
@@ -41,6 +40,7 @@ import {
   resolveWorkspacePanelType,
   WORKSPACE_SEGMENTED_DIVIDER_KEY,
 } from './workspacePanel';
+import { WorkspaceTabCountDigits } from './WorkspaceTabCountDigits';
 
 export {
   markWorkspacePanel,
@@ -114,9 +114,10 @@ const resolveTabConfig = (
     key: baseKey,
     icon: tab?.icon ?? defaultConfig.icon,
     title: tab?.title || defaultConfig.label,
-    count: typeof tab?.count === 'number' && Number.isFinite(tab.count)
-      ? tab.count
-      : undefined,
+    count:
+      typeof tab?.count === 'number' && Number.isFinite(tab.count)
+        ? tab.count
+        : undefined,
   };
 };
 
@@ -184,10 +185,7 @@ const resolveChildPanelType = (
 const isValidReactPanelType = (type: unknown): boolean =>
   typeof type === 'function' || typeof type === 'object';
 
-const pickFallbackTabKey = (
-  tabs: TabItem[],
-  preferredKey?: string,
-): string => {
+const pickFallbackTabKey = (tabs: TabItem[], preferredKey?: string): string => {
   const normalizedPreferred = normalizeTabKey(preferredKey);
   if (
     normalizedPreferred &&
@@ -249,7 +247,7 @@ const Workspace: FC<WorkspaceProps> & {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const { locale } = useContext(I18nContext);
   const prefixCls = getPrefixCls('workspace');
-  const { wrapSSR, hashId } = useWorkspaceStyle(prefixCls);
+  const { hashId } = useWorkspaceStyle(prefixCls);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [segmentedKey, setSegmentedKey] = useState(0);
@@ -358,8 +356,7 @@ const Workspace: FC<WorkspaceProps> & {
         icon: tab.icon,
       });
       const isFirstRealtime =
-        firstRealtimeIndex === i &&
-        tab.componentType === PANEL_TYPES.REALTIME;
+        firstRealtimeIndex === i && tab.componentType === PANEL_TYPES.REALTIME;
       if (isFirstRealtime && tabs.length > 1) {
         options.push({
           label: '',
@@ -402,7 +399,10 @@ const Workspace: FC<WorkspaceProps> & {
       ) {
         onTabChange?.(fallbackKey);
       }
-    } else if (isControlled && currentKey !== normalizeTabKey(internalActiveTab)) {
+    } else if (
+      isControlled &&
+      currentKey !== normalizeTabKey(internalActiveTab)
+    ) {
       setInternalActiveTab(currentKey);
     }
   }, [
@@ -467,7 +467,7 @@ const Workspace: FC<WorkspaceProps> & {
     return emptyContent ?? null;
   }
 
-  return wrapSSR(
+  return (
     <div
       ref={containerRef}
       className={classNames(
@@ -529,11 +529,14 @@ const Workspace: FC<WorkspaceProps> & {
       >
         {availableTabs.find((tab) => tab.key === currentActiveTab)?.content}
       </div>
-    </div>,
+    </div>
   );
 };
 
-Workspace.Realtime = markWorkspacePanel(RealtimeComponent, PANEL_TYPES.REALTIME);
+Workspace.Realtime = markWorkspacePanel(
+  RealtimeComponent,
+  PANEL_TYPES.REALTIME,
+);
 Workspace.Browser = markWorkspacePanel(BrowserComponent, PANEL_TYPES.BROWSER);
 Workspace.Task = markWorkspacePanel(TaskComponent, PANEL_TYPES.TASK);
 Workspace.File = markWorkspacePanel(FileComponent, PANEL_TYPES.FILE);

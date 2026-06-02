@@ -1,6 +1,9 @@
-import { describe, expect, it } from 'vitest';
-import { resolveTreeLeafFile } from '../resolveTreeLeafFile';
+﻿import { describe, expect, it } from 'vitest';
 import type { FileTreeNode } from '../../types';
+import {
+  hasTreeLeafFileBinding,
+  resolveTreeLeafFile,
+} from '../resolveTreeLeafFile';
 
 describe('resolveTreeLeafFile', () => {
   it('目录节点应返回 null', () => {
@@ -112,6 +115,32 @@ describe('resolveTreeLeafFile', () => {
         id: 'file:skills/data-query/SKILL.md',
         name: 'SKILL.md',
       }),
+    );
+  });
+
+  it('应仅在允许合成时将无 file 元数据叶子视为可绑定文件', () => {
+    const treeLeaf: FileTreeNode = {
+      key: 'file:README.md',
+      name: 'README.md',
+      isLeaf: true,
+    };
+
+    expect(hasTreeLeafFileBinding(treeLeaf)).toBe(false);
+    expect(hasTreeLeafFileBinding(treeLeaf, { allowSyntheticLeaf: true })).toBe(
+      true,
+    );
+  });
+
+  it('file 为 null 时即使允许合成也不绑定文件', () => {
+    const treeLeaf: FileTreeNode = {
+      key: 'file:missing.md',
+      name: 'missing.md',
+      isLeaf: true,
+      file: null,
+    } as any;
+
+    expect(hasTreeLeafFileBinding(treeLeaf, { allowSyntheticLeaf: true })).toBe(
+      false,
     );
   });
 });

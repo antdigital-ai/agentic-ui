@@ -69,6 +69,6 @@ const genStyle: GenStyleFn<'HistogramChart'> = (token) => {
 const useGenStyle = genStyleHooks('HistogramChart', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'HistogramChart');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'HistogramChart');
+  return { hashId };
 }

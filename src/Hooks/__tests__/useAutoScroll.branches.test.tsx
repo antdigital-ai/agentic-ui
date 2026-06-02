@@ -346,6 +346,51 @@ describe('useAutoScroll targeted coverage (aligned with current impl)', () => {
     );
   });
 
+  it('内容收缩且 pinned=true、已贴底时仅钳位 scrollTop，不跳到 scrollHeight', () => {
+    let setScrollHeight: (v: number) => void = () => {};
+    const Wrapper = () => {
+      const { containerRef } = useAutoScroll({ scrollBehavior: 'smooth' });
+      return (
+        <div
+          ref={(el) => {
+            if (!el) return;
+            const state = installScrollMetrics(el, {
+              scrollHeight: 100,
+              scrollTop: 50,
+              clientHeight: 50,
+            });
+            setScrollHeight = (v) => {
+              state.scrollHeight = v;
+            };
+            (
+              containerRef as React.MutableRefObject<HTMLDivElement | null>
+            ).current = el;
+          }}
+          data-testid="container"
+        >
+          <div />
+        </div>
+      );
+    };
+    render(<Wrapper />);
+    const container = document.querySelector(
+      '[data-testid="container"]',
+    ) as HTMLDivElement;
+
+    // 已贴底：distance = 100 - 50 - 50 = 0
+    setScrollHeight(80);
+    const ro = observers.roInstances[0];
+    act(() => {
+      ro.callback([] as unknown as ResizeObserverEntry[]);
+    });
+    act(() => {
+      flushRaf(2);
+    });
+
+    // 收缩后钳位到 maxScrollTop = 30，不应跳到 scrollHeight
+    expect(container.scrollTop).toBe(30);
+  });
+
   it('内容增长且 pinned=true 时，按 scrollBehavior=auto 直接吸底', () => {
     let setScrollHeight: (v: number) => void = () => {};
     const Wrapper = () => {

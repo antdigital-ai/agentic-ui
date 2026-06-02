@@ -1,7 +1,16 @@
-export { default as AnimationText } from './AnimationText';
-export type { AnimationConfig, AnimationTextProps } from './AnimationText';
-export { CharacterQueue } from './CharacterQueue';
 export type { UseMarkdownToReactOptions } from './markdownReactShared';
+export {
+  collectRendererComponents,
+  collectRendererRehypePlugins,
+  collectRendererRemarkPlugins,
+  mergeMarkdownRendererPlugins,
+} from './collectMarkdownRendererPlugin';
+export {
+  createRendererCodeBlockPlugin,
+  type CodeBlockRenderContext,
+  type CodeBlockRenderFn,
+} from './createRendererCodeBlockPlugin';
+export { extractBlockTextContent } from './extractBlockTextContent';
 export { default as MarkdownRenderer } from './MarkdownRenderer';
 export { AgenticUiFileMapBlockRenderer } from './renderers/AgenticUiFileMapBlockRenderer';
 export { AgenticUiTaskBlockRenderer } from './renderers/AgenticUiTaskBlockRenderer';
@@ -12,7 +21,7 @@ export { MermaidBlockRenderer } from './renderers/MermaidRenderer';
 export { SchemaBlockRenderer } from './renderers/SchemaRenderer';
 export { useStreamingMarkdownReact } from './streaming/useStreamingMarkdownReact';
 export type {
-  CharacterQueueOptions,
+  ContentThrottleOptions,
   FileMapConfig,
   MarkdownRendererEleProps,
   MarkdownRendererProps,
@@ -20,5 +29,6 @@ export type {
   RenderMode,
   RendererBlockProps,
 } from './types';
+export { useContentThrottle } from './useContentThrottle';
 export { markdownToReactSync, useMarkdownToReact } from './useMarkdownToReact';
 export { useStreaming } from './useStreaming';

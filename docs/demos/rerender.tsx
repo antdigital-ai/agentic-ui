@@ -263,8 +263,6 @@ export const RerenderMdDemo = () => {
         <MarkdownRenderer
           content={content}
           streaming={!manualContentMode && !isFinished}
-          isFinished={manualContentMode || isFinished}
-          queueOptions={{ animate: false }}
           style={{ width: '100%' }}
         />
       </div>
@@ -283,11 +281,8 @@ export const RerenderMdDemo = () => {
             <strong>streaming</strong>: 是否处于流式状态
           </li>
           <li>
-            <strong>isFinished</strong>: 流式是否完成
-          </li>
-          <li>
-            <strong>queueOptions</strong>: 字符队列配置，animate=false
-            表示由外部控制逐字输出
+            <strong>streaming</strong>: 为 true 时启用流式 token
+            缓存，避免半截语法误解析
           </li>
           <li>
             文末追加 <strong>agentar-card</strong> 示例：流式结束后应渲染 Schema

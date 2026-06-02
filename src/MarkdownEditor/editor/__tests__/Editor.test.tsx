@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+﻿import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React, { createRef } from 'react';
 import { Subject } from 'rxjs';
@@ -712,6 +712,57 @@ describe('SlateMarkdownEditor', () => {
         },
       });
       expect(onFootnoteDefinitionChange).toHaveBeenCalled();
+    });
+
+    it('文档变更后应再次调用 onFootnoteDefinitionChange', async () => {
+      const onFootnoteDefinitionChange = vi.fn();
+      const initSchemaValue: Elements[] = [
+        { type: 'paragraph', children: [{ text: 'p' }] } as ParagraphNode,
+        {
+          type: 'footnoteDefinition',
+          id: 'fn1',
+          identifier: '1',
+          value: 'note',
+          url: '',
+          children: [{ text: 'note' }],
+        } as any,
+      ];
+      renderEditor({
+        initSchemaValue,
+        fncProps: {
+          render: (_, defaultDom) => defaultDom,
+          onFootnoteDefinitionChange,
+        },
+      });
+
+      await waitFor(() => {
+        expect(onFootnoteDefinitionChange).toHaveBeenCalled();
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 150));
+      onFootnoteDefinitionChange.mockClear();
+
+      Transforms.insertNodes(mockEditorRef.current, {
+        type: 'footnoteDefinition',
+        identifier: '2',
+        value: 'second',
+        url: 'https://example.com',
+        children: [{ text: 'second' }],
+      } as any);
+      mockEditorRef.current.onChange();
+
+      await waitFor(() => {
+        expect(onFootnoteDefinitionChange).toHaveBeenCalledWith(
+          expect.arrayContaining([
+            expect.objectContaining({ placeholder: '1' }),
+            expect.objectContaining({
+              placeholder: '2',
+              origin_text: 'second',
+              url: 'https://example.com',
+            }),
+          ]),
+        );
+      });
     });
   });
 

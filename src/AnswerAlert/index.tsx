@@ -190,7 +190,7 @@ const AnswerAlertComponent: React.FC<AnswerAlertProps> = ({
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('answer-alert');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   // 关闭流程为两阶段，避免动画被截断：
   // - `closing`：用户已点击关闭，正在播放退出动画，DOM 仍在
@@ -262,7 +262,7 @@ const AnswerAlertComponent: React.FC<AnswerAlertProps> = ({
     hashId,
   );
 
-  return wrapSSR(
+  return (
     <div
       ref={containerRef}
       className={alertCls}
@@ -307,7 +307,7 @@ const AnswerAlertComponent: React.FC<AnswerAlertProps> = ({
           {description}
         </div>
       ) : null}
-    </div>,
+    </div>
   );
 };
 

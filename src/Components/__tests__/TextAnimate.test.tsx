@@ -11,7 +11,6 @@ import { describe, expect, it, vi } from 'vitest';
 // 同时 mock 掉 useTextAnimateStyle 以稳定 className（不依赖 hashId 生成器）。
 vi.mock('../TextAnimate/style', () => ({
   useTextAnimateStyle: () => ({
-    wrapSSR: (node: any) => node,
     hashId: 'test-hash',
   }),
 }));

@@ -7,7 +7,6 @@
  */
 export { useStyle } from '../MarkdownEditor/style';
 
-import { textSwapEnterKeyframes } from '../Components/TextSwap/textSwapMotion';
 import { genStyleHooks } from '../Hooks/useStyle';
 
 const useGenVarStyle = genStyleHooks('MarkdownRendererVars', (token) => ({
@@ -19,11 +18,9 @@ const useGenVarStyle = genStyleHooks('MarkdownRendererVars', (token) => ({
     '--padding-4x': '16px',
     '--padding-5x': '20px',
   },
-
-  ...textSwapEnterKeyframes,
 }));
 
 export const useRendererVarStyle = (prefixCls: string) => {
-  const [wrapSSR, hashId] = useGenVarStyle(prefixCls);
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenVarStyle(prefixCls);
+  return { hashId };
 };

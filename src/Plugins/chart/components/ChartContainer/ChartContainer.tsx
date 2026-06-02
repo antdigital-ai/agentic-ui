@@ -144,7 +144,7 @@ const ChartContainer: React.FC<
   errorBoundary = { enabled: true },
   ...restProps
 }) => {
-  const { wrapSSR, hashId } = useStyle(baseClassName);
+  const { hashId } = useStyle(baseClassName);
   const ancestorDarkAntdProvided = useChartDarkAntdProvided();
 
   // 自动检测主题：当 themeProp 未指定且 autoDetectTheme 为 true 时，自动检测
@@ -192,17 +192,17 @@ const ChartContainer: React.FC<
 
   // 如果启用了错误边界，则包装内容
   if (errorBoundary?.enabled !== false) {
-    return wrapSSR(
+    return (
       <ChartErrorBoundary
         fallback={errorBoundary?.fallback}
         onError={errorBoundary?.onError}
       >
         {containerContent}
-      </ChartErrorBoundary>,
+      </ChartErrorBoundary>
     );
   }
 
-  return wrapSSR(containerContent);
+  return <>{containerContent}</>;
 };
 
 export default ChartContainer;

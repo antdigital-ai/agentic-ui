@@ -9,7 +9,7 @@ describe('ActionItemBox 组件', () => {
     vi.clearAllMocks();
   });
 
-  it('在 ConfigProvider 下正确渲染并应用 prefixCls / useStyle / wrapSSR', () => {
+  it('在 ConfigProvider 下正确渲染并应用 prefixCls / useStyle', () => {
     const onClick = vi.fn();
 
     render(

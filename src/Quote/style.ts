@@ -138,6 +138,6 @@ const genQuoteStyle: GenStyleFn<'Quote'> = (token) => {
 const useGenStyle = genStyleHooks('Quote', genQuoteStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'quote');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'quote');
+  return { hashId };
 }

@@ -112,7 +112,7 @@ const QuoteComponent: React.FC<QuoteProps> = ({
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-quote');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   const handleFileClick = useRefFunction(() => {
     if (onFileClick && fileName) {
@@ -168,7 +168,7 @@ const QuoteComponent: React.FC<QuoteProps> = ({
     [popupDirection, customStyles?.popup],
   );
 
-  return wrapSSR(
+  return (
     <div
       className={cls.container}
       style={{ ...style, ...customStyles?.root }}
@@ -238,7 +238,7 @@ const QuoteComponent: React.FC<QuoteProps> = ({
           </div>
         </div>
       )}
-    </div>,
+    </div>
   );
 };
 

@@ -161,6 +161,6 @@ const genStyle: GenStyleFn<'DocCards'> = (token) => {
 const useGenStyle = genStyleHooks('DocCards', genStyle);
 
 export const useStyle = (prefixCls: string) => {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls);
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls);
+  return { hashId };
 };

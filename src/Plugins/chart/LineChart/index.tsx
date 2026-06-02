@@ -135,7 +135,7 @@ const LineChart: React.FC<LineChartProps> = ({
   // 样式注册
   const context = useContext(ConfigProvider.ConfigContext);
   const baseClassName = context?.getPrefixCls('line-chart-container');
-  const { wrapSSR, hashId } = useStyle(baseClassName);
+  const { hashId } = useStyle(baseClassName);
 
   const chartRef = useRef<ChartJS<'line'>>(null);
 
@@ -347,7 +347,7 @@ const LineChart: React.FC<LineChartProps> = ({
   const toolbarClassName = classNames(classNamesProp?.toolbar);
   const toolbarStyle = props.styles?.toolbar;
 
-  return wrapSSR(
+  return (
     <ChartContainer
       baseClassName={baseClassName}
       className={rootClassName}
@@ -414,7 +414,7 @@ const LineChart: React.FC<LineChartProps> = ({
       >
         <Line ref={chartRef} data={processedData} options={options} />
       </div>
-    </ChartContainer>,
+    </ChartContainer>
   );
 };
 

@@ -8,6 +8,12 @@ import remarkRehype from 'remark-rehype';
 import type { Plugin, Processor } from 'unified';
 import { unified } from 'unified';
 
+import {
+  getRemarkMathOptions,
+  isFormulaEnabled,
+  type FormulaConfig,
+} from '../Config/formulaConfig';
+
 import { remarkDirectiveContainer } from '../MarkdownEditor/editor/parser/remarkDirectiveContainer';
 import remarkDirectiveContainersOnly from '../MarkdownEditor/editor/parser/remarkDirectiveContainersOnly';
 import {
@@ -23,9 +29,6 @@ import {
 import { rehypeSanitizeUserHtml } from '../Utils/rehypeSanitizeUserHtml';
 import { rehypeFootnoteRef } from './plugins/rehypeFootnoteRef';
 import { remarkChartFromComment } from './plugins/remarkChartFromComment';
-
-/** `remark-math` 启用 `$...$` 单美元符号包裹的行内数学 */
-const INLINE_MATH_WITH_SINGLE_DOLLAR = { singleDollarTextMath: true };
 
 /** `remark-frontmatter` 仅识别 yaml 风格 frontmatter */
 const FRONTMATTER_LANGUAGES: readonly string[] = ['yaml'];
@@ -62,18 +65,28 @@ const remarkRehypePlugin = remarkRehype as unknown as Plugin;
 export const createHastProcessor = (
   extraRemarkPlugins?: MarkdownRemarkPlugin[],
   config?: MarkdownToHtmlConfig,
+  formulaConfig?: FormulaConfig,
+  extraRehypePlugins?: Plugin[],
 ): Processor => {
   const processor = unified() as Processor & {
     use: (plugin: Plugin, ...args: unknown[]) => Processor;
   };
 
+  const remarkMathOptions = getRemarkMathOptions(formulaConfig);
+
   (processor as any)
     .use(remarkParse)
     .use(remarkGfm, { singleTilde: false })
     .use(fixStrongWithSpecialChars)
-    .use(convertParagraphToImage)
-    .use(protectJinjaDollarInText)
-    .use(remarkMath, INLINE_MATH_WITH_SINGLE_DOLLAR)
+    .use(convertParagraphToImage);
+
+  if (remarkMathOptions) {
+    (processor as any)
+      .use(protectJinjaDollarInText)
+      .use(remarkMath, remarkMathOptions);
+  }
+
+  (processor as any)
     .use(remarkFrontmatter, FRONTMATTER_LANGUAGES)
     .use(remarkDirectiveContainersOnly)
     .use(remarkDirectiveContainer, REMARK_DIRECTIVE_CONTAINER_OPTIONS)
@@ -83,9 +96,19 @@ export const createHastProcessor = (
       handlers: REMARK_REHYPE_DIRECTIVE_HANDLERS,
     })
     .use(rehypeRaw)
-    .use(rehypeSanitizeUserHtml)
-    .use(rehypeKatex, { strict: 'ignore' } as any)
-    .use(rehypeFootnoteRef);
+    .use(rehypeSanitizeUserHtml);
+
+  if (isFormulaEnabled(formulaConfig)) {
+    (processor as any).use(rehypeKatex, { strict: 'ignore' } as any);
+  }
+
+  (processor as any).use(rehypeFootnoteRef);
+
+  if (extraRehypePlugins?.length) {
+    extraRehypePlugins.forEach((plugin) => {
+      processor.use(plugin);
+    });
+  }
 
   if (extraRemarkPlugins) {
     extraRemarkPlugins.forEach((entry) => {

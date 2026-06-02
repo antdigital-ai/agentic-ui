@@ -29,7 +29,7 @@ vi.mock('react-chartjs-2', () => ({
 
 // Mock style hook to avoid depending on antd context internals in tests
 vi.mock('../../FunnelChart/style', () => ({
-  useStyle: () => ({ wrapSSR: (node: any) => node, hashId: 'test-hash' }),
+  useStyle: () => ({ hashId: 'test-hash' }),
 }));
 
 vi.mock('../../components', () => ({

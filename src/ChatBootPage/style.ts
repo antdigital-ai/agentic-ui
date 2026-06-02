@@ -31,6 +31,6 @@ const useGenStyle = genStyleHooks('ChatBootTitle', genStyle);
  * @returns
  */
 export const useStyle = (prefixCls?: string) => {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'ChatBootTitle');
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(prefixCls ?? 'ChatBootTitle');
+  return { hashId };
 };

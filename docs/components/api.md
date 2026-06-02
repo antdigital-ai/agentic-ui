@@ -69,6 +69,49 @@ export default () => {
 };
 ```
 
+#### Markdown 模式自定义块（plugins.renderer）
+
+`renderMode: 'markdown'` 下，Slate 侧 `plugins[].elements` **不会**生效；请使用 `plugins[].renderer`：
+
+| 能力 | API | 说明 |
+| ---- | --- | ---- |
+| 自定义 fence | `createRendererCodeBlockPlugin({ 'insight-card': ({ code }) => ... })` | 按 \`\`\`language 注册渲染器 |
+| 合并多个插件 | `mergeMarkdownRendererPlugins(pluginA, pluginB)` | 合并 `rendererComponents` / remark / rehype |
+| 保留默认 DOM 再包装 | `eleRender` prop | 拦截 `p` / `table` / `img` 等，返回 `undefined` 回退默认 |
+| 覆盖整块渲染 | `renderer.rendererComponents.table` 等 | 完全替换对应 hast 标签组件 |
+
+```tsx | pure
+import {
+  MarkdownEditor,
+  createRendererCodeBlockPlugin,
+} from '@ant-design/agentic-ui';
+
+const cardPlugin = createRendererCodeBlockPlugin({
+  'insight-card': ({ code }) => <MyCard data={JSON.parse(code)} />,
+});
+
+export default () => (
+  <MarkdownEditor
+    readonly
+    renderMode="markdown"
+    initValue={'```insight-card\n{"topic":"demo"}\n```'}
+    plugins={[cardPlugin]}
+  />
+);
+```
+
+**仍仅 Slate 模式支持**：新建划词评论（FloatBar 选区提交）、`initSchemaValue`、`eleItemRender`（请改用 `eleRender` 或 renderer 插件）。
+
+**markdown 模式已支持（只读，纯 DOM + 原生 CSS）**：
+
+| 能力 | API |
+| ---- | --- |
+| 评论高亮 + 侧栏 | `comment={{ enable: true, commentList }}`，依赖 `refContent`；`<mark>` + `-comment-*` CSS 类 |
+| 文本搜索 | `editorRef.current.store.findByPathAndText([], keyword)` |
+| 兼容搜索 | `findByPathAndText(editorRef.current.store.editor, [], keyword)` |
+| 当前内容 | `editorRef.current.getDisplayedContent()` / `store.getMDContent()` |
+| 包装默认 DOM | `eleRender` |
+
 ### 自定义工具栏
 
 ```tsx | pure
@@ -315,6 +358,7 @@ export default () => {
 | Languages               | 支持的编程语言列表                                                  | `string[]`                                                                                   | -                                   | -    |
 | hideToolBar             | 是否隐藏代码块工具栏                                                | `boolean`                                                                                    | `false`                             | -    |
 | alwaysExpandedDeepThink | 是否始终展开深度思考块                                              | `boolean`                                                                                    | `false`                             | -    |
+| scrollDeepThinkIntoViewOnExpand | 深度思考块展开时是否将组件滚动到视窗内；传 `true` 默认 `{ behavior: 'smooth', block: 'nearest' }`，也可传 `ScrollIntoViewOptions` 自定义 | `boolean \| ScrollIntoViewOptions`                                                | `false`                             | 2.32.33 |
 | disableHtmlPreview      | 是否禁用 HTML 预览                                                  | `boolean`                                                                                    | -                                   | -    |
 | viewModeLabels          | 视图模式标签配置                                                    | `{ preview?: string; code?: string }`                                                        | `{ preview: '预览', code: '代码' }` | -    |
 | ...                     | 支持所有 [Ace.EditorOptions](https://ace.c9.io/#nav=api&api=editor) | `Partial<Ace.EditorOptions>`                                                                 | -                                   | -    |

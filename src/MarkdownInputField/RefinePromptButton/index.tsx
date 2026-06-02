@@ -24,7 +24,7 @@ export const RefinePromptButton: React.FC<RefinePromptButtonProps> = (
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const locale = useLocale();
   const baseCls = getPrefixCls('agentic-md-input-field-refine-button');
-  const { wrapSSR } = useStyle(baseCls);
+  useStyle(baseCls);
 
   const handleClick = () => {
     if (disabled) return;
@@ -46,13 +46,13 @@ export const RefinePromptButton: React.FC<RefinePromptButtonProps> = (
     return null;
   }
 
-  return wrapSSR(
+  return (
     <ActionIconBox
       title={actionTitle}
       onClick={handleClick}
       data-testid="refine-prompt-button"
     >
       <ErrorBoundary fallback={<div />}>{renderIcon()}</ErrorBoundary>
-    </ActionIconBox>,
+    </ActionIconBox>
   );
 };

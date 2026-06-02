@@ -177,7 +177,6 @@ vi.mock('copy-to-clipboard', () => ({ default: vi.fn() }));
 vi.mock('../MessagesContent/style', () => ({
   useMessagesContentStyle: () => ({
     hashId: 'test-hash',
-    wrapSSR: (node: any) => node,
   }),
 }));
 

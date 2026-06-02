@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { RenderElementProps } from 'slate-react';
 import { ToolUseBar } from '../../../../ToolUseBar';
 import { normalizeToolUseBarPropsFromJson } from './agenticUiEmbedUtils';
@@ -8,8 +8,9 @@ export const AgenticUiToolUseBarBlock: React.FC<RenderElementProps> = ({
   children,
   element,
 }) => {
-  const { tools, ...restBar } = normalizeToolUseBarPropsFromJson(
-    (element as any).value,
+  const { tools, ...restBar } = useMemo(
+    () => normalizeToolUseBarPropsFromJson((element as any).value),
+    [(element as any).value],
   );
 
   return (

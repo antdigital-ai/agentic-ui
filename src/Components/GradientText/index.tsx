@@ -20,14 +20,14 @@ export function GradientText({
 }: GradientTextProps) {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('gradient-text');
-  const { wrapSSR, hashId } = useGradientTextStyle(prefixCls);
+  const { hashId } = useGradientTextStyle(prefixCls);
 
   const gradientStyle = {
     backgroundImage: `linear-gradient(to right, ${colors.join(', ')})`,
     animationDuration: `${animationSpeed}s`,
   };
 
-  return wrapSSR(
+  return (
     <div
       className={classNames(prefixCls, hashId, className)}
       data-testid={prefixCls}
@@ -39,6 +39,6 @@ export function GradientText({
       >
         {children}
       </div>
-    </div>,
+    </div>
   );
 }

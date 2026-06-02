@@ -48,7 +48,6 @@ vi.mock('../../../editor/elements/Table/SimpleTable', () => ({
 
 vi.mock('../../../editor/elements/Table/Td/style', () => ({
   useStyle: vi.fn(() => ({
-    wrapSSR: (component: any) => component,
     hashId: 'test-hash',
   })),
 }));
@@ -635,7 +634,7 @@ describe('Table Components', () => {
     it('应该应用 hashId', () => {
       const { container } = render(<Td {...defaultTdProps} />);
       const td = container.querySelector('td');
-      // hashId 通过 wrapSSR 应用，检查 td 存在即可
+      // hashId 通过 useStyle 应用，检查 td 存在即可
       expect(td).toBeInTheDocument();
     });
 

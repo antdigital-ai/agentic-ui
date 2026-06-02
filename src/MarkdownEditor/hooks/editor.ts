@@ -1,4 +1,4 @@
-import { BaseElement, Path, Transforms } from 'slate';
+﻿import { BaseElement, Path, Transforms } from 'slate';
 import { ReactEditor, useSlate } from 'slate-react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { selChange$ } from '../editor/plugins/useOnchange';
@@ -71,15 +71,20 @@ export const useSelStatus = (element: any) => {
     selChange$,
     (ctx) => {
       const path = EditorUtils.findPath(markdownEditorRef.current, element);
-      if (!ctx) {
-        return setState({
-          selected: false,
-          path,
-        });
+      const selected = ctx
+        ? Path.equals(path, ctx.node?.[1] || [])
+        : false;
+      const prev = state();
+      if (
+        prev.selected === selected &&
+        prev.path.length === path.length &&
+        prev.path.every((segment, i) => segment === path[i])
+      ) {
+        return;
       }
       setState({
         path,
-        selected: Path.equals(path, ctx.node?.[1] || []),
+        selected,
       });
     },
     [element],

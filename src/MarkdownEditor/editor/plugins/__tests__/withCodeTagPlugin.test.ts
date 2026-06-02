@@ -280,6 +280,99 @@ describe('withCodeTagPlugin', () => {
   });
 
   // ================================================================
+  // insertBreak
+  // ================================================================
+
+  describe('insertBreak', () => {
+    it('光标在 tag 内按回车时先把光标移到下一个兄弟节点', () => {
+      const base = createEditor();
+      const originalInsertBreak = vi.fn();
+      base.insertBreak = originalInsertBreak;
+      const editor = withCodeTagPlugin(base);
+      editor.children = [para(tagNode('hello'), { text: ' world' })];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 5 },
+        focus: { path: [0, 0], offset: 5 },
+      };
+
+      const selectSpy = vi.spyOn(Transforms, 'select');
+
+      editor.insertBreak();
+
+      expect(selectSpy).toHaveBeenCalled();
+      expect(originalInsertBreak).toHaveBeenCalledTimes(1);
+      selectSpy.mockRestore();
+    });
+
+    it('光标在 tag 内且无下一个兄弟时插入空文本节点再换行', () => {
+      const base = createEditor();
+      const originalInsertBreak = vi.fn();
+      base.insertBreak = originalInsertBreak;
+      const editor = withCodeTagPlugin(base);
+      editor.children = [para(tagNode('hello'))];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 5 },
+        focus: { path: [0, 0], offset: 5 },
+      };
+
+      const insertNodesSpy = vi.spyOn(Transforms, 'insertNodes');
+
+      editor.insertBreak();
+
+      expect(insertNodesSpy).toHaveBeenCalledWith(
+        editor,
+        expect.objectContaining({ text: '' }),
+        expect.objectContaining({ select: true }),
+      );
+      expect(originalInsertBreak).toHaveBeenCalledTimes(1);
+      insertNodesSpy.mockRestore();
+    });
+
+    it('光标在普通节点时不预移动光标，直接 insertBreak', () => {
+      const base = createEditor();
+      const originalInsertBreak = vi.fn();
+      base.insertBreak = originalInsertBreak;
+      const editor = withCodeTagPlugin(base);
+      editor.children = [para({ text: 'hello' })];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 3 },
+        focus: { path: [0, 0], offset: 3 },
+      };
+
+      const selectSpy = vi.spyOn(Transforms, 'select');
+      const insertNodesSpy = vi.spyOn(Transforms, 'insertNodes');
+
+      editor.insertBreak();
+
+      expect(selectSpy).not.toHaveBeenCalled();
+      expect(insertNodesSpy).not.toHaveBeenCalled();
+      expect(originalInsertBreak).toHaveBeenCalledTimes(1);
+      selectSpy.mockRestore();
+      insertNodesSpy.mockRestore();
+    });
+
+    it('Node.get 抛错时不影响后续 insertBreak', () => {
+      const base = createEditor();
+      const originalInsertBreak = vi.fn();
+      base.insertBreak = originalInsertBreak;
+      const editor = withCodeTagPlugin(base);
+      editor.children = [para(tagNode('hello'))];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 5 },
+        focus: { path: [0, 0], offset: 5 },
+      };
+
+      const spy = vi.spyOn(Node, 'get').mockImplementation(() => {
+        throw new Error('boom');
+      });
+
+      expect(() => editor.insertBreak()).not.toThrow();
+      expect(originalInsertBreak).toHaveBeenCalledTimes(1);
+      spy.mockRestore();
+    });
+  });
+
+  // ================================================================
   // deleteBackward
   // ================================================================
 

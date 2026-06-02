@@ -212,11 +212,7 @@ export const normalizeRadarChartData = (
   const result: ChartDataItem[] = [];
 
   for (const raw of data) {
-    if (
-      raw === null ||
-      raw === undefined ||
-      typeof raw !== 'object'
-    ) {
+    if (raw === null || raw === undefined || typeof raw !== 'object') {
       continue;
     }
 
@@ -430,7 +426,10 @@ export const parseChartXDateSortKey = (
     if (year.isValid()) return year.valueOf();
   }
 
-  if (/^\d{4}-\d{1,2}(-\d{1,2})?$/.test(raw) || /^\d{4}\/\d{1,2}(\/\d{1,2})?$/.test(raw)) {
+  if (
+    /^\d{4}-\d{1,2}(-\d{1,2})?$/.test(raw) ||
+    /^\d{4}\/\d{1,2}(\/\d{1,2})?$/.test(raw)
+  ) {
     const parsed = dayjs(raw);
     if (parsed.isValid()) return parsed.valueOf();
   }
@@ -561,20 +560,16 @@ export const isXValueEqual = (
 export const resolveChartSortByField = (
   rows: Array<Record<string, unknown>> | null | undefined,
   explicitSortBy?: string,
-  getCellValue: (
-    row: Record<string, unknown>,
-    field: string,
-  ) => unknown = (row, field) => row[field],
+  getCellValue: (row: Record<string, unknown>, field: string) => unknown = (
+    row,
+    field,
+  ) => row[field],
 ): string | undefined => {
   if (explicitSortBy) return explicitSortBy;
   const data = rows ?? [];
   const hasIndexColumn = data.some((row) => {
     const value = getCellValue(row, CHART_AUTO_SORT_BY_COLUMN);
-    return (
-      value !== null &&
-      value !== undefined &&
-      String(value).trim() !== ''
-    );
+    return value !== null && value !== undefined && String(value).trim() !== '';
   });
   return hasIndexColumn ? CHART_AUTO_SORT_BY_COLUMN : undefined;
 };

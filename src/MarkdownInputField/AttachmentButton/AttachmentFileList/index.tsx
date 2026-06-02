@@ -97,7 +97,7 @@ export const AttachmentFileList: React.FC<AttachmentFileListProps> = ({
   const context = useContext(ConfigProvider.ConfigContext);
   const { locale } = useContext(I18nContext);
   const prefix = context?.getPrefixCls('agentic-md-editor-attachment-list');
-  const { wrapSSR, hashId } = useStyle(prefix);
+  const { hashId } = useStyle(prefix);
   const [imgSrc, setImgSrc] = React.useState<string | undefined>(undefined);
 
   const fileList = Array.from(fileMap?.values() || []);
@@ -209,7 +209,7 @@ export const AttachmentFileList: React.FC<AttachmentFileListProps> = ({
     if (!visible) setImgSrc(undefined);
   };
 
-  return wrapSSR(
+  return (
     <div
       className={classNames(`${prefix}-container`, hashId, {
         [`${prefix}-container-empty`]: !hasFiles,
@@ -269,6 +269,6 @@ export const AttachmentFileList: React.FC<AttachmentFileListProps> = ({
         onClick={onClearFileMap}
         className={classNames(`${prefix}-close-icon`, hashId)}
       />
-    </div>,
+    </div>
   );
 };

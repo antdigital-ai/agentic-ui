@@ -127,33 +127,31 @@ export const FloatBar = (props: { readonly: boolean }) => {
   const context = useContext(ConfigProvider.ConfigContext);
   const baseClassName = context?.getPrefixCls(`agentic-md-editor-float-bar`);
 
-  const { wrapSSR, hashId } = useStyle(baseClassName);
+  const { hashId } = useStyle(baseClassName);
 
   if (!markdownContainerRef.current) return null;
 
   return ReactDOM.createPortal(
-    wrapSSR(
-      <div
-        style={{
-          position: 'fixed',
-          opacity: isOpen ? 1 : 0,
-          transition: 'all 0.3s ease-out',
-          userSelect: 'none',
-        }}
-        ref={floatBarRef}
-        onMouseDown={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-        }}
-        className={classNames(baseClassName, hashId)}
-      >
-        {props.readonly ? (
-          <ReadonlyBaseBar prefix={baseClassName} />
-        ) : (
-          <BaseToolBar prefix={baseClassName} hashId={hashId} />
-        )}
-      </div>,
-    ),
+    <div
+      style={{
+        position: 'fixed',
+        opacity: isOpen ? 1 : 0,
+        transition: 'all 0.3s ease-out',
+        userSelect: 'none',
+      }}
+      ref={floatBarRef}
+      onMouseDown={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      className={classNames(baseClassName, hashId)}
+    >
+      {props.readonly ? (
+        <ReadonlyBaseBar prefix={baseClassName} />
+      ) : (
+        <BaseToolBar prefix={baseClassName} hashId={hashId} />
+      )}
+    </div>,
     document.body,
   );
 };

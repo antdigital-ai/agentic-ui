@@ -49,8 +49,8 @@ export const AvatarList: React.FC<{
 }> = ({ displayList, style }) => {
   const context = React.useContext(ConfigProvider.ConfigContext);
   const baseCls = context?.getPrefixCls('agentic-contributor-avatar-list');
-  const { wrapSSR, hashId } = useStyle(baseCls);
-  return wrapSSR(
+  const { hashId } = useStyle(baseCls);
+  return (
     <>
       <div
         className={classNames(hashId, baseCls)}
@@ -69,6 +69,6 @@ export const AvatarList: React.FC<{
           );
         })}
       </div>
-    </>,
+    </>
   );
 };

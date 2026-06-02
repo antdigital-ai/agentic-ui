@@ -175,9 +175,8 @@ describe('ChatLayout', () => {
       '.ant-chat-layout-content-scrollable',
     );
     const spacer = scrollable?.lastElementChild as HTMLElement;
-    // spacer 高度由 useElementSize 钩子测量的实际 footer 高度决定
-    // 在测试环境中由于 ResizeObserver 被 mock，高度为 0
-    expect(spacer).toHaveStyle('height: 0px');
+    // 测量未完成时回退到 footerHeight，避免内容被底部遮挡
+    expect(spacer).toHaveStyle('height: 150px');
   });
 
   it('sets spacer height to 0 when footer is not provided', () => {

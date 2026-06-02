@@ -1,13 +1,14 @@
-﻿import { Checkbox, Image } from 'antd';
+import { Checkbox, Image } from 'antd';
 import { toJsxRuntime } from 'hast-util-to-jsx-runtime';
 import React from 'react';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
-import type { Processor } from 'unified';
+import type { Processor, Plugin } from 'unified';
 
 import type {
   MarkdownRemarkPlugin,
   MarkdownToHtmlConfig,
 } from '../MarkdownEditor/editor/utils/markdownToHtml';
+import type { FormulaConfig } from '../Config/formulaConfig';
 import type { MarkdownEditorProps } from '../MarkdownEditor/types';
 import { ToolUseBarThink } from '../ToolUseBarThink';
 import { debugInfo } from '../Utils/debugUtils';
@@ -16,15 +17,14 @@ import {
   UNSAFE_URL_PLAIN_TEXT_STYLE,
 } from '../Utils/htmlUrlSafety';
 import {
-  FncRefForMarkdown,
   extractFootnoteRefFromSupChildren,
+  FncRefForMarkdown,
 } from './FncRefForMarkdown';
 import { createHastProcessor } from './processor';
 import {
   INITIAL_FENCE_STATE,
   updateFenceStateForLine,
 } from './streaming/fenceTracker';
-import { StreamAnimWrap } from './streaming/StreamAnimWrap';
 import type { MarkdownRendererEleProps, RendererBlockProps } from './types';
 import {
   extractChildrenText,
@@ -64,7 +64,6 @@ const buildEditorAlignedComponents = (
     onClick?: (url?: string) => boolean | void;
   },
   fncProps?: MarkdownEditorProps['fncProps'],
-  streamingParagraphAnimation?: boolean,
   eleRender?: (
     props: MarkdownRendererEleProps,
     defaultDom: React.ReactNode,
@@ -73,17 +72,6 @@ const buildEditorAlignedComponents = (
   const listCls = `${prefixCls}-list`;
   const tableCls = `${prefixCls}-content-table`;
   const contentCls = prefixCls; // e.g. ant-agentic-md-editor-content
-
-  /**
-   * 段落级流式淡入：通过模块级 StreamAnimWrap 组件实现，避免 buildEditorAlignedComponents
-   * 重建时 React 把 wrap 当作新组件类型导致整段子树卸载重挂。
-   */
-  const wrapAnimation = (children: any) =>
-    jsx(StreamAnimWrap, {
-      streaming,
-      streamingParagraphAnimation,
-      children,
-    });
 
   /**
    * 应用 eleRender 拦截：若用户返回非 undefined 值则使用，否则使用 defaultDom。
@@ -111,7 +99,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-be': 'paragraph',
         'data-testid': 'markdown-paragraph',
-        children: wrapAnimation(children),
+        children,
       });
       return applyEleRender('p', { node, children, ...rest }, defaultDom);
     },
@@ -327,7 +315,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-testid': 'markdown-th',
         style: { whiteSpace: 'normal', maxWidth: '20%' },
-        children: wrapAnimation(children),
+        children,
       });
     },
     td: (props: any) => {
@@ -336,7 +324,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-testid': 'markdown-td',
         style: { whiteSpace: 'normal', maxWidth: '20%' },
-        children: wrapAnimation(children),
+        children,
       });
     },
 
@@ -435,11 +423,24 @@ const buildEditorAlignedComponents = (
     },
 
     mark: (props: any) => {
-      const { node, children, ...rest } = props;
+      const { node, children, color, bg, label, ...rest } = props;
+      const markStyle: Record<string, string> = {};
+      if (color) markStyle.color = color;
+      if (bg) markStyle.backgroundColor = bg;
+      const labelNode =
+        label &&
+        jsx('span' as any, {
+          'data-testid': 'markdown-mark-label',
+          style: { marginInlineEnd: 4, fontSize: '0.85em', opacity: 0.75 },
+          children: label,
+        });
       const defaultDom = jsx('mark' as any, {
         ...rest,
         'data-testid': 'markdown-mark',
-        children,
+        style: Object.keys(markStyle).length
+          ? { ...rest.style, ...markStyle }
+          : rest.style,
+        children: labelNode ? [labelNode, children] : children,
       });
       return applyEleRender('mark', { node, children, ...rest }, defaultDom);
     },
@@ -522,7 +523,7 @@ const buildEditorAlignedComponents = (
           children: src,
         });
       }
-      const imgWidth = width ? Number(width) || width : 400;
+      // width 若未提供，不设置默认值，完全由 CSS 控制宽度
       const defaultDom = jsx('div' as any, {
         'data-be': 'image',
         'data-testid': 'markdown-image',
@@ -548,7 +549,7 @@ const buildEditorAlignedComponents = (
           children: jsx(Image as any, {
             src,
             alt: alt || 'image',
-            width: imgWidth,
+            width: width ? Number(width) || width : undefined,
             height,
             preview: { getContainer: () => document.body },
             referrerPolicy: 'no-referrer',
@@ -772,8 +773,6 @@ const LIST_ITEM_PATTERN = /^(\s*)([-+*]|\d+[.)]) /;
 const BLOCKQUOTE_PATTERN = /^\s*>/;
 const HTML_COMMENT_PATTERN = /^\s*<!--/;
 const FOOTNOTE_DEF_PATTERN = /^\s*\[\^/;
-/** GFM 表格行：以 `|` 开头并以 `|` 结尾，至少一段内容（含分隔行 `| --- |`） */
-const TABLE_LINE_PATTERN = /^\s*\|.*\|\s*$/;
 
 /** 按单空行拆块，保留围栏代码块、列表、blockquote、HTML 注释+表格、脚注定义、GFM 表格的连续性 */
 const splitMarkdownBlocks = (content: string): string[] => {
@@ -783,7 +782,6 @@ const splitMarkdownBlocks = (content: string): string[] => {
   let fenceState = { ...INITIAL_FENCE_STATE };
   let inList = false;
   let inBlockquote = false;
-  let inTable = false;
   let pendingBlankLines = 0;
 
   const lastNonEmptyLine = (): string => {
@@ -815,15 +813,15 @@ const splitMarkdownBlocks = (content: string): string[] => {
     if (pendingBlankLines > 0) {
       const nextIsListItem = LIST_ITEM_PATTERN.test(line);
       const nextIsBlockquote = BLOCKQUOTE_PATTERN.test(line);
-      const nextIsTableLine = TABLE_LINE_PATTERN.test(line);
       const nextIsContinuation =
         (inList && (nextIsListItem || /^\s+\S/.test(line))) ||
-        (inBlockquote && nextIsBlockquote) ||
-        (inTable && nextIsTableLine);
+        (inBlockquote && nextIsBlockquote);
 
       const prevIsHtmlComment = HTML_COMMENT_PATTERN.test(lastNonEmptyLine());
       const nextIsFootnoteDef = FOOTNOTE_DEF_PATTERN.test(line);
 
+      // GFM 中空行终止表格，所以两张相邻表格必须切成两块——若仍合并，
+      // 后表格每次增长都会拖累前表格的 memo 命中
       if (
         current.length > 0 &&
         !nextIsContinuation &&
@@ -834,7 +832,6 @@ const splitMarkdownBlocks = (content: string): string[] => {
         current = [];
         inList = false;
         inBlockquote = false;
-        inTable = false;
       } else {
         for (let i = 0; i < pendingBlankLines; i++) current.push('');
       }
@@ -843,7 +840,6 @@ const splitMarkdownBlocks = (content: string): string[] => {
 
     inList = LIST_ITEM_PATTERN.test(line) || (inList && /^\s+\S/.test(line));
     inBlockquote = BLOCKQUOTE_PATTERN.test(line);
-    inTable = TABLE_LINE_PATTERN.test(line) || (inTable && /^\s+\S/.test(line));
 
     current.push(line);
   }
@@ -858,7 +854,9 @@ const splitMarkdownBlocks = (content: string): string[] => {
 
 export interface UseMarkdownToReactOptions {
   remarkPlugins?: MarkdownRemarkPlugin[];
+  rehypePlugins?: Plugin[];
   htmlConfig?: MarkdownToHtmlConfig;
+  formula?: FormulaConfig;
   components?: Record<string, React.ComponentType<RendererBlockProps>>;
   prefixCls?: string;
   linkConfig?: {
@@ -867,8 +865,6 @@ export interface UseMarkdownToReactOptions {
   };
   fncProps?: MarkdownEditorProps['fncProps'];
   streaming?: boolean;
-  /** 默认开启；传 false 关闭末段段落动画 */
-  streamingParagraphAnimation?: boolean;
   /** 原始流字符串，与 useStreaming 输出分离避免缓存误判 */
   contentRevisionSource?: string;
   /** 返回 undefined 回退默认渲染 */

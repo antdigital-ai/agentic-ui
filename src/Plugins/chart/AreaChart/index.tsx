@@ -248,7 +248,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
   // 样式注册
   const context = useContext(ConfigProvider.ConfigContext);
   const baseClassName = context?.getPrefixCls('area-chart-container');
-  const { wrapSSR, hashId } = useStyle(baseClassName);
+  const { hashId } = useStyle(baseClassName);
 
   const chartRef = useRef<ChartJS<'line'>>(null);
 
@@ -471,7 +471,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
   const toolbarClassName = classNames(classNamesProp?.toolbar);
   const toolbarStyle = stylesProp?.toolbar;
 
-  return wrapSSR(
+  return (
     <ChartContainer
       baseClassName={baseClassName}
       className={rootClassName}
@@ -538,7 +538,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
       >
         <Line ref={chartRef} data={processedData} options={options} />
       </div>
-    </ChartContainer>,
+    </ChartContainer>
   );
 };
 

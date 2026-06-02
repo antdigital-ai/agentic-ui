@@ -58,6 +58,31 @@ export const clearCardAreaText = (editor: Editor, path: Path) => {
 };
 
 /**
+ * Atomic / void 类内容节点：children 通常是 `[{ text: '' }]` 作为占位，
+ * 但节点本身（image url / table 结构 / 代码 value 等）承载真正内容，
+ * 不能仅凭 text 为空就判定为"空 card"。
+ */
+const ATOMIC_CARD_CONTENT_TYPES = new Set([
+  'image',
+  'media',
+  'attach',
+  'link-card',
+  'code',
+  'mermaid',
+  'katex',
+  'inline-katex',
+  'hr',
+  'break',
+  'table',
+  'schema',
+  'apaasify',
+  'agentic-ui-task',
+  'agentic-ui-toolusebar',
+  'agentic-ui-usertoolbar',
+  'agentic-ui-filemap',
+]);
+
+/**
  * 检查卡片是否为空
  * @param cardNode - 卡片节点
  * @returns 如果卡片为空则返回true
@@ -79,6 +104,10 @@ export const isCardEmpty = (cardNode: any): boolean => {
 
   // 检查内容节点是否为空
   return contentNodes.every((node: any) => {
+    // atomic / void 节点哪怕 children 是 [{ text: '' }] 也应视为非空内容
+    if (node?.type && ATOMIC_CARD_CONTENT_TYPES.has(node.type)) {
+      return false;
+    }
     if (!node.children || node.children.length === 0) {
       return true;
     }

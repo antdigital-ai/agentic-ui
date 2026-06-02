@@ -1,19 +1,20 @@
-import type { Ace } from 'ace-builds';
+﻿import type { Ace } from 'ace-builds';
 import { AnchorProps, ImageProps } from 'antd';
 import React from 'react';
 import { BaseEditor, Editor, Selection } from 'slate';
 import { HistoryEditor } from 'slate-history';
 import { ReactEditor, RenderElementProps } from 'slate-react';
 import type {
-  CharacterQueueOptions,
+  ContentThrottleOptions,
   RenderMode,
 } from '../MarkdownRenderer/types';
+import type { FormulaConfig } from '../Config/formulaConfig';
 import { TagPopupProps } from './editor/elements/TagPopup';
-import { EditorStore } from './editor/store';
+import type { EditorStore } from './editor/store';
 import { InsertAutocompleteProps } from './editor/tools/InsertAutocomplete';
 import type { ToolsKeyType } from './editor/tools/ToolBar/config/toolsConfig';
 import type { MarkdownToHtmlOptions } from './editor/utils/markdownToHtml';
-import { CustomLeaf, Elements } from './el';
+import { CustomLeaf, Elements, FootnoteDefinitionNode } from './el';
 
 export type CommentDataType = {
   selection: Selection;
@@ -73,8 +74,10 @@ export interface MarkdownEditorInstance {
   markdownContainerRef: React.MutableRefObject<HTMLDivElement | null>;
   markdownEditorRef: React.MutableRefObject<
     BaseEditor & ReactEditor & HistoryEditor
-  >;
+  > | React.MutableRefObject<null>;
   exportHtml: (filename?: string) => void;
+  /** renderMode=markdown 时可用 */
+  getDisplayedContent?: () => string;
 }
 
 export type MarkdownEditorProps = {
@@ -87,12 +90,21 @@ export type MarkdownEditorProps = {
     type?: 'panel' | 'dropdown';
   } & TagPopupProps;
   editorStyle?: React.CSSProperties;
+  /** 脚注引用（fnc）与脚注定义列表（`onFootnoteDefinitionChange`）的配置 */
   fncProps?: {
-    render: (
+    /** 自定义脚注角标渲染；未传时使用默认 `FncLeaf` */
+    render?: (
       props: CustomLeaf<Record<string, any>> & { children: React.ReactNode },
       defaultDom: React.ReactNode,
     ) => React.ReactNode;
-    onOriginUrlClick?: (url?: string) => void;
+    /** 移动端点击脚注角标时 Modal 内容；未传时使用脚注定义与来源链接 */
+    renderMobileModal?: (props: {
+      identifier?: string;
+      displayLabel: string;
+      definition?: FootnoteDefinitionNode;
+      defaultContent: React.ReactNode;
+    }) => React.ReactNode;
+    onOriginUrlClick?: (identifier?: string) => void;
     onFootnoteDefinitionChange?: (
       data: {
         id: any;
@@ -117,6 +129,12 @@ export type MarkdownEditorProps = {
     Languages?: string[];
     hideToolBar?: boolean;
     alwaysExpandedDeepThink?: boolean;
+    /**
+     * 深度思考块展开时是否将组件滚动到视窗内。
+     * 传入 `true` 时使用默认参数 `{ behavior: 'smooth', block: 'nearest' }`，
+     * 也可直接传入 `ScrollIntoViewOptions` 自定义滚动行为。
+     */
+    scrollDeepThinkIntoViewOnExpand?: boolean | ScrollIntoViewOptions;
     disableHtmlPreview?: boolean;
     viewModeLabels?: {
       /** 默认 '预览' */
@@ -192,11 +210,36 @@ export type MarkdownEditorProps = {
     allowedTypes?: string[];
     /** @default false */
     plainTextOnly?: boolean;
+    /**
+     * 粘 text/plain 时是否启发式识别 markdown 并解析。
+     * 默认 true（保留旧行为）；关掉后含 `**bold**` `[x](y)` 等的纯文本会原样插入。
+     */
+    parseMarkdownInPlainText?: boolean;
+    /**
+     * text/html 单次粘贴体积上限（字节）。超过时降级为 text/plain，避免主线程被巨型
+     * Word/Excel 文档卡死。默认 1MB；设为 0 关闭限制。
+     * @default 1_048_576
+     */
+    htmlMaxBytes?: number;
+    /**
+     * 检测到 Word / Office 系列 HTML 时，先把 HTML 转成 markdown 再走 markdown 解析
+     * 流水线（更稳定的格式映射），失败时回退到 insertParsedHtmlNodes。
+     * 默认 true；设为 false 走旧的 docxDeserializer 路径。
+     * @default true
+     */
+    convertWordToMarkdown?: boolean;
   };
 
   jinja?: JinjaConfig;
+  /** 公式解析与 KaTeX 渲染配置；可通过 AgenticConfigProvide 全局设置 */
+  formula?: FormulaConfig;
   plugins?: any[];
   onChange?: (value: string, schema: Elements[]) => void;
+  /**
+   * onChange 去抖等待毫秒数。连续输入会合并为一次回调，默认 150ms。
+   * 设为 0 时仍会去掉同帧重复（rAF 级别）；设大值可进一步降低 setState 频率。
+   */
+  onChangeDebounceWait?: number;
   onSelectionChange?: (
     selection: Selection | null,
     selectedMarkdown: string,
@@ -249,10 +292,9 @@ export type MarkdownEditorProps = {
     onClick?: (url?: string) => boolean | void;
   };
 
-  /** 字符队列配置（仅 renderMode: 'markdown'），默认关闭逐字 RAF */
-  queueOptions?: CharacterQueueOptions;
-  /** 末段淡入动画（仅 renderMode: 'markdown'），默认开启；传 false 关闭 */
-  streamingParagraphAnimation?: boolean;
+  /** 流式限流（仅 renderMode: 'markdown'），默认 streaming 时开启 */
+  throttleOptions?: ContentThrottleOptions;
+
   /** MElement 刷新依赖 */
   deps?: string[];
 

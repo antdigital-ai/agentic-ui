@@ -121,20 +121,7 @@ interface HistoryItemProps {
   /** 收藏/取消收藏的回调函数 */
   onFavorite?: (sessionId: string, isFavorite: boolean) => void;
   /** 智能代理相关配置和回调 */
-  agent?: {
-    /** 是否启用智能代理功能 */
-    enabled?: boolean;
-    /** 搜索关键词回调 */
-    onSearch?: (keyword: string) => void;
-    /** 智能代理收藏回调 */
-    onFavorite?: (sessionId: string, isFavorite: boolean) => void;
-    /** 智能代理选择变化回调 */
-    onSelectionChange?: (selectedIds: string[]) => void;
-    /** 加载更多数据回调 */
-    onLoadMore?: () => void;
-    /** 是否正在加载更多数据 */
-    loadingMore?: boolean;
-  };
+  agent?: import('../types').AgentModeItemConfig;
   /** 额外的渲染内容，接收历史记录项作为参数 */
   extra?: (item: HistoryDataType) => React.ReactElement;
   /** 自定义操作区域 */

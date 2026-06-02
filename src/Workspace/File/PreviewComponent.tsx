@@ -88,7 +88,7 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
   const { locale } = useContext(I18nContext);
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const filePrefixCls = getPrefixCls('workspace-file');
-  const { wrapSSR, hashId } = useFileStyle(filePrefixCls);
+  const { hashId } = useFileStyle(filePrefixCls);
   const prefixCls = `${filePrefixCls}-preview`;
   const editorRef = useRef<MarkdownEditorInstance>();
 
@@ -316,7 +316,7 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
   const headerLastModified =
     headerFileOverride?.lastModified ?? file.lastModified;
 
-  return wrapSSR(
+  return (
     <div className={classNames(prefixCls, hashId)}>
       {customHeader ? (
         <div className={classNames(`${prefixCls}-header`, hashId)}>
@@ -423,6 +423,6 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
       <div className={classNames(`${prefixCls}-content`, hashId)}>
         {renderPreviewContent()}
       </div>
-    </div>,
+    </div>
   );
 };

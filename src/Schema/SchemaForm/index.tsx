@@ -96,7 +96,7 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
       if (property.required) {
         rules.push({
           required: true,
-          message: `${locale?.inputPlaceholder || '请输入'} ${property.title || property.description || ''}`,
+          message: `${locale?.inputPlaceholder || ''} ${property.title || property.description || ''}`.trim(),
         });
       }
 
@@ -166,7 +166,7 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
   // 获取通用输入框属性
   const getCommonInputProps = useCallback(
     (property: SchemaProperty) => ({
-      placeholder: `${locale?.inputPlaceholder || '请输入'} ${property.title || property.description}`,
+      placeholder: `${locale?.inputPlaceholder || ''} ${property.title || property.description || ''}`.trim(),
       readOnly: readonly,
       disabled: readonly,
     }),
@@ -220,7 +220,7 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
         return (
           <Form.Item name={name} style={{ margin: 0 }}>
             <Input
-              placeholder={locale?.inputPlaceholder || '请输入'}
+              placeholder={locale?.inputPlaceholder}
               readOnly={readonly}
               disabled={readonly}
             />
@@ -296,7 +296,7 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
                     block
                     icon={<Plus />}
                   >
-                    {locale?.['schemaForm.addItem'] || '添加'}{' '}
+                    {locale?.['schemaForm.addItem']}{' '}
                     {getPropertyTitle(property, key)}
                   </Button>
                 </Form.Item>
@@ -319,7 +319,7 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
       if (!property.properties) {
         return (
           <Input
-            placeholder={`${locale?.inputPlaceholder || '请输入'} ${property.title || property.description}`}
+            placeholder={`${locale?.inputPlaceholder || ''} ${property.title || property.description || ''}`.trim()}
             disabled
           />
         );

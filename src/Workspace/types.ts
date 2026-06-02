@@ -603,7 +603,7 @@ export interface FileTreeNode {
    * - 已有子节点时视为目录
    */
   isLeaf?: boolean;
-  /** 子节点；懒加载目录为 `isLeaf: false` 时可为 `[]` 或省略，展开后由 `onLoadChildren` 填充，空目录也保持为目录 */
+  /** 子节点；懒加载目录为 `isLeaf: false` 时可为 `[]` 或省略，展开后由 `onLoadChildren` 填充；返回空数组时节点会标记为叶子且不可再展开 */
   children?: FileTreeNode[];
   /** 节点图标 */
   icon?: ReactNode;

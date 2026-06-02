@@ -1,4 +1,4 @@
-import { createEditor } from 'slate';
+﻿import { createEditor } from 'slate';
 import { withReact } from 'slate-react';
 import { describe, expect, it } from 'vitest';
 import { canUseSlateNativePlaceholder } from '../canUseSlateNativePlaceholder';
@@ -14,6 +14,17 @@ describe('canUseSlateNativePlaceholder', () => {
   it('单空标题时返回 true', () => {
     editor.children = [{ type: 'head', level: 1, children: [{ text: '' }] }];
     expect(canUseSlateNativePlaceholder(editor)).toBe(true);
+  });
+
+  it('空标题含 tag 子节点时返回 false', () => {
+    editor.children = [
+      {
+        type: 'head',
+        level: 1,
+        children: [{ text: '', tag: true } as { text: string; tag: boolean }],
+      },
+    ];
+    expect(canUseSlateNativePlaceholder(editor)).toBe(false);
   });
 
   it('多 block 时返回 false', () => {

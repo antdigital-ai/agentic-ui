@@ -57,13 +57,13 @@ const StatusIcon: FC<{
 export const TaskList: FC<TaskListProps> = ({ data, onItemClick }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-workspace-task');
-  const { wrapSSR, hashId } = useTaskStyle(prefixCls);
+  const { hashId } = useTaskStyle(prefixCls);
 
   const handleItemClick = (item: TaskItem) => {
     onItemClick?.(item);
   };
 
-  return wrapSSR(
+  return (
     <div className={classNames(prefixCls, hashId)} data-testid="task-list">
       {data.items.map((item) => (
         <div
@@ -103,6 +103,6 @@ export const TaskList: FC<TaskListProps> = ({ data, onItemClick }) => {
           </div>
         </div>
       ))}
-    </div>,
+    </div>
   );
 };

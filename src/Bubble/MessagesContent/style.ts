@@ -155,6 +155,6 @@ const genStyle: GenStyleFn<'BubbleMessages'> = (token) => {
 const useGenStyle = genStyleHooks('BubbleMessages', genStyle);
 
 export function useMessagesContentStyle(componentCls: string) {
-  const [wrapSSR, hashId] = useGenStyle(componentCls);
-  return { wrapSSR, hashId };
+  const [, hashId] = useGenStyle(componentCls);
+  return { hashId };
 }
