@@ -632,10 +632,7 @@ describe('Editor branches - handleClipboardCopy', () => {
       'application/x-slate-md-fragment',
       expect.any(String),
     );
-    expect(event.clipboardData.setData).toHaveBeenCalledWith(
-      'text/plain',
-      expect.any(String),
-    );
+    // text/plain 由 ReactEditor.setFragmentData（已 mock）写入，handler 不再直接 setData
     expect(event.clipboardData.setData).toHaveBeenCalledWith(
       'text/markdown',
       expect.any(String),
@@ -707,7 +704,8 @@ describe('Editor branches - handleClipboardCopy', () => {
     expect(event.clipboardData.clearData).toHaveBeenCalled();
     expect(event.clipboardData.setData).not.toHaveBeenCalled();
     expect(ReactEditor.setFragmentData).not.toHaveBeenCalled();
-    expect(event.preventDefault).toHaveBeenCalled();
+    // 无效选区路径直接 return false，未走成功分支，不 preventDefault（原生兜底）
+    expect(event.preventDefault).not.toHaveBeenCalled();
   });
 
   it('cut gets selection from DOM, deletes content, and sets clipboard', () => {
@@ -747,7 +745,7 @@ describe('Editor branches - handleClipboardCopy', () => {
     window.getSelection = origGetSelection;
   });
 
-  it('copy/cut with no selection returns false and calls preventDefault fallback', () => {
+  it('copy/cut with no selection returns false without preventDefault (native fallback)', () => {
     const { editor } = setupStore({ readonly: false });
     editor.selection = null;
     vi.mocked(isEventHandled).mockReturnValue(false);
@@ -766,11 +764,11 @@ describe('Editor branches - handleClipboardCopy', () => {
     } as any;
 
     editableProps.onCopy(event);
-    // handleClipboardCopy returns false → onCopy calls preventDefault
-    expect(event.preventDefault).toHaveBeenCalled();
+    // 无选区 → handler 返回 false，onCopy 不再 preventDefault（让浏览器原生 copy 兜底）
+    expect(event.preventDefault).not.toHaveBeenCalled();
   });
 
-  it('copy/cut with isEventHandled returns false and calls preventDefault fallback', () => {
+  it('copy/cut with isEventHandled returns false without preventDefault (native fallback)', () => {
     setupStore({ readonly: false });
     vi.mocked(isEventHandled).mockReturnValue(true);
 
@@ -786,7 +784,8 @@ describe('Editor branches - handleClipboardCopy', () => {
     } as any;
 
     editableProps.onCopy(event);
-    expect(event.preventDefault).toHaveBeenCalled();
+    // isEventHandled 命中 → handler 直接返回 false，不 preventDefault（原生兜底）
+    expect(event.preventDefault).not.toHaveBeenCalled();
   });
 
   it('clipboard inner error catch returns false', () => {
@@ -797,9 +796,9 @@ describe('Editor branches - handleClipboardCopy', () => {
     };
     vi.mocked(isEventHandled).mockReturnValue(false);
     vi.mocked(hasEditableTarget).mockReturnValue(true);
-    // Make toDOMRange throw
-    vi.mocked(ReactEditor.toDOMRange).mockImplementation(() => {
-      throw new Error('toDOMRange error');
+    // 让内层 try 中实际调用的 setFragmentData 抛错以命中 inner catch
+    vi.mocked(ReactEditor.setFragmentData).mockImplementation(() => {
+      throw new Error('setFragmentData error');
     });
 
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -1063,6 +1062,7 @@ describe('Editor branches - handlePasteEvent', () => {
       stopPropagation: vi.fn(),
       clipboardData: createClipboardData({
         types: ['Files'],
+        files: [new File(['x'], 'a.png', { type: 'image/png' })],
         getData: vi.fn(() => ''),
       }),
       target: document.createElement('div'),
