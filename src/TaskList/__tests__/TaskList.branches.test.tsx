@@ -186,12 +186,21 @@ describe('TaskList Component', () => {
     const arrowContainer = screen.getAllByTestId('task-list-arrowContainer')[0];
     expect(arrowContainer).toBeInTheDocument();
     expect(screen.getByText('任务1内容')).toBeInTheDocument();
+    expect(screen.getByText('任务1内容').parentElement).not.toHaveClass(
+      'ant-task-list-body-collapsed',
+    );
 
+    // 折叠：内容保留在 DOM 中，通过 -collapsed 类隐藏
     fireEvent.click(arrowContainer);
-    expect(screen.queryByText('任务1内容')).not.toBeInTheDocument();
+    expect(screen.getByText('任务1内容').parentElement).toHaveClass(
+      'ant-task-list-body-collapsed',
+    );
 
+    // 再次点击展开
     fireEvent.click(arrowContainer);
-    expect(screen.getByText('任务1内容')).toBeInTheDocument();
+    expect(screen.getByText('任务1内容').parentElement).not.toHaveClass(
+      'ant-task-list-body-collapsed',
+    );
   });
 
   it('应该显示任务内容', () => {
@@ -291,7 +300,8 @@ describe('TaskList Component', () => {
       screen.getByTestId('task-list-thoughtChainItem'),
     ).toBeInTheDocument();
     expect(screen.getByTestId('task-list-arrowContainer')).toBeInTheDocument();
-    expect(screen.getByText('任务1')).toBeInTheDocument();
+    // 空内容时标题会作为内容兜底再渲染一次，'任务1' 命中两处
+    expect(screen.getAllByText('任务1').length).toBeGreaterThan(0);
   });
 
   it('应该处理空数组内容', () => {
@@ -314,7 +324,8 @@ describe('TaskList Component', () => {
       screen.getByTestId('task-list-thoughtChainItem'),
     ).toBeInTheDocument();
     expect(screen.getByTestId('task-list-arrowContainer')).toBeInTheDocument();
-    expect(screen.getByText('任务1')).toBeInTheDocument();
+    // 空内容时标题会作为内容兜底再渲染一次，'任务1' 命中两处
+    expect(screen.getAllByText('任务1').length).toBeGreaterThan(0);
   });
 
   it('应该支持受控模式', () => {
