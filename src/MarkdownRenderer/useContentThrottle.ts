@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { ContentThrottle } from './ContentThrottle';
 import type { ContentThrottleOptions } from './types';
 
