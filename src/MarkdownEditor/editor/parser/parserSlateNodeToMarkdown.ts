@@ -8,6 +8,7 @@ import { debugInfo } from '../../../Utils/debugUtils';
 import type { ChartNode, CustomLeaf } from '../../el';
 import type { MarkdownEditorPlugin } from '../../plugin';
 import { getMediaType } from '../utils/dom';
+import { getCodeBlockPlainText } from '../utils/codeBlockPlainText';
 import { extractFootnoteRefIdentifier } from '../utils/footnoteDisplay';
 import { JINJA_DOLLAR_PLACEHOLDER } from './constants';
 
@@ -1277,24 +1278,22 @@ const handleHead = (
  * @returns 处理后的代码块字符串
  */
 const handleCode = (node: any, preString: string) => {
-  let code = node?.value || '';
+  let code: string;
+  const rawValue = node?.value;
 
   // 如果 code 是对象，则转换为 JSON 字符串，实现对 apaasify 等节点的支持
-  if (typeof code === 'object') {
+  if (typeof rawValue === 'object' && rawValue !== null) {
     try {
-      code = JSON.stringify(code, null, 2);
+      code = JSON.stringify(rawValue, null, 2);
     } catch (e) {
       console.warn('Invalid code object', e);
+      code = '';
     }
   } else if (node?.type === 'code') {
-    // 对于普通代码块（type === 'code'），优先从 Slate children 中读取文本
-    // 因为用户编辑后 Slate 只更新 children，而 value 保留的是初始解析值
-    const childrenText = node?.children
-      ?.map((child: any) => child?.text ?? '')
-      .join('');
-    if (childrenText !== undefined && childrenText !== null) {
-      code = childrenText;
-    }
+    // void 块级 code 正文在 value，children 仅为占位；有编辑过的 children 时优先 Node.string
+    code = getCodeBlockPlainText(node);
+  } else {
+    code = typeof rawValue === 'string' ? rawValue : '';
   }
 
   // 如果语言是 think，转换为 <think> 标签

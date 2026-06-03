@@ -129,6 +129,19 @@ describe('parserSlateNodeToMarkdown', () => {
           '---\ntitle: Hello\n---',
       );
     });
+
+    it('void 代码块 children 为空占位时应从 value 序列化围栏', () => {
+      const nodes = [
+        {
+          type: 'code',
+          language: 'markdown',
+          value: '任务内容',
+          children: [{ text: '' }],
+        },
+      ];
+      const result = parserSlateNodeToMarkdown(nodes);
+      expect(result).toBe('```markdown\n任务内容\n```');
+    });
   });
 
   describe('handleAttach', () => {
