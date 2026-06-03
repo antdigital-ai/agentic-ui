@@ -2,12 +2,14 @@ import { createEditor, Transforms } from 'slate';
 import { describe, expect, it, vi } from 'vitest';
 import {
   handleCodeBlockAceKeyDown,
+  insertParagraphAfterCodeBlock,
   isCodeBlockAceInputTarget,
+  removeEmptyCodeBlock,
   setCodeBlockNodes,
 } from '../codeBlockBehavior';
 
 describe('codeBlockBehavior', () => {
-  it('setCodeBlockNodes 同步 value 与占位 children', () => {
+  it('setCodeBlockNodes 更新 value 并重置占位 text leaf', () => {
     const editor = createEditor();
     editor.children = [
       {
@@ -19,17 +21,51 @@ describe('codeBlockBehavior', () => {
     ];
     const setNodesSpy = vi.spyOn(Transforms, 'setNodes');
 
+    const removeNodesSpy = vi.spyOn(Transforms, 'removeNodes');
+    const insertNodesSpy = vi.spyOn(Transforms, 'insertNodes');
+
     setCodeBlockNodes(editor, [0], { value: 'new' });
 
     expect(setNodesSpy).toHaveBeenCalledWith(
       editor,
-      expect.objectContaining({
-        value: 'new',
-        children: [{ text: '' }],
-      }),
+      { value: 'new' },
       expect.objectContaining({ at: [0] }),
     );
+    expect(removeNodesSpy).toHaveBeenCalledWith(
+      editor,
+      expect.objectContaining({ at: [0, 0] }),
+    );
+    expect(insertNodesSpy).toHaveBeenCalledWith(
+      editor,
+      { text: '' },
+      expect.objectContaining({ at: [0, 0] }),
+    );
+    expect((editor.children[0] as { value: string }).value).toBe('new');
+    expect(editor.children[0].children[0].text).toBe('');
+
     setNodesSpy.mockRestore();
+    removeNodesSpy.mockRestore();
+    insertNodesSpy.mockRestore();
+  });
+
+  it('removeEmptyCodeBlock 与 insertParagraphAfterCodeBlock 每次插入独立段落', () => {
+    const editor = createEditor();
+    editor.children = [
+      { type: 'code', value: '', children: [{ text: '' }] },
+      { type: 'code', value: 'b', children: [{ text: '' }] },
+    ];
+
+    removeEmptyCodeBlock(editor, [0]);
+    insertParagraphAfterCodeBlock(editor, [1]);
+
+    const p0 = editor.children[0];
+    const p1 = editor.children[2];
+    expect(p0).toMatchObject({ type: 'paragraph' });
+    expect(p1).toMatchObject({ type: 'paragraph' });
+    expect(p0).not.toBe(p1);
+
+    p0.children[0].text = 'typed-a';
+    expect(p1.children[0].text).toBe('');
   });
 
   it('handleCodeBlockAceKeyDown 空块 Backspace 删除 code', () => {

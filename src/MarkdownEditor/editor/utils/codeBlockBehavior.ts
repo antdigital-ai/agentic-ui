@@ -1,12 +1,6 @@
 import { Editor, Element, Node, Path, Transforms } from 'slate';
-import type { CodeNode, ParagraphNode } from '../../el';
-
-const CODE_BLOCK_PLACEHOLDER_CHILD = [{ text: '' }] as CodeNode['children'];
-
-const EMPTY_PARAGRAPH: ParagraphNode = {
-  type: 'paragraph',
-  children: [{ text: '' }],
-};
+import type { CodeNode } from '../../el';
+import { EditorUtils } from './editorUtils';
 
 export const isCodeBlockElement = (
   node: Node | null | undefined,
@@ -15,26 +9,37 @@ export const isCodeBlockElement = (
 
 /**
  * 块级 code 唯一正文来源为 `value`；`children` 仅保留 void 占位。
+ * Slate `setNodes` 不能设置 `children`，更新 value 时单独重置占位 text leaf。
  */
 export const setCodeBlockNodes = (
   editor: Editor,
   path: Path,
   data: Partial<CodeNode>,
 ): void => {
-  const payload: Partial<CodeNode> = { ...data };
-  if ('value' in data) {
-    payload.children = CODE_BLOCK_PLACEHOLDER_CHILD;
+  const { value, ...rest } = data;
+  const nodeProps: Partial<CodeNode> = { ...rest };
+  if (value !== undefined) {
+    nodeProps.value = value;
   }
 
   Editor.withoutNormalizing(editor, () => {
-    Transforms.setNodes(editor, payload, { at: path });
+    if (Object.keys(nodeProps).length > 0) {
+      Transforms.setNodes(editor, nodeProps, { at: path });
+    }
+    if ('value' in data) {
+      const placeholderPath = [...path, 0];
+      if (Editor.hasPath(editor, placeholderPath)) {
+        Transforms.removeNodes(editor, { at: placeholderPath });
+        Transforms.insertNodes(editor, { text: '' }, { at: placeholderPath });
+      }
+    }
   });
 };
 
 export const removeEmptyCodeBlock = (editor: Editor, path: Path): void => {
   Editor.withoutNormalizing(editor, () => {
     Transforms.removeNodes(editor, { at: path });
-    Transforms.insertNodes(editor, EMPTY_PARAGRAPH, {
+    Transforms.insertNodes(editor, EditorUtils.p, {
       at: path,
       select: true,
     });
@@ -46,7 +51,7 @@ export const insertParagraphAfterCodeBlock = (
   editor: Editor,
   path: Path,
 ): void => {
-  Transforms.insertNodes(editor, EMPTY_PARAGRAPH, {
+  Transforms.insertNodes(editor, EditorUtils.p, {
     at: Path.next(path),
     select: true,
   });
