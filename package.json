@@ -69,7 +69,7 @@
     "docs:build": "dumi build",
     "doctor": "father doctor",
     "generate:version": "node scripts/bumpVersion.js",
-    "lint": "pnpm run lint:es && pnpm run lint:css",
+    "lint": "eslint \"{src,test}/**/*.{js,jsx,ts,tsx}\" && stylelint \"{src,test}/**/*.{css,less}\"",
     "lint:css": "stylelint \"{src,test}/**/*.{css,less}\"",
     "lint:es": "eslint \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
     "playwright:install": "playwright install --with-deps chromium",
@@ -83,12 +83,12 @@
     "strip:bom:check": "node scripts/strip-utf8-bom.mjs --check",
     "test": "vitest --run",
     "test:coverage": "vitest --run --coverage",
-    "test:coverage:full": "vitest --run --coverage --mode full",
+    "test:coverage:full": "node --max-old-space-size=8192 ./node_modules/vitest/vitest.mjs --run --coverage --mode full",
     "test:e2e": "playwright test",
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:skip-server": "cross-env SKIP_WEBSERVER=1 playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:full": "NODE_OPTIONS=--max-old-space-size=8192 vitest --run --mode full",
+    "test:full": "node --max-old-space-size=8192 ./node_modules/vitest/vitest.mjs --run --mode full",
     "tsc": "tsc --noEmit"
   },
   "lint-staged": {
@@ -104,6 +104,11 @@
   },
   "overrides": {
     "ajv-keywords": "5.1.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "std-env": "3.9.0"
+    }
   },
   "dependencies": {
     "@ant-design/cssinjs": "^1.24.0",

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Editor.tsx 分支覆盖补充测试
  *
  * 策略：Mock Slate/Editable 以捕获 handler 函数并直接调用，
@@ -1697,7 +1697,7 @@ describe('Editor branches - onCompositionStart/End', () => {
   });
 
   it('compositionStart sets data-composition and inputComposition', () => {
-    const { editor } = setupStore({ readonly: false });
+    const { editor, container } = setupStore({ readonly: false });
     editor.selection = {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [0, 0], offset: 0 },
@@ -1710,11 +1710,7 @@ describe('Editor branches - onCompositionStart/End', () => {
     editableProps.onCompositionStart(event);
 
     expect(mockStoreConfig.store.inputComposition).toBe(true);
-    expect(
-      document.querySelector('[data-slate-editor="true"]')?.hasAttribute(
-        'data-composition',
-      ),
-    ).toBe(true);
+    expect(container.hasAttribute('data-composition')).toBe(true);
     // preventDefault は移动端互換性のため呼び出さない：
     // 移动端键盘通过 IME 组合事件输入，调用 preventDefault 会阻断
     // 字符写入 contenteditable，导致占位符无法消失。

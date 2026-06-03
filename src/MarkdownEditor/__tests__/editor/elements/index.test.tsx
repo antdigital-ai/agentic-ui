@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom';
+﻿import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -114,6 +114,10 @@ vi.mock('../../../editor/elements/Blockquote', () => ({
 
 vi.mock('../../../editor/elements/Head', () => ({
   Head: elementStubs.box('head'),
+}));
+
+vi.mock('../../../editor/elements/Code', () => ({
+  Code: elementStubs.box('code'),
 }));
 
 // Mock Ant Design components

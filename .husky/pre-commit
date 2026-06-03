@@ -1,4 +1,7 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-npm run lint
+root="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$root" || exit 1
+"$root/node_modules/.bin/eslint" "{src,test}/**/*.{js,jsx,ts,tsx}" &&
+  "$root/node_modules/.bin/stylelint" "{src,test}/**/*.{css,less}"

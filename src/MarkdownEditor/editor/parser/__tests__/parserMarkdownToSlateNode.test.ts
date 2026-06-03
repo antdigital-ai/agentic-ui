@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+﻿import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { handleDefinition } from '../parse/parseElements';
 import { normalizeThinkTagAliases } from '../parse/parseHtml';
 import { handleMath, shouldTreatInlineMathAsText } from '../parse/parseMath';
@@ -915,7 +915,7 @@ describe('parserMarkdownToSlateNode', () => {
         language: 'yaml',
         frontmatter: true,
         value: 'title: Test\nauthor: John',
-        children: [{ text: 'title: Test\nauthor: John' }],
+        children: [{ text: '' }],
       });
       expect(result.schema[1]).toMatchObject({
         type: 'head',

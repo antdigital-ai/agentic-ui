@@ -179,8 +179,8 @@ function main() {
     byFile.get(item.file).push(item);
   }
   for (const [file, items] of byFile) {
-    const rel = path.relative(REPO_ROOT, file);
-    console.error(`  ${rel}`);
+    const rel = path.relative(rootAbs, file);
+    console.error(`  ${rel.split(path.sep).join('/')}`);
     for (const it of items) {
       const tag = it.kind === 'mock' ? ' [mock-only]' : '';
       console.error(`    └─ '${it.spec}'  → not found${tag}`);

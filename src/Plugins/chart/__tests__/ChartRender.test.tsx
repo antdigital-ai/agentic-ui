@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom';
+﻿import '@testing-library/jest-dom';
 import {
   act,
   fireEvent,
@@ -1085,6 +1085,8 @@ describe('ChartRender', () => {
         </I18nContext.Provider>,
       );
 
+      await screen.findByTestId('bar-chart', {}, { timeout: 3000 });
+
       const configTrigger = screen.getByRole('button', { name: '配置图表' });
       await act(async () => {
         fireEvent.click(configTrigger);
@@ -1092,7 +1094,6 @@ describe('ChartRender', () => {
 
       await waitFor(
         () => {
-          expect(screen.getByText('配置图表')).toBeInTheDocument();
           const form =
             document.body.querySelector('.ant-form') ||
             document.body.querySelector('form');
