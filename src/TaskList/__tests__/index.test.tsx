@@ -1070,12 +1070,13 @@ describe('TaskList', () => {
       });
     });
 
-    it('有错误任务时应显示取消状态', () => {
+    it('有 error 步骤且其余已完成时摘要应显示完成态而非「任务已取消」', () => {
       render(<TaskList items={simpleItemsWithError} variant="simple" />);
 
-      expect(screen.getByText('任务已取消')).toBeInTheDocument();
+      expect(screen.queryByText('任务已取消')).not.toBeInTheDocument();
+      expect(screen.getByText('任务完成')).toBeInTheDocument();
       expect(
-        screen.getByTestId('task-list-simple-summary-status-error'),
+        screen.getByTestId('task-list-simple-summary-status-success'),
       ).toBeInTheDocument();
     });
 
