@@ -1,6 +1,6 @@
 import type { Editor } from 'slate';
 import type { Location } from 'slate';
-import { Element } from 'slate';
+import { Element, Node, Path } from 'slate';
 
 import type { ListsSchema, ListType } from '../types';
 
@@ -23,14 +23,26 @@ export function wrapInList(
     const nonListEntries = Array.from(
         editor.nodes({
             at,
-            match: (node) => {
-                return (
-                    Element.isElement(node) &&
-                    !schema.isListNode(node) &&
-                    !schema.isListItemNode(node) &&
-                    !schema.isListItemTextNode(node) &&
-                    schema.isConvertibleToListTextNode(node)
-                );
+            match: (node, path) => {
+                if (
+                    !Element.isElement(node) ||
+                    schema.isListNode(node) ||
+                    schema.isListItemNode(node) ||
+                    !schema.isConvertibleToListTextNode(node)
+                ) {
+                    return false;
+                }
+                // schema 中 paragraph 同时是「可转换节点」与「list-item 文本节点」，
+                // 仅凭类型无法区分顶层段落与列表项内段落。这里改用路径判断：
+                // 仅跳过父级为 list-item 的文本节点，确保顶层段落仍可被包裹成列表。
+                const parentPath = Path.parent(path);
+                if (parentPath.length > 0) {
+                    const parent = Node.get(editor, parentPath);
+                    if (schema.isListItemNode(parent)) {
+                        return false;
+                    }
+                }
+                return true;
             },
         }),
     );
