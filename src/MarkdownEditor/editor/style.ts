@@ -201,7 +201,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           opacity: '1 !important',
         },
       },
-      'div[data-composition] [data-slate-placeholder="true"]': {
+      '&[data-composition] [data-slate-placeholder="true"]': {
         display: 'none !important',
       },
 

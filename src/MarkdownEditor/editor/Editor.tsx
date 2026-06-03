@@ -1,7 +1,7 @@
 ﻿/* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable react/no-children-prop */
 import classNames from 'clsx';
-import React, { useContext, useEffect, useMemo, useRef } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import {
   BaseRange,
@@ -211,6 +211,8 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
   const nodeRef = useRef<MarkdownEditorInstance>();
   const first = useRef(true);
   const cancelClearInputCompositionRef = useRef<(() => void) | null>(null);
+  const [suppressPlaceholderForIme, setSuppressPlaceholderForIme] =
+    useState(false);
 
   const plugins = useContext(PluginContext);
 
@@ -919,6 +921,22 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
    */
   const onPaste = useRefFunction(handlePasteEvent);
 
+  const syncEditableRootCompositionAttr = useRefFunction((active: boolean) => {
+    try {
+      const root = ReactEditor.toDOMNode(
+        markdownEditorRef.current,
+        markdownEditorRef.current,
+      ) as HTMLElement;
+      if (active) {
+        root.setAttribute('data-composition', '');
+      } else {
+        root.removeAttribute('data-composition');
+      }
+    } catch {
+      // editor not mounted
+    }
+  });
+
   const syncTagPopupCompositionAttr = useRefFunction((active: boolean) => {
     const focusPath = markdownEditorRef.current.selection?.focus.path || [];
     if (focusPath.length === 0) return;
@@ -943,6 +961,8 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     cancelClearInputCompositionRef.current = null;
 
     markdownContainerRef.current?.setAttribute('data-composition', '');
+    syncEditableRootCompositionAttr(true);
+    setSuppressPlaceholderForIme(true);
     store.inputComposition = true;
     props.onCompositionActiveChange?.(true);
     syncTagPopupCompositionAttr(true);
@@ -994,6 +1014,8 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     // 再解除占位符隐藏，避免竞态导致占位符短暂闪现。
     requestAnimationFrame(() => {
       markdownContainerRef.current?.removeAttribute('data-composition');
+      syncEditableRootCompositionAttr(false);
+      setSuppressPlaceholderForIme(false);
     });
   });
 
@@ -1312,6 +1334,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
       >
         <EditorEditable
           decorate={decorateFn}
+          suppressPlaceholder={suppressPlaceholderForIme}
           onDragOver={(e) => e.preventDefault()}
           readOnly={readonly}
           spellCheck={false}

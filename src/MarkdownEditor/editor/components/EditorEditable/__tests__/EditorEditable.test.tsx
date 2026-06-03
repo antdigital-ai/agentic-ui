@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+﻿import { render, screen, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React, { createRef } from 'react';
 import { createEditor } from 'slate';
@@ -15,6 +15,7 @@ function renderEditorEditable(options: {
   editorProps?: Record<string, unknown>;
   readonly?: boolean;
   localeInputPlaceholder?: string;
+  suppressPlaceholder?: boolean;
 }) {
   const containerRef = createRef<HTMLDivElement>();
   containerRef.current = document.createElement('div');
@@ -38,7 +39,10 @@ function renderEditorEditable(options: {
       >
         <Slate editor={editor} initialValue={editor.children}>
           <I18nContext.Provider value={{ locale, language: 'zh-CN' }}>
-            <EditorEditable readOnly={options.readonly ?? false} />
+            <EditorEditable
+              readOnly={options.readonly ?? false}
+              suppressPlaceholder={options.suppressPlaceholder}
+            />
           </I18nContext.Provider>
         </Slate>
       </EditorStoreContext.Provider>
@@ -142,6 +146,20 @@ describe('EditorEditable placeholder', () => {
       expect(
         document.querySelector('[data-slate-placeholder="true"]'),
       ).toHaveTextContent(DEFAULT_EDITOR_PLACEHOLDER);
+    });
+  });
+
+  it('suppressPlaceholder 为 true 时不渲染 placeholder（IME 组合态）', async () => {
+    renderEditorEditable({
+      editorChildren: [{ type: 'paragraph', children: [{ text: '' }] }],
+      editorProps: { placeholder: '请输入' },
+      suppressPlaceholder: true,
+    });
+
+    await waitFor(() => {
+      expect(
+        document.querySelector('[data-slate-placeholder="true"]'),
+      ).toBeNull();
     });
   });
 
