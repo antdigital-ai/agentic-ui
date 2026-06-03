@@ -105,11 +105,6 @@
   "overrides": {
     "ajv-keywords": "5.1.0"
   },
-  "pnpm": {
-    "overrides": {
-      "std-env": "3.9.0"
-    }
-  },
   "dependencies": {
     "@ant-design/cssinjs": "^1.24.0",
     "@ant-design/cssinjs-utils": "^1.1.3",
