@@ -12,13 +12,12 @@ export function isCollapsedInBlock(
   if (!sel || !Range.isCollapsed(sel)) {
     return false;
   }
-  return !!Array.from(
-    Editor.nodes(editor, {
-      at: sel,
-      match: (n) => Element.isElement(n) && n.type === blockType,
-      mode: 'lowest',
-    }),
-  ).next().value;
+  const nodes = Editor.nodes(editor, {
+    at: sel,
+    match: (n) => Element.isElement(n) && n.type === blockType,
+    mode: 'lowest',
+  });
+  return !nodes.next().done;
 }
 
 /** Tab：Prezly 列表优先；仅表格单元格走 TabKey */

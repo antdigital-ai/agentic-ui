@@ -1,5 +1,6 @@
 ﻿import { Editor } from 'slate';
 import { withCardPlugin } from './withCardPlugin';
+import { withCodeBlockPlugin } from './withCodeBlockPlugin';
 import { withCodeTagPlugin } from './withCodeTagPlugin';
 import { withFootnoteReferenceNormalize } from './withFootnoteReferenceNormalize';
 import { withInlineNodes } from './withInlineNodes';
@@ -22,6 +23,8 @@ import { withVoidNodes } from './withVoidNodes';
  * - 卡片功能（withCardPlugin）
  * - 链接和媒体功能（withLinkAndMediaPlugin）
  * - Schema功能（withSchemaPlugin）
+ * - 脚注引用规范化（withFootnoteReferenceNormalize）
+ * - 代码块 void（withCodeBlockPlugin）
  * - 代码标签功能（withCodeTagPlugin）
  *
  * 插件按顺序应用，每个插件都会增强编辑器的特定功能。
@@ -33,7 +36,9 @@ export const withMarkdown = (editor: Editor) => {
         withSchemaPlugin(
           withLinkAndMediaPlugin(
             withCardPlugin(
-              withListsPlugin(withVoidNodes(withInlineNodes(editor))),
+              withListsPlugin(
+                withVoidNodes(withCodeBlockPlugin(withInlineNodes(editor))),
+              ),
             ),
           ),
         ),

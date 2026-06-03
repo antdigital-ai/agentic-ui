@@ -4,6 +4,7 @@ import { ReactEditor, withReact } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { EditorStore } from '../../../../store';
 import { parserSlateNodeToMarkdown } from '../../../../utils';
+import { handleListsOnEnter } from '../../../lists';
 import { withMarkdown } from '../../../withMarkdown';
 import { BackspaceKey } from '../../backspace';
 import { EnterKey } from '../../enter';
@@ -200,36 +201,37 @@ describe('EnterKey - Markdown 输出测试', () => {
       expect(nestedLine.trimStart().length).toBeLessThan(nestedLine.length);
     });
 
-    it('在代码块中按回车应插入换行符，不新建代码块', () => {
+    it('void 代码块中 EnterKey 不在 Slate children 插入换行', () => {
       editor.children = [
         {
           type: 'code',
           language: 'javascript',
-          children: [{ text: 'const x = 1;' }],
+          value: 'const x = 1;',
+          children: [{ text: '' }],
         } as any,
       ];
 
       Transforms.select(editor, {
-        anchor: { path: [0, 0], offset: 12 },
-        focus: { path: [0, 0], offset: 12 },
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
       });
 
       const mockEvent = {
         preventDefault: vi.fn(),
         key: 'Enter',
-        shiftKey: false,
+        shiftKey: true,
         ctrlKey: false,
         metaKey: false,
       } as any;
 
       enterKey.run(mockEvent);
 
-      expect(mockEvent.preventDefault).toHaveBeenCalled();
-      // 仍然只有一个代码块节点
       expect(editor.children).toHaveLength(1);
-      expect(editor.children[0]).toMatchObject({ type: 'code' });
-      // 代码块中插入了换行
-      expect((editor.children[0] as any).children[0].text).toContain('\n');
+      expect(editor.children[0]).toMatchObject({
+        type: 'code',
+        value: 'const x = 1;',
+      });
+      expect((editor.children[0] as any).children[0].text).toBe('');
     });
 
     it('列表为空（仅一项且无内容）时按回车应转换为段落', () => {
@@ -258,8 +260,7 @@ describe('EnterKey - Markdown 输出测试', () => {
         metaKey: false,
       } as any;
 
-      enterKey.run(mockEvent);
-
+      expect(handleListsOnEnter(editor, mockEvent)).toBe(true);
       expect(mockEvent.preventDefault).toHaveBeenCalled();
       expect(editor.children).toHaveLength(1);
       expect(editor.children[0]).toMatchObject({
