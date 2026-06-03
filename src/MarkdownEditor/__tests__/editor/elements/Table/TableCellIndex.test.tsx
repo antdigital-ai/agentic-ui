@@ -1198,13 +1198,10 @@ describe('TableCellIndex 组件测试', () => {
       const insertBeforeButton = document.querySelector(
         '.ant-agentic-md-editor-table-cell-index-insert-row-before',
       );
-      if (insertBeforeButton) {
-        fireEvent.click(insertBeforeButton);
-      }
+      expect(insertBeforeButton).toBeInTheDocument();
+      fireEvent.click(insertBeforeButton!);
 
-      // 插入按钮受行 chrome 激活态控制，spacer td 始终渲染；断言 td 渲染即可
-      // 稳定验证插入处理不会崩溃（按钮存在时上面已触发点击）。
-      expect(document.querySelector('td')).toBeInTheDocument();
+      expect(mockInsertNodes).toHaveBeenCalled();
       mockInsertNodes.mockRestore();
     });
   });
@@ -1306,13 +1303,10 @@ describe('TableCellIndex 组件测试', () => {
       const insertAfterButton = document.querySelector(
         '.ant-agentic-md-editor-table-cell-index-insert-row-after',
       );
-      if (insertAfterButton) {
-        fireEvent.click(insertAfterButton);
-      }
+      expect(insertAfterButton).toBeInTheDocument();
+      fireEvent.click(insertAfterButton!);
 
-      // 插入按钮受行 chrome 激活态控制，spacer td 始终渲染；断言 td 渲染即可
-      // 稳定验证插入处理不会崩溃（按钮存在时上面已触发点击）。
-      expect(document.querySelector('td')).toBeInTheDocument();
+      expect(mockInsertNodes).toHaveBeenCalled();
       mockInsertNodes.mockRestore();
     });
 
@@ -1332,13 +1326,10 @@ describe('TableCellIndex 组件测试', () => {
       const insertAfterButton = document.querySelector(
         '.ant-agentic-md-editor-table-cell-index-insert-row-after',
       );
-      if (insertAfterButton) {
-        fireEvent.click(insertAfterButton);
-      }
+      expect(insertAfterButton).toBeInTheDocument();
+      fireEvent.click(insertAfterButton!);
 
-      // 插入按钮受行 chrome 激活态控制，spacer td 始终渲染；断言 td 渲染即可
-      // 稳定验证插入处理不会崩溃（按钮存在时上面已触发点击）。
-      expect(document.querySelector('td')).toBeInTheDocument();
+      expect(mockInsertNodes).toHaveBeenCalled();
       mockInsertNodes.mockRestore();
     });
   });
