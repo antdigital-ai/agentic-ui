@@ -87,6 +87,13 @@ vi.mock('slate-react', () => ({
     toDOMNode: vi.fn(() => document.createElement('div')),
   },
 }));
+vi.mock('../components/EditorEditable', () => ({
+  EditorEditable: (props: Record<string, any>) => {
+    editableProps = props;
+    return React.createElement('div', { 'data-testid': 'mock-editable' });
+  },
+}));
+
 
 vi.mock('../../../Hooks/useRefFunction', () => ({
   useRefFunction: (fn: (...args: any[]) => any) => fn,
@@ -124,6 +131,10 @@ vi.mock('../plugins/handlePaste', () => ({
   handleSpecialTextPaste: vi.fn(() => false),
   handleHttpLinkPaste: vi.fn(() => false),
   handlePlainTextPaste: vi.fn(async () => false),
+}));
+
+vi.mock('../plugins/parseMarkdownToNodesAndInsert', () => ({
+  parseMarkdownToNodesAndInsert: vi.fn(() => true),
 }));
 
 vi.mock('../utils', () => ({
@@ -177,6 +188,7 @@ import { ReactEditor } from 'slate-react';
 import { PluginContext } from '../../plugin';
 import { SlateMarkdownEditor } from '../Editor';
 import * as handlePasteModule from '../plugins/handlePaste';
+import { parseMarkdownToNodesAndInsert } from '../plugins/parseMarkdownToNodesAndInsert';
 import { parserSlateNodeToMarkdown } from '../utils';
 import {
   EditorUtils,
@@ -633,10 +645,6 @@ describe('Editor branches - handleClipboardCopy', () => {
       expect.any(String),
     );
     expect(event.clipboardData.setData).toHaveBeenCalledWith(
-      'text/plain',
-      expect.any(String),
-    );
-    expect(event.clipboardData.setData).toHaveBeenCalledWith(
       'text/markdown',
       expect.any(String),
     );
@@ -707,7 +715,7 @@ describe('Editor branches - handleClipboardCopy', () => {
     expect(event.clipboardData.clearData).toHaveBeenCalled();
     expect(event.clipboardData.setData).not.toHaveBeenCalled();
     expect(ReactEditor.setFragmentData).not.toHaveBeenCalled();
-    expect(event.preventDefault).toHaveBeenCalled();
+    expect(event.preventDefault).not.toHaveBeenCalled();
   });
 
   it('cut gets selection from DOM, deletes content, and sets clipboard', () => {
@@ -747,7 +755,7 @@ describe('Editor branches - handleClipboardCopy', () => {
     window.getSelection = origGetSelection;
   });
 
-  it('copy/cut with no selection returns false and calls preventDefault fallback', () => {
+  it('copy/cut with no selection lets native clipboard fallback run', () => {
     const { editor } = setupStore({ readonly: false });
     editor.selection = null;
     vi.mocked(isEventHandled).mockReturnValue(false);
@@ -766,11 +774,10 @@ describe('Editor branches - handleClipboardCopy', () => {
     } as any;
 
     editableProps.onCopy(event);
-    // handleClipboardCopy returns false → onCopy calls preventDefault
-    expect(event.preventDefault).toHaveBeenCalled();
+    expect(event.preventDefault).not.toHaveBeenCalled();
   });
 
-  it('copy/cut with isEventHandled returns false and calls preventDefault fallback', () => {
+  it('copy/cut with isEventHandled lets native clipboard fallback run', () => {
     setupStore({ readonly: false });
     vi.mocked(isEventHandled).mockReturnValue(true);
 
@@ -786,7 +793,7 @@ describe('Editor branches - handleClipboardCopy', () => {
     } as any;
 
     editableProps.onCopy(event);
-    expect(event.preventDefault).toHaveBeenCalled();
+    expect(event.preventDefault).not.toHaveBeenCalled();
   });
 
   it('clipboard inner error catch returns false', () => {
@@ -797,9 +804,8 @@ describe('Editor branches - handleClipboardCopy', () => {
     };
     vi.mocked(isEventHandled).mockReturnValue(false);
     vi.mocked(hasEditableTarget).mockReturnValue(true);
-    // Make toDOMRange throw
-    vi.mocked(ReactEditor.toDOMRange).mockImplementation(() => {
-      throw new Error('toDOMRange error');
+    vi.mocked(ReactEditor.setFragmentData).mockImplementation(() => {
+      throw new Error('setFragmentData error');
     });
 
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -1018,6 +1024,80 @@ describe('Editor branches - handlePasteEvent', () => {
     expect(handlePasteModule.handleHtmlPaste).toHaveBeenCalled();
   });
 
+  it('Word HTML paste converts through markdown before HTML fallback', async () => {
+    const { editor } = setupStore({ readonly: false });
+    const wordHtml = [
+      '<html><head>',
+      '<meta name="Generator" content="Microsoft Word 16">',
+      '</head><body>',
+      '<p class="MsoNormal">Word&nbsp;text<o:p></o:p></p>',
+      '</body></html>',
+    ].join('');
+
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
+    vi.mocked(Editor.hasPath).mockReturnValue(true);
+    vi.mocked(handlePasteModule.handleTagNodePaste).mockReturnValue(false);
+
+    renderEditor({});
+
+    const event = {
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      clipboardData: createClipboardData({
+        types: ['text/html'],
+        getData: (t: string) => (t === 'text/html' ? wordHtml : ''),
+      }),
+      target: document.createElement('div'),
+    } as any;
+
+    editableProps.onPaste(event);
+    await flushPromises();
+
+    expect(parseMarkdownToNodesAndInsert).toHaveBeenCalledWith(
+      editor,
+      'Word text',
+      [],
+    );
+    expect(handlePasteModule.handleHtmlPaste).not.toHaveBeenCalled();
+  });
+
+  it('Word HTML paste respects convertWordToMarkdown false', async () => {
+    const { editor } = setupStore({ readonly: false });
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
+    vi.mocked(Editor.hasPath).mockReturnValue(true);
+    vi.mocked(handlePasteModule.handleTagNodePaste).mockReturnValue(false);
+    vi.mocked(handlePasteModule.handleHtmlPaste).mockResolvedValue(true);
+
+    renderEditor({
+      pasteConfig: { convertWordToMarkdown: false },
+    });
+
+    const event = {
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      clipboardData: createClipboardData({
+        types: ['text/html'],
+        getData: (t: string) =>
+          t === 'text/html'
+            ? '<p class="MsoNormal">Fallback through HTML</p>'
+            : '',
+      }),
+      target: document.createElement('div'),
+    } as any;
+
+    editableProps.onPaste(event);
+    await flushPromises();
+
+    expect(parseMarkdownToNodesAndInsert).not.toHaveBeenCalled();
+    expect(handlePasteModule.handleHtmlPaste).toHaveBeenCalled();
+  });
+
   it('HTML paste returns false continues to next handler', async () => {
     const { editor } = setupStore({ readonly: false });
     editor.selection = {
@@ -1063,6 +1143,11 @@ describe('Editor branches - handlePasteEvent', () => {
       stopPropagation: vi.fn(),
       clipboardData: createClipboardData({
         types: ['Files'],
+        files: [
+          new File(['image'], 'pasted.png', {
+            type: 'image/png',
+          }),
+        ],
         getData: vi.fn(() => ''),
       }),
       target: document.createElement('div'),

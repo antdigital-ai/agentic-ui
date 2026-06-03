@@ -1,7 +1,8 @@
-import { Editor } from 'slate';
+﻿import { Editor } from 'slate';
 import { withCardPlugin } from './withCardPlugin';
 import { withCodeBlockPlugin } from './withCodeBlockPlugin';
 import { withCodeTagPlugin } from './withCodeTagPlugin';
+import { withFootnoteReferenceNormalize } from './withFootnoteReferenceNormalize';
 import { withInlineNodes } from './withInlineNodes';
 import { withLinkAndMediaPlugin } from './withLinkAndMediaPlugin';
 import { withListsPlugin } from './withListsPlugin';
@@ -22,6 +23,7 @@ import { withVoidNodes } from './withVoidNodes';
  * - 卡片功能（withCardPlugin）
  * - 链接和媒体功能（withLinkAndMediaPlugin）
  * - Schema功能（withSchemaPlugin）
+ * - 脚注引用规范化（withFootnoteReferenceNormalize）
  * - 代码块 void（withCodeBlockPlugin）
  * - 代码标签功能（withCodeTagPlugin）
  *
@@ -29,12 +31,14 @@ import { withVoidNodes } from './withVoidNodes';
  */
 export const withMarkdown = (editor: Editor) => {
   return withSanitizeInvalidChildren(
-    withCodeTagPlugin(
-      withSchemaPlugin(
-        withLinkAndMediaPlugin(
-          withCardPlugin(
-            withListsPlugin(
-              withVoidNodes(withCodeBlockPlugin(withInlineNodes(editor))),
+    withFootnoteReferenceNormalize(
+      withCodeTagPlugin(
+        withSchemaPlugin(
+          withLinkAndMediaPlugin(
+            withCardPlugin(
+              withListsPlugin(
+                withVoidNodes(withCodeBlockPlugin(withInlineNodes(editor))),
+              ),
             ),
           ),
         ),

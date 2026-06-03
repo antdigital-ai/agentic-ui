@@ -90,7 +90,7 @@ export class EnterKey {
           return;
         }
       }
-      if (el.type === 'blockquote' || el.type === 'list-item') {
+      if (el.type === 'blockquote') {
         this.empty(e, path);
         return;
       }
@@ -136,74 +136,6 @@ export class EnterKey {
       }
     }
 
-    if (parent.type === 'list-item') {
-      const [ul, ulPath] = Editor.parent(this.editor, parentPath);
-      const realEmpty = parent.children.length === 1;
-      if (ul.children.length === 1 && realEmpty) {
-        e.preventDefault();
-        Editor.withoutNormalizing(this.editor, () => {
-          Transforms.delete(this.editor, { at: ulPath });
-          Transforms.insertNodes(this.editor, EditorUtils.p, {
-            at: ulPath,
-            select: true,
-          });
-        });
-        return;
-      }
-      if (realEmpty) {
-        e.preventDefault();
-        Editor.withoutNormalizing(this.editor, () => {
-          if (!Path.hasPrevious(parentPath)) {
-            Transforms.delete(this.editor, { at: parentPath });
-            Transforms.insertNodes(this.editor, EditorUtils.p, {
-              at: ulPath,
-              select: true,
-            });
-          } else if (!Editor.hasPath(this.editor, Path.next(parentPath))) {
-            Transforms.delete(this.editor, { at: parentPath });
-            Transforms.insertNodes(this.editor, EditorUtils.p, {
-              at: Path.next(ulPath),
-              select: true,
-            });
-          } else {
-            Transforms.liftNodes(this.editor, { at: parentPath });
-            Transforms.delete(this.editor, { at: Path.next(ulPath) });
-            Transforms.insertNodes(this.editor, EditorUtils.p, {
-              at: Path.next(ulPath),
-              select: true,
-            });
-          }
-        });
-      } else {
-        if (!Editor.hasPath(this.editor, Path.next(path))) {
-          e.preventDefault();
-          Editor.withoutNormalizing(this.editor, () => {
-            Transforms.delete(this.editor, { at: path });
-            Transforms.insertNodes(
-              this.editor,
-              {
-                type: 'list-item',
-                checked:
-                  typeof parent.checked === 'boolean' ? false : undefined,
-                children: [EditorUtils.p],
-              },
-              { at: Path.next(parentPath), select: true },
-            );
-          });
-        } else if (!Path.hasPrevious(path)) {
-          e.preventDefault();
-          Transforms.insertNodes(
-            this.editor,
-            {
-              type: 'list-item',
-              checked: typeof parent.checked === 'boolean' ? false : undefined,
-              children: [EditorUtils.p],
-            },
-            { at: Path.next(parentPath), select: true },
-          );
-        }
-      }
-    }
   }
 
   private table(
@@ -327,157 +259,27 @@ export class EnterKey {
     if (isImeComposing(e, this.store.inputComposition)) {
       return false;
     }
-    const parent = Editor.parent(this.editor, node[1]);
     const end = Editor.end(this.editor, node[1]);
     if (Point.equals(end, sel.focus)) {
-      if (parent[0].type !== 'list-item' || Path.hasPrevious(node[1])) {
-        const str = Node.string(node[0]);
-        if (!str) return;
-        for (let n of BlockMathNodes) {
-          if (n.checkAllow && !n.checkAllow({ editor: this.editor, node, sel }))
-            continue;
-          const m = str?.match(n.reg);
-          if (m) {
-            const handled = n.run({
-              editor: this.editor,
-              path: node[1],
-              match: m,
-              el: node[0],
-              sel,
-              startText: m[0],
-            });
-            if (handled === false) continue;
-            e.preventDefault();
-            return true;
-          }
-        }
-      }
-    }
-    if (parent[0].type === 'list-item') {
-      // 列表为空（仅有一项且该项无内容）时，回车将列表转换为段落
-      const listItemPath = parent[1];
-      const [listNode, listPath] = Editor.parent(this.editor, listItemPath);
-      const isListWithSingleEmptyItem =
-        listNode.children.length === 1 &&
-        Node.string(node[0]) === '' &&
-        !Path.hasPrevious(listItemPath);
-
-      if (isListWithSingleEmptyItem) {
-        e.preventDefault();
-        Editor.withoutNormalizing(this.editor, () => {
-          Transforms.removeNodes(this.editor, { at: listPath });
-          Transforms.insertNodes(this.editor, EditorUtils.p, {
-            at: listPath,
-            select: true,
+      const str = Node.string(node[0]);
+      if (!str) return;
+      for (let n of BlockMathNodes) {
+        if (n.checkAllow && !n.checkAllow({ editor: this.editor, node, sel }))
+          continue;
+        const m = str?.match(n.reg);
+        if (m) {
+          const handled = n.run({
+            editor: this.editor,
+            path: node[1],
+            match: m,
+            el: node[0],
+            sel,
+            startText: m[0],
           });
-        });
-        return true;
-      }
-
-      if (isMod(e) || Path.hasPrevious(node[1])) {
-        const text = Point.equals(end, sel.focus)
-          ? [{ text: '' }]
-          : EditorUtils.cutText(this.editor, sel.focus);
-        Editor.withoutNormalizing(this.editor, () => {
-          Transforms.insertNodes(
-            this.editor,
-            {
-              type: 'paragraph',
-              children: text || ' ',
-            },
-            { at: Path.next(node[1]) },
-          );
-          if (!Point.equals(end, sel.focus)) {
-            Transforms.delete(this.editor, {
-              at: {
-                anchor: sel.focus,
-                focus: end,
-              },
-            });
-          }
-          if (Editor.hasPath(this.editor, Path.next(node[1]))) {
-            Transforms.select(
-              this.editor,
-              Editor.start(this.editor, Path.next(node[1])),
-            );
-          }
-        });
-        e.preventDefault();
-        return true;
-      } else {
-        e.preventDefault();
-        let checked: boolean | undefined = undefined;
-        if (typeof parent[0].checked === 'boolean') {
-          if (
-            sel.anchor.offset === 0 &&
-            !Path.hasPrevious(sel.anchor.path) &&
-            !Path.hasPrevious(node[1])
-          ) {
-            checked = parent[0].checked;
-            Transforms.insertNodes(
-              this.editor,
-              {
-                type: 'list-item',
-                children: [EditorUtils.p],
-                checked: typeof checked === 'boolean' ? false : undefined,
-              },
-              { at: parent[1] },
-            );
-            Transforms.select(
-              this.editor,
-              Editor.start(this.editor, Path.next(parent[1])),
-            );
-            return;
-          } else {
-            checked = false;
-          }
+          if (handled === false) continue;
+          e.preventDefault();
+          return true;
         }
-        const text = Point.equals(Editor.end(this.editor, node[1]), sel.focus)
-          ? [{ text: '' }]
-          : EditorUtils.cutText(this.editor, sel.focus);
-
-        Editor.withoutNormalizing(this.editor, () => {
-          Transforms.insertNodes(
-            this.editor,
-            {
-              type: 'list-item',
-              children: [
-                {
-                  type: 'paragraph',
-                  children: text || [{ text: '' }],
-                },
-              ],
-              checked,
-            },
-            { at: Path.next(parent[1]) },
-          );
-
-          if (!Point.equals(sel.anchor, Editor.end(this.editor, node[1]))) {
-            Transforms.delete(this.editor, {
-              at: {
-                anchor: sel.anchor,
-                focus: Editor.end(this.editor, node[1]),
-              },
-            });
-          }
-
-          if (
-            Point.equals(sel.anchor, Editor.start(this.editor, node[1])) &&
-            Node.string(Node.get(this.editor, node[1])) !== ''
-          ) {
-            EditorUtils.clearMarks(this.editor);
-          }
-
-          const nextParentPath = Path.next(parent[1]);
-          if (Editor.hasPath(this.editor, nextParentPath)) {
-            Transforms.select(
-              this.editor,
-              Editor.start(this.editor, nextParentPath),
-            );
-          }
-        });
-
-        return true;
       }
     }
   }

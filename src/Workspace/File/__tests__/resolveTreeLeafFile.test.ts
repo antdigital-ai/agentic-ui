@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+﻿import { describe, expect, it } from 'vitest';
 import type { FileTreeNode } from '../../types';
 import {
   hasTreeLeafFileBinding,
@@ -38,6 +38,17 @@ describe('resolveTreeLeafFile', () => {
         type: 'pdf',
       }),
     );
+  });
+
+  it('file 为 null 时应返回 null', () => {
+    const node = {
+      key: 'leaf-null',
+      name: 'missing.md',
+      isLeaf: true,
+      file: null,
+    } as FileTreeNode;
+
+    expect(resolveTreeLeafFile(node)).toBeNull();
   });
 
   it('无 file 时应由 name 与 key 合成 FileNode', () => {

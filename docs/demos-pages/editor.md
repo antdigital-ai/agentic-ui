@@ -65,7 +65,7 @@ group:
 
 ### Bubble 内动态 render（流式 Markdown）
 
-<code src="../demos/bubble/rerender-bubble-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/bubble/rerender-bubble-demo.tsx" background="var(--main-bg-color)" iframe=720></code>
 
 ### 编辑模式-动态render
 

@@ -15,6 +15,7 @@ import {
   getPointStrOffset,
   getSelectionFromDomSelection,
 } from '../../utils/editorUtils';
+import { resolveEditorPlaceholderFromProps } from '../../utils/resolveEditorPlaceholder';
 
 /**
  * 复制基础栏
@@ -171,9 +172,10 @@ export const ReadonlyBaseBar = (props: { prefix?: string }) => {
                   }}
                   placeholder={
                     editorProps?.comment?.placeholder ||
-                    editorProps?.titlePlaceholderContent ||
-                    i18n.locale?.inputPlaceholder ||
-                    '请输入内容...'
+                    resolveEditorPlaceholderFromProps(
+                      editorProps,
+                      i18n.locale?.inputPlaceholder,
+                    )
                   }
                   onChange={(e) => {
                     comment.content = e.target.value;

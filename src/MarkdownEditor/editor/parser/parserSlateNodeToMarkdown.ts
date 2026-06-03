@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-loop-func */
+﻿/* eslint-disable @typescript-eslint/no-loop-func */
 /* eslint-disable no-case-declarations */
 /* eslint-disable no-param-reassign */
 /* eslint-disable @typescript-eslint/no-use-before-define */
@@ -8,6 +8,7 @@ import { debugInfo } from '../../../Utils/debugUtils';
 import type { ChartNode, CustomLeaf } from '../../el';
 import type { MarkdownEditorPlugin } from '../../plugin';
 import { getMediaType } from '../utils/dom';
+import { extractFootnoteRefIdentifier } from '../utils/footnoteDisplay';
 import { JINJA_DOLLAR_PLACEHOLDER } from './constants';
 
 const inlineNode = new Set(['break']);
@@ -307,6 +308,9 @@ const parserNode = (
       break;
     case 'footnoteDefinition':
       str += handleFootnoteDefinition(node);
+      break;
+    case 'footnoteReference':
+      str += handleFootnoteReferenceNode(node);
       break;
     default:
       str += handleDefault(node, parent);
@@ -1606,6 +1610,15 @@ const handleBreak = (preString: string) => {
  */
 const handleFootnoteDefinition = (node: any) => {
   return `[^${node.identifier}]: [${node.value}](${node.url})\n`;
+};
+
+/**
+ * 历史 footnoteReference 元素 → Markdown 引用（归一化前文档兼容）
+ */
+const handleFootnoteReferenceNode = (node: any) => {
+  const identifier =
+    node.identifier ?? extractFootnoteRefIdentifier(node.text) ?? '';
+  return identifier ? `[^${identifier}]` : '';
 };
 
 /**

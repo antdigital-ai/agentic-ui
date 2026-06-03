@@ -6,6 +6,12 @@ import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock dependencies
+vi.mock('slate-react', () => ({
+  useSlate: vi.fn(() => ({
+    children: [{ type: 'paragraph', children: [{ text: '' }] }],
+  })),
+}));
+
 vi.mock('@ant-design/agentic-ui/MarkdownEditor/editor/store', () => ({
   useEditorStore: () => ({
     store: {
@@ -14,7 +20,7 @@ vi.mock('@ant-design/agentic-ui/MarkdownEditor/editor/store', () => ({
     },
     markdownEditorRef: {
       current: {
-        children: [{ type: 'paragraph', children: [{ text: 'test' }] }],
+        children: [{ type: 'paragraph', children: [{ text: '' }] }],
       },
     },
     markdownContainerRef: { current: document.createElement('div') },

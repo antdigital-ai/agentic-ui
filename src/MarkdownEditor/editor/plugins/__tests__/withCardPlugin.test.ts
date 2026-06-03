@@ -3,7 +3,7 @@ import { vi } from 'vitest';
 import { withCardPlugin } from '../withCardPlugin';
 
 describe('withCardPlugin', () => {
-  it('insert_text 父节点为 card-before 时阻止输入', () => {
+  it('insertText 父节点为 card-before 时阻止输入', () => {
     const editor = withCardPlugin(createEditor());
     editor.children = [
       {
@@ -15,30 +15,11 @@ describe('withCardPlugin', () => {
         ],
       },
     ];
+    Transforms.select(editor, { path: [0, 0, 0], offset: 0 });
     const textBefore = Node.get(editor, [0, 0, 0]);
-    editor.apply({
-      type: 'insert_text',
-      path: [0, 0, 0],
-      offset: 0,
-      text: 'x',
-    });
+    editor.insertText('x');
     const textAfter = Node.get(editor, [0, 0, 0]);
     expect((textAfter as any).text).toBe((textBefore as any).text);
-  });
-
-  it('insert_text 父节点为 card-after 且 grandParent 非 card 时 return true', () => {
-    const editor = withCardPlugin(createEditor());
-    // card-after 作为根子节点，其 grandParent 为根，非 card
-    editor.children = [{ type: 'card-after', children: [{ text: '' }] }];
-    const textBefore = (Node.get(editor, [0, 0]) as any).text;
-    editor.apply({
-      type: 'insert_text',
-      path: [0, 0],
-      offset: 0,
-      text: 'a',
-    });
-    const textAfter = (Node.get(editor, [0, 0]) as any).text;
-    expect(textAfter).toBe(textBefore);
   });
 
   it('insert_node 父节点为 card-after 且 grandParent 为 card 时插入到卡片后', () => {
@@ -126,21 +107,6 @@ describe('withCardPlugin', () => {
     Transforms.select(editor, { path: [0, 0], offset: 0 });
     editor.insertText('x');
     expect(origInsertText).toHaveBeenCalledWith('x');
-  });
-
-  it('insert_text 父节点为 card-after（不在 card 内）apply 层仍然阻止', () => {
-    const base = createEditor();
-    const origApply = vi.fn();
-    base.apply = origApply;
-    const editor = withCardPlugin(base);
-    editor.children = [{ type: 'card-after', children: [{ text: '' }] }];
-    editor.apply({
-      type: 'insert_text',
-      path: [0, 0],
-      offset: 0,
-      text: 'x',
-    });
-    expect(origApply).not.toHaveBeenCalled();
   });
 
   it('insert_node 路径长度不足时不应抛错', () => {

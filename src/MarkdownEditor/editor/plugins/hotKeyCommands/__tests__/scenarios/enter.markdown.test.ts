@@ -4,6 +4,7 @@ import { ReactEditor, withReact } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { EditorStore } from '../../../../store';
 import { parserSlateNodeToMarkdown } from '../../../../utils';
+import { handleListsOnEnter } from '../../../lists';
 import { withMarkdown } from '../../../withMarkdown';
 import { BackspaceKey } from '../../backspace';
 import { EnterKey } from '../../enter';
@@ -259,8 +260,7 @@ describe('EnterKey - Markdown 输出测试', () => {
         metaKey: false,
       } as any;
 
-      enterKey.run(mockEvent);
-
+      expect(handleListsOnEnter(editor, mockEvent)).toBe(true);
       expect(mockEvent.preventDefault).toHaveBeenCalled();
       expect(editor.children).toHaveLength(1);
       expect(editor.children[0]).toMatchObject({
