@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+﻿import { describe, expect, it } from 'vitest';
 import { parserSlateNodeToMarkdown } from '../parserSlateNodeToMarkdown';
 
 describe('parserSlateNodeToMarkdown', () => {
@@ -626,6 +626,16 @@ describe('parserSlateNodeToMarkdown - coverage', () => {
     };
     const result = parserSlateNodeToMarkdown([node]);
     expect(result).toMatch(/\[\^1\].*Note text/);
+  });
+
+  it('should serialize legacy footnoteReference element', () => {
+    const node = {
+      type: 'footnoteReference',
+      identifier: '2',
+      children: [{ text: '2' }],
+    };
+    const result = parserSlateNodeToMarkdown([node]);
+    expect(result).toBe('[^2]');
   });
 
   it('should handle paragraph with align', () => {

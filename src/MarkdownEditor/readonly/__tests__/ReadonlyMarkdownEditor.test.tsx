@@ -3,6 +3,7 @@ import React from 'react';
 import { describe, expect, it } from 'vitest';
 import { BaseMarkdownEditor } from '../../BaseMarkdownEditor';
 import { findByPathAndText } from '../../editor/utils/editorUtils';
+import { applyReadonlyCommentHighlights } from '../applyReadonlyCommentHighlights';
 import { READONLY_MARKDOWN_CONTAINER_KEY } from '../findTextInReadonlyMarkdownDom';
 import { ReadonlyMarkdownEditorStore } from '../ReadonlyMarkdownEditorStore';
 
@@ -37,8 +38,6 @@ describe('ReadonlyMarkdownEditorStore', () => {
   });
 });
 
-import { applyReadonlyCommentHighlights } from '../applyReadonlyCommentHighlights';
-
 describe('applyReadonlyCommentHighlights', () => {
   it('wraps refContent with comment id for jump target', () => {
     const root = document.createElement('div');
@@ -46,24 +45,62 @@ describe('applyReadonlyCommentHighlights', () => {
       '<div data-be="paragraph">Highlight me in markdown mode.</div>';
     document.body.appendChild(root);
 
-    applyReadonlyCommentHighlights(root, [
-      {
-        id: 'c1',
-        commentType: 'highlight',
-        content: 'note',
-        refContent: 'Highlight me',
-        time: Date.now(),
-        path: [],
-        anchorOffset: 0,
-        focusOffset: 12,
-        selection: null as any,
-      },
-    ], 'ant-agentic-md-editor-content');
+    applyReadonlyCommentHighlights(
+      root,
+      [
+        {
+          id: 'c1',
+          commentType: 'highlight',
+          content: 'note',
+          refContent: 'Highlight me',
+          time: Date.now(),
+          path: [],
+          anchorOffset: 0,
+          focusOffset: 12,
+          selection: null as any,
+        },
+      ],
+      'ant-agentic-md-editor-content',
+    );
 
     const mark = document.getElementById('comment-c1');
     expect(mark).toBeTruthy();
     expect(mark?.tagName).toBe('MARK');
     expect(mark?.className).toContain('comment-highlight');
+    document.body.removeChild(root);
+  });
+
+  it('falls back to refContent when the persisted block path is stale', () => {
+    const root = document.createElement('div');
+    root.innerHTML = [
+      '<div data-be="paragraph">Unrelated first block.</div>',
+      '<div data-be="paragraph">Recovered comment anchor lives here.</div>',
+    ].join('');
+    document.body.appendChild(root);
+
+    applyReadonlyCommentHighlights(
+      root,
+      [
+        {
+          id: 'stale-path',
+          commentType: 'highlight',
+          content: 'note',
+          refContent: 'Recovered comment anchor',
+          time: Date.now(),
+          path: [0],
+          anchorOffset: 0,
+          focusOffset: 24,
+          selection: null as any,
+        },
+      ],
+      'ant-agentic-md-editor-content',
+    );
+
+    const mark = document.getElementById('comment-stale-path');
+    expect(mark).toBeTruthy();
+    expect(mark?.textContent).toBe('Recovered comment anchor');
+    expect(root.children[0].querySelector('mark')).toBeNull();
+    expect(root.children[1].querySelector('mark')).toBe(mark);
     document.body.removeChild(root);
   });
 });

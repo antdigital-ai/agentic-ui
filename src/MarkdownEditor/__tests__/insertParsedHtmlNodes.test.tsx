@@ -669,6 +669,20 @@ describe('insertParsedHtmlNodes', () => {
       el.textContent = 'hello';
       expect(TEXT_TAGS.SPAN(el as any).text).toBe('hello');
     });
+
+    it('MARK 应保留 color、bg 和 label 属性', () => {
+      const el = document.createElement('mark');
+      el.setAttribute('color', 'red');
+      el.setAttribute('bg', '#f5f5f5');
+      el.setAttribute('label', 'Important');
+
+      expect(TEXT_TAGS.MARK(el as any)).toEqual({
+        mark: true,
+        markColor: 'red',
+        markBg: '#f5f5f5',
+        markLabel: 'Important',
+      });
+    });
   });
 
   describe('deserialize', () => {
@@ -787,6 +801,26 @@ describe('insertParsedHtmlNodes', () => {
       const result = deserialize(span as any, '');
       expect(Array.isArray(result)).toBe(true);
       expect((result as any[]).length).toBeGreaterThan(0);
+    });
+
+    it('MARK 标签反序列化时保留 mark 元数据', () => {
+      const mark = document.createElement('mark');
+      mark.setAttribute('color', 'red');
+      mark.setAttribute('bg', '#f5f5f5');
+      mark.setAttribute('label', 'Important');
+      mark.appendChild(document.createTextNode('highlighted'));
+
+      const result = deserialize(mark as any, '');
+
+      expect(result).toEqual([
+        expect.objectContaining({
+          text: 'highlighted',
+          mark: true,
+          markColor: 'red',
+          markBg: '#f5f5f5',
+          markLabel: 'Important',
+        }),
+      ]);
     });
 
     it('空元素 children 回退为 text 节点', () => {

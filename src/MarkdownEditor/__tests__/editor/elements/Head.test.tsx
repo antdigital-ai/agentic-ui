@@ -166,6 +166,20 @@ describe('Head Component', () => {
       expect(heading).toHaveClass('empty');
     });
 
+    it('空标题块级节点不应设置 data-slate-placeholder（由 EditorEditable 统一处理）', () => {
+      const emptyProps = {
+        ...defaultProps,
+        element: {
+          ...defaultProps.element,
+          children: [{ text: '' }],
+        },
+      };
+      const { container } = render(<Head {...emptyProps} />);
+      const heading = container.querySelector('h1');
+      expect(heading).not.toHaveAttribute('data-slate-placeholder');
+      expect(container.querySelector('[data-slate-placeholder="true"]')).toBeNull();
+    });
+
     it('应该为打字机模式添加 typewriter 类', () => {
       // 简化测试，只验证组件能正常渲染
       render(<Head {...defaultProps} />);
