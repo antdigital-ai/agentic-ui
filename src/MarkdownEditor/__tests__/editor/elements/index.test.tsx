@@ -470,9 +470,9 @@ describe('Elements Index', () => {
           ...defaultLeafProps,
           leaf: { ...defaultLeafProps.leaf, identifier: 'test-id' },
         };
-        render(<MLeaf {...props} />);
-        // identifier 功能会显示原始文本
-        expect(screen.getByText('Test Text')).toBeInTheDocument();
+        const { container } = render(<MLeaf {...props} />);
+        // identifier 作为脚注引用渲染，展示 identifier 值（data-fnc）
+        expect(container.textContent).toContain('test-id');
       });
 
       it('应该处理 fncProps.render 功能', () => {
