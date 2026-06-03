@@ -1,4 +1,4 @@
-import { Editor, Node, Operation, Path, Range, Text, Transforms } from 'slate';
+﻿import { Editor, Node, Operation, Path, Range, Text, Transforms } from 'slate';
 import type { CustomLeaf } from '../../el';
 import { hasRange } from './utils';
 import {
@@ -82,10 +82,10 @@ export const handleMarkRemoveTextOperation = (
     return false;
   }
 
-  const text = currentNode.text;
+  const text = currentNode.text ?? '';
+  const removed = operation.text ?? '';
   const nextText =
-    text.slice(0, operation.offset) +
-    text.slice(operation.offset + operation.text.length);
+    text.slice(0, operation.offset) + text.slice(operation.offset + removed.length);
 
   if (nextText.length > 0 && nextText.trim() !== '') {
     return false;
@@ -100,7 +100,8 @@ export const handleMarkRemoveTextOperation = (
     if (!Text.isText(afterNode)) {
       return;
     }
-    if (afterNode.text.length === 0 || afterNode.text.trim() === '') {
+    const afterText = afterNode.text ?? '';
+    if (afterText.length === 0 || afterText.trim() === '') {
       Transforms.unsetNodes(editor, [...MARK_LEAF_KEYS], {
         at: operation.path,
         match: Text.isText,
@@ -140,7 +141,7 @@ export const moveSelectionOutOfMarkLeaf = (editor: Editor): boolean => {
     const path = selection.anchor.path;
 
     Editor.withoutNormalizing(editor, () => {
-      if (node.text.length === 0) {
+      if ((node.text ?? '').length === 0) {
         Transforms.unsetNodes(editor, [...MARK_LEAF_KEYS], {
           at: path,
           match: Text.isText,
