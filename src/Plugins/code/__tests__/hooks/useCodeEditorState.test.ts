@@ -8,6 +8,10 @@ import { useCodeEditorState } from '../../hooks/useCodeEditorState';
 
 const mockSetNodes = vi.fn();
 vi.mock('slate', () => ({
+  Editor: {
+    withoutNormalizing: (_editor: unknown, fn: () => void) => fn(),
+    hasPath: () => false,
+  },
   Node: {
     string: (node: unknown): string => {
       const slateNode = node as {
