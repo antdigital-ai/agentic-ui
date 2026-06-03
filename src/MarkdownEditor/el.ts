@@ -1,4 +1,4 @@
-﻿import { BaseEditor, BaseElement, BaseRange } from 'slate';
+import { BaseEditor, BaseElement, BaseRange } from 'slate';
 import { HistoryEditor } from 'slate-history';
 import { ReactEditor, RenderElementProps } from 'slate-react';
 import type {

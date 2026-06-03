@@ -1,4 +1,4 @@
-﻿import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { handleDefinition } from '../parse/parseElements';
 import { normalizeThinkTagAliases } from '../parse/parseHtml';
 import { handleMath, shouldTreatInlineMathAsText } from '../parse/parseMath';

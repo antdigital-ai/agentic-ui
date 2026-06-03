@@ -1,4 +1,4 @@
-﻿import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { parserSlateNodeToMarkdown } from '../parserSlateNodeToMarkdown';
 
 describe('parserSlateNodeToMarkdown targeted coverage', () => {

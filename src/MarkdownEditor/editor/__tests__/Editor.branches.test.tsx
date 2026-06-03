@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Editor.tsx 分支覆盖补充测试
  *
  * 策略：Mock Slate/Editable 以捕获 handler 函数并直接调用，

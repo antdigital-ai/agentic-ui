@@ -1,4 +1,4 @@
-﻿import { Editor, Node, Operation, Path, Range, Text, Transforms } from 'slate';
+import { Editor, Node, Operation, Path, Range, Text, Transforms } from 'slate';
 import type { CustomLeaf } from '../../el';
 import { hasRange } from './utils';
 import {
