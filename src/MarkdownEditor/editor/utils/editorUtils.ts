@@ -1,4 +1,4 @@
-/* eslint-disable no-param-reassign */
+﻿/* eslint-disable no-param-reassign */
 import {
   Editor,
   Element,
@@ -247,6 +247,9 @@ export class EditorUtils {
     'code',
     'bold',
     'mark',
+    'markColor',
+    'markBg',
+    'markLabel',
     'color',
     'textColor',
     'highColor',

@@ -1,6 +1,7 @@
-import { createEditor, Transforms } from 'slate';
+﻿import { createEditor, Transforms } from 'slate';
 import { describe, expect, it, vi } from 'vitest';
 import {
+  handleMarkRemoveTextOperation,
   handleTagRemoveTextOperation,
   moveSelectionOutOfCodeTagLeaf,
   tryInsertTextOutsideTagOnDoubleSpace,
@@ -25,6 +26,51 @@ describe('codeTagLeafBehavior', () => {
     expect(setNodesSpy).toHaveBeenCalled();
     expect(apply).not.toHaveBeenCalled();
     setNodesSpy.mockRestore();
+  });
+
+  it('handleMarkRemoveTextOperation 删空 mark 正文后清除 mark 属性', () => {
+    const editor = createEditor();
+    editor.children = [
+      {
+        type: 'paragraph',
+        children: [
+          {
+            text: '@助理',
+            mark: true,
+            markLabel: '@',
+            markColor: 'blue',
+          },
+        ],
+      },
+    ];
+    const apply = editor.apply.bind(editor);
+    const unsetSpy = vi.spyOn(Transforms, 'unsetNodes');
+
+    const handled = handleMarkRemoveTextOperation(
+      editor,
+      {
+        type: 'remove_text',
+        path: [0, 0],
+        offset: 0,
+        text: '@助理',
+      },
+      apply,
+    );
+
+    expect(handled).toBe(true);
+    expect(unsetSpy).toHaveBeenCalledWith(
+      editor,
+      ['mark', 'markColor', 'markBg', 'markLabel'],
+      expect.objectContaining({ at: [0, 0] }),
+    );
+    const leaf = editor.children[0].children[0] as {
+      mark?: boolean;
+      markLabel?: string;
+      text: string;
+    };
+    expect(leaf.mark).toBeUndefined();
+    expect(leaf.markLabel).toBeUndefined();
+    unsetSpy.mockRestore();
   });
 
   it('moveSelectionOutOfCodeTagLeaf 在 code 叶子上移出选区', () => {

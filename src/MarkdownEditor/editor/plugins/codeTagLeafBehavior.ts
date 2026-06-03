@@ -1,15 +1,20 @@
-import { Editor, Node, Operation, Path, Range, Text, Transforms } from 'slate';
+﻿import { Editor, Node, Operation, Path, Range, Text, Transforms } from 'slate';
 import type { CustomLeaf } from '../../el';
 import { hasRange } from './utils';
+import {
+  getOrphanTagStripProps,
+  MARK_DECORATION_KEYS,
+  type CodeTagTextLeaf,
+} from './inlineLeafNormalizeUtils';
 
-export type CodeTagTextLeaf = CustomLeaf & { text: string };
+export type { CodeTagTextLeaf } from './inlineLeafNormalizeUtils';
+
+const MARK_LEAF_KEYS = MARK_DECORATION_KEYS;
 
 export const isCodeTagTextLeaf = (
   node: Node,
 ): node is CodeTagTextLeaf =>
   Text.isText(node) && !!(node.tag || node.code);
-
-const PLAIN_TEXT_AFTER_TAG = ' ';
 
 const tagPlaceholderLeaf = (source: CodeTagTextLeaf): CodeTagTextLeaf => ({
   ...source,
@@ -18,12 +23,8 @@ const tagPlaceholderLeaf = (source: CodeTagTextLeaf): CodeTagTextLeaf => ({
   text: ' ',
 });
 
-const stripTagMarks = (_leaf: CodeTagTextLeaf): Partial<CodeTagTextLeaf> => ({
-  tag: false,
-  code: false,
-  text: PLAIN_TEXT_AFTER_TAG,
-  triggerText: undefined,
-});
+const stripTagMarks = (leaf: CodeTagTextLeaf): Partial<CodeTagTextLeaf> =>
+  getOrphanTagStripProps(leaf);
 
 /**
  * remove_text 仍可能由选区删除、剪切等一次性触发，保留在 apply 层的唯一入口。
@@ -59,6 +60,53 @@ export const handleTagRemoveTextOperation = (
   }
 
   apply(operation);
+  return true;
+};
+
+/**
+ * mark 高亮（含 @ 助理等 label）删空正文后，清理 mark 相关属性，避免残留装饰条。
+ */
+export const handleMarkRemoveTextOperation = (
+  editor: Editor,
+  operation: Operation & { type: 'remove_text' },
+  apply: (op: Operation) => void,
+): boolean => {
+  let currentNode: Node;
+  try {
+    currentNode = Node.get(editor, operation.path);
+  } catch {
+    return false;
+  }
+
+  if (!Text.isText(currentNode) || !(currentNode as CustomLeaf).mark) {
+    return false;
+  }
+
+  const text = currentNode.text;
+  const nextText =
+    text.slice(0, operation.offset) +
+    text.slice(operation.offset + operation.text.length);
+
+  if (nextText.length > 0 && nextText.trim() !== '') {
+    return false;
+  }
+
+  Editor.withoutNormalizing(editor, () => {
+    apply(operation);
+    if (!Editor.hasPath(editor, operation.path)) {
+      return;
+    }
+    const afterNode = Node.get(editor, operation.path);
+    if (!Text.isText(afterNode)) {
+      return;
+    }
+    if (afterNode.text.length === 0 || afterNode.text.trim() === '') {
+      Transforms.unsetNodes(editor, [...MARK_LEAF_KEYS], {
+        at: operation.path,
+        match: Text.isText,
+      });
+    }
+  });
   return true;
 };
 

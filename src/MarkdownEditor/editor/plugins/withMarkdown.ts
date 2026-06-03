@@ -3,6 +3,7 @@ import { withCardPlugin } from './withCardPlugin';
 import { withCodeBlockPlugin } from './withCodeBlockPlugin';
 import { withCodeTagPlugin } from './withCodeTagPlugin';
 import { withFootnoteReferenceNormalize } from './withFootnoteReferenceNormalize';
+import { withOrphanInlineLeafNormalize } from './withOrphanInlineLeafNormalize';
 import { withInlineNodes } from './withInlineNodes';
 import { withLinkAndMediaPlugin } from './withLinkAndMediaPlugin';
 import { withListsPlugin } from './withListsPlugin';
@@ -24,6 +25,7 @@ import { withVoidNodes } from './withVoidNodes';
  * - 链接和媒体功能（withLinkAndMediaPlugin）
  * - Schema功能（withSchemaPlugin）
  * - 脚注引用规范化（withFootnoteReferenceNormalize）
+ * - 空 mark/tag 叶节点清理（withOrphanInlineLeafNormalize）
  * - 代码块 void（withCodeBlockPlugin）
  * - 代码标签功能（withCodeTagPlugin）
  *
@@ -31,13 +33,15 @@ import { withVoidNodes } from './withVoidNodes';
  */
 export const withMarkdown = (editor: Editor) => {
   return withSanitizeInvalidChildren(
-    withFootnoteReferenceNormalize(
-      withCodeTagPlugin(
-        withSchemaPlugin(
-          withLinkAndMediaPlugin(
-            withCardPlugin(
-              withListsPlugin(
-                withVoidNodes(withCodeBlockPlugin(withInlineNodes(editor))),
+    withOrphanInlineLeafNormalize(
+      withFootnoteReferenceNormalize(
+        withCodeTagPlugin(
+          withSchemaPlugin(
+            withLinkAndMediaPlugin(
+              withCardPlugin(
+                withListsPlugin(
+                  withVoidNodes(withCodeBlockPlugin(withInlineNodes(editor))),
+                ),
               ),
             ),
           ),

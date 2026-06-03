@@ -1,4 +1,4 @@
-export * from './utils';
+﻿export * from './utils';
 export * from './withCardPlugin';
 export * from './withCodeBlockPlugin';
 export * from './withCodeTagPlugin';
@@ -6,6 +6,7 @@ export * from './withInlineNodes';
 export * from './withLinkAndMediaPlugin';
 export * from './withListsPlugin';
 export * from './withMarkdown';
+export * from './withOrphanInlineLeafNormalize';
 export * from './withSanitizeInvalidChildren';
 export * from './withSchemaPlugin';
 export * from './withVoidNodes';

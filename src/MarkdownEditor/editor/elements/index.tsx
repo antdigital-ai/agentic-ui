@@ -524,7 +524,7 @@ const MLeafComponent = (
   if (leaf.italic) {
     style.fontStyle = 'italic';
   }
-  if (leaf.mark) {
+  if (leaf.mark && (leaf.text?.length ?? 0) > 0) {
     const markStyle: React.CSSProperties = {};
     if (leaf.markColor) markStyle.color = leaf.markColor;
     if (leaf.markBg) markStyle.backgroundColor = leaf.markBg;

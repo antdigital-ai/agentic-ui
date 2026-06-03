@@ -1,5 +1,6 @@
-import { Editor, Operation } from 'slate';
+﻿import { Editor, Operation } from 'slate';
 import {
+  handleMarkRemoveTextOperation,
   handleTagDeleteBackward,
   handleTagRemoveTextOperation,
   moveSelectionOutOfCodeTagLeaf,
@@ -18,11 +19,13 @@ export const withCodeTagPlugin = (editor: Editor) => {
   const { apply, deleteBackward, insertBreak, insertText } = editor;
 
   editor.apply = (operation: Operation) => {
-    if (
-      operation.type === 'remove_text' &&
-      handleTagRemoveTextOperation(editor, operation, apply)
-    ) {
-      return;
+    if (operation.type === 'remove_text') {
+      if (handleTagRemoveTextOperation(editor, operation, apply)) {
+        return;
+      }
+      if (handleMarkRemoveTextOperation(editor, operation, apply)) {
+        return;
+      }
     }
     apply(operation);
   };
