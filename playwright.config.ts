@@ -41,7 +41,9 @@ export default defineConfig({
         command: 'pnpm run build && pnpm run docs:build && pnpm run preview',
         url: 'http://localhost:4172',
         reuseExistingServer: !process.env.CI, // 本地开发时复用已有服务器
-        timeout: 180 * 1000, // 3 分钟超时（构建 + 预览启动通常比 dev 快）
+        // 构建（father build）+ 文档构建（dumi build）+ 预览启动在 CI 上可能超过 3 分钟，
+        // 放宽到 6 分钟避免偶发 “Timed out waiting from config.webServer”。
+        timeout: 360 * 1000,
         stdout: 'pipe', // 减少输出，提升性能
         stderr: 'pipe',
       },

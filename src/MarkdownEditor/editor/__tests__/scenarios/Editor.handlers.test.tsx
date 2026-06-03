@@ -96,7 +96,7 @@ describe('SlateMarkdownEditor handler coverage', () => {
     expect(event.preventDefault).toHaveBeenCalled();
   });
 
-  it('onCopy/onCut fallback should call preventDefault', () => {
+  it('onCopy/onCut should not preventDefault when event already handled (native fallback)', () => {
     const handledSpy = vi
       .spyOn(editorUtilsModule, 'isEventHandled')
       .mockReturnValue(true);
@@ -116,8 +116,9 @@ describe('SlateMarkdownEditor handler coverage', () => {
     editableProps.onCopy(copyEvent);
     editableProps.onCut(cutEvent);
 
-    expect(copyEvent.preventDefault).toHaveBeenCalled();
-    expect(cutEvent.preventDefault).toHaveBeenCalled();
+    // isEventHandled 命中 → handler 返回 false，onCopy/onCut 不再 preventDefault（原生兜底）
+    expect(copyEvent.preventDefault).not.toHaveBeenCalled();
+    expect(cutEvent.preventDefault).not.toHaveBeenCalled();
     handledSpy.mockRestore();
   });
 

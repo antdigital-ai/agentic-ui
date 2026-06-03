@@ -121,24 +121,22 @@ describe('withMarkdown Plugin Tests', () => {
         expect(editor.children.length).toBeLessThanOrEqual(initialLength);
       });
 
-      it('should prevent deletion of card-before', () => {
+      it('should delete entire card when removing card-before', () => {
         editor.children = [createCardNode()];
 
         const cardBeforeNode = Node.get(editor, [0, 0]);
         expect(cardBeforeNode.type).toBe('card-before');
 
-        // Try to remove card-before - this should be prevented
-        try {
-          Transforms.removeNodes(editor, {
-            at: [0, 0], // card > card-before
-          });
-        } catch (error) {
-          // This is expected as the operation should be blocked
-        }
+        // 删除 card-before 会连同整张卡片一起删除（避免残缺 [content, card-after] 结构）
+        Transforms.removeNodes(editor, {
+          at: [0, 0], // card > card-before
+        });
 
-        // card-before should still exist
-        const stillExists = Node.get(editor, [0, 0]);
-        expect(stillExists.type).toBe('card-before');
+        // 整张卡片应被移除
+        const remainingCard = (editor.children as any[]).find(
+          (n) => n?.type === 'card',
+        );
+        expect(remainingCard).toBeUndefined();
       });
 
       it('should handle empty card cleanup', () => {

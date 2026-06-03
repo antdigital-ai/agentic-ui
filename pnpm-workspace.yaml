@@ -1,0 +1,10 @@
+# pnpm 11 移除了 onlyBuiltDependencies，改用 allowBuilds 映射，并默认 strictDepBuilds=true，
+# 未在此列出的带构建脚本依赖会触发 ERR_PNPM_IGNORED_BUILDS 而导致 install 失败。
+# allowBuilds 自 pnpm v10.26.0 起可用，对 pnpm 10/11 均生效。
+allowBuilds:
+  '@parcel/watcher': true
+  '@swc/core': true
+  core-js: true
+  core-js-pure: true
+  esbuild: true
+  less: true

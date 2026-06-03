@@ -1795,7 +1795,7 @@ describe('TabKey', () => {
         .spyOn(Transforms, 'liftNodes')
         .mockImplementation((...args: any[]) => {
           liftCallCount += 1;
-          if (liftCallCount === 2) throw new Error('other error');
+          if (liftCallCount === 1) throw new Error('other error');
           return originalLift(...args);
         });
       expect(() => {
@@ -1954,7 +1954,7 @@ describe('TabKey', () => {
         .spyOn(Transforms, 'liftNodes')
         .mockImplementation((...args: any[]) => {
           liftCallCount += 1;
-          if (liftCallCount === 2) throw new Error('other error');
+          if (liftCallCount === 1) throw new Error('other error');
           return originalLift(...args);
         });
       expect(() => {

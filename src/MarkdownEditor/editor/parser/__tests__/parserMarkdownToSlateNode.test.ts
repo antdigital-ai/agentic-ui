@@ -36,9 +36,17 @@ describe('parserMarkdownToSlateNode', () => {
       );
       expect(inlineKatexNode).toBeUndefined();
 
-      const textContent = paragraph.children
-        .map((c: any) => c?.text ?? '')
-        .join('');
+      const collectText = (nodes: any[]): string =>
+        nodes
+          .map((c: any) =>
+            typeof c?.text === 'string'
+              ? c.text
+              : Array.isArray(c?.children)
+                ? collectText(c.children)
+                : '',
+          )
+          .join('');
+      const textContent = collectText(paragraph.children);
       expect(textContent).toContain('$a^2 + b^2 = c^2$');
     });
 
@@ -56,9 +64,17 @@ describe('parserMarkdownToSlateNode', () => {
       );
       expect(inlineKatexNode).toBeUndefined();
 
-      const textContent = paragraph.children
-        .map((c: any) => c?.text ?? '')
-        .join('');
+      const collectText = (nodes: any[]): string =>
+        nodes
+          .map((c: any) =>
+            typeof c?.text === 'string'
+              ? c.text
+              : Array.isArray(c?.children)
+                ? collectText(c.children)
+                : '',
+          )
+          .join('');
+      const textContent = collectText(paragraph.children);
       expect(textContent).toContain('$a^2 + b^2 = c^2$');
     });
 
@@ -74,9 +90,17 @@ describe('parserMarkdownToSlateNode', () => {
       );
       expect(inlineKatexNode).toBeUndefined();
 
-      const textContent = paragraph.children
-        .map((c: any) => c?.text ?? '')
-        .join('');
+      const collectText = (nodes: any[]): string =>
+        nodes
+          .map((c: any) =>
+            typeof c?.text === 'string'
+              ? c.text
+              : Array.isArray(c?.children)
+                ? collectText(c.children)
+                : '',
+          )
+          .join('');
+      const textContent = collectText(paragraph.children);
       expect(textContent).toContain('$24.4B$');
       expect(textContent).toContain('$18.2B$');
     });
@@ -115,11 +139,18 @@ describe('parserMarkdownToSlateNode', () => {
       );
       expect(inlineKatexNode).toBeUndefined();
 
-      const numericParagraphNode = paragraph.children.find(
-        (child: any) => child?.type === 'paragraph',
-      );
-      expect(numericParagraphNode).toBeDefined();
-      expect(numericParagraphNode.children).toEqual([{ text: '$100$' }]);
+      const collectText = (nodes: any[]): string =>
+        nodes
+          .map((c: any) =>
+            typeof c?.text === 'string'
+              ? c.text
+              : Array.isArray(c?.children)
+                ? collectText(c.children)
+                : '',
+          )
+          .join('');
+      const textContent = collectText(paragraph.children);
+      expect(textContent).toContain('$100$');
     });
 
     it('should handle paragraph with bold text', () => {

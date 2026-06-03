@@ -7,8 +7,8 @@ import { RenderElementProps } from 'slate-react';
 import { SimpleTable } from './SimpleTable';
 import { TableCellIndex } from './TableCellIndex';
 import { Td } from './Td';
-import { useSlateElementPath } from './utils/useSlateElementPath';
 import { isSameTableCellRenderProps } from './utils/tableCellMemo';
+import { useSlateElementPath } from './utils/useSlateElementPath';
 
 export type {
   TableCustomElement,
@@ -42,7 +42,7 @@ const ThComponent: React.FC<
   );
 };
 
-const Th = memo(ThComponent, isSameTableCellRenderProps);
+export const Th = memo(ThComponent, isSameTableCellRenderProps);
 Th.displayName = 'Th';
 
 const TableCellIndexWrapper: React.FC<{
@@ -66,10 +66,7 @@ type TableRowProps = {
   readonly?: boolean;
 };
 
-const TableRowComponent: React.FC<TableRowProps> = ({
-  rowProps,
-  readonly,
-}) => (
+const TableRowComponent: React.FC<TableRowProps> = ({ rowProps, readonly }) => (
   <tr {...rowProps.attributes}>
     {readonly ? null : <TableCellIndexWrapper targetRow={rowProps.element} />}
     {rowProps.children}

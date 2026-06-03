@@ -10,6 +10,7 @@ vi.mock('../../../editor/store', () => ({
     store: {
       dragStart: vi.fn(),
     },
+    markdownEditorRef: { current: null },
     markdownContainerRef: { current: document.createElement('div') },
     readonly: false,
   })),

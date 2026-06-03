@@ -30,8 +30,8 @@ import { withMarkdown } from '../../editor/plugins/withMarkdown';
 import { EditorStore, useEditorStore } from '../../editor/store';
 
 // Mock is-hotkey 库
-vi.mock('is-hotkey', () => ({
-  default: (hotkey: string, event: any) => {
+vi.mock('is-hotkey', () => {
+  const isHotkey = (hotkey: string, event: any) => {
     const handlers: Record<string, (e: any) => boolean> = {
       up: (e) => e.key === 'ArrowUp',
       down: (e) => e.key === 'ArrowDown',
@@ -46,8 +46,9 @@ vi.mock('is-hotkey', () => ({
         e.key === 's' && (e.metaKey || e.ctrlKey) && e.shiftKey,
     };
     return handlers[hotkey]?.(event) || false;
-  },
-}));
+  };
+  return { default: isHotkey, isHotkey };
+});
 
 // Mock 相关模块
 const mockSetOpenInsertCompletion = vi.fn();
@@ -99,7 +100,7 @@ describe('useKeyboard Hook Tests', () => {
     key: string,
     options: Partial<KeyboardEvent> = {},
   ): React.KeyboardEvent => {
-    return {
+    const base = {
       key,
       preventDefault: vi.fn(),
       stopPropagation: vi.fn(),
@@ -108,7 +109,9 @@ describe('useKeyboard Hook Tests', () => {
       shiftKey: false,
       altKey: false,
       ...options,
-    } as any;
+    };
+    // Prezly 列表键盘处理通过 event.nativeEvent 调 isHotkey，需提供原生事件
+    return { ...base, nativeEvent: base } as any;
   };
 
   beforeEach(() => {
