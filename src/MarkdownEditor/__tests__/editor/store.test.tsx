@@ -2209,20 +2209,14 @@ describe('EditorStore', () => {
         focus: { path: [0, 0], offset: 0 },
       };
 
-      const editorNodesSpy = vi
-        .spyOn(Editor, 'nodes')
-        .mockImplementation(function* () {
-          yield [
-            { type: 'code', language: 'js', children: [{ text: '' }] },
-            [0],
-          ] as any;
-        });
-      const pathNextSpy = vi.spyOn(Path, 'next').mockReturnValue([1]);
+      // 不再全局 mock Editor.nodes / Path.next（会在 insertNodes 的规范化阶段持续生效
+      // 导致规范化死循环）。改用真实编辑器状态：光标在 void code 内，insertLink 应在
+      // 其下一位置 [1] 插入段落链接。
       const insertNodesSpy = vi.spyOn(Transforms, 'insertNodes');
 
       store.insertLink('https://link.com');
 
-      expect(Transforms.insertNodes).toHaveBeenCalledWith(
+      expect(insertNodesSpy).toHaveBeenCalledWith(
         editor,
         {
           type: 'paragraph',
@@ -2231,8 +2225,6 @@ describe('EditorStore', () => {
         expect.objectContaining({ at: [1], select: true }),
       );
 
-      editorNodesSpy.mockRestore();
-      pathNextSpy.mockRestore();
       insertNodesSpy.mockRestore();
     });
   });
