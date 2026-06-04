@@ -1,4 +1,4 @@
-﻿name: Run Vitest and upload coverage to Codecov
+name: Run Vitest and upload coverage to Codecov
 
 on:
   push:
