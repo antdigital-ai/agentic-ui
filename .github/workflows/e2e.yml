@@ -32,7 +32,11 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm run playwright:install
 
+      - name: Build library and docs for E2E
+        run: pnpm run build && pnpm run docs:build
+
       - name: Run E2E Tests
         run: pnpm run test:e2e
         env:
           CI: true
+          E2E_PREBUILT: '1'

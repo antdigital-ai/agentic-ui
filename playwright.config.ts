@@ -37,13 +37,15 @@ export default defineConfig({
   webServer: process.env.SKIP_WEBSERVER
     ? undefined // 如果设置了 SKIP_WEBSERVER，跳过自动启动（假设服务器已运行）
     : {
-        // 先编译库产物再构建文档，确保 demo 中 `@ant-design/agentic-ui` 指向的 dist 与当前 src 一致
-        command: 'pnpm run build && pnpm run docs:build && pnpm run preview',
+        // 先编译库产物再构建文档，确保 demo 中 `@ant-design/agentic-ui` 指向的 dist 与当前 src 一致。
+        // CI 可设 E2E_PREBUILT=1，在 workflow 中先 build + docs:build，此处只启动 preview。
+        command: process.env.E2E_PREBUILT
+          ? 'pnpm run preview'
+          : 'pnpm run build && pnpm run docs:build && pnpm run preview',
         url: 'http://localhost:4172',
         reuseExistingServer: !process.env.CI, // 本地开发时复用已有服务器
-        // 构建（father build）+ 文档构建（dumi build）+ 预览启动在 CI 上可能超过 3 分钟，
-        // 放宽到 6 分钟避免偶发 “Timed out waiting from config.webServer”。
-        timeout: 360 * 1000,
+        // 全量 build + dumi build 在 CI 上常超过 6 分钟；预构建路径仅等 preview 启动。
+        timeout: process.env.E2E_PREBUILT ? 180 * 1000 : 720 * 1000,
         stdout: 'pipe', // 减少输出，提升性能
         stderr: 'pipe',
       },
