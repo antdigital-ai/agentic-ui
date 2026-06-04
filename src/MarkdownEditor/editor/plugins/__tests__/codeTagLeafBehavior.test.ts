@@ -6,8 +6,8 @@ import {
   handleTagRemoveTextOperation,
   moveSelectionOutOfCodeTagLeaf,
   shouldExitMarkOnInsertBreak,
-  tryInsertTextOutsideTagOnDoubleSpace,
   tryInsertTextOutsideMarkOnDoubleSpace,
+  tryInsertTextOutsideTagOnDoubleSpace,
 } from '../codeTagLeafBehavior';
 
 const tagNode = (text: string) => ({ text, tag: true, code: true });
