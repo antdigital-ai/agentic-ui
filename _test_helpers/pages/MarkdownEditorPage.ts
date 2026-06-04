@@ -1,7 +1,8 @@
-import type { Frame } from '@playwright/test';
+﻿import type { Frame } from '@playwright/test';
 import { Locator, Page, expect } from '@playwright/test';
 
 import { PLAYWRIGHT_FIXTURE_DEMOS } from '../constants/playwrightDemoRoutes';
+import { gotoDumiDemo } from '../utils/e2eNavigation';
 import { getDumiDemoContentRoot } from '../utils/dumiDemoFrame';
 
 /** 与 `markdown.matchInputToNode` 等输入规则联用时，逐字输入的默认间隔（ms） */
@@ -55,9 +56,7 @@ export class MarkdownEditorPage {
   async goto(
     demoPath: string = PLAYWRIGHT_FIXTURE_DEMOS.markdownEditor,
   ) {
-    await this.page.goto(`/~demos/${demoPath}`);
-    // 等待页面加载完成
-    await this.page.waitForLoadState('networkidle');
+    await gotoDumiDemo(this.page, demoPath);
     await this.bindDemoRoot();
     await this.waitForReady();
   }
@@ -67,8 +66,8 @@ export class MarkdownEditorPage {
    * 增加超时时间，因为 Slate 编辑器需要时间初始化
    */
   async waitForReady() {
-    // 增加超时时间到 10 秒，给组件和 Slate 编辑器足够的初始化时间
-    await expect(this.editableInput).toBeVisible({ timeout: 10000 });
+    await expect(this.editableInput).toBeVisible({ timeout: 15_000 });
+    await expect(this.editableInput).toBeEditable({ timeout: 15_000 });
   }
 
   /**

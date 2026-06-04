@@ -1,22 +1,33 @@
 import { defineConfig, devices } from '@playwright/test';
 
+import { E2E_VIEWPORT } from './_test_helpers/utils/e2eTimeouts';
+
+const isCi = !!process.env.CI;
+
 /**
  * Playwright 测试配置
  * 参考: https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
   testDir: './e2e',
-  fullyParallel: false, // 禁用并行执行，改为串行执行
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: 1, // 使用单个 worker，确保测试一个个执行
-  reporter: 'html',
+  fullyParallel: false,
+  forbidOnly: isCi,
+  retries: isCi ? 2 : 0,
+  workers: 1,
+  timeout: isCi ? 120_000 : 90_000,
+  expect: {
+    timeout: isCi ? 15_000 : 10_000,
+  },
+  reporter: isCi ? [['github'], ['html', { open: 'never' }]] : 'html',
   use: {
-    baseURL: 'http://localhost:4172', // preview 服务器端口
+    baseURL: 'http://localhost:4172',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
-    // 降低 headless/CI 下 “Page crashed” 概率（/dev/shm 不足、GPU 等）
+    navigationTimeout: isCi ? 90_000 : 60_000,
+    actionTimeout: isCi ? 20_000 : 15_000,
+    viewport: E2E_VIEWPORT,
+    locale: 'zh-CN',
     launchOptions: {
       args: [
         '--disable-dev-shm-usage',
@@ -30,7 +41,10 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: E2E_VIEWPORT,
+      },
     },
   ],
 

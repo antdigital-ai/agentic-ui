@@ -2,6 +2,11 @@
 import { Locator, Page, expect } from '@playwright/test';
 
 import { PLAYWRIGHT_FIXTURE_DEMOS } from '../constants/playwrightDemoRoutes';
+import { gotoDumiDemo } from '../utils/e2eNavigation';
+import {
+  E2E_AFTER_SEND_TIMEOUT_MS,
+  E2E_POLL_TIMEOUT_MS,
+} from '../utils/e2eTimeouts';
 import { getDumiDemoContentRoot } from '../utils/dumiDemoFrame';
 
 /**
@@ -66,11 +71,7 @@ export class MarkdownInputFieldPage {
   async goto(
     demoPath: string = PLAYWRIGHT_FIXTURE_DEMOS.markdownInputFieldOnFocus,
   ) {
-    await this.page.goto(`/~demos/${demoPath}`, {
-      waitUntil: 'domcontentloaded',
-      timeout: 60_000,
-    });
-    await this.page.waitForLoadState('networkidle');
+    await gotoDumiDemo(this.page, demoPath);
     await this.bindDemoRoot();
     await this.waitForReady();
   }
@@ -80,8 +81,22 @@ export class MarkdownInputFieldPage {
    * 增加超时时间，因为 Slate 编辑器需要时间初始化 contenteditable 元素
    */
   async waitForReady() {
-    // 增加超时时间到 10 秒，给组件和 Slate 编辑器足够的初始化时间
-    await expect(this.editableInput).toBeVisible({ timeout: 10000 });
+    await expect(this.editableInput).toBeVisible({ timeout: 15_000 });
+    await expect(this.editableInput).toBeEditable({ timeout: 15_000 });
+  }
+
+  /**
+   * 发送后等待输入框清空（demo onSend 含约 1s 延迟）
+   */
+  async expectAfterSendCleared(
+    timeout = E2E_AFTER_SEND_TIMEOUT_MS,
+  ): Promise<void> {
+    await expect
+      .poll(async () => (await this.getText()).trim(), {
+        timeout,
+        message: '等待发送后输入框清空',
+      })
+      .toBe('');
   }
 
   /**
@@ -89,13 +104,22 @@ export class MarkdownInputFieldPage {
    * 如果已经聚焦则跳过点击操作，避免重置光标位置
    */
   async focus() {
-    // 检查是否已经聚焦，如果已聚焦则跳过点击操作，避免重置光标位置
     const isFocused = await this.editableInput.evaluate((el) => {
       return el === document.activeElement;
     });
-    if (!isFocused) {
-      await this.editableInput.click();
+    if (isFocused) {
+      return;
     }
+    for (let attempt = 0; attempt < 3; attempt++) {
+      await this.editableInput.click({ timeout: 5_000 });
+      const focused = await this.editableInput.evaluate(
+        (el) => el === document.activeElement,
+      );
+      if (focused) {
+        return;
+      }
+    }
+    await expect(this.editableInput).toBeFocused({ timeout: 5_000 });
   }
 
   /**
@@ -145,7 +169,7 @@ export class MarkdownInputFieldPage {
                   );
                 },
                 {
-                  timeout: 3000,
+                  timeout: E2E_POLL_TIMEOUT_MS,
                   message: `等待行 "${lines[i]}" 输入完成`,
                 },
               )
@@ -194,7 +218,7 @@ export class MarkdownInputFieldPage {
                 );
               },
               {
-                timeout: 5000,
+                timeout: E2E_POLL_TIMEOUT_MS,
                 message: '等待换行完成',
               },
             )
@@ -224,7 +248,7 @@ export class MarkdownInputFieldPage {
             return currentText;
           },
           {
-            timeout: 3000,
+            timeout: E2E_POLL_TIMEOUT_MS,
             message: '等待文本输入完成',
           },
         )
@@ -273,7 +297,7 @@ export class MarkdownInputFieldPage {
   /**
    * 等待输入框无有效文本（trim 后为空）
    */
-  async expectEmptyContent(timeout = 8000) {
+  async expectEmptyContent(timeout = E2E_POLL_TIMEOUT_MS) {
     await expect
       .poll(
         async () => (await this.getText()).trim().length,
@@ -293,7 +317,6 @@ export class MarkdownInputFieldPage {
     const modifierKey = process.platform === 'darwin' ? 'Meta' : 'Control';
     const kb = this.keyboardPage.keyboard;
     await kb.press(`${modifierKey}+a`);
-    await this.keyboardPage.waitForTimeout(150);
     await kb.press('Backspace');
     await kb.press('Delete');
     await this.expectEmptyContent();
@@ -344,11 +367,10 @@ export class MarkdownInputFieldPage {
       await kb.press('Meta+ArrowRight');
     } else if (key === 'Enter') {
       await this.focus();
-      await this.editableInput.press('Enter');
+      await this.editableInput.press('Enter', { delay: 0 });
     } else {
       await kb.press(key);
     }
-    await this.keyboardPage.waitForTimeout(100);
   }
 
   /**
@@ -358,7 +380,6 @@ export class MarkdownInputFieldPage {
     await this.focus();
     const modifierKey = process.platform === 'darwin' ? 'Meta' : 'Control';
     await this.keyboardPage.keyboard.press(`${modifierKey}+a`);
-    await this.keyboardPage.waitForTimeout(process.platform === 'darwin' ? 250 : 150);
   }
 
   /**
@@ -421,7 +442,7 @@ export class MarkdownInputFieldPage {
             return text.trim().length;
           },
           {
-            timeout: 5000,
+            timeout: E2E_POLL_TIMEOUT_MS,
             message: '等待粘贴内容出现，如果超时可能是剪贴板为空或粘贴操作失败',
           },
         )
@@ -434,7 +455,7 @@ export class MarkdownInputFieldPage {
             const text = await this.getText();
             return text.trim().length;
           },
-          { timeout: 5000 },
+          { timeout: E2E_POLL_TIMEOUT_MS },
         )
         .toBeGreaterThan(beforeLength);
     }

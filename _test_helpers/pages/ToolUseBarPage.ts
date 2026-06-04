@@ -1,6 +1,7 @@
-import { Locator, Page, expect } from '@playwright/test';
+﻿import { Locator, Page, expect } from '@playwright/test';
 
 import { PLAYWRIGHT_FIXTURE_DEMOS } from '../constants/playwrightDemoRoutes';
+import { gotoDumiDemo } from '../utils/e2eNavigation';
 
 /**
  * ToolUseBar Page Object Model
@@ -22,8 +23,7 @@ export class ToolUseBarPage {
   async goto(
     demoPath: string = PLAYWRIGHT_FIXTURE_DEMOS.toolUseBarBasic,
   ) {
-    await this.page.goto(`/~demos/${demoPath}`);
-    console.log('goto', demoPath);
+    await gotoDumiDemo(this.page, demoPath);
     await this.waitForReady();
   }
 
