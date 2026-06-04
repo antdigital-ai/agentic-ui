@@ -9,6 +9,14 @@ const tagNode = (text: string, extra?: Record<string, any>) => ({
   ...extra,
 });
 
+const markNode = (text: string, extra?: Record<string, any>) => ({
+  text,
+  mark: true,
+  markLabel: '@',
+  markColor: 'blue',
+  ...extra,
+});
+
 const para = (...children: any[]) => ({
   type: 'paragraph',
   children,
@@ -62,6 +70,28 @@ describe('withCodeTagPlugin', () => {
       );
       removeNodesSpy.mockRestore();
       insertNodesSpy.mockRestore();
+    });
+
+    it('删空 mark 正文后清除 mark 装饰属性', () => {
+      const editor = withCodeTagPlugin(createEditor());
+      editor.children = [para(markNode('@助理', { markBg: '#e6f4ff' }))];
+
+      const unsetNodesSpy = vi.spyOn(Transforms, 'unsetNodes');
+
+      editor.apply({
+        type: 'remove_text',
+        path: [0, 0],
+        offset: 0,
+        text: '@助理',
+      });
+
+      expect(unsetNodesSpy).toHaveBeenCalledWith(
+        editor,
+        ['mark', 'markColor', 'markBg', 'markLabel'],
+        expect.objectContaining({ at: [0, 0] }),
+      );
+      expect(editor.children).toEqual([para({ text: '' })]);
+      unsetNodesSpy.mockRestore();
     });
 
     it('部分删除 tag 内文本时直接 apply', () => {
@@ -143,6 +173,22 @@ describe('withCodeTagPlugin', () => {
     it('tag 末尾连续两个空格时跳出到节点外', () => {
       const editor = withCodeTagPlugin(createEditor());
       editor.children = [para(tagNode('abc '))];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 4 },
+        focus: { path: [0, 0], offset: 4 },
+      };
+
+      const insertNodesSpy = vi.spyOn(Transforms, 'insertNodes');
+
+      editor.insertText(' ');
+
+      expect(insertNodesSpy).toHaveBeenCalledWith(editor, [{ text: ' ' }]);
+      insertNodesSpy.mockRestore();
+    });
+
+    it('mark 末尾连续两个空格时跳出到 mark 外', () => {
+      const editor = withCodeTagPlugin(createEditor());
+      editor.children = [para(markNode('@助理 '))];
       editor.selection = {
         anchor: { path: [0, 0], offset: 4 },
         focus: { path: [0, 0], offset: 4 },
@@ -275,6 +321,37 @@ describe('withCodeTagPlugin', () => {
         expect.objectContaining({ select: true }),
       );
       expect(originalInsertBreak).toHaveBeenCalledTimes(1);
+      insertNodesSpy.mockRestore();
+    });
+
+    it('空 mark 叶上再次回车时移出 mark 并换行', () => {
+      const base = createEditor();
+      const originalInsertBreak = vi.fn();
+      base.insertBreak = originalInsertBreak;
+      const editor = withCodeTagPlugin(base);
+      editor.children = [para(markNode('@助理'), markNode(''))];
+      editor.selection = {
+        anchor: { path: [0, 1], offset: 0 },
+        focus: { path: [0, 1], offset: 0 },
+      };
+
+      const unsetNodesSpy = vi.spyOn(Transforms, 'unsetNodes');
+      const insertNodesSpy = vi.spyOn(Transforms, 'insertNodes');
+
+      editor.insertBreak();
+
+      expect(unsetNodesSpy).toHaveBeenCalledWith(
+        editor,
+        ['mark', 'markColor', 'markBg', 'markLabel'],
+        expect.objectContaining({ at: [0, 1] }),
+      );
+      expect(insertNodesSpy).toHaveBeenCalledWith(
+        editor,
+        { text: '' },
+        expect.objectContaining({ at: [0, 2], select: true }),
+      );
+      expect(originalInsertBreak).toHaveBeenCalledTimes(1);
+      unsetNodesSpy.mockRestore();
       insertNodesSpy.mockRestore();
     });
 
