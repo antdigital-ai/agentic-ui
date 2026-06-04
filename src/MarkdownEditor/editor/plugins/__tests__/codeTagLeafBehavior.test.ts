@@ -1,4 +1,4 @@
-import { createEditor, Transforms } from 'slate';
+import { createEditor, Transforms, type Operation } from 'slate';
 import { describe, expect, it, vi } from 'vitest';
 import {
   handleMarkInsertBreak,
@@ -11,6 +11,16 @@ import {
 } from '../codeTagLeafBehavior';
 
 const tagNode = (text: string) => ({ text, tag: true, code: true });
+
+const malformedRemoveTextOperation = (
+  text?: string,
+): Operation & { type: 'remove_text' } =>
+  ({
+    type: 'remove_text',
+    path: [0, 0],
+    offset: 0,
+    text,
+  }) as Operation & { type: 'remove_text' };
 
 describe('codeTagLeafBehavior', () => {
   it('handleTagRemoveTextOperation 空 tag 转为普通文本', () => {
@@ -74,6 +84,66 @@ describe('codeTagLeafBehavior', () => {
     expect(leaf.mark).toBeUndefined();
     expect(leaf.markLabel).toBeUndefined();
     unsetSpy.mockRestore();
+  });
+
+  it('handleMarkRemoveTextOperation 缺失删除文本时不会误删非空 mark', () => {
+    const editor = createEditor();
+    editor.children = [
+      {
+        type: 'paragraph',
+        children: [
+          {
+            text: '@助理',
+            mark: true,
+            markLabel: '@',
+            markColor: 'blue',
+          },
+        ],
+      },
+    ];
+    const apply = vi.fn();
+
+    const handled = handleMarkRemoveTextOperation(
+      editor,
+      malformedRemoveTextOperation(),
+      apply,
+    );
+
+    expect(handled).toBe(false);
+    expect(apply).not.toHaveBeenCalled();
+    expect(editor.children[0].children[0]).toMatchObject({
+      text: '@助理',
+      mark: true,
+      markLabel: '@',
+    });
+  });
+
+  it('handleMarkRemoveTextOperation 缺失删除文本时仍清理空白 mark 装饰', () => {
+    const editor = createEditor();
+    editor.children = [
+      {
+        type: 'paragraph',
+        children: [
+          {
+            text: ' ',
+            mark: true,
+            markLabel: '@',
+            markBg: 'yellow',
+          },
+        ],
+      },
+    ];
+    const apply = vi.fn();
+
+    const handled = handleMarkRemoveTextOperation(
+      editor,
+      malformedRemoveTextOperation(),
+      apply,
+    );
+
+    expect(handled).toBe(true);
+    expect(apply).toHaveBeenCalledWith(malformedRemoveTextOperation());
+    expect(editor.children[0].children[0]).toEqual({ text: ' ' });
   });
 
   it('shouldExitMarkOnInsertBreak：正文末尾第一次 Enter 不退出，空 mark 叶第二次退出', () => {
