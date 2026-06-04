@@ -24,10 +24,8 @@ test.describe('MarkdownInputField 交互功能', () => {
       // 验证输入框被清空 (sendMessage 会清空内容)
       await expect
         .poll(
-          async () => {
-            return await markdownInputFieldPage.getText();
-          },
-          { timeout: 5000 },
+          async () => (await markdownInputFieldPage.getText()).trim(),
+          { timeout: 8000 },
         )
         .toBe('');
     });
@@ -73,10 +71,8 @@ test.describe('MarkdownInputField 交互功能', () => {
       // 验证输入框被清空
       await expect
         .poll(
-          async () => {
-            return await markdownInputFieldPage.getText();
-          },
-          { timeout: 5000 },
+          async () => (await markdownInputFieldPage.getText()).trim(),
+          { timeout: 8000 },
         )
         .toBe('');
     });

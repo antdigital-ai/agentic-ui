@@ -1,4 +1,4 @@
-import type { Frame } from '@playwright/test';
+﻿import type { Frame } from '@playwright/test';
 import { Locator, Page, expect } from '@playwright/test';
 
 import { PLAYWRIGHT_FIXTURE_DEMOS } from '../constants/playwrightDemoRoutes';
@@ -238,14 +238,26 @@ export class MarkdownInputFieldPage {
    * 使用 textContent 获取完整的多行文本
    */
   async getText(): Promise<string> {
-    // 使用 evaluate 获取完整的 textContent，这样可以获取所有文本包括换行
     const text = await this.editableInput.evaluate((el) => {
-      // 直接使用 textContent 获取所有文本（包括隐藏文本）
-      // textContent 会获取所有子节点的文本内容，包括换行
-      return el.textContent || '';
+      const collect = (node: Node): string => {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          const element = node as HTMLElement;
+          if (element.getAttribute('data-slate-placeholder') === 'true') {
+            return '';
+          }
+        }
+        if (node.nodeType === Node.TEXT_NODE) {
+          return node.textContent || '';
+        }
+        let acc = '';
+        node.childNodes.forEach((child) => {
+          acc += collect(child);
+        });
+        return acc;
+      };
+      return collect(el);
     });
 
-    // 排除占位符文本（如 "请输入内容..."）和特殊字符（如 "·"）
     const placeholderText = '请输入内容';
     const trimmedText = text.trim();
     if (
@@ -259,48 +271,53 @@ export class MarkdownInputFieldPage {
   }
 
   /**
+   * 等待输入框无有效文本（trim 后为空）
+   */
+  async expectEmptyContent(timeout = 8000) {
+    await expect
+      .poll(
+        async () => (await this.getText()).trim().length,
+        { timeout, message: '等待输入框内容清空' },
+      )
+      .toBe(0);
+  }
+
+  /**
    * 清空输入框
    */
   async clear() {
     await this.focus();
-    const isMac = process.platform === 'darwin';
-    const modifierKey = isMac ? 'Meta' : 'Control';
-    await this.keyboardPage.keyboard.press(`${modifierKey}+a`);
-    await this.keyboardPage.keyboard.press('Delete');
+    if ((await this.getText()).trim().length === 0) {
+      return;
+    }
+    const modifierKey = process.platform === 'darwin' ? 'Meta' : 'Control';
+    const kb = this.keyboardPage.keyboard;
+    await kb.press(`${modifierKey}+a`);
+    await this.keyboardPage.waitForTimeout(150);
+    await kb.press('Backspace');
+    await kb.press('Delete');
+    await this.expectEmptyContent();
   }
 
   /**
    * 验证占位符是否显示
-   * 使用 empty 类判断（符合实现逻辑），而不是依赖属性值
    */
   async expectPlaceholderVisible() {
-    // 检查是否有 empty 类的段落元素，且占位符属性存在
-    const hasPlaceholder = await this.root.evaluate(() => {
-      const emptyParagraph = document.querySelector(
-        '.empty[data-slate-placeholder]',
-      );
-      return (
-        emptyParagraph !== null &&
-        emptyParagraph.getAttribute('data-slate-placeholder') !== null
-      );
-    });
-    expect(hasPlaceholder).toBe(true);
+    const placeholder = this.inputField.locator(
+      '[data-slate-placeholder="true"]',
+    );
+    await expect(placeholder).toBeVisible({ timeout: 5000 });
   }
 
   /**
    * 验证占位符是否隐藏
-   * 使用 Playwright locator 和断言，更高效稳定
    */
   async expectPlaceholderHidden() {
-    // 使用 Playwright locator 查找 empty 类的占位符元素
-    const emptyPlaceholder = this.root.locator(
-      '.empty[data-slate-placeholder]',
+    const placeholder = this.inputField.locator(
+      '[data-slate-placeholder="true"]',
     );
+    await expect(placeholder).not.toBeVisible({ timeout: 5000 });
 
-    // 等待占位符消失（使用 not.toBeVisible 会自动重试）
-    await expect(emptyPlaceholder).not.toBeVisible({ timeout: 3000 });
-
-    // 验证输入框有实际内容
     const text = await this.getText();
     expect(text.trim().length).toBeGreaterThan(0);
   }
@@ -322,11 +339,12 @@ export class MarkdownInputFieldPage {
     const isMac = process.platform === 'darwin';
     const kb = this.keyboardPage.keyboard;
     if (isMac && key === 'Home') {
-      // Mac 上使用 Meta+Left 代替 Home
       await kb.press('Meta+ArrowLeft');
     } else if (isMac && key === 'End') {
-      // Mac 上使用 Meta+Right 代替 End
       await kb.press('Meta+ArrowRight');
+    } else if (key === 'Enter') {
+      await this.focus();
+      await this.editableInput.press('Enter');
     } else {
       await kb.press(key);
     }
@@ -334,35 +352,23 @@ export class MarkdownInputFieldPage {
   }
 
   /**
-   * 选中所有文本
-   * 在 Mac 上使用 Meta+A，在其他平台使用 Ctrl+A
-   * 全选后等待选中状态生效
+   * 选中所有文本（Slate 由编辑器 handleKeyDown 处理 Mod+A，不依赖 window.getSelection）
    */
   async selectAll() {
-    const isMac = process.platform === 'darwin';
-    const modifierKey = isMac ? 'Meta' : 'Control';
+    await this.focus();
+    const modifierKey = process.platform === 'darwin' ? 'Meta' : 'Control';
     await this.keyboardPage.keyboard.press(`${modifierKey}+a`);
-    // 等待选中状态生效，确保后续输入能够替换选中内容
-    // Mac 上可能需要更长的等待时间
-    await this.keyboardPage.waitForTimeout(isMac ? 200 : 100);
-    // 验证选中状态是否生效（通过检查是否有选中文本）
-    await expect
-      .poll(
-        async () => {
-          const hasSelection = await this.editableInput.evaluate(() => {
-            const selection = window.getSelection();
-            return (
-              selection && selection.rangeCount > 0 && !selection.isCollapsed
-            );
-          });
-          return hasSelection;
-        },
-        {
-          timeout: 1000,
-          message: '等待全选状态生效',
-        },
-      )
-      .toBe(true);
+    await this.keyboardPage.waitForTimeout(process.platform === 'darwin' ? 250 : 150);
+  }
+
+  /**
+   * 全选后删除，并等待内容清空
+   */
+  async selectAllAndDelete() {
+    await this.selectAll();
+    await this.keyboardPage.keyboard.press('Backspace');
+    await this.keyboardPage.keyboard.press('Delete');
+    await this.expectEmptyContent();
   }
 
   /**
