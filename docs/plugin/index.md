@@ -134,10 +134,17 @@ const handleExportMarkdown = () => {
 withEditor?: (editor: Editor) => Editor
 ```
 
+当 `plugins` 中 `withEditor` 的实现或顺序变化时，编辑器会 remount Slate 子树并尽量保留文档。参与检测的 key 为：插件顺序、是否含 `withEditor`、以及 `withEditorKey` 或具名 `withEditor` 的函数名（匿名函数视为同一槽位 `w`，替换实现不会 remount，请设置 `withEditorKey`）。
+
+```typescript | pure
+withEditorKey?: string
+```
+
 示例：
 
 ```typescript | pure
 const customVoidNodePlugin: MarkdownEditorPlugin = {
+  withEditorKey: 'custom-void-v1',
   withEditor: (editor) => {
     const { isVoid } = editor;
     editor.isVoid = (element) => {

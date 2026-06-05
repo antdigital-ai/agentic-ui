@@ -30,6 +30,7 @@ import { KeyboardTask, Methods } from './utils/keyboard';
 import type { ParserMarkdownToSlateNodeConfig } from './parser/parserMarkdownToSlateNode';
 import type { MarkdownToHtmlOptions } from './utils/markdownToHtml';
 import { markdownToHtmlSync } from './utils/markdownToHtml';
+import type { EditorSelChangePayload } from './utils/editorSelChange';
 const { createContext, useContext } = React;
 
 /**
@@ -57,14 +58,20 @@ export interface EditorStoreContextType {
   insertCompletionText$: Subject<string>;
   /** 打开插入链接流 */
   openInsertLink$: Subject<Selection>;
-  /** 是否刷新浮动工具栏 */
-  refreshFloatBar?: boolean;
+  /** 当前块级选区变化（每编辑器实例独立，避免多实例串线） */
+  selChange$: Subject<EditorSelChangePayload>;
+  /** 浮动工具栏刷新序号（递增以触发依赖方 effect） */
+  floatBarRevision?: number;
+  /** @deprecated 使用 floatBarRevision */
+  refreshFloatBar?: number;
   /** DOM矩形信息 */
   domRect: DOMRect | null;
   /** 设置DOM矩形 */
   setDomRect: (rect: DOMRect | null) => void;
-  /** 设置刷新浮动工具栏状态 */
-  setRefreshFloatBar?: (refresh: boolean) => void;
+  /** 请求刷新浮动工具栏（递增 revision） */
+  bumpFloatBarRevision?: () => void;
+  /** @deprecated 使用 bumpFloatBarRevision；兼容函数式 boolean 切换 */
+  setRefreshFloatBar?: React.Dispatch<React.SetStateAction<boolean>>;
   /** 是否打开插入自动完成 */
   openInsertCompletion?: boolean;
   /** 设置打开插入自动完成状态 */
@@ -107,22 +114,14 @@ export const EditorStoreContext = createContext<EditorStoreContextType | null>(
  * const { store, readonly, typewriter } = useEditorStore();
  * ```
  */
-export const useEditorStore = () => {
-  return (
-    useContext(EditorStoreContext)! || {
-      store: {} as Record<string, any>,
-      readonly: true,
-      typewriter: false,
-      editorProps: {} as MarkdownEditorProps,
-      markdownEditorRef: {} as React.MutableRefObject<any>,
-      openJinjaTemplate: false,
-      setOpenJinjaTemplate: undefined,
-      jinjaAnchorPath: null,
-      setJinjaAnchorPath: undefined,
-      jinjaEnabled: false,
-      jinjaTemplatePanelEnabled: false,
-    }
-  );
+export const useEditorStore = (): EditorStoreContextType => {
+  const ctx = useContext(EditorStoreContext);
+  if (!ctx) {
+    throw new Error(
+      'useEditorStore must be used within EditorStoreContext.Provider',
+    );
+  }
+  return ctx;
 };
 
 /** 支持键入操作的标签类型列表 */
@@ -209,6 +208,23 @@ export class EditorStore {
     this.plugins = plugins;
     this.markdownToHtmlOptions = markdownToHtmlOptions;
     this.parserConfig = parserConfig;
+  }
+
+  /** 同步运行时解析/插件配置，避免重复 new EditorStore */
+  setRuntimeConfig(options: {
+    plugins?: MarkdownEditorPlugin[];
+    markdownToHtmlOptions?: MarkdownToHtmlOptions;
+    parserConfig?: ParserMarkdownToSlateNodeConfig;
+  }) {
+    if (options.plugins !== undefined) {
+      this.plugins = options.plugins;
+    }
+    if (options.markdownToHtmlOptions !== undefined) {
+      this.markdownToHtmlOptions = options.markdownToHtmlOptions;
+    }
+    if (options.parserConfig !== undefined) {
+      this.parserConfig = options.parserConfig;
+    }
   }
 
   /**

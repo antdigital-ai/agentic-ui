@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useRef } from 'react';
-import { Subject } from 'rxjs';
+import { useRef } from 'react';
 import {
   BaseOperation,
-  BaseSelection,
   Editor,
   Element,
   NodeEntry,
@@ -16,10 +14,6 @@ import { Elements } from '../../el';
 import { useEditorStore } from '../store';
 import { parserSlateNodeToMarkdown } from '../utils';
 
-export const selChange$ = new Subject<{
-  sel: BaseSelection;
-  node: NodeEntry<any>;
-} | null>();
 const floatBarIgnoreNode = new Set(['code']);
 
 const DEFAULT_ONCHANGE_DEBOUNCE_WAIT = 150;
@@ -38,12 +32,10 @@ export interface UseOnchangeOptions {
 /**
  * 用于处理编辑器内容变化的自定义钩子函数。
  *
- * @param editor - Slate 编辑器实例。
  * @param onChange - 可选的回调函数，当编辑器内容变化时调用，传递 Markdown 格式的内容和元素数组。
  * @param options - 频率调优参数，详见 {@link UseOnchangeOptions}
  */
 export function useOnchange(
-  editor: Editor,
   onChange?: (value: string, schema: Elements[]) => void,
   options?: UseOnchangeOptions,
 ) {
@@ -51,37 +43,42 @@ export function useOnchange(
   const wait = options?.wait ?? DEFAULT_ONCHANGE_DEBOUNCE_WAIT;
   const selectionTrackingEnabled = options?.selectionTrackingEnabled !== false;
 
-  // debounce 内部直接读 editor.children，外部不再做无谓的预序列化。
+  const {
+    setRefreshFloatBar,
+    bumpFloatBarRevision,
+    setDomRect,
+    readonly,
+    markdownEditorRef,
+    selChange$,
+  } = useEditorStore();
+
   const onChangeDebounce = useDebounceFn(async () => {
     if (!onChange) return;
+    const editor = markdownEditorRef.current;
+    if (!editor) return;
     onChange(
       parserSlateNodeToMarkdown(editor.children),
       editor.children as Elements[],
     );
   }, wait);
 
-  const { setRefreshFloatBar, setDomRect, refreshFloatBar, readonly } =
-    useEditorStore();
-
-  // useRefFunction 保证 Slate.onChange 调用时拿到最新闭包；
-  // 避免 useMemo 漏依赖（refreshFloatBar / store setter）导致的陈旧值问题。
   return useRefFunction(
     (_value: any, _operations: BaseOperation[]) => {
+      const editor = markdownEditorRef.current;
+      if (!editor) return;
+
       const hasContentChange = _operations.some(
         (o) => o.type !== 'set_selection',
       );
 
-      // 早返：只读 + 仅选区变化（旧逻辑保留）
       if (readonly && !hasContentChange) {
         return;
       }
 
-      // 早返：编辑模式仅选区变化 + 不需要选区跟踪 → 跳过 Editor.nodes / selChange$
       if (!hasContentChange && !selectionTrackingEnabled) {
         return;
       }
 
-      // 内容变化才触发用户 onChange
       if (hasContentChange && onChange) {
         onChangeDebounce.run();
       }
@@ -96,11 +93,10 @@ export function useOnchange(
           mode: 'lowest',
         });
 
-        // 只发一次 selChange$（旧版本同 payload 推送两次是 bug）
         setTimeout(() => {
           selChange$.next({
             sel,
-            node,
+            node: node as NodeEntry<any>,
           });
         });
 
@@ -119,7 +115,11 @@ export function useOnchange(
 
           if (!domRange?.toString()?.trim()) return;
           if (rangeContent.current === domRange?.toString()) {
-            setRefreshFloatBar?.(!refreshFloatBar);
+            if (bumpFloatBarRevision) {
+              bumpFloatBarRevision();
+            } else {
+              setRefreshFloatBar?.((prev: boolean) => !prev);
+            }
             return;
           }
           rangeContent.current = domRange?.toString() || '';
@@ -133,7 +133,11 @@ export function useOnchange(
           rangeContent.current = '';
           setDomRect?.(null);
         }
-      } catch (error) {}
+      } catch (error) {
+        if (process.env.NODE_ENV !== 'production') {
+          console.error('[useOnchange] selection tracking failed:', error);
+        }
+      }
     },
   );
 }

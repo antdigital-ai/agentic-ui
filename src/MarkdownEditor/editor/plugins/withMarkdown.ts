@@ -12,24 +12,29 @@ import { withSchemaPlugin } from './withSchemaPlugin';
 import { withVoidNodes } from './withVoidNodes';
 
 /**
- * 为Slate编辑器添加Markdown支持的插件函数
+ * 为 Slate 编辑器叠加 Markdown 内核插件栈（固定顺序，勿随意调整）。
  *
- * @param editor - 要扩展的Slate编辑器实例
- * @returns 增强后的编辑器实例，具有Markdown处理能力
+ * ### 从内到外的包装顺序
+ * 1. `withInlineNodes` — `isInline`（break、inline-katex）
+ * 2. `withCodeBlockPlugin` — 块级 code → `isVoid`
+ * 3. `withVoidNodes` — hr、break 等 `isVoid`（card 系列 deliberately 非 void，见该文件注释）
+ * 4. `withListsPlugin` — 列表 normalize / 键盘
+ * 5. `withCardPlugin` — `apply`、`insertText`、`insertFragment`、`deleteBackward`
+ * 6. `withLinkAndMediaPlugin` — `apply`（链接内双空格、link-card/media split）
+ * 7. `withSchemaPlugin` — `apply`（schema `split_node`）
+ * 8. `withCodeTagPlugin` — `apply`、`insertText`、`insertBreak`、`deleteBackward`
+ * 9. `withFootnoteReferenceNormalize` — `normalizeNode`
+ * 10. `withOrphanInlineLeafNormalize` — `normalizeNode`
+ * 11. `withSanitizeInvalidChildren` — `normalize`、`normalizeNode`（非法 children）
  *
- * @description
- * 该插件通过组合多个子插件，为编辑器提供完整的Markdown支持：
- * - 行内节点识别（withInlineNodes）
- * - 空节点识别（withVoidNodes）
- * - 卡片功能（withCardPlugin）
- * - 链接和媒体功能（withLinkAndMediaPlugin）
- * - Schema功能（withSchemaPlugin）
- * - 脚注引用规范化（withFootnoteReferenceNormalize）
- * - 空 mark/tag 叶节点清理（withOrphanInlineLeafNormalize）
- * - 代码块 void（withCodeBlockPlugin）
- * - 代码标签功能（withCodeTagPlugin）
+ * ### `apply` 调用链（由外到内，先执行外层）
+ * `withCodeTagPlugin` → `withSchemaPlugin` → `withLinkAndMediaPlugin` → `withCardPlugin` → … → Slate 默认。
  *
- * 插件按顺序应用，每个插件都会增强编辑器的特定功能。
+ * 部分插件在「已处理」时会 **不调用内层 `apply`**（例如 schema/link 的 `split_node` 改为 `insertNodes`），
+ * Undo 仅撤销实际进入 history 的操作；行为见 `withMarkdownHistory.integration.test.ts`。
+ *
+ * 业务侧 `MarkdownEditorPlugin.withEditor` 由 `composePluginEditors` 叠在本栈 **之外**；
+ * 覆写 `apply` / `normalizeNode` 时必须委托内层函数，否则破坏上述链条。
  */
 export const withMarkdown = (editor: Editor) => {
   return withSanitizeInvalidChildren(

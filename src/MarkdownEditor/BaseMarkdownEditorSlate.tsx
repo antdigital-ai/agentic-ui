@@ -9,9 +9,7 @@ import React, {
   useState,
 } from 'react';
 import { Subject } from 'rxjs';
-import { createEditor, Editor, Selection } from 'slate';
-import { withHistory } from 'slate-history';
-import { withReact } from 'slate-react';
+import { Selection } from 'slate';
 import { resolveContainerContentStyle } from '../Constants/contentPaddingVars';
 import { useFormulaConfig } from '../Config';
 import { useDebounceFn } from '../Hooks/useDebounceFn';
@@ -20,8 +18,6 @@ import { CommentList } from './editor/components/CommentList';
 import { SlateMarkdownEditor } from './editor/Editor';
 import { parserMdToSchema } from './editor/parser/parserMdToSchema';
 import { parserSlateNodeToMarkdown } from './editor/parser/parserSlateNodeToMarkdown';
-import { withMarkdown } from './editor/plugins';
-import { withErrorReporting } from './editor/plugins/catchError';
 import { EditorStore, EditorStoreContext } from './editor/store';
 import { InsertAutocomplete } from './editor/tools/InsertAutocomplete';
 import { InsertLink } from './editor/tools/InsertLink';
@@ -29,6 +25,12 @@ import { JinjaTemplatePanel } from './editor/tools/JinjaTemplatePanel';
 import { TocHeading } from './editor/tools/Leading';
 import { FloatBar } from './editor/tools/ToolBar/FloatBar';
 import ToolBar from './editor/tools/ToolBar/ToolBar';
+import { copy } from './editor/utils';
+import {
+  createMarkdownSlateEditor,
+  getPluginsEditorCompositionKey,
+} from './editor/utils/createMarkdownSlateEditor';
+import { createEditorSelChangeSubject } from './editor/utils/editorSelChange';
 import { EditorUtils } from './editor/utils/editorUtils';
 import {
   KeyboardTask,
@@ -46,16 +48,6 @@ import {
 } from './types';
 import { exportHtml } from './utils/exportHtml';
 import { sanitizeEditorChromeStyle } from './utils/sanitizeChromeStyle';
-
-// 组合器函数
-const composeEditors = (editor: Editor, plugins: MarkdownEditorPlugin[]) => {
-  if (plugins.length > 1) {
-    return plugins.reduce((acc, plugin) => {
-      return plugin.withEditor ? plugin.withEditor(acc) : acc;
-    }, editor);
-  }
-  return editor;
-};
 
 /** Slate 编辑路径：可编辑、或只读但 renderMode=slate（Slate 文档） */
 const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
@@ -98,20 +90,55 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
     [],
   );
 
-  const markdownEditorRef = useRef(
-    composeEditors(
-      withMarkdown(withReact(withHistory(createEditor()))),
-      props.plugins || [],
-    ),
+  const pluginsCompositionKey = useMemo(
+    () => getPluginsEditorCompositionKey(props.plugins || []),
+    [props.plugins],
   );
+
+  const markdownEditorRef = useRef(
+    createMarkdownSlateEditor(props.plugins || []),
+  );
+  const pluginsCompositionKeyRef = useRef(pluginsCompositionKey);
+  const [slateRemountKey, setSlateRemountKey] = useState(0);
+  const [pluginRemountInitSchema, setPluginRemountInitSchema] = useState<
+    Elements[] | undefined
+  >(undefined);
 
   const markdownContainerRef = useRef<HTMLDivElement | null>(null);
   const pluginsForInitParseRef = useRef(props.plugins);
   pluginsForInitParseRef.current = props.plugins;
 
   useEffect(() => {
-    withErrorReporting(markdownEditorRef.current);
-  }, []);
+    if (pluginsCompositionKeyRef.current === pluginsCompositionKey) {
+      return;
+    }
+    pluginsCompositionKeyRef.current = pluginsCompositionKey;
+
+    const previousEditor = markdownEditorRef.current;
+    let preservedSchema: Elements[] | undefined;
+    try {
+      preservedSchema = copy(previousEditor.children as Elements[]);
+    } catch {
+      preservedSchema = undefined;
+    }
+
+    setPluginRemountInitSchema(
+      preservedSchema?.length ? preservedSchema : undefined,
+    );
+
+    const nextEditor = createMarkdownSlateEditor(props.plugins || []);
+    markdownEditorRef.current = nextEditor;
+
+    if (preservedSchema?.length) {
+      try {
+        EditorUtils.reset(nextEditor, preservedSchema);
+      } catch {
+        EditorUtils.deleteAll(nextEditor);
+      }
+    }
+
+    setSlateRemountKey((key) => key + 1);
+  }, [pluginsCompositionKey, props.plugins]);
 
   useEffect(() => {
     if (!rest?.onBlur) return;
@@ -171,16 +198,24 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
     [formulaConfig.enable, formulaConfig.singleDollarTextMath],
   );
 
-  const store = useMemo(
-    () =>
-      new EditorStore(
-        markdownEditorRef,
-        props.plugins,
-        props.markdownToHtmlOptions,
-        parserConfig,
-      ),
-    [props.plugins, props.markdownToHtmlOptions, parserConfig],
-  );
+  const storeRef = useRef<EditorStore | null>(null);
+  if (!storeRef.current) {
+    storeRef.current = new EditorStore(
+      markdownEditorRef,
+      props.plugins,
+      props.markdownToHtmlOptions,
+      parserConfig,
+    );
+  }
+  const store = storeRef.current;
+
+  useEffect(() => {
+    store.setRuntimeConfig({
+      plugins: props.plugins,
+      markdownToHtmlOptions: props.markdownToHtmlOptions,
+      parserConfig,
+    });
+  }, [store, props.plugins, props.markdownToHtmlOptions, parserConfig]);
 
   const initSchemaValue = useMemo(() => {
     const parseResult = parserMdToSchema(
@@ -196,7 +231,7 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
 
     const schema =
       props.initSchemaValue ||
-      (initValue ? list : JSON.parse(JSON.stringify([EditorUtils.p])));
+      (initValue ? list : copy([EditorUtils.p]));
 
     const filtered =
       schema?.filter((item: any) => {
@@ -223,6 +258,12 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
     return EditorUtils.coalesceRootAllEmptyParagraphs(filtered) as Elements[];
   }, [initValue, props.readonly, props.initSchemaValue]);
 
+  useEffect(() => {
+    setPluginRemountInitSchema(undefined);
+  }, [initValue, props.initSchemaValue]);
+
+  const slateInitSchemaValue = pluginRemountInitSchema ?? initSchemaValue;
+
   const instance = useMemo(() => {
     return {
       store,
@@ -233,18 +274,18 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
         exportHtml(htmlContent, filename);
       },
     } as MarkdownEditorInstance;
-  }, []);
+  }, [store]);
 
-  useSystemKeyboard(keyTask$, instance.store, props, markdownContainerRef);
+  useSystemKeyboard(keyTask$, store, props, markdownContainerRef);
 
   useImperativeHandle(editorRef, () => {
     return {
-      store: instance.store,
+      store,
       markdownContainerRef,
       markdownEditorRef,
       exportHtml: instance.exportHtml,
     };
-  }, [instance, editorMountStatus]);
+  }, [instance, store, editorMountStatus]);
 
   const context = useContext(ConfigProvider.ConfigContext);
   const baseClassName = context?.getPrefixCls(`agentic-md-editor`);
@@ -274,10 +315,14 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
   );
 
   const [openInsertCompletion, setOpenInsertCompletion] = useState(false);
-  const [refreshFloatBar, setRefreshFloatBar] = useState(false);
+  const [floatBarRevision, setFloatBarRevision] = useState(0);
+  const bumpFloatBarRevision = useRefFunction(() => {
+    setFloatBarRevision((revision) => revision + 1);
+  });
 
   const insertCompletionText$ = useMemo(() => new Subject<string>(), []);
   const openInsertLink$ = useMemo(() => new Subject<Selection>(), []);
+  const selChange$ = useMemo(() => createEditorSelChangeSubject(), []);
 
   const [domRect, setDomRect] = useState<DOMRect | null>(null);
 
@@ -312,6 +357,8 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
   const [openJinjaTemplate, setOpenJinjaTemplate] = useState(false);
   const [jinjaAnchorPath, setJinjaAnchorPath] = useState<number[] | null>(null);
 
+  const containerMountedRef = useRef(false);
+
   const isStreaming = props.streaming ?? props.typewriter ?? false;
 
   return (
@@ -322,13 +369,15 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
             keyTask$,
             insertCompletionText$,
             openInsertLink$,
+            selChange$,
             openInsertCompletion,
             setOpenInsertCompletion,
-            setRefreshFloatBar,
-            refreshFloatBar,
+            bumpFloatBarRevision,
+            floatBarRevision,
+            refreshFloatBar: floatBarRevision,
             rootContainer: props.rootContainer,
             setShowComment,
-            store: instance.store,
+            store,
             domRect,
             setDomRect,
             typewriter: isStreaming,
@@ -380,7 +429,7 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
                   min={toolBar.min}
                 />
               </div>
-            ) : readonly ? null : null}
+            ) : null}
             <div
               className={classNames(
                 `${baseClassName}-container`,
@@ -394,16 +443,21 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
               }}
               ref={(dom) => {
                 markdownContainerRef.current = dom;
-                setMountedStatus(true);
+                if (dom && !containerMountedRef.current) {
+                  containerMountedRef.current = true;
+                  setMountedStatus(true);
+                }
               }}
               tabIndex={-1}
             >
               <SlateMarkdownEditor
+                key={slateRemountKey}
+                slateRemountKey={slateRemountKey}
                 prefixCls={baseClassName}
                 {...rest}
                 lazy={lazy}
                 onChange={handleChildChange}
-                initSchemaValue={initSchemaValue}
+                initSchemaValue={slateInitSchemaValue}
                 style={editorStyle}
                 instance={instance}
               />

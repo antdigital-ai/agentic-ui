@@ -32,6 +32,7 @@ import { LazyElement } from './components/LazyElement';
 import { EditorEditable } from './components/EditorEditable';
 import { MElement, MLeaf } from './elements';
 import { buildFootnoteDefinitionChangePayload } from './utils/footnoteDisplay';
+import { applyTableMinSizeToSchema } from './utils/genTableMinSize';
 import {
   handleFilesPaste,
   handleHtmlPaste,
@@ -48,7 +49,7 @@ import { useKeyboard } from './plugins/useKeyboard';
 import { useOnchange } from './plugins/useOnchange';
 import { useEditorStore } from './store';
 import { useStyle } from './style';
-import { MARKDOWN_EDITOR_EVENTS, parserSlateNodeToMarkdown } from './utils';
+import { MARKDOWN_EDITOR_EVENTS, copy, parserSlateNodeToMarkdown } from './utils';
 import {
   cleanWordHtml,
   htmlToMarkdown,
@@ -100,40 +101,14 @@ export type MEditorProps = {
   reportMode?: MarkdownEditorProps['reportMode'];
   /** 输入框占位符文本 */
   placeholder?: string;
+  /** Slate 壳 remount 序号（插件 withEditor 栈变化时递增） */
+  slateRemountKey?: number;
 } & MarkdownEditorProps;
-
-/**
- * 生成表格最小尺寸配置
- *
- * 该函数用于设置表格的最小列数和行数，确保表格的基本结构。
- * 通过递归遍历编辑器元素，找到表格元素并应用最小尺寸约束。
- *
- * @param elements - 编辑器元素数组
- * @param config - 配置对象
- * @param config.minColumn - 最小列数
- * @param config.minRows - 最小行数
- */
-const genTableMinSize = (
-  elements: Elements[],
-  config?: {
-    minColumn?: number;
-    minRows?: number;
-  },
-) => {
-  if (!config) return elements;
-
-  elements.forEach((element) => {
-    if ((element as any).children) {
-      genTableMinSize((element as any).children, config);
-    }
-  });
-};
 
 /**
  * SlateMarkdownEditor 组件 - Slate Markdown编辑器组件
  *
- * 基于Slate.js的Markdown编辑器，支持丰富的编辑功能，包括文本编辑、表格、代码块、媒体插入、链接等。
- * 通过MobX进行状态管理，支持多种编辑器事件和操作。
+ * 基于 Slate.js 的 Markdown 编辑器，状态由 EditorStore 与 React Context 协作管理。
  *
  * @component
  * @description 基于Slate.js的Markdown编辑器组件
@@ -213,6 +188,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
   const cancelClearInputCompositionRef = useRef<(() => void) | null>(null);
   const [suppressPlaceholderForIme, setSuppressPlaceholderForIme] =
     useState(false);
+  const [hasEmptyRootParagraph, setHasEmptyRootParagraph] = useState(false);
 
   const plugins = useContext(PluginContext);
 
@@ -223,27 +199,16 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     (readonly
       ? !!props.reportMode && props.floatBar?.enable !== false
       : props.floatBar?.enable !== false);
-  const onChange = useOnchange(markdownEditorRef.current, props.onChange, {
+  const onChange = useOnchange(props.onChange, {
     wait: props.onChangeDebounceWait,
     selectionTrackingEnabled,
   });
   const high = useHighlight(store, jinjaEnabled);
 
-  const childrenIsEmpty = useMemo(() => {
-    if (!markdownEditorRef.current?.children) return false;
-    if (!Array.isArray(markdownEditorRef.current.children)) return false;
-    if (markdownEditorRef.current.children.length === 0) return false;
-    return (
-      value.current.filter(
-        (v) => v.type === 'paragraph' && v.children?.at?.(0)?.text === '',
-      ).length < 1
-    );
-  }, [markdownEditorRef.current?.children]);
-
   const readonlyCls = useMemo(() => {
     if (readonly) return 'readonly';
-    return !childrenIsEmpty ? 'focus' : '';
-  }, [readonly, !childrenIsEmpty]);
+    return hasEmptyRootParagraph ? 'focus' : '';
+  }, [readonly, hasEmptyRootParagraph]);
 
   const { hashId } = useStyle(`${props.prefixCls}-content`, {
     placeholderContent: props?.textAreaProps?.placeholder || props?.placeholder,
@@ -465,9 +430,6 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     // 忽略初始化时「仅选区 / 无实质操作」的第一次回调；若用户首次交互就是改内容（如 void 代码块 textarea），必须上报
     if (first.current) {
       if (!hasContentChanges) {
-        setTimeout(() => {
-          first.current = false;
-        }, 100);
         return;
       }
       first.current = false;
@@ -475,6 +437,12 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
 
     // 更新当前值引用
     value.current = v;
+    setHasEmptyRootParagraph(
+      v.some(
+        (node) =>
+          node.type === 'paragraph' && node.children?.at?.(0)?.text === '',
+      ),
+    );
     // 触发onChange回调
     onChange(v, operations);
     // 检查是否存在非选区变化操作，如有则标记内容已变更
@@ -650,14 +618,19 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
       nodeRef.current = props.instance;
       first.current = true;
       const tableConfig = props.tableConfig;
-      genTableMinSize(props.initSchemaValue || [], {
-        minColumn: tableConfig?.minColumn,
-        minRows: tableConfig?.minRows,
-      });
+      const schemaForReset = props.initSchemaValue?.length
+        ? copy(props.initSchemaValue)
+        : undefined;
+      if (schemaForReset && tableConfig) {
+        applyTableMinSizeToSchema(schemaForReset, {
+          minColumn: tableConfig.minColumn,
+          minRows: tableConfig.minRows,
+        });
+      }
       try {
         EditorUtils.reset(
           markdownEditorRef.current,
-          props.initSchemaValue?.length ? props.initSchemaValue : undefined,
+          schemaForReset?.length ? schemaForReset : undefined,
         );
       } catch (e) {
         EditorUtils.deleteAll(markdownEditorRef.current);
@@ -671,7 +644,11 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     if (nodeRef.current !== props.instance) {
       initialNote();
     }
-  }, [props.instance, markdownEditorRef.current]);
+  }, [props.instance]);
+
+  useEffect(() => {
+    first.current = true;
+  }, [props.slateRemountKey]);
 
   /**
    * 实际的粘贴处理逻辑
@@ -1325,9 +1302,9 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
   // 因为 useEffect 在 SSR 环境下不会执行，initialNote 不会被调用
   const initialValue = useMemo(() => {
     if (props.initSchemaValue?.length) {
-      return props.initSchemaValue;
+      return copy(props.initSchemaValue);
     }
-    return [EditorUtils.p];
+    return copy([EditorUtils.p]);
   }, [props.initSchemaValue]);
 
   return (

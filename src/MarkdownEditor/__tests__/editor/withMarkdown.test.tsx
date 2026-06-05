@@ -1,10 +1,10 @@
 import '@testing-library/jest-dom';
 import { cleanup } from '@testing-library/react';
-import { BaseEditor, createEditor, Node, Transforms } from 'slate';
-import { HistoryEditor, withHistory } from 'slate-history';
-import { ReactEditor, withReact } from 'slate-react';
+import { BaseEditor, Node, Transforms } from 'slate';
+import { HistoryEditor } from 'slate-history';
+import { ReactEditor } from 'slate-react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { withMarkdown } from '../../editor/plugins/withMarkdown';
+import { createTestMarkdownEditor } from '../../editor/__tests__/helpers/createTestMarkdownEditor';
 
 // Mock ReactEditor DOM methods
 vi.mock('slate-react', () => ({
@@ -27,7 +27,7 @@ describe('withMarkdown Plugin Tests', () => {
   let editor: BaseEditor & ReactEditor & HistoryEditor;
 
   const createTestEditor = () => {
-    const baseEditor = withMarkdown(withHistory(withReact(createEditor())));
+    const baseEditor = createTestMarkdownEditor([]);
     baseEditor.children = [{ type: 'paragraph', children: [{ text: '' }] }];
     return baseEditor;
   };

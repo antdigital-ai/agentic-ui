@@ -17,13 +17,17 @@ vi.mock('../../../../../Hooks/useDebounceFn', () => ({
   })),
 }));
 
+const editorStoreMock = {
+  readonly: false,
+  setRefreshFloatBar: vi.fn(),
+  setDomRect: vi.fn(),
+  refreshFloatBar: false,
+  markdownEditorRef: { current: null as ReturnType<typeof createEditor> | null },
+  selChange$: { next: vi.fn() },
+};
+
 vi.mock('../../../store', () => ({
-  useEditorStore: () => ({
-    readonly: false,
-    setRefreshFloatBar: vi.fn(),
-    setDomRect: vi.fn(),
-    refreshFloatBar: false,
-  }),
+  useEditorStore: () => editorStoreMock,
 }));
 
 const initial: Descendant[] = [
@@ -90,8 +94,10 @@ describe('SimpleCodeBlockEditor slate onChange', () => {
     editor.children = initial;
 
     const parentOnChange = vi.fn();
+    editorStoreMock.markdownEditorRef.current = editor;
+
     const { result } = renderHook(() =>
-      useOnchange(editor, parentOnChange, {
+      useOnchange(parentOnChange, {
         selectionTrackingEnabled: false,
       }),
     );

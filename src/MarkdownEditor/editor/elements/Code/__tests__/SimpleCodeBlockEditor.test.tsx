@@ -4,6 +4,7 @@ import React from 'react';
 import { createEditor, Descendant } from 'slate';
 import { Editable, Slate, withReact } from 'slate-react';
 import { describe, expect, it } from 'vitest';
+import { EditorStoreTestProvider } from '../../../__tests__/helpers/editorStoreTestContext';
 import { withCodeBlockPlugin } from '../../../plugins/withCodeBlockPlugin';
 import { getCodeBlockPlainText } from '../../../utils/codeBlockPlainText';
 import { Code } from '../index';
@@ -23,17 +24,19 @@ describe('SimpleCodeBlockEditor (via Code element)', () => {
     editor.children = initial;
 
     render(
-      <Slate editor={editor} initialValue={initial}>
-        <Editable
-          renderElement={(props) =>
-            props.element.type === 'code' ? (
-              <Code {...props} />
-            ) : (
-              <div {...props.attributes}>{props.children}</div>
-            )
-          }
-        />
-      </Slate>,
+      <EditorStoreTestProvider>
+        <Slate editor={editor} initialValue={initial}>
+          <Editable
+            renderElement={(props) =>
+              props.element.type === 'code' ? (
+                <Code {...props} />
+              ) : (
+                <div {...props.attributes}>{props.children}</div>
+              )
+            }
+          />
+        </Slate>
+      </EditorStoreTestProvider>,
     );
 
     const textarea = screen.getByTestId('simple-code-block-editor');
@@ -52,17 +55,19 @@ describe('SimpleCodeBlockEditor (via Code element)', () => {
     editor.children = initial;
 
     render(
-      <Slate editor={editor} initialValue={initial}>
-        <Editable
-          renderElement={(props) =>
-            props.element.type === 'code' ? (
-              <Code {...props} />
-            ) : (
-              <div {...props.attributes}>{props.children}</div>
-            )
-          }
-        />
-      </Slate>,
+      <EditorStoreTestProvider>
+        <Slate editor={editor} initialValue={initial}>
+          <Editable
+            renderElement={(props) =>
+              props.element.type === 'code' ? (
+                <Code {...props} />
+              ) : (
+                <div {...props.attributes}>{props.children}</div>
+              )
+            }
+          />
+        </Slate>
+      </EditorStoreTestProvider>,
     );
 
     const textarea = screen.getByTestId(

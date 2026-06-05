@@ -13,6 +13,8 @@ export * from './editor/utils';
 export * from './el';
 export * from './types';
 
+export type { EditorSelChangePayload } from './editor/utils/editorSelChange';
+export { createEditorSelChangeSubject } from './editor/utils/editorSelChange';
 export { ReadonlyMarkdownEditorView };
 export { ReadonlyMarkdownEditorStore } from './readonly/ReadonlyMarkdownEditorStore';
 export { findTextInReadonlyMarkdownDom } from './readonly/findTextInReadonlyMarkdownDom';

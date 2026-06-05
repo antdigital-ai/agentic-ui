@@ -1,4 +1,5 @@
-import { Editor, Node, Operation, Path, Transforms } from 'slate';
+import { Editor, Node, Operation, Path } from 'slate';
+import { insertEmptyParagraphAfter } from './insertEmptyParagraphAfter';
 
 /**
  * 处理schema相关节点的操作
@@ -21,19 +22,7 @@ const handleSchemaOperation = (
   ) {
     const node = Node.get(editor, operation.path);
     if (node?.type === 'schema') {
-      Transforms.insertNodes(
-        editor,
-        [
-          {
-            type: 'paragraph',
-            children: [{ text: '', p: 'true' }],
-          },
-        ],
-        {
-          at: Path.next(operation.path),
-          select: true,
-        },
-      );
+      insertEmptyParagraphAfter(editor, Path.next(operation.path));
     }
     return true;
   }

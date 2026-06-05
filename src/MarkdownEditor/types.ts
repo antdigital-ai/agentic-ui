@@ -158,6 +158,10 @@ export type MarkdownEditorProps = {
     ele: RenderElementProps,
     defaultDom: React.ReactNode,
   ) => React.ReactNode;
+  /**
+   * 初始 Markdown 字符串。Slate 模式下为**非受控**初始值：仅在挂载时解析一次。
+   * 挂载后更新正文请使用 `editorRef.current.store.setMDContent(markdown)`，或 remount（例如变更 `key`），勿仅依赖改此 prop 同步编辑器。
+   */
   initValue?: string;
   /**
    * 只读时是否仍挂载完整 Slate 取决于 `renderMode`：
@@ -233,6 +237,10 @@ export type MarkdownEditorProps = {
   jinja?: JinjaConfig;
   /** 公式解析与 KaTeX 渲染配置；可通过 AgenticConfigProvide 全局设置 */
   formula?: FormulaConfig;
+  /**
+   * 扩展插件。运行时变更会同步 Store 解析配置；`withEditor` 栈变化时会重建 Slate 编辑器并 remount（保留当前文档）。
+   * 若仅替换函数引用但栈形状不变，不会 remount。
+   */
   plugins?: any[];
   onChange?: (value: string, schema: Elements[]) => void;
   /**
@@ -327,7 +335,9 @@ export type MarkdownEditorProps = {
     extra?: React.ReactNode[];
   };
   id?: string;
-  /** 直接传入 Slate schema，优先级高于 initValue */
+  /**
+   * 直接传入 Slate schema，优先级高于 `initValue`；同样仅在挂载时作为初始文档，运行时更新请用 `setMDContent` 或 remount
+   */
   initSchemaValue?: Elements[];
   leafRender?: (
     props: Record<string, any> & { children: React.ReactNode },

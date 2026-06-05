@@ -25,13 +25,15 @@ import { resolveEditorPlaceholderFromProps } from '../../utils/resolveEditorPlac
 export const ReadonlyBaseBar = (props: { prefix?: string }) => {
   const baseClassName = props.prefix || `toolbar-action`;
 
-  const { refreshFloatBar, markdownEditorRef, editorProps } = useEditorStore();
+  const { floatBarRevision, refreshFloatBar, markdownEditorRef, editorProps } =
+    useEditorStore();
+  const floatBarRefreshKey = floatBarRevision ?? refreshFloatBar;
 
   const [, setRefresh] = React.useState(false);
 
   useEffect(() => {
     setRefresh((r) => !r);
-  }, [refreshFloatBar]);
+  }, [floatBarRefreshKey]);
   const i18n = useContext(I18nContext);
   /**
    * 获取当前节点

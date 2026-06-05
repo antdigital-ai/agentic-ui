@@ -26,6 +26,7 @@ import type { MarkdownEditorProps } from '../../types';
 import { SlateMarkdownEditor } from '../Editor';
 import * as handlePasteModule from '../plugins/handlePaste';
 import { EditorStore, EditorStoreContext } from '../store';
+import { createEditorSelChangeSubject } from '../utils/editorSelChange';
 import type { KeyboardTask, Methods } from '../utils';
 import * as editorUtilsModule from '../utils/editorUtils';
 import { EditorUtils } from '../utils/editorUtils';
@@ -185,6 +186,7 @@ describe('SlateMarkdownEditor', () => {
       keyTask$: new Subject<{ key: Methods<KeyboardTask>; args?: any[] }>(),
       insertCompletionText$: new Subject<string>(),
       openInsertLink$: new Subject<Selection>(),
+      selChange$: createEditorSelChangeSubject(),
       domRect: null,
       setDomRect: () => {},
       editorProps: {
@@ -500,6 +502,7 @@ describe('SlateMarkdownEditor', () => {
         keyTask$: new Subject<{ key: Methods<KeyboardTask>; args?: any[] }>(),
         insertCompletionText$: new Subject<string>(),
         openInsertLink$: new Subject<Selection>(),
+        selChange$: createEditorSelChangeSubject(),
         domRect: null,
         setDomRect,
         editorProps: {},
@@ -849,6 +852,7 @@ describe('SlateMarkdownEditor', () => {
         keyTask$: new Subject<{ key: Methods<KeyboardTask>; args?: any[] }>(),
         insertCompletionText$: new Subject<string>(),
         openInsertLink$: new Subject<Selection>(),
+        selChange$: createEditorSelChangeSubject(),
         domRect: null,
         setDomRect: () => {},
         editorProps: {},
@@ -906,6 +910,7 @@ describe('SlateMarkdownEditor', () => {
         keyTask$: new Subject<{ key: Methods<KeyboardTask>; args?: any[] }>(),
         insertCompletionText$: new Subject<string>(),
         openInsertLink$: new Subject<Selection>(),
+        selChange$: createEditorSelChangeSubject(),
         domRect: null,
         setDomRect,
         editorProps: {},
@@ -1042,6 +1047,7 @@ describe('SlateMarkdownEditor', () => {
         keyTask$: new Subject<{ key: Methods<KeyboardTask>; args?: any[] }>(),
         insertCompletionText$: new Subject<string>(),
         openInsertLink$: new Subject<Selection>(),
+        selChange$: createEditorSelChangeSubject(),
         domRect: null,
         setDomRect,
         editorProps: {},
@@ -1119,6 +1125,7 @@ describe('SlateMarkdownEditor', () => {
         keyTask$: new Subject<{ key: Methods<KeyboardTask>; args?: any[] }>(),
         insertCompletionText$: new Subject<string>(),
         openInsertLink$: new Subject<Selection>(),
+        selChange$: createEditorSelChangeSubject(),
         domRect: null,
         setDomRect: () => {},
         editorProps: {},

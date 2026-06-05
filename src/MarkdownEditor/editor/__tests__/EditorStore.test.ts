@@ -1,8 +1,8 @@
-/**
+﻿/**
  * 文件名 `EditorStore.*` 在同目录字典序上晚于 `Editor.branches.*`，使 vitest 先注册后者对 slate 的 vi.mock，
  * 再加载本文件中的真实 slate，避免剪贴板等用例的 mock 被覆盖。
  */
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import React from 'react';
 import { createEditor, Editor, Path, Transforms } from 'slate';
 import { withHistory } from 'slate-history';
@@ -181,19 +181,14 @@ describe('EditorStore', () => {
   });
 
   describe('useEditorStore', () => {
-    it('无 Provider 时返回默认 store 对象', () => {
+    it('无 Provider 时应抛出明确错误', () => {
       const TestComp = () => {
-        const ctx = useEditorStore();
-        return React.createElement(
-          'span',
-          {
-            'data-testid': 'readonly',
-          },
-          String(ctx.readonly),
-        );
+        useEditorStore();
+        return null;
       };
-      render(React.createElement(TestComp));
-      expect(screen.getByTestId('readonly')).toHaveTextContent('true');
+      expect(() => render(React.createElement(TestComp))).toThrow(
+        'useEditorStore must be used within EditorStoreContext.Provider',
+      );
     });
   });
 

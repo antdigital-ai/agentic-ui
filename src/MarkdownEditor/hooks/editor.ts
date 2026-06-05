@@ -1,7 +1,6 @@
 import { BaseElement, Path, Transforms } from 'slate';
 import { ReactEditor, useSlate } from 'slate-react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
-import { selChange$ } from '../editor/plugins/useOnchange';
 import { EditorStore, useEditorStore } from '../editor/store';
 import { useGetSetState } from '../editor/utils';
 import { EditorUtils } from '../editor/utils/editorUtils';
@@ -61,7 +60,7 @@ export const useMEditor = (el: BaseElement) => {
  */
 export const useSelStatus = (element: any) => {
   const editor = useSlate();
-  const { store, markdownEditorRef } = useEditorStore();
+  const { store, markdownEditorRef, selChange$ } = useEditorStore();
   const [state, setState] = useGetSetState({
     selected: ReactEditor.isFocused(editor),
     path: EditorUtils.findPath(editor, element),

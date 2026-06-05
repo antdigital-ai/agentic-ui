@@ -47,6 +47,10 @@ export type MarkdownEditorPlugin = {
 
   // ------------------ 编辑器行为扩展 ------------------
   withEditor?: (editor: Editor) => Editor; // 扩展编辑器实例
+  /**
+   * 参与 `getPluginsEditorCompositionKey`；替换匿名 `withEditor` 时若需 remount 请显式设置
+   */
+  withEditorKey?: string;
 
   hotkeys?: Record<string, (editor: Editor) => void>; // 自定义快捷键
 
