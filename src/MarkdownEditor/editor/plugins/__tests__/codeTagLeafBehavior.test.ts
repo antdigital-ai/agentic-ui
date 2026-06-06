@@ -76,6 +76,26 @@ describe('codeTagLeafBehavior', () => {
     unsetSpy.mockRestore();
   });
 
+  it('handleMarkRemoveTextOperation 遇到过期路径时不消费操作', () => {
+    const editor = createEditor();
+    editor.children = [{ type: 'paragraph', children: [{ text: '' }] }];
+    const apply = vi.fn();
+
+    const handled = handleMarkRemoveTextOperation(
+      editor,
+      {
+        type: 'remove_text',
+        path: [0, 1],
+        offset: 0,
+        text: '@助理',
+      },
+      apply,
+    );
+
+    expect(handled).toBe(false);
+    expect(apply).not.toHaveBeenCalled();
+  });
+
   it('shouldExitMarkOnInsertBreak：正文末尾第一次 Enter 不退出，空 mark 叶第二次退出', () => {
     expect(
       shouldExitMarkOnInsertBreak(
