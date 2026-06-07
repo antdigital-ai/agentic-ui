@@ -5,9 +5,10 @@ import {
   handleMarkRemoveTextOperation,
   handleTagRemoveTextOperation,
   moveSelectionOutOfCodeTagLeaf,
+  moveSelectionOutOfMarkLeaf,
   shouldExitMarkOnInsertBreak,
-  tryInsertTextOutsideTagOnDoubleSpace,
   tryInsertTextOutsideMarkOnDoubleSpace,
+  tryInsertTextOutsideTagOnDoubleSpace,
 } from '../codeTagLeafBehavior';
 
 const tagNode = (text: string) => ({ text, tag: true, code: true });
@@ -76,6 +77,72 @@ describe('codeTagLeafBehavior', () => {
     unsetSpy.mockRestore();
   });
 
+  it('handleMarkRemoveTextOperation 兼容缺失删除文本的空 mark 叶', () => {
+    const editor = createEditor();
+    editor.children = [
+      {
+        type: 'paragraph',
+        children: [{ text: '', mark: true, markLabel: '@' }],
+      },
+    ];
+    const apply = vi.fn();
+    const unsetSpy = vi.spyOn(Transforms, 'unsetNodes');
+    const operation = {
+      type: 'remove_text',
+      path: [0, 0],
+      offset: 0,
+      text: undefined,
+    } as never;
+
+    const handled = handleMarkRemoveTextOperation(editor, operation, apply);
+
+    expect(handled).toBe(true);
+    expect(apply).toHaveBeenCalledWith(operation);
+    expect(unsetSpy).toHaveBeenCalledWith(
+      editor,
+      ['mark', 'markColor', 'markBg', 'markLabel'],
+      expect.objectContaining({ at: [0, 0] }),
+    );
+    unsetSpy.mockRestore();
+  });
+
+  it('handleMarkRemoveTextOperation 删除 label 后仅剩空白也清除 mark', () => {
+    const editor = createEditor();
+    editor.children = [
+      {
+        type: 'paragraph',
+        children: [{ text: '@  ', mark: true, markLabel: '@' }],
+      },
+    ];
+    const apply = editor.apply.bind(editor);
+    const unsetSpy = vi.spyOn(Transforms, 'unsetNodes');
+
+    const handled = handleMarkRemoveTextOperation(
+      editor,
+      {
+        type: 'remove_text',
+        path: [0, 0],
+        offset: 0,
+        text: '@',
+      },
+      apply,
+    );
+
+    expect(handled).toBe(true);
+    expect(unsetSpy).toHaveBeenCalledWith(
+      editor,
+      ['mark', 'markColor', 'markBg', 'markLabel'],
+      expect.objectContaining({ at: [0, 0] }),
+    );
+    const leaf = editor.children[0].children[0] as {
+      mark?: boolean;
+      text: string;
+    };
+    expect(leaf).toMatchObject({ text: '  ' });
+    expect(leaf.mark).toBeUndefined();
+    unsetSpy.mockRestore();
+  });
+
   it('shouldExitMarkOnInsertBreak：正文末尾第一次 Enter 不退出，空 mark 叶第二次退出', () => {
     expect(
       shouldExitMarkOnInsertBreak(
@@ -114,6 +181,36 @@ describe('codeTagLeafBehavior', () => {
     expect(unsetSpy).toHaveBeenCalled();
     expect(originalInsertBreak).toHaveBeenCalledTimes(1);
     unsetSpy.mockRestore();
+  });
+
+  it('moveSelectionOutOfMarkLeaf 在空 mark 叶上清理 mark 并移出选区', () => {
+    const editor = createEditor();
+    editor.children = [
+      {
+        type: 'paragraph',
+        children: [{ text: '', mark: true, markLabel: '@' }],
+      },
+    ];
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
+
+    const unsetSpy = vi.spyOn(Transforms, 'unsetNodes');
+    const insertSpy = vi.spyOn(Transforms, 'insertNodes');
+    expect(moveSelectionOutOfMarkLeaf(editor)).toBe(true);
+    expect(unsetSpy).toHaveBeenCalledWith(
+      editor,
+      ['mark', 'markColor', 'markBg', 'markLabel'],
+      expect.objectContaining({ at: [0, 0] }),
+    );
+    expect(insertSpy).toHaveBeenCalledWith(
+      editor,
+      { text: '' },
+      expect.objectContaining({ at: [0, 1], select: true }),
+    );
+    unsetSpy.mockRestore();
+    insertSpy.mockRestore();
   });
 
   it('moveSelectionOutOfCodeTagLeaf 在 code 叶子上移出选区', () => {
