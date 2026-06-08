@@ -57,6 +57,43 @@ describe('ContentThrottle', () => {
     throttle.dispose();
   });
 
+  it('流式内容被非前缀修正时应从新内容起点重新推进', () => {
+    const flushed: string[] = [];
+    const throttle = new ContentThrottle((s) => flushed.push(s), {
+      charsPerFrame: 5,
+    });
+
+    throttle.push('Hello World');
+    vi.advanceTimersByTime(16);
+    expect(flushed.at(-1)).toBe('Hello');
+
+    throttle.push('Goodbye');
+    vi.advanceTimersByTime(16);
+    expect(flushed.at(-1)).toBe('Goodb');
+
+    vi.advanceTimersByTime(16);
+    expect(flushed.at(-1)).toBe('Goodbye');
+    throttle.dispose();
+  });
+
+  it('flushOnComplete 为 false 时 complete 不应立即补齐剩余内容', () => {
+    const flushed: string[] = [];
+    const throttle = new ContentThrottle((s) => flushed.push(s), {
+      charsPerFrame: 2,
+      flushOnComplete: false,
+    });
+
+    throttle.push('abcdef');
+    vi.advanceTimersByTime(16);
+    expect(flushed.at(-1)).toBe('ab');
+
+    throttle.complete();
+
+    expect(throttle.getDisplayedLength()).toBe(2);
+    expect(flushed.at(-1)).toBe('ab');
+    throttle.dispose();
+  });
+
   it('content 前缀变化时应重置进度', () => {
     const flushed: string[] = [];
     const throttle = new ContentThrottle((s) => flushed.push(s), {
