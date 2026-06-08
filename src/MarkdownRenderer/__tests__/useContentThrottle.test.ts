@@ -37,4 +37,47 @@ describe('useContentThrottle', () => {
 
     expect(result.current).toBe('abcdef');
   });
+
+  it('returns full content immediately when stream is already finished', () => {
+    const { result } = renderHook(() =>
+      useContentThrottle('finished content', true, { charsPerFrame: 1 }, true),
+    );
+
+    expect(result.current).toBe('finished content');
+  });
+
+  it('disposes pending throttle work when disabled', async () => {
+    const { result, rerender } = renderHook(
+      ({ content, enabled }) =>
+        useContentThrottle(content, enabled, { charsPerFrame: 1 }, false),
+      {
+        initialProps: {
+          content: 'abcdef',
+          enabled: true,
+        },
+      },
+    );
+
+    expect(result.current).toBe('');
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(16);
+    });
+    expect(result.current).toBe('a');
+
+    await act(async () => {
+      rerender({
+        content: 'disabled content',
+        enabled: false,
+      });
+    });
+
+    expect(result.current).toBe('disabled content');
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(64);
+    });
+
+    expect(result.current).toBe('disabled content');
+  });
 });
