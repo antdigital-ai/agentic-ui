@@ -142,6 +142,55 @@ describe('parserSlateNodeToMarkdown', () => {
       const result = parserSlateNodeToMarkdown(nodes);
       expect(result).toBe('```markdown\n任务内容\n```');
     });
+
+    it('void 代码块位于多段提示词中时应保持块顺序与占位符', () => {
+      const nodes = [
+        {
+          type: 'paragraph',
+          children: [
+            { text: '帮我创建一个定时任务。请根据我的描述: ' },
+            {
+              text: ' ',
+              code: true,
+              tag: true,
+              placeholder: '任务名称',
+            },
+            { text: ' 、 ' },
+            {
+              text: ' ',
+              code: true,
+              tag: true,
+              placeholder: '执行频率',
+            },
+            { text: ' ，内容如下：' },
+          ],
+        },
+        {
+          type: 'code',
+          language: 'markdown',
+          value: '任务内容',
+          children: [{ text: '' }],
+        },
+        {
+          type: 'paragraph',
+          children: [{ text: '帮我生成合适的定时任务配置。' }],
+        },
+      ];
+
+      const result = parserSlateNodeToMarkdown(nodes);
+
+      expect(result).toBe(
+        [
+          '帮我创建一个定时任务。请根据我的描述: `${placeholder:任务名称}` 、 `${placeholder:执行频率}` ，内容如下：',
+          '',
+          '```markdown',
+          '任务内容',
+          '```',
+          '',
+          '帮我生成合适的定时任务配置。',
+        ].join('\n'),
+      );
+    });
   });
 
   describe('handleAttach', () => {
