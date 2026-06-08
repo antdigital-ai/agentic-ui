@@ -1,7 +1,8 @@
-import { SquareArrowUpRight } from '@sofa-design/icons';
+﻿import { SquareArrowUpRight } from '@sofa-design/icons';
 import classNames from 'clsx';
-import React, { memo, useMemo, useState } from 'react';
+import React, { memo, useMemo, useRef, useState } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
+import { applyAvatarGroupHover } from './avatarGroupHover';
 import { useStyle } from './style';
 
 /**
@@ -181,6 +182,23 @@ const VisualListComponent: React.FC<VisualListProps> = ({
   // 兼容旧属性
   const loading = isLoading ?? legacyLoading;
   const { hashId } = useStyle(prefixCls);
+  const listRef = useRef<HTMLUListElement>(null);
+
+  const handleListMouseLeave = useRefFunction(() => {
+    const list = listRef.current;
+    if (!list) {
+      return;
+    }
+    applyAvatarGroupHover(list, null);
+  });
+
+  const handleItemMouseEnter = useRefFunction((index: number) => {
+    const list = listRef.current;
+    if (!list) {
+      return;
+    }
+    applyAvatarGroupHover(list, index);
+  });
 
   // 使用 useMemo 优化过滤后的数据计算
   const displayList = useMemo(() => {
@@ -217,7 +235,13 @@ const VisualListComponent: React.FC<VisualListProps> = ({
       .join(' ');
 
     return (
-      <li key={item.id || index} className={itemClassNames} style={itemStyle}>
+      <li
+        key={item.id || index}
+        className={itemClassNames}
+        style={itemStyle}
+        data-visual-list-item
+        onMouseEnter={() => handleItemMouseEnter(index)}
+      >
         {item.href ? (
           <a
             href={item.href}
@@ -302,7 +326,13 @@ const VisualListComponent: React.FC<VisualListProps> = ({
 
   return (
     <div className={containerClassName} data-testid={prefixCls} style={style}>
-      <ul className={classNames(prefixCls, hashId)}>{listItems}</ul>
+      <ul
+        ref={listRef}
+        className={classNames(prefixCls, hashId)}
+        onMouseLeave={handleListMouseLeave}
+      >
+        {listItems}
+      </ul>
       {/* 用来处理margin-8*/}
       <div style={{ width: 4 }} />
       {description && (

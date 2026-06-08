@@ -1,4 +1,4 @@
-import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
+﻿import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
 const genStyle: GenStyleFn<'VisualList'> = (token) => {
   return {
@@ -10,7 +10,12 @@ const genStyle: GenStyleFn<'VisualList'> = (token) => {
       padding: 0,
       flexFlow: 'wrap',
       gap: '4px',
-      // 容器样式
+      '--visual-list-avatar-lift': '-4px',
+      '--visual-list-avatar-dur': '320ms',
+      '--visual-list-avatar-scale': '1.05',
+      '--visual-list-avatar-falloff': '0.45',
+      '--visual-list-avatar-ease-in': 'cubic-bezier(0.22, 1, 0.36, 1)',
+      '--visual-list-avatar-ease-out': 'cubic-bezier(0.34, 3.85, 0.64, 1)',
 
       [`${token.componentCls}-item`]: {
         marginBottom: '0px',
@@ -20,15 +25,21 @@ const genStyle: GenStyleFn<'VisualList'> = (token) => {
         position: 'relative',
         zIndex: 1,
         cursor: 'pointer',
+        transformOrigin: 'center',
+        transform:
+          'translateY(var(--visual-list-shift, 0px)) scale(var(--visual-list-scale-active, 1))',
+        transition:
+          'transform var(--visual-list-avatar-dur) var(--visual-list-avatar-ease-in)',
+        willChange: 'transform',
+        '&:hover': {
+          zIndex: 2,
+        },
         'img,[data-type="image"]': {
           borderRadius: '8px',
-          transition: 'all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
         },
-        '&:hover': {
-          'img,[data-type="image"]': {
-            boxShadow: '0 2px 8px rgba(0, 122, 204, 0.15)',
-            transform: 'translateY(-16px) scale(1.5)',
-          },
+        '@media (prefers-reduced-motion: reduce)': {
+          transition: 'none !important',
+          transform: 'none !important',
         },
       },
 
