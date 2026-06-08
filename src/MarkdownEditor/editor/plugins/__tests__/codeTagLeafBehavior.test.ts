@@ -167,7 +167,8 @@ describe('codeTagLeafBehavior', () => {
       ['mark', 'markColor', 'markBg', 'markLabel'],
       expect.objectContaining({ at: [0, 0] }),
     );
-    expect(selectSpy).toHaveBeenCalledWith(editor, {
+    expect(selectSpy).toHaveBeenCalledWith(editor, { path: [0, 1], offset: 0 });
+    expect(editor.selection).toEqual({
       anchor: { path: [0, 1], offset: 0 },
       focus: { path: [0, 1], offset: 0 },
     });
