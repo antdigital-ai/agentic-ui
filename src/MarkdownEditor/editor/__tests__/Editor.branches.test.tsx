@@ -1589,7 +1589,7 @@ describe('Editor branches - onSlateChange', () => {
     expect(mockOnChange).toHaveBeenCalled();
   });
 
-  it('set_selection only operations do not mark content changed', () => {
+  it('set_selection only operations remain ignored before first content change', () => {
     const { editor } = setupStore({ readonly: false });
     renderEditor({});
 
@@ -1599,7 +1599,7 @@ describe('Editor branches - onSlateChange', () => {
     editor.operations = [{ type: 'set_selection' }];
     slateOnChange!([{ type: 'paragraph', children: [{ text: '' }] }]);
 
-    expect(mockOnChange).toHaveBeenCalled();
+    expect(mockOnChange).not.toHaveBeenCalled();
   });
 });
 
@@ -2069,7 +2069,7 @@ describe('Editor branches - readonlyCls and childrenIsEmpty', () => {
     expect(editableProps.className).toContain('readonly');
   });
 
-  it('non-readonly with non-empty content applies focus class', () => {
+  it('non-readonly with non-empty content does not apply empty paragraph focus class', () => {
     const { editor } = setupStore({ readonly: false });
     editor.children = [{ type: 'paragraph', children: [{ text: 'content' }] }];
 
@@ -2077,8 +2077,8 @@ describe('Editor branches - readonlyCls and childrenIsEmpty', () => {
       initSchemaValue: [{ type: 'paragraph', children: [{ text: 'content' }] }],
     });
 
-    // Should include 'focus' class when content is not empty
-    expect(editableProps.className).toContain('focus');
+    expect(editableProps.className).toContain('ant-md-content-edit');
+    expect(editableProps.className).not.toContain('ant-md-content-focus');
   });
 
   it('non-readonly with only non-empty paragraphs has empty readonlyCls', () => {
