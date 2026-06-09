@@ -220,6 +220,39 @@ export function AceEditor({
     });
   });
 
+  const setAceMode = useRefFunction(
+    async (
+      codeEditor: Ace.Editor,
+      language: string | null | undefined,
+      fallbackToText = true,
+    ) => {
+      let lang = (language || '') as string;
+      if (modeMap.has(lang)) {
+        lang = modeMap.get(lang)!;
+      }
+
+      const aceLangs = await getAceLangs();
+      if (editorRef.current !== codeEditor) return;
+
+      const mode = aceLangs.has(lang)
+        ? `ace/mode/${lang}`
+        : fallbackToText
+          ? 'ace/mode/text'
+          : null;
+
+      if (!mode) return;
+
+      try {
+        const session = codeEditor.getSession?.() || codeEditor.session;
+        if (editorRef.current === codeEditor && session) {
+          session.setMode(mode);
+        }
+      } catch (error) {
+        console.warn('Failed to set Ace Editor mode:', error);
+      }
+    },
+  );
+
   // 初始化 Ace 编辑器（仅在库加载完成后）
   // 注意： intentionally 不将 editorProps.codeProps 列入依赖，因其对象引用在父组件内容更新时会频繁变化，
   // 导致编辑器被不必要地销毁重建。codeProps 的配置在初始化时已应用，主题等动态变更由独立 effect 处理。
@@ -267,15 +300,8 @@ export function AceEditor({
     codeEditor.setTheme(`ace/theme/${theme}`);
 
     // 设置语法高亮
-    setTimeout(async () => {
-      let lang = element.language as string;
-      if (modeMap.has(lang)) {
-        lang = modeMap.get(lang)!;
-      }
-      const aceLangs = await getAceLangs();
-      if (aceLangs.has(lang)) {
-        codeEditor.session.setMode(`ace/mode/${lang}`);
-      }
+    const modeTimer = window.setTimeout(() => {
+      setAceMode(codeEditor, element.language, false);
     }, 16);
 
     if (!readonly) {
@@ -284,7 +310,11 @@ export function AceEditor({
     }
 
     return () => {
+      clearTimeout(modeTimer);
       clearTimeout(debounceTimer.current);
+      if (editorRef.current === codeEditor) {
+        editorRef.current = undefined;
+      }
       codeEditor.destroy();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -297,19 +327,8 @@ export function AceEditor({
 
     aceLanguageRef.current = element.language;
 
-    (async () => {
-      let lang = (element.language || '') as string;
-      if (modeMap.has(lang)) {
-        lang = modeMap.get(lang)!;
-      }
-      const aceLangs = await getAceLangs();
-      if (aceLangs.has(lang)) {
-        editorRef.current?.session.setMode(`ace/mode/${lang}`);
-      } else {
-        editorRef.current?.session.setMode(`ace/mode/text`);
-      }
-    })();
-  }, [element.language, aceLoaded]);
+    setAceMode(editorRef.current, element.language);
+  }, [element.language, aceLoaded, setAceMode]);
 
   // 监听外部值变化
   useEffect(() => {
@@ -380,11 +399,8 @@ export function AceEditor({
       lang = modeMap.get(lang)!;
     }
 
-    const aceLangs = await getAceLangs();
-    if (aceLangs.has(lang)) {
-      editorRef.current?.session.setMode(`ace/mode/${lang}`);
-    } else {
-      editorRef.current?.session.setMode(`ace/mode/text`);
+    if (editorRef.current) {
+      setAceMode(editorRef.current, lang);
     }
   });
 
