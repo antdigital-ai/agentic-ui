@@ -1,4 +1,4 @@
-﻿/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable react/no-children-prop */
 import classNames from 'clsx';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';

@@ -1,4 +1,4 @@
-﻿import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
 const genStyle: GenStyleFn<'VisualList'> = (token) => {
   return {

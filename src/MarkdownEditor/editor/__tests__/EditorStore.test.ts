@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 文件名 `EditorStore.*` 在同目录字典序上晚于 `Editor.branches.*`，使 vitest 先注册后者对 slate 的 vi.mock，
  * 再加载本文件中的真实 slate，避免剪贴板等用例的 mock 被覆盖。
  */
