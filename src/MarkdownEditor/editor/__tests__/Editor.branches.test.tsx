@@ -30,6 +30,7 @@ vi.mock('slate', () => ({
   Editor: {
     fragment: vi.fn(() => []),
     hasPath: vi.fn(() => true),
+    insertText: vi.fn(),
     node: vi.fn(() => [{ type: 'paragraph', children: [{ text: '' }] }, [0]]),
     nodes: vi.fn(function* () {}),
     start: vi.fn(() => ({ path: [0, 0], offset: 0 })),
@@ -1801,6 +1802,25 @@ describe('Editor branches - onCompositionStart/End', () => {
       });
     });
     expect(mockStoreConfig.store.inputComposition).toBe(false);
+  });
+
+  it('compositionEnd 在 Slate 未落盘时补写 IME 文本', async () => {
+    const { editor } = setupStore({ readonly: false });
+    editor.children = [{ type: 'paragraph', children: [{ text: '' }] }];
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
+    vi.mocked(Range.isCollapsed).mockReturnValue(true);
+
+    renderEditor({});
+
+    editableProps.onCompositionEnd({ data: '，' });
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(Editor.insertText).toHaveBeenCalledWith(editor, '，');
   });
 
   it('compositionEnd with tag-popup-input removes data-composition', () => {
