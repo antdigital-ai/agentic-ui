@@ -3,7 +3,7 @@ import React from 'react';
 import { createEditor, Editor as SlateEditor, Transforms } from 'slate';
 import { withReact } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { SlateMarkdownEditor } from '../../editor/Editor';
+import { SlateMarkdownEditor } from '../Editor';
 
 interface CapturedEditableProps {
   suppressPlaceholder?: boolean;
@@ -17,34 +17,34 @@ const testState = vi.hoisted(() => ({
   storeResult: null as any,
 }));
 
-vi.mock('../../editor/components/EditorEditable', () => ({
+vi.mock('../components/EditorEditable', () => ({
   EditorEditable: (props: CapturedEditableProps) => {
     testState.editableProps = props;
     return null;
   },
 }));
 
-vi.mock('../../editor/plugins/useHighlight', () => ({
+vi.mock('../plugins/useHighlight', () => ({
   useHighlight: () => ({
     decorate: () => [],
   }),
 }));
 
-vi.mock('../../editor/plugins/useKeyboard', () => ({
+vi.mock('../plugins/useKeyboard', () => ({
   useKeyboard: () => vi.fn(),
 }));
 
-vi.mock('../../editor/plugins/useOnchange', () => ({
+vi.mock('../plugins/useOnchange', () => ({
   useOnchange: () => vi.fn(),
 }));
 
-vi.mock('../../editor/style', () => ({
+vi.mock('../style', () => ({
   useStyle: () => ({
     hashId: '',
   }),
 }));
 
-vi.mock('../../editor/store', () => ({
+vi.mock('../store', () => ({
   useEditorStore: () => {
     if (!testState.storeResult) {
       throw new Error('Editor store test state is not initialized');
