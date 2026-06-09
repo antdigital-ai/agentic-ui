@@ -95,7 +95,6 @@ vi.mock('../components/EditorEditable', () => ({
   },
 }));
 
-
 vi.mock('../../../Hooks/useRefFunction', () => ({
   useRefFunction: (fn: (...args: any[]) => any) => fn,
 }));
