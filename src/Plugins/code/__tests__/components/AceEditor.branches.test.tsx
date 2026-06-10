@@ -629,7 +629,9 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
   it('setLanguage 在 Ace session 缺失时不抛错且不设置 mode', async () => {
     const captureRef = { current: null as ReturnType<typeof AceEditor> | null };
     const originalSession = mockEditor.session;
-    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const consoleWarnSpy = vi
+      .spyOn(console, 'warn')
+      .mockImplementation(() => {});
 
     (mockEditor as any).session = undefined;
     (mockEditor as any).getSession = vi.fn(() => undefined);
@@ -662,7 +664,9 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
         undefined,
       );
 
-      expect(defaultProps.onUpdate).toHaveBeenCalledWith({ language: 'python' });
+      expect(defaultProps.onUpdate).toHaveBeenCalledWith({
+        language: 'python',
+      });
       expect(originalSession.setMode).not.toHaveBeenCalled();
       expect(consoleWarnSpy).not.toHaveBeenCalled();
     } finally {
@@ -673,9 +677,8 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
   });
 
   it('卸载后异步 mode 加载完成不会更新已销毁编辑器', async () => {
-    const { getAceLangs } = await import(
-      '../../../../MarkdownEditor/editor/utils/ace'
-    );
+    const { getAceLangs } =
+      await import('../../../../MarkdownEditor/editor/utils/ace');
     const deferredLangs = createDeferred<Set<string>>();
     vi.mocked(getAceLangs).mockReturnValueOnce(deferredLangs.promise);
 
