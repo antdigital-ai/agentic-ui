@@ -216,6 +216,47 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     );
   });
 
+  it('初始化 mode 时 Ace session 缺失不应抛错或警告', async () => {
+    const originalSession = mockEditor.session;
+    const consoleWarnSpy = vi
+      .spyOn(console, 'warn')
+      .mockImplementation(() => {});
+
+    (mockEditor as any).getSession = vi.fn(() => null);
+    (mockEditor as any).session = undefined;
+
+    function Wrapper() {
+      const result = AceEditor(defaultProps);
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    try {
+      render(<Wrapper />);
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+      await act(async () => {
+        vi.advanceTimersByTime(25);
+        await Promise.resolve();
+      });
+
+      expect(consoleWarnSpy).not.toHaveBeenCalledWith(
+        'Failed to set Ace Editor mode:',
+        expect.anything(),
+      );
+      expect(originalSession.setMode).not.toHaveBeenCalled();
+    } finally {
+      (mockEditor as any).session = originalSession;
+      delete (mockEditor as any).getSession;
+      consoleWarnSpy.mockRestore();
+    }
+  });
+
   it('setupEditorEvents: focus/blur 触发 onShowBorderChange、onHideChange、onSelectionChange', async () => {
     function Wrapper() {
       const result = AceEditor(defaultProps);
