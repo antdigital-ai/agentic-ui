@@ -133,9 +133,22 @@ vi.mock('../../../../MarkdownEditor/editor/parser/json-parse', () => ({
   default: vi.fn((str: string) => JSON.parse(str)),
 }));
 
-vi.mock('../../../../Hooks/useRefFunction', () => ({
-  useRefFunction: (fn: any) => fn,
-}));
+vi.mock('../../../../Hooks/useRefFunction', async () => {
+  const ReactModule = await vi.importActual<typeof import('react')>('react');
+
+  return {
+    useRefFunction: <T extends (...args: any[]) => any>(fn: T) => {
+      const ref = ReactModule.useRef(fn);
+      ReactModule.useLayoutEffect(() => {
+        ref.current = fn;
+      });
+      return ReactModule.useCallback(
+        (...args: Parameters<T>): ReturnType<T> => ref.current(...args),
+        [],
+      ) as T;
+    },
+  };
+});
 
 describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
   const defaultProps = {
