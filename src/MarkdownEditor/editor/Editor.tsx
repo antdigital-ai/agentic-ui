@@ -67,6 +67,7 @@ import {
 import {
   commitImeCompositionTextIfMissing,
   getEditorTextSnapshot,
+  clearImeEnterCommitGuard,
   markImeEnterCommitGuard,
   scheduleClearInputComposition,
 } from './utils/isImeComposing';
@@ -1001,6 +1002,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     cancelClearInputCompositionRef.current?.();
     cancelClearInputCompositionRef.current = scheduleClearInputComposition(
       () => {
+        clearImeEnterCommitGuard();
         store.inputComposition = false;
         props.onCompositionActiveChange?.(false);
         cancelClearInputCompositionRef.current = null;

@@ -4,6 +4,7 @@ import {
   commitImeCompositionTextIfMissing,
   IME_PROCESSING_KEY_CODE,
   isImeComposing,
+  clearImeEnterCommitGuard,
   markImeEnterCommitGuard,
   resetImeEnterCommitGuardForTests,
   scheduleClearInputComposition,
@@ -47,7 +48,7 @@ describe('isImeComposing', () => {
     ).toBe(false);
   });
 
-  it('compositionend 后 Enter 在守卫窗口内返回 true', () => {
+  it('compositionend 后下一记 Enter 视为 IME 确认', () => {
     markImeEnterCommitGuard();
     expect(
       isImeComposing(
@@ -57,7 +58,7 @@ describe('isImeComposing', () => {
     ).toBe(true);
   });
 
-  it('守卫窗口内仅首记 Enter 视为 IME，后续 Enter 不再拦截', () => {
+  it('仅首记 Enter 消费守卫，后续 Enter 不再拦截', () => {
     markImeEnterCommitGuard();
     const enterEvent = {
       key: 'Enter',
@@ -68,19 +69,27 @@ describe('isImeComposing', () => {
     expect(isImeComposing(enterEvent, false)).toBe(false);
   });
 
-  it('守卫窗口过期后 Enter 不再视为 IME', () => {
-    vi.useFakeTimers();
+  it('双 rAF 清除守卫后 Enter 不再视为 IME', async () => {
+    const clear = vi.fn();
     markImeEnterCommitGuard();
-    vi.advanceTimersByTime(81);
+    scheduleClearInputComposition(() => {
+      clearImeEnterCommitGuard();
+      clear();
+    });
 
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => resolve());
+      });
+    });
+
+    expect(clear).toHaveBeenCalledTimes(1);
     expect(
       isImeComposing(
         { key: 'Enter', nativeEvent: { isComposing: false } },
         false,
       ),
     ).toBe(false);
-
-    vi.useRealTimers();
   });
 });
 
