@@ -661,10 +661,10 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
   });
 
   it('异步 mode 加载在卸载后完成时不更新已销毁编辑器', async () => {
-    function Wrapper({ language }: { language: string }) {
+    function Wrapper() {
       const result = AceEditor({
         ...defaultProps,
-        element: { ...defaultProps.element, language },
+        element: { ...defaultProps.element, language: 'typescript' },
       });
       return (
         <div ref={result.dom}>
@@ -676,17 +676,6 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     const { getAceLangs } = await import(
       '../../../../MarkdownEditor/editor/utils/ace'
     );
-    const { rerender, unmount } = render(<Wrapper language="javascript" />);
-    await act(async () => {
-      await Promise.resolve();
-      await Promise.resolve();
-    });
-    await act(async () => {
-      vi.advanceTimersByTime(25);
-      await Promise.resolve();
-    });
-
-    mockEditor.session.setMode.mockClear();
     let resolveAceLangs!: (langs: Set<string>) => void;
     vi.mocked(getAceLangs).mockImplementationOnce(
       () =>
@@ -695,8 +684,13 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
         }),
     );
 
+    const { unmount } = render(<Wrapper />);
     await act(async () => {
-      rerender(<Wrapper language="typescript" />);
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
       await Promise.resolve();
     });
     expect(resolveAceLangs).toEqual(expect.any(Function));
