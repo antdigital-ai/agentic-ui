@@ -17,6 +17,14 @@ const pushHandler = (event: string, handler: (...args: any[]) => void) => {
 const invokeHandlers = (event: string) => {
   eventHandlers[event]?.forEach((h) => h());
 };
+const mockSession = vi.hoisted(() => ({
+  setMode: vi.fn(),
+  insert: vi.fn(),
+  getDocument: vi.fn(() => ({
+    getLength: vi.fn(() => 1),
+    getLine: vi.fn(() => 'abc'),
+  })),
+}));
 const mockEditor = vi.hoisted(() => ({
   setTheme: vi.fn(),
   setValue: vi.fn(),
@@ -34,14 +42,10 @@ const mockEditor = vi.hoisted(() => ({
     off: vi.fn(),
     clearSelection: vi.fn(),
   },
-  session: {
-    setMode: vi.fn(),
-    insert: vi.fn(),
-    getDocument: vi.fn(() => ({
-      getLength: vi.fn(() => 1),
-      getLine: vi.fn(() => 'abc'),
-    })),
-  },
+  getSession: vi.fn(function (this: { session?: typeof mockSession }) {
+    return this.session;
+  }),
+  session: mockSession,
   commands: {
     addCommand: vi.fn(),
   },
@@ -168,7 +172,16 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     mockEditor.getValue.mockReturnValue('');
     mockEditor.setValue.mockClear();
     mockEditor.setTheme.mockClear();
+    mockEditor.getSession.mockClear();
+    mockEditor.getSession.mockImplementation(function (this: {
+      session?: typeof mockSession;
+    }) {
+      return this.session;
+    });
+    mockEditor.session = mockSession;
     mockEditor.session.setMode.mockClear();
+    mockEditor.session.insert.mockClear();
+    mockEditor.session.getDocument.mockClear();
     mockEditor.on.mockImplementation(
       (event: string, handler: (...args: any[]) => void) => {
         pushHandler(event, handler);
@@ -616,5 +629,87 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     mockEditor.session.setMode.mockClear();
     await captureRef.current!.setLanguage('javascript');
     expect(mockEditor.session.setMode).not.toHaveBeenCalled();
+  });
+
+  it('language prop 变化时复用编辑器并通过 getSession 更新 mode', async () => {
+    function Wrapper({ language }: { language: string }) {
+      const result = AceEditor({
+        ...defaultProps,
+        element: { ...defaultProps.element, language },
+      });
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    const { rerender } = render(<Wrapper language="javascript" />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    mockEditor.destroy.mockClear();
+    mockEditor.session.setMode.mockClear();
+
+    rerender(<Wrapper language="ts" />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(mockEditor.getSession).toHaveBeenCalled();
+    expect(mockEditor.session.setMode).toHaveBeenCalledWith(
+      'ace/mode/typescript',
+    );
+    expect(mockEditor.destroy).not.toHaveBeenCalled();
+  });
+
+  it('Ace session 缺失时跳过 mode 设置且不抛出 warning', async () => {
+    function Wrapper({ language }: { language: string }) {
+      const result = AceEditor({
+        ...defaultProps,
+        element: { ...defaultProps.element, language },
+      });
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    const { rerender } = render(<Wrapper language="javascript" />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    mockEditor.getSession.mockReturnValue(undefined);
+    (mockEditor as unknown as { session?: typeof mockSession }).session =
+      undefined;
+
+    rerender(<Wrapper language="python" />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(warnSpy).not.toHaveBeenCalledWith(
+      'Failed to set Ace Editor mode:',
+      expect.anything(),
+    );
+
+    warnSpy.mockRestore();
+    mockEditor.session = mockSession;
   });
 });
