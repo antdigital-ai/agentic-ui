@@ -623,37 +623,41 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     (mockEditor as any).session = undefined;
     (mockEditor as any).getSession = vi.fn(() => undefined);
 
-    const captureRef = { current: null as ReturnType<typeof AceEditor> | null };
-    function Wrapper() {
-      const result = AceEditor({
-        ...defaultProps,
-        element: { ...defaultProps.element, language: 'javascript' },
+    try {
+      const captureRef = {
+        current: null as ReturnType<typeof AceEditor> | null,
+      };
+      function Wrapper() {
+        const result = AceEditor({
+          ...defaultProps,
+          element: { ...defaultProps.element, language: 'javascript' },
+        });
+        captureRef.current = result;
+        return (
+          <div ref={result.dom}>
+            <textarea aria-label="ace" />
+          </div>
+        );
+      }
+
+      render(<Wrapper />);
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
       });
-      captureRef.current = result;
-      return (
-        <div ref={result.dom}>
-          <textarea aria-label="ace" />
-        </div>
+      await act(async () => {
+        vi.advanceTimersByTime(25);
+        await Promise.resolve();
+      });
+
+      await expect(captureRef.current!.setLanguage('python')).resolves.toBe(
+        undefined,
       );
+      expect(originalSession.setMode).not.toHaveBeenCalled();
+    } finally {
+      (mockEditor as any).session = originalSession;
+      delete (mockEditor as any).getSession;
     }
-
-    render(<Wrapper />);
-    await act(async () => {
-      await Promise.resolve();
-      await Promise.resolve();
-    });
-    await act(async () => {
-      vi.advanceTimersByTime(25);
-      await Promise.resolve();
-    });
-
-    await expect(captureRef.current!.setLanguage('python')).resolves.toBe(
-      undefined,
-    );
-    expect(originalSession.setMode).not.toHaveBeenCalled();
-
-    (mockEditor as any).session = originalSession;
-    delete (mockEditor as any).getSession;
   });
 
   it('异步 mode 加载在卸载后完成时不更新已销毁编辑器', async () => {
@@ -691,8 +695,15 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
         }),
     );
 
-    rerender(<Wrapper language="typescript" />);
-    unmount();
+    await act(async () => {
+      rerender(<Wrapper language="typescript" />);
+      await Promise.resolve();
+    });
+    expect(resolveAceLangs).toEqual(expect.any(Function));
+
+    await act(async () => {
+      unmount();
+    });
     await act(async () => {
       resolveAceLangs(new Set(['typescript']));
       await Promise.resolve();
