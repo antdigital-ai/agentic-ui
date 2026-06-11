@@ -673,9 +673,8 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
       );
     }
 
-    const { getAceLangs } = await import(
-      '../../../../MarkdownEditor/editor/utils/ace'
-    );
+    const { getAceLangs } =
+      await import('../../../../MarkdownEditor/editor/utils/ace');
     let resolveAceLangs!: (langs: Set<string>) => void;
     vi.mocked(getAceLangs).mockImplementationOnce(
       () =>
