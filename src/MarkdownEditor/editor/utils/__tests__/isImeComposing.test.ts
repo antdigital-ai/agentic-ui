@@ -56,6 +56,32 @@ describe('isImeComposing', () => {
       ),
     ).toBe(true);
   });
+
+  it('守卫窗口内仅首记 Enter 视为 IME，后续 Enter 不再拦截', () => {
+    markImeEnterCommitGuard();
+    const enterEvent = {
+      key: 'Enter',
+      nativeEvent: { isComposing: false },
+    };
+
+    expect(isImeComposing(enterEvent, false)).toBe(true);
+    expect(isImeComposing(enterEvent, false)).toBe(false);
+  });
+
+  it('守卫窗口过期后 Enter 不再视为 IME', () => {
+    vi.useFakeTimers();
+    markImeEnterCommitGuard();
+    vi.advanceTimersByTime(81);
+
+    expect(
+      isImeComposing(
+        { key: 'Enter', nativeEvent: { isComposing: false } },
+        false,
+      ),
+    ).toBe(false);
+
+    vi.useRealTimers();
+  });
 });
 
 describe('commitImeCompositionTextIfMissing', () => {

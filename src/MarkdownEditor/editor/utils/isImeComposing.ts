@@ -19,7 +19,7 @@ export function getEditorTextSnapshot(
 export const IME_PROCESSING_KEY_CODE = 229;
 
 /** compositionend 后短暂窗口内，紧随的 Enter 仍视为 IME 确认选字 */
-const IME_ENTER_COMMIT_GUARD_MS = 200;
+const IME_ENTER_COMMIT_GUARD_MS = 80;
 
 let imeEnterCommitGuardUntil = 0;
 
@@ -30,7 +30,8 @@ export interface ImeKeyboardEventLike {
 }
 
 /**
- * compositionend 后标记：下一记 Enter 多为确认选字，勿触发发送或 / 快捷面板。
+ * compositionend 后标记：紧随的一记 Enter 多为确认选字，勿触发发送或 / 快捷面板。
+ * 守卫窗口较短且仅消费一次，避免误吞用户用于发送的 Enter。
  */
 export function markImeEnterCommitGuard(): void {
   imeEnterCommitGuardUntil = Date.now() + IME_ENTER_COMMIT_GUARD_MS;
@@ -56,6 +57,7 @@ export function isImeComposing(
   if (event.nativeEvent?.isComposing) return true;
   if (event.keyCode === IME_PROCESSING_KEY_CODE) return true;
   if (event.key === 'Enter' && Date.now() < imeEnterCommitGuardUntil) {
+    imeEnterCommitGuardUntil = 0;
     return true;
   }
   return false;
