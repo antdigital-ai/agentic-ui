@@ -617,4 +617,88 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     await captureRef.current!.setLanguage('javascript');
     expect(mockEditor.session.setMode).not.toHaveBeenCalled();
   });
+
+  it('setLanguage 在 Ace session 缺失时不抛错也不设置 mode', async () => {
+    const originalSession = mockEditor.session;
+    (mockEditor as any).session = undefined;
+    (mockEditor as any).getSession = vi.fn(() => undefined);
+
+    const captureRef = { current: null as ReturnType<typeof AceEditor> | null };
+    function Wrapper() {
+      const result = AceEditor({
+        ...defaultProps,
+        element: { ...defaultProps.element, language: 'javascript' },
+      });
+      captureRef.current = result;
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    render(<Wrapper />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    await expect(captureRef.current!.setLanguage('python')).resolves.toBe(
+      undefined,
+    );
+    expect(originalSession.setMode).not.toHaveBeenCalled();
+
+    (mockEditor as any).session = originalSession;
+    delete (mockEditor as any).getSession;
+  });
+
+  it('异步 mode 加载在卸载后完成时不更新已销毁编辑器', async () => {
+    function Wrapper({ language }: { language: string }) {
+      const result = AceEditor({
+        ...defaultProps,
+        element: { ...defaultProps.element, language },
+      });
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    const { getAceLangs } = await import(
+      '../../../../MarkdownEditor/editor/utils/ace'
+    );
+    const { rerender, unmount } = render(<Wrapper language="javascript" />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    mockEditor.session.setMode.mockClear();
+    let resolveAceLangs!: (langs: Set<string>) => void;
+    vi.mocked(getAceLangs).mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveAceLangs = resolve;
+        }),
+    );
+
+    rerender(<Wrapper language="typescript" />);
+    unmount();
+    await act(async () => {
+      resolveAceLangs(new Set(['typescript']));
+      await Promise.resolve();
+    });
+
+    expect(mockEditor.destroy).toHaveBeenCalled();
+    expect(mockEditor.session.setMode).not.toHaveBeenCalled();
+  });
 });
