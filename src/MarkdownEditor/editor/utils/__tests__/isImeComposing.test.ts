@@ -72,14 +72,11 @@ describe('isImeComposing', () => {
   it('双 rAF 清除守卫后 Enter 不再视为 IME', async () => {
     const clear = vi.fn();
     markImeEnterCommitGuard();
-    scheduleClearInputComposition(() => {
-      clearImeEnterCommitGuard();
-      clear();
-    });
-
     await new Promise<void>((resolve) => {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => resolve());
+      scheduleClearInputComposition(() => {
+        clearImeEnterCommitGuard();
+        clear();
+        resolve();
       });
     });
 
