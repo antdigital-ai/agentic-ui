@@ -257,12 +257,14 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     expect(mockEditor.session.setMode).not.toHaveBeenCalled();
   });
 
-  it('语言变化时只更新 mode，不重新创建编辑器', async () => {
-    function Wrapper({ language }: { language: string }) {
+  it('setLanguage 切换语言时只更新 mode，不重新创建编辑器', async () => {
+    const captureRef = { current: null as ReturnType<typeof AceEditor> | null };
+    function Wrapper() {
       const result = AceEditor({
         ...defaultProps,
-        element: { ...defaultProps.element, language },
+        element: { ...defaultProps.element, language: 'javascript' },
       });
+      captureRef.current = result;
       return (
         <div ref={result.dom}>
           <textarea aria-label="ace" />
@@ -270,30 +272,34 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
       );
     }
 
-    const { rerender } = render(<Wrapper language="javascript" />);
+    render(<Wrapper />);
     await flushAceInitialization();
 
+    expect(captureRef.current).toBeTruthy();
     mockEditor.session.setMode.mockClear();
     mockEditor.destroy.mockClear();
 
     await act(async () => {
-      rerender(<Wrapper language="python" />);
+      await captureRef.current!.setLanguage('python');
       await Promise.resolve();
       await Promise.resolve();
     });
 
+    expect(defaultProps.onUpdate).toHaveBeenCalledWith({ language: 'python' });
     expect(mockEditor.session.setMode).toHaveBeenCalledWith(
       'ace/mode/python',
     );
     expect(mockEditor.destroy).not.toHaveBeenCalled();
   });
 
-  it('运行时语言变化到未知语言时回退到 text mode', async () => {
-    function Wrapper({ language }: { language: string }) {
+  it('setLanguage 切换到未知语言时回退到 text mode', async () => {
+    const captureRef = { current: null as ReturnType<typeof AceEditor> | null };
+    function Wrapper() {
       const result = AceEditor({
         ...defaultProps,
-        element: { ...defaultProps.element, language },
+        element: { ...defaultProps.element, language: 'javascript' },
       });
+      captureRef.current = result;
       return (
         <div ref={result.dom}>
           <textarea aria-label="ace" />
@@ -301,13 +307,14 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
       );
     }
 
-    const { rerender } = render(<Wrapper language="javascript" />);
+    render(<Wrapper />);
     await flushAceInitialization();
 
+    expect(captureRef.current).toBeTruthy();
     mockEditor.session.setMode.mockClear();
 
     await act(async () => {
-      rerender(<Wrapper language="unknown-lang" />);
+      await captureRef.current!.setLanguage('unknown-lang');
       await Promise.resolve();
       await Promise.resolve();
     });
