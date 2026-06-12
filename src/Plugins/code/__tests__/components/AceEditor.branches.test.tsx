@@ -276,8 +276,8 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     mockEditor.session.setMode.mockClear();
     mockEditor.destroy.mockClear();
 
-    rerender(<Wrapper language="python" />);
     await act(async () => {
+      rerender(<Wrapper language="python" />);
       await Promise.resolve();
       await Promise.resolve();
     });
@@ -306,8 +306,8 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
 
     mockEditor.session.setMode.mockClear();
 
-    rerender(<Wrapper language="unknown-lang" />);
     await act(async () => {
+      rerender(<Wrapper language="unknown-lang" />);
       await Promise.resolve();
       await Promise.resolve();
     });
