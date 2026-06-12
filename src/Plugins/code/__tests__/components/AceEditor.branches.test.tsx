@@ -286,9 +286,7 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     });
 
     expect(defaultProps.onUpdate).toHaveBeenCalledWith({ language: 'python' });
-    expect(mockEditor.session.setMode).toHaveBeenCalledWith(
-      'ace/mode/python',
-    );
+    expect(mockEditor.session.setMode).toHaveBeenCalledWith('ace/mode/python');
     expect(mockEditor.destroy).not.toHaveBeenCalled();
   });
 
@@ -341,9 +339,7 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     await flushAceInitialization();
 
     expect((mockEditor as any).getSession).toHaveBeenCalled();
-    expect(fallbackSession.setMode).toHaveBeenCalledWith(
-      'ace/mode/javascript',
-    );
+    expect(fallbackSession.setMode).toHaveBeenCalledWith('ace/mode/javascript');
 
     mockEditor.session = originalSession;
   });
