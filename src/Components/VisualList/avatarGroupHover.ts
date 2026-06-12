@@ -1,4 +1,4 @@
-﻿const ITEM_SELECTOR = '[data-visual-list-item]';
+const ITEM_SELECTOR = '[data-visual-list-item]';
 
 export interface AvatarGroupHoverConfig {
   lift: number;

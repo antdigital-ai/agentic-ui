@@ -1,4 +1,4 @@
-﻿import { SquareArrowUpRight } from '@sofa-design/icons';
+import { SquareArrowUpRight } from '@sofa-design/icons';
 import classNames from 'clsx';
 import React, { memo, useMemo, useRef, useState } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
