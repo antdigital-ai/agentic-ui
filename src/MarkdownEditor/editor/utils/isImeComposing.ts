@@ -27,8 +27,10 @@ export interface ImeKeyboardEventLike {
   nativeEvent: { isComposing?: boolean };
 }
 
+/**
  * compositionend 后标记：下一记 Enter 多为确认选字，勿触发发送或 / 快捷面板。
  * 仅消费一次；未命中时应在双 rAF 后调用 clearImeEnterCommitGuard 清除。
+ */
 export function markImeEnterCommitGuard(): void {
   imeEnterCommitGuardPending = true;
 }

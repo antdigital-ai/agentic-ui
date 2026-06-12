@@ -1,7 +1,9 @@
+import { endsInsideGfmTable } from './gfmTableLine';
 import { endsInsideUnclosedFence } from './fenceTracker';
 
 const LAST_BLOCK_THROTTLE_CHARS = 20;
 const BLOCK_BOUNDARY_TRIGGERS = /[\n`|#>*\-!~]/;
+const TABLE_STREAMING_BOUNDARY_TRIGGERS = /[\n#>*!~]/;
 // inline 起始字符出现在行首或空白后时立即重 parse，避免 `<a` / `_em` / `[link`
 // 等增量在 < 20 字符时被节流卡住、用户看到半成品 DOM
 const INLINE_CONTEXT_TRIGGERS = /(?:^|\s)[$[<_]/;
@@ -22,6 +24,12 @@ export const shouldReparseLastBlock = (
   if (endsInsideUnclosedFence(newSource)) return true;
   const added = newSource.slice(prevParsedSource.length);
   if (added.length >= LAST_BLOCK_THROTTLE_CHARS) return true;
+  // 表格流式：`|` / `-` 每个字符都触发 reparse 会导致整表卸载重挂；仅换行等边界符立即重算
+  if (endsInsideGfmTable(newSource)) {
+    if (TABLE_STREAMING_BOUNDARY_TRIGGERS.test(added)) return true;
+    if (INLINE_CONTEXT_TRIGGERS.test(added)) return true;
+    return false;
+  }
   if (BLOCK_BOUNDARY_TRIGGERS.test(added)) return true;
   if (INLINE_CONTEXT_TRIGGERS.test(added)) return true;
   return false;

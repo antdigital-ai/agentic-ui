@@ -19,4 +19,16 @@ describe('shouldReparseLastBlock', () => {
     const next = '```js\nx\n```\nmore';
     expect(shouldReparseLastBlock(prev, next, true)).toBe(false);
   });
+
+  it('流式末块在 GFM 表格内不因 | 或 - 立即重 parse', () => {
+    const prev = '| a | b |\n| - | - |\n| 1';
+    const next = '| a | b |\n| - | - |\n| 1 |';
+    expect(shouldReparseLastBlock(prev, next, true)).toBe(false);
+  });
+
+  it('流式末块在 GFM 表格内换行仍立即重 parse', () => {
+    const prev = '| a | b |';
+    const next = '| a | b |\n| - | - |';
+    expect(shouldReparseLastBlock(prev, next, true)).toBe(true);
+  });
 });

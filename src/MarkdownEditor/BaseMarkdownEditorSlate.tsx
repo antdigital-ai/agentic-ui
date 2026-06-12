@@ -299,6 +299,15 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
     setSchema(initSchemaValue);
   }, [initSchemaValue]);
 
+  // 只读流式：外部通过 initValue 累加时 initSchemaValue 会变，但 Slate initialNote 仅随 instance 重置。
+  // 与 ThoughtChainList/MarkdownEditorUpdate 一致，用 updateNodeList 同步文档树，避免中间态 schema 残留堆叠。
+  useEffect(() => {
+    if (!readonly) {
+      return;
+    }
+    store.updateNodeList(initSchemaValue);
+  }, [readonly, initSchemaValue, store]);
+
   // toc 关闭时无人消费 schema，无需 setState 触发整树 re-render；
   // toc 开启时延迟到稳定后再更新，TOC 跟随节奏可接受地放慢。
   const tocEnabled = toc !== false;

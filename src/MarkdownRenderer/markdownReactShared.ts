@@ -769,6 +769,8 @@ const renderMarkdownBlock = (
   }
 };
 
+import { isGfmTableLine } from './streaming/gfmTableLine';
+
 const LIST_ITEM_PATTERN = /^(\s*)([-+*]|\d+[.)]) /;
 const BLOCKQUOTE_PATTERN = /^\s*>/;
 const HTML_COMMENT_PATTERN = /^\s*<!--/;
@@ -840,6 +842,19 @@ const splitMarkdownBlocks = (content: string): string[] => {
 
     inList = LIST_ITEM_PATTERN.test(line) || (inList && /^\s+\S/.test(line));
     inBlockquote = BLOCKQUOTE_PATTERN.test(line);
+
+    // AI 流式输出常见「标题 → 表格」无空行；表格单独成块避免末块 reparse 连带标题闪烁
+    if (
+      current.length > 0 &&
+      isGfmTableLine(line) &&
+      !isGfmTableLine(lastNonEmptyLine()) &&
+      !HTML_COMMENT_PATTERN.test(lastNonEmptyLine())
+    ) {
+      blocks.push(current.join('\n'));
+      current = [];
+      inList = false;
+      inBlockquote = false;
+    }
 
     current.push(line);
   }
