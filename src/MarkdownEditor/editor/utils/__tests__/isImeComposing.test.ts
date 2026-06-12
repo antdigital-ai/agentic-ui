@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { createEditor, Editor, Transforms } from 'slate';
 import {
   commitImeCompositionTextIfMissing,
+  getEditorTextSnapshot,
   IME_PROCESSING_KEY_CODE,
   isImeComposing,
   markImeEnterCommitGuard,
@@ -58,6 +59,19 @@ describe('isImeComposing', () => {
   });
 });
 
+describe('getEditorTextSnapshot', () => {
+  it('应读取光标所在段落文本而非首段', () => {
+    const editor = createEditor();
+    editor.children = [
+      { type: 'paragraph', children: [{ text: '第一行' }] },
+      { type: 'paragraph', children: [{ text: '第二行' }] },
+    ];
+    Transforms.select(editor, { path: [1, 0], offset: 3 });
+
+    expect(getEditorTextSnapshot(editor)).toBe('第二行');
+  });
+});
+
 describe('commitImeCompositionTextIfMissing', () => {
   it('Slate 已写入时不重复插入', async () => {
     const editor = createEditor();
@@ -78,6 +92,19 @@ describe('commitImeCompositionTextIfMissing', () => {
     expect(getSnapshot(editor)).toBe('');
     await Promise.resolve();
     expect(getSnapshot(editor)).toBe('，');
+  });
+
+  it('换行后 Slate 已写入时不重复插入（#628）', async () => {
+    const editor = createEditor();
+    editor.children = [
+      { type: 'paragraph', children: [{ text: '第一行' }] },
+      { type: 'paragraph', children: [{ text: '世界' }] },
+    ];
+    Transforms.select(editor, { path: [1, 0], offset: 2 });
+
+    commitImeCompositionTextIfMissing(editor, '世界', getSnapshot);
+    await Promise.resolve();
+    expect(getSnapshot(editor)).toBe('世界');
   });
 });
 

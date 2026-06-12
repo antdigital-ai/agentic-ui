@@ -1,15 +1,12 @@
 import { Editor, Range } from 'slate';
 
-/** 读取编辑器首段纯文本，供 IME commit 回退比对 */
+/** 读取光标所在文本节点的纯文本，供 IME commit 回退比对 */
 export function getEditorTextSnapshot(
-  editor: { children: unknown[] } | null | undefined,
+  editor: Editor | null | undefined,
 ): string {
-  if (!editor?.children?.length) return '';
+  if (!editor?.selection) return '';
   try {
-    const paragraph = editor.children[0] as {
-      children?: Array<{ text?: string }>;
-    };
-    return paragraph.children?.map((c) => c.text ?? '').join('') ?? '';
+    return Editor.string(editor, editor.selection.focus.path);
   } catch {
     return '';
   }
