@@ -31,4 +31,10 @@ describe('shouldReparseLastBlock', () => {
     const next = '| a | b |\n| - | - |';
     expect(shouldReparseLastBlock(prev, next, true)).toBe(true);
   });
+
+  it('流式末块在 GFM 表格内新增行内语法起点时立即重 parse', () => {
+    const prev = '| a | b |\n| - | - |\n| 1 |';
+    const next = '| a | b |\n| - | - |\n| 1 | [link';
+    expect(shouldReparseLastBlock(prev, next, true)).toBe(true);
+  });
 });
