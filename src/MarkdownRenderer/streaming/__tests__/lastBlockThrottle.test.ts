@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { endsInsideGfmTable, isGfmTableLine } from '../gfmTableLine';
 import { shouldReparseLastBlock } from '../lastBlockThrottle';
 
 describe('shouldReparseLastBlock', () => {
@@ -30,5 +31,25 @@ describe('shouldReparseLastBlock', () => {
     const prev = '| a | b |';
     const next = '| a | b |\n| - | - |';
     expect(shouldReparseLastBlock(prev, next, true)).toBe(true);
+  });
+});
+
+describe('GFM table streaming detection', () => {
+  it('识别包含对齐标记的 GFM 表格分隔行', () => {
+    expect(isGfmTableLine('|:---|:---:|---:|')).toBe(true);
+    expect(isGfmTableLine('| :--- | :---: | ---: |')).toBe(true);
+  });
+
+  it('从末尾扫描时跳过空行但不跨过非表格正文', () => {
+    const tableWithTrailingBlankLine = [
+      '| a | b |',
+      '| - | - |',
+      '| 1 | 2 |',
+      '',
+    ].join('\n');
+    const tableFollowedByParagraph = `${tableWithTrailingBlankLine}\nsummary`;
+
+    expect(endsInsideGfmTable(tableWithTrailingBlankLine)).toBe(true);
+    expect(endsInsideGfmTable(tableFollowedByParagraph)).toBe(false);
   });
 });
