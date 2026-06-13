@@ -6,6 +6,10 @@
 import { renderHook } from '@testing-library/react';
 import { createEditor, Transforms } from 'slate';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  markImeEnterCommitGuard,
+  resetImeEnterCommitGuardForTests,
+} from '../../../MarkdownEditor/editor/utils/isImeComposing';
 import { useKeyboardHandler } from '../useKeyboardHandler';
 
 vi.mock('../../../Hooks/useRefFunction', () => ({
@@ -48,6 +52,7 @@ function createDefaultParams(overrides: Record<string, any> = {}) {
 describe('useKeyboardHandler', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    resetImeEnterCommitGuardForTests();
     mockIsMobileDevice.mockReturnValue(false);
   });
 
@@ -86,6 +91,43 @@ describe('useKeyboardHandler', () => {
     result.current.handleKeyDown(e);
     expect(e.preventDefault).not.toHaveBeenCalled();
     expect(params.sendMessage).not.toHaveBeenCalled();
+  });
+
+  it('compositionend 后的 Enter 守卫仅消费一次确认选字 Enter', () => {
+    const params = createDefaultParams();
+    params.props.onSend = vi.fn();
+    const { result } = renderHook(() => useKeyboardHandler(params));
+
+    markImeEnterCommitGuard();
+
+    const imeConfirmEnter = {
+      key: 'Enter',
+      ctrlKey: false,
+      metaKey: false,
+      shiftKey: false,
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      nativeEvent: { isComposing: false },
+    } as any;
+    result.current.handleKeyDown(imeConfirmEnter);
+
+    expect(imeConfirmEnter.stopPropagation).toHaveBeenCalled();
+    expect(imeConfirmEnter.preventDefault).not.toHaveBeenCalled();
+    expect(params.sendMessage).not.toHaveBeenCalled();
+
+    const userSendEnter = {
+      key: 'Enter',
+      ctrlKey: false,
+      metaKey: false,
+      shiftKey: false,
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      nativeEvent: { isComposing: false },
+    } as any;
+    result.current.handleKeyDown(userSendEnter);
+
+    expect(userSendEnter.preventDefault).toHaveBeenCalled();
+    expect(params.sendMessage).toHaveBeenCalledTimes(1);
   });
 
   it('isComposing 为 true 时直接 return', () => {
