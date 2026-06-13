@@ -9,12 +9,14 @@ import type { MarkdownEditorInstance } from '../types';
 describe('BaseMarkdownEditor readonly streaming', () => {
   it('updates Slate readonly content from growing initValue without duplicating list roots', async () => {
     const editorRef = React.createRef<MarkdownEditorInstance>();
+    const firstChunk = '- Alpha';
+    const finalChunk = '- Alpha\n- Beta\n- Gamma';
     const { container, rerender } = render(
       <BaseMarkdownEditor
         readonly
         toc={false}
         floatBar={{ enable: false }}
-        initValue="- Alpha"
+        initValue={firstChunk}
         editorRef={editorRef}
       />,
     );
@@ -28,15 +30,13 @@ describe('BaseMarkdownEditor readonly streaming', () => {
         readonly
         toc={false}
         floatBar={{ enable: false }}
-        initValue="- Alpha\n- Beta\n- Gamma"
+        initValue={finalChunk}
         editorRef={editorRef}
       />,
     );
 
     await waitFor(() => {
-      expect(editorRef.current?.store.getMDContent().trim()).toBe(
-        '- Alpha\n- Beta\n- Gamma',
-      );
+      expect(editorRef.current?.store.getMDContent().trim()).toBe(finalChunk);
     });
 
     expect(container.querySelectorAll('[data-be="list"]')).toHaveLength(1);
