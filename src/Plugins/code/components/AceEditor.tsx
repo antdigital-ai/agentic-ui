@@ -19,12 +19,13 @@ import type { Path } from 'slate';
 import { useRefFunction } from '../../../Hooks/useRefFunction';
 import partialParse from '../../../MarkdownEditor/editor/parser/json-parse';
 import { useEditorStore } from '../../../MarkdownEditor/editor/store';
-import { getAceLangs, modeMap } from '../../../MarkdownEditor/editor/utils/ace';
+import { modeMap } from '../../../MarkdownEditor/editor/utils/ace';
 import { handleCodeBlockAceKeyDown } from '../../../MarkdownEditor/editor/utils/codeBlockBehavior';
 import { getCodeBlockPlainText } from '../../../MarkdownEditor/editor/utils/codeBlockPlainText';
 import { EditorUtils } from '../../../MarkdownEditor/editor/utils/editorUtils';
 import { CodeNode } from '../../../MarkdownEditor/el';
 import { loadAceEditor, loadAceTheme } from '../loadAceEditor';
+import { setAceEditorMode } from '../utils/aceMode';
 
 /**
  * AceEditor 组件属性接口
@@ -226,30 +227,12 @@ export function AceEditor({
       language: string | null | undefined,
       fallbackToText = true,
     ) => {
-      let lang = (language || '') as string;
-      if (modeMap.has(lang)) {
-        lang = modeMap.get(lang)!;
-      }
-
-      const aceLangs = await getAceLangs();
-      if (editorRef.current !== codeEditor) return;
-
-      const mode = aceLangs.has(lang)
-        ? `ace/mode/${lang}`
-        : fallbackToText
-          ? 'ace/mode/text'
-          : null;
-
-      if (!mode) return;
-
-      try {
-        const session = codeEditor.getSession?.() || codeEditor.session;
-        if (editorRef.current === codeEditor && session) {
-          session.setMode(mode);
-        }
-      } catch (error) {
-        console.warn('Failed to set Ace Editor mode:', error);
-      }
+      await setAceEditorMode({
+        codeEditor,
+        language,
+        fallbackToText,
+        isCurrentEditor: (editor) => editorRef.current === editor,
+      });
     },
   );
 
