@@ -50,3 +50,26 @@ describe('BaseMarkdownEditor renderMode=markdown', () => {
     ).toBeInTheDocument();
   });
 });
+
+describe('BaseMarkdownEditor renderMode=slate', () => {
+  it('只读流式 initValue 更新应同步到 Slate 文档树', async () => {
+    const firstChunk = '# 进度\n\n第一步';
+    const nextChunk = `${firstChunk}\n\n第二步`;
+    const { container, rerender } = render(
+      <BaseMarkdownEditor readonly initValue={firstChunk} toc={false} />,
+    );
+
+    await waitFor(() => {
+      expect(container.textContent).toContain('第一步');
+    });
+
+    rerender(
+      <BaseMarkdownEditor readonly initValue={nextChunk} toc={false} />,
+    );
+
+    await waitFor(() => {
+      expect(container.textContent).toContain('第二步');
+    });
+    expect(container.textContent?.match(/第一步/g)).toHaveLength(1);
+  });
+});
