@@ -140,6 +140,7 @@ vi.mock('../plugins/parseMarkdownToNodesAndInsert', () => ({
 
 vi.mock('../utils', () => ({
   MARKDOWN_EDITOR_EVENTS: { SELECTIONCHANGE: 'md-selectionchange' },
+  copy: vi.fn((value: unknown) => JSON.parse(JSON.stringify(value))),
   parserSlateNodeToMarkdown: vi.fn(() => 'mock-md'),
 }));
 
