@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { endsInsideGfmTable, isGfmTableLine } from '../gfmTableLine';
 import { shouldReparseLastBlock } from '../lastBlockThrottle';
 
 describe('shouldReparseLastBlock', () => {
@@ -30,5 +31,21 @@ describe('shouldReparseLastBlock', () => {
     const prev = '| a | b |';
     const next = '| a | b |\n| - | - |';
     expect(shouldReparseLastBlock(prev, next, true)).toBe(true);
+  });
+
+  it('识别带对齐符的 GFM 表格分隔行', () => {
+    expect(isGfmTableLine('|:---|:---:|---:|')).toBe(true);
+  });
+
+  it('表格末尾空行仍按表格上下文处理', () => {
+    expect(endsInsideGfmTable('| a | b |\n| --- | --- |\n\n')).toBe(true);
+  });
+
+  it('普通正文出现在表格后时不再按表格上下文节流', () => {
+    const prev = '| a | b |\n| --- | --- |\n| 1 | 2 |\nplain';
+    const next = `${prev} text`;
+
+    expect(endsInsideGfmTable(prev)).toBe(false);
+    expect(shouldReparseLastBlock(prev, next, true)).toBe(false);
   });
 });
