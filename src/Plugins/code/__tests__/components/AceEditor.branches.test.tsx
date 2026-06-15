@@ -589,6 +589,71 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     mockEditorStore.readonly = prevReadonly;
   });
 
+  it('初始化未知语言时不回退 text mode，避免流式语言未完成时闪烁', async () => {
+    function Wrapper() {
+      const result = AceEditor({
+        ...defaultProps,
+        element: { ...defaultProps.element, language: 'not-yet-complete' },
+      });
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    render(<Wrapper />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    expect(mockEditor.session.setMode).not.toHaveBeenCalled();
+  });
+
+  it('setLanguage 在 Ace session 缺失时不抛错', async () => {
+    const originalSession = mockEditor.session;
+    (mockEditor as any).session = undefined;
+
+    try {
+      const captureRef = {
+        current: null as ReturnType<typeof AceEditor> | null,
+      };
+      function Wrapper() {
+        const result = AceEditor(defaultProps);
+        captureRef.current = result;
+        return (
+          <div ref={result.dom}>
+            <textarea aria-label="ace" />
+          </div>
+        );
+      }
+
+      render(<Wrapper />);
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+      await act(async () => {
+        vi.advanceTimersByTime(25);
+        await Promise.resolve();
+      });
+
+      await expect(captureRef.current!.setLanguage('python')).resolves.toBe(
+        undefined,
+      );
+      expect(defaultProps.onUpdate).toHaveBeenCalledWith({
+        language: 'python',
+      });
+    } finally {
+      mockEditor.session = originalSession;
+    }
+  });
+
   it('setLanguage 与当前语言相同时提前返回', async () => {
     const captureRef = { current: null as ReturnType<typeof AceEditor> | null };
     function Wrapper() {

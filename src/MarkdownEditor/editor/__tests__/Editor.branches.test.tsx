@@ -32,6 +32,8 @@ vi.mock('slate', () => ({
     hasPath: vi.fn(() => true),
     node: vi.fn(() => [{ type: 'paragraph', children: [{ text: '' }] }, [0]]),
     nodes: vi.fn(function* () {}),
+    string: vi.fn(() => ''),
+    insertText: vi.fn(),
     start: vi.fn(() => ({ path: [0, 0], offset: 0 })),
     end: vi.fn(() => ({ path: [0, 0], offset: 0 })),
   },
@@ -1694,6 +1696,7 @@ describe('Editor branches - onCompositionStart/End', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     editableProps = {};
+    vi.mocked(Editor.string).mockReturnValue('');
   });
 
   it('compositionStart sets data-composition and inputComposition', () => {
@@ -1801,6 +1804,39 @@ describe('Editor branches - onCompositionStart/End', () => {
       });
     });
     expect(mockStoreConfig.store.inputComposition).toBe(false);
+  });
+
+  it('compositionEnd 对已落盘的换行后中文文本不重复插入', async () => {
+    const { editor } = setupStore({ readonly: false });
+    editor.selection = {
+      anchor: { path: [1, 0], offset: 2 },
+      focus: { path: [1, 0], offset: 2 },
+    };
+    vi.mocked(Editor.string).mockReturnValue('世界');
+
+    renderEditor({});
+
+    editableProps.onCompositionEnd({ data: '世界' });
+    await Promise.resolve();
+
+    expect(Editor.string).toHaveBeenCalledWith(editor, [1, 0]);
+    expect(Editor.insertText).not.toHaveBeenCalled();
+  });
+
+  it('compositionEnd 在全角标点未落盘时通过 event.data 补写', async () => {
+    const { editor } = setupStore({ readonly: false });
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
+    vi.mocked(Editor.string).mockReturnValue('');
+
+    renderEditor({});
+
+    editableProps.onCompositionEnd({ data: '，' });
+    await Promise.resolve();
+
+    expect(Editor.insertText).toHaveBeenCalledWith(editor, '，');
   });
 
   it('compositionEnd with tag-popup-input removes data-composition', () => {
