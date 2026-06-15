@@ -1819,6 +1819,11 @@ describe('Editor branches - onCompositionStart/End', () => {
 
     editableProps.onCompositionEnd({ data: '世界' });
     await Promise.resolve();
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => resolve());
+      });
+    });
 
     expect(Editor.string).toHaveBeenCalledWith(editor, [1, 0]);
     expect(Editor.insertText).not.toHaveBeenCalled();
@@ -1836,6 +1841,11 @@ describe('Editor branches - onCompositionStart/End', () => {
 
     editableProps.onCompositionEnd({ data: '，' });
     await Promise.resolve();
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => resolve());
+      });
+    });
 
     expect(Editor.insertText).toHaveBeenCalledWith(editor, '，');
   });
