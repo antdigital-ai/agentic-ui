@@ -662,9 +662,8 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
   });
 
   it('卸载后忽略未完成的异步 mode 设置', async () => {
-    const { getAceLangs } = await import(
-      '../../../../MarkdownEditor/editor/utils/ace'
-    );
+    const { getAceLangs } =
+      await import('../../../../MarkdownEditor/editor/utils/ace');
     let resolveLangs: (langs: Set<string>) => void = () => {};
     vi.mocked(getAceLangs).mockReturnValueOnce(
       new Promise<Set<string>>((resolve) => {
