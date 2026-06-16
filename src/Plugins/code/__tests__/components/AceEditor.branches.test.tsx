@@ -617,4 +617,73 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     await captureRef.current!.setLanguage('javascript');
     expect(mockEditor.session.setMode).not.toHaveBeenCalled();
   });
+
+  it('Ace session 缺失时跳过 mode 设置且不抛错', async () => {
+    const originalSession = mockEditor.session;
+    (mockEditor as any).session = undefined;
+
+    function Wrapper() {
+      const result = AceEditor(defaultProps);
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    try {
+      render(<Wrapper />);
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+      await act(async () => {
+        vi.advanceTimersByTime(25);
+        await Promise.resolve();
+      });
+
+      expect(originalSession.setMode).not.toHaveBeenCalled();
+    } finally {
+      mockEditor.session = originalSession;
+    }
+  });
+
+  it('异步 mode 解析晚于卸载时不更新已销毁编辑器', async () => {
+    const { getAceLangs } = await import(
+      '../../../../MarkdownEditor/editor/utils/ace'
+    );
+    let resolveAceLangs!: (langs: Set<string>) => void;
+    const aceLangsPromise = new Promise<Set<string>>((resolve) => {
+      resolveAceLangs = resolve;
+    });
+    vi.mocked(getAceLangs).mockReturnValueOnce(aceLangsPromise);
+
+    function Wrapper() {
+      const result = AceEditor(defaultProps);
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    const { unmount } = render(<Wrapper />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    unmount();
+    resolveAceLangs(new Set(['javascript', 'text']));
+    await act(async () => {
+      await aceLangsPromise;
+      await Promise.resolve();
+    });
+
+    expect(mockEditor.session.setMode).not.toHaveBeenCalled();
+  });
 });
