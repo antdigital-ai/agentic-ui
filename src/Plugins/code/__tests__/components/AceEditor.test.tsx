@@ -8,6 +8,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AceEditor } from '../../components/AceEditor';
 
 // Mock ace-builds
+const mockSession = {
+  setMode: vi.fn(),
+};
+
 const mockEditor = {
   setTheme: vi.fn(),
   setValue: vi.fn(),
@@ -21,9 +25,8 @@ const mockEditor = {
     off: vi.fn(),
     clearSelection: vi.fn(),
   },
-  session: {
-    setMode: vi.fn(),
-  },
+  session: mockSession,
+  getSession: vi.fn(() => mockSession),
   commands: {
     addCommand: vi.fn(),
   },
@@ -153,7 +156,9 @@ describe('AceEditor Component', () => {
     mockEditor.setValue.mockClear();
     mockEditor.getValue.mockReturnValue('');
     mockEditor.setTheme.mockClear();
-    mockEditor.session.setMode.mockClear();
+    mockEditor.session = mockSession;
+    mockEditor.getSession.mockReturnValue(mockSession);
+    mockSession.setMode.mockClear();
     mockEditor.on.mockClear();
     mockEditor.selection.on.mockClear();
     mockEditor.commands.addCommand.mockClear();
@@ -248,9 +253,7 @@ describe('AceEditor Component', () => {
       await result.setLanguage('javascript');
 
       // 验证是否调用了正确的语言设置方法
-      expect(mockEditor.session.setMode).toHaveBeenCalledWith(
-        'ace/mode/javascript',
-      );
+      expect(mockSession.setMode).toHaveBeenCalledWith('ace/mode/javascript');
     });
 
     it('应该处理未知语言', async () => {
@@ -269,7 +272,7 @@ describe('AceEditor Component', () => {
       await result.setLanguage('unknown');
 
       // 验证是否回退到文本模式
-      expect(mockEditor.session.setMode).toHaveBeenCalledWith('ace/mode/text');
+      expect(mockSession.setMode).toHaveBeenCalledWith('ace/mode/text');
     });
 
     it('应该处理语言映射', async () => {
@@ -288,9 +291,51 @@ describe('AceEditor Component', () => {
       await result.setLanguage('ts');
 
       // 验证是否正确映射语言
-      expect(mockEditor.session.setMode).toHaveBeenCalledWith(
+      expect(mockSession.setMode).toHaveBeenCalledWith('ace/mode/typescript');
+    });
+
+    it('应该在 session 属性缺失时通过 getSession 设置语言模式', async () => {
+      const fallbackSession = {
+        setMode: vi.fn(),
+      };
+      mockEditor.session = undefined as any;
+      mockEditor.getSession.mockReturnValue(fallbackSession);
+
+      const result = AceEditor({
+        ...defaultProps,
+        element: {
+          ...defaultProps.element,
+          language: 'python',
+        },
+      });
+
+      await result.setLanguage('ts');
+
+      expect(mockEditor.getSession).toHaveBeenCalled();
+      expect(fallbackSession.setMode).toHaveBeenCalledWith(
         'ace/mode/typescript',
       );
+    });
+
+    it('应该在 Ace session 暂不可用时跳过语言模式设置', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      mockEditor.session = undefined as any;
+      mockEditor.getSession.mockReturnValue(undefined);
+
+      const result = AceEditor({
+        ...defaultProps,
+        element: {
+          ...defaultProps.element,
+          language: 'python',
+        },
+      });
+
+      await expect(result.setLanguage('javascript')).resolves.toBeUndefined();
+
+      expect(mockSession.setMode).not.toHaveBeenCalled();
+      expect(warnSpy).not.toHaveBeenCalled();
+
+      warnSpy.mockRestore();
     });
   });
 
