@@ -51,20 +51,20 @@ describe('CI 构建环境配置', () => {
     const MIN_WEBSERVER_TIMEOUT_MS = 360 * 1000;
     const playwrightConfig = readRepoFile('playwright.config.ts');
 
-    /** 解析 webServer 块内 `timeout: N` 或 `timeout: N * M` 形式的毫秒值 */
+    /** 解析 webServer 块内 `N * M` 或 `timeout: N * M` 形式的毫秒值 */
     const resolveWebServerTimeoutMs = (source: string): number | null => {
       const webServerIndex = source.indexOf('webServer');
       if (webServerIndex === -1) {
         return null;
       }
       const scoped = source.slice(webServerIndex);
-      const match = scoped.match(/timeout:\s*(\d+)\s*(?:\*\s*(\d+))?/);
-      if (!match) {
+      const matches = [...scoped.matchAll(/(\d+)\s*\*\s*(\d+)/g)];
+      if (matches.length === 0) {
         return null;
       }
-      const base = Number(match[1]);
-      const factor = match[2] ? Number(match[2]) : 1;
-      return base * factor;
+      return Math.max(
+        ...matches.map((match) => Number(match[1]) * Number(match[2])),
+      );
     };
 
     it('应配置 webServer 自动启动命令', () => {
