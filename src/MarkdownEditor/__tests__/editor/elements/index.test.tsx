@@ -17,21 +17,27 @@ const elementStubs = vi.hoisted(() => {
 });
 
 // Mock 依赖
-vi.mock('../../../editor/store', () => ({
-  useEditorStore: vi.fn(() => ({
-    markdownEditorRef: { current: { focus: vi.fn() } },
-    markdownContainerRef: { current: document.createElement('div') },
-    readonly: false,
-    store: {
-      dragStart: vi.fn(),
-      isLatestNode: vi.fn().mockReturnValue(false),
-    },
-    typewriter: false,
-    editorProps: {
-      titlePlaceholderContent: '请输入内容...',
-    },
-  })),
-}));
+vi.mock('../../../editor/store', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('../../../editor/store')>();
+  return {
+    ...actual,
+    useEditorStore: vi.fn(() => ({
+      markdownEditorRef: { current: { focus: vi.fn() } },
+      markdownContainerRef: { current: document.createElement('div') },
+      readonly: false,
+      store: {
+        dragStart: vi.fn(),
+        isLatestNode: vi.fn().mockReturnValue(false),
+        footnoteDefinitionMap: new Map(),
+      },
+      typewriter: false,
+      editorProps: {
+        titlePlaceholderContent: '请输入内容...',
+      },
+    })),
+  };
+});
 
 vi.mock('slate-react', () => ({
   ReactEditor: {

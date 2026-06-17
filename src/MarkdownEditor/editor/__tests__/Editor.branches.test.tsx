@@ -1592,11 +1592,12 @@ describe('Editor branches - onSlateChange', () => {
     const { editor } = setupStore({ readonly: false });
     renderEditor({});
 
-    slateOnChange!([{ type: 'paragraph', children: [{ text: '' }] }]);
-    vi.advanceTimersByTime(150);
+    editor.operations = [{ type: 'insert_text' }];
+    slateOnChange!([{ type: 'paragraph', children: [{ text: 'hello' }] }]);
+    mockOnChange.mockClear();
 
     editor.operations = [{ type: 'set_selection' }];
-    slateOnChange!([{ type: 'paragraph', children: [{ text: '' }] }]);
+    slateOnChange!([{ type: 'paragraph', children: [{ text: 'hello' }] }]);
 
     expect(mockOnChange).toHaveBeenCalled();
   });
@@ -2049,15 +2050,19 @@ describe('Editor branches - readonlyCls and childrenIsEmpty', () => {
     expect(editableProps.className).toContain('readonly');
   });
 
-  it('non-readonly with non-empty content applies focus class', () => {
+  it('non-readonly with empty root paragraph applies focus class', () => {
     const { editor } = setupStore({ readonly: false });
-    editor.children = [{ type: 'paragraph', children: [{ text: 'content' }] }];
+    editor.children = [{ type: 'paragraph', children: [{ text: '' }] }];
 
     renderEditor({
-      initSchemaValue: [{ type: 'paragraph', children: [{ text: 'content' }] }],
+      initSchemaValue: [{ type: 'paragraph', children: [{ text: '' }] }],
     });
 
-    // Should include 'focus' class when content is not empty
+    act(() => {
+      editor.operations = [{ type: 'insert_text', text: '' }];
+      slateOnChange!([{ type: 'paragraph', children: [{ text: '' }] }]);
+    });
+
     expect(editableProps.className).toContain('focus');
   });
 

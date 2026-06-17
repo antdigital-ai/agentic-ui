@@ -5,6 +5,16 @@ import { ReadonlyEditorImage } from '../../../../editor/elements/Image/ReadonlyE
 import * as editorUtils from '../../../../editor/utils';
 import * as domUtils from '../../../../editor/utils/dom';
 
+vi.mock('../../../../editor/store', () => ({
+  useEditorStore: vi.fn(() => ({
+    editorProps: {
+      image: {
+        render: undefined,
+      },
+    },
+  })),
+}));
+
 vi.mock('../../../../editor/utils/dom', () => ({
   getMediaType: vi.fn(() => 'image'),
 }));
