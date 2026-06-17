@@ -50,3 +50,39 @@ describe('BaseMarkdownEditor renderMode=markdown', () => {
     ).toBeInTheDocument();
   });
 });
+
+describe('BaseMarkdownEditor readonly renderMode=slate', () => {
+  it('应在流式 initValue 追加时同步只读 Slate 内容', async () => {
+    const firstChunk = '第一段';
+    const nextChunk = `${firstChunk}\n\n第二段`;
+
+    const { container, rerender } = render(
+      <BaseMarkdownEditor
+        readonly
+        streaming
+        initValue={firstChunk}
+        renderMode="slate"
+        toc={false}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(container).toHaveTextContent(firstChunk);
+    });
+
+    rerender(
+      <BaseMarkdownEditor
+        readonly
+        streaming
+        initValue={nextChunk}
+        renderMode="slate"
+        toc={false}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(container).toHaveTextContent(firstChunk);
+      expect(container).toHaveTextContent('第二段');
+    });
+  });
+});
