@@ -11,6 +11,7 @@ import {
   I18nContext,
   I18nProvide,
   saveUserLanguage,
+  useLocale,
   useMergedLocale,
 } from '..';
 
@@ -216,6 +217,23 @@ describe('saveUserLanguage', () => {
   });
 });
 
+describe('useLocale', () => {
+  it('应返回当前 I18nContext 中的 locale', () => {
+    const TestComponent = () => {
+      const locale = useLocale();
+      return <div data-testid="locale-table">{locale.table}</div>;
+    };
+
+    render(
+      <I18nProvide defaultLanguage="zh-CN" autoDetect={false}>
+        <TestComponent />
+      </I18nProvide>,
+    );
+
+    expect(screen.getByTestId('locale-table')).toHaveTextContent('表格');
+  });
+});
+
 describe('useMergedLocale', () => {
   it('有 override 时应合并返回 (120-122)', () => {
     const TestComponent = () => {
@@ -228,6 +246,99 @@ describe('useMergedLocale', () => {
       </I18nProvide>,
     );
     expect(screen.getByTestId('merged')).toHaveTextContent('OverriddenTable');
+  });
+
+  it('无 override 时应直接返回 context locale', () => {
+    const TestComponent = () => {
+      const merged = useMergedLocale();
+      return <div data-testid="merged-default">{merged.copy}</div>;
+    };
+
+    render(
+      <I18nProvide defaultLanguage="zh-CN" autoDetect={false}>
+        <TestComponent />
+      </I18nProvide>,
+    );
+
+    expect(screen.getByTestId('merged-default')).toHaveTextContent('复制');
+  });
+});
+
+describe('I18nProvide setLanguage', () => {
+  it('setLanguage 应切换语言并写入 localStorage', () => {
+    const TestComponent = () => {
+      const { setLanguage, language } = React.useContext(I18nContext);
+      return (
+        <div>
+          <span data-testid="lang">{language}</span>
+          <button
+            type="button"
+            data-testid="set-en"
+            onClick={() => setLanguage?.('en-US')}
+          >
+            EN
+          </button>
+        </div>
+      );
+    };
+
+    render(
+      <I18nProvide defaultLanguage="zh-CN" autoDetect={false}>
+        <TestComponent />
+      </I18nProvide>,
+    );
+
+    expect(screen.getByTestId('lang')).toHaveTextContent('zh-CN');
+    fireEvent.click(screen.getByTestId('set-en'));
+    expect(screen.getByTestId('lang')).toHaveTextContent('en-US');
+    expect(window.localStorage.getItem('md-editor-language')).toBe('en-US');
+  });
+});
+
+describe('I18nProvide autoDetect', () => {
+  it('autoDetect=false 时应使用 defaultLanguage', () => {
+    const TestComponent = () => {
+      const { language } = React.useContext(I18nContext);
+      return <span data-testid="lang">{language}</span>;
+    };
+
+    render(
+      <I18nProvide autoDetect={false} defaultLanguage="en-US">
+        <TestComponent />
+      </I18nProvide>,
+    );
+
+    expect(screen.getByTestId('lang')).toHaveTextContent('en-US');
+  });
+});
+
+describe('I18nProvide ConfigProvider sync', () => {
+  it('antd locale 变化时应同步 language 并持久化', () => {
+    const TestComponent = () => {
+      const { language } = React.useContext(I18nContext);
+      return <span data-testid="lang">{language}</span>;
+    };
+
+    const { rerender } = render(
+      <ConfigProvider locale={{ locale: 'zh-CN' }}>
+        <I18nProvide defaultLanguage="zh-CN" autoDetect={false}>
+          <TestComponent />
+        </I18nProvide>
+      </ConfigProvider>,
+    );
+
+    expect(screen.getByTestId('lang')).toHaveTextContent('zh-CN');
+
+    rerender(
+      <ConfigProvider locale={{ locale: 'en-US' }}>
+        <I18nProvide defaultLanguage="zh-CN" autoDetect>
+          <TestComponent />
+        </I18nProvide>
+      </ConfigProvider>,
+    );
+
+    expect(screen.getByTestId('lang')).toHaveTextContent('en-US');
+    expect(window.localStorage.getItem('md-editor-language')).toBe('en-US');
   });
 });
 

@@ -45,7 +45,6 @@ const defaultTestExcludes = [
   '**/src/Schema/**/__tests__/**',
   '**/src/History/__tests__/**',
   '**/src/MarkdownInputField/**',
-  '**/src/Utils/__tests__/language.test.ts',
 ];
 
 const fullSuiteTestExcludes = ['**/node_modules/**', '**/dist/**', '**/e2e/**'];
