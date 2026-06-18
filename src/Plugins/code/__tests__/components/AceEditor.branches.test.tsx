@@ -168,6 +168,7 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     mockEditor.getValue.mockReturnValue('');
     mockEditor.setValue.mockClear();
     mockEditor.setTheme.mockClear();
+    mockEditor.destroy.mockClear();
     mockEditor.session.setMode.mockClear();
     mockEditor.on.mockImplementation(
       (event: string, handler: (...args: any[]) => void) => {
@@ -214,6 +215,47 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     expect(mockEditor.commands.addCommand).toHaveBeenCalledWith(
       expect.objectContaining({ name: 'disableFind' }),
     );
+  });
+
+  it('mode 设置时 Ace session 尚未就绪则跳过 setMode', async () => {
+    const originalSession = mockEditor.session;
+    const mutableMockEditor = mockEditor as typeof mockEditor & {
+      getSession?: () => null;
+      session?: typeof originalSession;
+    };
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    mutableMockEditor.getSession = vi.fn(() => null);
+    mutableMockEditor.session = undefined;
+
+    try {
+      function Wrapper() {
+        const result = AceEditor(defaultProps);
+        return (
+          <div ref={result.dom}>
+            <textarea aria-label="ace" />
+          </div>
+        );
+      }
+
+      render(<Wrapper />);
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+      await act(async () => {
+        vi.advanceTimersByTime(25);
+        await Promise.resolve();
+      });
+
+      expect(mutableMockEditor.getSession).toHaveBeenCalled();
+      expect(originalSession.setMode).not.toHaveBeenCalled();
+      expect(consoleSpy).not.toHaveBeenCalled();
+    } finally {
+      mutableMockEditor.session = originalSession;
+      delete mutableMockEditor.getSession;
+      consoleSpy.mockRestore();
+    }
   });
 
   it('setupEditorEvents: focus/blur 触发 onShowBorderChange、onHideChange、onSelectionChange', async () => {
@@ -587,6 +629,36 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     expect(mockEditor.destroy).toHaveBeenCalled();
 
     mockEditorStore.readonly = prevReadonly;
+  });
+
+  it('初始化后立即卸载应取消延迟 mode 设置', async () => {
+    function Wrapper() {
+      const result = AceEditor(defaultProps);
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    const { unmount } = render(<Wrapper />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(mockEditor.setTheme).toHaveBeenCalledWith('ace/theme/github');
+
+    mockEditor.session.setMode.mockClear();
+    unmount();
+
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    expect(mockEditor.destroy).toHaveBeenCalled();
+    expect(mockEditor.session.setMode).not.toHaveBeenCalled();
   });
 
   it('setLanguage 与当前语言相同时提前返回', async () => {
