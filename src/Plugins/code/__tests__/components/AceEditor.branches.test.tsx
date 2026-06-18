@@ -48,6 +48,7 @@ const mockEditor = vi.hoisted(() => ({
   getCursorPosition: vi.fn(() => ({ row: 0, column: 0 })),
   focus: vi.fn(),
 }));
+const mockAceSession = mockEditor.session;
 
 vi.mock('ace-builds', () => ({
   default: {
@@ -165,6 +166,8 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     Object.keys(eventHandlers).forEach((k) => delete eventHandlers[k]);
+    (mockEditor as any).session = mockAceSession;
+    delete (mockEditor as any).getSession;
     mockEditor.getValue.mockReturnValue('');
     mockEditor.setValue.mockClear();
     mockEditor.setTheme.mockClear();
@@ -615,6 +618,77 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     expect(captureRef.current).toBeTruthy();
     mockEditor.session.setMode.mockClear();
     await captureRef.current!.setLanguage('javascript');
+    expect(mockEditor.session.setMode).not.toHaveBeenCalled();
+  });
+
+  it('Ace 会话缺失时跳过 mode 设置且不抛错', async () => {
+    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    (mockEditor as any).session = undefined;
+    (mockEditor as any).getSession = vi.fn(() => undefined);
+
+    function Wrapper() {
+      const result = AceEditor(defaultProps);
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    render(<Wrapper />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    expect((mockEditor as any).getSession).toHaveBeenCalled();
+    expect(consoleWarnSpy).not.toHaveBeenCalled();
+
+    consoleWarnSpy.mockRestore();
+  });
+
+  it('卸载后异步 mode 查询返回时不再写入已销毁编辑器', async () => {
+    const { getAceLangs } =
+      await import('../../../../MarkdownEditor/editor/utils/ace');
+    let resolveLangs!: (langs: Set<string>) => void;
+    vi.mocked(getAceLangs).mockReturnValueOnce(
+      new Promise<Set<string>>((resolve) => {
+        resolveLangs = resolve;
+      }),
+    );
+
+    function Wrapper() {
+      const result = AceEditor(defaultProps);
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    const { unmount } = render(<Wrapper />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    mockEditor.session.setMode.mockClear();
+    unmount();
+
+    await act(async () => {
+      resolveLangs(new Set(['javascript']));
+      await Promise.resolve();
+    });
+
     expect(mockEditor.session.setMode).not.toHaveBeenCalled();
   });
 });
