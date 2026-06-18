@@ -6,9 +6,26 @@
 import '@testing-library/jest-dom';
 import { render } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { CodeNode } from '../../../../MarkdownEditor/el';
 import { ThinkBlock } from '../../components/ThinkBlock';
+
+vi.mock('../../../../MarkdownEditor/editor/store', async () => {
+  const React = await import('react');
+  return {
+    useEditorStore: () => ({
+      markdownEditorRef: { current: {} },
+    }),
+    EditorStoreContext: React.createContext({}),
+  };
+});
+
+vi.mock('../../../../MarkdownEditor/editor/utils/editorUtils', () => ({
+  EditorUtils: {
+    findPath: vi.fn(() => [0]),
+    checkSelEnd: vi.fn(() => true),
+  },
+}));
 
 describe('ThinkBlock alwaysExpandedDeepThink 集成测试', () => {
   const mockCodeNode: CodeNode = {
