@@ -6,6 +6,10 @@
 import { renderHook } from '@testing-library/react';
 import { createEditor, Transforms } from 'slate';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  markImeEnterCommitGuard,
+  resetImeEnterCommitGuardForTests,
+} from '../../../MarkdownEditor/editor/utils/isImeComposing';
 import { useKeyboardHandler } from '../useKeyboardHandler';
 
 vi.mock('../../../Hooks/useRefFunction', () => ({
@@ -48,6 +52,7 @@ function createDefaultParams(overrides: Record<string, any> = {}) {
 describe('useKeyboardHandler', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    resetImeEnterCommitGuardForTests();
     mockIsMobileDevice.mockReturnValue(false);
   });
 
@@ -103,6 +108,31 @@ describe('useKeyboardHandler', () => {
     result.current.handleKeyDown(e);
     expect(e.preventDefault).not.toHaveBeenCalled();
     expect(params.sendMessage).not.toHaveBeenCalled();
+  });
+
+  it('compositionend 后的 Enter 守卫窗口内不触发发送', () => {
+    markImeEnterCommitGuard();
+    const params = createDefaultParams();
+    params.props.onSend = vi.fn();
+    const { result } = renderHook(() => useKeyboardHandler(params));
+    const e = {
+      key: 'Enter',
+      ctrlKey: false,
+      metaKey: false,
+      shiftKey: false,
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      nativeEvent: { isComposing: false },
+    } as any;
+
+    try {
+      result.current.handleKeyDown(e);
+      expect(e.stopPropagation).toHaveBeenCalled();
+      expect(e.preventDefault).not.toHaveBeenCalled();
+      expect(params.sendMessage).not.toHaveBeenCalled();
+    } finally {
+      resetImeEnterCommitGuardForTests();
+    }
   });
 
   it('Home 键应 preventDefault 并 Transforms.select 到文档开头', () => {
