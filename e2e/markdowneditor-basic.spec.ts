@@ -66,6 +66,7 @@ test.describe('MarkdownEditor 基础功能', () => {
 
     // 移动到开头并插入
     await markdownEditorPage.pressKey('Home');
+    await markdownEditorPage.focus();
     await markdownEditorPage.editableInput.type('Prefix ', { delay: 0 });
     await markdownEditorPage.expectContainsText('Prefix');
     await markdownEditorPage.expectContainsText('Middle Content');

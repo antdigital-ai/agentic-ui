@@ -6,7 +6,7 @@ import { RenderLeafProps } from 'slate-react';
 import { useRefFunction } from '../../../../Hooks/useRefFunction';
 import { isMobileDevice } from '../../../../MarkdownInputField/AttachmentButton/utils';
 import { MarkdownEditorProps } from '../../../types';
-import { useEditorStore } from '../../store';
+import { EditorStoreContext } from '../../store';
 import {
   extractFootnoteDefinitionIdentifier,
   formatFootnoteRefDisplayLabel,
@@ -38,7 +38,7 @@ export const FncLeaf = ({
   const mdEditorBaseClass = context?.getPrefixCls('agentic-md-editor-content');
   const isMobile = isMobileDevice();
   const hasFnc = leaf.fnc || leaf.identifier;
-  const { store } = useEditorStore();
+  const store = useContext(EditorStoreContext)?.store;
   const [mobileModalOpen, setMobileModalOpen] = useState(false);
 
   const resolvedIdentifier = useMemo(

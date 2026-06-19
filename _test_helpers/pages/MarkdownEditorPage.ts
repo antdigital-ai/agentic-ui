@@ -4,6 +4,7 @@ import { Locator, Page, expect } from '@playwright/test';
 import { PLAYWRIGHT_FIXTURE_DEMOS } from '../constants/playwrightDemoRoutes';
 import { gotoDumiDemo } from '../utils/e2eNavigation';
 import { getDumiDemoContentRoot } from '../utils/dumiDemoFrame';
+import { E2E_POLL_TIMEOUT_MS } from '../utils/e2eTimeouts';
 
 /** 与 `markdown.matchInputToNode` 等输入规则联用时，逐字输入的默认间隔（ms） */
 const DEFAULT_INPUT_RULE_TYPE_DELAY_MS = 25;
@@ -87,7 +88,7 @@ export class MarkdownEditorPage {
           return content.length > 0;
         },
         {
-          timeout: 3000,
+          timeout: E2E_POLL_TIMEOUT_MS,
           message: '等待文本输入完成',
         },
       )
@@ -180,7 +181,7 @@ export class MarkdownEditorPage {
           return content.includes(text);
         },
         {
-          timeout: 3000,
+          timeout: E2E_POLL_TIMEOUT_MS,
           message: `等待文本 "${text}" 出现`,
         },
       )

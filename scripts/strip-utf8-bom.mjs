@@ -112,7 +112,7 @@ export function runStripUtf8Bom(options = {}) {
     if (!hasUtf8Bom(buf)) {
       continue;
     }
-    const rel = relative(root, file);
+    const rel = relative(root, file).replace(/\\/g, '/');
     withBom.push(rel);
     if (!checkOnly && !dryRun) {
       writeFileSync(file, stripUtf8Bom(buf));

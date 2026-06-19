@@ -6,6 +6,10 @@ import { BlowingWindLottie } from '../lotties/BlowingWindLottie';
 import { BouncingLottie } from '../lotties/BouncingLottie';
 import { PeekLottie } from '../lotties/PeekLottie';
 
+vi.mock('../../../lotties/useAsyncLottieData', () => ({
+  useAsyncLottieData: () => ({ v: '5.6.9' }),
+}));
+
 vi.mock('lottie-react', () => ({
   default: ({
     animationData,
@@ -16,9 +20,9 @@ vi.mock('lottie-react', () => ({
     ...props
   }: any) => (
     <div
-      data-testid="lottie-animation"
-      data-loop={loop}
-      data-autoplay={autoplay}
+      data-testid="lottie-mock"
+      data-loop={String(loop)}
+      data-autoplay={String(autoplay)}
       data-animation={animationData ? 'loaded' : 'empty'}
       style={style}
       className={className}
