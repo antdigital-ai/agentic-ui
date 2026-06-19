@@ -7,6 +7,7 @@ import '@testing-library/jest-dom';
 import { act, render } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { getAceLangs } from '../../../../MarkdownEditor/editor/utils/ace';
 import { AceEditor } from '../../components/AceEditor';
 
 const eventHandlers: Record<string, ((...args: any[]) => void)[]> = {};
@@ -17,6 +18,14 @@ const pushHandler = (event: string, handler: (...args: any[]) => void) => {
 const invokeHandlers = (event: string) => {
   eventHandlers[event]?.forEach((h) => h());
 };
+const mockAceSession = vi.hoisted(() => ({
+  setMode: vi.fn(),
+  insert: vi.fn(),
+  getDocument: vi.fn(() => ({
+    getLength: vi.fn(() => 1),
+    getLine: vi.fn(() => 'abc'),
+  })),
+}));
 const mockEditor = vi.hoisted(() => ({
   setTheme: vi.fn(),
   setValue: vi.fn(),
@@ -34,14 +43,8 @@ const mockEditor = vi.hoisted(() => ({
     off: vi.fn(),
     clearSelection: vi.fn(),
   },
-  session: {
-    setMode: vi.fn(),
-    insert: vi.fn(),
-    getDocument: vi.fn(() => ({
-      getLength: vi.fn(() => 1),
-      getLine: vi.fn(() => 'abc'),
-    })),
-  },
+  session: mockAceSession,
+  getSession: vi.fn(() => undefined),
   commands: {
     addCommand: vi.fn(),
   },
@@ -165,6 +168,8 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     Object.keys(eventHandlers).forEach((k) => delete eventHandlers[k]);
+    (mockEditor as any).session = mockAceSession;
+    mockEditor.getSession.mockReturnValue(undefined);
     mockEditor.getValue.mockReturnValue('');
     mockEditor.setValue.mockClear();
     mockEditor.setTheme.mockClear();
@@ -214,6 +219,82 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     expect(mockEditor.commands.addCommand).toHaveBeenCalledWith(
       expect.objectContaining({ name: 'disableFind' }),
     );
+  });
+
+  it('getAceLangs 延迟返回且编辑器已卸载时不设置 mode', async () => {
+    let resolveLangs: (langs: Set<string>) => void = () => {};
+    vi.mocked(getAceLangs).mockReturnValueOnce(
+      new Promise<Set<string>>((resolve) => {
+        resolveLangs = resolve;
+      }),
+    );
+
+    function Wrapper() {
+      const result = AceEditor(defaultProps);
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    const { unmount } = render(<Wrapper />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    mockEditor.session.setMode.mockClear();
+    unmount();
+
+    await act(async () => {
+      resolveLangs(new Set(['javascript']));
+      await Promise.resolve();
+    });
+
+    expect(mockEditor.session.setMode).not.toHaveBeenCalled();
+  });
+
+  it('Ace session 缺失时跳过 mode 设置且不抛错', async () => {
+    const consoleWarnSpy = vi
+      .spyOn(console, 'warn')
+      .mockImplementation(() => {});
+    (mockEditor as any).session = undefined;
+    mockEditor.getSession.mockReturnValue(undefined);
+
+    try {
+      function Wrapper() {
+        const result = AceEditor(defaultProps);
+        return (
+          <div ref={result.dom}>
+            <textarea aria-label="ace" />
+          </div>
+        );
+      }
+
+      render(<Wrapper />);
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+      await act(async () => {
+        vi.advanceTimersByTime(25);
+        await Promise.resolve();
+      });
+
+      expect(mockAceSession.setMode).not.toHaveBeenCalled();
+      expect(consoleWarnSpy).not.toHaveBeenCalledWith(
+        'Failed to set Ace Editor mode:',
+        expect.anything(),
+      );
+    } finally {
+      consoleWarnSpy.mockRestore();
+      (mockEditor as any).session = mockAceSession;
+    }
   });
 
   it('setupEditorEvents: focus/blur 触发 onShowBorderChange、onHideChange、onSelectionChange', async () => {

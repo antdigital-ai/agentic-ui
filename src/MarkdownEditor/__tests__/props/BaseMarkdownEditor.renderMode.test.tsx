@@ -50,3 +50,24 @@ describe('BaseMarkdownEditor renderMode=markdown', () => {
     ).toBeInTheDocument();
   });
 });
+
+describe('BaseMarkdownEditor readonly Slate streaming', () => {
+  it('initValue 累加时同步替换 Slate 文档而不是重复堆叠旧内容', async () => {
+    const { container, rerender } = render(
+      <BaseMarkdownEditor readonly streaming initValue="# One" />,
+    );
+
+    rerender(
+      <BaseMarkdownEditor
+        readonly
+        streaming
+        initValue={'# One\n\nSecond line'}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(container).toHaveTextContent('Second line');
+    });
+    expect(container.textContent?.match(/One/g)).toHaveLength(1);
+  });
+});
