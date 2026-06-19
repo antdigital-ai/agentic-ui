@@ -617,4 +617,88 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     await captureRef.current!.setLanguage('javascript');
     expect(mockEditor.session.setMode).not.toHaveBeenCalled();
   });
+
+  it('setAceMode: Ace session 缺失时跳过 mode 设置', async () => {
+    const originalSession = mockEditor.session;
+    const originalGetSession = (mockEditor as any).getSession;
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    (mockEditor as any).session = undefined;
+    (mockEditor as any).getSession = vi.fn(() => undefined);
+
+    try {
+      function Wrapper() {
+        const result = AceEditor(defaultProps);
+        return (
+          <div ref={result.dom}>
+            <textarea aria-label="ace" />
+          </div>
+        );
+      }
+
+      render(<Wrapper />);
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+      await act(async () => {
+        vi.advanceTimersByTime(25);
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+
+      expect((mockEditor as any).getSession).toHaveBeenCalled();
+      expect(originalSession.setMode).not.toHaveBeenCalled();
+      expect(consoleSpy).not.toHaveBeenCalled();
+    } finally {
+      (mockEditor as any).session = originalSession;
+      if (originalGetSession) {
+        (mockEditor as any).getSession = originalGetSession;
+      } else {
+        delete (mockEditor as any).getSession;
+      }
+      consoleSpy.mockRestore();
+    }
+  });
+
+  it('setAceMode: 卸载后忽略未完成的语言模式解析', async () => {
+    const { getAceLangs } =
+      await import('../../../../MarkdownEditor/editor/utils/ace');
+    let resolveLangs!: (langs: Set<string>) => void;
+    vi.mocked(getAceLangs).mockReturnValueOnce(
+      new Promise<Set<string>>((resolve) => {
+        resolveLangs = resolve;
+      }),
+    );
+
+    function Wrapper() {
+      const result = AceEditor(defaultProps);
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    const { unmount } = render(<Wrapper />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    expect(getAceLangs).toHaveBeenCalled();
+    unmount();
+
+    await act(async () => {
+      resolveLangs(new Set(['javascript']));
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(mockEditor.session.setMode).not.toHaveBeenCalled();
+  });
 });
