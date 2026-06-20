@@ -330,33 +330,21 @@ const STREAM_TOKEN_DURATION_MS = 420;
  * 仅在流式容器 `${componentCls}-content-streaming` 内对 token span 应用淡入。
  * 已渲染 token 重解析时复用 DOM、动画不重放；新 token 挂载各自淡入一次，
  * 叠加限流的逐字推进，得到接近 GPT 的平滑出字效果。
+ *
+ * 复用表格行入场的 `agenticMdBlurFadeIn` keyframes（同一 opacity + blur 淡入），
+ * 仅淡入时长不同。
  */
 const genStreamingTokenStyle = (
   token: FullToken<'MarkdownEditor'>,
 ): Record<string, CSSInterpolation> => ({
   [`${token.componentCls}-content-streaming`]: {
     [`.${STREAM_TOKEN_CLASS}`]: {
-      display: 'inline',
-      animationName: 'agenticMdStreamTokenIn',
-      animationDuration: `${STREAM_TOKEN_DURATION_MS}ms`,
-      animationTimingFunction: TEXT_SWAP_EASING,
-      animationFillMode: 'both',
-      willChange: 'opacity, filter',
+      animation: `agenticMdBlurFadeIn ${STREAM_TOKEN_DURATION_MS}ms ${TEXT_SWAP_EASING} both`,
     },
     '@media (prefers-reduced-motion: reduce)': {
       [`.${STREAM_TOKEN_CLASS}`]: {
         animation: 'none',
       },
-    },
-  },
-  '@keyframes agenticMdStreamTokenIn': {
-    from: {
-      opacity: 0,
-      filter: `blur(${TEXT_SWAP_BLUR_PX}px)`,
-    },
-    to: {
-      opacity: 1,
-      filter: 'blur(0)',
     },
   },
 });

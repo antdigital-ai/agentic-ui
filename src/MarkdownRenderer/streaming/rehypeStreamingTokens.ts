@@ -48,49 +48,40 @@ const isText = (node: HastNode): node is HastText =>
 const isElement = (node: HastNode): node is HastElement =>
   (node as HastElement).type === 'element';
 
-/** 把文本拆成「连续非空白」与「连续空白」交替的片段，仅非空白片段包裹成 span */
+/**
+ * 把文本拆成「连续非空白」与「连续空白」交替的片段。
+ * `\s+|\S+` 保证每个片段要么全空白、要么全可见，仅可见片段包裹成 span。
+ */
 const wrapTextValue = (value: string): HastNode[] => {
   const pieces = value.match(/\s+|\S+/g);
-  if (!pieces || pieces.length === 0) return [{ type: 'text', value }];
-  // 纯单段空白或无可见字符时无需包裹，减少 DOM 体积
-  if (pieces.length === 1 && /^\s+$/.test(pieces[0])) {
-    return [{ type: 'text', value }];
-  }
-  return pieces.map((piece) => {
-    if (/^\s+$/.test(piece)) {
-      return { type: 'text', value: piece };
-    }
-    return {
-      type: 'element',
-      tagName: 'span',
-      properties: { className: [STREAM_TOKEN_CLASS] },
-      children: [{ type: 'text', value: piece }],
-    } as HastElement;
-  });
+  if (!pieces) return [{ type: 'text', value }];
+  return pieces.map((piece) =>
+    /\S/.test(piece)
+      ? ({
+          type: 'element',
+          tagName: 'span',
+          properties: { className: [STREAM_TOKEN_CLASS] },
+          children: [{ type: 'text', value: piece }],
+        } as HastElement)
+      : { type: 'text', value: piece },
+  );
 };
+
+const isSkipped = (node: HastNode): boolean =>
+  isElement(node) && (SKIP_TAGS.has(node.tagName) || isMathElement(node));
 
 const transformChildren = (parent: { children?: HastNode[] }): void => {
   const children = parent.children;
-  if (!children || children.length === 0) return;
+  if (!children?.length) return;
 
   const next: HastNode[] = [];
   for (const child of children) {
     if (isText(child)) {
       next.push(...wrapTextValue(child.value));
-      continue;
-    }
-    if (isElement(child)) {
-      if (!SKIP_TAGS.has(child.tagName) && !isMathElement(child)) {
-        transformChildren(child);
-      }
+    } else {
+      if (!isSkipped(child)) transformChildren(child);
       next.push(child);
-      continue;
     }
-    // root / 其他容器节点继续向下
-    if ((child as { children?: HastNode[] }).children) {
-      transformChildren(child as { children?: HastNode[] });
-    }
-    next.push(child);
   }
   parent.children = next;
 };
