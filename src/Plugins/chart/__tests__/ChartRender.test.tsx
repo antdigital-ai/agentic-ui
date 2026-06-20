@@ -5,6 +5,7 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
@@ -14,54 +15,20 @@ import { I18nContext } from '../../../I18n';
 vi.mock('antd', async (importOriginal) => {
   const actual = await importOriginal<typeof import('antd')>();
   const React = await import('react');
-  const { useState, cloneElement, isValidElement } = React;
-
-  function MockPopover({
-    content,
-    children,
-    open: controlledOpen,
-    onOpenChange,
-    trigger = 'hover',
-  }: {
-    content?: React.ReactNode;
-    children?: React.ReactNode;
-    open?: boolean;
-    onOpenChange?: (open: boolean) => void;
-    trigger?: string | string[];
-  }) {
-    const [internalOpen, setInternalOpen] = useState(false);
-    const isClickTrigger =
-      trigger === 'click' ||
-      (Array.isArray(trigger) && trigger.includes('click'));
-    const open = controlledOpen ?? internalOpen;
-    const setOpen = (next: boolean) => {
-      setInternalOpen(next);
-      onOpenChange?.(next);
-    };
-
-    const child = isValidElement(children)
-      ? cloneElement(children as React.ReactElement<{ onClick?: React.MouseEventHandler }>, {
-          onClick: (e: React.MouseEvent) => {
-            if (isClickTrigger) {
-              setOpen(!open);
-            }
-            (children as React.ReactElement<{ onClick?: React.MouseEventHandler }>)
-              .props?.onClick?.(e);
-          },
-        })
-      : children;
-
-    return (
-      <div data-testid="chart-config-popover">
-        {child}
-        {open ? <div className="ant-popover-content">{content}</div> : null}
-      </div>
-    );
-  }
-
   return {
     ...actual,
-    Popover: MockPopover,
+    Popover: ({
+      content,
+      children,
+    }: {
+      content?: React.ReactNode;
+      children?: React.ReactNode;
+    }) => (
+      <div data-testid="chart-config-popover">
+        {children}
+        <div className="ant-popover-content">{content}</div>
+      </div>
+    ),
   };
 });
 
@@ -252,10 +219,12 @@ describe('ChartRender', () => {
     await waitFor(
       () => {
         const form =
-          document.body.querySelector('.ant-agentic-chart-config-form') ||
-          document.body.querySelector('.ant-popover-content form') ||
-          document.body.querySelector('.ant-form') ||
-          document.body.querySelector('form');
+          document.querySelector(
+            '[data-testid="chart-config-popover"] .ant-popover-content .ant-agentic-chart-config-form',
+          ) ||
+          document.querySelector(
+            '[data-testid="chart-config-popover"] .ant-popover-content form',
+          );
         expect(form).not.toBeNull();
         expect(form).toBeInTheDocument();
       },
@@ -263,9 +232,27 @@ describe('ChartRender', () => {
     );
   };
 
+  const getChartConfigSubmitButton = async () =>
+    waitFor(
+      () => {
+        const popoverContent = document.querySelector(
+          '[data-testid="chart-config-popover"] .ant-popover-content',
+        );
+        expect(popoverContent).toBeInTheDocument();
+
+        const submitButton =
+          popoverContent?.querySelector('button.ant-btn-primary') ||
+          popoverContent?.querySelector('button[type="submit"]');
+        expect(submitButton).toBeTruthy();
+        return submitButton as HTMLElement;
+      },
+      { timeout: 8000 },
+    );
+
   beforeEach(() => {
     vi.clearAllMocks();
     runtimeMountSequence = 0;
+    document.body.innerHTML = '';
     // 设置测试环境，但允许图表渲染
     process.env.NODE_ENV = 'test-chart';
     // 确保 window 对象存在
@@ -1176,14 +1163,10 @@ describe('ChartRender', () => {
         fireEvent.mouseDown(xSelects[1]);
       }
 
-      const submitBtn =
-        document.body.querySelector('button.ant-btn-primary') ||
-        screen.queryByRole('button', { name: '更新' });
-      if (submitBtn) {
-        await act(async () => {
-          fireEvent.click(submitBtn);
-        });
-      }
+      const submitBtn = await getChartConfigSubmitButton();
+      await act(async () => {
+        fireEvent.click(submitBtn);
+      });
     });
 
     it('提交配置后应该重新挂载图表运行时，避免底层图表实例复用旧配置', async () => {
@@ -1203,11 +1186,9 @@ describe('ChartRender', () => {
 
       await openChartConfigForm();
 
-      const submitButton =
-        document.body.querySelector('button.ant-btn-primary') ||
-        screen.getByRole('button', { name: '更新' });
+      const submitButton = await getChartConfigSubmitButton();
       await act(async () => {
-        fireEvent.click(submitButton!);
+        fireEvent.click(submitButton);
       });
 
       await waitFor(() => {
@@ -1340,9 +1321,12 @@ describe('ChartRender', () => {
         </I18nContext.Provider>,
       );
 
-      // 应该只渲染有效的列
-      expect(screen.getByText('Name')).toBeInTheDocument();
-      expect(screen.getByText('Valid')).toBeInTheDocument();
+      const descriptionView = document.querySelector('.ant-descriptions');
+      expect(descriptionView).toBeInTheDocument();
+
+      // 应该只渲染有效的列（限定在 Descriptions 组件内，避免工具栏配置表单干扰）
+      expect(within(descriptionView as HTMLElement).getByText('Name')).toBeInTheDocument();
+      expect(within(descriptionView as HTMLElement).getByText('Valid')).toBeInTheDocument();
     });
   });
 });
