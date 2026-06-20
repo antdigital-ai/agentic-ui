@@ -73,14 +73,14 @@ export default () => {
 
 `renderMode: 'markdown'` 下，Slate 侧 `plugins[].elements` **不会**生效；请使用 `plugins[].renderer`：
 
-| 能力 | API | 说明 |
-| ---- | --- | ---- |
-| 自定义 fence | `createRendererCodeBlockPlugin({ 'insight-card': ({ code }) => ... })` | 按 \`\`\`language 注册渲染器 |
-| 合并多个插件 | `mergeMarkdownRendererPlugins(pluginA, pluginB)` | 合并 `rendererComponents` / remark / rehype |
-| 保留默认 DOM 再包装 | `eleRender` prop | 拦截 `p` / `table` / `img` 等，返回 `undefined` 回退默认 |
-| 覆盖整块渲染 | `renderer.rendererComponents.table` 等 | 完全替换对应 hast 标签组件 |
+| 能力                | API                                                                    | 说明                                                     |
+| ------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------- |
+| 自定义 fence        | `createRendererCodeBlockPlugin({ 'insight-card': ({ code }) => ... })` | 按 \`\`\`language 注册渲染器                             |
+| 合并多个插件        | `mergeMarkdownRendererPlugins(pluginA, pluginB)`                       | 合并 `rendererComponents` / remark / rehype              |
+| 保留默认 DOM 再包装 | `eleRender` prop                                                       | 拦截 `p` / `table` / `img` 等，返回 `undefined` 回退默认 |
+| 覆盖整块渲染        | `renderer.rendererComponents.table` 等                                 | 完全替换对应 hast 标签组件                               |
 
-```tsx | pure
+````tsx | pure
 import {
   MarkdownEditor,
   createRendererCodeBlockPlugin,
@@ -98,19 +98,19 @@ export default () => (
     plugins={[cardPlugin]}
   />
 );
-```
+````
 
 **仍仅 Slate 模式支持**：新建划词评论（FloatBar 选区提交）、`initSchemaValue`、`eleItemRender`（请改用 `eleRender` 或 renderer 插件）。
 
 **markdown 模式已支持（只读，纯 DOM + 原生 CSS）**：
 
-| 能力 | API |
-| ---- | --- |
+| 能力            | API                                                                                          |
+| --------------- | -------------------------------------------------------------------------------------------- |
 | 评论高亮 + 侧栏 | `comment={{ enable: true, commentList }}`，依赖 `refContent`；`<mark>` + `-comment-*` CSS 类 |
-| 文本搜索 | `editorRef.current.store.findByPathAndText([], keyword)` |
-| 兼容搜索 | `findByPathAndText(editorRef.current.store.editor, [], keyword)` |
-| 当前内容 | `editorRef.current.getDisplayedContent()` / `store.getMDContent()` |
-| 包装默认 DOM | `eleRender` |
+| 文本搜索        | `editorRef.current.store.findByPathAndText([], keyword)`                                     |
+| 兼容搜索        | `findByPathAndText(editorRef.current.store.editor, [], keyword)`                             |
+| 当前内容        | `editorRef.current.getDisplayedContent()` / `store.getMDContent()`                           |
+| 包装默认 DOM    | `eleRender`                                                                                  |
 
 ### 自定义工具栏
 
@@ -230,36 +230,35 @@ export default () => {
 
 #### 内容与模式
 
-| 属性                        | 说明                                                                                                                                                     | 类型                    | 默认值    | 版本 |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- | --------- | ---- |
-| initValue                   | 初始 Markdown 文本内容                                                                                                                                   | `string`                | -         | -    |
-| initSchemaValue             | 直接传入 Slate schema，优先级高于 `initValue`                                                                                                            | `Elements[]`            | -         | -    |
-| readonly                    | 是否只读模式。与 `renderMode` 联用决定渲染方式                                                                                                           | `boolean`               | `false`   | -    |
-| renderMode                  | 只读渲染模式，默认 `'slate'`。`'slate'`：Slate 文档树（与编辑态一致）；`'markdown'`：轻量 `Markdown → hast → React`，无 Slate 依赖，仅 `readonly` 时生效 | `'slate' \| 'markdown'` | `'slate'` | -    |
-| renderType                  | `renderMode` 的别名，同时传入时以 `renderMode` 为准                                                                                                      | `'slate' \| 'markdown'` | -         | -    |
-| toc                         | 是否显示目录                                                                                                                                             | `boolean`               | `false`   | -    |
-| reportMode                  | 是否开启报告模式                                                                                                                                         | `boolean`               | `false`   | -    |
-| slideMode                   | 是否开启 PPT 模式                                                                                                                                        | `boolean`               | `false`   | -    |
-| compact                     | 是否启用紧凑模式                                                                                                                                         | `boolean`               | `false`   | -    |
-| streaming                   | 流式输出模式，同时传入时优先于 `typewriter`                                                                                                              | `boolean`               | -         | -    |
-| isFinished                  | 流式是否完成（仅 `renderMode: 'markdown'`），未传入时回退到 `!streaming`                                                                                 | `boolean`               | -         | -    |
-| ~~typewriter~~              | **已废弃**：`streaming` 的别名，向下兼容，新代码请使用 `streaming`                                                                                       | `boolean`               | -         | -    |
-| streamingParagraphAnimation | 末段淡入动画（仅 `renderMode: 'markdown'`），默认开启，传 `false` 关闭                                                                                   | `boolean`               | -         | -    |
-| queueOptions                | 字符队列配置（仅 `renderMode: 'markdown'`），默认关闭逐字 RAF                                                                                            | `CharacterQueueOptions` | -         | -    |
-| deps                        | MElement 刷新依赖                                                                                                                                        | `string[]`              | -         | -    |
-| children                    | 子元素                                                                                                                                                   | `React.ReactNode`       | -         | -    |
+| 属性            | 说明                                                                                                                                                     | 类型                     | 默认值    | 版本 |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ | --------- | ---- |
+| initValue       | 初始 Markdown 文本内容                                                                                                                                   | `string`                 | -         | -    |
+| initSchemaValue | 直接传入 Slate schema，优先级高于 `initValue`                                                                                                            | `Elements[]`             | -         | -    |
+| readonly        | 是否只读模式。与 `renderMode` 联用决定渲染方式                                                                                                           | `boolean`                | `false`   | -    |
+| renderMode      | 只读渲染模式，默认 `'slate'`。`'slate'`：Slate 文档树（与编辑态一致）；`'markdown'`：轻量 `Markdown → hast → React`，无 Slate 依赖，仅 `readonly` 时生效 | `'slate' \| 'markdown'`  | `'slate'` | -    |
+| renderType      | `renderMode` 的别名，同时传入时以 `renderMode` 为准                                                                                                      | `'slate' \| 'markdown'`  | -         | -    |
+| toc             | 是否显示目录                                                                                                                                             | `boolean`                | `false`   | -    |
+| reportMode      | 是否开启报告模式                                                                                                                                         | `boolean`                | `false`   | -    |
+| slideMode       | 是否开启 PPT 模式                                                                                                                                        | `boolean`                | `false`   | -    |
+| compact         | 是否启用紧凑模式                                                                                                                                         | `boolean`                | `false`   | -    |
+| streaming       | 流式输出模式，同时传入时优先于 `typewriter`                                                                                                              | `boolean`                | -         | -    |
+| isFinished      | 流式是否完成（仅 `renderMode: 'markdown'`），未传入时回退到 `!streaming`                                                                                 | `boolean`                | -         | -    |
+| ~~typewriter~~  | **已废弃**：`streaming` 的别名，向下兼容，新代码请使用 `streaming`                                                                                       | `boolean`                | -         | -    |
+| fadeStreaming   | GPT 风格逐词淡入（仅 `renderMode: 'markdown'`），默认开启，传 `false` 关闭                                                                               | `boolean`                | -         | -    |
+| throttleOptions | 流式限流配置（仅 `renderMode: 'markdown'`），默认 `streaming` 时开启                                                                                     | `ContentThrottleOptions` | -         | -    |
+| deps            | MElement 刷新依赖                                                                                                                                        | `string[]`               | -         | -    |
+| children        | 子元素                                                                                                                                                   | `React.ReactNode`        | -         | -    |
 
-#### CharacterQueueOptions
+#### ContentThrottleOptions
 
-| 属性                      | 说明                                     | 类型      | 默认值 |
-| ------------------------- | ---------------------------------------- | --------- | ------ |
-| charsPerFrame             | 每帧渲染字符数                           | `number`  | `3`    |
-| animate                   | 是否启用逐字动画，流式时默认合并为 false | `boolean` | -      |
-| animateTailChars          | 仅对末尾 N 字做动画，前面内容立即展示    | `number`  | -      |
-| speed                     | 速度因子                                 | `number`  | `1.0`  |
-| flushOnComplete           | 完成时是否刷新                           | `boolean` | -      |
-| backgroundInterval        | 后台渲染间隔（ms）                       | `number`  | `100`  |
-| backgroundBatchMultiplier | 后台批量乘数                             | `number`  | `10`   |
+| 属性                      | 说明                                    | 类型      | 默认值 |
+| ------------------------- | --------------------------------------- | --------- | ------ |
+| charsPerFrame             | 每帧最多推进字符数                      | `number`  | `3`    |
+| speed                     | 速度倍率                                | `number`  | `1`    |
+| flushOnComplete           | 流式结束时是否立即展示剩余内容          | `boolean` | `true` |
+| backgroundInterval        | 标签页不可见时的轮询间隔（ms）          | `number`  | `100`  |
+| backgroundBatchMultiplier | 后台每批字符相对前台倍数                | `number`  | `10`   |
+| enabled                   | 为 `false` 时关闭限流，流式内容即时渲染 | `boolean` | `true` |
 
 #### 工具栏 (toolBar)
 
@@ -352,16 +351,16 @@ export default () => {
 
 #### 代码块 (codeProps)
 
-| 属性                    | 说明                                                                | 类型                                                                                         | 默认值                              | 版本 |
-| ----------------------- | ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ----------------------------------- | ---- |
-| render                  | 自定义代码块渲染，返回 `undefined` 回退默认渲染，返回 `null` 不渲染 | `(props: CustomLeaf, defaultDom: React.ReactNode, codeProps?: codeProps) => React.ReactNode` | -                                   | -    |
-| Languages               | 支持的编程语言列表                                                  | `string[]`                                                                                   | -                                   | -    |
-| hideToolBar             | 是否隐藏代码块工具栏                                                | `boolean`                                                                                    | `false`                             | -    |
-| alwaysExpandedDeepThink | 是否始终展开深度思考块                                              | `boolean`                                                                                    | `false`                             | -    |
-| scrollDeepThinkIntoViewOnExpand | 深度思考块展开时是否将组件滚动到视窗内；传 `true` 默认 `{ behavior: 'smooth', block: 'nearest' }`，也可传 `ScrollIntoViewOptions` 自定义 | `boolean \| ScrollIntoViewOptions`                                                | `false`                             | 2.32.33 |
-| disableHtmlPreview      | 是否禁用 HTML 预览                                                  | `boolean`                                                                                    | -                                   | -    |
-| viewModeLabels          | 视图模式标签配置                                                    | `{ preview?: string; code?: string }`                                                        | `{ preview: '预览', code: '代码' }` | -    |
-| ...                     | 支持所有 [Ace.EditorOptions](https://ace.c9.io/#nav=api&api=editor) | `Partial<Ace.EditorOptions>`                                                                 | -                                   | -    |
+| 属性                            | 说明                                                                                                                                     | 类型                                                                                         | 默认值                              | 版本    |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ----------------------------------- | ------- |
+| render                          | 自定义代码块渲染，返回 `undefined` 回退默认渲染，返回 `null` 不渲染                                                                      | `(props: CustomLeaf, defaultDom: React.ReactNode, codeProps?: codeProps) => React.ReactNode` | -                                   | -       |
+| Languages                       | 支持的编程语言列表                                                                                                                       | `string[]`                                                                                   | -                                   | -       |
+| hideToolBar                     | 是否隐藏代码块工具栏                                                                                                                     | `boolean`                                                                                    | `false`                             | -       |
+| alwaysExpandedDeepThink         | 是否始终展开深度思考块                                                                                                                   | `boolean`                                                                                    | `false`                             | -       |
+| scrollDeepThinkIntoViewOnExpand | 深度思考块展开时是否将组件滚动到视窗内；传 `true` 默认 `{ behavior: 'smooth', block: 'nearest' }`，也可传 `ScrollIntoViewOptions` 自定义 | `boolean \| ScrollIntoViewOptions`                                                           | `false`                             | 2.32.33 |
+| disableHtmlPreview              | 是否禁用 HTML 预览                                                                                                                       | `boolean`                                                                                    | -                                   | -       |
+| viewModeLabels                  | 视图模式标签配置                                                                                                                         | `{ preview?: string; code?: string }`                                                        | `{ preview: '预览', code: '代码' }` | -       |
+| ...                             | 支持所有 [Ace.EditorOptions](https://ace.c9.io/#nav=api&api=editor)                                                                      | `Partial<Ace.EditorOptions>`                                                                 | -                                   | -       |
 
 #### 表格 (tableConfig)
 

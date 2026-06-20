@@ -341,11 +341,11 @@ const RerenderBubbleDemo = () => {
 
       <div style={{ fontSize: 13, color: '#666', lineHeight: 1.6 }}>
         <p style={{ margin: '0 0 8px' }}>
-          与「动态 render」演示共用{' '}
-          <code>newEnergyFundContent</code> +{' '}
+          与「动态 render」演示共用 <code>newEnergyFundContent</code> +{' '}
           <code>RERENDER_CARD_APPENDIX</code>
-          ，流式过程中可观察多种 Markdown / Agentic 块在{' '}
-          <code>Bubble</code> +{' '}
+          ，流式过程中可观察多种 Markdown / Agentic 块在 <code>
+            Bubble
+          </code> +{' '}
           <code>markdownRenderConfig.renderMode: &apos;markdown&apos;</code>{' '}
           下的渲染与限流表现（无 Slate 实例）。
         </p>
@@ -361,8 +361,8 @@ const RerenderBubbleDemo = () => {
           <code>isFinished: false</code> 时自动视为流式）。
         </p>
         <p style={{ margin: 0 }}>
-          与 Slate 打字机动画不同；末段段落淡入由{' '}
-          <code>streamingParagraphAnimation</code> 单独控制（未传时默认开启）。
+          与 Slate 打字机动画不同；GPT 风格逐词淡入由 <code>fadeStreaming</code>{' '}
+          单独控制（未传时默认开启）。
         </p>
       </div>
     </div>
