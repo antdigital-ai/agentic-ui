@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -41,6 +41,39 @@ describe('FncLeaf', () => {
     expect(span).toBeTruthy();
     fireEvent.click(span!);
     expect(document.body.querySelector('.ant-modal')).toBeInTheDocument();
+  });
+
+  it('移动端脚注 Modal 应展示 EditorStoreContext 中的定义内容', () => {
+    vi.mocked(isMobileDevice).mockReturnValue(true);
+    const definition = {
+      type: 'footnoteDefinition',
+      identifier: '1',
+      value: 'context footnote body',
+      url: 'https://example.com/source',
+      children: [{ text: 'fallback footnote body' }],
+    };
+    const store = {
+      footnoteDefinitionMap: new Map([['1', definition]]),
+    };
+
+    render(
+      <EditorStoreTestProvider value={{ store } as any}>
+        <ConfigProvider>
+          <FncLeaf
+            {...defaultProps}
+            leaf={{ ...defaultProps.leaf, text: '[^1]', identifier: '1' }}
+          />
+        </ConfigProvider>
+      </EditorStoreTestProvider>,
+    );
+
+    fireEvent.click(document.querySelector('[data-fnc="fnc"]')!);
+
+    expect(screen.getByText('context footnote body')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: '查看来源' })).toHaveAttribute(
+      'href',
+      'https://example.com/source',
+    );
   });
 
   it('linkConfig.onClick 返回 false 时应 return false', () => {
