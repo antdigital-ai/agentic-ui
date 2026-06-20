@@ -57,8 +57,6 @@ export type { ActionsSlotState, MarkdownInputFieldProps, SlotRenderState };
  * @param {AttachmentProps} [props.attachment] - 附件配置
  * @param {string[]} [props.bgColorList] - 背景颜色列表，推荐使用3-4种颜色
  * @param {React.RefObject} [props.inputRef] - 输入框引用
- * @param {MarkdownRenderConfig} [props.markdownRenderConfig] - Markdown渲染配置
- * @param {SuggestionProps} [props.suggestion] - 自动完成配置
  *
  * @example
  * ```tsx

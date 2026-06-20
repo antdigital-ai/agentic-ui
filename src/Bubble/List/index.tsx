@@ -332,7 +332,7 @@ export type BubbleListProps = {
  * @param {string} [props.className] - 自定义CSS类名
  * @param {React.CSSProperties} [props.style] - 自定义样式
  * @param {BubbleRenderConfig} [props.bubbleRenderConfig] - 气泡渲染配置
- * @param {MarkdownRenderConfig} [props.markdownRenderConfig] - Markdown渲染配置
+ * @param {MarkdownEditorProps} [props.markdownRenderConfig] - Markdown渲染配置
  * @param {BubbleMetaData} [props.userMeta] - 用户头像元数据
  * @param {BubbleMetaData} [props.assistantMeta] - 助手头像元数据
  * @param {BubbleStyles} [props.styles] - 自定义样式配置

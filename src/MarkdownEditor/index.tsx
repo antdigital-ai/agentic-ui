@@ -17,7 +17,6 @@ export * from './BaseMarkdownEditor';
  * @param {React.RefObject} [props.editorRef] - 编辑器引用
  * @param {boolean} [props.readonly] - 是否只读模式
  * @param {Plugin[]} [props.plugins] - 自定义插件列表
- * @param {MarkdownRenderConfig} [props.markdownRenderConfig] - Markdown渲染配置
  * @param {string} [props.className] - 自定义CSS类名
  * @param {React.CSSProperties} [props.style] - 自定义样式
  *

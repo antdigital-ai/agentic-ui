@@ -342,7 +342,7 @@ const ThoughtChainContent = React.memo<
  * @param {BubbleProps} [props.bubble] - 气泡数据
  * @param {React.CSSProperties} [props.style] - 自定义样式
  * @param {boolean} [props.compact] - 是否使用紧凑模式
- * @param {MarkdownRenderConfig} [props.markdownRenderProps] - Markdown渲染配置
+ * @param {MarkdownEditorProps} [props.markdownRenderProps] - Markdown渲染配置
  * @param {boolean} [props.finishAutoCollapse=true] - 完成后是否自动折叠
  * @param {(meta: DocMeta | null) => void} [props.onDocMetaClick] - 文档元数据点击回调
  * @param {string} [props.className] - 自定义CSS类名
