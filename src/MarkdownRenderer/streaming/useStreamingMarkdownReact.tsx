@@ -51,8 +51,7 @@ export const useStreamingMarkdownReact = (
   // GPT 风格逐词淡入开关：用稳定对象承载，processor 在流式会话内保持同一实例，
   // 避免随 streaming 变化重建导致 chart / 代码块卸载重挂。
   const tokenStateRef = useRef<StreamingTokenState>({ enabled: false });
-  tokenStateRef.current.enabled =
-    !!options?.streaming && options?.fadeStreaming !== false;
+  tokenStateRef.current.enabled = !!options?.fadeTokens;
 
   const processor = useMemo(
     () =>

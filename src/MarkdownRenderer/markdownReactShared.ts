@@ -880,8 +880,8 @@ export interface UseMarkdownToReactOptions {
   };
   fncProps?: MarkdownEditorProps['fncProps'];
   streaming?: boolean;
-  /** 流式逐词淡入动画开关，默认 true（仅 streaming 时生效） */
-  fadeStreaming?: boolean;
+  /** 是否对文本拆分 token 做逐词淡入（已含 streaming 判定，由上层解析后传入） */
+  fadeTokens?: boolean;
   /** 原始流字符串，与 useStreaming 输出分离避免缓存误判 */
   contentRevisionSource?: string;
   /** 返回 undefined 回退默认渲染 */
