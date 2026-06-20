@@ -953,3 +953,16 @@ pnpm run build
 
 - 详细开发指南请参考 `docs/development/` 目录下的文档
 - 遇到问题请查阅 GitHub Issues 或 Discussions
+
+---
+
+## Cursor Cloud specific instructions
+
+> 面向后续 cloud agent 的运行时须知。VM 启动时已执行 update script（`corepack enable` → `corepack prepare pnpm@9.15.9 --activate` → `pnpm install --frozen-lockfile`），依赖已就绪，无需重复安装。环境已自带 Node 22 与 pnpm 9.15.9。
+
+- **运行应用**：本仓库的「应用」即文档站点。用 `pnpm dev`（等同 `pnpm start`）启动，监听 `http://localhost:8000`。建议在 tmux 会话内长驻运行。
+- **首屏编译延迟（非 bug）**：dumi/umi 是 SPA，首次请求会触发按需编译，初始 HTML 仅返回 `Umi Loading...` 外壳，需等待数秒前端才渲染出内容；`curl` 拿到 200 不代表页面已可交互。
+- **组件路由**：组件页路径由文档 frontmatter 生成，并非全部能从组件名直接拼出（例如 `MarkdownEditor` 的 URL 与 `/components/markdown-editor` 不一定一致）。直接猜 URL 可能 404，优先点顶部「组件」再走左侧栏导航。
+- **测试范围**：`pnpm test` 默认跑精简集（见 `vitest.config.ts` 的 exclude）。验证单个组件用 `pnpm test -- src/<Component>` 更快；全量用 `pnpm run test:full`（已带 `--max-old-space-size=8192`）。
+- **E2E**：`pnpm run test:e2e` 需先 `pnpm run playwright:install`（下载 Chromium，未纳入 update script）。
+- **校验顺序**：提交前依次 `pnpm run lint`、`pnpm tsc`、相关 `pnpm test`，与 `.husky/pre-commit`（eslint + stylelint）一致。
