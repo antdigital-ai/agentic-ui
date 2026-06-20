@@ -6,7 +6,7 @@ import { RenderLeafProps } from 'slate-react';
 import { useRefFunction } from '../../../../Hooks/useRefFunction';
 import { isMobileDevice } from '../../../../MarkdownInputField/AttachmentButton/utils';
 import { MarkdownEditorProps } from '../../../types';
-import { EditorStoreContext } from '../../store';
+import { EditorStoreContext } from '../../editorStoreContext';
 import {
   extractFootnoteDefinitionIdentifier,
   formatFootnoteRefDisplayLabel,

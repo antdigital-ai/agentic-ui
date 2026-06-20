@@ -31,7 +31,11 @@ import type { ParserMarkdownToSlateNodeConfig } from './parser/parserMarkdownToS
 import type { MarkdownToHtmlOptions } from './utils/markdownToHtml';
 import { markdownToHtmlSync } from './utils/markdownToHtml';
 import type { EditorSelChangePayload } from './utils/editorSelChange';
-const { createContext, useContext } = React;
+import { EditorStoreContext } from './editorStoreContext';
+
+export { EditorStoreContext };
+
+const { useContext } = React;
 
 /**
  * 编辑器上下文接口
@@ -97,10 +101,6 @@ export interface EditorStoreContextType {
   /** Markdown容器引用 */
   markdownContainerRef: React.MutableRefObject<HTMLDivElement | null>;
 }
-
-export const EditorStoreContext = createContext<EditorStoreContextType | null>(
-  null,
-);
 
 /**
  * 获取编辑器存储上下文的Hook
