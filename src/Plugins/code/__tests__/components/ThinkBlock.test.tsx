@@ -7,6 +7,7 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MessagesContext } from '../../../../Bubble/MessagesContent/BubbleContext';
+import { EditorStoreContext } from '../../../../MarkdownEditor/editor/editorStoreContext';
 import { CodeNode } from '../../../../MarkdownEditor/el';
 import { ThinkBlock, ThinkBlockProvider } from '../../components/ThinkBlock';
 
@@ -53,6 +54,16 @@ describe('ThinkBlock', () => {
       <ThinkBlockProvider expanded onExpandedChange={() => {}}>
         {node}
       </ThinkBlockProvider>,
+    );
+
+  const renderWithEditorStore = (
+    node: React.ReactElement,
+    storeValue: React.ContextType<typeof EditorStoreContext>,
+  ) =>
+    render(
+      <EditorStoreContext.Provider value={storeValue}>
+        {node}
+      </EditorStoreContext.Provider>,
     );
 
   beforeEach(() => {
@@ -250,6 +261,27 @@ describe('ThinkBlock', () => {
       const thinkBlock = screen.getByTestId('think-block');
       expect(thinkBlock).toBeInTheDocument();
       expect(thinkBlock).toHaveTextContent(mockCodeNode.value);
+    });
+
+    it('应通过 EditorStoreContext 展开深度思考内容', () => {
+      const { container } = renderWithEditorStore(
+        <ThinkBlock {...mockProps} />,
+        {
+          editorProps: {
+            codeProps: {
+              alwaysExpandedDeepThink: true,
+            },
+          },
+          markdownEditorRef: { current: null },
+        } as any,
+      );
+
+      expect(screen.getByTestId('think-block').className).toContain(
+        'agentic-tool-use-bar-think-active',
+      );
+      expect(
+        container.querySelector('[class*="think-collapse-open"]'),
+      ).toBeInTheDocument();
     });
 
     it('应该能正确处理包含省略号的加载状态内容', () => {
