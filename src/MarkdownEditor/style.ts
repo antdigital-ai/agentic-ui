@@ -17,6 +17,7 @@ import {
   type FullToken,
   type GenStyleFn,
 } from '../Hooks/useStyle';
+import { STREAM_TOKEN_CLASS } from '../MarkdownRenderer/streaming/rehypeStreamingTokens';
 
 // ── Table ──────────────────────────────────────────────────────────────────
 const TABLE_BORDER = '1px solid var(--agentic-ui-table-border-color, #E7E9E8)';
@@ -320,6 +321,45 @@ const genTableStyle = (
     },
   };
 };
+
+// ── 流式逐词淡入（GPT 风格） ─────────────────────────────────────────────────
+/** 单个 token 的淡入时长（ms）；略长于限流帧间隔，形成连续的「波浪」淡入 */
+const STREAM_TOKEN_DURATION_MS = 420;
+
+/**
+ * 仅在流式容器 `${componentCls}-content-streaming` 内对 token span 应用淡入。
+ * 已渲染 token 重解析时复用 DOM、动画不重放；新 token 挂载各自淡入一次，
+ * 叠加限流的逐字推进，得到接近 GPT 的平滑出字效果。
+ */
+const genStreamingTokenStyle = (
+  token: FullToken<'MarkdownEditor'>,
+): Record<string, CSSInterpolation> => ({
+  [`${token.componentCls}-content-streaming`]: {
+    [`.${STREAM_TOKEN_CLASS}`]: {
+      display: 'inline',
+      animationName: 'agenticMdStreamTokenIn',
+      animationDuration: `${STREAM_TOKEN_DURATION_MS}ms`,
+      animationTimingFunction: TEXT_SWAP_EASING,
+      animationFillMode: 'both',
+      willChange: 'opacity, filter',
+    },
+    '@media (prefers-reduced-motion: reduce)': {
+      [`.${STREAM_TOKEN_CLASS}`]: {
+        animation: 'none',
+      },
+    },
+  },
+  '@keyframes agenticMdStreamTokenIn': {
+    from: {
+      opacity: 0,
+      filter: `blur(${TEXT_SWAP_BLUR_PX}px)`,
+    },
+    to: {
+      opacity: 1,
+      filter: 'blur(0)',
+    },
+  },
+});
 
 const genStyle: GenStyleFn<'MarkdownEditor'> = (token) => {
   return {
@@ -687,6 +727,9 @@ const genStyle: GenStyleFn<'MarkdownEditor'> = (token) => {
       // --- Table（全部样式统一在 genTableStyle 中）---
       ...genTableStyle(token, MOBILE_BREAKPOINT, MOBILE_PADDING),
     },
+
+    // --- 流式逐词淡入（GPT 风格）---
+    ...genStreamingTokenStyle(token),
   };
 };
 

@@ -26,6 +26,11 @@ group:
 
 ## Unreleased
 
+- MarkdownRenderer
+  - 🆕 Added GPT-style streaming word-by-word fade-in: while `streaming`, newly appearing words fade in individually, already-shown content reuses DOM without replaying the animation or flickering. Pure CSS driven, honors `prefers-reduced-motion`, and skips code blocks / tables / formulas when splitting tokens.
+  - 🆕 Added the `fadeStreaming` prop (default `true`, only effective when `streaming`): set `false` to disable the fade-in. `MarkdownEditor` (`renderMode: 'markdown'`) and `ReadonlyMarkdownEditorView` forward this prop too.
+  - 🛠 The fade-in splits text tokens via a rehype plugin registered last on the final hast; the processor stays the same instance across a streaming session to avoid unmounting/remounting charts and code blocks.
+
 - TaskList
   - 🛠 `simple` variant drops the 2px progress bar underneath the summary; `showProgress` now only toggles the inline "completed/total" count text.
   - 🆕 Added `scrollIntoViewOnExpand` (`boolean | ScrollIntoViewOptions`, default `false`): when the `simple` summary expands, scroll the component into the viewport. `true` resolves to `{ behavior: 'smooth', block: 'nearest' }`; the initial mount does not trigger it.

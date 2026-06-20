@@ -29,6 +29,10 @@ import {
 import { rehypeSanitizeUserHtml } from '../Utils/rehypeSanitizeUserHtml';
 import { rehypeFootnoteRef } from './plugins/rehypeFootnoteRef';
 import { remarkChartFromComment } from './plugins/remarkChartFromComment';
+import {
+  createStreamingTokenPlugin,
+  type StreamingTokenState,
+} from './streaming/rehypeStreamingTokens';
 
 /** `remark-frontmatter` 仅识别 yaml 风格 frontmatter */
 const FRONTMATTER_LANGUAGES: readonly string[] = ['yaml'];
@@ -67,6 +71,7 @@ export const createHastProcessor = (
   config?: MarkdownToHtmlConfig,
   formulaConfig?: FormulaConfig,
   extraRehypePlugins?: Plugin[],
+  streamingTokenState?: StreamingTokenState,
 ): Processor => {
   const processor = unified() as Processor & {
     use: (plugin: Plugin, ...args: unknown[]) => Processor;
@@ -136,6 +141,11 @@ export const createHastProcessor = (
         processor.use(entry as Plugin);
       }
     });
+  }
+
+  // 必须最后注册：在最终 hast 上拆分文本 token，避免影响其它插件的文本匹配
+  if (streamingTokenState) {
+    (processor as any).use(createStreamingTokenPlugin(streamingTokenState));
   }
 
   return processor as Processor;

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
 import {
   JINJA_DOLLAR_PLACEHOLDER,
@@ -14,6 +14,7 @@ import {
 } from '../markdownReactShared';
 
 import { MarkdownBlockPiece } from './MarkdownBlockPiece';
+import type { StreamingTokenState } from './rehypeStreamingTokens';
 import { shouldResetRevisionProgress } from './revisionPolicy';
 import { useProgressiveBlocks } from './useProgressiveBlocks';
 import { useShallowMemo } from './useShallowMemo';
@@ -47,6 +48,12 @@ export const useStreamingMarkdownReact = (
       ? options.contentRevisionSource
       : content;
 
+  // GPT 风格逐词淡入开关：用稳定对象承载，processor 在流式会话内保持同一实例，
+  // 避免随 streaming 变化重建导致 chart / 代码块卸载重挂。
+  const tokenStateRef = useRef<StreamingTokenState>({ enabled: false });
+  tokenStateRef.current.enabled =
+    !!options?.streaming && options?.fadeStreaming !== false;
+
   const processor = useMemo(
     () =>
       createHastProcessor(
@@ -54,6 +61,7 @@ export const useStreamingMarkdownReact = (
         options?.htmlConfig,
         options?.formula,
         options?.rehypePlugins,
+        tokenStateRef.current,
       ),
     [
       options?.remarkPlugins,

@@ -2,13 +2,13 @@ import { Checkbox, Image } from 'antd';
 import { toJsxRuntime } from 'hast-util-to-jsx-runtime';
 import React from 'react';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
-import type { Processor, Plugin } from 'unified';
+import type { Plugin, Processor } from 'unified';
 
+import type { FormulaConfig } from '../Config/formulaConfig';
 import type {
   MarkdownRemarkPlugin,
   MarkdownToHtmlConfig,
 } from '../MarkdownEditor/editor/utils/markdownToHtml';
-import type { FormulaConfig } from '../Config/formulaConfig';
 import type { MarkdownEditorProps } from '../MarkdownEditor/types';
 import { ToolUseBarThink } from '../ToolUseBarThink';
 import { debugInfo } from '../Utils/debugUtils';
@@ -880,6 +880,8 @@ export interface UseMarkdownToReactOptions {
   };
   fncProps?: MarkdownEditorProps['fncProps'];
   streaming?: boolean;
+  /** 流式逐词淡入动画开关，默认 true（仅 streaming 时生效） */
+  fadeStreaming?: boolean;
   /** 原始流字符串，与 useStreaming 输出分离避免缓存误判 */
   contentRevisionSource?: string;
   /** 返回 undefined 回退默认渲染 */

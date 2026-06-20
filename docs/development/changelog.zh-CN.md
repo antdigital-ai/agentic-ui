@@ -26,6 +26,11 @@ group:
 
 ## 未发布
 
+- MarkdownRenderer
+  - 🆕 新增 GPT 风格的流式逐词淡入动画：`streaming` 时默认对新出现的词语逐个淡入，已显示内容复用 DOM、不重放动画、不闪烁；纯 CSS 驱动，自动尊重 `prefers-reduced-motion`，代码块 / 表格 / 公式不参与拆词。
+  - 🆕 新增 `fadeStreaming` 属性（默认 `true`，仅 `streaming` 时生效）：传 `false` 关闭逐词淡入；`MarkdownEditor`（`renderMode: 'markdown'`）与 `ReadonlyMarkdownEditorView` 同步透出该属性。
+  - 🛠 逐词淡入通过末注册的 rehype 插件在最终 hast 上拆分文本 token，processor 在流式会话内保持同一实例，避免 chart / 代码块因 processor 变更而卸载重挂。
+
 - TaskList
   - 🛠 `simple` 模式移除摘要条下方 2px 细线进度条；`showProgress` 现仅控制摘要内「已完成/总数」计数文本是否展示。
   - 🆕 新增 `scrollIntoViewOnExpand` 属性（`boolean | ScrollIntoViewOptions`，默认 `false`）：`simple` 模式下展开摘要条时将组件滚动到视窗内；传 `true` 走默认 `{ behavior: 'smooth', block: 'nearest' }`，初次挂载不触发。

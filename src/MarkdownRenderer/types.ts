@@ -1,9 +1,9 @@
 import type React from 'react';
+import type { FormulaConfig } from '../Config/formulaConfig';
 import type {
   MarkdownRemarkPlugin,
   MarkdownToHtmlConfig,
 } from '../MarkdownEditor/editor/utils/markdownToHtml';
-import type { FormulaConfig } from '../Config/formulaConfig';
 import type { MarkdownEditorPlugin } from '../MarkdownEditor/plugin';
 import type { MarkdownEditorProps } from '../MarkdownEditor/types';
 import type { AttachmentFile } from '../MarkdownInputField/AttachmentButton/types';
@@ -62,6 +62,11 @@ export interface MarkdownRendererProps {
   isFinished?: boolean;
   /** 流式限流配置；streaming 为 true 且未设 enabled: false 时默认开启 */
   throttleOptions?: ContentThrottleOptions;
+  /**
+   * GPT 风格逐词淡入动画；默认 true，仅在 streaming 时生效。
+   * 设为 false 关闭动画，流式内容即时显示（无淡入）。
+   */
+  fadeStreaming?: boolean;
   plugins?: MarkdownEditorPlugin[];
   remarkPlugins?: MarkdownRemarkPlugin[];
   htmlConfig?: MarkdownToHtmlConfig;

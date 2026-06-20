@@ -36,6 +36,7 @@ const InternalMarkdownRenderer = forwardRef<
     streaming = false,
     isFinished,
     throttleOptions,
+    fadeStreaming = true,
     plugins,
     remarkPlugins,
     htmlConfig,
@@ -141,9 +142,7 @@ const InternalMarkdownRenderer = forwardRef<
 
   const reactContent = useMarkdownToReact(safeContent, {
     remarkPlugins: mergedRemarkPlugins,
-    rehypePlugins: mergedRehypePlugins.length
-      ? mergedRehypePlugins
-      : undefined,
+    rehypePlugins: mergedRehypePlugins.length ? mergedRehypePlugins : undefined,
     htmlConfig,
     formula: formulaConfig,
     components,
@@ -151,10 +150,13 @@ const InternalMarkdownRenderer = forwardRef<
     linkConfig,
     fncProps,
     streaming,
+    fadeStreaming,
     // 修订追踪用未限流的完整 source，保证缓存键随真实流入推进，而非随限流帧抖动。
     contentRevisionSource: streaming ? sourceText : undefined,
     eleRender,
   });
+
+  const fadeActive = streaming && fadeStreaming;
 
   return (
     <div
@@ -171,6 +173,7 @@ const InternalMarkdownRenderer = forwardRef<
           className={clsx(
             contentCls,
             `${contentCls}-markdown-readonly`,
+            { [`${contentCls}-streaming`]: fadeActive },
             hashId,
           )}
           style={{ whiteSpace: 'normal', wordWrap: 'normal' }}
