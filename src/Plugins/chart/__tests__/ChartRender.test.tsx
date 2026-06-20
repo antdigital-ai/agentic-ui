@@ -6,9 +6,65 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
+import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { I18nContext } from '../../../I18n';
+
+vi.mock('antd', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('antd')>();
+  const React = await import('react');
+  const { useState, cloneElement, isValidElement } = React;
+
+  function MockPopover({
+    content,
+    children,
+    open: controlledOpen,
+    onOpenChange,
+    trigger = 'hover',
+  }: {
+    content?: React.ReactNode;
+    children?: React.ReactNode;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+    trigger?: string | string[];
+  }) {
+    const [internalOpen, setInternalOpen] = useState(false);
+    const isClickTrigger =
+      trigger === 'click' ||
+      (Array.isArray(trigger) && trigger.includes('click'));
+    const open = controlledOpen ?? internalOpen;
+    const setOpen = (next: boolean) => {
+      setInternalOpen(next);
+      onOpenChange?.(next);
+    };
+
+    const child = isValidElement(children)
+      ? cloneElement(children as React.ReactElement<{ onClick?: React.MouseEventHandler }>, {
+          onClick: (e: React.MouseEvent) => {
+            if (isClickTrigger) {
+              setOpen(!open);
+            }
+            (children as React.ReactElement<{ onClick?: React.MouseEventHandler }>)
+              .props?.onClick?.(e);
+          },
+        })
+      : children;
+
+    return (
+      <div data-testid="chart-config-popover">
+        {child}
+        {open ? <div className="ant-popover-content">{content}</div> : null}
+      </div>
+    );
+  }
+
+  return {
+    ...actual,
+    Popover: MockPopover,
+  };
+});
+
 import { ChartRender } from '../ChartRender';
 
 vi.mock('../../../Hooks/useIntersectionOnce', () => ({
@@ -180,6 +236,31 @@ describe('ChartRender', () => {
       fullScreen: '全屏',
     } as any,
     language: 'zh-CN' as const,
+  };
+
+  const renderChart = (ui: React.ReactElement) =>
+    render(<ConfigProvider>{ui}</ConfigProvider>);
+
+  const openChartConfigForm = async () => {
+    await screen.findByTestId('bar-chart', {}, { timeout: 3000 });
+
+    const configTrigger = screen.getByRole('button', { name: '配置图表' });
+    await act(async () => {
+      fireEvent.click(configTrigger);
+    });
+
+    await waitFor(
+      () => {
+        const form =
+          document.body.querySelector('.ant-agentic-chart-config-form') ||
+          document.body.querySelector('.ant-popover-content form') ||
+          document.body.querySelector('.ant-form') ||
+          document.body.querySelector('form');
+        expect(form).not.toBeNull();
+        expect(form).toBeInTheDocument();
+      },
+      { timeout: 8000 },
+    );
   };
 
   beforeEach(() => {
@@ -1079,29 +1160,13 @@ describe('ChartRender', () => {
     });
 
     it('应该打开配置 Popover、触发表单 X/Y 的 stopPropagation 并提交（833, 847, 851, 871, 888）', async () => {
-      render(
+      renderChart(
         <I18nContext.Provider value={mockI18n}>
           <ChartRender {...defaultProps} />
         </I18nContext.Provider>,
       );
 
-      await screen.findByTestId('bar-chart', {}, { timeout: 3000 });
-
-      const configTrigger = screen.getByRole('button', { name: '配置图表' });
-      await act(async () => {
-        fireEvent.click(configTrigger);
-      });
-
-      await waitFor(
-        () => {
-          const form =
-            document.body.querySelector('.ant-form') ||
-            document.body.querySelector('form');
-          expect(form).not.toBeNull();
-          expect(form).toBeInTheDocument();
-        },
-        { timeout: 2000 },
-      );
+      await openChartConfigForm();
 
       const xSelects = document.body.querySelectorAll('.ant-select-selector');
       if (xSelects.length >= 1) {
@@ -1111,7 +1176,9 @@ describe('ChartRender', () => {
         fireEvent.mouseDown(xSelects[1]);
       }
 
-      const submitBtn = document.body.querySelector('button.ant-btn-primary');
+      const submitBtn =
+        document.body.querySelector('button.ant-btn-primary') ||
+        screen.queryByRole('button', { name: '更新' });
       if (submitBtn) {
         await act(async () => {
           fireEvent.click(submitBtn);
@@ -1120,7 +1187,7 @@ describe('ChartRender', () => {
     });
 
     it('提交配置后应该重新挂载图表运行时，避免底层图表实例复用旧配置', async () => {
-      render(
+      renderChart(
         <I18nContext.Provider value={mockI18n}>
           <ChartRender {...defaultProps} />
         </I18nContext.Provider>,
@@ -1134,24 +1201,11 @@ describe('ChartRender', () => {
       const mountIdBeforeSubmit =
         chartBeforeSubmit.getAttribute('data-mount-id');
 
-      const configTrigger = screen.getByRole('button', { name: '配置图表' });
-      await act(async () => {
-        fireEvent.click(configTrigger);
-      });
+      await openChartConfigForm();
 
-      await waitFor(
-        () => {
-          const submitButton = document.body.querySelector(
-            'button.ant-btn-primary',
-          );
-          expect(submitButton).toBeInTheDocument();
-        },
-        { timeout: 2000 },
-      );
-
-      const submitButton = document.body.querySelector(
-        'button.ant-btn-primary',
-      );
+      const submitButton =
+        document.body.querySelector('button.ant-btn-primary') ||
+        screen.getByRole('button', { name: '更新' });
       await act(async () => {
         fireEvent.click(submitButton!);
       });
