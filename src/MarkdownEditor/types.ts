@@ -300,14 +300,11 @@ export type MarkdownEditorProps = {
     onClick?: (url?: string) => boolean | void;
   };
 
-  /** 流式限流（仅 renderMode: 'markdown'），默认 streaming 时开启 */
-  throttleOptions?: ContentThrottleOptions;
-
   /**
-   * GPT 风格逐词淡入动画（仅 renderMode: 'markdown'），默认 true。
-   * 设为 false 关闭流式淡入动画。
+   * 流式限流与展示配置（仅 renderMode: 'markdown'），默认 streaming 时开启限流。
+   * GPT 风格逐词淡入由 `throttleOptions.fade` 控制（默认开启，传 false 关闭）。
    */
-  fadeStreaming?: boolean;
+  throttleOptions?: ContentThrottleOptions;
 
   /** MElement 刷新依赖 */
   deps?: string[];

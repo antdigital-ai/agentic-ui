@@ -36,7 +36,6 @@ const InternalMarkdownRenderer = forwardRef<
     streaming = false,
     isFinished,
     throttleOptions,
-    fadeStreaming = true,
     plugins,
     remarkPlugins,
     htmlConfig,
@@ -141,7 +140,7 @@ const InternalMarkdownRenderer = forwardRef<
   const safeContent = useStreaming(displayedText, streaming);
 
   // 逐词淡入是否生效：流式 + 未显式关闭。单一来源，同时驱动 token 拆分与容器类。
-  const fadeActive = streaming && fadeStreaming;
+  const fadeActive = streaming && throttleOptions?.fade !== false;
 
   const reactContent = useMarkdownToReact(safeContent, {
     remarkPlugins: mergedRemarkPlugins,

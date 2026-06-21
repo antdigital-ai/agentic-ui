@@ -128,13 +128,12 @@ describe('MarkdownRenderer streaming fade integration', () => {
     expect(countTokens(container as HTMLElement)).toBe(0);
   });
 
-  it('does not emit token spans when fadeStreaming is false', () => {
+  it('does not emit token spans when throttleOptions.fade is false', () => {
     const { container } = render(
       <MarkdownRenderer
         content="hello world"
         streaming
-        fadeStreaming={false}
-        throttleOptions={throttleOff}
+        throttleOptions={{ enabled: false, fade: false }}
       />,
     );
     expect(countTokens(container as HTMLElement)).toBe(0);

@@ -361,8 +361,8 @@ const RerenderBubbleDemo = () => {
           <code>isFinished: false</code> 时自动视为流式）。
         </p>
         <p style={{ margin: 0 }}>
-          与 Slate 打字机动画不同；GPT 风格逐词淡入由 <code>fadeStreaming</code>{' '}
-          单独控制（未传时默认开启）。
+          与 Slate 打字机动画不同；GPT 风格逐词淡入由{' '}
+          <code>throttleOptions.fade</code> 控制（未传时默认开启）。
         </p>
       </div>
     </div>

@@ -244,21 +244,21 @@ export default () => {
 | streaming       | 流式输出模式，同时传入时优先于 `typewriter`                                                                                                              | `boolean`                | -         | -    |
 | isFinished      | 流式是否完成（仅 `renderMode: 'markdown'`），未传入时回退到 `!streaming`                                                                                 | `boolean`                | -         | -    |
 | ~~typewriter~~  | **已废弃**：`streaming` 的别名，向下兼容，新代码请使用 `streaming`                                                                                       | `boolean`                | -         | -    |
-| fadeStreaming   | GPT 风格逐词淡入（仅 `renderMode: 'markdown'`），默认开启，传 `false` 关闭                                                                               | `boolean`                | -         | -    |
-| throttleOptions | 流式限流配置（仅 `renderMode: 'markdown'`），默认 `streaming` 时开启                                                                                     | `ContentThrottleOptions` | -         | -    |
+| throttleOptions | 流式限流与展示配置（仅 `renderMode: 'markdown'`），默认 `streaming` 时开启限流；逐词淡入由 `throttleOptions.fade` 控制（默认开启，传 `false` 关闭）      | `ContentThrottleOptions` | -         | -    |
 | deps            | MElement 刷新依赖                                                                                                                                        | `string[]`               | -         | -    |
 | children        | 子元素                                                                                                                                                   | `React.ReactNode`        | -         | -    |
 
 #### ContentThrottleOptions
 
-| 属性                      | 说明                                    | 类型      | 默认值 |
-| ------------------------- | --------------------------------------- | --------- | ------ |
-| charsPerFrame             | 每帧最多推进字符数                      | `number`  | `3`    |
-| speed                     | 速度倍率                                | `number`  | `1`    |
-| flushOnComplete           | 流式结束时是否立即展示剩余内容          | `boolean` | `true` |
-| backgroundInterval        | 标签页不可见时的轮询间隔（ms）          | `number`  | `100`  |
-| backgroundBatchMultiplier | 后台每批字符相对前台倍数                | `number`  | `10`   |
-| enabled                   | 为 `false` 时关闭限流，流式内容即时渲染 | `boolean` | `true` |
+| 属性                      | 说明                                        | 类型      | 默认值 |
+| ------------------------- | ------------------------------------------- | --------- | ------ |
+| charsPerFrame             | 每帧最多推进字符数                          | `number`  | `3`    |
+| speed                     | 速度倍率                                    | `number`  | `1`    |
+| flushOnComplete           | 流式结束时是否立即展示剩余内容              | `boolean` | `true` |
+| backgroundInterval        | 标签页不可见时的轮询间隔（ms）              | `number`  | `100`  |
+| backgroundBatchMultiplier | 后台每批字符相对前台倍数                    | `number`  | `10`   |
+| enabled                   | 为 `false` 时关闭限流，流式内容即时渲染     | `boolean` | `true` |
+| fade                      | GPT 风格逐词淡入开关，仅 `streaming` 时生效 | `boolean` | `true` |
 
 #### 工具栏 (toolBar)
 

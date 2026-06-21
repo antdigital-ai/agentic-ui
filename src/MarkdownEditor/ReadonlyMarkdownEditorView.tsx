@@ -224,7 +224,6 @@ const ReadonlyMarkdownEditorView: React.FC<MarkdownEditorProps> = (props) => {
               streaming={isStreaming}
               isFinished={props.isFinished ?? !isStreaming}
               throttleOptions={props.throttleOptions}
-              fadeStreaming={props.fadeStreaming}
               plugins={props.plugins}
               remarkPlugins={props.markdownToHtmlOptions}
               formula={formulaConfig}

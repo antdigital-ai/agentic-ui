@@ -28,7 +28,7 @@ group:
 
 - MarkdownRenderer
   - 🆕 Added GPT-style streaming word-by-word fade-in: while `streaming`, newly appearing words fade in individually, already-shown content reuses DOM without replaying the animation or flickering. Pure CSS driven, honors `prefers-reduced-motion`, and skips code blocks / tables / formulas when splitting tokens.
-  - 🆕 Added the `fadeStreaming` prop (default `true`, only effective when `streaming`): set `false` to disable the fade-in. `MarkdownEditor` (`renderMode: 'markdown'`) and `ReadonlyMarkdownEditorView` forward this prop too.
+  - 🆕 The fade-in toggle is consolidated into `throttleOptions.fade` (default `true`, only effective when `streaming`): pass `throttleOptions={{ fade: false }}` to disable. All streaming-display config now lives in the single `throttleOptions` object, so `MarkdownEditor` (`renderMode: 'markdown'`) and `Bubble.markdownRenderConfig` pick it up through the existing `throttleOptions` passthrough.
   - 🛠 The fade-in splits text tokens via a rehype plugin registered last on the final hast; the processor stays the same instance across a streaming session to avoid unmounting/remounting charts and code blocks.
 
 - TaskList

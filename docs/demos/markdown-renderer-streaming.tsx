@@ -24,7 +24,7 @@ function greet(name: string) {
 export default () => {
   const [content, setContent] = useState('');
   const [running, setRunning] = useState(true);
-  const [fadeStreaming, setFadeStreaming] = useState(true);
+  const [fade, setFade] = useState(true);
   const indexRef = useRef(0);
 
   useEffect(() => {
@@ -55,11 +55,7 @@ export default () => {
         </Button>
         <Space size={4}>
           <span style={{ color: '#666' }}>逐词淡入</span>
-          <Switch
-            checked={fadeStreaming}
-            onChange={setFadeStreaming}
-            size="small"
-          />
+          <Switch checked={fade} onChange={setFade} size="small" />
         </Space>
         <span style={{ color: '#999' }}>
           状态：{running ? '流式中' : '已完成'}
@@ -76,7 +72,7 @@ export default () => {
         <MarkdownRenderer
           content={content}
           streaming={running}
-          fadeStreaming={fadeStreaming}
+          throttleOptions={{ fade }}
         />
       </div>
     </div>

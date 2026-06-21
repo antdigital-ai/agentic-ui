@@ -76,8 +76,7 @@ export default () => {
       content={content}
       streaming={!done}
       isFinished={done}
-      // fadeStreaming 默认开启，传 false 可关闭逐词淡入
-      fadeStreaming
+      // 逐词淡入默认开启；传 throttleOptions={{ fade: false }} 可关闭
     />
   );
 };
@@ -85,7 +84,7 @@ export default () => {
 
 ### 逐词淡入（GPT 风格）
 
-流式时默认开启 GPT 风格的逐词淡入：新出现的词语各自淡入一次，已显示内容保持稳定、不闪烁，纯 CSS 驱动、性能友好，并自动尊重 `prefers-reduced-motion`。代码块、表格、公式不参与拆词，避免破坏布局。如需关闭，传 `fadeStreaming={false}`。
+流式时默认开启 GPT 风格的逐词淡入：新出现的词语各自淡入一次，已显示内容保持稳定、不闪烁，纯 CSS 驱动、性能友好，并自动尊重 `prefers-reduced-motion`。代码块、表格、公式不参与拆词，避免破坏布局。如需关闭，传 `throttleOptions={{ fade: false }}`。
 
 ### 自定义代码块渲染
 
@@ -125,8 +124,7 @@ export default () => (
 | content                     | Markdown 文本内容                                                                                                                                                                                         | `string`                                                                            | -                        | -    |
 | streaming                   | 是否处于流式输出过程中                                                                                                                                                                                    | `boolean`                                                                           | `false`                  | -    |
 | isFinished                  | 流式输出是否已结束（触发限流器立即 flush 收尾）；仅在 `streaming={true}` 时生效                                                                                                                           | `boolean`                                                                           | `false`                  | -    |
-| fadeStreaming               | GPT 风格逐词淡入开关；仅在 `streaming={true}` 时生效，传 `false` 关闭                                                                                                                                     | `boolean`                                                                           | `true`                   | -    |
-| throttleOptions             | 流式限流配置，控制大段文本按帧顺序展示；`streaming={true}` 且未设 `enabled: false` 时默认开启                                                                                                             | `ContentThrottleOptions`                                                            | -                        | -    |
+| throttleOptions             | 流式限流与展示配置（含逐词淡入 `fade`）；`streaming={true}` 且未设 `enabled: false` 时默认开启限流                                                                                                        | `ContentThrottleOptions`                                                            | -                        | -    |
 | plugins                     | 编辑器/渲染器插件，用于扩展元素渲染                                                                                                                                                                       | `MarkdownEditorPlugin[]`                                                            | -                        | -    |
 | remarkPlugins               | 自定义 remark/rehype 插件，每项为 `Plugin` 或 `[Plugin, ...options]`，例如 `[remarkGfm, [remarkMath, { singleDollarTextMath: false }]]`                                                                   | `MarkdownRemarkPlugin[]`                                                            | -                        | -    |
 | htmlConfig                  | Markdown → HTML 配置，详见下方 [MarkdownToHtmlConfig](#markdowntohtmlconfig)                                                                                                                              | `MarkdownToHtmlConfig`                                                              | -                        | -    |
@@ -151,16 +149,17 @@ export default () => (
 
 ### ContentThrottleOptions
 
-控制流式内容按帧顺序展示的节奏与节流，避免 SSE 一次推送过多导致整段突变。
+控制流式内容按帧顺序展示的节奏与节流，避免 SSE 一次推送过多导致整段突变；并统一承载逐词淡入开关。
 
-| 属性                      | 说明                                       | 类型      | 默认值 |
-| ------------------------- | ------------------------------------------ | --------- | ------ |
-| charsPerFrame             | 每帧最多推进字符数                         | `number`  | `3`    |
-| speed                     | 速度倍率                                   | `number`  | `1`    |
-| flushOnComplete           | 流式结束时是否立即展示剩余内容             | `boolean` | `true` |
-| backgroundInterval        | 标签页不可见时的轮询间隔（毫秒）           | `number`  | `100`  |
-| backgroundBatchMultiplier | 后台每批字符相对前台倍数                   | `number`  | `10`   |
-| enabled                   | 为 `false` 时关闭限流，流式内容即时渲染    | `boolean` | `true` |
+| 属性                      | 说明                                                       | 类型      | 默认值 |
+| ------------------------- | ---------------------------------------------------------- | --------- | ------ |
+| charsPerFrame             | 每帧最多推进字符数                                         | `number`  | `3`    |
+| speed                     | 速度倍率                                                   | `number`  | `1`    |
+| flushOnComplete           | 流式结束时是否立即展示剩余内容                             | `boolean` | `true` |
+| backgroundInterval        | 标签页不可见时的轮询间隔（毫秒）                           | `number`  | `100`  |
+| backgroundBatchMultiplier | 后台每批字符相对前台倍数                                   | `number`  | `10`   |
+| enabled                   | 为 `false` 时关闭限流，流式内容即时渲染                    | `boolean` | `true` |
+| fade                      | GPT 风格逐词淡入开关；仅 `streaming` 时生效，传 `false` 关闭 | `boolean` | `true` |
 
 ### MarkdownToHtmlConfig
 
@@ -211,6 +210,6 @@ export default () => (
 ## 注意事项
 
 1. **`isFinished` vs `streaming`**：流式过程中保持 `streaming={true}`；结束时将 `isFinished` 置为 `true` 会让限流器立即 flush 剩余字符并触发收尾。**`isFinished` 仅在 `streaming={true}` 时生效**；不传也不会卡住，限流器会自然按 `charsPerFrame` 推进完。
-2. **`fadeStreaming` 的语义**：仅在 `streaming={true}` 时生效，默认开启逐词淡入；只有显式传 `false` 才关闭。代码块、表格、公式不参与拆词。
+2. **`throttleOptions.fade` 的语义**：仅在 `streaming={true}` 时生效，默认开启逐词淡入；只有显式传 `throttleOptions={{ fade: false }}` 才关闭。代码块、表格、公式不参与拆词。
 3. **`linkConfig.onClick`**：返回 `false` 可阻止默认跳转，便于实现路由内导航或埋点。
 4. **`eleRender`**：返回 `undefined` / `null` 都会回退到默认 DOM；只有显式返回 React 节点才会覆盖默认渲染。
