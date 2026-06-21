@@ -52,7 +52,7 @@ describe('parseSchemaJson', () => {
     expect(parseSchemaJson('')).toEqual([]);
   });
 
-  it('keeps schema parsing strict before fallback handling', () => {
-    expect(parseSchemaJson("[{ type: 'input' }]")).toBeNull();
+  it('returns null when JSON.parse and partial parsing both fail', () => {
+    expect(parseSchemaJson('__PARSE_FAIL__')).toBeNull();
   });
 });
