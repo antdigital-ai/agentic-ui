@@ -37,7 +37,7 @@ describe('FncLeaf', () => {
 
     const span = container.querySelector('[data-fnc="fnc"]');
     expect(span).toBeInTheDocument();
-    expect(span).toHaveTextContent('[1]');
+    expect(span).toHaveTextContent('1');
   });
 
   it('移动端点击脚注角标应打开 Modal', () => {
