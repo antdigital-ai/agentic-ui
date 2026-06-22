@@ -43,8 +43,8 @@ describe('parseSchemaJson', () => {
     });
   });
 
-  it('不应接受仅 json5 支持的 schema 语法', () => {
-    expect(parseSchemaJson('{type:"form"}')).toBeNull();
+  it('不应按 json5 语义保留宽松 schema 字段', () => {
+    expect(parseSchemaJson('{type:"form"}')).toEqual({});
   });
 
   it('应在严格 JSON 与 partial-json 均失败时返回 null', () => {
