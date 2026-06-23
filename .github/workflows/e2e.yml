@@ -21,16 +21,22 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install pnpm
-        run: npm install -g pnpm
+      - name: Enable Corepack and install dependencies
+        run: |
+          corepack enable
+          pnpm install --frozen-lockfile
 
-      - name: Install dependencies
-        run: pnpm install
+      - name: Check UTF-8 BOM
+        run: pnpm run strip:bom:check
 
       - name: Install Playwright Browsers
         run: pnpm run playwright:install
+
+      - name: Build library and docs for E2E
+        run: pnpm run build && pnpm run docs:build
 
       - name: Run E2E Tests
         run: pnpm run test:e2e
         env:
           CI: true
+          E2E_PREBUILT: '1'

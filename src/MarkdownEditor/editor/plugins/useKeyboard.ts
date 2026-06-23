@@ -13,12 +13,18 @@ import { HistoryEditor } from 'slate-history';
 import { ReactEditor } from 'slate-react';
 import { MarkdownEditorProps } from '../../BaseMarkdownEditor';
 import { EditorStore } from '../store';
+import { isCodeBlockAceInputTarget } from '../utils/codeBlockBehavior';
 import { EditorUtils } from '../utils/editorUtils';
 import { isImeComposing } from '../utils/isImeComposing';
 import { BackspaceKey } from './hotKeyCommands/backspace';
 import { EnterKey } from './hotKeyCommands/enter';
 import { MatchKey } from './hotKeyCommands/match';
 import { TabKey } from './hotKeyCommands/tab';
+import {
+  handleListsOnBackspace,
+  handleListsOnEnter,
+  handleTabWithLists,
+} from './lists';
 
 import { NativeTableKeyboard } from '../../utils/native-table';
 import { useEditorStore } from '../store';
@@ -28,7 +34,6 @@ import { useEditorStore } from '../store';
 // incorrectly split the node into two nodes with Slate's default behavior.
 const SPECIAL_ENTER_BLOCK_TYPES = new Set([
   'list-item',
-  'code',
   'table-cell',
   'head',
   'blockquote',
@@ -121,6 +126,10 @@ export const useKeyboard = (
       // 只读模式下跳过所有键盘处理，提升性能
       if (props.readonly) return;
 
+      if (isCodeBlockAceInputTarget(e.target)) {
+        return;
+      }
+
       const imeActive = isImeComposing(e, store.inputComposition);
 
       // 处理表格键盘事件
@@ -159,6 +168,11 @@ export const useKeyboard = (
       }
       if (isHotkey('backspace', e) && markdownEditorRef.current.selection) {
         if (Range.isCollapsed(markdownEditorRef.current.selection)) {
+          if (handleListsOnBackspace(markdownEditorRef.current, e)) {
+            e.stopPropagation();
+            e.preventDefault();
+            return;
+          }
           if (backspace.run()) {
             e.stopPropagation();
             e.preventDefault();
@@ -225,9 +239,20 @@ export const useKeyboard = (
         return;
       }
 
-      if (e.key === 'Tab') tab.run(e);
+      if (e.key === 'Tab') {
+        if (handleTabWithLists(markdownEditorRef.current, e)) {
+          return;
+        }
+        tab.run(e);
+        return;
+      }
 
-      // Enter 发送，Shift+Enter 换行
+      if (e.key === 'Enter' && !imeActive && handleListsOnEnter(markdownEditorRef.current, e)) {
+        e.stopPropagation();
+        e.preventDefault();
+        return;
+      }
+
       if (
         e.key === 'Enter' &&
         e.shiftKey &&
@@ -239,7 +264,7 @@ export const useKeyboard = (
         enter.run(e);
         return;
       }
-      // Enter 键（无 Shift）处理：如果在特殊块类型中（列表项、代码块等），让 EnterKey 处理；否则由 MarkdownInputField 处理发送
+      // Enter 键（无 Shift）处理：如果在特殊块类型中（代码块等），让 EnterKey 处理；否则由 MarkdownInputField 处理发送
       if (
         e.key === 'Enter' &&
         !(e.ctrlKey || e.metaKey) &&

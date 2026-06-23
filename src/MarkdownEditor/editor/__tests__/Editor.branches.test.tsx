@@ -30,6 +30,7 @@ vi.mock('slate', () => ({
   Editor: {
     fragment: vi.fn(() => []),
     hasPath: vi.fn(() => true),
+    insertText: vi.fn(),
     node: vi.fn(() => [{ type: 'paragraph', children: [{ text: '' }] }, [0]]),
     nodes: vi.fn(function* () {}),
     start: vi.fn(() => ({ path: [0, 0], offset: 0 })),
@@ -87,6 +88,12 @@ vi.mock('slate-react', () => ({
     toDOMNode: vi.fn(() => document.createElement('div')),
   },
 }));
+vi.mock('../components/EditorEditable', () => ({
+  EditorEditable: (props: Record<string, any>) => {
+    editableProps = props;
+    return React.createElement('div', { 'data-testid': 'mock-editable' });
+  },
+}));
 
 vi.mock('../../../Hooks/useRefFunction', () => ({
   useRefFunction: (fn: (...args: any[]) => any) => fn,
@@ -126,8 +133,13 @@ vi.mock('../plugins/handlePaste', () => ({
   handlePlainTextPaste: vi.fn(async () => false),
 }));
 
+vi.mock('../plugins/parseMarkdownToNodesAndInsert', () => ({
+  parseMarkdownToNodesAndInsert: vi.fn(() => true),
+}));
+
 vi.mock('../utils', () => ({
   MARKDOWN_EDITOR_EVENTS: { SELECTIONCHANGE: 'md-selectionchange' },
+  copy: vi.fn((value: unknown) => JSON.parse(JSON.stringify(value))),
   parserSlateNodeToMarkdown: vi.fn(() => 'mock-md'),
 }));
 
@@ -177,6 +189,7 @@ import { ReactEditor } from 'slate-react';
 import { PluginContext } from '../../plugin';
 import { SlateMarkdownEditor } from '../Editor';
 import * as handlePasteModule from '../plugins/handlePaste';
+import { parseMarkdownToNodesAndInsert } from '../plugins/parseMarkdownToNodesAndInsert';
 import { parserSlateNodeToMarkdown } from '../utils';
 import {
   EditorUtils,
@@ -633,10 +646,6 @@ describe('Editor branches - handleClipboardCopy', () => {
       expect.any(String),
     );
     expect(event.clipboardData.setData).toHaveBeenCalledWith(
-      'text/plain',
-      expect.any(String),
-    );
-    expect(event.clipboardData.setData).toHaveBeenCalledWith(
       'text/markdown',
       expect.any(String),
     );
@@ -707,7 +716,7 @@ describe('Editor branches - handleClipboardCopy', () => {
     expect(event.clipboardData.clearData).toHaveBeenCalled();
     expect(event.clipboardData.setData).not.toHaveBeenCalled();
     expect(ReactEditor.setFragmentData).not.toHaveBeenCalled();
-    expect(event.preventDefault).toHaveBeenCalled();
+    expect(event.preventDefault).not.toHaveBeenCalled();
   });
 
   it('cut gets selection from DOM, deletes content, and sets clipboard', () => {
@@ -747,7 +756,7 @@ describe('Editor branches - handleClipboardCopy', () => {
     window.getSelection = origGetSelection;
   });
 
-  it('copy/cut with no selection returns false and calls preventDefault fallback', () => {
+  it('copy/cut with no selection lets native clipboard fallback run', () => {
     const { editor } = setupStore({ readonly: false });
     editor.selection = null;
     vi.mocked(isEventHandled).mockReturnValue(false);
@@ -766,11 +775,10 @@ describe('Editor branches - handleClipboardCopy', () => {
     } as any;
 
     editableProps.onCopy(event);
-    // handleClipboardCopy returns false → onCopy calls preventDefault
-    expect(event.preventDefault).toHaveBeenCalled();
+    expect(event.preventDefault).not.toHaveBeenCalled();
   });
 
-  it('copy/cut with isEventHandled returns false and calls preventDefault fallback', () => {
+  it('copy/cut with isEventHandled lets native clipboard fallback run', () => {
     setupStore({ readonly: false });
     vi.mocked(isEventHandled).mockReturnValue(true);
 
@@ -786,7 +794,7 @@ describe('Editor branches - handleClipboardCopy', () => {
     } as any;
 
     editableProps.onCopy(event);
-    expect(event.preventDefault).toHaveBeenCalled();
+    expect(event.preventDefault).not.toHaveBeenCalled();
   });
 
   it('clipboard inner error catch returns false', () => {
@@ -797,9 +805,8 @@ describe('Editor branches - handleClipboardCopy', () => {
     };
     vi.mocked(isEventHandled).mockReturnValue(false);
     vi.mocked(hasEditableTarget).mockReturnValue(true);
-    // Make toDOMRange throw
-    vi.mocked(ReactEditor.toDOMRange).mockImplementation(() => {
-      throw new Error('toDOMRange error');
+    vi.mocked(ReactEditor.setFragmentData).mockImplementation(() => {
+      throw new Error('setFragmentData error');
     });
 
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -1018,6 +1025,80 @@ describe('Editor branches - handlePasteEvent', () => {
     expect(handlePasteModule.handleHtmlPaste).toHaveBeenCalled();
   });
 
+  it('Word HTML paste converts through markdown before HTML fallback', async () => {
+    const { editor } = setupStore({ readonly: false });
+    const wordHtml = [
+      '<html><head>',
+      '<meta name="Generator" content="Microsoft Word 16">',
+      '</head><body>',
+      '<p class="MsoNormal">Word&nbsp;text<o:p></o:p></p>',
+      '</body></html>',
+    ].join('');
+
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
+    vi.mocked(Editor.hasPath).mockReturnValue(true);
+    vi.mocked(handlePasteModule.handleTagNodePaste).mockReturnValue(false);
+
+    renderEditor({});
+
+    const event = {
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      clipboardData: createClipboardData({
+        types: ['text/html'],
+        getData: (t: string) => (t === 'text/html' ? wordHtml : ''),
+      }),
+      target: document.createElement('div'),
+    } as any;
+
+    editableProps.onPaste(event);
+    await flushPromises();
+
+    expect(parseMarkdownToNodesAndInsert).toHaveBeenCalledWith(
+      editor,
+      'Word text',
+      [],
+    );
+    expect(handlePasteModule.handleHtmlPaste).not.toHaveBeenCalled();
+  });
+
+  it('Word HTML paste respects convertWordToMarkdown false', async () => {
+    const { editor } = setupStore({ readonly: false });
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
+    vi.mocked(Editor.hasPath).mockReturnValue(true);
+    vi.mocked(handlePasteModule.handleTagNodePaste).mockReturnValue(false);
+    vi.mocked(handlePasteModule.handleHtmlPaste).mockResolvedValue(true);
+
+    renderEditor({
+      pasteConfig: { convertWordToMarkdown: false },
+    });
+
+    const event = {
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      clipboardData: createClipboardData({
+        types: ['text/html'],
+        getData: (t: string) =>
+          t === 'text/html'
+            ? '<p class="MsoNormal">Fallback through HTML</p>'
+            : '',
+      }),
+      target: document.createElement('div'),
+    } as any;
+
+    editableProps.onPaste(event);
+    await flushPromises();
+
+    expect(parseMarkdownToNodesAndInsert).not.toHaveBeenCalled();
+    expect(handlePasteModule.handleHtmlPaste).toHaveBeenCalled();
+  });
+
   it('HTML paste returns false continues to next handler', async () => {
     const { editor } = setupStore({ readonly: false });
     editor.selection = {
@@ -1063,6 +1144,11 @@ describe('Editor branches - handlePasteEvent', () => {
       stopPropagation: vi.fn(),
       clipboardData: createClipboardData({
         types: ['Files'],
+        files: [
+          new File(['image'], 'pasted.png', {
+            type: 'image/png',
+          }),
+        ],
         getData: vi.fn(() => ''),
       }),
       target: document.createElement('div'),
@@ -1473,6 +1559,16 @@ describe('Editor branches - onSlateChange', () => {
     expect(mockOnChange).not.toHaveBeenCalled();
   });
 
+  it('first content-changing call still triggers onChange (e.g. void code block)', () => {
+    const { editor } = setupStore({ readonly: false });
+    renderEditor({});
+
+    editor.operations = [{ type: 'set_node' }];
+    slateOnChange!([{ type: 'code', value: 'x', children: [{ text: '' }] }]);
+
+    expect(mockOnChange).toHaveBeenCalled();
+  });
+
   it('after timer, subsequent calls trigger onChange and detect content changes', () => {
     const { editor } = setupStore({ readonly: false });
     renderEditor({});
@@ -1492,7 +1588,7 @@ describe('Editor branches - onSlateChange', () => {
     expect(mockOnChange).toHaveBeenCalled();
   });
 
-  it('set_selection only operations do not mark content changed', () => {
+  it('set_selection only operations remain ignored before first content change', () => {
     const { editor } = setupStore({ readonly: false });
     renderEditor({});
 
@@ -1502,7 +1598,7 @@ describe('Editor branches - onSlateChange', () => {
     editor.operations = [{ type: 'set_selection' }];
     slateOnChange!([{ type: 'paragraph', children: [{ text: '' }] }]);
 
-    expect(mockOnChange).toHaveBeenCalled();
+    expect(mockOnChange).not.toHaveBeenCalled();
   });
 });
 
@@ -1602,7 +1698,7 @@ describe('Editor branches - onCompositionStart/End', () => {
   });
 
   it('compositionStart sets data-composition and inputComposition', () => {
-    const { editor } = setupStore({ readonly: false });
+    const { editor, container } = setupStore({ readonly: false });
     editor.selection = {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [0, 0], offset: 0 },
@@ -1615,6 +1711,7 @@ describe('Editor branches - onCompositionStart/End', () => {
     editableProps.onCompositionStart(event);
 
     expect(mockStoreConfig.store.inputComposition).toBe(true);
+    expect(container.hasAttribute('data-composition')).toBe(true);
     // preventDefault は移动端互換性のため呼び出さない：
     // 移动端键盘通过 IME 组合事件输入，调用 preventDefault 会阻断
     // 字符写入 contenteditable，导致占位符无法消失。
@@ -1705,6 +1802,25 @@ describe('Editor branches - onCompositionStart/End', () => {
       });
     });
     expect(mockStoreConfig.store.inputComposition).toBe(false);
+  });
+
+  it('compositionEnd 在 Slate 未落盘时补写 IME 文本', async () => {
+    const { editor } = setupStore({ readonly: false });
+    editor.children = [{ type: 'paragraph', children: [{ text: '' }] }];
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
+    vi.mocked(Range.isCollapsed).mockReturnValue(true);
+
+    renderEditor({});
+
+    editableProps.onCompositionEnd({ data: '，' });
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(Editor.insertText).toHaveBeenCalledWith(editor, '，');
   });
 
   it('compositionEnd with tag-popup-input removes data-composition', () => {
@@ -1952,7 +2068,7 @@ describe('Editor branches - readonlyCls and childrenIsEmpty', () => {
     expect(editableProps.className).toContain('readonly');
   });
 
-  it('non-readonly with non-empty content applies focus class', () => {
+  it('non-readonly with non-empty content does not apply empty paragraph focus class', () => {
     const { editor } = setupStore({ readonly: false });
     editor.children = [{ type: 'paragraph', children: [{ text: 'content' }] }];
 
@@ -1960,8 +2076,8 @@ describe('Editor branches - readonlyCls and childrenIsEmpty', () => {
       initSchemaValue: [{ type: 'paragraph', children: [{ text: 'content' }] }],
     });
 
-    // Should include 'focus' class when content is not empty
-    expect(editableProps.className).toContain('focus');
+    expect(editableProps.className).toContain('ant-md-content-edit');
+    expect(editableProps.className).not.toContain('ant-md-content-focus');
   });
 
   it('non-readonly with only non-empty paragraphs has empty readonlyCls', () => {

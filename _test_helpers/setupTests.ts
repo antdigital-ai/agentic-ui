@@ -6,8 +6,32 @@ import { vi } from 'vitest';
 import { setupLottieMock } from './_mocks_/lottieMock';
 import { setupGlobalMocks } from './_mocks_/sharedMocks';
 
+// antd Anchor/Tabs 等组件的 scrollTo 动画在 teardown 后仍可能触发 rAF/setTimeout；
+// happy-dom 未暴露全局 Document 时，回调里 `instanceof Document` 会抛未捕获异常。
+const { noopAntdScrollTo } = vi.hoisted(() => ({
+  noopAntdScrollTo: vi.fn((_y: number, options?: { callback?: () => void }) => {
+    options?.callback?.();
+  }),
+}));
+
+vi.mock('antd/lib/_util/scrollTo', () => ({
+  default: noopAntdScrollTo,
+}));
+
+vi.mock('antd/es/_util/scrollTo', () => ({
+  default: noopAntdScrollTo,
+}));
+
 // happy-dom 会自动创建完整的 window/document，无需手动覆盖。
 MotionGlobalConfig.skipAnimations = true;
+
+if (typeof globalThis.Document === 'undefined' && typeof document !== 'undefined') {
+  Object.defineProperty(globalThis, 'Document', {
+    configurable: true,
+    writable: true,
+    value: document.constructor,
+  });
+}
 
 // Mock ace-builds 模块，避免在测试环境中加载真实的 ace 库
 vi.mock('ace-builds/src-noconflict/ext-modelist', () => ({

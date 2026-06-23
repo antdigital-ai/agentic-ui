@@ -1,4 +1,4 @@
-﻿import type { CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 import type { AttachmentFile } from '../../../../MarkdownInputField/AttachmentButton/types';
 import { normalizeTaskContent } from '../../../../TaskList/normalizeTaskContent';
 import type {

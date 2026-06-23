@@ -1,4 +1,4 @@
-﻿import {
+import {
   BoxAndWiskers,
   BoxPlotController,
 } from '@sgratzl/chartjs-chart-boxplot';

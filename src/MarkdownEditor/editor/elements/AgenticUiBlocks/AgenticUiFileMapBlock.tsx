@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { RenderElementProps } from 'slate-react';
 import { FileMapView } from '../../../../MarkdownInputField/FileMapView';
 import { normalizeFileMapPropsFromJson } from './agenticUiEmbedUtils';
@@ -8,10 +8,14 @@ export const AgenticUiFileMapBlock: React.FC<RenderElementProps> = ({
   children,
   element,
 }) => {
-  const { fileList, className } = normalizeFileMapPropsFromJson(
-    (element as any).value,
+  const { fileList, className } = useMemo(
+    () => normalizeFileMapPropsFromJson((element as any).value),
+    [(element as any).value],
   );
-  const fileMap = new Map(fileList.map((f) => [f.uuid || f.name, f]));
+  const fileMap = useMemo(
+    () => new Map(fileList.map((f) => [f.uuid || f.name, f])),
+    [fileList],
+  );
 
   return (
     <div

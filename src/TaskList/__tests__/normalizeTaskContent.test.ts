@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { describe, expect, it } from 'vitest';
 import {
   hasNormalizedTaskContent,
@@ -30,12 +30,20 @@ describe('normalizeTaskContent', () => {
       'web_fetch · url',
     );
     expect(normalizeTaskContent({}, 'exec · bash')).toBe('exec · bash');
+    expect(normalizeTaskContent('', 0)).toBe('0');
   });
 
   it('空白字符串正文回退 title', () => {
     expect(normalizeTaskContent('   ', 'fallback title')).toBe(
       'fallback title',
     );
+  });
+
+  it('保留 falsy 但有效的正文值', () => {
+    expect(normalizeTaskContent(0, 'fallback title')).toBe('0');
+    expect(normalizeTaskContent(false, 'fallback title')).toBe('false');
+    expect(hasNormalizedTaskContent(0)).toBe(true);
+    expect(hasNormalizedTaskContent(false)).toBe(true);
   });
 
   it('数组 content join 为多行', () => {

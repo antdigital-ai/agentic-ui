@@ -1,4 +1,4 @@
-﻿export type TableChromePosition = {
+export type TableChromePosition = {
   rowIndex?: number;
   columnIndex?: number;
 } | null;

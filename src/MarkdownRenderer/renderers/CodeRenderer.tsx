@@ -1,4 +1,4 @@
-﻿import copy from 'copy-to-clipboard';
+import copy from 'copy-to-clipboard';
 import React, { useMemo, useState } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import type { CodeNode } from '../../MarkdownEditor/el';

@@ -1,4 +1,4 @@
-﻿---
+---
 title: TaskList 任务列表
 atomId: TaskList
 group:
@@ -56,8 +56,9 @@ group:
 - **摘要文案优先级**（由高到低）：
   1. 全部 item 为 `success` → 「任务完成」（或 `taskCompleteText`）；**不因** `loading={true}` 滞留为进行中。
   2. 存在 `status: 'loading'` 或 `pending` 的 item → 「正在进行${title}任务」。
-  3. 存在 `error` 且无 loading item → 「任务已取消」。
-  4. `loading={true}` 或仅有 `pending` → 「正在进行任务」。
+  3. `loading={true}` 或仅有 `pending` → 「正在进行任务」。
+
+  存在 `error` 的 item 不参与摘要完成判定；当其余 item 均为 `success` 时摘要仍显示完成态，不在摘要条展示「任务已取消」。展开详情时仍可查看 `error` 步骤。
 
 工具调用时间线若需逐步 API 展示，可优先考虑 [ToolUseBar](/components/tool-use-bar)；继续用 TaskList simple 时请接受收起时仅显示最后一步，并保证流式结束后 `loading={false}`、item `status` 与内容字段正确。
 

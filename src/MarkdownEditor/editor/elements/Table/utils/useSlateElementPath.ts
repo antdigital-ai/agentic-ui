@@ -1,4 +1,4 @@
-﻿import { useMemo } from 'react';
+import { useMemo } from 'react';
 import { ReactEditor } from 'slate-react';
 import { useEditorStore } from '../../../store';
 

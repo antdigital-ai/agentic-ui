@@ -1,4 +1,4 @@
-﻿import React, { type ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
 import type { MarkdownEditorProps } from '../MarkdownEditor';
 import type { BrowserProps as InternalBrowserProps } from './Browser';
 import type { RealtimeFollowData } from './RealtimeFollow';

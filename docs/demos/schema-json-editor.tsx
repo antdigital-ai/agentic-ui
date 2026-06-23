@@ -1,4 +1,4 @@
-﻿import {
+import {
   LowCodeSchema,
   SchemaRenderer,
   validator,

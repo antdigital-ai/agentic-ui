@@ -163,11 +163,11 @@ describe('parserSlateNodeToMarkdown targeted coverage', () => {
     circular.self = circular;
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-    expect(() =>
-      parserSlateNodeToMarkdown([
-        { type: 'code', language: 'json', value: circular },
-      ] as any),
-    ).toThrow();
+    const circularResult = parserSlateNodeToMarkdown([
+      { type: 'code', language: 'json', value: circular },
+    ] as any);
+    expect(warnSpy).toHaveBeenCalled();
+    expect(circularResult).toContain('```json');
 
     const marker = '\u200B';
     const thinkValue = `${marker}【CODE_BLOCK:js】\nconsole.log(1)\n【/CODE_BLOCK】${marker}`;
@@ -783,8 +783,9 @@ describe('parserSlateNodeToMarkdown targeted coverage', () => {
         children: [{ text: 'new_value' }],
       },
     ] as any);
-    expect(result).toContain('new_value');
-    expect(result).not.toContain('old_value');
+    // void 块级 code 以 value 为准；仅当 children 更长（流式）时才覆盖 value
+    expect(result).toContain('old_value');
+    expect(result).not.toContain('new_value');
   });
 
   it('覆盖 code with frontmatter', () => {

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  canRenderQuadrantChart,
   canResolveDocCardsTitleColumn,
   columnKeyMatchesConfiguredField,
   DOC_CARDS_FIELD_ALIASES,
@@ -119,6 +120,18 @@ describe('columnMatching', () => {
 
     it('什么都不命中时 false', () => {
       expect(canResolveDocCardsTitleColumn(['col1', 'col2'])).toBe(false);
+    });
+  });
+
+  describe('canRenderQuadrantChart', () => {
+    it('至少 1 列且至少 1 行数据时允许渲染', () => {
+      expect(canRenderQuadrantChart(['象限'], 1)).toBe(true);
+      expect(canRenderQuadrantChart(['象限', '内容'], 4)).toBe(true);
+    });
+
+    it('无列或无数据行时不允许渲染', () => {
+      expect(canRenderQuadrantChart([], 1)).toBe(false);
+      expect(canRenderQuadrantChart(['象限'], 0)).toBe(false);
     });
   });
 });

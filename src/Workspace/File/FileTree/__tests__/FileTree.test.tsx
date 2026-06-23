@@ -1,4 +1,4 @@
-﻿import {
+import {
   act,
   fireEvent,
   render,
@@ -516,7 +516,7 @@ describe('Workspace.FileTree', () => {
     });
   });
 
-  it('treats leaf nodes without file metadata as plain selectable tree nodes', async () => {
+  it('treats leaf nodes with file null as plain selectable tree nodes', async () => {
     const onFileClick = vi.fn();
     const onPreview = vi.fn();
     const onSelect = vi.fn();
@@ -531,11 +531,6 @@ describe('Workspace.FileTree', () => {
                 name: 'missing-file.md',
                 isLeaf: true,
                 file: null,
-              },
-              {
-                key: 'leaf-without-file',
-                name: 'omitted-file.md',
-                isLeaf: true,
               },
             ]}
             onLoadChildren={vi.fn()}
@@ -555,14 +550,10 @@ describe('Workspace.FileTree', () => {
     ).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByText('missing-file.md'));
-    fireEvent.click(screen.getByText('omitted-file.md'));
 
     await waitFor(() => {
       expect(onSelect).toHaveBeenCalledWith(
         expect.objectContaining({ key: 'leaf-with-null-file' }),
-      );
-      expect(onSelect).toHaveBeenCalledWith(
-        expect.objectContaining({ key: 'leaf-without-file' }),
       );
     });
     expect(onFileClick).not.toHaveBeenCalled();

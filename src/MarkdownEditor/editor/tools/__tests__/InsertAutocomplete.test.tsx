@@ -11,7 +11,6 @@ import { Subject } from 'rxjs';
 import { Editor, Node, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { selChange$ } from '../../plugins/useOnchange';
 import { getRemoteMediaType } from '../../utils/media';
 import {
   getInsertOptions,
@@ -115,12 +114,13 @@ vi.mock('../../../../I18n', () => ({
   LocalKeys: {},
 }));
 
-vi.mock('../../plugins/useOnchange', () => ({
-  selChange$: {
-    next: vi.fn(),
-    subscribe: vi.fn(() => ({ unsubscribe: vi.fn() })),
-  },
-}));
+vi.mock('../../plugins/useOnchange', () => ({}));
+
+const mockSelChangeNext = vi.fn();
+const mockSelChange$ = {
+  next: mockSelChangeNext,
+  subscribe: vi.fn(() => ({ unsubscribe: vi.fn() })),
+};
 
 vi.mock('../../utils/dom', () => ({
   getOffsetLeft: vi.fn(() => 24),
@@ -213,6 +213,7 @@ function getDefaultStore() {
     setOpenInsertCompletion,
     keyTask$: { next: keyTaskNext },
     insertCompletionText$,
+    selChange$: mockSelChange$,
   };
 }
 
@@ -1065,7 +1066,7 @@ describe('InsertAutocomplete insertAttachment', () => {
         await act(async () => {});
         expect(fetch).toHaveBeenCalledWith('https://example.com/file.pdf');
         expect(Transforms.setNodes).toHaveBeenCalled();
-        expect(selChange$.next).toHaveBeenCalled();
+        expect(mockSelChangeNext).toHaveBeenCalled();
       }
     }
   });

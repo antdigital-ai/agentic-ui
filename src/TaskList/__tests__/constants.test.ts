@@ -1,4 +1,4 @@
-﻿import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { getTaskStatusStyleKey, isTaskInProgress } from '../constants';
 
 describe('TaskList constants', () => {

@@ -11,6 +11,11 @@ export function useContentThrottle(
   options?: ContentThrottleOptions,
   isFinished?: boolean,
 ): string {
+  const charsPerFrame = options?.charsPerFrame;
+  const speed = options?.speed;
+  const flushOnComplete = options?.flushOnComplete;
+  const backgroundInterval = options?.backgroundInterval;
+  const backgroundBatchMultiplier = options?.backgroundBatchMultiplier;
   const [displayed, setDisplayed] = useState(() =>
     enabled && !isFinished ? '' : content,
   );
@@ -34,6 +39,18 @@ export function useContentThrottle(
     engineRef.current.push(content);
     if (isFinished) engineRef.current.complete();
   }, [content, enabled, isFinished]);
+
+  useEffect(() => {
+    if (!enabled || !engineRef.current) return;
+    engineRef.current.setOptions(optionsRef.current);
+  }, [
+    enabled,
+    charsPerFrame,
+    speed,
+    flushOnComplete,
+    backgroundInterval,
+    backgroundBatchMultiplier,
+  ]);
 
   useEffect(
     () => () => {

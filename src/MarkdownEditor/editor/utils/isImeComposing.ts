@@ -1,10 +1,22 @@
+import { Editor, Range } from 'slate';
+
+/** 读取光标所在文本节点的纯文本，供 IME commit 回退比对 */
+export function getEditorTextSnapshot(
+  editor: Editor | null | undefined,
+): string {
+  if (!editor?.selection) return '';
+  try {
+    return Editor.string(editor, editor.selection.focus.path);
+  } catch {
+    return '';
+  }
+}
+
 /** Chrome / Edge：IME 组合期间 keydown 的 keyCode 常为 229 */
 export const IME_PROCESSING_KEY_CODE = 229;
 
-/** compositionend 后短暂窗口内，紧随的 Enter 仍视为 IME 确认选字 */
-const IME_ENTER_COMMIT_GUARD_MS = 200;
-
-let imeEnterCommitGuardUntil = 0;
+/** compositionend 后下一记 Enter 仍视为 IME 确认选字（无固定毫秒窗口） */
+let imeEnterCommitGuardPending = false;
 
 export interface ImeKeyboardEventLike {
   key?: string;
@@ -14,14 +26,20 @@ export interface ImeKeyboardEventLike {
 
 /**
  * compositionend 后标记：下一记 Enter 多为确认选字，勿触发发送或 / 快捷面板。
+ * 仅消费一次；未命中时应在双 rAF 后调用 clearImeEnterCommitGuard 清除。
  */
 export function markImeEnterCommitGuard(): void {
-  imeEnterCommitGuardUntil = Date.now() + IME_ENTER_COMMIT_GUARD_MS;
+  imeEnterCommitGuardPending = true;
 }
 
-/** 测试用：重置 Enter 守卫时间戳 */
+/** compositionend 双 rAF 后清除未消费的 Enter 守卫 */
+export function clearImeEnterCommitGuard(): void {
+  imeEnterCommitGuardPending = false;
+}
+
+/** 测试用：重置 Enter 守卫 */
 export function resetImeEnterCommitGuardForTests(): void {
-  imeEnterCommitGuardUntil = 0;
+  imeEnterCommitGuardPending = false;
 }
 
 /**
@@ -38,7 +56,8 @@ export function isImeComposing(
   if (inputComposition) return true;
   if (event.nativeEvent?.isComposing) return true;
   if (event.keyCode === IME_PROCESSING_KEY_CODE) return true;
-  if (event.key === 'Enter' && Date.now() < imeEnterCommitGuardUntil) {
+  if (event.key === 'Enter' && imeEnterCommitGuardPending) {
+    imeEnterCommitGuardPending = false;
     return true;
   }
   return false;
@@ -54,9 +73,11 @@ export function scheduleClearInputComposition(clear: () => void): () => void {
     if (!cancelled) clear();
   };
 
-  if (typeof requestAnimationFrame === 'function') {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(runClear);
+  const requestAnimationFrameFn = globalThis.requestAnimationFrame;
+
+  if (typeof requestAnimationFrameFn === 'function') {
+    requestAnimationFrameFn(() => {
+      requestAnimationFrameFn(runClear);
     });
   } else {
     setTimeout(runClear, 0);
@@ -65,4 +86,36 @@ export function scheduleClearInputComposition(clear: () => void): () => void {
   return () => {
     cancelled = true;
   };
+}
+
+/**
+ * Windows Chrome + 中文 IME 全角标点：slate-react 在 compositionend 依赖
+ * event.data 写入 Slate；若与 React 渲染竞态导致内容未落盘，在 microtask 中补写。
+ * 已写入则跳过，避免重复字符。
+ */
+export function commitImeCompositionTextIfMissing(
+  editor: Editor | null | undefined,
+  composedText: string,
+  getTextSnapshot: (editor: Editor) => string,
+): void {
+  if (!editor?.selection || !composedText || !Range.isCollapsed(editor.selection)) {
+    return;
+  }
+
+  const textBefore = getTextSnapshot(editor);
+
+  queueMicrotask(() => {
+    if (!editor.selection || !Range.isCollapsed(editor.selection)) {
+      return;
+    }
+
+    const textAfter = getTextSnapshot(editor);
+    if (textAfter.endsWith(composedText) && textAfter.length >= textBefore.length) {
+      return;
+    }
+
+    if (textAfter.length === textBefore.length) {
+      Editor.insertText(editor, composedText);
+    }
+  });
 }

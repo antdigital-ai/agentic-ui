@@ -1,4 +1,4 @@
-﻿import {
+import {
   MARKDOWN_EDITOR_EVENTS,
   MarkdownEditor,
   MarkdownEditorInstance,

@@ -22,27 +22,25 @@ export function Head({
   const [selected, path] = useSelStatus(element);
   const str = Node.string(element);
 
-  return React.useMemo(() => {
-    return createElement(
-      `h${element.level}`,
-      {
-        ...attributes,
-        id: slugify(str),
-        ['data-be']: 'head',
-        ['data-head']: slugify(Node.string(element) || ''),
-        ['data-title']: path?.[0] === 0,
-        onDragStart: (e) => {
-          store.dragStart(e, markdownContainerRef.current!);
-        },
-        ['data-empty']: !str && selected ? 'true' : undefined,
-        ['data-align']: element.align,
-        ['data-drag-el']: true,
-        style: { textAlign: element.align },
-        className: classNames({
-          empty: !str,
-        }),
+  return createElement(
+    `h${element.level}`,
+    {
+      ...attributes,
+      id: slugify(str),
+      ['data-be']: 'head',
+      ['data-head']: slugify(Node.string(element) || ''),
+      ['data-title']: path?.[0] === 0,
+      onDragStart: (e) => {
+        store.dragStart(e, markdownContainerRef.current!);
       },
-      <>{children}</>,
-    );
-  }, [element.level, str, element.children, selected, path]);
+      ['data-empty']: !str && selected ? 'true' : undefined,
+      ['data-align']: element.align,
+      ['data-drag-el']: true,
+      style: { textAlign: element.align },
+      className: classNames({
+        empty: !str,
+      }),
+    },
+    <>{children}</>,
+  );
 }

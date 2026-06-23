@@ -1,4 +1,4 @@
-﻿import { ConfigProvider } from 'antd';
+import { ConfigProvider } from 'antd';
 import { ChartData, Chart as ChartJS, ChartOptions } from 'chart.js';
 import classNames from 'clsx';
 import React, { useContext, useLayoutEffect, useMemo, useRef } from 'react';

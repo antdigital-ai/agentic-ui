@@ -1,4 +1,4 @@
-﻿import { QuadrantChart } from '@ant-design/agentic-ui';
+import { QuadrantChart } from '@ant-design/agentic-ui';
 import { Tag } from 'antd';
 import React from 'react';
 

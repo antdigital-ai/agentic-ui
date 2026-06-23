@@ -34,8 +34,6 @@ import { CommentLeaf } from './CommentLeaf';
 import { FncLeaf } from './FncLeaf';
 import { FootnoteDefinition } from './FootnoteDefinition';
 import { ReadonlyFootnoteDefinition } from './FootnoteDefinition/ReadonlyFootnoteDefinition';
-import { FootnoteReference } from './FootnoteReference';
-import { ReadonlyFootnoteReference } from './FootnoteReference/ReadonlyFootnoteReference';
 import { Head } from './Head';
 import { ReadonlyHead } from './Head/ReadonlyHead';
 import { Hr } from './Hr';
@@ -275,12 +273,6 @@ const MElementComponent = (
         <ReadonlyFootnoteDefinition {...readonlyElementProps} />
       ) : (
         <FootnoteDefinition {...props} />
-      );
-    case 'footnoteReference':
-      return props.readonly ? (
-        <ReadonlyFootnoteReference {...readonlyElementProps} />
-      ) : (
-        <FootnoteReference {...props} />
       );
     case 'card':
       return props.readonly ? (
@@ -532,7 +524,7 @@ const MLeafComponent = (
   if (leaf.italic) {
     style.fontStyle = 'italic';
   }
-  if (leaf.mark) {
+  if (leaf.mark && (leaf.text?.length ?? 0) > 0) {
     const markStyle: React.CSSProperties = {};
     if (leaf.markColor) markStyle.color = leaf.markColor;
     if (leaf.markBg) markStyle.backgroundColor = leaf.markBg;
@@ -644,7 +636,7 @@ const MLeafComponent = (
     } catch (e) {}
   };
 
-  // 如果检测到 fnc、identifier 或 fnd，使用 FncLeaf 组件
+  // 如果检测到 fnc、identifier 或 fnd，使用 FncLeaf 渲染脚注
   const hasFnc = leaf.fnc || leaf.identifier || leaf.fnd;
   const hasComment = !!leaf.comment;
 
@@ -736,7 +728,6 @@ export {
   ReadonlyCode,
   ReadonlyEditorImage,
   ReadonlyFootnoteDefinition,
-  ReadonlyFootnoteReference,
   ReadonlyHead,
   ReadonlyHr,
   ReadonlyInlineKatex,

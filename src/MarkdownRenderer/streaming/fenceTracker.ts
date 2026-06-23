@@ -1,4 +1,4 @@
-﻿export interface FenceState {
+export interface FenceState {
   inFenced: boolean;
   fenceChar: string;
   fenceLen: number;

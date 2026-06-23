@@ -1,12 +1,19 @@
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
-import React, { CSSProperties, useContext, useMemo } from 'react';
+import React, { CSSProperties, useContext, useMemo, useState } from 'react';
 import { RenderLeafProps } from 'slate-react';
 
 import { useRefFunction } from '../../../../Hooks/useRefFunction';
 import { isMobileDevice } from '../../../../MarkdownInputField/AttachmentButton/utils';
 import { MarkdownEditorProps } from '../../../types';
+import { EditorStoreContext } from '../../editorStoreContext';
+import {
+  extractFootnoteDefinitionIdentifier,
+  formatFootnoteRefDisplayLabel,
+  resolveFootnoteRefIdentifier,
+} from '../../utils/footnoteDisplay';
 import { dragStart } from '../index';
+import { FncLeafMobileModal } from './FncLeafMobileModal';
 
 interface FncLeafProps extends RenderLeafProps {
   fncProps: MarkdownEditorProps['fncProps'];
@@ -16,7 +23,7 @@ interface FncLeafProps extends RenderLeafProps {
 }
 
 /**
- * FncLeaf 组件：专门处理 fnc（函数调用）和 fnd（函数定义）类型的叶子节点
+ * FncLeaf：脚注引用（fnc）与行内脚注定义标记（fnd）的叶子渲染
  */
 export const FncLeaf = ({
   attributes,
@@ -31,8 +38,21 @@ export const FncLeaf = ({
   const mdEditorBaseClass = context?.getPrefixCls('agentic-md-editor-content');
   const isMobile = isMobileDevice();
   const hasFnc = leaf.fnc || leaf.identifier;
+  const store = useContext(EditorStoreContext)?.store;
+  const [mobileModalOpen, setMobileModalOpen] = useState(false);
 
-  // 使用 useMemo 优化 className 计算
+  const resolvedIdentifier = useMemo(
+    () => resolveFootnoteRefIdentifier(leaf.text, leaf.identifier),
+    [leaf.text, leaf.identifier],
+  );
+
+  const footnoteDefinition = useMemo(() => {
+    if (!resolvedIdentifier || !store?.footnoteDefinitionMap?.get) {
+      return undefined;
+    }
+    return store.footnoteDefinitionMap.get(resolvedIdentifier);
+  }, [resolvedIdentifier, store?.footnoteDefinitionMap]);
+
   const fncClassName = useMemo(
     () =>
       classNames({
@@ -42,31 +62,28 @@ export const FncLeaf = ({
     [prefixClassName, mdEditorBaseClass, leaf.fnc, leaf.fnd],
   );
 
-  // 使用 useMemo 优化文本格式化计算
+  const displayLabel = useMemo(
+    () => formatFootnoteRefDisplayLabel(leaf.text, leaf.identifier),
+    [leaf.text, leaf.identifier],
+  );
+
   const formattedText = useMemo(() => {
     if (leaf.fnc || leaf.identifier) {
-      return (
-        leaf.text
-          ?.replaceAll(']', '')
-          ?.replaceAll('[^DOC_', '')
-          ?.replaceAll('[^', '') || ''
-      );
+      return displayLabel;
     }
     return children;
-  }, [leaf.fnc, leaf.identifier, leaf.text, children]);
+  }, [leaf.fnc, leaf.identifier, displayLabel, children]);
 
-  // 使用 useMemo 优化 data-fnc-name 和 data-fnd-name 计算
   const dataFncName = useMemo(
-    () => (leaf.fnc ? leaf.text?.replace(/\[\^(.+)]:?/g, '$1') : undefined),
-    [leaf.fnc, leaf.text],
+    () => (leaf.fnc ? resolvedIdentifier : undefined),
+    [leaf.fnc, resolvedIdentifier],
   );
 
   const dataFndName = useMemo(
-    () => (leaf.fnd ? leaf.text?.replace(/\[\^(.+)]:?/g, '$1') : undefined),
+    () => (leaf.fnd ? extractFootnoteDefinitionIdentifier(leaf.text) : undefined),
     [leaf.fnd, leaf.text],
   );
 
-  // 使用 useMemo 优化 style 对象
   const mergedStyle = useMemo(
     () => ({
       fontSize: leaf.fnc ? 10 : undefined,
@@ -75,11 +92,12 @@ export const FncLeaf = ({
     [leaf.fnc, style],
   );
 
-  // 使用 useRefFunction 优化 onClick 处理函数（事件 handler，引用恒定）
   const handleClick = useRefFunction((e: React.MouseEvent) => {
-    // 在手机上，如果是 fnc，阻止点击事件（使用长按代替）
     if (isMobile && hasFnc) {
       e.preventDefault();
+      e.stopPropagation();
+      setMobileModalOpen(true);
+      fncProps?.onOriginUrlClick?.(leaf?.identifier);
       return;
     }
     if (hasFnc) {
@@ -88,7 +106,6 @@ export const FncLeaf = ({
       if (fncProps?.onOriginUrlClick) {
         fncProps.onOriginUrlClick(leaf?.identifier);
       }
-      // 如果同时有 URL，也要处理 URL 打开逻辑
       if (leaf.url) {
         if (linkConfig?.onClick) {
           const res = linkConfig.onClick(leaf.url);
@@ -106,14 +123,9 @@ export const FncLeaf = ({
     }
   });
 
-  // 使用 useMemo 优化自定义渲染的 children 计算
   const customRenderChildren = useMemo(
-    () =>
-      leaf.text
-        ?.toLocaleUpperCase()
-        ?.replaceAll('[^', '')
-        .replaceAll(']', '') || '',
-    [leaf.text],
+    () => displayLabel,
+    [displayLabel],
   );
 
   let dom = (
@@ -135,7 +147,6 @@ export const FncLeaf = ({
     </span>
   );
 
-  // 如果提供了自定义渲染函数，使用它
   if (fncProps?.render && (leaf.fnc || leaf.identifier)) {
     dom = (
       <>
@@ -150,5 +161,21 @@ export const FncLeaf = ({
     );
   }
 
-  return dom;
+  return (
+    <>
+      {dom}
+      {isMobile && hasFnc ? (
+        <FncLeafMobileModal
+          open={mobileModalOpen}
+          onClose={() => setMobileModalOpen(false)}
+          displayLabel={displayLabel}
+          identifier={resolvedIdentifier}
+          definition={footnoteDefinition}
+          leafUrl={leaf.url}
+          linkConfig={linkConfig}
+          fncProps={fncProps}
+        />
+      ) : null}
+    </>
+  );
 };

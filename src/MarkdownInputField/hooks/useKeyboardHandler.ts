@@ -3,6 +3,7 @@ import { Editor, Transforms } from 'slate';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import type { MarkdownEditorInstance } from '../../MarkdownEditor';
 import { isImeComposing } from '../../MarkdownEditor/editor/utils/isImeComposing';
+import { isCodeBlockAceInputTarget } from '../../MarkdownEditor/editor/utils/codeBlockBehavior';
 import { isMobileDevice } from '../AttachmentButton/utils';
 import type { MarkdownInputFieldProps } from '../types/MarkdownInputFieldProps';
 
@@ -43,9 +44,12 @@ export const useKeyboardHandler = ({
       const isEnter = e.key === 'Enter';
       const isMod = e.ctrlKey || e.metaKey;
       const isShift = e.shiftKey;
+      const inCodeBlockTextInput =
+        isCodeBlockAceInputTarget(e.target) ||
+        isCodeBlockAceInputTarget(document.activeElement);
 
       // Home：移动到文档开头
-      if (e.key === 'Home' && !isMod && editor) {
+      if (e.key === 'Home' && !isMod && editor && !inCodeBlockTextInput) {
         e.preventDefault();
         e.stopPropagation();
         const start = Editor.start(editor, []);
@@ -54,7 +58,7 @@ export const useKeyboardHandler = ({
       }
 
       // End：移动到文档末尾
-      if (e.key === 'End' && !isMod && editor) {
+      if (e.key === 'End' && !isMod && editor && !inCodeBlockTextInput) {
         e.preventDefault();
         e.stopPropagation();
         const end = Editor.end(editor, []);
@@ -63,7 +67,13 @@ export const useKeyboardHandler = ({
       }
 
       // Ctrl+A / Cmd+A：全选
-      if ((e.key === 'a' || e.key === 'A') && isMod && !isShift && editor) {
+      if (
+        (e.key === 'a' || e.key === 'A') &&
+        isMod &&
+        !isShift &&
+        editor &&
+        !inCodeBlockTextInput
+      ) {
         e.preventDefault();
         e.stopPropagation();
         Transforms.select(editor, {

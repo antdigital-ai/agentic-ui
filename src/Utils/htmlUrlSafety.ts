@@ -1,4 +1,4 @@
-﻿import type { CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 
 /** 含 on* 事件处理器（onerror、onload 等） */
 export const DANGEROUS_EVENT_HANDLER_PATTERN = /\bon\w+\s*=/i;

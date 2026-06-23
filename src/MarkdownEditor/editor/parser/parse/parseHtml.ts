@@ -517,6 +517,28 @@ const handleBlockHtml = (
     };
   }
 
+  // 块级 `<div data-card="true">…</div>` —— 与 handleCard 的序列化对称，
+  // 还原 card 包裹。内部用 parseMarkdownFn 递归解析后塞回 wrapperCardNode。
+  const blockOnlyCardMatch =
+    typeof currentElement?.value === 'string' &&
+    currentElement.value.match(
+      /^\s*<div[^>]*\bdata-card\s*=\s*["']true["'][^>]*>([\s\S]*?)<\/div>\s*$/i,
+    );
+  if (blockOnlyCardMatch) {
+    const innerMd = blockOnlyCardMatch[1].trim();
+    if (parseMarkdownFn && innerMd) {
+      const { schema: cardSchema } = parseMarkdownFn(innerMd);
+      if (cardSchema?.length) {
+        return EditorUtils.wrapperCardNode(cardSchema);
+      }
+    }
+    // fallback：把原文当一段文本放进 card
+    return EditorUtils.wrapperCardNode({
+      type: 'paragraph',
+      children: [{ text: innerMd }],
+    });
+  }
+
   if (currentElement.value === '<br/>') {
     return { type: 'paragraph', children: [{ text: '' }] };
   }

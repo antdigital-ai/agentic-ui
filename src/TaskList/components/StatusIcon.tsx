@@ -1,4 +1,4 @@
-﻿import { SuccessFill, X } from '@sofa-design/icons';
+import { SuccessFill, X } from '@sofa-design/icons';
 import classNames from 'clsx';
 import React, { memo, useMemo } from 'react';
 import { Loading } from '../../Components/Loading';

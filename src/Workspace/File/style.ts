@@ -549,6 +549,9 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
         minHeight: '500px',
       },
       [`&-unsupported-item`]: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
         borderRadius: ' var(--radius-card-base)',
         background: 'var(--color-gray-bg-card-white)',
         border: 'var(--color-gray-border-light)',

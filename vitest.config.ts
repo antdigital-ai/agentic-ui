@@ -1,5 +1,6 @@
+/// <reference types="vitest/config" />
 import path from 'path';
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from 'vite';
 
 /**
  * 默认排除「非单元」或「纯覆盖率补洞」测试，降低 pnpm test 用例数量与耗时。

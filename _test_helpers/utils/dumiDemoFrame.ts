@@ -1,4 +1,6 @@
-import type { Frame, Page } from '@playwright/test';
+﻿import type { Frame, Page } from '@playwright/test';
+
+import { E2E_DEMO_FRAME_TIMEOUT_MS } from './e2eTimeouts';
 
 const SLATE_EDITABLE_SELECTOR = '.ant-agentic-md-editor-content';
 const MARKDOWN_INPUT_ROOT = '[data-testid="markdown-input-field"]';
@@ -72,7 +74,7 @@ export async function getDumiDemoContentRoot(page: Page): Promise<Page | Frame> 
       }
       return false;
     },
-    { timeout: 20_000 },
+    { timeout: E2E_DEMO_FRAME_TIMEOUT_MS },
   );
 
   const n = await page.locator('iframe').count();

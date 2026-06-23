@@ -1,4 +1,4 @@
-﻿import { MarkdownEditor } from '@ant-design/agentic-ui';
+import { MarkdownEditor } from '@ant-design/agentic-ui';
 import React from 'react';
 
 const defaultValue = `## 优先级矩阵（艾森豪威尔）

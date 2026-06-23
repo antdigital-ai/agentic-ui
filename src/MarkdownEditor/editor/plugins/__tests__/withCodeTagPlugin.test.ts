@@ -9,6 +9,14 @@ const tagNode = (text: string, extra?: Record<string, any>) => ({
   ...extra,
 });
 
+const markNode = (text: string, extra?: Record<string, any>) => ({
+  text,
+  mark: true,
+  markLabel: '@',
+  markColor: 'blue',
+  ...extra,
+});
+
 const para = (...children: any[]) => ({
   type: 'paragraph',
   children,
@@ -64,6 +72,28 @@ describe('withCodeTagPlugin', () => {
       insertNodesSpy.mockRestore();
     });
 
+    it('删空 mark 正文后清除 mark 装饰属性', () => {
+      const editor = withCodeTagPlugin(createEditor());
+      editor.children = [para(markNode('@助理', { markBg: '#e6f4ff' }))];
+
+      const unsetNodesSpy = vi.spyOn(Transforms, 'unsetNodes');
+
+      editor.apply({
+        type: 'remove_text',
+        path: [0, 0],
+        offset: 0,
+        text: '@助理',
+      });
+
+      expect(unsetNodesSpy).toHaveBeenCalledWith(
+        editor,
+        ['mark', 'markColor', 'markBg', 'markLabel'],
+        expect.objectContaining({ at: [0, 0] }),
+      );
+      expect(editor.children).toEqual([para({ text: '' })]);
+      unsetNodesSpy.mockRestore();
+    });
+
     it('部分删除 tag 内文本时直接 apply', () => {
       const base = createEditor();
       const originalApply = vi.fn();
@@ -108,10 +138,10 @@ describe('withCodeTagPlugin', () => {
   // ================================================================
 
   describe('insert_text', () => {
-    it('空 tag 输入第一个字符时直接 apply（修复崩溃）', () => {
+    it('空 tag 输入第一个字符时走默认 insertText', () => {
       const base = createEditor();
-      const originalApply = vi.fn();
-      base.apply = originalApply;
+      const originalInsertText = vi.fn();
+      base.insertText = originalInsertText;
       const editor = withCodeTagPlugin(base);
       editor.children = [para(tagNode('$ ', { triggerText: '$' }))];
       editor.selection = {
@@ -119,22 +149,15 @@ describe('withCodeTagPlugin', () => {
         focus: { path: [0, 0], offset: 2 },
       };
 
-      editor.apply({
-        type: 'insert_text',
-        path: [0, 0],
-        offset: 2,
-        text: '任',
-      });
+      editor.insertText('任');
 
-      expect(originalApply).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'insert_text', text: '任' }),
-      );
+      expect(originalInsertText).toHaveBeenCalledWith('任');
     });
 
-    it('空 tag 输入多个字符时直接 apply', () => {
+    it('空 tag 输入多个字符时走默认 insertText', () => {
       const base = createEditor();
-      const originalApply = vi.fn();
-      base.apply = originalApply;
+      const originalInsertText = vi.fn();
+      base.insertText = originalInsertText;
       const editor = withCodeTagPlugin(base);
       editor.children = [para(tagNode('  '))];
       editor.selection = {
@@ -142,16 +165,9 @@ describe('withCodeTagPlugin', () => {
         focus: { path: [0, 0], offset: 2 },
       };
 
-      editor.apply({
-        type: 'insert_text',
-        path: [0, 0],
-        offset: 2,
-        text: 'hello',
-      });
+      editor.insertText('hello');
 
-      expect(originalApply).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'insert_text', text: 'hello' }),
-      );
+      expect(originalInsertText).toHaveBeenCalledWith('hello');
     });
 
     it('tag 末尾连续两个空格时跳出到节点外', () => {
@@ -164,12 +180,23 @@ describe('withCodeTagPlugin', () => {
 
       const insertNodesSpy = vi.spyOn(Transforms, 'insertNodes');
 
-      editor.apply({
-        type: 'insert_text',
-        path: [0, 0],
-        offset: 4,
-        text: ' ',
-      });
+      editor.insertText(' ');
+
+      expect(insertNodesSpy).toHaveBeenCalledWith(editor, [{ text: ' ' }]);
+      insertNodesSpy.mockRestore();
+    });
+
+    it('mark 末尾连续两个空格时跳出到 mark 外', () => {
+      const editor = withCodeTagPlugin(createEditor());
+      editor.children = [para(markNode('@助理 '))];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 4 },
+        focus: { path: [0, 0], offset: 4 },
+      };
+
+      const insertNodesSpy = vi.spyOn(Transforms, 'insertNodes');
+
+      editor.insertText(' ');
 
       expect(insertNodesSpy).toHaveBeenCalledWith(editor, [{ text: ' ' }]);
       insertNodesSpy.mockRestore();
@@ -177,8 +204,8 @@ describe('withCodeTagPlugin', () => {
 
     it('tag 末尾第一个空格不跳出', () => {
       const base = createEditor();
-      const originalApply = vi.fn();
-      base.apply = originalApply;
+      const originalInsertText = vi.fn();
+      base.insertText = originalInsertText;
       const editor = withCodeTagPlugin(base);
       editor.children = [para(tagNode('abc'))];
       editor.selection = {
@@ -186,22 +213,15 @@ describe('withCodeTagPlugin', () => {
         focus: { path: [0, 0], offset: 3 },
       };
 
-      editor.apply({
-        type: 'insert_text',
-        path: [0, 0],
-        offset: 3,
-        text: ' ',
-      });
+      editor.insertText(' ');
 
-      expect(originalApply).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'insert_text', text: ' ' }),
-      );
+      expect(originalInsertText).toHaveBeenCalledWith(' ');
     });
 
-    it('非 tag 节点的 insert_text 透传', () => {
+    it('非 tag 节点的 insertText 透传', () => {
       const base = createEditor();
-      const originalApply = vi.fn();
-      base.apply = originalApply;
+      const originalInsertText = vi.fn();
+      base.insertText = originalInsertText;
       const editor = withCodeTagPlugin(base);
       editor.children = [para({ text: 'hello' })];
       editor.selection = {
@@ -209,25 +229,18 @@ describe('withCodeTagPlugin', () => {
         focus: { path: [0, 0], offset: 5 },
       };
 
-      editor.apply({
-        type: 'insert_text',
-        path: [0, 0],
-        offset: 5,
-        text: 'x',
-      });
+      editor.insertText('x');
 
-      expect(originalApply).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'insert_text' }),
-      );
+      expect(originalInsertText).toHaveBeenCalledWith('x');
     });
   });
 
   // ================================================================
-  // split_node
+  // split_node（不再在 apply 层拦截；用户回车由 insertBreak 移出 tag/code）
   // ================================================================
 
   describe('split_node', () => {
-    it('tag 节点吞掉 split_node（禁止回车拆分）', () => {
+    it('tag 与 code 叶子的 split_node 透传 apply', () => {
       const base = createEditor();
       const originalApply = vi.fn();
       base.apply = originalApply;
@@ -241,24 +254,7 @@ describe('withCodeTagPlugin', () => {
         properties: {},
       });
 
-      expect(originalApply).not.toHaveBeenCalled();
-    });
-
-    it('code 节点吞掉 split_node', () => {
-      const base = createEditor();
-      const originalApply = vi.fn();
-      base.apply = originalApply;
-      const editor = withCodeTagPlugin(base);
-      editor.children = [para({ text: 'x', code: true })];
-
-      editor.apply({
-        type: 'split_node',
-        path: [0, 0],
-        position: 1,
-        properties: {},
-      });
-
-      expect(originalApply).not.toHaveBeenCalled();
+      expect(originalApply).toHaveBeenCalled();
     });
 
     it('普通节点的 split_node 透传', () => {
@@ -325,6 +321,37 @@ describe('withCodeTagPlugin', () => {
         expect.objectContaining({ select: true }),
       );
       expect(originalInsertBreak).toHaveBeenCalledTimes(1);
+      insertNodesSpy.mockRestore();
+    });
+
+    it('空 mark 叶上再次回车时移出 mark 并换行', () => {
+      const base = createEditor();
+      const originalInsertBreak = vi.fn();
+      base.insertBreak = originalInsertBreak;
+      const editor = withCodeTagPlugin(base);
+      editor.children = [para(markNode('@助理'), markNode(''))];
+      editor.selection = {
+        anchor: { path: [0, 1], offset: 0 },
+        focus: { path: [0, 1], offset: 0 },
+      };
+
+      const unsetNodesSpy = vi.spyOn(Transforms, 'unsetNodes');
+      const insertNodesSpy = vi.spyOn(Transforms, 'insertNodes');
+
+      editor.insertBreak();
+
+      expect(unsetNodesSpy).toHaveBeenCalledWith(
+        editor,
+        ['mark', 'markColor', 'markBg', 'markLabel'],
+        expect.objectContaining({ at: [0, 1] }),
+      );
+      expect(insertNodesSpy).toHaveBeenCalledWith(
+        editor,
+        { text: '' },
+        expect.objectContaining({ at: [0, 2], select: true }),
+      );
+      expect(originalInsertBreak).toHaveBeenCalledTimes(1);
+      unsetNodesSpy.mockRestore();
       insertNodesSpy.mockRestore();
     });
 

@@ -1,4 +1,4 @@
-﻿import type { FileNode, FileTreeNode } from '../types';
+import type { FileNode, FileTreeNode } from '../types';
 import { ensureNodeWithId } from './handlers';
 import { fileIdOrTreeKeyToRelativePath } from './workspaceFileId';
 
@@ -81,6 +81,10 @@ export const resolveTreeLeafFile = (
   const hasChildren = Boolean(node.children && node.children.length > 0);
   const resolvedIsLeaf = node.isLeaf ?? !hasChildren;
   if (!resolvedIsLeaf) {
+    return null;
+  }
+
+  if (node.file === null) {
     return null;
   }
 

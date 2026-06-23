@@ -1,4 +1,4 @@
-﻿import {
+import {
   AudioOutlined,
   FileImageOutlined,
   FileTextFilled,

@@ -72,10 +72,6 @@ vi.mock('../../../editor/elements/FootnoteDefinition', () => ({
   FootnoteDefinition: elementStubs.box('footnote-definition'),
 }));
 
-vi.mock('../../../editor/elements/FootnoteReference', () => ({
-  FootnoteReference: elementStubs.box('footnote-reference'),
-}));
-
 vi.mock('../../../editor/elements/Image', () => ({
   EditorImage: elementStubs.box('editor-image'),
 }));
@@ -118,6 +114,10 @@ vi.mock('../../../editor/elements/Blockquote', () => ({
 
 vi.mock('../../../editor/elements/Head', () => ({
   Head: elementStubs.box('head'),
+}));
+
+vi.mock('../../../editor/elements/Code', () => ({
+  Code: elementStubs.box('code'),
 }));
 
 // Mock Ant Design components
@@ -182,7 +182,6 @@ describe('Elements Index', () => {
         ['media', 'media', {}],
         ['image', 'editor-image', {}],
         ['footnoteDefinition', 'footnote-definition', {}],
-        ['footnoteReference', 'footnote-reference', {}],
         ['card', 'warp-card', {}],
         ['schema', 'schema', {}],
         ['apaasify', 'schema', {}],
@@ -475,9 +474,9 @@ describe('Elements Index', () => {
           ...defaultLeafProps,
           leaf: { ...defaultLeafProps.leaf, identifier: 'test-id' },
         };
-        render(<MLeaf {...props} />);
-        // identifier 功能会显示原始文本
-        expect(screen.getByText('Test Text')).toBeInTheDocument();
+        const { container } = render(<MLeaf {...props} />);
+        // identifier 作为脚注引用渲染，展示 identifier 值（data-fnc）
+        expect(container.textContent).toContain('test-id');
       });
 
       it('应该处理 fncProps.render 功能', () => {
@@ -546,8 +545,8 @@ describe('Elements Index', () => {
           },
         };
         render(<MLeaf {...props} />);
-        // identifier 文本应该被格式化处理，显示为 "456"
-        expect(screen.getByText('456')).toBeInTheDocument();
+        // identifier 文本展示为解析后的脚注 id（不再剥离 DOC_ 前缀）
+        expect(screen.getByText('DOC_456')).toBeInTheDocument();
       });
 
       it('应该在 fnc 时设置字体大小为 10 和相关属性', () => {
@@ -556,7 +555,7 @@ describe('Elements Index', () => {
           leaf: { ...defaultLeafProps.leaf, fnc: true, text: '[^DOC_123]' },
         };
         const { container } = render(<MLeaf {...props} />);
-        expect(screen.getByText('123')).toBeInTheDocument();
+        expect(screen.getByText('DOC_123')).toBeInTheDocument();
 
         // 查找带有 data-fnc 属性的 span 元素
         const span = container.querySelector('[data-fnc="fnc"]');

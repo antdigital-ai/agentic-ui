@@ -2,15 +2,24 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ContentThrottle } from '../ContentThrottle';
 import { installRafStub } from './installRafStub';
 
+const setDocumentVisibility = (visibilityState: DocumentVisibilityState) => {
+  Object.defineProperty(document, 'visibilityState', {
+    configurable: true,
+    value: visibilityState,
+  });
+};
+
 describe('ContentThrottle', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     installRafStub();
+    setDocumentVisibility('visible');
   });
 
   afterEach(() => {
     vi.useRealTimers();
     vi.unstubAllGlobals();
+    setDocumentVisibility('visible');
   });
 
   it('enabled 模式下按帧推进字符', () => {
@@ -48,6 +57,43 @@ describe('ContentThrottle', () => {
     throttle.dispose();
   });
 
+  it('流式内容被非前缀修正时应从新内容起点重新推进', () => {
+    const flushed: string[] = [];
+    const throttle = new ContentThrottle((s) => flushed.push(s), {
+      charsPerFrame: 5,
+    });
+
+    throttle.push('Hello World');
+    vi.advanceTimersByTime(16);
+    expect(flushed.at(-1)).toBe('Hello');
+
+    throttle.push('Goodbye');
+    vi.advanceTimersByTime(16);
+    expect(flushed.at(-1)).toBe('Goodb');
+
+    vi.advanceTimersByTime(16);
+    expect(flushed.at(-1)).toBe('Goodbye');
+    throttle.dispose();
+  });
+
+  it('flushOnComplete 为 false 时 complete 不应立即补齐剩余内容', () => {
+    const flushed: string[] = [];
+    const throttle = new ContentThrottle((s) => flushed.push(s), {
+      charsPerFrame: 2,
+      flushOnComplete: false,
+    });
+
+    throttle.push('abcdef');
+    vi.advanceTimersByTime(16);
+    expect(flushed.at(-1)).toBe('ab');
+
+    throttle.complete();
+
+    expect(throttle.getDisplayedLength()).toBe(2);
+    expect(flushed.at(-1)).toBe('ab');
+    throttle.dispose();
+  });
+
   it('content 前缀变化时应重置进度', () => {
     const flushed: string[] = [];
     const throttle = new ContentThrottle((s) => flushed.push(s), {
@@ -76,6 +122,31 @@ describe('ContentThrottle', () => {
 
     vi.advanceTimersToNextTimer();
     expect(flushed.length).toBe(countAfterComplete);
+    throttle.dispose();
+  });
+
+  it('页面不可见时用后台批量推进，并在切回可见后改回 raf', () => {
+    const flushed: string[] = [];
+    setDocumentVisibility('hidden');
+    const throttle = new ContentThrottle((s) => flushed.push(s), {
+      backgroundBatchMultiplier: 4,
+      backgroundInterval: 50,
+      charsPerFrame: 2,
+    });
+
+    throttle.push('abcdefghij');
+
+    vi.advanceTimersByTime(49);
+    expect(flushed).toEqual([]);
+
+    vi.advanceTimersByTime(1);
+    expect(flushed.at(-1)).toBe('abcdefgh');
+
+    setDocumentVisibility('visible');
+    document.dispatchEvent(new Event('visibilitychange'));
+
+    vi.advanceTimersByTime(16);
+    expect(flushed.at(-1)).toBe('abcdefghij');
     throttle.dispose();
   });
 });

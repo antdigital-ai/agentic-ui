@@ -249,22 +249,53 @@ describe('Editor Card Tests', () => {
       expect(editor.children[1].children[0].text).toBe('after');
     });
 
-    it('should delete entire card when card-after is removed', () => {
+    it('在 card-after 内 Backspace 应先把光标移到 card 内容尾部，不直接删整卡（两阶段）', () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'before' }] },
+        createCardNode({
+          type: 'paragraph',
+          children: [{ text: 'card body' }],
+        }),
+        { type: 'paragraph', children: [{ text: 'after' }] },
+      ];
+
+      // 选中 card-after 并按 Backspace
+      const cardAfterPath = [1, 2, 0];
+      Transforms.select(editor, { path: cardAfterPath, offset: 0 });
+      editor.deleteBackward('character');
+
+      // card 仍然存在，光标已经挪到 card content 末尾
+      expect(editor.children.length).toBe(3);
+      expect((editor.children[1] as any).type).toBe('card');
+      expect(editor.selection?.anchor.path).toEqual([1, 1, 0]);
+      expect(editor.selection?.anchor.offset).toBe('card body'.length);
+    });
+
+    it('直接通过 apply(remove_node) 删除 card-after 仍会删整张卡片（保持程序化契约）', () => {
       editor.children = [
         { type: 'paragraph', children: [{ text: 'before' }] },
         createCardNode(),
         { type: 'paragraph', children: [{ text: 'after' }] },
       ];
 
-      // 选中 card-after 并删除
-      const cardAfterPath = [1, 2, 0];
-      Transforms.select(editor, { path: cardAfterPath, offset: 0 });
-      editor.deleteBackward('character');
+      editor.apply({
+        type: 'remove_node',
+        path: [1, 2],
+        node: (editor.children[1] as any).children[2],
+      });
 
-      // 验证整个卡片被删除
       expect(editor.children.length).toBe(2);
-      expect(editor.children[0].children[0].text).toBe('before');
-      expect(editor.children[1].children[0].text).toBe('after');
+      expect((editor.children[0] as any).children[0].text).toBe('before');
+      expect((editor.children[1] as any).children[0].text).toBe('after');
+    });
+
+    it('删除最后一个 card 后文档自动补一个空段落', () => {
+      editor.children = [createCardNode()];
+
+      Transforms.removeNodes(editor, { at: [0] });
+
+      expect(editor.children.length).toBe(1);
+      expect((editor.children[0] as any).type).toBe('paragraph');
     });
 
     it('should prevent deletion of card-before', () => {

@@ -1,4 +1,4 @@
-﻿import { Paperclip } from '@sofa-design/icons';
+import { Paperclip } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import React, { useContext } from 'react';

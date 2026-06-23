@@ -152,7 +152,7 @@ export default () => {
             <strong>plugins</strong>: 插件数组，用于扩展编辑器功能
           </li>
           <li>
-            <strong>fncProps</strong>: 函数属性配置，包含 render 函数
+            <strong>fncProps</strong>: 脚注引用配置，含 render、renderMobileModal、onFootnoteDefinitionChange
           </li>
           <li>
             <strong>onChange</strong>: 内容变化时的回调函数

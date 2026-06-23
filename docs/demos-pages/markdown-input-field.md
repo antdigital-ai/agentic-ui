@@ -9,9 +9,9 @@ group:
 
 # Markdown 输入框
 
-## 基本用法
+## 基本用法（Tag + Mark）{#tag-mark-basic}
 
-<code src="../demos/markdownInputField/basic.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/markdownInputField/basic.tsx" background="var(--main-bg-color)" iframe=640></code>
 
 ## 中文输入法（IME Enter）{#ime-compose-enter}
 

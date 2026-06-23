@@ -20,6 +20,7 @@ import {
   openHtmlLocalPreview,
   openMarkdownLocalPreview,
 } from '../utils/localPreview';
+import { resolveInitialCodeBlockViewMode } from '../utils/resolveInitialCodeBlockViewMode';
 import {
   AceEditor,
   AceEditorContainer,
@@ -122,13 +123,13 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
   // 如果禁用了 HTML 预览或包含 JavaScript，强制使用代码模式
   const shouldDisablePreview = disableHtmlPreview || hasJavaScript;
 
-  const [viewMode, setViewMode] = useState<'preview' | 'code'>(() => {
-    // 如果禁用了 HTML 预览或包含 JavaScript，强制使用代码模式
-    if (shouldDisablePreview && language === 'html') {
-      return 'code';
-    }
-    return language === 'html' || language === 'markdown' ? 'preview' : 'code';
-  });
+  const [viewMode, setViewMode] = useState<'preview' | 'code'>(() =>
+    resolveInitialCodeBlockViewMode({
+      readonly,
+      language,
+      shouldDisableHtmlPreview: shouldDisablePreview,
+    }),
+  );
 
   // 使用Ace编辑器Hook
   const { dom, setLanguage, focusEditor } = AceEditor({
@@ -282,7 +283,12 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
                 {viewMode === 'preview' &&
                   props.element.language &&
                   props.element.language === 'markdown' && (
-                    <MarkdownEditor initValue={codePlainText} />
+                    <MarkdownEditor
+                      initValue={codePlainText}
+                      readonly
+                      toolBar={{ enable: false }}
+                      floatBar={{ enable: false }}
+                    />
                   )}
                 <div
                   style={{

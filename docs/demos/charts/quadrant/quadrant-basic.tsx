@@ -1,4 +1,4 @@
-﻿import { QuadrantChart } from '@ant-design/agentic-ui';
+import { QuadrantChart } from '@ant-design/agentic-ui';
 import React from 'react';
 
 /**

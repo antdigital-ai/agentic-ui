@@ -1,6 +1,10 @@
 import { Editor, Element, Node, Path, Range, Transforms } from 'slate';
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
-import { getListType, isListType } from '../../plugins/withListsPlugin';
+import {
+  ListsEditor,
+  listMatchesToolbarMode,
+  syncListMetadataForMode,
+} from '../../plugins/lists';
 import {
   convertToParagraph,
   createList,
@@ -25,8 +29,8 @@ vi.mock('slate', () => {
       hasPath: mockFn(),
       start: mockFn(),
       end: mockFn(),
-      withoutNormalizing: mockFn(),
-      isInline: mockFn(),
+      withoutNormalizing: mockFn((_, fn: () => void) => fn()),
+      isInline: mockFn(() => false),
       isEditor: mockFn(),
       node: mockFn(),
       string: mockFn(),
@@ -102,6 +106,31 @@ vi.mock('../../plugins/withListsPlugin', () => ({
   getListType: vi.fn(),
 }));
 
+vi.mock('../../plugins/lists/ListsEditor', () => ({
+  ListsEditor: {
+    isListsEnabled: vi.fn(() => true),
+    getLists: vi.fn(() => []),
+    unwrapList: vi.fn(() => true),
+    setListType: vi.fn(() => true),
+    wrapInList: vi.fn(() => true),
+  },
+}));
+
+vi.mock('../../plugins/lists/taskList', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('../../plugins/lists/taskList')>();
+  return {
+    ...actual,
+    listMatchesToolbarMode: vi.fn(() => false),
+    syncListMetadataForMode: vi.fn(),
+  };
+});
+
+function mockWrappableBlocks(blocks: Array<[Record<string, unknown>, Path]>) {
+  (Editor.nodes as Mock).mockReturnValue(blocks);
+  (Element.isElement as unknown as Mock).mockReturnValue(true);
+}
+
 // Note: getCurrentNodes is an internal function, we'll mock Editor.nodes instead
 
 describe('createList', () => {
@@ -113,616 +142,127 @@ describe('createList', () => {
     editor = {
       selection: null,
       children: [],
+      normalize: vi.fn(),
     } as any;
 
-    // 默认 mock 返回值
-    (Editor.hasPath as Mock).mockReturnValue(true);
+    (ListsEditor.isListsEnabled as Mock).mockReturnValue(true);
+    (ListsEditor.getLists as Mock).mockReturnValue([]);
+    (ListsEditor.wrapInList as Mock).mockReturnValue(true);
+    (ListsEditor.unwrapList as Mock).mockReturnValue(true);
+    (ListsEditor.setListType as Mock).mockReturnValue(true);
+    (listMatchesToolbarMode as Mock).mockReturnValue(false);
     (Element.isElement as unknown as Mock).mockReturnValue(true);
-    (Range.isCollapsed as Mock).mockReturnValue(true);
+    (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
   });
 
-  describe('基本功能', () => {
-    it('should return early if no selection', () => {
-      editor.selection = null;
+  it('should return early if no selection', () => {
+    editor.selection = null;
 
-      createList(editor, 'unordered');
+    createList(editor, 'unordered');
 
-      expect(Editor.nodes).not.toHaveBeenCalled();
-    });
-
-    it('should convert paragraph to unordered list', () => {
-      const selection = {
-        anchor: { offset: 0, path: [0, 0] },
-        focus: { offset: 0, path: [0, 0] },
-      } as any;
-      editor.selection = selection;
-
-      const paragraphNode = { type: 'paragraph', children: [{ text: 'Test' }] };
-      const path = [0];
-
-      // Mock Editor.nodes for getCurrentNodes (called first)
-      (Editor.nodes as Mock).mockReturnValueOnce([[paragraphNode, path]]);
-      // Mock Editor.nodes for findBlockNodesInSelection (returns empty, so uses curNode)
-      (Editor.nodes as Mock).mockReturnValueOnce([]);
-      (getListType as Mock).mockReturnValue('bulleted-list');
-      (Editor.parent as Mock).mockReturnValue([
-        { type: 'paragraph', children: [] },
-        [0],
-      ]);
-      (Node.get as Mock).mockReturnValue(paragraphNode);
-      (Node.string as Mock).mockReturnValue('Test');
-      (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
-      (Editor.hasPath as Mock).mockReturnValue(true);
-
-      createList(editor, 'unordered');
-
-      expect(Transforms.wrapNodes).toHaveBeenCalled();
-    });
-
-    it('should convert paragraph to ordered list', () => {
-      const selection = {
-        anchor: { offset: 0, path: [0, 0] },
-        focus: { offset: 0, path: [0, 0] },
-      } as any;
-      editor.selection = selection;
-
-      const paragraphNode = { type: 'paragraph', children: [{ text: 'Test' }] };
-      const path = [0];
-
-      // Mock Editor.nodes for getCurrentNodes (called first)
-      (Editor.nodes as Mock).mockReturnValueOnce([[paragraphNode, path]]);
-      // Mock Editor.nodes for findBlockNodesInSelection (returns empty, so uses curNode)
-      (Editor.nodes as Mock).mockReturnValueOnce([]);
-      (getListType as Mock).mockReturnValue('numbered-list');
-      (Editor.parent as Mock).mockReturnValue([
-        { type: 'paragraph', children: [] },
-        [0],
-      ]);
-      (Node.get as Mock).mockReturnValue(paragraphNode);
-      (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
-
-      createList(editor, 'ordered');
-
-      expect(Transforms.wrapNodes).toHaveBeenCalled();
-    });
-
-    it('should convert paragraph to task list', () => {
-      const selection = {
-        anchor: { offset: 0, path: [0, 0] },
-        focus: { offset: 0, path: [0, 0] },
-      } as any;
-      editor.selection = selection;
-
-      const paragraphNode = { type: 'paragraph', children: [{ text: 'Test' }] };
-      const path = [0];
-
-      // Mock Editor.nodes for getCurrentNodes (called first)
-      (Editor.nodes as Mock).mockReturnValueOnce([[paragraphNode, path]]);
-      // Mock Editor.nodes for findBlockNodesInSelection (returns empty, so uses curNode)
-      (Editor.nodes as Mock).mockReturnValueOnce([]);
-      (getListType as Mock).mockReturnValue('bulleted-list');
-      (Editor.parent as Mock).mockReturnValue([
-        { type: 'paragraph', children: [] },
-        [0],
-      ]);
-      (Node.get as Mock).mockReturnValue(paragraphNode);
-      (Node.string as Mock).mockReturnValue('Test');
-      (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
-      (Editor.hasPath as Mock).mockReturnValue(true);
-
-      createList(editor, 'task');
-
-      expect(Transforms.wrapNodes).toHaveBeenCalled();
-    });
+    expect(ListsEditor.wrapInList).not.toHaveBeenCalled();
   });
 
-  describe('标题转换', () => {
-    it('should convert heading to paragraph before creating list', () => {
-      const selection = {
-        anchor: { offset: 0, path: [0, 0] },
-        focus: { offset: 0, path: [0, 0] },
-      } as any;
-      editor.selection = selection;
+  it('should return early when lists plugin is disabled', () => {
+    editor.selection = {
+      anchor: { offset: 0, path: [0, 0] },
+      focus: { offset: 0, path: [0, 0] },
+    } as any;
+    (ListsEditor.isListsEnabled as Mock).mockReturnValue(false);
 
-      const headNode = {
-        type: 'head',
-        level: 1,
-        children: [{ text: 'Title' }],
-      };
-      const paragraphNode = {
-        type: 'paragraph',
-        children: [{ text: 'Title' }],
-      };
-      const path = [0];
+    createList(editor, 'unordered');
 
-      // Mock Editor.nodes for getCurrentNodes (called first)
-      (Editor.nodes as Mock).mockReturnValueOnce([[headNode, path]]);
-      // Mock Editor.nodes for findBlockNodesInSelection (returns empty, so uses curNode)
-      (Editor.nodes as Mock).mockReturnValueOnce([]);
-      (getListType as Mock).mockReturnValue('bulleted-list');
-      (Editor.parent as Mock).mockReturnValue([
-        { type: 'head', children: [] },
-        [0],
-      ]);
-      // After convertHeadingToParagraph, Node.get should return paragraph
-      (Node.get as Mock).mockReturnValue(paragraphNode);
-      (Node.string as Mock).mockReturnValue('Title');
-      (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
-      (Editor.hasPath as Mock).mockReturnValue(true);
-
-      createList(editor, 'unordered');
-
-      expect(Transforms.setNodes).toHaveBeenCalledWith(
-        editor,
-        { type: 'paragraph' },
-        { at: path },
-      );
-      expect(Transforms.unsetNodes).toHaveBeenCalledWith(editor, 'level', {
-        at: path,
-      });
-    });
+    expect(ListsEditor.wrapInList).not.toHaveBeenCalled();
   });
 
-  describe('反向转换（Unwrap）', () => {
-    it('should unwrap list-item when same type and not task', () => {
-      const selection = {
-        anchor: { offset: 0, path: [0, 0] },
-        focus: { offset: 0, path: [0, 0] },
-      } as any;
-      editor.selection = selection;
+  it('should wrap selection in list when no list in selection', () => {
+    editor.selection = {
+      anchor: { offset: 0, path: [0, 0] },
+      focus: { offset: 0, path: [0, 0] },
+    } as any;
+    const paragraphNode = { type: 'paragraph', children: [{ text: 'Test' }] };
+    mockWrappableBlocks([[paragraphNode, [0]]]);
+    (Node.get as Mock).mockReturnValue(paragraphNode);
 
-      const listItemNode = {
-        type: 'list-item',
-        children: [{ type: 'paragraph', children: [{ text: 'Item' }] }],
-      };
-      const listItemPath = [0];
-      const listPath = [1];
-      const listNode = { type: 'bulleted-list', children: [listItemNode] };
+    createList(editor, 'unordered');
 
-      // Mock Editor.nodes for getCurrentNodes
-      (Editor.nodes as Mock).mockReturnValueOnce([
-        [listItemNode, listItemPath],
-      ]);
-      // Mock Editor.parent to return list node
-      (Editor.parent as Mock).mockReturnValue([listNode, listPath]);
-      (getListType as Mock).mockReturnValue('bulleted-list');
-      (isListType as unknown as Mock).mockReturnValue(true);
-      (Node.get as Mock).mockReturnValue(listNode);
-      (Path.parent as Mock).mockReturnValue(listPath);
-      (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
-
-      createList(editor, 'unordered');
-
-      expect(Transforms.unwrapNodes).toHaveBeenCalled();
-    });
-
-    it('should update list type when different type', () => {
-      const selection = {
-        anchor: { offset: 0, path: [0, 0] },
-        focus: { offset: 0, path: [0, 0] },
-      } as any;
-      editor.selection = selection;
-
-      const listItemNode = {
-        type: 'list-item',
-        children: [{ type: 'paragraph', children: [{ text: 'Item' }] }],
-      };
-      const listItemPath = [0];
-      const listPath = [1];
-      const listNode = { type: 'bulleted-list', children: [listItemNode] };
-
-      (Editor.nodes as Mock).mockReturnValue([[listItemNode, listItemPath]]);
-      (getListType as Mock).mockReturnValue('numbered-list');
-      (isListType as unknown as Mock).mockReturnValue(true);
-      (Node.get as Mock).mockReturnValue(listNode);
-      (Path.parent as Mock).mockReturnValue(listPath);
-      (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
-
-      createList(editor, 'ordered');
-
-      expect(Transforms.setNodes).toHaveBeenCalledWith(
-        editor,
-        expect.objectContaining({ type: 'numbered-list' }),
-        { at: listPath },
-      );
-    });
-
-    it('should not unwrap when converting to task list', () => {
-      const selection = {
-        anchor: { offset: 0, path: [0, 0] },
-        focus: { offset: 0, path: [0, 0] },
-      } as any;
-      editor.selection = selection;
-
-      const listItemNode = {
-        type: 'list-item',
-        children: [{ type: 'paragraph', children: [{ text: 'Item' }] }],
-      };
-      const listItemPath = [0];
-      const listPath = [1];
-      const listNode = { type: 'bulleted-list', children: [listItemNode] };
-
-      // Mock Editor.nodes for getCurrentNodes
-      (Editor.nodes as Mock).mockReturnValueOnce([
-        [listItemNode, listItemPath],
-      ]);
-      // Mock Editor.parent to return list node
-      (Editor.parent as Mock).mockReturnValue([listNode, listPath]);
-      (getListType as Mock).mockReturnValue('bulleted-list');
-      (isListType as unknown as Mock).mockReturnValue(true);
-      (Node.get as Mock).mockReturnValue(listNode);
-      (Path.parent as Mock).mockReturnValue(listPath);
-      (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
-
-      createList(editor, 'task');
-
-      expect(Transforms.unwrapNodes).not.toHaveBeenCalled();
-      expect(Transforms.setNodes).toHaveBeenCalled();
-    });
+    expect(ListsEditor.wrapInList).toHaveBeenCalledWith(
+      editor,
+      'bulleted-list',
+      editor.selection,
+    );
+    expect(syncListMetadataForMode).toHaveBeenCalled();
+    expect(editor.normalize).toHaveBeenCalledWith({ force: true });
   });
 
-  describe('合并相邻列表', () => {
-    it('should merge into adjacent list of same type', () => {
-      const selection = {
-        anchor: { offset: 0, path: [1, 0] },
-        focus: { offset: 0, path: [1, 0] },
-      } as any;
-      editor.selection = selection;
+  it('should unwrap when selection list matches toolbar mode', () => {
+    editor.selection = {
+      anchor: { offset: 0, path: [0, 0] },
+      focus: { offset: 0, path: [0, 0] },
+    } as any;
+    const listNode = { type: 'bulleted-list', children: [] };
+    (ListsEditor.getLists as Mock).mockReturnValue([[listNode, [0]]]);
+    (listMatchesToolbarMode as Mock).mockReturnValue(true);
 
-      const paragraphNode = { type: 'paragraph', children: [{ text: 'Test' }] };
-      const path = [1];
-      const parentPath = [0];
-      const adjacentListPath = [0];
-      const adjacentListNode = {
-        type: 'bulleted-list',
-        children: [{ type: 'list-item', children: [] }],
-      };
+    createList(editor, 'unordered');
 
-      const listItemNode = {
-        type: 'list-item',
-        children: [paragraphNode],
-      };
-
-      // Mock Editor.nodes for getCurrentNodes
-      (Editor.nodes as Mock).mockReturnValueOnce([[paragraphNode, path]]);
-      // Mock Editor.nodes for findBlockNodesInSelection (returns empty, so uses curNode)
-      (Editor.nodes as Mock).mockReturnValueOnce([]);
-      (getListType as Mock).mockReturnValue('bulleted-list');
-      (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
-      // Mock Editor.parent - first for checking if in list-item, then for getting parent of list-item
-      (Editor.parent as Mock)
-        .mockReturnValueOnce([{ type: 'root' }, []]) // First call - not in list-item
-        .mockReturnValueOnce([{ type: 'root' }, []]) // After wrapping, get parent of list-item
-        .mockReturnValueOnce([adjacentListNode, adjacentListPath]); // For adjacent list check
-      (Path.parent as Mock).mockReturnValue(parentPath);
-      (Path.hasPrevious as Mock).mockReturnValue(true);
-      (Path.previous as Mock).mockReturnValue(adjacentListPath);
-      // Mock Node.get - first for currentNode, then for adjacent list, then for list-item after wrapping
-      (Node.get as Mock)
-        .mockReturnValueOnce(paragraphNode) // First call in loop
-        .mockReturnValueOnce(adjacentListNode) // For adjacent list check
-        .mockReturnValueOnce(listItemNode); // After wrapping
-      (Node.string as Mock).mockReturnValue('Test');
-      (isListType as unknown as Mock).mockReturnValue(true);
-      // Mock Editor.hasPath for various checks
-      (Editor.hasPath as Mock).mockReturnValue(true);
-
-      createList(editor, 'unordered');
-
-      expect(Transforms.moveNodes).toHaveBeenCalled();
-    });
+    expect(ListsEditor.unwrapList).toHaveBeenCalledWith(
+      editor,
+      editor.selection,
+    );
+    expect(ListsEditor.wrapInList).not.toHaveBeenCalled();
   });
 
-  describe('多节点转换', () => {
-    it('should convert multiple paragraphs to single list', () => {
-      const selection = {
-        anchor: { offset: 0, path: [0, 0] },
-        focus: { offset: 5, path: [2, 0] },
-      } as any;
-      editor.selection = selection;
+  it('should change list type when selection is in a different list type', () => {
+    editor.selection = {
+      anchor: { offset: 0, path: [0, 0] },
+      focus: { offset: 0, path: [0, 0] },
+    } as any;
+    const listNode = { type: 'bulleted-list', children: [] };
+    (ListsEditor.getLists as Mock).mockReturnValue([[listNode, [0]]]);
 
-      const paragraphNode1 = {
-        type: 'paragraph',
-        children: [{ text: 'Item 1' }],
-      };
-      const paragraphNode2 = {
-        type: 'paragraph',
-        children: [{ text: 'Item 2' }],
-      };
-      const path1 = [0];
-      const path2 = [1];
+    createList(editor, 'ordered');
 
-      (Editor.nodes as Mock)
-        .mockReturnValueOnce([[paragraphNode1, path1]])
-        .mockReturnValue([
-          [paragraphNode1, path1],
-          [paragraphNode2, path2],
-        ]);
-      (Range.isCollapsed as Mock).mockReturnValue(false);
-      (getListType as Mock).mockReturnValue('bulleted-list');
-      (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
-      (Editor.parent as Mock).mockReturnValue([{ type: 'root' }, []]);
-      (Path.parent as Mock).mockReturnValue([0]);
-      (Path.hasPrevious as Mock).mockReturnValue(false);
-
-      createList(editor, 'unordered');
-
-      expect(Transforms.wrapNodes).toHaveBeenCalled();
-    });
+    expect(ListsEditor.setListType).toHaveBeenCalledWith(
+      editor,
+      'numbered-list',
+      editor.selection,
+    );
+    expect(syncListMetadataForMode).toHaveBeenCalled();
   });
 
-  describe('边界情况', () => {
-    it('should handle empty paragraph', () => {
-      const selection = {
-        anchor: { offset: 0, path: [0, 0] },
-        focus: { offset: 0, path: [0, 0] },
-      } as any;
-      editor.selection = selection;
+  it('should demote heading before wrapping in list', () => {
+    editor.selection = {
+      anchor: { offset: 0, path: [0, 0] },
+      focus: { offset: 0, path: [0, 0] },
+    } as any;
+    const headNode = { type: 'head', level: 1, children: [{ text: 'Title' }] };
+    mockWrappableBlocks([[headNode, [0]]]);
+    (Node.get as Mock).mockReturnValue(headNode);
 
-      const paragraphNode = { type: 'paragraph', children: [{ text: '' }] };
-      const path = [0];
+    createList(editor, 'unordered');
 
-      (Editor.nodes as Mock).mockReturnValue([[paragraphNode, path]]);
-      (Node.string as Mock).mockReturnValue('');
-      (getListType as Mock).mockReturnValue('bulleted-list');
-      (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
-
-      createList(editor, 'unordered');
-
-      expect(Transforms.wrapNodes).toHaveBeenCalled();
+    expect(Transforms.setNodes).toHaveBeenCalledWith(
+      editor,
+      { type: 'paragraph' },
+      { at: [0] },
+    );
+    expect(Transforms.unsetNodes).toHaveBeenCalledWith(editor, 'level', {
+      at: [0],
     });
-
-    it('should handle paragraph in list-item (unwrap scenario)', () => {
-      const selection = {
-        anchor: { offset: 0, path: [0, 0, 0] },
-        focus: { offset: 0, path: [0, 0, 0] },
-      } as any;
-      editor.selection = selection;
-
-      const paragraphNode = { type: 'paragraph', children: [{ text: 'Test' }] };
-      const paragraphPath = [0, 0];
-      const listItemNode = {
-        type: 'list-item',
-        children: [paragraphNode],
-      };
-      const listItemPath = [0];
-      const listPath = [1];
-      const listNode = { type: 'bulleted-list', children: [listItemNode] };
-
-      (Editor.nodes as Mock).mockReturnValue([[paragraphNode, paragraphPath]]);
-      (Editor.parent as Mock)
-        .mockReturnValueOnce([listItemNode, listItemPath])
-        .mockReturnValueOnce([listNode, listPath]);
-      (Path.hasPrevious as Mock).mockReturnValue(false);
-      (getListType as Mock).mockReturnValue('bulleted-list');
-      (isListType as unknown as Mock).mockReturnValue(true);
-      (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
-
-      createList(editor, 'unordered');
-
-      expect(Transforms.unwrapNodes).toHaveBeenCalled();
-    });
-
-    it('should filter out nodes already in list', () => {
-      const selection = {
-        anchor: { offset: 0, path: [0, 0] },
-        focus: { offset: 0, path: [0, 0] },
-      } as any;
-      editor.selection = selection;
-
-      const paragraphNode = { type: 'paragraph', children: [{ text: 'Test' }] };
-      const path = [0];
-      const listItemNode = { type: 'list-item', children: [paragraphNode] };
-
-      (Editor.nodes as Mock).mockReturnValue([[paragraphNode, path]]);
-      (Editor.parent as Mock).mockReturnValue([listItemNode, [0]]);
-      (getListType as Mock).mockReturnValue('bulleted-list');
-
-      createList(editor, 'unordered');
-
-      // 应该被过滤掉，不会调用 wrapNodes
-      expect(Transforms.wrapNodes).not.toHaveBeenCalled();
-    });
-
-    it('should handle root path safely', () => {
-      const selection = {
-        anchor: { offset: 0, path: [0] },
-        focus: { offset: 0, path: [0] },
-      } as any;
-      editor.selection = selection;
-
-      const paragraphNode = { type: 'paragraph', children: [{ text: 'Test' }] };
-      const path = [0];
-
-      (Editor.nodes as Mock).mockReturnValue([[paragraphNode, path]]);
-      (getListType as Mock).mockReturnValue('bulleted-list');
-      (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
-      (Path.parent as Mock).mockReturnValue([]); // 根路径
-      (Editor.hasPath as Mock).mockReturnValue(false);
-
-      // 不应该抛出错误
-      expect(() => createList(editor, 'unordered')).not.toThrow();
-    });
+    expect(ListsEditor.wrapInList).toHaveBeenCalled();
   });
 
-  describe('任务列表特殊处理', () => {
-    it('should set task property on list for task mode', () => {
-      const selection = {
-        anchor: { offset: 0, path: [0, 0] },
-        focus: { offset: 0, path: [0, 0] },
-      } as any;
-      editor.selection = selection;
+  it('should not wrap when no wrappable blocks in selection', () => {
+    editor.selection = {
+      anchor: { offset: 0, path: [0, 0] },
+      focus: { offset: 0, path: [0, 0] },
+    } as any;
+    (Editor.nodes as Mock).mockReturnValue([]);
 
-      const paragraphNode = { type: 'paragraph', children: [{ text: 'Task' }] };
-      const path = [0];
-      const listItemNode = {
-        type: 'list-item',
-        checked: false,
-        children: [paragraphNode],
-      };
+    createList(editor, 'unordered');
 
-      // Mock Editor.nodes for getCurrentNodes
-      (Editor.nodes as Mock).mockReturnValueOnce([[paragraphNode, path]]);
-      // Mock Editor.nodes for findBlockNodesInSelection (returns empty, so uses curNode)
-      (Editor.nodes as Mock).mockReturnValueOnce([]);
-      (getListType as Mock).mockReturnValue('bulleted-list');
-      (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
-      (Editor.parent as Mock).mockReturnValue([{ type: 'root' }, []]);
-      (Path.parent as Mock).mockReturnValue([0]);
-      (Path.hasPrevious as Mock).mockReturnValue(false);
-      (Editor.hasPath as Mock).mockReturnValue(true);
-      // After wrapNodes for list-item, Node.get should return list-item
-      (Node.get as Mock)
-        .mockReturnValueOnce(paragraphNode) // First call in the loop
-        .mockReturnValueOnce(listItemNode); // After wrapping
-      (Node.string as Mock).mockReturnValue('Task');
-
-      createList(editor, 'task');
-
-      // Check that wrapNodes was called with list containing task: true
-      const wrapNodesCalls = (Transforms.wrapNodes as Mock).mock.calls;
-      const listWrapCall = wrapNodesCalls.find(
-        (call) => call[1]?.type === 'bulleted-list',
-      );
-      expect(listWrapCall).toBeDefined();
-      if (listWrapCall) {
-        expect(listWrapCall[1]).toMatchObject({
-          type: 'bulleted-list',
-          task: true,
-        });
-      }
-    });
-  });
-
-  describe('createList 防御分支覆盖补充', () => {
-    it('有 selection 但 getCurrentNodes 为空时直接返回', () => {
-      editor.selection = {
-        anchor: { offset: 0, path: [0, 0] },
-        focus: { offset: 0, path: [0, 0] },
-      } as any;
-      (Editor.nodes as Mock).mockReturnValueOnce([]);
-      createList(editor, 'unordered');
-      expect(Transforms.wrapNodes).not.toHaveBeenCalled();
-    });
-
-    it('blockNodes 过滤后为空时提前返回', () => {
-      editor.selection = {
-        anchor: { offset: 0, path: [0, 0] },
-        focus: { offset: 0, path: [0, 0] },
-      } as any;
-      const p = { type: 'paragraph', children: [{ text: 'x' }] };
-      (Editor.nodes as Mock)
-        .mockReturnValueOnce([[p, [0]]]) // getCurrentNodes
-        .mockReturnValueOnce([[p, [0]]]); // findBlockNodesInSelection
-      (Editor.parent as Mock).mockReturnValue([{ type: 'list-item' }, [0]]);
-      (getListType as Mock).mockReturnValue('bulleted-list');
-
-      createList(editor, 'unordered');
-      expect(Transforms.wrapNodes).not.toHaveBeenCalled();
-    });
-
-    it('wrap list-item 时路径无效会 continue（850）', () => {
-      editor.selection = {
-        anchor: { offset: 0, path: [0, 0] },
-        focus: { offset: 0, path: [0, 0] },
-      } as any;
-      const p = { type: 'paragraph', children: [{ text: 'x' }] };
-      (Editor.nodes as Mock)
-        .mockReturnValueOnce([[p, [0]]])
-        .mockReturnValueOnce([[p, [0]]]);
-      (Editor.parent as Mock).mockReturnValue([{ type: 'root' }, []]);
-      (Node.get as Mock).mockReturnValue(p);
-      (Node.string as Mock).mockReturnValue('x');
-      (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
-      (getListType as Mock).mockReturnValue('bulleted-list');
-      (Editor.hasPath as Mock).mockReturnValue(false);
-
-      createList(editor, 'unordered');
-      expect(Transforms.wrapNodes).not.toHaveBeenCalled();
-    });
-
-    it('首个 listItem path 无效时在 888 返回', () => {
-      editor.selection = {
-        anchor: { offset: 0, path: [0, 0] },
-        focus: { offset: 0, path: [0, 0] },
-      } as any;
-      const p = { type: 'paragraph', children: [{ text: 'x' }] };
-      const listItem = { type: 'list-item', children: [p] };
-      (Editor.nodes as Mock)
-        .mockReturnValueOnce([[p, [0]]])
-        .mockReturnValueOnce([[p, [0]]]);
-      (Editor.parent as Mock).mockReturnValue([{ type: 'root' }, []]);
-      (Node.get as Mock).mockReturnValue(listItem);
-      (Node.string as Mock).mockReturnValue('x');
-      (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
-      (getListType as Mock).mockReturnValue('bulleted-list');
-      (Editor.hasPath as Mock).mockImplementation(
-        (_, path) => JSON.stringify(path) !== '[0]',
-      );
-
-      createList(editor, 'unordered');
-      expect(Transforms.select).not.toHaveBeenCalled();
-    });
-
-    it('firstPath 为根路径时在 897 返回', () => {
-      editor.selection = {
-        anchor: { offset: 0, path: [0] },
-        focus: { offset: 0, path: [0] },
-      } as any;
-      const p = { type: 'paragraph', children: [{ text: 'x' }] };
-      const listItem = { type: 'list-item', children: [p] };
-      (Editor.nodes as Mock)
-        .mockReturnValueOnce([[p, []]])
-        .mockReturnValueOnce([[p, []]]);
-      (Editor.parent as Mock).mockReturnValue([{ type: 'root' }, []]);
-      (Node.get as Mock).mockReturnValue(listItem);
-      (Node.string as Mock).mockReturnValue('x');
-      (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
-      (getListType as Mock).mockReturnValue('bulleted-list');
-      (Editor.hasPath as Mock).mockReturnValue(true);
-
-      createList(editor, 'unordered');
-      expect(Transforms.wrapNodes).not.toHaveBeenCalledWith(
-        editor,
-        expect.objectContaining({ type: 'bulleted-list' }),
-        expect.anything(),
-      );
-    });
-
-    it('mergeIntoAdjacentList 目标不是列表时直接返回（572）', () => {
-      editor.selection = {
-        anchor: { offset: 0, path: [1, 0] },
-        focus: { offset: 0, path: [1, 0] },
-      } as any;
-      const p = { type: 'paragraph', children: [{ text: 'x' }] };
-      const listItem = { type: 'list-item', children: [p] };
-      const rootNode = { type: 'root', children: [{}, {}, {}] };
-      const listNode = { type: 'bulleted-list', children: [listItem] };
-
-      (Editor.nodes as Mock)
-        .mockReturnValueOnce([[p, [1]]])
-        .mockReturnValueOnce([[p, [1]]]);
-      (Editor.parent as Mock).mockReturnValue([{ type: 'root' }, []]);
-      (getListType as Mock).mockReturnValue('bulleted-list');
-      (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
-      (Path.hasPrevious as Mock).mockReturnValue(false);
-      (Path.parent as Mock).mockReturnValue([]);
-      (Path.next as Mock).mockReturnValue([2]);
-      (Node.string as Mock).mockReturnValue('x');
-      (Node.get as Mock)
-        .mockReturnValueOnce(p)
-        .mockReturnValueOnce(listItem)
-        .mockReturnValueOnce(rootNode)
-        .mockReturnValueOnce(listNode)
-        .mockReturnValueOnce({ type: 'paragraph', children: [] });
-      (Editor.hasPath as Mock).mockReturnValue(true);
-      (isListType as unknown as Mock)
-        .mockReturnValueOnce(true)
-        .mockReturnValueOnce(false);
-
-      createList(editor, 'unordered');
-      expect(Transforms.moveNodes).not.toHaveBeenCalled();
-    });
+    expect(ListsEditor.wrapInList).not.toHaveBeenCalled();
   });
 });
 
@@ -1078,6 +618,9 @@ describe('setHeading', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     editor = { selection: null, children: [] } as any;
+    (EditorUtils.isTop as unknown as Mock).mockReturnValue(true);
+    (Range.isCollapsed as Mock).mockReturnValue(true);
+    (Element.isElement as unknown as Mock).mockReturnValue(true);
   });
 
   it('should convert to paragraph when level is 4', () => {
@@ -1154,6 +697,7 @@ describe('convertToParagraph', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     editor = { selection: null, children: [] } as any;
+    (Element.isElement as unknown as Mock).mockReturnValue(true);
   });
 
   it('should convert head node to paragraph', () => {
@@ -1186,6 +730,7 @@ describe('increaseHeadingLevel', () => {
     vi.clearAllMocks();
     editor = { selection: null, children: [] } as any;
     (EditorUtils.isTop as unknown as Mock).mockReturnValue(true);
+    (Element.isElement as unknown as Mock).mockReturnValue(true);
   });
 
   it('should convert paragraph to level 4 heading', () => {
@@ -1254,6 +799,7 @@ describe('decreaseHeadingLevel', () => {
     vi.clearAllMocks();
     editor = { selection: null, children: [] } as any;
     (EditorUtils.isTop as unknown as Mock).mockReturnValue(true);
+    (Element.isElement as unknown as Mock).mockReturnValue(true);
   });
 
   it('should convert paragraph to level 1 heading', () => {

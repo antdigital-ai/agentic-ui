@@ -19,7 +19,6 @@ import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { I18nContext, LocalKeys } from '../../../I18n';
 import { CardNode } from '../../el';
 import { useSubject } from '../../hooks/subscribe';
-import { selChange$ } from '../plugins/useOnchange';
 import { useEditorStore } from '../store';
 import { getOffsetLeft } from '../utils/dom';
 import { EditorUtils } from '../utils/editorUtils';
@@ -264,6 +263,7 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
     setOpenInsertCompletion,
     keyTask$,
     insertCompletionText$,
+    selChange$,
   } = useEditorStore();
   const dom = useRef<HTMLDivElement>(null);
   const ctx = useRef<{

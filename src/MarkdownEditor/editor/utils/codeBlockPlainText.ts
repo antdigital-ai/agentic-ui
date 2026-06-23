@@ -1,6 +1,9 @@
 import { Node } from 'slate';
 import type { CodeNode } from '../../el';
 
+/** void 代码块占位 leaf 常见零宽/空白，不能当作正文 */
+const VOID_CODE_PLACEHOLDER_TEXT = /^[\s\uFEFF\u200B]*$/;
+
 /** 可从 Slate 子节点或 `value` 取正文的元素（code / mermaid / katex / think 等） */
 export type SlatePlainTextSource =
   | {
@@ -45,10 +48,34 @@ export function getSlateElementPlainText(
 }
 
 /**
- * 从 `CodeNode` 取正文，与 {@link getSlateElementPlainText} 行为一致。
+ * 从 `CodeNode` 取正文。
+ * void 块级 code 以 `value` 为权威来源；流式场景可能仅更新 children 且比 value 更长，此时优先 children。
  */
 export function getCodeBlockPlainText(
   element: CodeNode | undefined | null,
 ): string {
-  return getSlateElementPlainText(element);
+  if (!element) return '';
+  const valueStr = typeof element.value === 'string' ? element.value : '';
+  let fromSlate = '';
+  if (hasElementChildren(element)) {
+    try {
+      fromSlate = Node.string(
+        element as Parameters<typeof Node.string>[0],
+      );
+    } catch {
+      // 测试中可能对 slate / 节点结构部分 mock，退回到 value
+    }
+  }
+
+  const slateIsPlaceholder =
+    fromSlate === '' || VOID_CODE_PLACEHOLDER_TEXT.test(fromSlate);
+  if (slateIsPlaceholder) {
+    return valueStr;
+  }
+
+  if (fromSlate !== valueStr) {
+    return fromSlate.length > valueStr.length ? fromSlate : valueStr;
+  }
+
+  return fromSlate;
 }

@@ -14,6 +14,7 @@ vi.mock('../../../../I18n/index', () => ({
   I18nContext: React.createContext({
     locale: {
       switchLanguage: '切换语言',
+      'code.searchLanguage': 'Search',
     },
   }),
 }));

@@ -160,18 +160,26 @@ vi.mock('../../../../I18n', () => ({
       'n-list': '有序列表',
       't-list': '任务列表',
       localeImage: '本地图片',
+      'editor.embedMediaLinks': 'Embed media links',
+      'editor.pasteMediaLink': 'Paste media link',
+      'editor.embed': 'Embed',
+      'editor.local': 'Local',
+      'editor.chooseFile': 'Choose a file',
+      'editor.embedLink': 'Embed Link',
+      'editor.pasteAttachmentLink': 'Paste attachment link',
     },
     t: (key: string) => key,
   }),
   LocalKeys: {},
 }));
 
-vi.mock('../../plugins/useOnchange', () => ({
-  selChange$: {
-    next: vi.fn(),
-    subscribe: vi.fn(() => ({ unsubscribe: vi.fn() })),
-  },
-}));
+vi.mock('../../plugins/useOnchange', () => ({}));
+
+const mockSelChangeNext = vi.fn();
+const mockSelChange$ = {
+  next: mockSelChangeNext,
+  subscribe: vi.fn(() => ({ unsubscribe: vi.fn() })),
+};
 
 vi.mock('../../utils/dom', () => ({
   getOffsetLeft: vi.fn(() => 24),
@@ -210,7 +218,6 @@ vi.mock('react-dom', async () => {
 });
 
 import { Editor, Element, Node, Transforms } from 'slate';
-import { selChange$ } from '../../plugins/useOnchange';
 import { useEditorStore } from '../../store';
 import { EditorUtils } from '../../utils/editorUtils';
 import { getRemoteMediaType } from '../../utils/media';
@@ -230,6 +237,7 @@ function getDefaultStore() {
     setOpenInsertCompletion,
     keyTask$: { next: keyTaskNext },
     insertCompletionText$,
+    selChange$: mockSelChange$,
   };
 }
 
@@ -434,7 +442,7 @@ describe('InsertAutocomplete branches - insertMedia via link input', () => {
       'https://example.com/photo.jpg',
     );
     expect(Transforms.setNodes).toHaveBeenCalled();
-    expect(selChange$.next).toHaveBeenCalled();
+    expect(mockSelChangeNext).toHaveBeenCalled();
   });
 
   it('insertMedia with protocol-relative URL (//example.com) passes protocol check', async () => {
@@ -595,7 +603,7 @@ describe('InsertAutocomplete branches - insertAttachByLink', () => {
 
     expect(fetch).toHaveBeenCalledWith('https://example.com/file.pdf');
     expect(Transforms.setNodes).toHaveBeenCalled();
-    expect(selChange$.next).toHaveBeenCalled();
+    expect(mockSelChangeNext).toHaveBeenCalled();
   });
 
   it('insertAttachByLink extracts filename from URL path', async () => {

@@ -215,7 +215,8 @@ describe('handlePaste 分支覆盖', () => {
         { ...mockClipboard, files: [mockFile] } as unknown as DataTransfer,
         { image: { upload } },
       );
-      expect(result).toBe(true);
+      // upload 返回 falsy URL → uploadedUrls 为空 → handleFilesPaste 返回 false（跳过插入）
+      expect(result).toBe(false);
       expect(upload).toHaveBeenCalledWith([mockFile]);
     });
 

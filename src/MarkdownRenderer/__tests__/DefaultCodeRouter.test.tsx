@@ -125,6 +125,45 @@ describe('DefaultCodeRouter', () => {
     );
   });
 
+  it('resolves specialized route aliases registered by plugin key', () => {
+    const LegacyToolUseRenderer = createPluginComponent(
+      'plugin-legacy-tooluse',
+    );
+    const JsonChartRenderer = createPluginComponent('plugin-json-chart');
+
+    const { rerender } = render(
+      <DefaultCodeRouter
+        language="agentic-ui-toolusebar"
+        pluginComponents={{
+          'agentic-ui-usertoolbar': LegacyToolUseRenderer,
+        }}
+      >
+        {'{"tools":[]}'}
+      </DefaultCodeRouter>,
+    );
+
+    expect(screen.getByTestId('plugin-legacy-tooluse')).toHaveTextContent(
+      'agentic-ui-toolusebar',
+    );
+    expect(LegacyToolUseRenderer.mock.calls[0][0]).toEqual(
+      expect.objectContaining({ language: 'agentic-ui-toolusebar' }),
+    );
+
+    rerender(
+      <DefaultCodeRouter
+        language="chart"
+        pluginComponents={{ 'json-chart': JsonChartRenderer }}
+      >
+        {'{"data":[]}'}
+      </DefaultCodeRouter>,
+    );
+
+    expect(screen.getByTestId('plugin-json-chart')).toHaveTextContent('chart');
+    expect(JsonChartRenderer.mock.calls[0][0]).toEqual(
+      expect.objectContaining({ language: 'chart' }),
+    );
+  });
+
   it('shows extracted fallback text while the default code renderer is loading', () => {
     render(
       <DefaultCodeRouter language="tsx" pluginComponents={{}}>

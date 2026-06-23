@@ -1,4 +1,4 @@
-﻿import { ConfigProvider } from 'antd';
+import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import React, { memo, useContext, useEffect, useRef, useState } from 'react';
 import { DEFAULT_TEXT_SWAP_DURATION_MS } from './constants';

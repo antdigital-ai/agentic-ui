@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import type { TaskStatus } from './types';
 
 export const LOADING_SIZE = 16;

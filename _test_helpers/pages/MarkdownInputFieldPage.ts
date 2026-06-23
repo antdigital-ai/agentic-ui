@@ -1,7 +1,12 @@
-import type { Frame } from '@playwright/test';
+﻿import type { Frame } from '@playwright/test';
 import { Locator, Page, expect } from '@playwright/test';
 
 import { PLAYWRIGHT_FIXTURE_DEMOS } from '../constants/playwrightDemoRoutes';
+import { gotoDumiDemo } from '../utils/e2eNavigation';
+import {
+  E2E_AFTER_SEND_TIMEOUT_MS,
+  E2E_POLL_TIMEOUT_MS,
+} from '../utils/e2eTimeouts';
 import { getDumiDemoContentRoot } from '../utils/dumiDemoFrame';
 
 /**
@@ -66,11 +71,7 @@ export class MarkdownInputFieldPage {
   async goto(
     demoPath: string = PLAYWRIGHT_FIXTURE_DEMOS.markdownInputFieldOnFocus,
   ) {
-    await this.page.goto(`/~demos/${demoPath}`, {
-      waitUntil: 'domcontentloaded',
-      timeout: 60_000,
-    });
-    await this.page.waitForLoadState('networkidle');
+    await gotoDumiDemo(this.page, demoPath);
     await this.bindDemoRoot();
     await this.waitForReady();
   }
@@ -80,8 +81,22 @@ export class MarkdownInputFieldPage {
    * 增加超时时间，因为 Slate 编辑器需要时间初始化 contenteditable 元素
    */
   async waitForReady() {
-    // 增加超时时间到 10 秒，给组件和 Slate 编辑器足够的初始化时间
-    await expect(this.editableInput).toBeVisible({ timeout: 10000 });
+    await expect(this.editableInput).toBeVisible({ timeout: 15_000 });
+    await expect(this.editableInput).toBeEditable({ timeout: 15_000 });
+  }
+
+  /**
+   * 发送后等待输入框清空（demo onSend 含约 1s 延迟）
+   */
+  async expectAfterSendCleared(
+    timeout = E2E_AFTER_SEND_TIMEOUT_MS,
+  ): Promise<void> {
+    await expect
+      .poll(async () => (await this.getText()).trim(), {
+        timeout,
+        message: '等待发送后输入框清空',
+      })
+      .toBe('');
   }
 
   /**
@@ -89,13 +104,22 @@ export class MarkdownInputFieldPage {
    * 如果已经聚焦则跳过点击操作，避免重置光标位置
    */
   async focus() {
-    // 检查是否已经聚焦，如果已聚焦则跳过点击操作，避免重置光标位置
     const isFocused = await this.editableInput.evaluate((el) => {
       return el === document.activeElement;
     });
-    if (!isFocused) {
-      await this.editableInput.click();
+    if (isFocused) {
+      return;
     }
+    for (let attempt = 0; attempt < 3; attempt++) {
+      await this.editableInput.click({ timeout: 5_000 });
+      const focused = await this.editableInput.evaluate(
+        (el) => el === document.activeElement,
+      );
+      if (focused) {
+        return;
+      }
+    }
+    await expect(this.editableInput).toBeFocused({ timeout: 5_000 });
   }
 
   /**
@@ -145,7 +169,7 @@ export class MarkdownInputFieldPage {
                   );
                 },
                 {
-                  timeout: 3000,
+                  timeout: E2E_POLL_TIMEOUT_MS,
                   message: `等待行 "${lines[i]}" 输入完成`,
                 },
               )
@@ -194,7 +218,7 @@ export class MarkdownInputFieldPage {
                 );
               },
               {
-                timeout: 5000,
+                timeout: E2E_POLL_TIMEOUT_MS,
                 message: '等待换行完成',
               },
             )
@@ -224,7 +248,7 @@ export class MarkdownInputFieldPage {
             return currentText;
           },
           {
-            timeout: 3000,
+            timeout: E2E_POLL_TIMEOUT_MS,
             message: '等待文本输入完成',
           },
         )
@@ -238,14 +262,26 @@ export class MarkdownInputFieldPage {
    * 使用 textContent 获取完整的多行文本
    */
   async getText(): Promise<string> {
-    // 使用 evaluate 获取完整的 textContent，这样可以获取所有文本包括换行
     const text = await this.editableInput.evaluate((el) => {
-      // 直接使用 textContent 获取所有文本（包括隐藏文本）
-      // textContent 会获取所有子节点的文本内容，包括换行
-      return el.textContent || '';
+      const collect = (node: Node): string => {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          const element = node as HTMLElement;
+          if (element.getAttribute('data-slate-placeholder') === 'true') {
+            return '';
+          }
+        }
+        if (node.nodeType === Node.TEXT_NODE) {
+          return node.textContent || '';
+        }
+        let acc = '';
+        node.childNodes.forEach((child) => {
+          acc += collect(child);
+        });
+        return acc;
+      };
+      return collect(el);
     });
 
-    // 排除占位符文本（如 "请输入内容..."）和特殊字符（如 "·"）
     const placeholderText = '请输入内容';
     const trimmedText = text.trim();
     if (
@@ -259,48 +295,52 @@ export class MarkdownInputFieldPage {
   }
 
   /**
+   * 等待输入框无有效文本（trim 后为空）
+   */
+  async expectEmptyContent(timeout = E2E_POLL_TIMEOUT_MS) {
+    await expect
+      .poll(
+        async () => (await this.getText()).trim().length,
+        { timeout, message: '等待输入框内容清空' },
+      )
+      .toBe(0);
+  }
+
+  /**
    * 清空输入框
    */
   async clear() {
     await this.focus();
-    const isMac = process.platform === 'darwin';
-    const modifierKey = isMac ? 'Meta' : 'Control';
-    await this.keyboardPage.keyboard.press(`${modifierKey}+a`);
-    await this.keyboardPage.keyboard.press('Delete');
+    if ((await this.getText()).trim().length === 0) {
+      return;
+    }
+    const modifierKey = process.platform === 'darwin' ? 'Meta' : 'Control';
+    const kb = this.keyboardPage.keyboard;
+    await kb.press(`${modifierKey}+a`);
+    await kb.press('Backspace');
+    await kb.press('Delete');
+    await this.expectEmptyContent();
   }
 
   /**
    * 验证占位符是否显示
-   * 使用 empty 类判断（符合实现逻辑），而不是依赖属性值
    */
   async expectPlaceholderVisible() {
-    // 检查是否有 empty 类的段落元素，且占位符属性存在
-    const hasPlaceholder = await this.root.evaluate(() => {
-      const emptyParagraph = document.querySelector(
-        '.empty[data-slate-placeholder]',
-      );
-      return (
-        emptyParagraph !== null &&
-        emptyParagraph.getAttribute('data-slate-placeholder') !== null
-      );
-    });
-    expect(hasPlaceholder).toBe(true);
+    const placeholder = this.inputField.locator(
+      '[data-slate-placeholder="true"]',
+    );
+    await expect(placeholder).toBeVisible({ timeout: 5000 });
   }
 
   /**
    * 验证占位符是否隐藏
-   * 使用 Playwright locator 和断言，更高效稳定
    */
   async expectPlaceholderHidden() {
-    // 使用 Playwright locator 查找 empty 类的占位符元素
-    const emptyPlaceholder = this.root.locator(
-      '.empty[data-slate-placeholder]',
+    const placeholder = this.inputField.locator(
+      '[data-slate-placeholder="true"]',
     );
+    await expect(placeholder).not.toBeVisible({ timeout: 5000 });
 
-    // 等待占位符消失（使用 not.toBeVisible 会自动重试）
-    await expect(emptyPlaceholder).not.toBeVisible({ timeout: 3000 });
-
-    // 验证输入框有实际内容
     const text = await this.getText();
     expect(text.trim().length).toBeGreaterThan(0);
   }
@@ -322,47 +362,34 @@ export class MarkdownInputFieldPage {
     const isMac = process.platform === 'darwin';
     const kb = this.keyboardPage.keyboard;
     if (isMac && key === 'Home') {
-      // Mac 上使用 Meta+Left 代替 Home
       await kb.press('Meta+ArrowLeft');
     } else if (isMac && key === 'End') {
-      // Mac 上使用 Meta+Right 代替 End
       await kb.press('Meta+ArrowRight');
+    } else if (key === 'Enter') {
+      await this.focus();
+      await this.editableInput.press('Enter', { delay: 0 });
     } else {
       await kb.press(key);
     }
-    await this.keyboardPage.waitForTimeout(100);
   }
 
   /**
-   * 选中所有文本
-   * 在 Mac 上使用 Meta+A，在其他平台使用 Ctrl+A
-   * 全选后等待选中状态生效
+   * 选中所有文本（Slate 由编辑器 handleKeyDown 处理 Mod+A，不依赖 window.getSelection）
    */
   async selectAll() {
-    const isMac = process.platform === 'darwin';
-    const modifierKey = isMac ? 'Meta' : 'Control';
+    await this.focus();
+    const modifierKey = process.platform === 'darwin' ? 'Meta' : 'Control';
     await this.keyboardPage.keyboard.press(`${modifierKey}+a`);
-    // 等待选中状态生效，确保后续输入能够替换选中内容
-    // Mac 上可能需要更长的等待时间
-    await this.keyboardPage.waitForTimeout(isMac ? 200 : 100);
-    // 验证选中状态是否生效（通过检查是否有选中文本）
-    await expect
-      .poll(
-        async () => {
-          const hasSelection = await this.editableInput.evaluate(() => {
-            const selection = window.getSelection();
-            return (
-              selection && selection.rangeCount > 0 && !selection.isCollapsed
-            );
-          });
-          return hasSelection;
-        },
-        {
-          timeout: 1000,
-          message: '等待全选状态生效',
-        },
-      )
-      .toBe(true);
+  }
+
+  /**
+   * 全选后删除，并等待内容清空
+   */
+  async selectAllAndDelete() {
+    await this.selectAll();
+    await this.keyboardPage.keyboard.press('Backspace');
+    await this.keyboardPage.keyboard.press('Delete');
+    await this.expectEmptyContent();
   }
 
   /**
@@ -415,7 +442,7 @@ export class MarkdownInputFieldPage {
             return text.trim().length;
           },
           {
-            timeout: 5000,
+            timeout: E2E_POLL_TIMEOUT_MS,
             message: '等待粘贴内容出现，如果超时可能是剪贴板为空或粘贴操作失败',
           },
         )
@@ -428,7 +455,7 @@ export class MarkdownInputFieldPage {
             const text = await this.getText();
             return text.trim().length;
           },
-          { timeout: 5000 },
+          { timeout: E2E_POLL_TIMEOUT_MS },
         )
         .toBeGreaterThan(beforeLength);
     }

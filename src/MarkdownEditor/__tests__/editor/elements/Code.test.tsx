@@ -1,29 +1,52 @@
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { createEditor, Descendant } from 'slate';
+import { Editable, Slate, withReact } from 'slate-react';
+import { describe, expect, it, vi } from 'vitest';
 import { Code } from '../../../editor/elements/Code';
+import { withCodeBlockPlugin } from '../../../editor/plugins/withCodeBlockPlugin';
+
+vi.mock('../../../editor/store', () => ({
+  useEditorStore: () => ({ readonly: false }),
+}));
+
+const mockAttributes = {
+  'data-slate-node': 'element' as const,
+  ref: null,
+};
+
+function renderCodeBlock(element: Record<string, unknown>) {
+  const codeNode = { type: 'code', ...element } as Descendant;
+  const initial: Descendant[] = [codeNode];
+  const editor = withCodeBlockPlugin(withReact(createEditor()));
+  editor.children = initial;
+
+  return render(
+    <Slate editor={editor} initialValue={initial}>
+      <Editable
+        renderElement={(props) =>
+          props.element.type === 'code' ? (
+            <Code {...props} />
+          ) : (
+            <div {...props.attributes}>{props.children}</div>
+          )
+        }
+      />
+    </Slate>,
+  );
+}
 
 describe('Code Element', () => {
-  const mockAttributes = {
-    'data-slate-node': 'element' as const,
-    ref: null,
-  };
-
   it('应该渲染基本代码块', () => {
-    const element = {
-      type: 'code',
+    const { container } = renderCodeBlock({
       value: 'console.log("Hello World");',
       children: [{ text: 'console.log("Hello World");' }],
-    };
-
-    const { container } = render(
-      <Code attributes={mockAttributes} element={element}>
-        <span>console.log(&quot;Hello World&quot;);</span>
-      </Code>,
-    );
+    });
 
     expect(container.firstChild).toBeDefined();
-    expect(container.textContent).toContain('console.log');
+    expect(screen.getByTestId('simple-code-block-editor')).toHaveValue(
+      'console.log("Hello World");',
+    );
   });
 
   it('应该渲染 HTML 语言的代码', () => {
@@ -35,7 +58,7 @@ describe('Code Element', () => {
     };
 
     const { container } = render(
-      <Code attributes={mockAttributes} element={element}>
+      <Code attributes={mockAttributes} element={element as any}>
         <span>&lt;div&gt;Test&lt;/div&gt;</span>
       </Code>,
     );
@@ -55,7 +78,7 @@ describe('Code Element', () => {
     };
 
     const { container } = render(
-      <Code attributes={mockAttributes} element={element}>
+      <Code attributes={mockAttributes} element={element as any}>
         <span></span>
       </Code>,
     );
@@ -76,7 +99,7 @@ describe('Code Element', () => {
     };
 
     const { container } = render(
-      <Code attributes={mockAttributes} element={element}>
+      <Code attributes={mockAttributes} element={element as any}>
         <span>&lt;div&gt;Content&lt;/div&gt;</span>
       </Code>,
     );
@@ -94,104 +117,68 @@ describe('Code Element', () => {
     };
 
     const { container } = render(
-      <Code attributes={mockAttributes} element={element}>
+      <Code attributes={mockAttributes} element={element as any}>
         <span></span>
       </Code>,
     );
 
-    // DOMPurify 应该移除危险的脚本
     expect(container.innerHTML).not.toContain('<script>');
   });
 
   it('应该渲染非 HTML 语言的代码块并应用默认样式', () => {
-    const element = {
-      type: 'code',
+    const { container } = renderCodeBlock({
       language: 'javascript',
       value: 'const x = 10;',
       children: [{ text: 'const x = 10;' }],
-    };
+    });
 
-    const { container } = render(
-      <Code attributes={mockAttributes} element={element}>
-        <span>const x = 10;</span>
-      </Code>,
-    );
-
-    const div = container.firstChild as HTMLElement;
+    const div = container.querySelector('[data-be="code"]') as HTMLElement;
     expect(div.style.height).toBe('240px');
     expect(div.style.minWidth).toBe('398px');
   });
 
   it('应该处理空值', () => {
-    const element = {
-      type: 'code',
+    renderCodeBlock({
       value: '',
       children: [{ text: 'fallback content' }],
-    };
+    });
 
-    const { container } = render(
-      <Code attributes={mockAttributes} element={element}>
-        <span>fallback content</span>
-      </Code>,
+    expect(screen.getByTestId('simple-code-block-editor')).toHaveValue(
+      'fallback content',
     );
-
-    expect(container.textContent).toContain('fallback content');
   });
 
-  it('应该修剪代码值的空白', () => {
-    const element = {
-      type: 'code',
+  it('应该使用 getCodeBlockPlainText 作为 textarea 展示来源', () => {
+    renderCodeBlock({
       value: '  \n  code with spaces  \n  ',
       children: [{ text: 'code with spaces' }],
-    };
+    });
 
-    const { container } = render(
-      <Code attributes={mockAttributes} element={element}>
-        <span>code with spaces</span>
-      </Code>,
+    expect(screen.getByTestId('simple-code-block-editor')).toHaveValue(
+      '  \n  code with spaces  \n  ',
     );
-
-    expect(container.textContent).toBe('code with spaces');
   });
 
   it('应该传递 attributes 到渲染的 div', () => {
-    const customAttributes = {
-      'data-slate-node': 'element' as const,
-      'data-test-id': 'custom-code',
-      ref: null,
-    };
-
-    const element = {
-      type: 'code',
+    renderCodeBlock({
       value: 'test',
       children: [{ text: 'test' }],
-    };
+    });
 
-    const { container } = render(
-      <Code attributes={customAttributes} element={element}>
-        <span>test</span>
-      </Code>,
-    );
-
-    const div = container.firstChild as HTMLElement;
-    expect(div.getAttribute('data-test-id')).toBe('custom-code');
+    const div = document.querySelector('[data-be="code"]') as HTMLElement;
+    expect(div).toBeTruthy();
+    expect(div.getAttribute('data-slate-node')).toBe('element');
   });
 
   it('应该处理没有 language 属性的元素', () => {
-    const element = {
-      type: 'code',
+    renderCodeBlock({
       value: 'plain code',
       children: [{ text: 'plain code' }],
-    };
+    });
 
-    const { container } = render(
-      <Code attributes={mockAttributes} element={element}>
-        <span>plain code</span>
-      </Code>,
+    expect(screen.getByTestId('simple-code-block-editor')).toHaveValue(
+      'plain code',
     );
-
-    expect(container.firstChild).toBeDefined();
-    expect(container.textContent).toContain('plain code');
   });
 
   it('应该处理没有 otherProps 的 HTML 元素', () => {
@@ -203,7 +190,7 @@ describe('Code Element', () => {
     };
 
     const { container } = render(
-      <Code attributes={mockAttributes} element={element}>
+      <Code attributes={mockAttributes} element={element as any}>
         <span>&lt;p&gt;Hello&lt;/p&gt;</span>
       </Code>,
     );

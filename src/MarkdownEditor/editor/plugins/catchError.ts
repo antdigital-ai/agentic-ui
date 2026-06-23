@@ -1,21 +1,44 @@
 import { Editor } from 'slate';
+
+const SLATE_EDITOR_METHOD_BLOCKLIST = new Set(['children', 'selection', 'marks']);
+
+const ERROR_REPORTING_WRAPPED = Symbol('markdownEditorErrorReportingWrapped');
+
 const tryCatchCallback =
-  (editorFunc: any) =>
-  (...editorFuncArgs: any) => {
+  (editorFunc: (...args: unknown[]) => unknown) =>
+  (...editorFuncArgs: unknown[]) => {
     try {
       return editorFunc(...editorFuncArgs);
     } catch (error) {
-      console.error(error);
-      console.log(editorFuncArgs);
-      // editor.undo();
+      console.error('[MarkdownEditor] Slate editor method failed:', error);
+      throw error;
     }
   };
-export const withErrorReporting = (editor: any): Editor => {
-  Object.entries(editor).forEach(([key, value]) => {
-    if (typeof value === 'function') {
-      editor[key] = tryCatchCallback(value);
+
+/**
+ * 为 Slate 编辑器方法包一层错误日志；失败时 rethrow，避免静默吞错导致文档半一致状态。
+ */
+export const withErrorReporting = (editor: Editor): Editor => {
+  const editorRecord = editor as unknown as Record<string, unknown>;
+  Object.keys(editor).forEach((key) => {
+    if (SLATE_EDITOR_METHOD_BLOCKLIST.has(key)) return;
+    const value = editorRecord[key];
+    if (typeof value !== 'function') return;
+    if (
+      (value as { [ERROR_REPORTING_WRAPPED]?: boolean })[
+        ERROR_REPORTING_WRAPPED
+      ]
+    ) {
+      return;
     }
+    const wrapped = tryCatchCallback(
+      value as (...args: unknown[]) => unknown,
+    );
+    (wrapped as { [ERROR_REPORTING_WRAPPED]?: boolean })[
+      ERROR_REPORTING_WRAPPED
+    ] = true;
+    editorRecord[key] = wrapped;
   });
 
-  return editor as Editor;
+  return editor;
 };

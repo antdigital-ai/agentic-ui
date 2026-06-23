@@ -7,6 +7,11 @@ import partialJsonParse from '../json-parse';
 const NOT_SPACE_START = /^\S*/;
 const ENDING_NEWLINE = /\n$/;
 
+/** void 块级 code 在 Slate 中的占位 children（正文在 `value`） */
+const VOID_CODE_BLOCK_PLACEHOLDER_CHILDREN: Array<{ text: string }> = [
+  { text: '' },
+];
+
 // 类型定义
 export type CodeElement = {
   type: string;
@@ -183,7 +188,7 @@ export const handleCode = (currentElement: any, config?: any): CodeElement => {
     render: currentElement.meta === 'render',
     value: currentElement.value,
     isConfig: currentElement?.value.trim()?.startsWith('<!--'),
-    children: [{ text: currentElement.value }],
+    children: VOID_CODE_BLOCK_PLACEHOLDER_CHILDREN,
     // 添加流式状态支持
     otherProps,
   };
@@ -254,7 +259,7 @@ export const handleYaml = (currentElement: any) => {
     language: 'yaml',
     value: currentElement.value,
     frontmatter: true,
-    children: [{ text: currentElement.value }],
+    children: VOID_CODE_BLOCK_PLACEHOLDER_CHILDREN,
   };
   debugInfo('handleYaml - YAML 处理完成', {
     type: result.type,

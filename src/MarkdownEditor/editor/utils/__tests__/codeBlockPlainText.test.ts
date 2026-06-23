@@ -38,4 +38,26 @@ describe('getSlateElementPlainText / getCodeBlockPlainText', () => {
 
     expect(getCodeBlockPlainText(element)).toBe('const x = 1;');
   });
+
+  it('子节点仅为 void 占位零宽字符时应回退到 value', () => {
+    const element = {
+      type: 'code' as const,
+      language: 'markdown',
+      value: '任务内容',
+      children: [{ text: '\uFEFF' }],
+    } satisfies CodeNode;
+
+    expect(getCodeBlockPlainText(element)).toBe('任务内容');
+  });
+
+  it('value 已更新但 children 仍为解析遗留正文时优先 value', () => {
+    const element = {
+      type: 'code' as const,
+      language: 'markdown',
+      value: '任务内容\n第二行',
+      children: [{ text: '任务内容' }],
+    } satisfies CodeNode;
+
+    expect(getCodeBlockPlainText(element)).toBe('任务内容\n第二行');
+  });
 });

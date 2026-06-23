@@ -1,4 +1,4 @@
-﻿import { FileFolders } from '@sofa-design/icons';
+import { FileFolders } from '@sofa-design/icons';
 import { ConfigProvider, Empty, Tree, Typography } from 'antd';
 import type { DataNode, EventDataNode, TreeProps } from 'antd/es/tree';
 import type { AntdTreeNodeAttribute } from 'antd/es/tree/Tree';

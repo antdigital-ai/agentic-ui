@@ -115,6 +115,17 @@ describe('parseText', () => {
       expect(result).toHaveLength(1);
       expect(result[0].text).toBe('hello');
     });
+
+    it('footnoteReference 在 parseText 循环中转为 fnc 叶子', () => {
+      const result = parseText([
+        { type: 'footnoteReference', identifier: 'ref-a' } as any,
+      ]);
+      expect(result[0]).toMatchObject({
+        text: '[^ref-a]',
+        identifier: 'ref-a',
+        fnc: true,
+      });
+    });
   });
 
   describe('applyHtmlTagsToElement', () => {
@@ -271,6 +282,20 @@ describe('parseText', () => {
       expect(parseNodesFn).toHaveBeenCalled();
       expect(result.url).toBe('https://link.com');
       expect(result.text).toBe('from-html');
+    });
+
+    it('footnoteReference 转为 fnc 文本叶子', () => {
+      const result = handleTextAndInlineElementsPure(
+        { type: 'footnoteReference', identifier: '9' },
+        [],
+        identityFormat,
+        parseNodesFn,
+      );
+      expect(result).toEqual({
+        text: '[^9]',
+        identifier: '9',
+        fnc: true,
+      });
     });
 
     it('未知 elementType 时返回空文本', () => {

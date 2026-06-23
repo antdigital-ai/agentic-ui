@@ -1,4 +1,4 @@
-﻿import SkeletonList from './SkeletonList';
+import SkeletonList from './SkeletonList';
 
 import { MutableRefObject, useContext, useMemo, useRef } from 'react';
 

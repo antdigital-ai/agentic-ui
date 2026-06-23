@@ -20,16 +20,7 @@ test.describe('MarkdownInputField 交互功能', () => {
 
       // 按 Enter 发送
       await markdownInputFieldPage.pressKey('Enter');
-
-      // 验证输入框被清空 (sendMessage 会清空内容)
-      await expect
-        .poll(
-          async () => {
-            return await markdownInputFieldPage.getText();
-          },
-          { timeout: 5000 },
-        )
-        .toBe('');
+      await markdownInputFieldPage.expectAfterSendCleared();
     });
 
     test('按 Shift+Enter 应该换行而不是发送', async ({
@@ -69,16 +60,7 @@ test.describe('MarkdownInputField 交互功能', () => {
       // 这里主要测试点击能否触发发送
 
       await sendBtn.click();
-
-      // 验证输入框被清空
-      await expect
-        .poll(
-          async () => {
-            return await markdownInputFieldPage.getText();
-          },
-          { timeout: 5000 },
-        )
-        .toBe('');
+      await markdownInputFieldPage.expectAfterSendCleared();
     });
   });
 

@@ -50,3 +50,30 @@ describe('BaseMarkdownEditor renderMode=markdown', () => {
     ).toBeInTheDocument();
   });
 });
+
+describe('BaseMarkdownEditor readonly renderMode=slate', () => {
+  it('只读 Slate 模式下 initValue 追加时同步文档内容', async () => {
+    const { rerender } = render(
+      <BaseMarkdownEditor
+        readonly
+        initValue="第一段"
+        renderMode="slate"
+        toc={false}
+      />,
+    );
+
+    expect(await screen.findByText('第一段')).toBeInTheDocument();
+
+    rerender(
+      <BaseMarkdownEditor
+        readonly
+        initValue={'第一段\n\n第二段'}
+        renderMode="slate"
+        toc={false}
+      />,
+    );
+
+    expect(await screen.findByText('第二段')).toBeInTheDocument();
+    expect(screen.getAllByText('第一段')).toHaveLength(1);
+  });
+});

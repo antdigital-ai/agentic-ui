@@ -20,6 +20,8 @@ group:
 - 🍵 支持插槽输入
 - 🎯 支持技能模式
 
+<code src="../demos/markdownInputField/basic.tsx" background="var(--main-bg-color)" iframe=640></code>
+
 ```tsx
 import { message } from 'antd';
 import { AimOutlined, GlobalOutlined, EditOutlined } from '@ant-design/icons';

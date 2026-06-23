@@ -103,8 +103,11 @@ export default () => (
 ```bash
 git clone git@github.com:ant-design/agentic-ui.git
 cd agentic-ui
+corepack enable
 pnpm install
 ```
+
+> 若 `pnpm i` 报需要 Node.js v22.13，说明当前是 pnpm 10+；请执行 `corepack prepare pnpm@9.15.9 --activate` 后再安装（见 [AGENTS.md](./AGENTS.md) 故障排查）。
 
 启动文档站点进行预览：
 

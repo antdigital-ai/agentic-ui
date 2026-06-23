@@ -613,6 +613,7 @@ describe('CodeRenderer Component', () => {
 
   describe('流式 Slate 文本同步', () => {
     it('HTML 预览应使用 Slate 子节点文本而不是滞后的 value', () => {
+      mockEditorStore.readonly = true;
       const props = {
         ...defaultProps,
         element: {
@@ -629,9 +630,11 @@ describe('CodeRenderer Component', () => {
       expect(screen.getByTestId('html-content')).toHaveTextContent(
         '<section>from slate</section>',
       );
+      mockEditorStore.readonly = false;
     });
 
     it('Markdown 预览应使用 Slate 子节点文本而不是滞后的 value', () => {
+      mockEditorStore.readonly = true;
       const props = {
         ...defaultProps,
         element: {
@@ -646,6 +649,7 @@ describe('CodeRenderer Component', () => {
       expect(screen.getByTestId('markdown-content')).toHaveTextContent(
         '## from slate',
       );
+      mockEditorStore.readonly = false;
     });
   });
 

@@ -1,4 +1,4 @@
-﻿import {
+import {
   CARD_RESIZE_DURATION_MS,
   CARD_RESIZE_EASING,
 } from '../Constants/cardResizeMotion';

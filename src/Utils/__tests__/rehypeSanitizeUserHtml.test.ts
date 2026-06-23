@@ -1,4 +1,4 @@
-﻿import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
   markdownToHtml,
   markdownToHtmlSync,
@@ -111,6 +111,28 @@ describe('rehypeSanitizeUserHtml', () => {
       expect(result).not.toMatch(/<a[\s>]/i);
       expect(result).toContain('javascript:');
       expect(result).toMatch(/&#x3C;a|&lt;a/i);
+    });
+
+    it('应将含事件处理器的视频降级为纯文本', async () => {
+      const result = await markdownToHtml(
+        'Safe\n\n<video src="movie.mp4" onerror="alert(1)"></video>',
+      );
+
+      expect(result).toContain('Safe');
+      expect(result).not.toMatch(/<video[\s>]/i);
+      expect(result).toMatch(/&#x3C;video|&lt;video/i);
+      expect(result).toMatch(/onerror|onError/i);
+    });
+
+    it('应将危险 source URL 降级为纯文本', async () => {
+      const result = await markdownToHtml(
+        '<video controls><source src="javascript:alert(1)"></video>',
+      );
+
+      expect(result).toMatch(/<video[\s>]/i);
+      expect(result).not.toMatch(/<source[\s>]/i);
+      expect(result).toContain('javascript:alert(1)');
+      expect(result).toMatch(/&#x3C;source|&lt;source/i);
     });
   });
 

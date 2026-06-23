@@ -70,7 +70,6 @@ export type ChatTokenType = FullToken & {
    */
   antCls: string;
   componentCls: string;
-  placeholderContent?: string;
 };
 
 export type GenerateStyle<T = ChatTokenType> = (

@@ -3,13 +3,43 @@ import { parserSlateNodeToMarkdown } from '../parserSlateNodeToMarkdown';
 
 describe('parserSlateNodeToMarkdown', () => {
   describe('handleCard', () => {
-    it('should handle card node correctly', () => {
+    it('普通内容应包一层 <div data-card="true"> 保证 markdown 往返还原', () => {
       const node = {
         type: 'card',
-        children: [{ type: 'paragraph', children: [{ text: 'Card content' }] }],
+        children: [
+          { type: 'card-before', children: [{ text: '' }] },
+          { type: 'paragraph', children: [{ text: 'Card content' }] },
+          { type: 'card-after', children: [{ text: '' }] },
+        ],
       };
       const result = parserSlateNodeToMarkdown([node]);
-      expect(result).toBe('Card content');
+      expect(result).toContain('<div data-card="true">');
+      expect(result).toContain('Card content');
+      expect(result).toContain('</div>');
+    });
+
+    it('table 内容跳过 wrapper（parseTable 会自动重新包装为 card）', () => {
+      const node = {
+        type: 'card',
+        children: [
+          { type: 'card-before', children: [{ text: '' }] },
+          {
+            type: 'table',
+            children: [
+              {
+                type: 'table-row',
+                children: [
+                  { type: 'table-cell', children: [{ text: 'A' }] },
+                ],
+              },
+            ],
+          },
+          { type: 'card-after', children: [{ text: '' }] },
+        ],
+      };
+      const result = parserSlateNodeToMarkdown([node]);
+      expect(result).not.toContain('<div data-card');
+      expect(result).toContain('| A |');
     });
   });
 
@@ -97,6 +127,68 @@ describe('parserSlateNodeToMarkdown', () => {
         '```javascript\nconsole.log("hello");\n```\n\n' +
           '<div>Hello</div>\n\n' +
           '---\ntitle: Hello\n---',
+      );
+    });
+
+    it('void 代码块 children 为空占位时应从 value 序列化围栏', () => {
+      const nodes = [
+        {
+          type: 'code',
+          language: 'markdown',
+          value: '任务内容',
+          children: [{ text: '' }],
+        },
+      ];
+      const result = parserSlateNodeToMarkdown(nodes);
+      expect(result).toBe('```markdown\n任务内容\n```');
+    });
+
+    it('void 代码块位于多段提示词中时应保持块顺序与占位符', () => {
+      const nodes = [
+        {
+          type: 'paragraph',
+          children: [
+            { text: '帮我创建一个定时任务。请根据我的描述: ' },
+            {
+              text: ' ',
+              code: true,
+              tag: true,
+              placeholder: '任务名称',
+            },
+            { text: ' 、 ' },
+            {
+              text: ' ',
+              code: true,
+              tag: true,
+              placeholder: '执行频率',
+            },
+            { text: ' ，内容如下：' },
+          ],
+        },
+        {
+          type: 'code',
+          language: 'markdown',
+          value: '任务内容',
+          children: [{ text: '' }],
+        },
+        {
+          type: 'paragraph',
+          children: [{ text: '帮我生成合适的定时任务配置。' }],
+        },
+      ];
+
+      const result = parserSlateNodeToMarkdown(nodes);
+
+      expect(result).toBe(
+        [
+          '帮我创建一个定时任务。请根据我的描述: `${placeholder:任务名称}` 、 `${placeholder:执行频率}` ，内容如下：',
+          '',
+          '```markdown',
+          '任务内容',
+          '```',
+          '',
+          '帮我生成合适的定时任务配置。',
+        ].join('\n'),
       );
     });
   });
@@ -596,6 +688,16 @@ describe('parserSlateNodeToMarkdown - coverage', () => {
     };
     const result = parserSlateNodeToMarkdown([node]);
     expect(result).toMatch(/\[\^1\].*Note text/);
+  });
+
+  it('should serialize legacy footnoteReference element', () => {
+    const node = {
+      type: 'footnoteReference',
+      identifier: '2',
+      children: [{ text: '2' }],
+    };
+    const result = parserSlateNodeToMarkdown([node]);
+    expect(result).toBe('[^2]');
   });
 
   it('should handle paragraph with align', () => {

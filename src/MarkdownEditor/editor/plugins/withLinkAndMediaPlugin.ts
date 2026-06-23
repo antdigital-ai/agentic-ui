@@ -1,4 +1,5 @@
 import { Editor, Node, Operation, Path, Text, Transforms } from 'slate';
+import { insertEmptyParagraphAfter } from './insertEmptyParagraphAfter';
 
 /**
  * 连续空格跳出链接的阈值（输入第二个空格时跳出 data-url）
@@ -55,18 +56,9 @@ const handleLinkAndMediaOperation = (
   ) {
     const node = Node.get(editor, operation.path);
     if (['link-card', 'media'].includes(node?.type)) {
-      Transforms.insertNodes(
+      insertEmptyParagraphAfter(
         editor,
-        [
-          {
-            type: 'paragraph',
-            children: [{ text: '', p: 'true' }],
-          },
-        ],
-        {
-          at: Path.next([operation.path.at(0)!]),
-          select: true,
-        },
+        Path.next([operation.path.at(0)!]),
       );
     }
     return true;

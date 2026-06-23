@@ -268,6 +268,12 @@ export type CustomLeaf<T = Record<string, any>> = {
   identifier?: string;
   code?: boolean | null;
   tag?: boolean | null;
+  /** 触发 tag 的原始按键（如 `$`、`` ` ``） */
+  triggerText?: string;
+  /** `${placeholder:…}` 占位 Tag 的名称 */
+  placeholder?: string;
+  /** 占位 Tag 已填写的值 */
+  value?: string;
   italic?: boolean | null;
   strikethrough?: boolean | null;
   /** 行内 `<mark>` 高亮（与 MarkdownRenderer 语义一致） */

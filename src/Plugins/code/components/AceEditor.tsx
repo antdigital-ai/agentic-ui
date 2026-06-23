@@ -12,14 +12,15 @@
  * @see {@link https://ace.c9.io/} Ace Editor 官方文档
  */
 
-import type { Ace } from 'ace-builds';
 import isHotkey from 'is-hotkey';
 import { startTransition, useEffect, useRef, useState } from 'react';
-import { Editor, Path, Transforms } from 'slate';
+import type { Ace } from 'ace-builds';
+import type { Path } from 'slate';
 import { useRefFunction } from '../../../Hooks/useRefFunction';
 import partialParse from '../../../MarkdownEditor/editor/parser/json-parse';
 import { useEditorStore } from '../../../MarkdownEditor/editor/store';
 import { getAceLangs, modeMap } from '../../../MarkdownEditor/editor/utils/ace';
+import { handleCodeBlockAceKeyDown } from '../../../MarkdownEditor/editor/utils/codeBlockBehavior';
 import { getCodeBlockPlainText } from '../../../MarkdownEditor/editor/utils/codeBlockPlainText';
 import { EditorUtils } from '../../../MarkdownEditor/editor/utils/editorUtils';
 import { CodeNode } from '../../../MarkdownEditor/el';
@@ -138,43 +139,20 @@ export function AceEditor({
     });
   }, [editorProps.codeProps?.theme, props.theme]);
 
-  // 键盘事件处理
+  // 键盘：空块删除、Mod+Enter 跳出；Enter/Tab 等由 Ace 处理，不再 dispatch 到 window
   const handleKeyDown = useRefFunction((e: KeyboardEvent) => {
-    // 删除空代码块
-    if (isHotkey('backspace', e)) {
-      if (codeRef.current.trim() === '') {
-        Editor.withoutNormalizing(store.editor, () => {
-          Transforms.delete(store.editor, { at: pathRef.current });
-          // 如果这是最后一个节点，使用替换而不是删除+插入，避免文档为空
-          Transforms.insertNodes(
-            store.editor,
-            { type: 'paragraph', children: [{ text: '' }] },
-            { at: pathRef.current, select: true },
-          );
-          Transforms.select(
-            store.editor,
-            Editor.start(store.editor, pathRef.current),
-          );
-        });
-        return;
+    const result = handleCodeBlockAceKeyDown(
+      store.editor,
+      pathRef.current,
+      e,
+      codeRef.current,
+    );
+    if (result === 'handled') {
+      if (isHotkey('mod+enter', e)) {
+        EditorUtils.focus(store.editor);
       }
-    }
-
-    // Cmd/Ctrl + Enter: 插入新段落
-    if (isHotkey('mod+enter', e) && pathRef.current) {
-      EditorUtils.focus(store.editor);
-      Transforms.insertNodes(
-        store.editor,
-        { type: 'paragraph', children: [{ text: '' }] },
-        { at: Path.next(pathRef.current), select: true },
-      );
-      e.stopPropagation();
       return;
     }
-
-    // 转发键盘事件
-    const newEvent = new KeyboardEvent(e.type, e);
-    window.dispatchEvent(newEvent);
   });
 
   // 配置编辑器事件
@@ -242,6 +220,39 @@ export function AceEditor({
     });
   });
 
+  const setAceMode = useRefFunction(
+    async (
+      codeEditor: Ace.Editor,
+      language: string | null | undefined,
+      fallbackToText = true,
+    ) => {
+      let lang = (language || '') as string;
+      if (modeMap.has(lang)) {
+        lang = modeMap.get(lang)!;
+      }
+
+      const aceLangs = await getAceLangs();
+      if (editorRef.current !== codeEditor) return;
+
+      const mode = aceLangs.has(lang)
+        ? `ace/mode/${lang}`
+        : fallbackToText
+          ? 'ace/mode/text'
+          : null;
+
+      if (!mode) return;
+
+      try {
+        const session = codeEditor.getSession?.() || codeEditor.session;
+        if (editorRef.current === codeEditor && session) {
+          session.setMode(mode);
+        }
+      } catch (error) {
+        console.warn('Failed to set Ace Editor mode:', error);
+      }
+    },
+  );
+
   // 初始化 Ace 编辑器（仅在库加载完成后）
   // 注意： intentionally 不将 editorProps.codeProps 列入依赖，因其对象引用在父组件内容更新时会频繁变化，
   // 导致编辑器被不必要地销毁重建。codeProps 的配置在初始化时已应用，主题等动态变更由独立 effect 处理。
@@ -289,15 +300,8 @@ export function AceEditor({
     codeEditor.setTheme(`ace/theme/${theme}`);
 
     // 设置语法高亮
-    setTimeout(async () => {
-      let lang = element.language as string;
-      if (modeMap.has(lang)) {
-        lang = modeMap.get(lang)!;
-      }
-      const aceLangs = await getAceLangs();
-      if (aceLangs.has(lang)) {
-        codeEditor.session.setMode(`ace/mode/${lang}`);
-      }
+    const modeTimer = window.setTimeout(() => {
+      setAceMode(codeEditor, element.language, false);
     }, 16);
 
     if (!readonly) {
@@ -306,7 +310,11 @@ export function AceEditor({
     }
 
     return () => {
+      clearTimeout(modeTimer);
       clearTimeout(debounceTimer.current);
+      if (editorRef.current === codeEditor) {
+        editorRef.current = undefined;
+      }
       codeEditor.destroy();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -319,19 +327,8 @@ export function AceEditor({
 
     aceLanguageRef.current = element.language;
 
-    (async () => {
-      let lang = (element.language || '') as string;
-      if (modeMap.has(lang)) {
-        lang = modeMap.get(lang)!;
-      }
-      const aceLangs = await getAceLangs();
-      if (aceLangs.has(lang)) {
-        editorRef.current?.session.setMode(`ace/mode/${lang}`);
-      } else {
-        editorRef.current?.session.setMode(`ace/mode/text`);
-      }
-    })();
-  }, [element.language, aceLoaded]);
+    setAceMode(editorRef.current, element.language);
+  }, [element.language, aceLoaded, setAceMode]);
 
   // 监听外部值变化
   useEffect(() => {
@@ -402,11 +399,8 @@ export function AceEditor({
       lang = modeMap.get(lang)!;
     }
 
-    const aceLangs = await getAceLangs();
-    if (aceLangs.has(lang)) {
-      editorRef.current?.session.setMode(`ace/mode/${lang}`);
-    } else {
-      editorRef.current?.session.setMode(`ace/mode/text`);
+    if (editorRef.current) {
+      setAceMode(editorRef.current, lang);
     }
   });
 

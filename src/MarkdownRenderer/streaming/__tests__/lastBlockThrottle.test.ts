@@ -1,4 +1,4 @@
-﻿import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { shouldReparseLastBlock } from '../lastBlockThrottle';
 
 describe('shouldReparseLastBlock', () => {
@@ -18,5 +18,23 @@ describe('shouldReparseLastBlock', () => {
     const prev = '```js\nx\n```\n';
     const next = '```js\nx\n```\nmore';
     expect(shouldReparseLastBlock(prev, next, true)).toBe(false);
+  });
+
+  it('流式末块在 GFM 表格内不因 | 或 - 立即重 parse', () => {
+    const prev = '| a | b |\n| - | - |\n| 1';
+    const next = '| a | b |\n| - | - |\n| 1 |';
+    expect(shouldReparseLastBlock(prev, next, true)).toBe(false);
+  });
+
+  it('流式末块在 GFM 表格内换行仍立即重 parse', () => {
+    const prev = '| a | b |';
+    const next = '| a | b |\n| - | - |';
+    expect(shouldReparseLastBlock(prev, next, true)).toBe(true);
+  });
+
+  it('流式末块在 GFM 表格内新增行内语法起点时立即重 parse', () => {
+    const prev = '| a | b |\n| - | - |\n| 1 |';
+    const next = '| a | b |\n| - | - |\n| 1 | [link';
+    expect(shouldReparseLastBlock(prev, next, true)).toBe(true);
   });
 });

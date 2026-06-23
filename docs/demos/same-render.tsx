@@ -1,4 +1,4 @@
-﻿import {
+import {
   MarkdownEditor,
   MarkdownEditorInstance,
   parserMdToSchema,

@@ -1,4 +1,4 @@
-import { test as base } from '@playwright/test';
+﻿import { test as base } from '@playwright/test';
 import { MarkdownEditorPage } from '../pages/MarkdownEditorPage';
 import { MarkdownInputFieldPage } from '../pages/MarkdownInputFieldPage';
 import { ToolUseBarPage } from '../pages/ToolUseBarPage';
@@ -14,6 +14,14 @@ type TestFixtures = {
 };
 
 export const test = base.extend<TestFixtures>({
+  page: async ({ page, baseURL }, use) => {
+    const origin = baseURL ?? 'http://localhost:4172';
+    await page
+      .context()
+      .grantPermissions(['clipboard-read', 'clipboard-write'], { origin });
+    await use(page);
+  },
+
   markdownEditorPage: async ({ page }, use) => {
     const markdownEditorPage = new MarkdownEditorPage(page);
     await use(markdownEditorPage);

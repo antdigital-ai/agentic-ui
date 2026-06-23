@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Transitions.dev「Card resize」节奏：工具条 / 深度思考展开收起共用。
  */
 export const CARD_RESIZE_DURATION_MS = 300;

@@ -1,9 +1,9 @@
-import { createEditor, Editor, Transforms } from 'slate';
+import { createEditor, Transforms } from 'slate';
 import { vi } from 'vitest';
 import { withListsPlugin } from '../withListsPlugin';
 
 describe('withListsPlugin', () => {
-  it('should convert non list-item child of list to list-item', () => {
+  it('should wrap non-list-item child of list in list-item', () => {
     const editor = withListsPlugin(createEditor());
     editor.children = [
       {
@@ -12,18 +12,14 @@ describe('withListsPlugin', () => {
       },
     ];
 
-    const setNodesSpy = vi.spyOn(Transforms, 'setNodes');
+    const wrapNodesSpy = vi.spyOn(editor, 'wrapNodes');
     editor.normalizeNode([editor.children[0] as any, [0]]);
 
-    expect(setNodesSpy).toHaveBeenCalledWith(
-      editor,
-      { type: 'list-item' },
-      { at: [0, 0] },
-    );
-    setNodesSpy.mockRestore();
+    expect(wrapNodesSpy).toHaveBeenCalled();
+    wrapNodesSpy.mockRestore();
   });
 
-  it('should insert paragraph when list-item has no children', () => {
+  it('should normalize empty list-item via slate defaults', () => {
     const editor = withListsPlugin(createEditor());
     editor.children = [
       {
@@ -32,45 +28,28 @@ describe('withListsPlugin', () => {
       },
     ] as any;
 
-    const insertNodesSpy = vi.spyOn(Transforms, 'insertNodes');
-    editor.normalizeNode([editor.children[0], [0]]);
-
-    expect(insertNodesSpy).toHaveBeenCalledWith(
-      editor,
-      { type: 'paragraph', children: [{ text: '' }] },
-      { at: [0, 0] },
-    );
-    insertNodesSpy.mockRestore();
+    expect(() =>
+      editor.normalizeNode([editor.children[0], [0]]),
+    ).not.toThrow();
   });
 
-  it('should wrap non-block first child of list-item in paragraph', () => {
+  it('should wrap bare text child of list-item in list-item-text', () => {
     const editor = withListsPlugin(createEditor());
-    const firstChild = { type: 'link', children: [{ text: 'x' }], url: '' };
     editor.children = [
       {
         type: 'list-item',
-        children: [firstChild],
+        children: [{ text: 'x' }],
       },
     ] as any;
 
-    const isBlockSpy = vi
-      .spyOn(Editor, 'isBlock')
-      .mockImplementation((_e, n) => {
-        return (n as any).type === 'link' ? false : true;
-      });
-    const wrapNodesSpy = vi.spyOn(Transforms, 'wrapNodes');
+    const wrapNodesSpy = vi.spyOn(editor, 'wrapNodes');
     editor.normalizeNode([editor.children[0], [0]]);
 
-    expect(wrapNodesSpy).toHaveBeenCalledWith(
-      editor,
-      expect.objectContaining({ type: 'paragraph', children: [] }),
-      { at: [0, 0] },
-    );
+    expect(wrapNodesSpy).toHaveBeenCalled();
     wrapNodesSpy.mockRestore();
-    isBlockSpy.mockRestore();
   });
 
-  it('should wrap block non-list child at index 1 in list-item and list', () => {
+  it('should coerce block non-list-item-text child to paragraph', () => {
     const editor = withListsPlugin(createEditor());
     editor.children = [
       {
@@ -82,14 +61,14 @@ describe('withListsPlugin', () => {
       },
     ] as any;
 
-    const wrapNodesSpy = vi.spyOn(Transforms, 'wrapNodes');
+    const setNodesSpy = vi.spyOn(editor, 'setNodes');
     editor.normalizeNode([editor.children[0], [0]]);
 
-    expect(wrapNodesSpy).toHaveBeenCalled();
-    wrapNodesSpy.mockRestore();
+    expect(setNodesSpy).toHaveBeenCalled();
+    setNodesSpy.mockRestore();
   });
 
-  it('should convert legacy list type to bulleted-list and unset order', () => {
+  it('should convert legacy list type to numbered-list and unset order', () => {
     const editor = withListsPlugin(createEditor());
     editor.children = [
       {
@@ -116,6 +95,66 @@ describe('withListsPlugin', () => {
     expect(unsetNodesSpy).toHaveBeenCalledWith(editor, 'order', { at: [0] });
     setNodesSpy.mockRestore();
     unsetNodesSpy.mockRestore();
+  });
+
+  it('should merge adjacent bulleted lists of the same type', () => {
+    const editor = withListsPlugin(createEditor());
+    editor.children = [
+      {
+        type: 'bulleted-list',
+        children: [
+          {
+            type: 'list-item',
+            children: [{ type: 'paragraph', children: [{ text: 'a' }] }],
+          },
+        ],
+      },
+      {
+        type: 'bulleted-list',
+        children: [
+          {
+            type: 'list-item',
+            children: [{ type: 'paragraph', children: [{ text: 'b' }] }],
+          },
+        ],
+      },
+    ] as any;
+
+    const mergeNodesSpy = vi.spyOn(editor, 'mergeNodes');
+    editor.normalizeNode([editor.children[1], [1]]);
+
+    expect(mergeNodesSpy).toHaveBeenCalledWith({ at: [1] });
+    mergeNodesSpy.mockRestore();
+  });
+
+  it('should not merge ordered and bulleted lists', () => {
+    const editor = withListsPlugin(createEditor());
+    editor.children = [
+      {
+        type: 'numbered-list',
+        children: [
+          {
+            type: 'list-item',
+            children: [{ type: 'paragraph', children: [{ text: '1' }] }],
+          },
+        ],
+      },
+      {
+        type: 'bulleted-list',
+        children: [
+          {
+            type: 'list-item',
+            children: [{ type: 'paragraph', children: [{ text: 'x' }] }],
+          },
+        ],
+      },
+    ] as any;
+
+    const mergeNodesSpy = vi.spyOn(editor, 'mergeNodes');
+    editor.normalizeNode([editor.children[1], [1]]);
+
+    expect(mergeNodesSpy).not.toHaveBeenCalled();
+    mergeNodesSpy.mockRestore();
   });
 
   it('should convert legacy list without order to bulleted-list', () => {

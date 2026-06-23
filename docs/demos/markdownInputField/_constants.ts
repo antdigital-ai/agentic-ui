@@ -3,6 +3,14 @@ import type { CSSProperties } from 'react';
 export const TEMPLATE_VALUE =
   '帮我查询`${placeholder:目标企业}` `${placeholder:近3年;initialValue:近6年}`的`${placeholder:资产总额}`。';
 
+/** demo-0：Tag（$ / 占位符）+ Mark（@ /）初始内容 */
+export const TAG_MARK_DEMO_INITIAL = [
+  '<mark label="@">@客服助理</mark> ',
+  '请继续编辑：$ 打开 tag；@ / 插入 mark。',
+  '',
+  TEMPLATE_VALUE,
+].join('\n');
+
 export const TAG_ITEMS = ['tag1', 'tag2', 'tag3'].map((item) => ({
   key: item,
   label: item,

@@ -21,6 +21,7 @@ import {
   toggleQuote,
 } from './editorCommands';
 import { EditorUtils } from './editorUtils';
+import { isCodeBlockAceInputTarget } from './codeBlockBehavior';
 
 export type Methods<T> = {
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -483,6 +484,10 @@ export const useSystemKeyboard = (
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const keydown = useRefFunction((e: KeyboardEvent) => {
     if (!store) return;
+
+    if (isCodeBlockAceInputTarget(e.target)) {
+      return;
+    }
 
     if (isHotkey('mod+c', e) || isHotkey('mod+x', e)) {
       const [node] = Editor.nodes<MediaNode | AttachNode>(store?.editor, {

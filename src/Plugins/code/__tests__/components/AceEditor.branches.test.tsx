@@ -17,6 +17,14 @@ const pushHandler = (event: string, handler: (...args: any[]) => void) => {
 const invokeHandlers = (event: string) => {
   eventHandlers[event]?.forEach((h) => h());
 };
+const createDeferred = <T,>() => {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((promiseResolve) => {
+    resolve = promiseResolve;
+  });
+
+  return { promise, resolve };
+};
 const mockEditor = vi.hoisted(() => ({
   setTheme: vi.fn(),
   setValue: vi.fn(),
@@ -74,9 +82,10 @@ vi.mock('../../../../MarkdownEditor/editor/utils/ace', () => ({
 }));
 
 const mockTransforms = vi.hoisted(() => ({
-  delete: vi.fn(),
+  removeNodes: vi.fn(),
   insertNodes: vi.fn(),
   select: vi.fn(),
+  setNodes: vi.fn(),
 }));
 const mockEditorStart = vi.hoisted(() =>
   vi.fn(() => ({ path: [0, 0], offset: 0 })),
@@ -213,6 +222,47 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     expect(mockEditor.commands.addCommand).toHaveBeenCalledWith(
       expect.objectContaining({ name: 'disableFind' }),
     );
+  });
+
+  it('初始化 mode 时 Ace session 缺失不应抛错或警告', async () => {
+    const originalSession = mockEditor.session;
+    const consoleWarnSpy = vi
+      .spyOn(console, 'warn')
+      .mockImplementation(() => {});
+
+    (mockEditor as any).getSession = vi.fn(() => null);
+    (mockEditor as any).session = undefined;
+
+    function Wrapper() {
+      const result = AceEditor(defaultProps);
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    try {
+      render(<Wrapper />);
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+      await act(async () => {
+        vi.advanceTimersByTime(25);
+        await Promise.resolve();
+      });
+
+      expect(consoleWarnSpy).not.toHaveBeenCalledWith(
+        'Failed to set Ace Editor mode:',
+        expect.anything(),
+      );
+      expect(originalSession.setMode).not.toHaveBeenCalled();
+    } finally {
+      (mockEditor as any).session = originalSession;
+      delete (mockEditor as any).getSession;
+      consoleWarnSpy.mockRestore();
+    }
   });
 
   it('setupEditorEvents: focus/blur 触发 onShowBorderChange、onHideChange、onSelectionChange', async () => {
@@ -375,7 +425,7 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     });
     textarea!.dispatchEvent(keydownEvent);
 
-    expect(mockTransforms.delete).toHaveBeenCalled();
+    expect(mockTransforms.removeNodes).toHaveBeenCalled();
     expect(mockTransforms.insertNodes).toHaveBeenCalled();
     expect(mockTransforms.select).toHaveBeenCalled();
   });
@@ -614,6 +664,94 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     expect(captureRef.current).toBeTruthy();
     mockEditor.session.setMode.mockClear();
     await captureRef.current!.setLanguage('javascript');
+    expect(mockEditor.session.setMode).not.toHaveBeenCalled();
+  });
+
+  it('setLanguage 在 Ace session 缺失时不抛错且不设置 mode', async () => {
+    const captureRef = { current: null as ReturnType<typeof AceEditor> | null };
+    const originalSession = mockEditor.session;
+    const consoleWarnSpy = vi
+      .spyOn(console, 'warn')
+      .mockImplementation(() => {});
+
+    (mockEditor as any).session = undefined;
+    (mockEditor as any).getSession = vi.fn(() => undefined);
+
+    try {
+      function Wrapper() {
+        const result = AceEditor({
+          ...defaultProps,
+          element: { ...defaultProps.element, language: 'javascript' },
+        });
+        captureRef.current = result;
+        return (
+          <div ref={result.dom}>
+            <textarea aria-label="ace" />
+          </div>
+        );
+      }
+
+      render(<Wrapper />);
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+      await act(async () => {
+        vi.advanceTimersByTime(25);
+        await Promise.resolve();
+      });
+
+      await expect(captureRef.current!.setLanguage('python')).resolves.toBe(
+        undefined,
+      );
+
+      expect(defaultProps.onUpdate).toHaveBeenCalledWith({
+        language: 'python',
+      });
+      expect(originalSession.setMode).not.toHaveBeenCalled();
+      expect(consoleWarnSpy).not.toHaveBeenCalled();
+    } finally {
+      (mockEditor as any).session = originalSession;
+      delete (mockEditor as any).getSession;
+      consoleWarnSpy.mockRestore();
+    }
+  });
+
+  it('卸载后异步 mode 加载完成不会更新已销毁编辑器', async () => {
+    const { getAceLangs } =
+      await import('../../../../MarkdownEditor/editor/utils/ace');
+    const deferredLangs = createDeferred<Set<string>>();
+    vi.mocked(getAceLangs).mockReturnValueOnce(deferredLangs.promise);
+
+    function Wrapper() {
+      const result = AceEditor(defaultProps);
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    const { unmount } = render(<Wrapper />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    mockEditor.session.setMode.mockClear();
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    unmount();
+
+    await act(async () => {
+      deferredLangs.resolve(new Set(['javascript', 'text']));
+      await deferredLangs.promise;
+      await Promise.resolve();
+    });
+
     expect(mockEditor.session.setMode).not.toHaveBeenCalled();
   });
 });

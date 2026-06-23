@@ -1,5 +1,6 @@
 import type { RootContent } from 'mdast';
 import { CustomLeaf } from '../../../el';
+import { handleFootnoteReference } from './parseFootnote';
 import { handleInlineCode } from './parseElements';
 
 /**
@@ -118,6 +119,11 @@ export const parseText = (
       continue;
     }
 
+    if (n.type === 'footnoteReference') {
+      leafs.push({ ...leaf, ...handleFootnoteReference(n as any) });
+      continue;
+    }
+
     // remark-directive 的 textDirective/leafDirective，提取其 children 的文本内容
     if (n.type === 'textDirective' || n.type === 'leafDirective') {
       const directiveResult = parseText((n as any).children || [], leaf);
@@ -217,6 +223,20 @@ export const handleTextAndInlineElementsPure = (
     const leafWithHtmlTags = applyHtmlTagsToElement(formattedLeaf, htmlTag);
     const inlineCodeResult = handleInlineCode(currentElement);
     return { ...leafWithHtmlTags, ...inlineCodeResult };
+  }
+
+  if (elementType === 'footnoteReference') {
+    const finished = (currentElement as any).finished;
+    const baseLeaf: CustomLeaf = {
+      ...(finished === false && {
+        otherProps: {
+          finished,
+        },
+      }),
+    };
+    const formattedLeaf = applyInlineFormattingFn(baseLeaf, currentElement);
+    const leafWithHtmlTags = applyHtmlTagsToElement(formattedLeaf, htmlTag);
+    return { ...leafWithHtmlTags, ...handleFootnoteReference(currentElement) };
   }
 
   // remark-directive 的 textDirective/leafDirective，递归解析其 children

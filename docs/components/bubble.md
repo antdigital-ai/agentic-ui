@@ -1,4 +1,4 @@
-﻿---
+---
 title: Bubble 气泡组件
 atomId: Bubble
 group:

@@ -1,4 +1,4 @@
-﻿import { useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext } from '../../I18n';
 import type { AttachmentButtonProps } from '../AttachmentButton';

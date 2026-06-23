@@ -1,4 +1,4 @@
-﻿/**
+/**
  * title: 暗黑主题
  * description: 设置 theme="dark"，与 ChartContainer 暗色算法一致
  */

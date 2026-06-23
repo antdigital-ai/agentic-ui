@@ -1,4 +1,4 @@
-﻿import {
+import {
   BaseMarkdownEditor,
   MarkdownEditorPlugin,
   parserMdToSchema,

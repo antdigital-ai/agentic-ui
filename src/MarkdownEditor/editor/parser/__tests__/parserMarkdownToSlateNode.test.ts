@@ -8,7 +8,6 @@ import {
   parserMarkdownToSlateNode,
 } from '../parserMarkdownToSlateNode';
 import { parserMdToSchema } from '../parserMdToSchema';
-
 import { parserSlateNodeToMarkdown } from '../parserSlateNodeToMarkdown';
 
 describe('parserMarkdownToSlateNode', () => {
@@ -37,9 +36,17 @@ describe('parserMarkdownToSlateNode', () => {
       );
       expect(inlineKatexNode).toBeUndefined();
 
-      const textContent = paragraph.children
-        .map((c: any) => c?.text ?? '')
-        .join('');
+      const collectText = (nodes: any[]): string =>
+        nodes
+          .map((c: any) =>
+            typeof c?.text === 'string'
+              ? c.text
+              : Array.isArray(c?.children)
+                ? collectText(c.children)
+                : '',
+          )
+          .join('');
+      const textContent = collectText(paragraph.children);
       expect(textContent).toContain('$a^2 + b^2 = c^2$');
     });
 
@@ -57,9 +64,17 @@ describe('parserMarkdownToSlateNode', () => {
       );
       expect(inlineKatexNode).toBeUndefined();
 
-      const textContent = paragraph.children
-        .map((c: any) => c?.text ?? '')
-        .join('');
+      const collectText = (nodes: any[]): string =>
+        nodes
+          .map((c: any) =>
+            typeof c?.text === 'string'
+              ? c.text
+              : Array.isArray(c?.children)
+                ? collectText(c.children)
+                : '',
+          )
+          .join('');
+      const textContent = collectText(paragraph.children);
       expect(textContent).toContain('$a^2 + b^2 = c^2$');
     });
 
@@ -75,9 +90,17 @@ describe('parserMarkdownToSlateNode', () => {
       );
       expect(inlineKatexNode).toBeUndefined();
 
-      const textContent = paragraph.children
-        .map((c: any) => c?.text ?? '')
-        .join('');
+      const collectText = (nodes: any[]): string =>
+        nodes
+          .map((c: any) =>
+            typeof c?.text === 'string'
+              ? c.text
+              : Array.isArray(c?.children)
+                ? collectText(c.children)
+                : '',
+          )
+          .join('');
+      const textContent = collectText(paragraph.children);
       expect(textContent).toContain('$24.4B$');
       expect(textContent).toContain('$18.2B$');
     });
@@ -116,11 +139,18 @@ describe('parserMarkdownToSlateNode', () => {
       );
       expect(inlineKatexNode).toBeUndefined();
 
-      const numericParagraphNode = paragraph.children.find(
-        (child: any) => child?.type === 'paragraph',
-      );
-      expect(numericParagraphNode).toBeDefined();
-      expect(numericParagraphNode.children).toEqual([{ text: '$100$' }]);
+      const collectText = (nodes: any[]): string =>
+        nodes
+          .map((c: any) =>
+            typeof c?.text === 'string'
+              ? c.text
+              : Array.isArray(c?.children)
+                ? collectText(c.children)
+                : '',
+          )
+          .join('');
+      const textContent = collectText(paragraph.children);
+      expect(textContent).toContain('$100$');
     });
 
     it('should handle paragraph with bold text', () => {
@@ -198,6 +228,27 @@ describe('parserMarkdownToSlateNode', () => {
       });
     });
 
+    it('should preserve inline <mark> color, bg and label attributes on highlighted leaf', () => {
+      const markdown =
+        'prefix <mark color="red" bg="#eee" label="Note">highlighted</mark> suffix';
+      const result = parserMarkdownToSlateNode(markdown);
+      expect(result.schema).toHaveLength(1);
+      expect(result.schema[0]).toMatchObject({
+        type: 'paragraph',
+        children: [
+          { text: 'prefix ' },
+          {
+            text: 'highlighted',
+            mark: true,
+            markColor: 'red',
+            markBg: '#eee',
+            markLabel: 'Note',
+          },
+          { text: ' suffix' },
+        ],
+      });
+    });
+
     it('should parse block-only <mark>...</mark> as paragraph with mark', () => {
       const markdown = '<mark>/alipay-aipay-product-intro </mark>';
       const result = parserMarkdownToSlateNode(markdown);
@@ -226,6 +277,49 @@ describe('parserMarkdownToSlateNode', () => {
       const marked = para.children.find((c: any) => c?.mark);
       expect(marked.markColor).toBe('red"x');
       expect(marked.markLabel).toBe('&Note');
+    });
+
+    it('应把 <div data-card="true"> 块还原为 card 节点（包 card-before/after）', () => {
+      const markdown = `<div data-card="true">\nHello inside card\n</div>`;
+      const result = parserMarkdownToSlateNode(markdown);
+      const cardNode = result.schema.find((n: any) => n?.type === 'card');
+      expect(cardNode).toBeDefined();
+      expect((cardNode as any).children[0]).toMatchObject({
+        type: 'card-before',
+      });
+      expect((cardNode as any).children.at(-1)).toMatchObject({
+        type: 'card-after',
+      });
+      const inner = (cardNode as any).children.find(
+        (c: any) => c.type !== 'card-before' && c.type !== 'card-after',
+      );
+      expect(inner.type).toBe('paragraph');
+    });
+
+    it('card → markdown → card 往返保持 image 内容', () => {
+      const original = {
+        type: 'card',
+        children: [
+          { type: 'card-before', children: [{ text: '' }] },
+          {
+            type: 'image',
+            url: 'https://example.com/x.png',
+            children: [{ text: '' }],
+          },
+          { type: 'card-after', children: [{ text: '' }] },
+        ],
+      };
+      const md = parserSlateNodeToMarkdown([original]);
+      expect(md).toContain('<div data-card="true">');
+      expect(md).toContain('https://example.com/x.png');
+
+      const back = parserMarkdownToSlateNode(md);
+      const card = back.schema.find((n: any) => n?.type === 'card');
+      expect(card).toBeDefined();
+      const urlFound = JSON.stringify(card).includes(
+        'https://example.com/x.png',
+      );
+      expect(urlFound).toBe(true);
     });
 
     it('should handle paragraph with inline code', () => {
@@ -379,7 +473,7 @@ describe('parserMarkdownToSlateNode', () => {
         render: false,
         isConfig: false,
         value: 'console.log("hello");',
-        children: [{ text: 'console.log("hello");' }],
+        children: [{ text: '' }],
       });
       // 验证 otherProps 存在（不再包含 data-block 等冗余属性）
       expect(codeNode).toHaveProperty('otherProps');
@@ -397,7 +491,7 @@ describe('parserMarkdownToSlateNode', () => {
         render: false,
         isConfig: false,
         value: 'some code',
-        children: [{ text: 'some code' }],
+        children: [{ text: '' }],
       });
       // 验证 otherProps 存在（不再包含 data-block 等冗余属性）
       expect(codeNode).toHaveProperty('otherProps');
@@ -416,9 +510,7 @@ describe('parserMarkdownToSlateNode', () => {
         render: false,
         isConfig: false,
         value: 'def hello():\n    print("Hello World")\n    return True',
-        children: [
-          { text: 'def hello():\n    print("Hello World")\n    return True' },
-        ],
+        children: [{ text: '' }],
       });
       // 验证 otherProps 存在（不再包含 data-block 等冗余属性）
       expect(codeNode).toHaveProperty('otherProps');
@@ -823,7 +915,7 @@ describe('parserMarkdownToSlateNode', () => {
         language: 'yaml',
         frontmatter: true,
         value: 'title: Test\nauthor: John',
-        children: [{ text: 'title: Test\nauthor: John' }],
+        children: [{ text: '' }],
       });
       expect(result.schema[1]).toMatchObject({
         type: 'head',
@@ -1175,7 +1267,7 @@ function hello() {
         type: 'code',
         language: 'think',
         value: '深度思考内容',
-        children: [{ text: '深度思考内容' }],
+        children: [{ text: '' }],
       });
     });
 

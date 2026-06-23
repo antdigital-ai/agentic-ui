@@ -15,8 +15,7 @@ import { MessagesContext } from '../../../Bubble/MessagesContent/BubbleContext';
 import { I18nContext } from '../../../I18n';
 import {
   EditorStoreContext,
-  useEditorStore,
-} from '../../../MarkdownEditor/editor/store';
+} from '../../../MarkdownEditor/editor/editorStoreContext';
 import { getSlateElementPlainText } from '../../../MarkdownEditor/editor/utils/codeBlockPlainText';
 import { EditorUtils } from '../../../MarkdownEditor/editor/utils/editorUtils';
 import { CodeNode, ElementProps } from '../../../MarkdownEditor/el';
@@ -87,9 +86,10 @@ const restoreCodeBlocks = (content: string): string => {
 export function ThinkBlock(props: ThinkBlockProps) {
   const { element } = props;
   const { locale } = useContext(I18nContext);
-  const { editorProps } = useContext(EditorStoreContext) || {};
+  const editorStore = useContext(EditorStoreContext);
+  const { editorProps, markdownEditorRef = { current: null } } =
+    editorStore || {};
   const { message } = useContext(MessagesContext);
-  const { markdownEditorRef } = useEditorStore();
   const thinkBlockContext = useContext(ThinkBlockContext);
 
   // 获取当前 Bubble 的 isFinished 状态

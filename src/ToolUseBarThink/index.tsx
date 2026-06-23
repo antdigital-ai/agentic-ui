@@ -1,4 +1,4 @@
-﻿import {
+import {
   Brain,
   ChevronDown,
   ChevronsDownUp,

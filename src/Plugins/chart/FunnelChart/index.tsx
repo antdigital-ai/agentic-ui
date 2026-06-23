@@ -1,4 +1,4 @@
-﻿import { ConfigProvider } from 'antd';
+import { ConfigProvider } from 'antd';
 import type { LegendItem, PointStyle } from 'chart.js';
 import {
   BarElement,

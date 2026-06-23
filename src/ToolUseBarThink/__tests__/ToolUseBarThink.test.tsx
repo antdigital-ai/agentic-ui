@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -14,6 +14,33 @@ vi.mock('framer-motion', () => ({
 const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <ConfigProvider>{children}</ConfigProvider>
 );
+
+const mockOverflowingContent = (scrollHeight = 250) => {
+  const originalResizeObserver = global.ResizeObserver;
+
+  global.ResizeObserver = class MockResizeObserver {
+    private readonly callback: () => void;
+
+    constructor(callback: () => void) {
+      this.callback = callback;
+    }
+
+    observe(el: HTMLElement) {
+      Object.defineProperty(el, 'scrollHeight', {
+        value: scrollHeight,
+        configurable: true,
+      });
+      this.callback();
+    }
+
+    disconnect() {}
+    unobserve() {}
+  };
+
+  return () => {
+    global.ResizeObserver = originalResizeObserver;
+  };
+};
 
 describe('ToolUseBarThink', () => {
   it('should render with time and show time element', () => {
@@ -111,6 +138,94 @@ describe('ToolUseBarThink', () => {
       </Wrapper>,
     );
     expect(screen.getByTestId('think-content')).toBeInTheDocument();
+  });
+
+  it('展开时应在折叠动画结束后滚动到组件容器', () => {
+    const scrollIntoViewSpy = vi.fn();
+    vi.useFakeTimers();
+    Element.prototype.scrollIntoView = scrollIntoViewSpy;
+
+    try {
+      render(
+        <Wrapper>
+          <ToolUseBarThink toolName="Test" scrollIntoViewOnExpand />
+        </Wrapper>,
+      );
+
+      fireEvent.click(screen.getByTestId('tool-use-bar-think-bar'));
+
+      expect(scrollIntoViewSpy).not.toHaveBeenCalled();
+      act(() => {
+        vi.advanceTimersByTime(350);
+      });
+
+      expect(scrollIntoViewSpy).toHaveBeenCalledWith({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
+    } finally {
+      vi.useRealTimers();
+      delete (Element.prototype as Partial<Element>).scrollIntoView;
+    }
+  });
+
+  it('初始展开不触发滚动，后续展开透传自定义滚动参数', () => {
+    const scrollIntoViewSpy = vi.fn();
+    vi.useFakeTimers();
+    Element.prototype.scrollIntoView = scrollIntoViewSpy;
+
+    try {
+      const scrollOptions: ScrollIntoViewOptions = {
+        behavior: 'auto',
+        block: 'center',
+      };
+      const { rerender } = render(
+        <Wrapper>
+          <ToolUseBarThink
+            toolName="Test"
+            expanded={true}
+            scrollIntoViewOnExpand={scrollOptions}
+          />
+        </Wrapper>,
+      );
+
+      act(() => {
+        vi.advanceTimersByTime(350);
+      });
+      expect(scrollIntoViewSpy).not.toHaveBeenCalled();
+
+      rerender(
+        <Wrapper>
+          <ToolUseBarThink
+            toolName="Test"
+            expanded={false}
+            scrollIntoViewOnExpand={scrollOptions}
+          />
+        </Wrapper>,
+      );
+      act(() => {
+        vi.advanceTimersByTime(350);
+      });
+
+      rerender(
+        <Wrapper>
+          <ToolUseBarThink
+            toolName="Test"
+            expanded={true}
+            scrollIntoViewOnExpand={scrollOptions}
+          />
+        </Wrapper>,
+      );
+      act(() => {
+        vi.advanceTimersByTime(350);
+      });
+
+      expect(scrollIntoViewSpy).toHaveBeenCalledTimes(1);
+      expect(scrollIntoViewSpy).toHaveBeenCalledWith(scrollOptions);
+    } finally {
+      vi.useRealTimers();
+      delete (Element.prototype as Partial<Element>).scrollIntoView;
+    }
   });
 
   it('内容溢出时显示展开/收起按钮并可点击', () => {
@@ -228,5 +343,75 @@ describe('ToolUseBarThink', () => {
     }
     expect(screen.getByTestId('think-tall-3')).toBeInTheDocument();
     global.ResizeObserver = originalRO;
+  });
+
+  it('内容溢出展开后解除折叠父级和容器高度限制', () => {
+    const restoreResizeObserver = mockOverflowingContent();
+
+    try {
+      render(
+        <Wrapper>
+          <ToolUseBarThink
+            toolName="Test"
+            status="success"
+            thinkContent={<div data-testid="think-overflowing">Tall</div>}
+            defaultExpanded
+          />
+        </Wrapper>,
+      );
+
+      const container = screen.getByTestId('tool-use-bar-think-container');
+      const collapse = container.parentElement?.parentElement;
+
+      expect(screen.getByTestId('think-overflowing')).toBeInTheDocument();
+      expect(container.style.maxHeight).toBe('');
+      expect(collapse?.className).not.toContain(
+        'think-collapse-content-expanded',
+      );
+
+      fireEvent.click(screen.getByTestId('tool-use-bar-think-content-expand'));
+
+      expect(container).toHaveStyle({
+        maxHeight: 'none',
+        overflowY: 'auto',
+      });
+      expect(collapse?.className).toContain('think-collapse-content-expanded');
+    } finally {
+      restoreResizeObserver();
+    }
+  });
+
+  it('loading 状态 floating 展开后解除长内容裁剪并保持按钮可见', () => {
+    render(
+      <Wrapper>
+        <ToolUseBarThink
+          toolName="Test"
+          status="loading"
+          thinkContent={<div data-testid="think-loading-long">Loading</div>}
+          defaultExpanded
+        />
+      </Wrapper>,
+    );
+
+    const container = screen.getByTestId('tool-use-bar-think-container');
+    const collapse = container.parentElement?.parentElement;
+
+    expect(container.style.maxHeight).toBe('');
+    expect(container.className).not.toContain('container-floating-expanded');
+    expect(collapse?.className).not.toContain(
+      'think-collapse-content-expanded',
+    );
+
+    fireEvent.click(screen.getByTestId('tool-use-bar-think-floating-expand'));
+
+    expect(container).toHaveStyle({
+      maxHeight: 'none',
+      overflowY: 'auto',
+    });
+    expect(container.className).toContain('container-floating-expanded');
+    expect(collapse?.className).toContain('think-collapse-content-expanded');
+    expect(
+      screen.getByTestId('tool-use-bar-think-floating-expand'),
+    ).toBeInTheDocument();
   });
 });

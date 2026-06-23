@@ -1,4 +1,4 @@
-﻿import { MarkdownEditor } from '@ant-design/agentic-ui';
+import { MarkdownEditor } from '@ant-design/agentic-ui';
 import React from 'react';
 
 const bugMd = `<!-- [{"chartType": "line", "x": "date", "y": "uv_click_mark", "colorLegend": "content_name", "subgraphBy": "hook_name", "title": "最近31天内UV点击量统计"}, {"chartType": "line", "x": "date", "y": "page_exposure_count", "colorLegend": "content_name", "subgraphBy": "hook_name", "title": "最近31天内页面曝光量统计"}] -->

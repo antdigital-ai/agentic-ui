@@ -1,4 +1,4 @@
-﻿import {
+import {
   ChevronDown as DownIcon,
   Download as DownloadIcon,
   ChevronRight as RightIcon,

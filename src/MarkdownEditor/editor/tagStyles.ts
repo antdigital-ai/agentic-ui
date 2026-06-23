@@ -4,7 +4,7 @@ import { COLORS } from '../../Constants/colors';
  * 集中管理所有标签相关的样式，避免重复定义
  */
 
-// 函数标签样式 (fnc)
+// 脚注引用角标样式 (fnc)
 export const FNC_TAG_STYLES = {
   background: 'var(--color-gray-border-light)',
   color: 'var(--color-gray-text-light)',
@@ -33,7 +33,7 @@ export const FNC_TAG_STYLES = {
   },
 };
 
-// 函数定义标签样式 (fnd)
+// 脚注定义行内标记样式 (fnd)
 export const FND_TAG_STYLES = {
   paddingLeft: '0.125em',
   paddingRight: '0.125em',

@@ -351,6 +351,9 @@ const genStyle: GenStyleFn<'MarkdownEditor'> = (token) => {
         {
           display: 'none',
         },
+      'div[data-composition] [data-slate-placeholder="true"]': {
+        display: 'none',
+      },
       '> *': {
         boxSizing: 'border-box',
         scrollbarWidth: 'thin',

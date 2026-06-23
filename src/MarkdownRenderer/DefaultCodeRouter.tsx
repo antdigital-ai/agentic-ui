@@ -71,6 +71,64 @@ const CodeBlockLazyFallback: React.FC<RendererBlockProps> = (props) => {
   );
 };
 
+/* -------------------------------------------------------------------------- */
+/*  声明式路由表                                                               */
+/* -------------------------------------------------------------------------- */
+
+type LazyComponent = React.LazyExoticComponent<React.ComponentType<any>>;
+
+interface RouteConfig {
+  /** 匹配的 language 标识；aliases 中的语言也路由到同一组件 */
+  language: string;
+  /** 同路由的别名（如 'agentic-ui-usertoolbar' → 'agentic-ui-toolusebar'） */
+  aliases?: string[];
+  /** React.lazy 加载的组件 */
+  component: LazyComponent;
+  /** 需要从 pluginComponents 中查找的插件 key（默认等于 language） */
+  pluginKey?: string;
+  /** 额外透传给组件的 props 选择器 */
+  extraProps?: (
+    ctx: DefaultCodeRouterProps,
+  ) => Record<string, any> | undefined;
+}
+
+const ROUTE_TABLE: RouteConfig[] = [
+  {
+    language: 'mermaid',
+    component: LazyMermaidBlockRenderer,
+  },
+  {
+    language: 'chart',
+    aliases: ['json-chart'],
+    component: LazyChartBlockRenderer,
+  },
+  {
+    language: 'agentic-ui-task',
+    component: LazyAgenticUiTaskBlockRenderer,
+  },
+  {
+    language: 'agentic-ui-toolusebar',
+    aliases: ['agentic-ui-usertoolbar'],
+    component: LazyAgenticUiToolUseBarBlockRenderer,
+  },
+  {
+    language: 'agentic-ui-filemap',
+    component: LazyAgenticUiFileMapBlockRenderer,
+    extraProps: (ctx) => ({ fileMapConfig: ctx.fileMapConfig }),
+  },
+];
+
+/** 构建 language → RouteConfig 的查找表（含 aliases 展开） */
+const ROUTE_MAP = new Map<string, RouteConfig>();
+for (const route of ROUTE_TABLE) {
+  ROUTE_MAP.set(route.language, route);
+  if (route.aliases) {
+    for (const alias of route.aliases) {
+      ROUTE_MAP.set(alias, route);
+    }
+  }
+}
+
 export type DefaultCodeRouterProps = RendererBlockProps & {
   pluginComponents: Record<string, React.ComponentType<RendererBlockProps>>;
   apaasifyRender?: (value: any) => React.ReactNode;
@@ -86,93 +144,48 @@ export const DefaultCodeRouter: React.FC<DefaultCodeRouterProps> = (props) => {
     language,
     pluginComponents,
     apaasifyRender,
-    fileMapConfig,
+    // 仅用于从 rest 里剥离；实际通过 route.extraProps(props) 传给 filemap 组件
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    fileMapConfig: _fileMapConfig,
     editorCodeProps,
     ...rest
   } = props;
 
-  if (language === 'mermaid') {
-    if (pluginComponents.mermaid) {
-      const C = pluginComponents.mermaid;
-      return <C {...rest} language={language} />;
-    }
-    return (
-      <Suspense
-        fallback={<CodeBlockLazyFallback {...rest} language={language} />}
-      >
-        <LazyMermaidBlockRenderer {...rest} language={language} />
-      </Suspense>
-    );
-  }
-
-  if (language === 'chart' || language === 'json-chart') {
-    if (pluginComponents.chart) {
-      const C = pluginComponents.chart;
-      return <C {...rest} language={language} />;
-    }
-    return (
-      <Suspense
-        fallback={<CodeBlockLazyFallback {...rest} language={language} />}
-      >
-        <LazyChartBlockRenderer {...rest} language={language} />
-      </Suspense>
-    );
-  }
-
-  if (language === 'agentic-ui-task') {
-    if (pluginComponents['agentic-ui-task']) {
-      const C = pluginComponents['agentic-ui-task'];
-      return <C {...rest} language={language} />;
-    }
-    return (
-      <Suspense
-        fallback={<CodeBlockLazyFallback {...rest} language={language} />}
-      >
-        <LazyAgenticUiTaskBlockRenderer {...rest} language={language} />
-      </Suspense>
-    );
-  }
-
-  if (
-    language === 'agentic-ui-toolusebar' ||
-    language === 'agentic-ui-usertoolbar'
-  ) {
-    if (
-      pluginComponents['agentic-ui-toolusebar'] ||
-      pluginComponents['agentic-ui-usertoolbar']
-    ) {
-      const C =
-        pluginComponents['agentic-ui-toolusebar'] ||
-        pluginComponents['agentic-ui-usertoolbar']!;
-      return <C {...rest} language={language} />;
-    }
-    return (
-      <Suspense
-        fallback={<CodeBlockLazyFallback {...rest} language={language} />}
-      >
-        <LazyAgenticUiToolUseBarBlockRenderer {...rest} language={language} />
-      </Suspense>
-    );
-  }
-
-  if (language === 'agentic-ui-filemap') {
-    if (pluginComponents['agentic-ui-filemap']) {
-      const C = pluginComponents['agentic-ui-filemap'];
-      return <C {...rest} language={language} fileMapConfig={fileMapConfig} />;
-    }
-    return (
-      <Suspense
-        fallback={<CodeBlockLazyFallback {...rest} language={language} />}
-      >
-        <LazyAgenticUiFileMapBlockRenderer
+  // 1. 声明式路由表匹配
+  const route = language ? ROUTE_MAP.get(language) : undefined;
+  if (route) {
+    const pluginKey = route.pluginKey ?? route.language;
+    // 别名也检查对应的 plugin key
+    const C =
+      pluginComponents[pluginKey] ??
+      (route.aliases
+        ? route.aliases
+            .map((a) => pluginComponents[a])
+            .find((c) => c !== undefined)
+        : undefined);
+    if (C) {
+      return (
+        <C
           {...rest}
           language={language}
-          fileMapConfig={fileMapConfig}
+          {...(route.extraProps?.(props) ?? {})}
+        />
+      );
+    }
+    return (
+      <Suspense
+        fallback={<CodeBlockLazyFallback {...rest} language={language} />}
+      >
+        <route.component
+          {...rest}
+          language={language}
+          {...(route.extraProps?.(props) ?? {})}
         />
       </Suspense>
     );
   }
 
+  // 2. schema 语言族（共享同一个 lazy 组件 + apaasifyRender/editorCodeProps）
   if (language && SCHEMA_LANGUAGES.has(language)) {
     if (pluginComponents.schema) {
       const C = pluginComponents.schema;
@@ -199,6 +212,7 @@ export const DefaultCodeRouter: React.FC<DefaultCodeRouterProps> = (props) => {
     );
   }
 
+  // 3. 通用插件路由：任何 pluginComponents[language] 都可渲染
   if (language && pluginComponents[language]) {
     const C = pluginComponents[language];
     return (
@@ -206,6 +220,7 @@ export const DefaultCodeRouter: React.FC<DefaultCodeRouterProps> = (props) => {
     );
   }
 
+  // 4. 默认代码块渲染
   if (pluginComponents.code) {
     const C = pluginComponents.code;
     return (

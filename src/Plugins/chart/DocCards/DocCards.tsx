@@ -1,4 +1,4 @@
-﻿import { ConfigProvider } from 'antd';
+import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import React, { memo, useContext, useMemo } from 'react';
 import { I18nContext } from '../../../I18n';

@@ -1,4 +1,4 @@
-﻿import { ThoughtChainList } from '@ant-design/agentic-ui';
+import { ThoughtChainList } from '@ant-design/agentic-ui';
 import React from 'react';
 
 export default function Home() {

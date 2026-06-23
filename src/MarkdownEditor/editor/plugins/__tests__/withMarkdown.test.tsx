@@ -1,13 +1,12 @@
-import { createEditor, Editor, Transforms } from 'slate';
-import { withReact } from 'slate-react';
+import { Editor, Transforms } from 'slate';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { withMarkdown } from '../withMarkdown';
+import { createTestMarkdownEditor } from '../../__tests__/helpers/createTestMarkdownEditor';
 
 describe('withMarkdown plugin - tag operations', () => {
   let editor: Editor;
 
   beforeEach(() => {
-    editor = withMarkdown(withReact(createEditor()));
+    editor = createTestMarkdownEditor([]);
   });
 
   describe('tag deletion behavior', () => {

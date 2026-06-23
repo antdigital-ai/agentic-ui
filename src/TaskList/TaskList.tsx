@@ -128,10 +128,11 @@ export const TaskList = memo(
     } = useMemo(() => {
       const completedCount = items.filter((i) => i.status === 'success').length;
       const inProgressItem = items.find((i) => isTaskInProgress(i.status));
-      const hasError = items.some((i) => i.status === 'error');
-      const allSuccess = completedCount === items.length && items.length > 0;
-      // 全部 item 已为 success 时展示完成态；不因 loading prop 滞留为「进行中」
-      const allDone = allSuccess;
+      const nonErrorItems = items.filter((i) => i.status !== 'error');
+      // error 项不参与摘要完成判定；单步失败不等同于整任务取消，摘要不展示「任务已取消」
+      const allDone =
+        nonErrorItems.length > 0 &&
+        nonErrorItems.every((i) => i.status === 'success');
 
       let status: TaskStatus = 'pending';
       let text: React.ReactNode = locale?.['taskList.taskList'] || '任务列表';
@@ -157,10 +158,6 @@ export const TaskList = memo(
             : '';
         text = tpl.replace('${taskName}', taskName);
         swapKey = `loading:${inProgressItem.key}:${taskName}`;
-      } else if (hasError) {
-        status = 'error';
-        text = locale?.['taskList.taskAborted'] || '任务已取消';
-        swapKey = `error:${items.map((i) => `${i.key}:${i.status}`).join('|')}`;
       } else if (externalLoading || items.length > 0) {
         status = 'loading';
         const tpl =

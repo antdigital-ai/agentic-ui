@@ -1,4 +1,4 @@
-﻿import { DeleteFilled, EyeOutlined, LoadingOutlined } from '@ant-design/icons';
+import { DeleteFilled, EyeOutlined, LoadingOutlined } from '@ant-design/icons';
 import { Modal, Popover, Skeleton } from 'antd';
 import React, {
   useContext,

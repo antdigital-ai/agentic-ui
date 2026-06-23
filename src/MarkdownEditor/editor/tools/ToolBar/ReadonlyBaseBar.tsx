@@ -15,6 +15,7 @@ import {
   getPointStrOffset,
   getSelectionFromDomSelection,
 } from '../../utils/editorUtils';
+import { resolveEditorPlaceholderFromProps } from '../../utils/resolveEditorPlaceholder';
 
 /**
  * 复制基础栏
@@ -24,13 +25,15 @@ import {
 export const ReadonlyBaseBar = (props: { prefix?: string }) => {
   const baseClassName = props.prefix || `toolbar-action`;
 
-  const { refreshFloatBar, markdownEditorRef, editorProps } = useEditorStore();
+  const { floatBarRevision, refreshFloatBar, markdownEditorRef, editorProps } =
+    useEditorStore();
+  const floatBarRefreshKey = floatBarRevision ?? refreshFloatBar;
 
   const [, setRefresh] = React.useState(false);
 
   useEffect(() => {
     setRefresh((r) => !r);
-  }, [refreshFloatBar]);
+  }, [floatBarRefreshKey]);
   const i18n = useContext(I18nContext);
   /**
    * 获取当前节点
@@ -171,9 +174,10 @@ export const ReadonlyBaseBar = (props: { prefix?: string }) => {
                   }}
                   placeholder={
                     editorProps?.comment?.placeholder ||
-                    editorProps?.titlePlaceholderContent ||
-                    i18n.locale?.inputPlaceholder ||
-                    '请输入内容...'
+                    resolveEditorPlaceholderFromProps(
+                      editorProps,
+                      i18n.locale?.inputPlaceholder,
+                    )
                   }
                   onChange={(e) => {
                     comment.content = e.target.value;

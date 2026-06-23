@@ -9,6 +9,15 @@ vi.mock('../../../../editor/utils/dom', () => ({
   getMediaType: vi.fn(() => 'image'),
 }));
 
+vi.mock('../../../../editor/store', () => ({
+  useEditorStore: vi.fn(() => ({
+    editorProps: {},
+    readonly: true,
+    store: {},
+    typewriter: false,
+  })),
+}));
+
 vi.mock('../../../../editor/utils', async (importOriginal) => {
   const mod = await importOriginal<typeof import('../../../../editor/utils')>();
   const origUseGetSetState = mod.useGetSetState;

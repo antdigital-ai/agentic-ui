@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @fileoverview 图表插件 Hooks 统一导出文件
  * 提供图表组件相关的 React Hooks
  * @author Chart Plugin Team

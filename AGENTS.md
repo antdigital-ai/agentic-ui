@@ -53,8 +53,8 @@
 
 ### 开发环境要求
 
-- **Node.js**: >= 16.0.0（推荐使用 LTS 版本）
-- **包管理器**: pnpm >= 7.0.0（推荐）
+- **Node.js**: >= 18.17.0（推荐 22 LTS）
+- **包管理器**: 仓库锁定 **pnpm 9.15.9**（与 `pnpm-lock.yaml` lockfile v9 一致；**勿用全局 pnpm 10+**，其在 Node 18 上会报 `requires at least Node.js v22.13`）
 - **操作系统**: Windows 10+, macOS 10.15+, Linux
 - **浏览器兼容性**: 现代浏览器（Chrome 80+、Edge、Firefox、Safari）
 
@@ -65,7 +65,16 @@
 git clone git@github.com:ant-design/agentic-ui.git
 cd agentic-ui
 
-# 安装依赖
+# 使用 Corepack 启用 package.json 中锁定的 pnpm 版本（Node 16.9+ 自带 Corepack）
+corepack enable
+pnpm install
+```
+
+若未使用 Corepack，可显式激活同一版本：
+
+```bash
+corepack enable
+corepack prepare pnpm@9.15.9 --activate
 pnpm install
 ```
 
@@ -874,11 +883,32 @@ export type { ComponentNameProps, ComponentNameRef } from './types';
 
 ```bash
 # 确认 Node.js 版本
-node -v  # 应该 >= 16
+node -v  # 应该 >= 18.17
 
 # 尝试清理并重新安装
 rm -rf node_modules pnpm-lock.yaml
+corepack enable
 pnpm install
+```
+
+#### `pnpm i` 提示 requires at least Node.js v22.13
+
+全局或 Corepack 误用了 **pnpm 10+**。本仓库锁定 **pnpm 9.15.9**，在 Node 18 上可用：
+
+```bash
+corepack enable
+corepack prepare pnpm@9.15.9 --activate
+pnpm -v   # 应为 9.15.9
+pnpm install
+```
+
+#### JSON 报 `Unexpected token ﻿`（UTF-8 BOM）
+
+部分编辑器会以「UTF-8 with BOM」保存文件。清理：
+
+```bash
+pnpm run strip:bom          # 写回移除 BOM
+pnpm run strip:bom:check    # 仅检查（有 BOM 时 exit 1）
 ```
 
 #### 样式不生效

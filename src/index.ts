@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @ant-design/agentic-ui 公共 API 入口
  *
  * 导出规则：
@@ -281,7 +281,6 @@ export {
   ReadonlyCode,
   ReadonlyEditorImage,
   ReadonlyFootnoteDefinition,
-  ReadonlyFootnoteReference,
   ReadonlyHead,
   ReadonlyHr,
   ReadonlyInlineKatex,

@@ -14,7 +14,7 @@ import type { EditorStore } from './editor/store';
 import { InsertAutocompleteProps } from './editor/tools/InsertAutocomplete';
 import type { ToolsKeyType } from './editor/tools/ToolBar/config/toolsConfig';
 import type { MarkdownToHtmlOptions } from './editor/utils/markdownToHtml';
-import { CustomLeaf, Elements } from './el';
+import { CustomLeaf, Elements, FootnoteDefinitionNode } from './el';
 
 export type CommentDataType = {
   selection: Selection;
@@ -90,12 +90,21 @@ export type MarkdownEditorProps = {
     type?: 'panel' | 'dropdown';
   } & TagPopupProps;
   editorStyle?: React.CSSProperties;
+  /** 脚注引用（fnc）与脚注定义列表（`onFootnoteDefinitionChange`）的配置 */
   fncProps?: {
-    render: (
+    /** 自定义脚注角标渲染；未传时使用默认 `FncLeaf` */
+    render?: (
       props: CustomLeaf<Record<string, any>> & { children: React.ReactNode },
       defaultDom: React.ReactNode,
     ) => React.ReactNode;
-    onOriginUrlClick?: (url?: string) => void;
+    /** 移动端点击脚注角标时 Modal 内容；未传时使用脚注定义与来源链接 */
+    renderMobileModal?: (props: {
+      identifier?: string;
+      displayLabel: string;
+      definition?: FootnoteDefinitionNode;
+      defaultContent: React.ReactNode;
+    }) => React.ReactNode;
+    onOriginUrlClick?: (identifier?: string) => void;
     onFootnoteDefinitionChange?: (
       data: {
         id: any;
@@ -149,6 +158,10 @@ export type MarkdownEditorProps = {
     ele: RenderElementProps,
     defaultDom: React.ReactNode,
   ) => React.ReactNode;
+  /**
+   * 初始 Markdown 字符串。Slate 模式下为**非受控**初始值：仅在挂载时解析一次。
+   * 挂载后更新正文请使用 `editorRef.current.store.setMDContent(markdown)`，或 remount（例如变更 `key`），勿仅依赖改此 prop 同步编辑器。
+   */
   initValue?: string;
   /**
    * 只读时是否仍挂载完整 Slate 取决于 `renderMode`：
@@ -224,6 +237,10 @@ export type MarkdownEditorProps = {
   jinja?: JinjaConfig;
   /** 公式解析与 KaTeX 渲染配置；可通过 AgenticConfigProvide 全局设置 */
   formula?: FormulaConfig;
+  /**
+   * 扩展插件。运行时变更会同步 Store 解析配置；`withEditor` 栈变化时会重建 Slate 编辑器并 remount（保留当前文档）。
+   * 若仅替换函数引用但栈形状不变，不会 remount。
+   */
   plugins?: any[];
   onChange?: (value: string, schema: Elements[]) => void;
   /**
@@ -318,7 +335,9 @@ export type MarkdownEditorProps = {
     extra?: React.ReactNode[];
   };
   id?: string;
-  /** 直接传入 Slate schema，优先级高于 initValue */
+  /**
+   * 直接传入 Slate schema，优先级高于 `initValue`；同样仅在挂载时作为初始文档，运行时更新请用 `setMDContent` 或 remount
+   */
   initSchemaValue?: Elements[];
   leafRender?: (
     props: Record<string, any> & { children: React.ReactNode },
@@ -339,7 +358,13 @@ export type MarkdownEditorProps = {
   slideMode?: boolean;
   containerClassName?: string;
   floatBar?: { enable?: boolean };
+  /** 编辑器空态占位文案；优先级高于 textAreaProps.placeholder 与 titlePlaceholderContent */
+  placeholder?: string;
   textAreaProps?: { enable?: boolean; placeholder?: string };
+  /**
+   * 编辑器空态占位文案（向下兼容）
+   * @deprecated 请使用 `placeholder`
+   */
   titlePlaceholderContent?: string;
   /** IME 组合开始/结束时回调，用于关闭与 `/`、`@` 冲突的浮动面板 */
   onCompositionActiveChange?: (active: boolean) => void;

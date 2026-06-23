@@ -2,7 +2,9 @@ import DOMPurify from 'dompurify';
 import React from 'react';
 import { RenderElementProps } from 'slate-react';
 import { debugInfo } from '../../../../Utils/debugUtils';
+import type { CodeNode } from '../../../el';
 import { getSlateElementPlainText } from '../../utils/codeBlockPlainText';
+import { SimpleCodeBlockEditor } from './SimpleCodeBlockEditor';
 
 export const Code = ({ attributes, children, element }: RenderElementProps) => {
   debugInfo('Code - 渲染代码块', {
@@ -68,20 +70,16 @@ export const Code = ({ attributes, children, element }: RenderElementProps) => {
         boxShadow: 'var(--shadow-control-base)',
         position: 'relative',
       }}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter') {
-          e.stopPropagation();
-          e.preventDefault();
-        }
-      }}
-      onKeyUp={(e) => {
-        if (e.key === 'Enter') {
-          e.stopPropagation();
-          e.preventDefault();
-        }
-      }}
     >
-      <div style={{ width: '100%', height: '100%' }}>{children}</div>
+      <div
+        contentEditable={false}
+        style={{ width: '100%', height: '100%', flex: 1, minHeight: 0 }}
+        onMouseDown={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <SimpleCodeBlockEditor element={element as CodeNode} />
+      </div>
+      <span style={{ display: 'none' }}>{children}</span>
     </div>
   );
 };

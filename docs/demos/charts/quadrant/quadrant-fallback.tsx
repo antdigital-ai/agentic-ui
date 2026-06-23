@@ -1,4 +1,4 @@
-﻿import { MarkdownEditor, QuadrantChart } from '@ant-design/agentic-ui';
+import { MarkdownEditor, QuadrantChart } from '@ant-design/agentic-ui';
 import React from 'react';
 
 /**

@@ -1,4 +1,4 @@
-﻿import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { useStreaming } from '../useStreaming';
 

@@ -369,6 +369,31 @@ describe('parseTableOrChart 通过 parserMarkdownToSlateNode', () => {
     expect(chart?.otherProps?.config?.chartType).toBe('docCards');
   });
 
+  it('quadrant 有表头和数据行时产出 chart 节点', () => {
+    const md = `<!-- {"chartType": "quadrant"} -->
+| 象限 | 内容 |
+| --- | --- |
+| 高价值 | 核心流程, 共享工具 |`;
+    const result = parserMarkdownToSlateNode(md);
+    const card = result.schema.find((n: any) => n.type === 'card');
+    expect(card).toBeDefined();
+    const chart = (card as any).children?.[1];
+    expect(chart.type).toBe('chart');
+    expect(chart?.otherProps?.config?.chartType).toBe('quadrant');
+    expect(chart?.otherProps?.dataSource).toHaveLength(1);
+  });
+
+  it('quadrant 无数据行时整表降级为普通表格', () => {
+    const md = `<!-- {"chartType": "quadrant"} -->
+| 象限 | 内容 |
+| --- | --- |`;
+    const result = parserMarkdownToSlateNode(md);
+    const card = result.schema.find((n: any) => n.type === 'card');
+    expect(card).toBeDefined();
+    const inner = (card as any).children?.[1];
+    expect(inner.type).toBe('table');
+  });
+
   it('mergeCells + 空单元格通过注释传入', () => {
     const md = `<!-- {"mergeCells": [{"row": 0, "col": 0, "rowSpan": 2, "colSpan": 2}]} -->
 | A | B |

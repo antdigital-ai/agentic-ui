@@ -1,4 +1,4 @@
-﻿import { LoadingOutlined } from '@ant-design/icons';
+import { LoadingOutlined } from '@ant-design/icons';
 import { Skeleton } from 'antd';
 import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useRefFunction } from '../../../../Hooks/useRefFunction';

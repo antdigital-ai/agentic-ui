@@ -12,6 +12,8 @@ import {
 import { HistoryEditor, withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { I18nContext } from '../../../I18n';
+import { DEFAULT_EDITOR_PLACEHOLDER } from '../utils/resolveEditorPlaceholder';
 import {
   CodeNode,
   ElementProps,
@@ -24,6 +26,7 @@ import type { MarkdownEditorProps } from '../../types';
 import { SlateMarkdownEditor } from '../Editor';
 import * as handlePasteModule from '../plugins/handlePaste';
 import { EditorStore, EditorStoreContext } from '../store';
+import { createEditorSelChangeSubject } from '../utils/editorSelChange';
 import type { KeyboardTask, Methods } from '../utils';
 import * as editorUtilsModule from '../utils/editorUtils';
 import { EditorUtils } from '../utils/editorUtils';
@@ -183,9 +186,14 @@ describe('SlateMarkdownEditor', () => {
       keyTask$: new Subject<{ key: Methods<KeyboardTask>; args?: any[] }>(),
       insertCompletionText$: new Subject<string>(),
       openInsertLink$: new Subject<Selection>(),
+      selChange$: createEditorSelChangeSubject(),
       domRect: null,
       setDomRect: () => {},
-      editorProps: {},
+      editorProps: {
+        placeholder: props.placeholder,
+        textAreaProps: props.textAreaProps,
+        titlePlaceholderContent: props.titlePlaceholderContent,
+      },
       markdownEditorRef: mockEditorRef,
       markdownContainerRef:
         containerRef as React.MutableRefObject<HTMLDivElement | null>,
@@ -194,6 +202,14 @@ describe('SlateMarkdownEditor', () => {
     return {
       ...render(
         <ConfigProvider>
+          <I18nContext.Provider
+            value={{
+              locale: props.localeInputPlaceholder
+                ? { inputPlaceholder: props.localeInputPlaceholder }
+                : undefined,
+              language: 'zh-CN',
+            }}
+          >
           <div ref={containerRef} data-testid="editor-wrapper">
             <EditorStoreContext.Provider value={contextValue}>
               <PluginContext.Provider value={props.plugins || []}>
@@ -227,6 +243,7 @@ describe('SlateMarkdownEditor', () => {
               </PluginContext.Provider>
             </EditorStoreContext.Provider>
           </div>
+          </I18nContext.Provider>
         </ConfigProvider>,
       ),
       containerRef,
@@ -485,6 +502,7 @@ describe('SlateMarkdownEditor', () => {
         keyTask$: new Subject<{ key: Methods<KeyboardTask>; args?: any[] }>(),
         insertCompletionText$: new Subject<string>(),
         openInsertLink$: new Subject<Selection>(),
+        selChange$: createEditorSelChangeSubject(),
         domRect: null,
         setDomRect,
         editorProps: {},
@@ -541,14 +559,112 @@ describe('SlateMarkdownEditor', () => {
   });
 
   describe('placeholder 与 textAreaProps', () => {
-    it('应支持 placeholder 与 textAreaProps.placeholder', () => {
+    it('空段落时应渲染 Slate 原生 placeholder', async () => {
       renderEditor({
         placeholder: 'Type here',
         initSchemaValue: [
           { type: 'paragraph', children: [{ text: '' }] } as ParagraphNode,
         ],
       });
-      expect(screen.getByRole('textbox')).toBeInTheDocument();
+
+      await waitFor(() => {
+        expect(
+          document.querySelector('[data-slate-placeholder="true"]'),
+        ).toHaveTextContent('Type here');
+      });
+    });
+
+    it('textAreaProps.placeholder 作为回退', async () => {
+      renderEditor({
+        textAreaProps: { placeholder: 'From textAreaProps' },
+        initSchemaValue: [
+          { type: 'paragraph', children: [{ text: '' }] } as ParagraphNode,
+        ],
+      });
+
+      await waitFor(() => {
+        expect(
+          document.querySelector('[data-slate-placeholder="true"]'),
+        ).toHaveTextContent('From textAreaProps');
+      });
+    });
+
+    it('titlePlaceholderContent 作为向下兼容回退', async () => {
+      renderEditor({
+        titlePlaceholderContent: 'Legacy placeholder',
+        initSchemaValue: [
+          { type: 'paragraph', children: [{ text: '' }] } as ParagraphNode,
+        ],
+      });
+
+      await waitFor(() => {
+        expect(
+          document.querySelector('[data-slate-placeholder="true"]'),
+        ).toHaveTextContent('Legacy placeholder');
+      });
+    });
+
+    it('locale.inputPlaceholder 作为回退', async () => {
+      renderEditor({
+        localeInputPlaceholder: 'Locale placeholder',
+        initSchemaValue: [
+          { type: 'paragraph', children: [{ text: '' }] } as ParagraphNode,
+        ],
+      });
+
+      await waitFor(() => {
+        expect(
+          document.querySelector('[data-slate-placeholder="true"]'),
+        ).toHaveTextContent('Locale placeholder');
+      });
+    });
+
+    it('readonly 时不渲染 placeholder', async () => {
+      renderEditor({
+        placeholder: 'Hidden',
+        readonly: true,
+        initSchemaValue: [
+          { type: 'paragraph', children: [{ text: '' }] } as ParagraphNode,
+        ],
+      });
+
+      await waitFor(() => {
+        expect(
+          document.querySelector('[data-slate-placeholder="true"]'),
+        ).toBeNull();
+      });
+    });
+
+    it('含 tag 子节点时不渲染 editor 级 placeholder', async () => {
+      renderEditor({
+        placeholder: 'Should not show',
+        initSchemaValue: [
+          {
+            type: 'paragraph',
+            children: [{ text: '', tag: true } as { text: string; tag: boolean }],
+          } as ParagraphNode,
+        ],
+      });
+
+      await waitFor(() => {
+        expect(
+          document.querySelector('[data-slate-placeholder="true"]'),
+        ).toBeNull();
+      });
+    });
+
+    it('无任何配置时使用默认 placeholder', async () => {
+      renderEditor({
+        initSchemaValue: [
+          { type: 'paragraph', children: [{ text: '' }] } as ParagraphNode,
+        ],
+      });
+
+      await waitFor(() => {
+        expect(
+          document.querySelector('[data-slate-placeholder="true"]'),
+        ).toHaveTextContent(DEFAULT_EDITOR_PLACEHOLDER);
+      });
     });
   });
 
@@ -599,6 +715,57 @@ describe('SlateMarkdownEditor', () => {
         },
       });
       expect(onFootnoteDefinitionChange).toHaveBeenCalled();
+    });
+
+    it('文档变更后应再次调用 onFootnoteDefinitionChange', async () => {
+      const onFootnoteDefinitionChange = vi.fn();
+      const initSchemaValue: Elements[] = [
+        { type: 'paragraph', children: [{ text: 'p' }] } as ParagraphNode,
+        {
+          type: 'footnoteDefinition',
+          id: 'fn1',
+          identifier: '1',
+          value: 'note',
+          url: '',
+          children: [{ text: 'note' }],
+        } as any,
+      ];
+      renderEditor({
+        initSchemaValue,
+        fncProps: {
+          render: (_, defaultDom) => defaultDom,
+          onFootnoteDefinitionChange,
+        },
+      });
+
+      await waitFor(() => {
+        expect(onFootnoteDefinitionChange).toHaveBeenCalled();
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 150));
+      onFootnoteDefinitionChange.mockClear();
+
+      Transforms.insertNodes(mockEditorRef.current, {
+        type: 'footnoteDefinition',
+        identifier: '2',
+        value: 'second',
+        url: 'https://example.com',
+        children: [{ text: 'second' }],
+      } as any);
+      mockEditorRef.current.onChange();
+
+      await waitFor(() => {
+        expect(onFootnoteDefinitionChange).toHaveBeenCalledWith(
+          expect.arrayContaining([
+            expect.objectContaining({ placeholder: '1' }),
+            expect.objectContaining({
+              placeholder: '2',
+              origin_text: 'second',
+              url: 'https://example.com',
+            }),
+          ]),
+        );
+      });
     });
   });
 
@@ -685,6 +852,7 @@ describe('SlateMarkdownEditor', () => {
         keyTask$: new Subject<{ key: Methods<KeyboardTask>; args?: any[] }>(),
         insertCompletionText$: new Subject<string>(),
         openInsertLink$: new Subject<Selection>(),
+        selChange$: createEditorSelChangeSubject(),
         domRect: null,
         setDomRect: () => {},
         editorProps: {},
@@ -742,6 +910,7 @@ describe('SlateMarkdownEditor', () => {
         keyTask$: new Subject<{ key: Methods<KeyboardTask>; args?: any[] }>(),
         insertCompletionText$: new Subject<string>(),
         openInsertLink$: new Subject<Selection>(),
+        selChange$: createEditorSelChangeSubject(),
         domRect: null,
         setDomRect,
         editorProps: {},
@@ -878,6 +1047,7 @@ describe('SlateMarkdownEditor', () => {
         keyTask$: new Subject<{ key: Methods<KeyboardTask>; args?: any[] }>(),
         insertCompletionText$: new Subject<string>(),
         openInsertLink$: new Subject<Selection>(),
+        selChange$: createEditorSelChangeSubject(),
         domRect: null,
         setDomRect,
         editorProps: {},
@@ -955,6 +1125,7 @@ describe('SlateMarkdownEditor', () => {
         keyTask$: new Subject<{ key: Methods<KeyboardTask>; args?: any[] }>(),
         insertCompletionText$: new Subject<string>(),
         openInsertLink$: new Subject<Selection>(),
+        selChange$: createEditorSelChangeSubject(),
         domRect: null,
         setDomRect: () => {},
         editorProps: {},

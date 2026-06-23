@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import type { TaskItem } from './types';
 
 const isPlainObject = (v: unknown): v is Record<string, unknown> =>

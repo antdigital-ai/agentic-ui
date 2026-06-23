@@ -97,8 +97,11 @@ export const BaseToolBar = React.memo<{
     store,
     setDomRect,
 
+    floatBarRevision,
     refreshFloatBar,
   } = useEditorStore();
+
+  const floatBarRefreshKey = floatBarRevision ?? refreshFloatBar;
 
   const i18n = useContext(I18nContext);
   const toolsConfig = useToolsConfig();
@@ -109,7 +112,7 @@ export const BaseToolBar = React.memo<{
     store,
     openInsertLink$,
     setDomRect,
-    refreshFloatBar,
+    refreshFloatBar: floatBarRefreshKey,
     domRect,
   });
 

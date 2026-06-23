@@ -3,6 +3,7 @@
  * 不 mock Slate，仅 mock NativeTableEditor 等外部依赖。
  */
 import { createEditor, Editor } from 'slate';
+import { withAgenticLists } from '../../../editor/plugins/lists';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   convertToParagraph,
@@ -30,7 +31,7 @@ describe('editorCommands 集成覆盖', () => {
 
   beforeEach(() => {
     insertTableMock.mockClear();
-    editor = createEditor();
+    editor = withAgenticLists(createEditor());
     editor.children = [
       { type: 'paragraph', children: [{ text: 'first' }] },
       { type: 'paragraph', children: [{ text: '' }] },
@@ -390,9 +391,8 @@ describe('editorCommands 集成覆盖', () => {
         focus: { path: [0, 0, 0, 0], offset: 0 },
       };
       createList(editor, 'unordered');
-      const list = editor.children[0] as any;
-      expect(list.type).toBe('bulleted-list');
-      expect(list.children[0].type).toBe('paragraph');
+      // 在同类型列表上再次 toggle 会解包为普通段落
+      expect((editor.children[0] as any).type).toBe('paragraph');
     });
 
     it('当前已是 list-item 且类型不同时更新列表类型', () => {
@@ -434,9 +434,8 @@ describe('editorCommands 集成覆盖', () => {
         focus: { path: [0, 0, 0, 0], offset: 0 },
       };
       createList(editor, 'unordered');
-      const list = editor.children[0] as any;
-      expect(list.type).toBe('bulleted-list');
-      expect(list.children[0].type).toBe('paragraph');
+      // 在同类型列表上再次 toggle 会解包为普通段落
+      expect((editor.children[0] as any).type).toBe('paragraph');
     });
 
     it('当前节点非 paragraph/head 时不转换列表', () => {
@@ -547,9 +546,11 @@ describe('editorCommands 集成覆盖', () => {
         focus: { path: [1, 1, 0], offset: 1 },
       };
       createList(editor, 'unordered');
-      const list = editor.children[0] as any;
-      expect(list.type).toBe('bulleted-list');
-      expect(list.children.length).toBeGreaterThanOrEqual(2);
+      // 选区在 blockquote 内的多段落会就地合并为同一列表（不跨容器并入顶层列表）
+      const blockquote = editor.children[1] as any;
+      const innerList = blockquote.children[0];
+      expect(innerList.type).toBe('bulleted-list');
+      expect(innerList.children.length).toBeGreaterThanOrEqual(2);
     });
 
     it('多段落选为列表时包装并合并到同一列表', () => {

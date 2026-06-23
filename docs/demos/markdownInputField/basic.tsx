@@ -1,14 +1,11 @@
-import { MarkdownInputField } from '@ant-design/agentic-ui';
 import { Typography } from 'antd';
 import React, { useCallback } from 'react';
-import { TEMPLATE_VALUE, inputMinStyle, pageStyle } from './_constants';
-import { useDemoSend } from './useDemoSend';
+import { TagMarkInputDemo } from './_TagMarkInputDemo';
+import { TAG_MARK_DEMO_INITIAL, inputMinStyle, pageStyle } from './_constants';
 
 const { Text, Title } = Typography;
 
 export default () => {
-  const { handleSend, handleStop } = useDemoSend();
-
   const asyncTagItems = useCallback(
     async (props: { placeholder?: string } | undefined) =>
       ['tag1', 'tag2', 'tag3'].map((item) => ({
@@ -21,21 +18,19 @@ export default () => {
   return (
     <div style={pageStyle}>
       <Title level={5} style={{ marginTop: 0, marginBottom: 4 }}>
-        基本：异步标签与占位符模板
+        Tag 与 Mark 演示
       </Title>
       <Text type="secondary" style={{ display: 'block', marginBottom: 12 }}>
-        `tagInputProps.items` 异步返回候选；`value` 展示模板占位语法。
+        <Text strong>Tag</Text>：输入 <Text code>$</Text> 选择候选，或点击{' '}
+        <Text code>{'${placeholder:…}'}</Text> 占位块下拉。
+        <Text strong> Mark</Text>：输入 <Text code>@</Text> /{' '}
+        <Text code>/</Text> 或点输入框左侧 @、/ 按钮，插入{' '}
+        <Text code>&lt;mark&gt;</Text> 高亮（删空正文后装饰会自动清理；连续两次空格或两次 Enter 可移出 mark）。
       </Text>
-      <MarkdownInputField
+      <TagMarkInputDemo
         style={inputMinStyle}
-        value={TEMPLATE_VALUE}
-        tagInputProps={{
-          enable: true,
-          items: asyncTagItems,
-        }}
-        onSend={handleSend}
-        onStop={handleStop}
-        placeholder="请输入内容"
+        initialValue={TAG_MARK_DEMO_INITIAL}
+        tagInputItems={asyncTagItems}
       />
     </div>
   );

@@ -1,4 +1,4 @@
-﻿import React, { memo, useMemo, useRef } from 'react';
+import React, { memo, useMemo, useRef } from 'react';
 import type { Processor } from 'unified';
 
 import { renderMarkdownBlock } from '../markdownReactShared';

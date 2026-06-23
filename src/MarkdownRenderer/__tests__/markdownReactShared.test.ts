@@ -107,6 +107,14 @@ describe('splitMarkdownBlocks', () => {
     const result = splitMarkdownBlocks(md);
     expect(result.length).toBe(1);
   });
+
+  it('splits heading from following table without blank line', () => {
+    const md = '# Title\n| a | b |\n| - | - |\n| 1 | 2 |';
+    const result = splitMarkdownBlocks(md);
+    expect(result.length).toBe(2);
+    expect(result[0]).toBe('# Title');
+    expect(result[1]).toBe('| a | b |\n| - | - |\n| 1 | 2 |');
+  });
 });
 
 describe('createHastProcessor', () => {

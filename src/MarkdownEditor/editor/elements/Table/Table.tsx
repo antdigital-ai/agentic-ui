@@ -1,4 +1,4 @@
-﻿import { ConfigProvider } from 'antd';
+import { ConfigProvider } from 'antd';
 import React, { useContext } from 'react';
 import { RenderElementProps } from 'slate-react';
 import { useEditorStore } from '../../store';

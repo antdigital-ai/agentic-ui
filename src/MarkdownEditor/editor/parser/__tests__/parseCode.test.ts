@@ -181,7 +181,7 @@ describe('parseCode handleYaml', () => {
       language: 'yaml',
       value: 'key: value',
       frontmatter: true,
-      children: [{ text: 'key: value' }],
+      children: [{ text: '' }],
     });
   });
 });

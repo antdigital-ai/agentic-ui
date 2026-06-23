@@ -1,4 +1,4 @@
-﻿import {
+import {
   DeleteOutlined,
   InsertRowAboveOutlined,
   InsertRowBelowOutlined,

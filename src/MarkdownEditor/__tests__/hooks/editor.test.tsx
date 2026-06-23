@@ -9,7 +9,7 @@ import {
   withReact,
 } from 'slate-react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { selChange$ } from '../../editor/plugins/useOnchange';
+import { createEditorSelChangeSubject } from '../../editor/utils/editorSelChange';
 import { EditorStore, EditorStoreContext } from '../../editor/store';
 import { useMEditor, useSelStatus } from '../../hooks/editor';
 
@@ -19,6 +19,7 @@ describe('MarkdownEditor hooks/editor', () => {
     BaseEditor & ReactEditor & HistoryEditor
   >;
   let store: EditorStore;
+  let selChange$: ReturnType<typeof createEditorSelChangeSubject>;
 
   beforeEach(() => {
     editor = withHistory(withReact(createEditor())) as BaseEditor &
@@ -30,6 +31,7 @@ describe('MarkdownEditor hooks/editor', () => {
     ];
     editorRef = { current: editor };
     store = new EditorStore(editorRef);
+    selChange$ = createEditorSelChangeSubject();
   });
 
   afterEach(() => {
@@ -72,6 +74,7 @@ describe('MarkdownEditor hooks/editor', () => {
         store,
         markdownEditorRef: editorRef,
         markdownContainerRef: { current: null },
+        selChange$,
       };
 
       const { getByTestId } = render(
@@ -115,6 +118,7 @@ describe('MarkdownEditor hooks/editor', () => {
         store,
         markdownEditorRef: editorRef,
         markdownContainerRef: { current: null },
+        selChange$,
       };
 
       const { getByTestId } = render(

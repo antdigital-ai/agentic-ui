@@ -1,4 +1,4 @@
-﻿import { Keyframes } from '@ant-design/cssinjs';
+import { Keyframes } from '@ant-design/cssinjs';
 import {
   INPUT_FIELD_EDITOR_CONTENT_PADDING_MOBILE_CSS_VAR,
   MOBILE_INPUT_FIELD_EDITOR_CONTENT_PADDING_DEFAULT,
@@ -173,15 +173,23 @@ const genStyle: GenerateStyle<
           letterSpacing: 'var(--letter-spacing-paragraph-base, normal)',
         },
       },
-      // 仅覆盖 MarkdownInputField 内的代码块默认高度
-      '& [data-language][data-is-unclosed="true"]': {
+      // 仅覆盖 MarkdownInputField 内的代码块默认高度（void / SimpleCodeBlock / Ace 共用外壳）
+      '& [data-be="code"]': {
         height: `${DEFAULT_INPUT_CODE_BLOCK_HEIGHT}px !important`,
         minHeight: `${DEFAULT_INPUT_CODE_BLOCK_HEIGHT}px !important`,
-      },
-      '& [data-be="code"]': {
+        maxHeight: `${DEFAULT_INPUT_CODE_BLOCK_HEIGHT}px !important`,
+        minWidth: '0 !important',
+        maxWidth: '100% !important',
+        margin: '0.5em 0 !important',
+        padding: '8px 12px !important',
+        boxSizing: 'border-box',
         background: 'var(--color-gray-bg-card-light) !important',
         color:
           'var(--color-gray-text-default, rgba(20, 22, 28, 0.88)) !important',
+        '& textarea': {
+          minHeight: '0 !important',
+          height: '100% !important',
+        },
       },
       '&-editor-content': {
         display: 'flex',
