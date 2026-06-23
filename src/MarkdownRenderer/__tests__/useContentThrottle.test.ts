@@ -46,6 +46,27 @@ describe('useContentThrottle', () => {
     expect(result.current).toBe('finished content');
   });
 
+  it('flushes remaining content when stream finishes mid-throttle', async () => {
+    const { result, rerender } = renderHook(
+      ({ isFinished }) =>
+        useContentThrottle('abcdef', true, { charsPerFrame: 1 }, isFinished),
+      { initialProps: { isFinished: false } },
+    );
+
+    expect(result.current).toBe('');
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(16);
+    });
+    expect(result.current).toBe('a');
+
+    await act(async () => {
+      rerender({ isFinished: true });
+    });
+
+    expect(result.current).toBe('abcdef');
+  });
+
   it('disposes pending throttle work when disabled', async () => {
     const { result, rerender } = renderHook(
       ({ content, enabled }) =>

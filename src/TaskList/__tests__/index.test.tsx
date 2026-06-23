@@ -855,6 +855,18 @@ describe('TaskList', () => {
       render(<TaskList items={simpleItems} variant="simple" />);
 
       expect(screen.getByText('正在进行Running Task任务')).toBeInTheDocument();
+      expect(
+        screen.queryByTestId('task-list-simple-progress-count'),
+      ).not.toBeInTheDocument();
+    });
+
+    it('showProgress=true 时展示已完成/总数计数且保留当前任务摘要', () => {
+      render(<TaskList items={simpleItems} variant="simple" showProgress />);
+
+      expect(screen.getByText('正在进行Running Task任务')).toBeInTheDocument();
+      expect(
+        screen.getByTestId('task-list-simple-progress-count'),
+      ).toHaveTextContent('1/3');
     });
 
     it('应该显示当前正在运行的任务名称', () => {
