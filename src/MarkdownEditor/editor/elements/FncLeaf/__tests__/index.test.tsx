@@ -25,6 +25,21 @@ describe('FncLeaf', () => {
     vi.mocked(isMobileDevice).mockReturnValue(false);
   });
 
+  it('无 EditorStoreContext 的只读路径应正常渲染脚注角标', () => {
+    const { container } = render(
+      <ConfigProvider>
+        <FncLeaf
+          {...defaultProps}
+          leaf={{ ...defaultProps.leaf, text: '[^1]', identifier: '1' }}
+        />
+      </ConfigProvider>,
+    );
+
+    const span = container.querySelector('[data-fnc="fnc"]');
+    expect(span).toBeInTheDocument();
+    expect(span).toHaveTextContent('1');
+  });
+
   it('移动端点击脚注角标应打开 Modal', () => {
     vi.mocked(isMobileDevice).mockReturnValue(true);
     render(

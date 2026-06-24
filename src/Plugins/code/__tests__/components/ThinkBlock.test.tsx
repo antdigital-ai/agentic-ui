@@ -7,22 +7,13 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MessagesContext } from '../../../../Bubble/MessagesContent/BubbleContext';
+import { createStubEditorStoreContextValue } from '../../../../MarkdownEditor/editor/__tests__/helpers/editorStoreTestContext';
+import { EditorStoreContext } from '../../../../MarkdownEditor/editor/editorStoreContext';
 import { CodeNode } from '../../../../MarkdownEditor/el';
 import { ThinkBlock, ThinkBlockProvider } from '../../components/ThinkBlock';
 
 const mockFindPath = vi.fn();
 const mockCheckSelEnd = vi.fn();
-const mockUseEditorStore = vi.fn(() => ({
-  markdownEditorRef: { current: {} },
-}));
-
-vi.mock('../../../../MarkdownEditor/editor/store', async () => {
-  const React = await import('react');
-  return {
-    useEditorStore: (...args: any[]) => mockUseEditorStore(...args),
-    EditorStoreContext: React.createContext({}),
-  };
-});
 
 vi.mock('../../../../MarkdownEditor/editor/utils/editorUtils', () => ({
   EditorUtils: {
@@ -55,8 +46,22 @@ describe('ThinkBlock', () => {
       </ThinkBlockProvider>,
     );
 
+  const renderWithEditorStore = (
+    node: React.ReactElement,
+    value = createStubEditorStoreContextValue({
+      markdownEditorRef: { current: {} } as any,
+    }),
+  ) =>
+    render(
+      <EditorStoreContext.Provider value={value}>
+        {node}
+      </EditorStoreContext.Provider>,
+    );
+
   beforeEach(() => {
     document.body.innerHTML = '';
+    mockFindPath.mockReset();
+    mockCheckSelEnd.mockReset();
     mockFindPath.mockReturnValue([0]);
     mockCheckSelEnd.mockReturnValue(true);
   });
@@ -67,6 +72,21 @@ describe('ThinkBlock', () => {
 
       const thinkBlock = screen.getByTestId('think-block');
       expect(thinkBlock).toBeInTheDocument();
+    });
+
+    it('没有 EditorStoreContext 时应跳过编辑器路径判断并正常渲染', () => {
+      render(<ThinkBlock {...mockProps} />);
+
+      expect(screen.getByTestId('think-block')).toBeInTheDocument();
+      expect(mockFindPath).not.toHaveBeenCalled();
+      expect(mockCheckSelEnd).not.toHaveBeenCalled();
+    });
+
+    it('有 EditorStoreContext 时应使用 markdownEditorRef 判断当前节点位置', () => {
+      renderWithEditorStore(<ThinkBlock {...mockProps} />);
+
+      expect(mockFindPath).toHaveBeenCalledWith({}, mockCodeNode);
+      expect(mockCheckSelEnd).toHaveBeenCalledWith({}, [0]);
     });
 
     it('应该显示思考块的内容', () => {
@@ -242,10 +262,15 @@ describe('ThinkBlock', () => {
 
   describe('alwaysExpandedDeepThink 属性测试', () => {
     it('应该正确处理 alwaysExpandedDeepThink 属性的逻辑', () => {
-      // 测试 alwaysExpandedDeepThink 为 true 的情况
-      // 由于 ToolUseBarThink 组件已经在实际渲染中被使用，
-      // 这里主要测试组件能正确渲染，不会因为该属性报错
-      renderWithExpanded(<ThinkBlock {...mockProps} />);
+      renderWithEditorStore(
+        <ThinkBlock {...mockProps} />,
+        createStubEditorStoreContextValue({
+          editorProps: {
+            codeProps: { alwaysExpandedDeepThink: true },
+          } as any,
+          markdownEditorRef: { current: null } as any,
+        }),
+      );
 
       const thinkBlock = screen.getByTestId('think-block');
       expect(thinkBlock).toBeInTheDocument();
@@ -317,11 +342,14 @@ describe('ThinkBlock', () => {
 
   describe('elementPath 与 isLastNode 分支', () => {
     it('markdownEditorRef.current 为 null 时 elementPath 为 null', () => {
-      mockUseEditorStore.mockReturnValueOnce({
-        markdownEditorRef: { current: null },
-      });
-      render(<ThinkBlock {...mockProps} />);
+      renderWithEditorStore(
+        <ThinkBlock {...mockProps} />,
+        createStubEditorStoreContextValue({
+          markdownEditorRef: { current: null } as any,
+        }),
+      );
       expect(screen.getByTestId('think-block')).toBeInTheDocument();
+      expect(mockFindPath).not.toHaveBeenCalled();
     });
 
     it('findPath 抛错时捕获并返回 null', () => {
@@ -331,17 +359,20 @@ describe('ThinkBlock', () => {
       const consoleSpy = vi
         .spyOn(console, 'error')
         .mockImplementation(() => {});
-      render(<ThinkBlock {...mockProps} />);
+      renderWithEditorStore(<ThinkBlock {...mockProps} />);
       expect(screen.getByTestId('think-block')).toBeInTheDocument();
       consoleSpy.mockRestore();
     });
 
     it('无 elementPath 时 isLastNode 为 false', () => {
-      mockUseEditorStore.mockReturnValueOnce({
-        markdownEditorRef: { current: null },
-      });
-      render(<ThinkBlock {...mockProps} />);
+      renderWithEditorStore(
+        <ThinkBlock {...mockProps} />,
+        createStubEditorStoreContextValue({
+          markdownEditorRef: { current: null } as any,
+        }),
+      );
       expect(screen.getByTestId('think-block')).toBeInTheDocument();
+      expect(mockCheckSelEnd).not.toHaveBeenCalled();
     });
 
     it('checkSelEnd 抛错时捕获并返回 false', () => {
@@ -351,7 +382,7 @@ describe('ThinkBlock', () => {
       const consoleSpy = vi
         .spyOn(console, 'error')
         .mockImplementation(() => {});
-      render(<ThinkBlock {...mockProps} />);
+      renderWithEditorStore(<ThinkBlock {...mockProps} />);
       expect(screen.getByTestId('think-block')).toBeInTheDocument();
       consoleSpy.mockRestore();
     });
@@ -360,7 +391,7 @@ describe('ThinkBlock', () => {
   describe('非最后一个节点时自动收起', () => {
     it('isLastNode 为 false 时应调用 setExpanded(false)', () => {
       mockCheckSelEnd.mockReturnValueOnce(false);
-      render(<ThinkBlock {...mockProps} />);
+      renderWithEditorStore(<ThinkBlock {...mockProps} />);
       expect(screen.getByTestId('think-block')).toBeInTheDocument();
     });
 
