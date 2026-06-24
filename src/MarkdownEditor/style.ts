@@ -93,9 +93,10 @@ const genTableStyle = (
         },
       },
 
-      // 流式中关闭行入场动画：增量更新反复重挂行会让 blur 淡入重放，表现为表格闪动。
-      // 双类名提权，确保覆盖下方 `tbody tr` 的 animation。
-      '&&-streaming table tbody tr:not(.config-tr)': {
+      // Slate 模式表格不使用行入场动画：流式增量更新会反复重挂行，blur 淡入重放
+      // 表现为表格闪动；非流式也统一去掉动画，保持 Slate 渲染零动画。
+      // 双类名提权，确保覆盖下方 `tbody tr` 的 animation。markdown 渲染模式不加该标记，保留入场动画。
+      '&&-no-anim table tbody tr:not(.config-tr)': {
         animation: 'none',
       },
 
