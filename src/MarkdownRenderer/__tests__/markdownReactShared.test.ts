@@ -92,6 +92,15 @@ describe('splitMarkdownBlocks', () => {
     expect(result[1]).toBe('after');
   });
 
+  it('treats think tags inside fenced code as code content', () => {
+    const md = '```\n<think>\n\nstill code\n</think>\n```\n\nafter';
+    const result = splitMarkdownBlocks(md);
+
+    expect(result.length).toBe(2);
+    expect(result[0]).toBe('```\n<think>\n\nstill code\n</think>\n```');
+    expect(result[1]).toBe('after');
+  });
+
   it('splits two adjacent tables separated by a blank line', () => {
     const md =
       '| a | b |\n| - | - |\n| 1 | 2 |\n\n| c | d |\n| - | - |\n| 3 | 4 |';
