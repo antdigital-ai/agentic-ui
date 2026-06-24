@@ -115,6 +115,81 @@ describe('splitMarkdownBlocks', () => {
     expect(result[0]).toBe('# Title');
     expect(result[1]).toBe('| a | b |\n| - | - |\n| 1 | 2 |');
   });
+
+  it('does not split inside <think> tags with blank lines', () => {
+    const md = '<think>\nHere is thinking:\n\n1. Step one\n\n2. Step two\n</think>\n\nResponse text.';
+    const result = splitMarkdownBlocks(md);
+    expect(result.length).toBe(2);
+    expect(result[0]).toBe('<think>\nHere is thinking:\n\n1. Step one\n\n2. Step two\n</think>');
+    expect(result[1]).toBe('Response text.');
+  });
+
+  it('does not split inside <thinking> tags with blank lines', () => {
+    const md = '<thinking>\nSome thinking\n\nWith blank lines\n</thinking>\n\nResponse text.';
+    const result = splitMarkdownBlocks(md);
+    expect(result.length).toBe(2);
+    expect(result[0]).toBe('<thinking>\nSome thinking\n\nWith blank lines\n</thinking>');
+    expect(result[1]).toBe('Response text.');
+  });
+
+  it('does not split inside <redacted_thinking> tags with blank lines', () => {
+    const md = '<redacted_thinking>\nInternal reasoning\n\nContinued\n</redacted_thinking>\n\nOutput.';
+    const result = splitMarkdownBlocks(md);
+    expect(result.length).toBe(2);
+    expect(result[0]).toBe(
+      '<redacted_thinking>\nInternal reasoning\n\nContinued\n</redacted_thinking>',
+    );
+    expect(result[1]).toBe('Output.');
+  });
+
+  it('handles think tag without blank lines (existing normal case)', () => {
+    const md = '<think>\nContinuous thinking content\n</think>\n\nAfter think.';
+    const result = splitMarkdownBlocks(md);
+    expect(result.length).toBe(2);
+    expect(result[0]).toBe('<think>\nContinuous thinking content\n</think>');
+    expect(result[1]).toBe('After think.');
+  });
+
+  it('handles multiple think tag pairs', () => {
+    const md =
+      '<think>\nFirst think\n\nWith blank line\n</think>\n\nBetween.\n\n<think>\nSecond think\n</think>';
+    const result = splitMarkdownBlocks(md);
+    expect(result.length).toBe(3);
+    expect(result[0]).toBe('<think>\nFirst think\n\nWith blank line\n</think>');
+    expect(result[1]).toBe('Between.');
+    expect(result[2]).toBe('<think>\nSecond think\n</think>');
+  });
+
+  it('handles inline think tag pair on same line', () => {
+    const md = '<think>inline thinking</think>\n\nResponse text.';
+    const result = splitMarkdownBlocks(md);
+    expect(result.length).toBe(2);
+    expect(result[0]).toBe('<think>inline thinking</think>');
+    expect(result[1]).toBe('Response text.');
+  });
+
+  it('handles think open tag with inline content', () => {
+    const md = '<think>thinking starts here\n\ncontinues\n</think>\n\nResponse.';
+    const result = splitMarkdownBlocks(md);
+    expect(result.length).toBe(2);
+    expect(result[0]).toBe('<think>thinking starts here\n\ncontinues\n</think>');
+    expect(result[1]).toBe('Response.');
+  });
+
+  it('handles unclosed think tag (streaming mid-output)', () => {
+    const md = '<think>\nThinking in progress...';
+    const result = splitMarkdownBlocks(md);
+    expect(result.length).toBe(1);
+    expect(result[0]).toBe('<think>\nThinking in progress...');
+  });
+
+  it('handles think tag with attributes', () => {
+    const md = '<think lang="zh">\n思考内容\n\n继续思考\n</think>\n\n回复。';
+    const result = splitMarkdownBlocks(md);
+    expect(result.length).toBe(2);
+    expect(result[0]).toBe('<think lang="zh">\n思考内容\n\n继续思考\n</think>');
+    expect(result[1]).toBe('回复。');
+  });
 });
 
 describe('createHastProcessor', () => {
