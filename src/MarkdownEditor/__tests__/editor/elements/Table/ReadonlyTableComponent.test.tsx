@@ -517,16 +517,6 @@ describe('ReadonlyTableComponent', () => {
       );
       expect(wrapper).toBeInTheDocument();
     });
-
-    it('Slate 只读表格容器应始终带 -no-anim 类以关闭行入场动画', () => {
-      renderComponent();
-      const wrapper = document.querySelector(
-        '.ant-agentic-md-editor-content-table',
-      );
-      expect(wrapper).toHaveClass(
-        'ant-agentic-md-editor-content-table-no-anim',
-      );
-    });
   });
 
   describe('复制功能扩展测试', () => {

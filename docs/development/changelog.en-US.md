@@ -27,7 +27,7 @@ group:
 ## Unreleased
 
 - MarkdownEditor
-  - 🐞 Fixed **table flickering** during Slate streaming and removed the table row entry animation in Slate mode: incremental updates repeatedly remount table rows, replaying the row entry `agenticMdBlurFadeIn` blur fade-in. Slate-mode tables (both readonly and editable) now carry a `-no-anim` class that disables the row entry animation; the `renderMode: 'markdown'` renderer is unaffected and keeps the entry fade-in.
+  - 🐞 Fixed **table flickering**: removed the table row entry animation outright (`agenticMdBlurFadeIn` on `tbody tr` plus its reduced-motion fallback). Incremental streaming updates remount table rows and replay the blur fade-in, which shows up as flickering; the animation is now deleted instead of being defined and then overridden off. The `agenticMdBlurFadeIn` keyframes are kept solely for the `MarkdownRenderer` streaming word-by-word fade-in.
 
 - MarkdownRenderer
   - 🆕 Added GPT-style streaming word-by-word fade-in: while `streaming`, newly appearing words fade in individually, already-shown content reuses DOM without replaying the animation or flickering. Pure CSS driven, honors `prefers-reduced-motion`, and skips code blocks / tables / formulas when splitting tokens.

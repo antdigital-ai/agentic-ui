@@ -132,8 +132,7 @@ export const EditableTable: React.FC<EditableTableProps> = ({
 
   return (
     <div
-      // Slate 模式表格不使用行入场动画
-      className={classNames(baseCls, `${baseCls}-no-anim`)}
+      className={classNames(baseCls)}
       ref={tableRef}
       style={{
         ...boxShadowStyle,

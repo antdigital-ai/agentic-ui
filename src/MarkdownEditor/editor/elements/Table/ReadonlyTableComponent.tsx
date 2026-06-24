@@ -155,8 +155,7 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
       <>
         <div
           ref={containerRef}
-          // Slate 模式表格不使用行入场动画（避免流式增量重挂导致的闪动）
-          className={classNames(baseCls, `${baseCls}-no-anim`)}
+          className={classNames(baseCls)}
           style={tableCssVariables as React.CSSProperties}
         >
           {tableDom}

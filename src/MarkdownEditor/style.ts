@@ -1,6 +1,5 @@
 import type { CSSInterpolation } from '@ant-design/cssinjs';
 import {
-  DEFAULT_TEXT_SWAP_DURATION_MS,
   TEXT_SWAP_BLUR_PX,
   TEXT_SWAP_EASING,
 } from '../Components/TextSwap/constants';
@@ -93,13 +92,6 @@ const genTableStyle = (
         },
       },
 
-      // Slate 模式表格不使用行入场动画：流式增量更新会反复重挂行，blur 淡入重放
-      // 表现为表格闪动；非流式也统一去掉动画，保持 Slate 渲染零动画。
-      // 双类名提权，确保覆盖下方 `tbody tr` 的 animation。markdown 渲染模式不加该标记，保留入场动画。
-      '&&-no-anim table tbody tr:not(.config-tr)': {
-        animation: 'none',
-      },
-
       table: {
         borderCollapse: 'separate',
         borderSpacing: 0,
@@ -148,9 +140,6 @@ const genTableStyle = (
         'tr:last-child td:not(.config-td)': { borderBottom: 'none' },
         'tr td:first-child:not(.config-td)': { fontWeight: 600 },
 
-        'tbody tr:not(.config-tr)': {
-          animation: `agenticMdBlurFadeIn ${DEFAULT_TEXT_SWAP_DURATION_MS}ms ${TEXT_SWAP_EASING} both`,
-        },
         'tbody tr:not(.config-tr):hover': {
           background:
             'linear-gradient(var(--agentic-ui-table-hover-bg, rgba(0, 0, 0, 0.04)), var(--agentic-ui-table-hover-bg, rgba(0, 0, 0, 0.04))), linear-gradient(var(--agentic-ui-table-cell-bg, var(--color-gray-bg-card-white)), var(--agentic-ui-table-cell-bg, var(--color-gray-bg-card-white)))',
@@ -320,12 +309,6 @@ const genTableStyle = (
         filter: 'blur(0)',
       },
     },
-
-    '@media (prefers-reduced-motion: reduce)': {
-      [`${tableCls} table tbody tr:not(.config-tr)`]: {
-        animation: 'none',
-      },
-    },
   };
 };
 
@@ -338,8 +321,7 @@ const STREAM_TOKEN_DURATION_MS = 420;
  * 已渲染 token 重解析时复用 DOM、动画不重放；新 token 挂载各自淡入一次，
  * 叠加限流的逐字推进，得到接近 GPT 的平滑出字效果。
  *
- * 复用表格行入场的 `agenticMdBlurFadeIn` keyframes（同一 opacity + blur 淡入），
- * 仅淡入时长不同。
+ * 使用 `agenticMdBlurFadeIn` keyframes（opacity + blur 淡入）。
  */
 const genStreamingTokenStyle = (
   token: FullToken<'MarkdownEditor'>,
