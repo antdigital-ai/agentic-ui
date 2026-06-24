@@ -52,14 +52,19 @@ vi.mock('../../MarkdownRenderer', () => ({
   MarkdownRenderer: ({
     content,
     streaming,
+    throttleOptions,
   }: {
     content?: string;
     streaming?: boolean;
+    throttleOptions?: unknown;
   }) => (
     <div data-testid="markdown-renderer-markdown-mode">
       <span data-testid="markdown-renderer-content">{content}</span>
       <span data-testid="markdown-renderer-streaming">
         {String(Boolean(streaming))}
+      </span>
+      <span data-testid="markdown-renderer-throttle-options">
+        {JSON.stringify(throttleOptions ?? null)}
       </span>
     </div>
   ),
@@ -264,6 +269,34 @@ describe('MarkdownPreview', () => {
       expect(
         screen.getByTestId('markdown-renderer-streaming'),
       ).toHaveTextContent('true');
+    });
+
+    it('markdown 渲染模式下透传 throttleOptions.fade=false', () => {
+      render(
+        <MarkdownPreview
+          {...defaultProps}
+          typing
+          markdownRenderConfig={{
+            renderMode: 'markdown',
+            throttleOptions: { enabled: false, fade: false },
+          }}
+          originData={{
+            role: 'assistant',
+            content: 'hello',
+            isFinished: false,
+            isLast: true,
+          }}
+        />,
+      );
+
+      expect(
+        screen.getByTestId('markdown-renderer-streaming'),
+      ).toHaveTextContent('true');
+      expect(
+        JSON.parse(
+          screen.getByTestId('markdown-renderer-throttle-options').textContent!,
+        ),
+      ).toEqual({ enabled: false, fade: false });
     });
 
     it('slate 渲染模式下，非最后一条消息不启用 typewriter', () => {
