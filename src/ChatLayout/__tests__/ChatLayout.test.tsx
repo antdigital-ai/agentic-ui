@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React, { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { ChatLayout, type ChatLayoutRef } from '../index';
@@ -177,6 +177,41 @@ describe('ChatLayout', () => {
     const spacer = scrollable?.lastElementChild as HTMLElement;
     // 测量未完成时回退到 footerHeight，避免内容被底部遮挡
     expect(spacer).toHaveStyle('height: 150px');
+  });
+
+  it('uses measured footer height for spacer when available', async () => {
+    const getBoundingClientRectSpy = vi
+      .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
+      .mockReturnValue({
+        width: 320,
+        height: 96,
+        top: 0,
+        right: 320,
+        bottom: 96,
+        left: 0,
+        x: 0,
+        y: 0,
+        toJSON: () => ({}),
+      });
+
+    try {
+      const { container } = render(
+        <ChatLayout footer={<div>Footer</div>} footerHeight={48}>
+          <div>Test content</div>
+        </ChatLayout>,
+      );
+
+      const scrollable = container.querySelector(
+        '.ant-chat-layout-content-scrollable',
+      );
+      const spacer = scrollable?.lastElementChild as HTMLElement;
+
+      await waitFor(() => {
+        expect(spacer).toHaveStyle('height: 96px');
+      });
+    } finally {
+      getBoundingClientRectSpy.mockRestore();
+    }
   });
 
   it('sets spacer height to 0 when footer is not provided', () => {
