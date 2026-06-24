@@ -11,6 +11,10 @@ import { QuoteLottie } from '../bubble-actions/Quote';
 import { RefreshLottie } from '../bubble-actions/Refresh';
 import { ShareLottie } from '../bubble-actions/Share';
 
+vi.mock('../useAsyncLottieData', () => ({
+  useAsyncLottieData: () => ({ v: '5.5.7', layers: [] }),
+}));
+
 vi.mock('lottie-react', () => ({
   default: ({
     animationData,

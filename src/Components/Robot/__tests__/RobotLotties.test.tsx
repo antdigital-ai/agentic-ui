@@ -6,7 +6,7 @@ import { BlowingWindLottie } from '../lotties/BlowingWindLottie';
 import { BouncingLottie } from '../lotties/BouncingLottie';
 import { PeekLottie } from '../lotties/PeekLottie';
 
-vi.mock('../../../lotties/useAsyncLottieData', () => ({
+vi.mock('../../lotties/useAsyncLottieData', () => ({
   useAsyncLottieData: () => ({ v: '5.6.9' }),
 }));
 

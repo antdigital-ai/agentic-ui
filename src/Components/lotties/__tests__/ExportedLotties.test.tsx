@@ -28,6 +28,10 @@ vi.mock('lottie-react', () => ({
   ),
 }));
 
+vi.mock('../useAsyncLottieData', () => ({
+  useAsyncLottieData: () => ({ v: '5.5.7', layers: [] }),
+}));
+
 describe('Components/lotties 导出（与 Robot/lotties 独立入口）', () => {
   it('DazingLottie 默认 autoplay/loop 并传入动画数据', async () => {
     render(<DazingLottie />);
@@ -95,6 +99,9 @@ describe('Components/lotties 导出（与 Robot/lotties 独立入口）', () => 
   it('CreativeSparkLottie 基础渲染', async () => {
     render(<CreativeSparkLottie size={32} autoplay={false} />);
     const el = await screen.findByTestId('lottie-animation');
+    await waitFor(() => {
+      expect(el).toHaveAttribute('data-has-animation', 'yes');
+    });
     expect(el).toHaveAttribute('data-autoplay', 'false');
     expect(el).toHaveStyle({ width: '32px', height: '32px' });
   });

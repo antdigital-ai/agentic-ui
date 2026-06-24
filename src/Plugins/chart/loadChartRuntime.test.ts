@@ -1,5 +1,20 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+const stubChartComponent = vi.hoisted(() => {
+  const Stub = () => null;
+  return Stub;
+});
+
+vi.mock('./AreaChart', () => ({ default: stubChartComponent }));
+vi.mock('./BarChart', () => ({ default: stubChartComponent }));
+vi.mock('./BoxPlotChart', () => ({ default: stubChartComponent }));
+vi.mock('./DonutChart', () => ({ default: stubChartComponent }));
+vi.mock('./FunnelChart', () => ({ default: stubChartComponent }));
+vi.mock('./HistogramChart', () => ({ default: stubChartComponent }));
+vi.mock('./LineChart', () => ({ default: stubChartComponent }));
+vi.mock('./RadarChart', () => ({ default: stubChartComponent }));
+vi.mock('./ScatterChart', () => ({ default: stubChartComponent }));
+
 describe('loadChartRuntime', () => {
   afterEach(() => {
     vi.restoreAllMocks();
