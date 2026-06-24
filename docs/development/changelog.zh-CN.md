@@ -26,6 +26,9 @@ group:
 
 ## 未发布
 
+- MarkdownEditor
+  - 🐞 修复 Slate 只读流式渲染时**表格闪动**：流式增量更新会反复重挂表格行，导致行入场 `agenticMdBlurFadeIn` blur 淡入反复重放。现流式（`typewriter`）期间给只读表格容器加 `-streaming` 类并关闭行入场动画，流式结束后恢复一次性入场淡入。
+
 - MarkdownRenderer
   - 🆕 新增 GPT 风格的流式逐词淡入动画：`streaming` 时默认对新出现的词语逐个淡入，已显示内容复用 DOM、不重放动画、不闪烁；纯 CSS 驱动，自动尊重 `prefers-reduced-motion`，代码块 / 表格 / 公式不参与拆词。
   - 🆕 逐词淡入开关收敛到 `throttleOptions.fade`（默认 `true`，仅 `streaming` 时生效）：传 `throttleOptions={{ fade: false }}` 关闭。流式展示配置统一在 `throttleOptions` 一个对象内，`MarkdownEditor`（`renderMode: 'markdown'`）与 `Bubble.markdownRenderConfig` 经既有 `throttleOptions` 透传即可生效。

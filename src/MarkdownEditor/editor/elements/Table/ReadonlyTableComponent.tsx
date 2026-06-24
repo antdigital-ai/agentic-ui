@@ -26,7 +26,7 @@ interface ReadonlyTableComponentProps {
  */
 export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
   React.memo(({ children, element, baseCls }) => {
-    const { editorProps } = useEditorStore();
+    const { editorProps, typewriter } = useEditorStore();
     const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
     const {
       actions = {
@@ -155,7 +155,10 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
       <>
         <div
           ref={containerRef}
-          className={classNames(baseCls)}
+          className={classNames(baseCls, {
+            // 流式中关闭行入场动画：增量更新会反复重挂行，blur 淡入重放会造成表格闪动
+            [`${baseCls}-streaming`]: typewriter,
+          })}
           style={tableCssVariables as React.CSSProperties}
         >
           {tableDom}

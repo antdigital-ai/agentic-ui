@@ -93,6 +93,12 @@ const genTableStyle = (
         },
       },
 
+      // 流式中关闭行入场动画：增量更新反复重挂行会让 blur 淡入重放，表现为表格闪动。
+      // 双类名提权，确保覆盖下方 `tbody tr` 的 animation。
+      '&&-streaming table tbody tr:not(.config-tr)': {
+        animation: 'none',
+      },
+
       table: {
         borderCollapse: 'separate',
         borderSpacing: 0,

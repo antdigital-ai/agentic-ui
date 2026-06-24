@@ -517,6 +517,34 @@ describe('ReadonlyTableComponent', () => {
       );
       expect(wrapper).toBeInTheDocument();
     });
+
+    it('流式（typewriter）时容器应带 -streaming 类以关闭行入场动画', () => {
+      vi.mocked(editorStore.useEditorStore).mockReturnValue({
+        editorProps: { tableConfig: {} },
+        typewriter: true,
+      } as any);
+      renderComponent();
+      const wrapper = document.querySelector(
+        '.ant-agentic-md-editor-content-table',
+      );
+      expect(wrapper).toHaveClass(
+        'ant-agentic-md-editor-content-table-streaming',
+      );
+    });
+
+    it('非流式时容器不应带 -streaming 类', () => {
+      vi.mocked(editorStore.useEditorStore).mockReturnValue({
+        editorProps: { tableConfig: {} },
+        typewriter: false,
+      } as any);
+      renderComponent();
+      const wrapper = document.querySelector(
+        '.ant-agentic-md-editor-content-table',
+      );
+      expect(wrapper).not.toHaveClass(
+        'ant-agentic-md-editor-content-table-streaming',
+      );
+    });
   });
 
   describe('复制功能扩展测试', () => {

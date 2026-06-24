@@ -26,6 +26,9 @@ group:
 
 ## Unreleased
 
+- MarkdownEditor
+  - 🐞 Fixed **table flickering** during Slate readonly streaming: incremental updates repeatedly remount table rows, replaying the row entry `agenticMdBlurFadeIn` blur fade-in. While streaming (`typewriter`), the readonly table container now gets a `-streaming` class that disables the row entry animation; the one-time entry fade-in resumes after streaming ends.
+
 - MarkdownRenderer
   - 🆕 Added GPT-style streaming word-by-word fade-in: while `streaming`, newly appearing words fade in individually, already-shown content reuses DOM without replaying the animation or flickering. Pure CSS driven, honors `prefers-reduced-motion`, and skips code blocks / tables / formulas when splitting tokens.
   - 🆕 The fade-in toggle is consolidated into `throttleOptions.fade` (default `true`, only effective when `streaming`): pass `throttleOptions={{ fade: false }}` to disable. All streaming-display config now lives in the single `throttleOptions` object, so `MarkdownEditor` (`renderMode: 'markdown'`) and `Bubble.markdownRenderConfig` pick it up through the existing `throttleOptions` passthrough.
