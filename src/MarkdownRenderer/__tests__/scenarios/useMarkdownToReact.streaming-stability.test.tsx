@@ -28,10 +28,12 @@ const createCodeBlockProbe = (counters: Counters) => {
 const HookHarness: React.FC<{
   content: string;
   streaming: boolean;
+  fadeTokens?: boolean;
   codeBlockComponent: React.ComponentType<RendererBlockProps>;
-}> = ({ content, streaming, codeBlockComponent }) => {
+}> = ({ content, streaming, fadeTokens, codeBlockComponent }) => {
   const reactNode = useMarkdownToReact(content, {
     streaming,
+    fadeTokens,
     components: {
       __codeBlock: codeBlockComponent,
     },
@@ -111,6 +113,60 @@ describe('useMarkdownToReact streaming stability', () => {
       />,
     );
 
+    expect(counters.mounts).toBe(1);
+    expect(counters.unmounts).toBe(0);
+
+    unmount();
+    expect(counters.unmounts).toBe(1);
+  });
+
+  it('切换逐词淡入开关时，不应重建 processor 并卸载代码块', () => {
+    const counters: Counters = { mounts: 0, unmounts: 0 };
+    const CodeBlockProbe = createCodeBlockProbe(counters);
+    const baseContent = '```chart\n{"value":1}\n```\n\n\nTail text';
+    const fadeOffContent = `${baseContent} with enough appended words`;
+    const fadeOnContent = `${fadeOffContent} and enough words again`;
+
+    const { container, rerender, unmount } = render(
+      <HookHarness
+        content={baseContent}
+        streaming
+        fadeTokens
+        codeBlockComponent={CodeBlockProbe}
+      />,
+    );
+
+    expect(
+      screen.getByTestId('streaming-code-block-probe'),
+    ).toBeInTheDocument();
+    expect(container.querySelectorAll('.stream-token').length).toBeGreaterThan(
+      0,
+    );
+    expect(counters.mounts).toBe(1);
+    expect(counters.unmounts).toBe(0);
+
+    rerender(
+      <HookHarness
+        content={fadeOffContent}
+        streaming
+        fadeTokens={false}
+        codeBlockComponent={CodeBlockProbe}
+      />,
+    );
+    expect(container.querySelectorAll('.stream-token')).toHaveLength(0);
+
+    rerender(
+      <HookHarness
+        content={fadeOnContent}
+        streaming
+        fadeTokens
+        codeBlockComponent={CodeBlockProbe}
+      />,
+    );
+
+    expect(container.querySelectorAll('.stream-token').length).toBeGreaterThan(
+      0,
+    );
     expect(counters.mounts).toBe(1);
     expect(counters.unmounts).toBe(0);
 

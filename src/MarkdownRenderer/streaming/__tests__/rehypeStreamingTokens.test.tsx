@@ -94,6 +94,30 @@ describe('createStreamingTokenPlugin (hast transform)', () => {
     transform(tree);
     expect(tree.children).toHaveLength(3);
   });
+
+  it('keeps KaTeX math content untouched', () => {
+    const plugin = createStreamingTokenPlugin({ enabled: true });
+    const transform = (plugin as any)();
+    const tree = {
+      type: 'root',
+      children: [
+        {
+          type: 'element',
+          tagName: 'span',
+          properties: { className: ['katex'] },
+          children: [{ type: 'text', value: 'E = mc^2' }],
+        },
+      ],
+    };
+
+    transform(tree);
+
+    expect(collectSpanTokens(tree)).toEqual([]);
+    expect(tree.children[0].children[0]).toEqual({
+      type: 'text',
+      value: 'E = mc^2',
+    });
+  });
 });
 
 describe('MarkdownRenderer streaming fade integration', () => {
@@ -149,5 +173,34 @@ describe('MarkdownRenderer streaming fade integration', () => {
       />,
     );
     expect(container.textContent).toContain('The quick brown fox');
+  });
+
+  it('reuses existing token DOM when streaming appends words', () => {
+    const { container, rerender } = render(
+      <MarkdownRenderer
+        content="Hello"
+        streaming
+        throttleOptions={throttleOff}
+      />,
+    );
+    const firstToken = container.querySelector(`.${STREAM_TOKEN_CLASS}`);
+
+    expect(firstToken).not.toBeNull();
+    expect(firstToken?.textContent).toBe('Hello');
+
+    rerender(
+      <MarkdownRenderer
+        content="Hello world"
+        streaming
+        throttleOptions={throttleOff}
+      />,
+    );
+
+    const tokens = container.querySelectorAll(`.${STREAM_TOKEN_CLASS}`);
+    expect(tokens).toHaveLength(2);
+    expect(tokens[0]).toBe(firstToken);
+    expect(tokens[0]?.textContent).toBe('Hello');
+    expect(tokens[1]?.textContent).toBe('world');
+    expect(container.textContent).toContain('Hello world');
   });
 });
