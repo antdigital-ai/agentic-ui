@@ -68,6 +68,23 @@ describe('createStreamingTokenPlugin (hast transform)', () => {
     expect(tokens).not.toContain('inlineCode');
   });
 
+  it('keeps KaTeX formula output untouched', () => {
+    const hast = runProcessor(
+      [
+        'before formula',
+        '',
+        '$$',
+        'a^2 + b^2 = c^2',
+        '$$',
+        '',
+        'after formula',
+      ].join('\n'),
+      { enabled: true },
+    );
+    const tokens = collectSpanTokens(hast);
+    expect(tokens).toEqual(['before', 'formula', 'after', 'formula']);
+  });
+
   it('reads the enabled flag live from the shared state object', () => {
     const state: StreamingTokenState = { enabled: false };
     const processor = createHastProcessor(
