@@ -2,6 +2,7 @@ import { act, render } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MarkdownRenderer } from '../index';
+import { STREAM_TOKEN_CLASS } from '../streaming/rehypeStreamingTokens';
 import type { MarkdownRendererRef } from '../types';
 import { installRafStub } from './installRafStub';
 
@@ -352,6 +353,27 @@ describe('MarkdownRenderer', () => {
 
     const fndEl = container.querySelector('[data-be="footnoteDefinition"]');
     expect(fndEl).toBeTruthy();
+  });
+
+  it('流式逐词淡入时应保留带定义的脚注引用', () => {
+    const { container } = render(
+      <MarkdownRenderer
+        content={'Revenue increased[^1].\n\n[^1]: Verified source.'}
+        streaming
+        isFinished
+      />,
+    );
+
+    expect(
+      container.querySelectorAll(`.${STREAM_TOKEN_CLASS}`).length,
+    ).toBeGreaterThan(0);
+    const fncEl = container.querySelector('[data-fnc="fnc"]');
+    expect(fncEl).toBeTruthy();
+    expect(fncEl?.textContent).toContain('1');
+    expect(
+      container.querySelector('[data-be="footnoteDefinition"]'),
+    ).toBeTruthy();
+    expect(container.textContent).toContain('Verified source.');
   });
 
   it('应渲染裸脚注引用（无定义，AI 对话场景）', () => {
