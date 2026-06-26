@@ -12,8 +12,21 @@ export interface StreamingTokenState {
 /** token span 的类名：CSS 仅在流式容器内对其应用淡入动画 */
 export const STREAM_TOKEN_CLASS = 'stream-token';
 
-/** 这些标签内的文本不拆分（代码、样式、脚本保持原样） */
-const SKIP_TAGS = new Set(['code', 'pre', 'style', 'script', 'textarea']);
+/** 这些标签内的文本不拆分（代码、表格、样式、脚本保持原样） */
+const SKIP_TAGS = new Set([
+  'code',
+  'pre',
+  'style',
+  'script',
+  'table',
+  'tbody',
+  'td',
+  'textarea',
+  'tfoot',
+  'th',
+  'thead',
+  'tr',
+]);
 
 /** 公式渲染（KaTeX）自带复杂结构，拆分会破坏布局 */
 const isMathElement = (node: HastElement): boolean => {

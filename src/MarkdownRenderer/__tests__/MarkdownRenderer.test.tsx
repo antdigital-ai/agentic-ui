@@ -418,6 +418,24 @@ describe('MarkdownRenderer', () => {
     expect(container.textContent).toContain('最终回答');
   });
 
+  it('应保持 <think> 标签内部空行并完整渲染思考块', () => {
+    const { container } = render(
+      <MarkdownRenderer
+        content={
+          '<think lang="zh">\nStep one\n\nStep two\n</think>\n\nFinal answer'
+        }
+      />,
+    );
+
+    const thinkBlock = container.querySelector(
+      '[data-testid="think-block-renderer"]',
+    );
+    expect(thinkBlock).toBeTruthy();
+    expect(thinkBlock?.textContent).toContain('Step one');
+    expect(thinkBlock?.textContent).toContain('Step two');
+    expect(container.textContent).toContain('Final answer');
+  });
+
   it('应将 HTML 注释 + 表格组合渲染为图表', async () => {
     const content = [
       '<!-- [{"chartType":"line","title":"趋势","x":"month","y":"value"}] -->',
