@@ -45,6 +45,18 @@ describe('createStreamingTokenPlugin (hast transform)', () => {
     return acc;
   };
 
+  const findElementByTagName = (node: any, tagName: string): any => {
+    if (!node) return null;
+    if (node.type === 'element' && node.tagName === tagName) return node;
+
+    for (const child of node.children || []) {
+      const match = findElementByTagName(child, tagName);
+      if (match) return match;
+    }
+
+    return null;
+  };
+
   it('does nothing when disabled', () => {
     const hast = runProcessor('hello world', { enabled: false });
     expect(collectSpanTokens(hast)).toEqual([]);
@@ -83,6 +95,22 @@ describe('createStreamingTokenPlugin (hast transform)', () => {
     );
     const tokens = collectSpanTokens(hast);
     expect(tokens).toEqual(['before', 'formula', 'after', 'formula']);
+  });
+
+  it('keeps GFM table cells untouched', () => {
+    const hast = runProcessor(
+      [
+        '| Month | Value |',
+        '| --- | --- |',
+        '| Jan | 100 |',
+        '',
+        'Outside text',
+      ].join('\n'),
+      { enabled: true },
+    );
+
+    expect(collectSpanTokens(findElementByTagName(hast, 'table'))).toEqual([]);
+    expect(collectSpanTokens(hast)).toEqual(['Outside', 'text']);
   });
 
   it('reads the enabled flag live from the shared state object', () => {
