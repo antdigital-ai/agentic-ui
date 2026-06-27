@@ -1,5 +1,6 @@
 import { render } from '@testing-library/react';
 import React from 'react';
+import type { Plugin } from 'unified';
 import { describe, expect, it } from 'vitest';
 import { MarkdownRenderer } from '../../index';
 import { createHastProcessor } from '../../processor';
@@ -134,6 +135,85 @@ describe('createStreamingTokenPlugin (hast transform)', () => {
       type: 'text',
       value: 'E = mc^2',
     });
+  });
+
+  it.each(['style', 'script', 'textarea'])(
+    'keeps raw %s text untouched',
+    (tagName) => {
+      const plugin = createStreamingTokenPlugin({ enabled: true });
+      const transform = (plugin as any)();
+      const tree = {
+        type: 'root',
+        children: [
+          {
+            type: 'element',
+            tagName,
+            children: [{ type: 'text', value: 'const value = "a b";' }],
+          },
+        ],
+      };
+
+      transform(tree);
+
+      expect(collectSpanTokens(tree)).toEqual([]);
+      expect(tree.children[0].children[0]).toEqual({
+        type: 'text',
+        value: 'const value = "a b";',
+      });
+    },
+  );
+
+  it('keeps KaTeX math content untouched when className is a string', () => {
+    const plugin = createStreamingTokenPlugin({ enabled: true });
+    const transform = (plugin as any)();
+    const tree = {
+      type: 'root',
+      children: [
+        {
+          type: 'element',
+          tagName: 'span',
+          properties: { className: 'katex-display' },
+          children: [{ type: 'text', value: 'x + y' }],
+        },
+      ],
+    };
+
+    transform(tree);
+
+    expect(collectSpanTokens(tree)).toEqual([]);
+    expect(tree.children[0].children[0]).toEqual({
+      type: 'text',
+      value: 'x + y',
+    });
+  });
+
+  it('wraps visible text added by custom rehype plugins registered before it', () => {
+    const appendVisibleTextPlugin: Plugin = () => (tree: any) => {
+      tree.children = [
+        ...(tree.children || []),
+        {
+          type: 'element',
+          tagName: 'p',
+          properties: {},
+          children: [{ type: 'text', value: 'added by rehype' }],
+        },
+      ];
+    };
+    const processor = createHastProcessor(
+      undefined,
+      undefined,
+      undefined,
+      [appendVisibleTextPlugin],
+      { enabled: true },
+    );
+    const hast = processor.runSync(processor.parse('source')) as any;
+
+    expect(collectSpanTokens(hast)).toEqual([
+      'source',
+      'added',
+      'by',
+      'rehype',
+    ]);
   });
 });
 
