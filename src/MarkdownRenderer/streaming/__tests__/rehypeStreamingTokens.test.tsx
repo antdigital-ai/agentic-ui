@@ -45,6 +45,30 @@ describe('createStreamingTokenPlugin (hast transform)', () => {
     return acc;
   };
 
+  const hasStreamingTokenSpan = (node: any): boolean => {
+    if (!node) return false;
+    if (
+      node.type === 'element' &&
+      node.tagName === 'span' &&
+      Array.isArray(node.properties?.className) &&
+      node.properties.className.includes(STREAM_TOKEN_CLASS)
+    ) {
+      return true;
+    }
+    return (node.children || []).some((child: any) =>
+      hasStreamingTokenSpan(child),
+    );
+  };
+
+  const replaceText = (node: any, from: string, to: string): void => {
+    if (!node) return;
+    if (node.type === 'text') {
+      node.value = node.value.replace(from, to);
+      return;
+    }
+    (node.children || []).forEach((child: any) => replaceText(child, from, to));
+  };
+
   it('does nothing when disabled', () => {
     const hast = runProcessor('hello world', { enabled: false });
     expect(collectSpanTokens(hast)).toEqual([]);
@@ -134,6 +158,50 @@ describe('createStreamingTokenPlugin (hast transform)', () => {
       type: 'text',
       value: 'E = mc^2',
     });
+  });
+
+  it('keeps KaTeX math content untouched when className is a string', () => {
+    const plugin = createStreamingTokenPlugin({ enabled: true });
+    const transform = (plugin as any)();
+    const tree = {
+      type: 'root',
+      children: [
+        {
+          type: 'element',
+          tagName: 'span',
+          properties: { className: 'katex-display' },
+          children: [{ type: 'text', value: 'x + y' }],
+        },
+      ],
+    };
+
+    transform(tree);
+
+    expect(collectSpanTokens(tree)).toEqual([]);
+    expect(tree.children[0].children[0]).toEqual({
+      type: 'text',
+      value: 'x + y',
+    });
+  });
+
+  it('runs user rehype plugins before wrapping streaming tokens', () => {
+    let sawTokenSpanBeforeUserPlugin = false;
+    const replaceTargetPlugin = () => (tree: any) => {
+      sawTokenSpanBeforeUserPlugin = hasStreamingTokenSpan(tree);
+      replaceText(tree, 'target', 'patched');
+    };
+
+    const processor = createHastProcessor(
+      undefined,
+      undefined,
+      undefined,
+      [replaceTargetPlugin as any],
+      { enabled: true },
+    );
+    const hast = processor.runSync(processor.parse('hello target')) as any;
+
+    expect(sawTokenSpanBeforeUserPlugin).toBe(false);
+    expect(collectSpanTokens(hast)).toEqual(['hello', 'patched']);
   });
 });
 
