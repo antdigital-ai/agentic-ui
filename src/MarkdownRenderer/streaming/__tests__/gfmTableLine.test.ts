@@ -7,6 +7,11 @@ describe('isGfmTableLine', () => {
     expect(isGfmTableLine('name | value')).toBe(true);
   });
 
+  it('detects in-progress streaming rows with trailing pipes', () => {
+    expect(isGfmTableLine('| value |')).toBe(true);
+    expect(isGfmTableLine('value |')).toBe(true);
+  });
+
   it('detects leading-pipe and pipe-less GFM table separators', () => {
     expect(isGfmTableLine('| :--- | ---: |')).toBe(true);
     expect(isGfmTableLine(':--- | ---:')).toBe(true);
