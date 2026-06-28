@@ -1,8 +1,9 @@
-/** GFM 表格行：`| a | b |` */
-const GFM_TABLE_ROW_PATTERN = /^\s*\|(.+\|)+\s*$/;
+/** GFM 表格行：`| a | b |` 或 `a | b` */
+const GFM_TABLE_ROW_PATTERN = /^\s*\|?[^|\n]+(?:\|[^|\n]+)+\|?\s*$/;
 
-/** GFM 表格分隔行：`| --- | --- |` 或 `|:---|:---:|---:|` */
-const GFM_TABLE_SEPARATOR_PATTERN = /^\s*\|(\s*:?-+:?\s*\|)+\s*$/;
+/** GFM 表格分隔行：`| --- | --- |` 或 `--- | ---` */
+const GFM_TABLE_SEPARATOR_PATTERN =
+  /^\s*\|?\s*:?-+:?\s*(?:\|\s*:?-+:?\s*)+\|?\s*$/;
 
 export const isGfmTableLine = (line: string): boolean =>
   GFM_TABLE_ROW_PATTERN.test(line) || GFM_TABLE_SEPARATOR_PATTERN.test(line);

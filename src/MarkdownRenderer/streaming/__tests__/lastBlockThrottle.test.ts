@@ -26,6 +26,12 @@ describe('shouldReparseLastBlock', () => {
     expect(shouldReparseLastBlock(prev, next, true)).toBe(false);
   });
 
+  it('流式末块在无边框 GFM 表格内不因 | 或 - 立即重 parse', () => {
+    const prev = 'a | b\n- | -\n1';
+    const next = 'a | b\n- | -\n1 |';
+    expect(shouldReparseLastBlock(prev, next, true)).toBe(false);
+  });
+
   it('流式末块在 GFM 表格内换行仍立即重 parse', () => {
     const prev = '| a | b |';
     const next = '| a | b |\n| - | - |';

@@ -116,6 +116,14 @@ describe('splitMarkdownBlocks', () => {
     expect(result[1]).toBe('| a | b |\n| - | - |\n| 1 | 2 |');
   });
 
+  it('splits heading from following pipe-less table without blank line', () => {
+    const md = '# Title\na | b\n- | -\n1 | 2';
+    const result = splitMarkdownBlocks(md);
+    expect(result.length).toBe(2);
+    expect(result[0]).toBe('# Title');
+    expect(result[1]).toBe('a | b\n- | -\n1 | 2');
+  });
+
   it('does not split inside <think> tags with blank lines', () => {
     const md = '<think>\nHere is thinking:\n\n1. Step one\n\n2. Step two\n</think>\n\nResponse text.';
     const result = splitMarkdownBlocks(md);
