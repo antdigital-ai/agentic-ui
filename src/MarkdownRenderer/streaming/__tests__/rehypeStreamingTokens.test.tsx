@@ -68,6 +68,13 @@ describe('createStreamingTokenPlugin (hast transform)', () => {
     expect(tokens).not.toContain('inlineCode');
   });
 
+  it('keeps GFM table cells untouched', () => {
+    const hast = runProcessor('| name | value |\n| --- | --- |\n| a | 1 |', {
+      enabled: true,
+    });
+    expect(collectSpanTokens(hast)).toEqual([]);
+  });
+
   it('keeps KaTeX formula output untouched', () => {
     const hast = runProcessor(
       [
