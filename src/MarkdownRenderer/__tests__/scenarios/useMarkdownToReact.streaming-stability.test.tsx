@@ -25,17 +25,34 @@ const createCodeBlockProbe = (counters: Counters) => {
   return CodeBlockProbe;
 };
 
+const createThinkProbe = (counters: Counters) => {
+  const ThinkProbe: React.FC<RendererBlockProps> = ({ children }) => {
+    useEffect(() => {
+      counters.mounts += 1;
+      return () => {
+        counters.unmounts += 1;
+      };
+    }, []);
+
+    return <div data-testid="streaming-think-probe">{children}</div>;
+  };
+
+  return ThinkProbe;
+};
+
 const HookHarness: React.FC<{
   content: string;
   streaming: boolean;
   fadeTokens?: boolean;
-  codeBlockComponent: React.ComponentType<RendererBlockProps>;
-}> = ({ content, streaming, fadeTokens, codeBlockComponent }) => {
+  codeBlockComponent?: React.ComponentType<RendererBlockProps>;
+  components?: Record<string, React.ComponentType<RendererBlockProps>>;
+}> = ({ content, streaming, fadeTokens, codeBlockComponent, components }) => {
   const reactNode = useMarkdownToReact(content, {
     streaming,
     fadeTokens,
     components: {
-      __codeBlock: codeBlockComponent,
+      ...(codeBlockComponent ? { __codeBlock: codeBlockComponent } : {}),
+      ...components,
     },
   });
 
@@ -167,6 +184,45 @@ describe('useMarkdownToReact streaming stability', () => {
     expect(container.querySelectorAll('.stream-token').length).toBeGreaterThan(
       0,
     );
+    expect(counters.mounts).toBe(1);
+    expect(counters.unmounts).toBe(0);
+
+    unmount();
+    expect(counters.unmounts).toBe(1);
+  });
+
+  it('流式追加 think 块内空行时，不应重复卸载挂载 think 组件', () => {
+    const counters: Counters = { mounts: 0, unmounts: 0 };
+    const ThinkProbe = createThinkProbe(counters);
+
+    const { container, rerender, unmount } = render(
+      <HookHarness
+        content="<think>Step 1</think>"
+        streaming
+        components={{ think: ThinkProbe }}
+      />,
+    );
+
+    expect(screen.getByTestId('streaming-think-probe')).toHaveTextContent(
+      'Step 1',
+    );
+    expect(counters.mounts).toBe(1);
+    expect(counters.unmounts).toBe(0);
+
+    rerender(
+      <HookHarness
+        content="<think>Step 1\n\nStep 2</think>"
+        streaming
+        components={{ think: ThinkProbe }}
+      />,
+    );
+
+    const thinkProbe = screen.getByTestId('streaming-think-probe');
+    expect(thinkProbe).toHaveTextContent('Step 1');
+    expect(thinkProbe).toHaveTextContent('Step 2');
+    expect(
+      container.querySelectorAll('[data-testid="markdown-paragraph"]'),
+    ).toHaveLength(0);
     expect(counters.mounts).toBe(1);
     expect(counters.unmounts).toBe(0);
 
