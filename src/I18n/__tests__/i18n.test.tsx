@@ -1,4 +1,10 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -17,7 +23,19 @@ import {
 describe('I18n Provider', () => {
   afterEach(() => {
     cleanup();
+    localStorage.removeItem('md-editor-language');
   });
+
+  const LocaleProbe = () => {
+    const { language, locale } = React.useContext(I18nContext);
+
+    return (
+      <div>
+        <span data-testid="language">{language}</span>
+        <span data-testid="table-label">{locale.table}</span>
+      </div>
+    );
+  };
 
   it('should provide Chinese labels by default', () => {
     const TestComponent = () => {
@@ -33,20 +51,47 @@ describe('I18n Provider', () => {
     expect(screen.getByTestId('test')).toHaveTextContent('表格');
   });
 
-  it('should respect ConfigProvider locale', () => {
-    const TestComponent = () => {
-      return <div data-testid="test">{enLabels.table}</div>;
-    };
-
+  it('should sync context labels from ConfigProvider locale', async () => {
+    localStorage.setItem('md-editor-language', 'zh-CN');
     render(
       <ConfigProvider locale={{ locale: 'en-US' }}>
         <I18nProvide>
-          <TestComponent />
+          <LocaleProbe />
         </I18nProvide>
       </ConfigProvider>,
     );
 
-    expect(screen.getByTestId('test')).toHaveTextContent('Table');
+    await waitFor(() => {
+      expect(screen.getByTestId('language')).toHaveTextContent('en-US');
+    });
+    expect(screen.getByTestId('table-label')).toHaveTextContent('Table');
+  });
+
+  it('should update context labels when ConfigProvider locale changes', async () => {
+    const { rerender } = render(
+      <ConfigProvider locale={{ locale: 'en-US' }}>
+        <I18nProvide>
+          <LocaleProbe />
+        </I18nProvide>
+      </ConfigProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('language')).toHaveTextContent('en-US');
+    });
+
+    rerender(
+      <ConfigProvider locale={{ locale: 'zh-CN' }}>
+        <I18nProvide>
+          <LocaleProbe />
+        </I18nProvide>
+      </ConfigProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('language')).toHaveTextContent('zh-CN');
+    });
+    expect(screen.getByTestId('table-label')).toHaveTextContent('表格');
   });
 
   it('should use browser language preference when available', () => {
