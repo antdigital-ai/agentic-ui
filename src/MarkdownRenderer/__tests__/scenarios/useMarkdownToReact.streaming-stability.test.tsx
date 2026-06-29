@@ -197,7 +197,7 @@ describe('useMarkdownToReact streaming stability', () => {
 
     const { container, rerender, unmount } = render(
       <HookHarness
-        content="<think>Step 1</think>"
+        content="<think>\nStep 1\n</think>"
         streaming
         components={{ think: ThinkProbe }}
       />,
@@ -211,7 +211,7 @@ describe('useMarkdownToReact streaming stability', () => {
 
     rerender(
       <HookHarness
-        content="<think>Step 1\n\nStep 2</think>"
+        content="<think>\nStep 1\n\nStep 2\n</think>"
         streaming
         components={{ think: ThinkProbe }}
       />,
