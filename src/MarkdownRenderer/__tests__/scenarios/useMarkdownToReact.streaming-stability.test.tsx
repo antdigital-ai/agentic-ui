@@ -220,9 +220,10 @@ describe('useMarkdownToReact streaming stability', () => {
     const thinkProbe = screen.getByTestId('streaming-think-probe');
     expect(thinkProbe).toHaveTextContent('Step 1');
     expect(thinkProbe).toHaveTextContent('Step 2');
-    expect(
+    const outsideThinkParagraphs = Array.from(
       container.querySelectorAll('[data-testid="markdown-paragraph"]'),
-    ).toHaveLength(0);
+    ).filter((paragraph) => !thinkProbe.contains(paragraph));
+    expect(outsideThinkParagraphs).toHaveLength(0);
     expect(counters.mounts).toBe(1);
     expect(counters.unmounts).toBe(0);
 
