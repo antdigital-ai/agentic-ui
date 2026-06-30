@@ -429,9 +429,9 @@ describe('MarkdownRenderer', () => {
     const thinkContent = container.querySelector(
       '[data-testid="tool-use-bar-think-container"]',
     );
-    const paragraphTexts = Array.from(container.querySelectorAll('p')).map(
-      (paragraph) => paragraph.textContent,
-    );
+    const paragraphTexts = Array.from(
+      container.querySelectorAll('[data-testid="markdown-paragraph"]'),
+    ).map((paragraph) => paragraph.textContent);
 
     expect(thinkBlock).toBeTruthy();
     expect(thinkContent?.textContent).toContain('步骤一：读取上下文');
