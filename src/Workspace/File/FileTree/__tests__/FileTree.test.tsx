@@ -480,6 +480,49 @@ describe('Workspace.FileTree', () => {
     });
   });
 
+  it('keeps preview-only leaf without flat index as a plain selectable tree node', async () => {
+    const onPreview = vi.fn();
+    const onSelect = vi.fn();
+
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.FileTree
+            treeData={[
+              {
+                key: 'leaf-preview-only',
+                name: 'orphan-preview.md',
+                isLeaf: true,
+              },
+            ]}
+            onLoadChildren={vi.fn()}
+            onPreview={onPreview}
+            onSelect={onSelect}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    expect(
+      document.querySelector('.ant-workspace-file-item--tree'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: '预览' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: '下载' }),
+    ).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('orphan-preview.md'));
+
+    await waitFor(() => {
+      expect(onSelect).toHaveBeenCalledWith(
+        expect.objectContaining({ key: 'leaf-preview-only' }),
+      );
+    });
+    expect(onPreview).not.toHaveBeenCalled();
+  });
+
   it('invokes onPreview on leaf select when file is set and onFileClick omitted', async () => {
     const onPreview = vi.fn();
     const file: FileNode = {
