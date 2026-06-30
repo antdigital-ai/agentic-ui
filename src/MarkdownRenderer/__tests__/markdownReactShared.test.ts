@@ -117,23 +117,30 @@ describe('splitMarkdownBlocks', () => {
   });
 
   it('does not split inside <think> tags with blank lines', () => {
-    const md = '<think>\nHere is thinking:\n\n1. Step one\n\n2. Step two\n</think>\n\nResponse text.';
+    const md =
+      '<think>\nHere is thinking:\n\n1. Step one\n\n2. Step two\n</think>\n\nResponse text.';
     const result = splitMarkdownBlocks(md);
     expect(result.length).toBe(2);
-    expect(result[0]).toBe('<think>\nHere is thinking:\n\n1. Step one\n\n2. Step two\n</think>');
+    expect(result[0]).toBe(
+      '<think>\nHere is thinking:\n\n1. Step one\n\n2. Step two\n</think>',
+    );
     expect(result[1]).toBe('Response text.');
   });
 
   it('does not split inside <thinking> tags with blank lines', () => {
-    const md = '<thinking>\nSome thinking\n\nWith blank lines\n</thinking>\n\nResponse text.';
+    const md =
+      '<thinking>\nSome thinking\n\nWith blank lines\n</thinking>\n\nResponse text.';
     const result = splitMarkdownBlocks(md);
     expect(result.length).toBe(2);
-    expect(result[0]).toBe('<thinking>\nSome thinking\n\nWith blank lines\n</thinking>');
+    expect(result[0]).toBe(
+      '<thinking>\nSome thinking\n\nWith blank lines\n</thinking>',
+    );
     expect(result[1]).toBe('Response text.');
   });
 
   it('does not split inside <redacted_thinking> tags with blank lines', () => {
-    const md = '<redacted_thinking>\nInternal reasoning\n\nContinued\n</redacted_thinking>\n\nOutput.';
+    const md =
+      '<redacted_thinking>\nInternal reasoning\n\nContinued\n</redacted_thinking>\n\nOutput.';
     const result = splitMarkdownBlocks(md);
     expect(result.length).toBe(2);
     expect(result[0]).toBe(
@@ -148,6 +155,18 @@ describe('splitMarkdownBlocks', () => {
     expect(result.length).toBe(2);
     expect(result[0]).toBe('<think>\nContinuous thinking content\n</think>');
     expect(result[1]).toBe('After think.');
+  });
+
+  it('splits paragraph before think block and preserves think blank lines', () => {
+    const md =
+      'Intro paragraph\n\n<think>\nStep 1\n\nStep 2\n</think>\n\nFinal answer.';
+    const result = splitMarkdownBlocks(md);
+
+    expect(result).toEqual([
+      'Intro paragraph',
+      '<think>\nStep 1\n\nStep 2\n</think>',
+      'Final answer.',
+    ]);
   });
 
   it('handles multiple think tag pairs', () => {
@@ -169,10 +188,13 @@ describe('splitMarkdownBlocks', () => {
   });
 
   it('handles think open tag with inline content', () => {
-    const md = '<think>thinking starts here\n\ncontinues\n</think>\n\nResponse.';
+    const md =
+      '<think>thinking starts here\n\ncontinues\n</think>\n\nResponse.';
     const result = splitMarkdownBlocks(md);
     expect(result.length).toBe(2);
-    expect(result[0]).toBe('<think>thinking starts here\n\ncontinues\n</think>');
+    expect(result[0]).toBe(
+      '<think>thinking starts here\n\ncontinues\n</think>',
+    );
     expect(result[1]).toBe('Response.');
   });
 

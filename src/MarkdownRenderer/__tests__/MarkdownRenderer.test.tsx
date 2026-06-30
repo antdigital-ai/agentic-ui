@@ -418,6 +418,27 @@ describe('MarkdownRenderer', () => {
     expect(container.textContent).toContain('最终回答');
   });
 
+  it('应将前置段落后的多段 <think> 内容完整保留在思考组件内', () => {
+    const content =
+      '前置说明\n\n<think>\n步骤一：读取上下文\n\n步骤二：生成答案\n</think>\n\n最终回答';
+    const { container } = render(<MarkdownRenderer content={content} />);
+
+    const thinkBlock = container.querySelector(
+      '[data-testid="think-block-renderer"]',
+    );
+    const thinkContent = container.querySelector(
+      '[data-testid="tool-use-bar-think-container"]',
+    );
+    const paragraphTexts = Array.from(
+      container.querySelectorAll('[data-testid="markdown-paragraph"]'),
+    ).map((paragraph) => paragraph.textContent);
+
+    expect(thinkBlock).toBeTruthy();
+    expect(thinkContent?.textContent).toContain('步骤一：读取上下文');
+    expect(thinkContent?.textContent).toContain('步骤二：生成答案');
+    expect(paragraphTexts).toEqual(['前置说明', '最终回答']);
+  });
+
   it('应将 HTML 注释 + 表格组合渲染为图表', async () => {
     const content = [
       '<!-- [{"chartType":"line","title":"趋势","x":"month","y":"value"}] -->',
