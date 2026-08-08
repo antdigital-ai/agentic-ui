@@ -79,7 +79,7 @@ const convertCodeNode = (codeNode: any, preString: string): string => {
   const language = codeNode.lang || '';
   const value = codeNode.value || '';
 
-  if (!value?.trim()) {
+  if (!value.trim()) {
     return `${preString}\`\`\`${language}\n${preString}\`\`\``;
   }
 
@@ -106,7 +106,7 @@ const convertBlockquoteNode = (
   return (
     '> ' +
     parserSlateNodeToMarkdown(
-      blockquoteNode.children || [],
+      blockquoteNode.children,
       preString,
       [...parent, { ...blockquoteNode, converted: true }],
       plugins,
@@ -126,7 +126,7 @@ const convertParagraphNode = (
   return (
     preString +
     parserSlateNodeToMarkdown(
-      paragraphNode.children || [],
+      paragraphNode.children,
       preString,
       [...parent, { ...paragraphNode, converted: true }],
       plugins,
@@ -145,7 +145,7 @@ const convertHeadingNode = (
 ): string => {
   const level = headingNode.depth || 1;
   const content = parserSlateNodeToMarkdown(
-    headingNode.children || [],
+    headingNode.children,
     preString,
     [...parent, { ...headingNode, converted: true }],
     plugins,
@@ -768,8 +768,8 @@ const textHtml = (t: Text) => {
   if (t.italic) str = `<i>${str}</i>`;
   if (t.bold) str = `<b>${str}</b>`;
   if (t.strikethrough) str = `<del>${str}</del>`;
-  if (t?.url) str = `<a href="${t?.url}">${str}</a>`;
-  if (t?.identifier || t?.fnc) str = `[^${str}]`;
+  if (t.url) str = `<a href="${t.url}">${str}</a>`;
+  if (t.identifier || t.fnc) str = `[^${str}]`;
   if ((t as CustomLeaf).mark) {
     const attrs: string[] = [];
     if ((t as CustomLeaf).markColor)
@@ -803,12 +803,11 @@ const textHtml = (t: Text) => {
  */
 const textStyle = (t: Text) => {
   if (!t.text && !t.tag) return '';
-  let str =
-    (t?.text || '')
-      .split(JINJA_DOLLAR_PLACEHOLDER)
-      .join('$')
-      ?.replace(/(?<!\\)\\/g, '\\')
-      .replace(/\n/g, '  \n') || '';
+  let str = (t.text || '')
+    .split(JINJA_DOLLAR_PLACEHOLDER)
+    .join('$')
+    .replace(/(?<!\\)\\/g, '\\')
+    .replace(/\n/g, '  \n');
   let preStr = '',
     afterStr = '';
 
@@ -818,12 +817,10 @@ const textStyle = (t: Text) => {
   // 3. Italic (emphasis)
   // 4. Strikethrough (modification)
   if (t.code && !t.tag) {
-    // Extract whitespace for non-tag code
-    if (t.code || t.bold || t.strikethrough || t.italic) {
-      preStr = str.match(/^\s+/)?.[0] || '';
-      afterStr = str.match(/\s+$/)?.[0] || '';
-      str = str.trim();
-    }
+    // Extract whitespace for non-tag code（t.code 已成立）
+    preStr = str.match(/^\s+/)?.[0] || '';
+    afterStr = str.match(/\s+$/)?.[0] || '';
+    str = str.trim();
     str = `\`${str}\``;
   } else if (t.tag) {
     // 如果是 tag，优先检查是否有 value，如果有 value 则使用 value 和 placeholder
@@ -903,8 +900,8 @@ const composeText = (t: Text, parent: any[]) => {
   // @ts-ignore
   const index = siblings?.findIndex((n) => n === t);
   let str = textStyle(t)!;
-  if (t?.url) {
-    str = `[${(t.text || '').split(JINJA_DOLLAR_PLACEHOLDER).join('$')}](${encodeURI(t?.url)})`;
+  if (t.url) {
+    str = `[${(t.text || '').split(JINJA_DOLLAR_PLACEHOLDER).join('$')}](${encodeURI(t.url)})`;
   } else if (isMix(t) && index !== -1) {
     const next = siblings[index + 1];
     if (!str.endsWith(' ') && next && !Node.string(next).startsWith(' ')) {
@@ -1345,7 +1342,7 @@ const handleCode = (node: any, preString: string) => {
  * @returns 处理后的 HTML 链接标签字符串
  */
 const handleAttach = (node: any) => {
-  return `<a href="${encodeURI(node?.url)}" download data-size="${node.size}">${node.name}</a>`;
+  return `<a href="${encodeURI(node.url)}" download data-size="${node.size}">${node.name}</a>`;
 };
 
 /**
@@ -1428,7 +1425,7 @@ const handleBlockquote = (
  */
 const handleImage = (node: any) => {
   try {
-    let nodeImageUrl = new URL(node?.url);
+    let nodeImageUrl = new URL(node.url);
     if (node.width) {
       nodeImageUrl.searchParams.set('width', node.width);
     }
@@ -1440,8 +1437,8 @@ const handleImage = (node: any) => {
     }
     return `![${node.alt || ''}](${nodeImageUrl.toString()})`;
   } catch (e) {
-    console.warn('Invalid image URL:', node?.url, e);
-    return `![${node.alt || ''}](${encodeURI(node?.url)})`;
+    console.warn('Invalid image URL:', node.url, e);
+    return `![${node.alt || ''}](${encodeURI(node.url)})`;
   }
 };
 
@@ -1451,8 +1448,8 @@ const handleImage = (node: any) => {
  * @returns 处理后的 HTML 媒体标签或 Markdown 图片字符串
  */
 const handleMedia = (node: any) => {
-  let nodeUrl = node?.url;
-  let type = node.mediaType || getMediaType(nodeUrl, node?.alt);
+  let nodeUrl = node.url;
+  let type = node.mediaType || getMediaType(nodeUrl, node.alt);
   if (node.height) {
     if (type === 'video') {
       return `<video src="${encodeURI(nodeUrl)}" alt="" height="${node.height || ''}"/>`;
@@ -1464,7 +1461,7 @@ const handleMedia = (node: any) => {
       return `<video src="${encodeURI(nodeUrl)}"/>`;
     } else if (type === 'image' || type === 'media') {
       if (node.align) {
-        return `<img src="${encodeURI(nodeUrl)}" alt="" ${node.align ? `data-align="${node.align}"` : ''}/>`;
+        return `<img src="${encodeURI(nodeUrl)}" alt="" data-align="${node.align}"/>`;
       } else {
         return `![${node.alt || ''}](${encodeURI(nodeUrl)})`;
       }
@@ -1581,7 +1578,7 @@ const handleSchema = (node: any) => {
  * @returns 处理后的 Markdown 链接字符串
  */
 const handleLinkCard = (node: any) => {
-  return `[${node.name}](${node?.url} "${node.name}")`;
+  return `[${node.name}](${node.url} "${node.name}")`;
 };
 
 /**

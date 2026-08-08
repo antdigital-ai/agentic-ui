@@ -14,7 +14,7 @@ export const MarkdownEditorUpdate = (
   const editorRef = React.useRef<MarkdownEditorInstance>();
 
   useEffect(() => {
-    const formatted = MarkdownFormatter.format(props.initValue || '') || '';
+    const formatted = MarkdownFormatter.format(props.initValue || '');
     editorRef.current?.store?.updateNodeList(
       parserMdToSchema(formatted.trim(), props.plugins).schema,
     );

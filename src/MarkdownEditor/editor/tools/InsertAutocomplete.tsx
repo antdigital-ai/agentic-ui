@@ -164,21 +164,21 @@ export const getInsertOptions: (
       key: 'list',
       children: [
         {
-          label: [locale['b-list'] || '无序列表'],
+          label: [locale?.['b-list'] || '无序列表'],
           task: 'list',
           key: 'b-list',
           args: ['unordered'],
           icon: <UnorderedListOutlined />,
         },
         {
-          label: [locale['n-list'] || '有序列表'],
+          label: [locale?.['n-list'] || '有序列表'],
           task: 'list',
           key: 'n-list',
           args: ['ordered'],
           icon: <OrderedListOutlined />,
         },
         {
-          label: [locale['t-list'] || '任务列表'],
+          label: [locale?.['t-list'] || '任务列表'],
           task: 'list',
           key: 't-list',
           args: ['task'],
@@ -301,7 +301,7 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
       insertAttachment: false,
       insertUrl: '',
     });
-    if (typeof window === 'undefined') return;
+    // 组件仅挂载于浏览器；window 守卫为死分支
     window.removeEventListener('click', clickClose);
   });
 
@@ -320,8 +320,6 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
           x: state.left,
           y: state.top || state.bottom || 0,
         });
-        if (typeof window === 'undefined') return;
-        if (typeof window.matchMedia === 'undefined') return;
         setOpenInsertCompletion?.(false);
         close();
         return;
@@ -337,7 +335,7 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
         } else {
           setState({ insertAttachment: true });
         }
-      } else if (op) {
+      } else {
         Transforms.insertText(markdownEditorRef.current, '', {
           at: {
             anchor: Editor.start(markdownEditorRef.current, ctx.current.path),
@@ -348,8 +346,6 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
           key: op.task,
           args: op.args,
         });
-        if (typeof window === 'undefined') return;
-        if (typeof window.matchMedia === 'undefined') return;
         setOpenInsertCompletion?.(false);
         close();
       }
@@ -543,7 +539,7 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
         [] as InsertOptions['children'],
       );
     }
-    if (props.insertOptions && props?.insertOptions?.length) {
+    if (props.insertOptions?.length) {
       filterOptions.unshift({
         label: ['快捷设置', 'My Quick'],
         key: 'quick',
@@ -589,7 +585,7 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
       }
 
       // 如果节点下方空间不足但上方有足够空间，显示在上方
-      if (spaceBelow < 212 && spaceAbove >= 212) {
+      if (spaceBelow < 212) {
         return {
           top: undefined,
           bottom: containerHeight - nodeTopRelativeToContainer,
@@ -598,25 +594,19 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
       }
 
       // 默认逻辑，优先显示在下方
-      if (spaceBelow >= 212) {
-        return {
-          top: nodeBottomRelativeToContainer,
-          bottom: undefined,
-          left,
-        };
-      }
-
-      return undefined;
+      return {
+        top: nodeBottomRelativeToContainer,
+        bottom: undefined,
+        left,
+      };
     };
 
     const setupEventListeners = () => {
-      if (typeof window === 'undefined') return;
       markdownContainerRef?.current?.addEventListener('keydown', keydown);
       markdownContainerRef?.current?.addEventListener('click', clickClose);
     };
 
     const removeEventListeners = () => {
-      if (typeof window === 'undefined') return;
       markdownContainerRef?.current?.removeEventListener('keydown', keydown);
       markdownContainerRef?.current?.removeEventListener('click', clickClose);
     };
@@ -632,19 +622,14 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
           path: node[1],
           isTop: EditorUtils.isTop(markdownEditorRef.current, node[1]),
         };
-        if (node?.[0]?.type === 'paragraph') {
+        if (node[0]?.type === 'paragraph') {
           try {
             const el = ReactEditor.toDOMNode(
               markdownEditorRef.current,
               node[0],
             );
             if (el) {
-              const position = calculatePosition(el, document.body);
-              if (position) {
-                setState(position);
-              } else {
-                setState({ top: 0, left: 0, bottom: undefined });
-              }
+              setState(calculatePosition(el, document.body));
             }
           } catch {
             // node may not be mounted yet; position update skipped
@@ -745,7 +730,7 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
                   .map((l) => {
                     return l?.children;
                   })
-                  .flat(1) || [],
+                  .flat(1),
               ) as any[]
             }
           />

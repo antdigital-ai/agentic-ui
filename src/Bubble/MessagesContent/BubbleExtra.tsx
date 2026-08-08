@@ -123,8 +123,8 @@ export const BubbleExtra = ({
           active={originalData?.feedback === 'thumbsUp'}
           title={likeButtonTitle}
           onClick={async (e: any) => {
-            e?.preventDefault?.();
-            e?.stopPropagation?.();
+            e.preventDefault();
+            e.stopPropagation();
             try {
               // 处理取消点赞
               if (alreadyFeedback) {
@@ -311,8 +311,8 @@ export const BubbleExtra = ({
           }}
           className={classNames(`${prefixCls}-action-box`)}
         >
-          {voiceDom ? voiceDom : null}
-          {copyDom ? copyDom : null}
+          {voiceDom}
+          {copyDom}
           {(voiceDom || copyDom) && (like || disLike) && (
             <Divider
               type="vertical"
@@ -321,8 +321,8 @@ export const BubbleExtra = ({
               }}
             />
           )}
-          {like ? like : null}
-          {disLike ? disLike : null}
+          {like}
+          {disLike}
         </div>
       ) : null,
     [voiceDom, copyDom, like, disLike, prefixCls],

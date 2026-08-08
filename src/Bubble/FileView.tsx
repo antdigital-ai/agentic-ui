@@ -15,19 +15,19 @@ type BubbleFileViewProps = {
 const DEFAULT_DOWNLOAD_FILENAME = 'download';
 
 const openFileInNewWindow = (file: AttachmentFile): void => {
-  const url = file?.previewUrl || file?.url;
+  const url = file.previewUrl || file.url;
   if (!url || typeof window === 'undefined') return;
 
   window.open(url, '_blank');
 };
 
 const downloadFile = (file: AttachmentFile): void => {
-  const url = file?.url || file?.previewUrl;
+  const url = file.url || file.previewUrl;
   if (!url || typeof document === 'undefined') return;
 
   const link = document.createElement('a');
   link.href = url;
-  link.download = file?.name || DEFAULT_DOWNLOAD_FILENAME;
+  link.download = file.name || DEFAULT_DOWNLOAD_FILENAME;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -102,7 +102,12 @@ export const BubbleFileView: React.FC<BubbleFileViewProps> = ({
   bubble,
   placement,
 }) => {
-  const { originData, fileViewEvents, fileViewConfig = {} } = bubble;
+  const { originData, fileViewEvents } = bubble;
+  // null/false 与缺省一样视为空配置（解构默认值只覆盖 undefined）
+  const fileViewConfig =
+    bubble.fileViewConfig && typeof bubble.fileViewConfig === 'object'
+      ? bubble.fileViewConfig
+      : {};
 
   if (!originData?.fileMap || originData.fileMap.size === 0) return null;
 

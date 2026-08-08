@@ -1,16 +1,17 @@
-import { act, renderHook } from '@testing-library/react';
+import { act, cleanup, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useContentThrottle } from '../useContentThrottle';
 import { installRafStub } from './installRafStub';
 
 describe('useContentThrottle', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     installRafStub();
   });
 
   afterEach(() => {
-    vi.useRealTimers();
+    cleanup();
+    vi.clearAllTimers();
     vi.unstubAllGlobals();
   });
 

@@ -172,4 +172,42 @@ describe('AreaChart 额外覆盖用例', () => {
     expect(screen.getByTestId('line-chart')).toBeInTheDocument();
     expect(hexToRgba).toHaveBeenCalled();
   });
+
+  it('空数据仍渲染容器', () => {
+    render(<AreaChart data={[]} title="空面积" />);
+    expect(document.body.textContent).toBeTruthy();
+  });
+
+  it('多 type 与 category 筛选', () => {
+    render(
+      <AreaChart
+        data={[
+          { x: '2024-01', y: 10, type: 'A', category: 'c1' },
+          { x: '2024-02', y: 20, type: 'B', category: 'c2' },
+        ]}
+      />,
+    );
+    expect(screen.getByTestId('line-chart')).toBeInTheDocument();
+  });
+
+  it('width/height 字符串', () => {
+    render(
+      <AreaChart
+        data={[{ x: '2024-01', y: 1, type: 'A' }]}
+        width="100%"
+        height={280}
+      />,
+    );
+    expect(screen.getByTestId('line-chart')).toBeInTheDocument();
+  });
+
+  it('theme dark', () => {
+    render(
+      <AreaChart
+        data={[{ x: '2024-01', y: 1, type: 'A' }]}
+        theme="dark"
+      />,
+    );
+    expect(screen.getByTestId('line-chart')).toBeInTheDocument();
+  });
 });

@@ -12,13 +12,13 @@ export class MarkdownFormatter {
    */
   static normalizeParagraphs(text: string): string {
     // 将所有的换行符统一为 \n
-    let normalizedText = text?.replace(/\r\n/g, '\n')?.replace(/\r/g, '\n');
+    let normalizedText = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
     // 清理开头和结尾的空白字符
     normalizedText = normalizedText.trim();
 
     // 将连续的空白行（包括只包含空格的行）替换为单个换行符
-    normalizedText = normalizedText?.replace(/\n[\s\n]+/g, '\n');
+    normalizedText = normalizedText.replace(/\n[\s\n]+/g, '\n');
 
     // 保护表格内容：识别表格行并保持它们的单行换行符
     const lines = normalizedText.split('\n');
@@ -48,7 +48,7 @@ export class MarkdownFormatter {
       }
     }
 
-    return result.join('\n')?.replace(/\n+$/, '');
+    return result.join('\n').replace(/\n+$/, '');
   }
 
   /**
@@ -64,42 +64,42 @@ export class MarkdownFormatter {
     // 临时替换需要保护的内容
     const preservedText = text
       // 保存代码块
-      ?.replace(/```[\s\S]*?```/g, (match) => {
+      .replace(/```[\s\S]*?```/g, (match) => {
         const placeholder = `__CODEBLOCK_${counter}__`;
         placeholders[placeholder] = match;
         counter++;
         return placeholder;
       })
       // 保存 HTML 注释
-      ?.replace(/(<!--[\s\S]*?-->)/g, (match) => {
+      .replace(/(<!--[\s\S]*?-->)/g, (match) => {
         const placeholder = `__COMMENT_${counter}__`;
         placeholders[placeholder] = match;
         counter++;
         return placeholder;
       })
       // 保存 Markdown 链接（包含 HTML 标签的情况）
-      ?.replace(/\[([^\]]*<[^>]+>[^\]]*)\]\([^)]+\)/g, (match) => {
+      .replace(/\[([^\]]*<[^>]+>[^\]]*)\]\([^)]+\)/g, (match) => {
         const placeholder = `__LINK_HTML_${counter}__`;
         placeholders[placeholder] = match;
         counter++;
         return placeholder;
       })
       // 保存完整的 HTML 标签块（包括内容）
-      ?.replace(/(<[^>]+>.*?<\/[^>]+>|<[^>]+>)/g, (match) => {
+      .replace(/(<[^>]+>.*?<\/[^>]+>|<[^>]+>)/g, (match) => {
         const placeholder = `__HTML_${counter}__`;
         placeholders[placeholder] = match;
         counter++;
         return placeholder;
       })
       // 保存普通 Markdown 链接
-      ?.replace(/(\[([^\]]+)\]\([^)]+\))/g, (match) => {
+      .replace(/(\[([^\]]+)\]\([^)]+\))/g, (match) => {
         const placeholder = `__LINK_${counter}__`;
         placeholders[placeholder] = match;
         counter++;
         return placeholder;
       })
       // 保存行内代码
-      ?.replace(/(`[^`]+`)/g, (match) => {
+      .replace(/(`[^`]+`)/g, (match) => {
         const placeholder = `__CODE_${counter}__`;
         placeholders[placeholder] = match;
         counter++;
@@ -109,20 +109,20 @@ export class MarkdownFormatter {
     // 添加空格
     let spacedText = preservedText
       // 在中文和英文之间添加空格
-      ?.replace(/([\u4e00-\u9fa5])([A-Za-z])/g, '$1 $2')
-      ?.replace(/([A-Za-z])([\u4e00-\u9fa5])/g, '$1 $2')
+      .replace(/([\u4e00-\u9fa5])([A-Za-z])/g, '$1 $2')
+      .replace(/([A-Za-z])([\u4e00-\u9fa5])/g, '$1 $2')
       // 在中文和数字之间添加空格
-      ?.replace(/([\u4e00-\u9fa5])(\d+)/g, '$1 $2')
-      ?.replace(/(\d+)([\u4e00-\u9fa5])/g, '$1 $2')
+      .replace(/([\u4e00-\u9fa5])(\d+)/g, '$1 $2')
+      .replace(/(\d+)([\u4e00-\u9fa5])/g, '$1 $2')
       // 在中文和括号之间添加空格
-      ?.replace(/([\u4e00-\u9fa5])([\(\)])/g, '$1 $2')
-      ?.replace(/([\(\)])([\u4e00-\u9fa5])/g, '$1 $2')
+      .replace(/([\u4e00-\u9fa5])([\(\)])/g, '$1 $2')
+      .replace(/([\(\)])([\u4e00-\u9fa5])/g, '$1 $2')
       // 修复可能出现的多余空格，但保留换行符
-      ?.replace(/([^\s\n])\s+([^\s\n])/g, '$1 $2');
+      .replace(/([^\s\n])\s+([^\s\n])/g, '$1 $2');
 
     // 还原所有保护的内容
     Object.entries(placeholders).forEach(([placeholder, original]) => {
-      spacedText = spacedText?.replace(
+      spacedText = spacedText.replace(
         new RegExp(`(\\s*)${placeholder}(\\s*)`),
         (_, before, after) => {
           // 确保特殊语法前后有空格
@@ -154,7 +154,7 @@ export class MarkdownFormatter {
     }
 
     // 保存代码块内容
-    const textWithoutCodeBlocks = text?.replace(/```[\s\S]*?```/g, (match) => {
+    const textWithoutCodeBlocks = text.replace(/```[\s\S]*?```/g, (match) => {
       const placeholder = `__CODEBLOCK_${counter}__`;
       codeBlocks[placeholder] = match;
       counter++;
@@ -171,10 +171,10 @@ export class MarkdownFormatter {
 
     // 还原代码块内容
     Object.entries(codeBlocks).forEach(([placeholder, original]) => {
-      result = result?.replace(placeholder, original);
+      result = result.replace(placeholder, original);
     });
 
-    return result || '';
+    return result;
   }
 }
 

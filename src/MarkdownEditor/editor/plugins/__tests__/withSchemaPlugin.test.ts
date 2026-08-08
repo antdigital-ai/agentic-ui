@@ -3,6 +3,28 @@ import { vi } from 'vitest';
 import { withSchemaPlugin } from '../withSchemaPlugin';
 
 describe('withSchemaPlugin', () => {
+  it('istanbul one-miss: split_node 且 properties.type 为 schema 时拦截 apply', () => {
+    const editor = withSchemaPlugin(createEditor());
+    editor.children = [
+      {
+        type: 'schema',
+        children: [{ text: 'schema content' }],
+      },
+    ];
+
+    const insertNodesSpy = vi.spyOn(Transforms, 'insertNodes');
+
+    editor.apply({
+      type: 'split_node',
+      path: [0],
+      position: 0,
+      properties: { type: 'schema' },
+    });
+
+    expect(insertNodesSpy).toHaveBeenCalled();
+    insertNodesSpy.mockRestore();
+  });
+
   it('split_node 且 type 为 schema 时应在其后插入段落', () => {
     const editor = withSchemaPlugin(createEditor());
     editor.children = [

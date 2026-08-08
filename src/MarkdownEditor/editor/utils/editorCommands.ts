@@ -110,7 +110,7 @@ export function insertTable(editor: Editor, node?: [any, Path]) {
 
   if (
     node !== undefined &&
-    !['paragraph', 'head'].includes(node[0]?.type as string)
+    !['paragraph', 'head'].includes(node[0].type as string)
   ) {
     return;
   }
@@ -119,9 +119,9 @@ export function insertTable(editor: Editor, node?: [any, Path]) {
     node === undefined
       ? (resolveParagraphOrHead(editor) ?? firstLowestElement(editor))
       : resolveParagraphOrHead(editor, node);
-  if (currentNode && ['paragraph', 'head'].includes(currentNode?.[0]?.type)) {
+  if (currentNode && ['paragraph', 'head'].includes(currentNode[0].type)) {
     const path =
-      currentNode?.[0]?.type === 'paragraph' && !Node.string(currentNode[0])
+      currentNode[0].type === 'paragraph' && !Node.string(currentNode[0])
         ? currentNode[1]
         : Path.next(currentNode[1]);
 
@@ -132,10 +132,7 @@ export function insertTable(editor: Editor, node?: [any, Path]) {
       at: path,
     });
 
-    if (
-      currentNode?.[0]?.type === 'paragraph' &&
-      !Node.string(currentNode[0])
-    ) {
+    if (currentNode[0].type === 'paragraph' && !Node.string(currentNode[0])) {
       Transforms.delete(editor, { at: Path.next(path) });
     }
     Transforms.select(editor, Editor.start(editor, path));
@@ -159,7 +156,7 @@ export function insertCodeBlock(
 ) {
   if (
     node !== undefined &&
-    !['paragraph', 'head'].includes(node[0]?.type as string)
+    !['paragraph', 'head'].includes(node[0].type as string)
   ) {
     return;
   }
@@ -213,13 +210,13 @@ export function insertCodeBlock(
  */
 export function toggleQuote(editor: Editor, node?: [any, Path]) {
   const currentNode = node || Array.from(getCurrentNodes(editor))[0];
-  if (!currentNode || !['paragraph', 'head'].includes(currentNode?.[0]?.type))
+  if (!currentNode || !['paragraph', 'head'].includes(currentNode[0].type))
     return;
   if (Node.parent(editor, currentNode[1]).type === 'blockquote') {
     Transforms.unwrapNodes(editor, { at: Path.parent(currentNode[1]) });
     return;
   }
-  if (currentNode?.[0]?.type === 'head') {
+  if (currentNode[0].type === 'head') {
     Transforms.setNodes(
       editor,
       {
@@ -245,9 +242,9 @@ export function toggleQuote(editor: Editor, node?: [any, Path]) {
  */
 export function insertHorizontalLine(editor: Editor, node?: [any, Path]) {
   const currentNode = node || Array.from(getCurrentNodes(editor))[0];
-  if (currentNode && ['paragraph', 'head'].includes(currentNode?.[0]?.type)) {
+  if (currentNode && ['paragraph', 'head'].includes(currentNode[0].type)) {
     const path =
-      currentNode?.[0]?.type === 'paragraph' && !Node.string(currentNode[0])
+      currentNode[0].type === 'paragraph' && !Node.string(currentNode[0])
         ? currentNode[1]
         : Path.next(currentNode[1]);
     Transforms.insertNodes(
@@ -282,7 +279,7 @@ export function insertHorizontalLine(editor: Editor, node?: [any, Path]) {
  */
 function convertToParagraph(editor: Editor) {
   const [node] = getCurrentNodes(editor);
-  if (node && ['head'].includes(node?.[0]?.type)) {
+  if (node && ['head'].includes(node[0].type)) {
     Transforms.setNodes(editor, { type: 'paragraph' }, { at: node[1] });
   }
 }
@@ -385,23 +382,9 @@ function processSelectionForHeading(
         continue;
       }
 
-      // 情况1: 选中了整个节点（从开始到结束）
-      if (
-        Point.equals(actualStart, nodeStart) &&
-        Point.equals(actualEnd, nodeEnd)
-      ) {
-        Transforms.setNodes(editor, { type: 'head', level }, { at: path });
-        continue;
-      }
-
-      // 情况2: 只选中了节点的一部分，需要拆分
+      // 选中节点的一部分，需要拆分
       const isAtStart = Point.equals(actualStart, nodeStart);
       const isAtEnd = Point.equals(actualEnd, nodeEnd);
-
-      if (isAtStart && isAtEnd) {
-        // 这种情况已经在情况1处理了，不会到这里
-        continue;
-      }
 
       // 获取原节点的属性
       const originalNode = Node.get(editor, path);
@@ -468,15 +451,7 @@ function processSelectionForHeading(
 
         let currentOffset = 0;
         for (const [textNode, textPath] of textNodes) {
-          if (!Text.isText(textNode)) {
-            continue;
-          }
-
-          const text = textNode.text;
-          if (typeof text !== 'string') {
-            continue;
-          }
-
+          const text = (textNode as Text).text ?? '';
           const textLength = text.length;
           const nextOffset = currentOffset + textLength;
 
@@ -545,7 +520,7 @@ export function setHeading(editor: Editor, level: number) {
   const [node] = getCurrentNodes(editor);
   if (
     node &&
-    ['paragraph', 'head'].includes(node?.[0]?.type) &&
+    ['paragraph', 'head'].includes(node[0].type) &&
     EditorUtils.isTop(editor, node[1])
   ) {
     Transforms.setNodes(editor, { type: 'head', level }, { at: node[1] });
@@ -567,10 +542,10 @@ export function increaseHeadingLevel(editor: Editor) {
   const [node] = getCurrentNodes(editor);
   if (
     node &&
-    ['paragraph', 'head'].includes(node?.[0]?.type) &&
+    ['paragraph', 'head'].includes(node[0].type) &&
     EditorUtils.isTop(editor, node[1])
   ) {
-    if (node?.[0]?.type === 'paragraph') {
+    if (node[0].type === 'paragraph') {
       Transforms.setNodes(editor, { type: 'head', level: 4 }, { at: node[1] });
     } else if (node[0].level === 1) {
       Transforms.setNodes(editor, { type: 'paragraph' }, { at: node[1] });
@@ -597,10 +572,10 @@ export function decreaseHeadingLevel(editor: Editor) {
   const [node] = getCurrentNodes(editor);
   if (
     node &&
-    ['paragraph', 'head'].includes(node?.[0]?.type) &&
+    ['paragraph', 'head'].includes(node[0].type) &&
     EditorUtils.isTop(editor, node[1])
   ) {
-    if (node?.[0]?.type === 'paragraph') {
+    if (node[0].type === 'paragraph') {
       Transforms.setNodes(editor, { type: 'head', level: 1 }, { at: node[1] });
     } else if (node[0].level === 4) {
       Transforms.setNodes(editor, { type: 'paragraph' }, { at: node[1] });

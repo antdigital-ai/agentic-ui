@@ -15,7 +15,7 @@ describe('scrollTo - 完整功能测试', () => {
   let mockDocument: Document;
 
   beforeEach(() => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
 
     // Mock window
     mockWindow = {
@@ -46,8 +46,8 @@ describe('scrollTo - 完整功能测试', () => {
   });
 
   afterEach(() => {
+    vi.clearAllTimers();
     vi.restoreAllMocks();
-    vi.useRealTimers();
   });
 
   describe('基本滚动功能', () => {
@@ -314,12 +314,14 @@ describe('scrollTo - 完整功能测试', () => {
       expect(callback).toHaveBeenCalledTimes(1);
     });
 
-    it('frameFunc 内 window 变为 undefined 时应调用 callback (44-47)', () => {
+    it('frameFunc 内 window 变为 undefined 时动画结束仍应调用 callback', () => {
       const callback = vi.fn();
       scrollTo(100, { container: mockElement, callback, duration: 200 });
       const origWindow = global.window;
       (global as any).window = undefined;
-      vi.advanceTimersByTime(20);
+      expect(() => {
+        vi.advanceTimersByTime(220);
+      }).not.toThrow();
       expect(callback).toHaveBeenCalledTimes(1);
       global.window = origWindow;
     });

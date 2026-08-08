@@ -141,7 +141,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
     return Array.isArray(statisticConfig) ? statisticConfig : [statisticConfig];
   }, [statisticConfig]);
 
-  // 响应式尺寸
+  // 响应式尺寸计算
   const [windowWidth, setWindowWidth] = useState(
     typeof window !== 'undefined' ? window.innerWidth : 768,
   );
@@ -164,18 +164,27 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
   const [showTrapezoid, setShowTrapezoid] = useState(true);
   const [pluginToggleKey, setPluginToggleKey] = useState(0);
 
-  // 类别筛选（外层）
+  // 类别筛选（外层）；过滤 falsy，避免筛选器出现空 label
   const categories = useMemo(() => {
-    return [...new Set(safeData.map((d) => d.category))];
+    return [...new Set(safeData.map((d) => d.category))].filter(
+      (c): c is string => Boolean(c),
+    );
   }, [safeData]);
 
   // 状态
   const [selectedFilter, setSelectedFilter] = useState<string>(
-    categories.find(Boolean) || '',
+    categories[0] || '',
   );
   const [selectedFilterLabel, setSelectedFilterLabel] = useState<
     string | undefined
   >(undefined);
+
+  // 当数据变化导致当前选中分类失效时，自动回退到首个有效分类或空（显示全部）
+  useEffect(() => {
+    if (selectedFilter && !categories.includes(selectedFilter)) {
+      setSelectedFilter(categories[0] || '');
+    }
+  }, [categories, selectedFilter]);
 
   // 二级筛选（可选）- 仅基于当前选中 category 的可用标签
   const filterLabels = useMemo(() => {
@@ -186,18 +195,25 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
     return labels.length > 0 ? [...new Set(labels)] : undefined;
   }, [safeData, selectedFilter]);
 
-  // 当切换 category 时，如当前二级筛选不在可选列表中，则重置为该类目第一项或清空
+  // 当切换 category 时，如当前二级筛选不在可选列表中则清空，避免残留无效筛选
   useEffect(() => {
-    const first =
-      filterLabels && filterLabels.length > 0 ? filterLabels[0] : undefined;
     if (!filterLabels || filterLabels.length === 0) {
       if (selectedFilterLabel !== undefined) setSelectedFilterLabel(undefined);
       return;
     }
-    if (!selectedFilterLabel || !filterLabels.includes(selectedFilterLabel)) {
-      setSelectedFilterLabel(first);
+    if (selectedFilterLabel && !filterLabels.includes(selectedFilterLabel)) {
+      setSelectedFilterLabel(undefined);
     }
-  }, [filterLabels]);
+  }, [filterLabels, selectedFilterLabel]);
+
+  const resolvedFilterLabel = useMemo(() => {
+    if (!filterLabels?.length || !selectedFilterLabel) {
+      return undefined;
+    }
+    return filterLabels.includes(selectedFilterLabel)
+      ? selectedFilterLabel
+      : undefined;
+  }, [filterLabels, selectedFilterLabel]);
 
   // 数据筛选
   const filteredData = useMemo(() => {
@@ -205,12 +221,13 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
       ? safeData.filter((d) => d.category === selectedFilter)
       : safeData;
     const withFilterLabel =
-      !filterLabels || !selectedFilterLabel
+      !filterLabels || !resolvedFilterLabel
         ? base
-        : base.filter((d) => d.filterLabel === selectedFilterLabel);
+        : base.filter((d) => d.filterLabel === resolvedFilterLabel);
     // 统一过滤掉 x 为空（null/undefined）的数据，避免后续 toString 报错
-    return withFilterLabel.filter((d) => d.x !== null && d.x !== undefined);
-  }, [safeData, selectedFilter, filterLabels, selectedFilterLabel]);
+    // eslint-disable-next-line eqeqeq -- intentional nullish
+    return withFilterLabel.filter((d) => d.x != null);
+  }, [safeData, selectedFilter, filterLabels, resolvedFilterLabel]);
 
   // 阶段（使用 x 值作为阶段名称），按 y 从大到小排序以符合漏斗习惯
   const stages = useMemo(() => {
@@ -218,7 +235,8 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
       ...new Set(
         filteredData
           .map((d) => d.x)
-          .filter((x) => x !== null && x !== undefined),
+          // eslint-disable-next-line eqeqeq -- intentional nullish
+          .filter((x) => x != null),
       ),
     ];
     // 映射阶段 -> 数值
@@ -367,7 +385,8 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
 
   const ratioDisplay = useMemo(() => {
     const formatRaw = (v: any): string | undefined => {
-      if (v === null || v === undefined) return undefined;
+      // eslint-disable-next-line eqeqeq -- intentional nullish
+      if (v == null) return undefined;
       if (typeof v === 'string') {
         const s = v.trim();
         if (!s) return undefined;
@@ -382,18 +401,19 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
     const anyNonTopProvided = stages.some((_, i) => {
       if (i === 0) return false;
       const prevStage = stages[i - 1];
-      const dp = (filteredData || []).find((d) =>
+      const dp = filteredData.find((d) =>
         isXValueEqual(d.x, prevStage),
       );
       const v = dp?.ratio;
-      if (v === null || v === undefined) return false;
+      // eslint-disable-next-line eqeqeq -- intentional nullish
+      if (v == null) return false;
       if (typeof v === 'string') return v.trim() !== '';
       return true;
     });
     return stages.map((_, i) => {
       if (i === 0) return anyNonTopProvided ? '100%' : undefined;
       const prevStage = stages[i - 1];
-      const dp = (filteredData || []).find((d) =>
+      const dp = filteredData.find((d) =>
         isXValueEqual(d.x, prevStage),
       );
       return formatRaw(dp?.ratio);
@@ -404,11 +424,12 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
     return stages.map((_, i) => {
       if (i === 0) return false;
       const prevStage = stages[i - 1];
-      const dp = (filteredData || []).find((d) =>
+      const dp = filteredData.find((d) =>
         isXValueEqual(d.x, prevStage),
       );
       const v = dp?.ratio;
-      if (v === null || v === undefined) return false;
+      // eslint-disable-next-line eqeqeq -- intentional nullish
+      if (v == null) return false;
       if (typeof v === 'string') return v.trim() !== '';
       return true;
     });
@@ -418,8 +439,8 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
   const filterOptions = useMemo(
     () =>
       categories.map((c) => ({
-        label: c || '默认',
-        value: c || '默认',
+        label: c,
+        value: c,
       })),
     [categories],
   );
@@ -461,21 +482,22 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
           pointStyle: 'rectRounded',
           generateLabels: (chart): LegendItem[] => {
             // @ts-ignore
-            const base: LegendItem[] = (
-              ChartJS.defaults.plugins.legend.labels.generateLabels(chart) || []
-            ).map((it) => ({
-              ...it,
-              pointStyle: 'rectRounded' as PointStyle,
-            }));
+            const base: LegendItem[] = ChartJS.defaults.plugins.legend.labels
+              .generateLabels(chart)
+              .map((it) => ({
+                ...it,
+                pointStyle: 'rectRounded' as PointStyle,
+              }));
             // 若除顶层外没有任何 ratio，则移除“转化率”图例
             const anyNonTopProvided = stages.some((_, i) => {
               if (i === 0) return false;
               const prevStage = stages[i - 1];
-              const dp = (filteredData || []).find((d) =>
+              const dp = filteredData.find((d) =>
                 isXValueEqual(d.x, prevStage),
               );
               const v = dp?.ratio;
-              if (v === null || v === undefined) return false;
+              // eslint-disable-next-line eqeqeq -- intentional nullish
+              if (v == null) return false;
               if (typeof v === 'string') return v.trim() !== '';
               return true;
             });
@@ -529,8 +551,8 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
           label: (ctx) => {
             // 使用原始值而非调整后的视觉宽度
             const idx = ctx.dataIndex ?? 0;
-            const originalValue = originalValues?.[idx] ?? 0;
-            const percentStr: string | undefined = ratioDisplay?.[idx];
+            const originalValue = originalValues[idx] ?? 0;
+            const percentStr: string | undefined = ratioDisplay[idx];
             // 仅当传入了 ratio 时展示百分比，否则只展示数值
             if (showPercent === false || !percentStr) {
               return `${originalValue}`;
@@ -597,8 +619,8 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
         for (let i = 0; i < meta.data.length - 1; i++) {
           const elTop = meta.data[i];
           const elBot = meta.data[i + 1];
-          const rawTop = ds?.[i];
-          const rawBot = ds?.[i + 1];
+          const rawTop = ds[i];
+          const rawBot = ds[i + 1];
           if (!Array.isArray(rawTop) || !Array.isArray(rawBot)) continue;
 
           // 顶部、底部条的像素左右与宽度
@@ -617,9 +639,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
             ? xScale.getPixelForValue(Math.max(sBot, eBot))
             : elBot.x + Math.abs(eBot - sBot) / 2;
 
-          const dpr =
-            (typeof window !== 'undefined' && (window.devicePixelRatio || 1)) ||
-            1;
+          const dpr = window.devicePixelRatio || 1;
           const seam = (isMobile ? 0.25 : 0.35) / dpr;
           const joinTop = elTop.y + elTop.height / 2;
           const joinBot = elBot.y - elBot.height / 2;
@@ -627,10 +647,10 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
           const botY = joinBot - seam;
 
           // 如果该层未显式提供 ratio，则不绘制梯形
-          if (!providedFlags?.[i + 1]) {
+          if (!providedFlags[i + 1]) {
             continue;
           }
-          const ratioText = providedRatioText?.[i + 1] ?? '0%';
+          const ratioText = providedRatioText[i + 1] ?? '0%';
 
           // 梯形边与上下柱完全对齐
           const topL = Math.min(topLx, topRx);
@@ -671,7 +691,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
     isLight,
     isMobile,
     showTrapezoid,
-    JSON.stringify(filteredData.map((d) => d?.ratio)),
+    JSON.stringify(filteredData.map((d) => d.ratio)),
   ]);
 
   // 右侧阶段文本标签（跟随每个柱，显示 stage 名称）
@@ -688,7 +708,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
 
         // 计算所有条末端的像素坐标，找最大值作为对齐基准
         const ends: number[] = meta.data.map((el: any, i: number) => {
-          const raw = ds?.[i];
+          const raw = ds[i];
           if (!raw || !Array.isArray(raw)) return el.x;
           const end = Number(raw[1] ?? 0);
           return xScale?.getPixelForValue
@@ -699,10 +719,10 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
         const padding = 12;
 
         meta.data.forEach((el: any, i: number) => {
-          const raw = ds?.[i];
+          const raw = ds[i];
           if (!raw || !Array.isArray(raw)) return;
           const y = el.y;
-          const label = labels?.[i] ?? '';
+          const label = labels[i] ?? '';
 
           ctx.save();
           ctx.fillStyle = axisTextColor;
@@ -716,7 +736,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
           const start = Number(raw[0] ?? 0);
           const end = Number(raw[1] ?? 0);
           const mid = (start + end) / 2;
-          const originalValue = originalValues?.[i] ?? 0;
+          const originalValue = originalValues[i] ?? 0;
           const cx = xScale?.getPixelForValue
             ? xScale.getPixelForValue(mid)
             : el.x;

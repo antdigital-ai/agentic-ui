@@ -69,7 +69,7 @@ export function useProgressiveBlocks(
   useEffect(() => {
     if (streaming || state.visibleCount >= totalBlocks) return;
 
-    if (typeof document !== 'undefined' && document.hidden) {
+    if (document.hidden) {
       setState((prev) => ({ ...prev, visibleCount: totalBlocks }));
       return;
     }
@@ -101,15 +101,11 @@ export function useProgressiveBlocks(
       }
     };
 
-    if (typeof document !== 'undefined') {
-      document.addEventListener('visibilitychange', handleVisibility);
-    }
+    document.addEventListener('visibilitychange', handleVisibility);
 
     return () => {
       cancelled = true;
-      if (typeof document !== 'undefined') {
-        document.removeEventListener('visibilitychange', handleVisibility);
-      }
+      document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, [state.visibleCount, totalBlocks, streaming]);
 

@@ -260,7 +260,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
 
     // 确保颜色数组安全访问
     const safeIndex = Math.max(0, index % defaultColorList.length);
-    const safeDefaultColor = defaultColorList[safeIndex] || '#1677ff';
+    const safeDefaultColor = defaultColorList[safeIndex];
 
     const finalColor = baseColor || safeDefaultColor;
 
@@ -283,29 +283,10 @@ const RadarChart: React.FC<RadarChartProps> = ({
     };
   });
 
-  // 处理数据，应用默认颜色和样式，添加最终安全检查
+  // 空数据已在上方 early-return；此处 xValues / datasets 必非空
   const processedData: ChartData<'radar'> = {
-    labels: xValues.length > 0 ? xValues.map((x) => x.toString()) : ['默认'],
-    datasets:
-      datasets.length > 0
-        ? datasets
-        : [
-            {
-              label: '默认',
-              data: [0],
-              borderColor: defaultColorList[0] || '#1677ff',
-              backgroundColor: `${defaultColorList[0] || '#1677ff'}20`,
-              borderWidth: isMobile ? 1.5 : 2,
-              pointBackgroundColor: defaultColorList[0] || '#1677ff',
-              pointBorderColor: isLight
-                ? '#fff'
-                : defaultColorList[0] || '#1677ff',
-              pointBorderWidth: isLight ? 1 : 0,
-              pointRadius: isMobile ? 3 : 4,
-              pointHoverRadius: isMobile ? 5 : 6,
-              fill: true,
-            },
-          ],
+    labels: xValues.map((x) => x.toString()),
+    datasets,
   };
 
   // 图表配置选项
@@ -385,6 +366,11 @@ const RadarChart: React.FC<RadarChartProps> = ({
             return;
           }
 
+          // 无有效 dataPoints 时不创建 tooltip DOM
+          if (!tooltip.dataPoints || tooltip.dataPoints.length === 0) {
+            return;
+          }
+
           // 获取或创建自定义 tooltip 元素
           let tooltipEl = document.getElementById('custom-radar-tooltip');
           if (!tooltipEl) {
@@ -396,22 +382,17 @@ const RadarChart: React.FC<RadarChartProps> = ({
             document.body.appendChild(tooltipEl);
           }
 
-          // 获取数据，添加安全检查
-          if (!tooltip.dataPoints || tooltip.dataPoints.length === 0) {
-            return;
-          }
-
           const dataPoint = tooltip.dataPoints[0];
           if (!dataPoint) {
             return;
           }
 
-          const dimensionTitle = dataPoint?.label?.toString() || ''; // 维度标题，如"技术"
-          const label = dataPoint?.dataset?.label?.toString() || '数据指标'; // 数据集标签
+          const dimensionTitle = dataPoint.label?.toString() || ''; // 维度标题，如"技术"
+          const label = dataPoint.dataset?.label?.toString() || '数据指标'; // 数据集标签
 
           let value = '';
           try {
-            const rawValue = dataPoint?.parsed?.r;
+            const rawValue = dataPoint.parsed?.r;
             if (typeof rawValue === 'number' && Number.isFinite(rawValue)) {
               value = rawValue.toFixed(1);
             } else {
@@ -423,7 +404,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
 
           // 获取数据集颜色作为图标颜色
           const iconColor =
-            dataPoint?.dataset?.borderColor?.toString() || '#388BFF';
+            dataPoint.dataset?.borderColor?.toString() || '#388BFF';
 
           // 创建 HTML 内容
           const isDark = !isLight;

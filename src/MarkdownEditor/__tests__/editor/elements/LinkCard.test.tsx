@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { LinkCard } from '../../../editor/elements/LinkCard';
@@ -258,11 +258,12 @@ describe('LinkCard', () => {
     };
 
     afterEach(() => {
-      vi.useRealTimers();
+      cleanup();
+      vi.clearAllTimers();
     });
 
     it('finished 为 false 时 5 秒内显示 Skeleton (27-29, 62)', () => {
-      vi.useFakeTimers();
+      vi.useFakeTimers({ shouldAdvanceTime: true });
       const props = {
         ...defaultProps,
         element: unfinishedElement,
@@ -273,7 +274,7 @@ describe('LinkCard', () => {
     });
 
     it('finished 为 false 时 5 秒后显示为文本 (32-33, 43-44)', () => {
-      vi.useFakeTimers();
+      vi.useFakeTimers({ shouldAdvanceTime: true });
       const props = {
         ...defaultProps,
         element: unfinishedElement,

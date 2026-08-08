@@ -10,10 +10,10 @@ import {
 
 const WRAPPABLE_BLOCK_TYPES = ['paragraph', 'head'] as const;
 
-function findWrappableBlocksInSelection(editor: Editor, at: Editor['selection']) {
-  if (!at) {
-    return [] as Array<[Element, Path]>;
-  }
+function findWrappableBlocksInSelection(
+  editor: Editor,
+  at: NonNullable<Editor['selection']>,
+) {
   return Array.from(
     Editor.nodes(editor, {
       at,

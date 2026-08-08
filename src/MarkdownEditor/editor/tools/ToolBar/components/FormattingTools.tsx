@@ -59,7 +59,7 @@ export const FormattingTools = React.memo<FormattingToolsProps>(
             <ToolBarItem
               key={tool.key}
               title={
-                (i18n?.locale?.[
+                (i18n.locale?.[
                   tool.key as keyof typeof i18n.locale
                 ] as string) || tool.title
               }

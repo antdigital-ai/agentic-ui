@@ -163,8 +163,8 @@ export const BorderBeamAnimation: React.FC<BorderBeamAnimationProps> = ({
 
     resizeObserver.observe(containerRef.current);
     setDimensions({
-      width: containerRef.current?.clientWidth || 0,
-      height: containerRef.current?.clientHeight || 0,
+      width: containerRef.current.clientWidth,
+      height: containerRef.current.clientHeight,
     });
     return () => {
       resizeObserver.disconnect();

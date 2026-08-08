@@ -60,12 +60,12 @@ describe('Chart Plugin Utils', () => {
 
   describe('debounce', () => {
     beforeEach(() => {
-      vi.useFakeTimers();
+      vi.useFakeTimers({ shouldAdvanceTime: true });
     });
 
     afterEach(() => {
+      vi.clearAllTimers();
       vi.restoreAllMocks();
-      vi.useRealTimers();
     });
 
     it('应该延迟执行函数', () => {

@@ -42,7 +42,7 @@ export const Katex = (props: { el?: CodeNode }) => {
   useEffect(() => {
     if (!katexLoaded || !katexRef.current) return;
 
-    const code = safeEl.value || '';
+    const code = safeEl.value;
     clearTimeout(timer.current);
     timer.current = window.setTimeout(
       () => {
@@ -52,7 +52,7 @@ export const Katex = (props: { el?: CodeNode }) => {
         if (state().code) {
           try {
             if (divRef.current && katexRef.current) {
-              katexRef.current.render(state().code, divRef.current!, {
+              katexRef.current.render(state().code, divRef.current, {
                 strict: false,
                 output: 'htmlAndMathml',
                 throwOnError: false,

@@ -89,7 +89,7 @@ export function AceEditor({
   const codePlainSource = getCodeBlockPlainText(element);
 
   // 各种引用
-  const codeRef = useRef(codePlainSource || '');
+  const codeRef = useRef(codePlainSource);
   const pathRef = useRef<Path>(path);
   const posRef = useRef({ row: 0, column: 0 });
   const pasted = useRef(false);
@@ -213,7 +213,6 @@ export function AceEditor({
       if (readonly) return;
       clearTimeout(debounceTimer.current);
       debounceTimer.current = window.setTimeout(() => {
-        if (typeof window === 'undefined') return;
         onUpdate({ value: codeEditor.getValue() });
         codeRef.current = codeEditor.getValue();
       }, 100);
@@ -243,7 +242,7 @@ export function AceEditor({
       if (!mode) return;
 
       try {
-        const session = codeEditor.getSession?.() || codeEditor.session;
+        const session = codeEditor.getSession();
         if (editorRef.current === codeEditor && session) {
           session.setMode(mode);
         }
@@ -264,7 +263,7 @@ export function AceEditor({
 
     const codeProps = editorProps.codeProps || {};
 
-    let value = codePlainSource || '';
+    let value = codePlainSource;
     const shouldFormatJsonInAce =
       element.language === 'json' && element.otherProps?.finished !== false;
     if (shouldFormatJsonInAce) {
@@ -332,7 +331,7 @@ export function AceEditor({
 
   // 监听外部值变化
   useEffect(() => {
-    let value = codePlainSource || '';
+    let value = codePlainSource;
 
     // 流式 JSON：partialParse + JSON.stringify 会随不完整结构变化而整块改写，
     // 与 Slate 原文的 startsWith 关系断裂，反复 setValue 造成闪动；闭合后再格式化。

@@ -3,11 +3,11 @@ import { debounce } from '../../utils';
 
 describe('debounce', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
   });
 
   afterEach(() => {
-    vi.useRealTimers();
+    vi.clearAllTimers();
   });
 
   it('应该延迟执行函数', () => {

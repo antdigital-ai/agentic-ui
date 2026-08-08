@@ -37,7 +37,7 @@ export const formatNumber = (
     precision !== undefined ? numValue.toFixed(precision) : numValue.toString();
 
   // 应用千分位分隔符
-  if (groupSeparator && groupSeparator !== '') {
+  if (groupSeparator) {
     const parts = formattedValue.split('.');
     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, groupSeparator);
     formattedValue = parts.join('.');

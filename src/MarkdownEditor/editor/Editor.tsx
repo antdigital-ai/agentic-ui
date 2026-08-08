@@ -220,31 +220,26 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
 
   const commentMap = useMemo(() => {
     const map = new Map<string, Map<string, CommentDataType[]>>();
-    props?.comment?.commentList?.forEach((c: CommentDataType) => {
+    props.comment?.commentList?.forEach((c: CommentDataType) => {
       c.updateTime = Date.now();
       const path = c.path.join(',');
       if (map.has(path)) {
-        const childrenMap = map.get(path);
+        const childrenMap = map.get(path)!;
         const selection = JSON.stringify(c.selection);
-        if (childrenMap?.has(selection)) {
-          childrenMap.set(selection, [
-            ...(childrenMap.get(selection) || []),
-            c,
-          ]);
-          map.set(path, childrenMap);
-          return;
-        } else if (childrenMap) {
-          childrenMap?.set(selection, [c]);
-          map.set(path, childrenMap);
-          return;
+        if (childrenMap.has(selection)) {
+          childrenMap.set(selection, [...childrenMap.get(selection)!, c]);
+        } else {
+          childrenMap.set(selection, [c]);
         }
+        map.set(path, childrenMap);
+        return;
       }
       const childrenMap = new Map<string, CommentDataType[]>();
       childrenMap.set(JSON.stringify(c.selection), [c]);
       map.set(path, childrenMap);
     });
     return map;
-  }, [props?.comment?.commentList]);
+  }, [props.comment?.commentList]);
 
   const handleSelectionChange = useDebounceFn(
     async (e?: React.SyntheticEvent<HTMLDivElement>) => {
@@ -292,7 +287,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
         // 调用 props.onSelectionChange 回调
         if (props.onSelectionChange) {
           const { markdown, nodes } = getSelectionContent(currentSelection);
-          props.onSelectionChange?.(currentSelection, markdown, nodes);
+          props.onSelectionChange(currentSelection, markdown, nodes);
         }
 
         return;
@@ -304,7 +299,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
         setDomRect?.(null);
         // 调用 props.onSelectionChange 回调（无选中）
         if (props.onSelectionChange) {
-          props.onSelectionChange?.(null, '', []);
+          props.onSelectionChange(null, '', []);
         }
         return;
       }
@@ -331,7 +326,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
           // 调用 props.onSelectionChange 回调
           if (props.onSelectionChange) {
             const { markdown, nodes } = getSelectionContent(selection);
-            props.onSelectionChange?.(selection, markdown, nodes);
+            props.onSelectionChange(selection, markdown, nodes);
           }
 
           if (
@@ -356,7 +351,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
           setDomRect?.(null);
           // 调用 props.onSelectionChange 回调（无选中）
           if (props.onSelectionChange) {
-            props.onSelectionChange?.(null, '', []);
+            props.onSelectionChange(null, '', []);
           }
         }
       } catch (error) {
@@ -533,57 +528,53 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
         }
 
         // 3. 处理复制/剪切选中内容
-        if (markdownEditorRef.current?.selection) {
-          event.clipboardData?.clearData();
-          const editor = markdownEditorRef.current;
-          const sel = editor.selection as Range;
+        event.clipboardData?.clearData();
+        const editor = markdownEditorRef.current;
+        const sel = editor.selection as Range;
 
-          if (
-            !Editor.hasPath(editor, sel.anchor.path) ||
-            !Editor.hasPath(editor, sel.focus.path)
-          ) {
-            return false;
-          }
-
-          try {
-            // ReactEditor.setFragmentData 内部会写 application/x-slate-fragment、
-            // text/html、text/plain（slate-dom）。我们让它先写默认值再追加自定义键，
-            // 避免重复 cloneContents / 多次 markdown 序列化。
-            ReactEditor.setFragmentData(
-              markdownEditorRef.current,
-              event.clipboardData,
-              operationType,
-            );
-
-            const fragment = editor?.getFragment() || [];
-            const markdown = parserSlateNodeToMarkdown(fragment);
-
-            // 自定义 key 不会被 Slate 默认实现覆盖
-            event.clipboardData.setData(
-              'application/x-slate-md-fragment',
-              JSON.stringify(fragment),
-            );
-            // text/markdown 是非标准 MIME，但同源粘回时会优先使用，且保留 markdown 原文
-            event.clipboardData.setData('text/markdown', markdown);
-
-            // 5. 如果是剪切操作，删除选中内容
-            if (operationType === 'cut') {
-              Transforms.delete(markdownEditorRef.current, {
-                at: markdownEditorRef.current.selection!,
-              });
-            }
-
-            // 阻止默认行为和事件冒泡
-            event.preventDefault();
-
-            return true;
-          } catch (innerError) {
-            console.error('Error during clipboard operation:', innerError);
-            return false;
-          }
+        if (
+          !Editor.hasPath(editor, sel.anchor.path) ||
+          !Editor.hasPath(editor, sel.focus.path)
+        ) {
+          return false;
         }
 
-        return false;
+        try {
+          // ReactEditor.setFragmentData 内部会写 application/x-slate-fragment、
+          // text/html、text/plain（slate-dom）。我们让它先写默认值再追加自定义键，
+          // 避免重复 cloneContents / 多次 markdown 序列化。
+          ReactEditor.setFragmentData(
+            markdownEditorRef.current,
+            event.clipboardData,
+            operationType,
+          );
+
+          const fragment = editor.getFragment();
+          const markdown = parserSlateNodeToMarkdown(fragment);
+
+          // 自定义 key 不会被 Slate 默认实现覆盖
+          event.clipboardData.setData(
+            'application/x-slate-md-fragment',
+            JSON.stringify(fragment),
+          );
+          // text/markdown 是非标准 MIME，但同源粘回时会优先使用，且保留 markdown 原文
+          event.clipboardData.setData('text/markdown', markdown);
+
+          // 5. 如果是剪切操作，删除选中内容
+          if (operationType === 'cut') {
+            Transforms.delete(markdownEditorRef.current, {
+              at: markdownEditorRef.current.selection!,
+            });
+          }
+
+          // 阻止默认行为和事件冒泡
+          event.preventDefault();
+
+          return true;
+        } catch (innerError) {
+          console.error('Error during clipboard operation:', innerError);
+          return false;
+        }
       } catch (error) {
         console.error('Clipboard copy/cut operation failed:', error);
         return false;
@@ -595,7 +586,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     (event: React.KeyboardEvent<HTMLDivElement>) => {
       if (
         props.tagInputProps?.enable &&
-        [prefixCls].flat(2)?.includes(event?.key)
+        [prefixCls].flat(2).includes(event.key)
       ) {
         event.preventDefault();
         event.stopPropagation();
@@ -604,8 +595,8 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
             code: true,
             tag: true,
             autoOpen: true,
-            text: event?.key + ' ',
-            triggerText: event?.key,
+            text: event.key + ' ',
+            triggerText: event.key,
           },
         ]);
         return;
@@ -632,10 +623,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
         });
       }
       try {
-        EditorUtils.reset(
-          markdownEditorRef.current,
-          schemaForReset?.length ? schemaForReset : undefined,
-        );
+        EditorUtils.reset(markdownEditorRef.current, schemaForReset);
       } catch (e) {
         EditorUtils.deleteAll(markdownEditorRef.current);
       }
@@ -694,7 +682,6 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     const currentTextSelection = markdownEditorRef.current.selection;
     if (
       currentTextSelection &&
-      currentTextSelection.anchor &&
       Editor.hasPath(
         markdownEditorRef.current,
         currentTextSelection.anchor.path,
@@ -709,11 +696,11 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     }
 
     if (currentTextSelection) {
-      const nodeList = Editor?.node(
+      const nodeList = Editor.node(
         markdownEditorRef.current,
         currentTextSelection.focus.path!,
       );
-      const curNode = nodeList?.at(0);
+      const curNode = nodeList[0];
       if (
         handleTagNodePaste(
           markdownEditorRef.current,
@@ -820,7 +807,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
 
     // 4. text/markdown
     if (cachedMarkdown && allowedTypes.includes('text/markdown')) {
-      const text = cachedMarkdown.trim();
+      const text = (cachedMarkdown || '').trim();
       if (text) {
         const selection = markdownEditorRef.current.selection;
         // 与 text/plain 保持一致：在代码块/表格单元格内不解析为 markdown 节点
@@ -1189,9 +1176,9 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
 
   const decorateFn = (e: any) => {
     // 始终运行 useHighlight，以支持 fnc（脚注）、链接等基础展示
-    const decorateList: any[] | undefined = high(e) || [];
-    if (!props?.comment) return decorateList;
-    if (props?.comment?.enable === false) return decorateList;
+    const decorateList: any[] = high(e) || [];
+    if (!props.comment) return decorateList;
+    if (props.comment.enable === false) return decorateList;
     if (commentMap.size === 0) return decorateList;
 
     try {
@@ -1200,7 +1187,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
       const itemMap = commentMap.get(path.join(','));
       if (!itemMap) return decorateList;
       itemMap.forEach((itemList) => {
-        itemList?.forEach((item) => {
+        itemList.forEach((item) => {
           const { anchor, focus } = item.selection || {};
 
           let newSelection: BaseSelection | undefined = undefined;

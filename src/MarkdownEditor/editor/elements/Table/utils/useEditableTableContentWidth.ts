@@ -45,7 +45,7 @@ export function useEditableTableContentWidth({
   );
 
   useEffect(() => {
-    if (readonly || typeof window === 'undefined') return;
+    if (readonly) return;
 
     const contentElement = getEditorContentElement(markdownContainerRef);
     if (!contentElement) {

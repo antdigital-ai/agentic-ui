@@ -568,7 +568,7 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
             onLikeCancel={props.onLikeCancel}
             onAvatarClick={props.onAvatarClick}
             onDoubleClick={props.onDoubleClick}
-            customConfig={props?.bubbleRenderConfig?.customConfig}
+            customConfig={props.bubbleRenderConfig?.customConfig}
             shouldShowCopy={props.shouldShowCopy}
             shouldShowVoice={props.shouldShowVoice}
           />
@@ -712,8 +712,8 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
         style={style}
         ref={bubbleListRef}
         onScroll={onScroll}
-        onWheel={(e) => onWheel?.(e, bubbleListRef?.current || null)}
-        onTouchMove={(e) => onTouchMove?.(e, bubbleListRef?.current || null)}
+        onWheel={(e) => onWheel?.(e, bubbleListRef?.current ?? null)}
+        onTouchMove={(e) => onTouchMove?.(e, bubbleListRef?.current ?? null)}
       >
         {bubbleListDom}
       </div>

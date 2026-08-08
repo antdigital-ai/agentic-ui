@@ -1,8 +1,13 @@
-import { renderHook } from '@testing-library/react';
+import { cleanup, renderHook } from '@testing-library/react';
 import { Editor } from 'slate';
 import { Subject } from 'rxjs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useOnchange } from '../../../editor/plugins/useOnchange';
+
+function resetFakeTimers() {
+  cleanup();
+  vi.clearAllTimers();
+}
 
 const mockCancel = vi.fn();
 const mockRun = vi.fn();
@@ -57,7 +62,7 @@ vi.mock('../../../editor/utils', () => ({
 
 describe('useOnchange targeted coverage', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     storeState.readonly = false;
     storeState.floatBarRevision = 0;
     storeState.refreshFloatBar = 0;
@@ -75,7 +80,7 @@ describe('useOnchange targeted coverage', () => {
   });
 
   afterEach(() => {
-    vi.useRealTimers();
+    resetFakeTimers();
     vi.restoreAllMocks();
   });
 

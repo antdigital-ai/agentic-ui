@@ -98,7 +98,7 @@ export const AIBubble: React.FC<
 
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const context = useContext(BubbleConfigContext);
-  const { compact, standalone, extraShowOnHover } = context || {};
+  const { compact, standalone, extraShowOnHover } = context!;
 
   const prefixClass = getPrefixCls('agentic');
   const { hashId } = useStyle(prefixClass);
@@ -136,7 +136,7 @@ export const AIBubble: React.FC<
     />,
   );
 
-  const id = props?.originData?.id;
+  const id = props.originData?.id;
   if (id === undefined || id === LOADING_FLAT) {
     if (!messageDisplayKeyRef.current) {
       messageDisplayKeyRef.current = nanoid();
@@ -147,7 +147,7 @@ export const AIBubble: React.FC<
   }
   const messageDisplayKey = messageDisplayKeyRef.current ?? id!;
 
-  const rawContent = props?.originData?.content as string | undefined;
+  const rawContent = props.originData?.content as string | undefined;
   const { blocks: filemapBlocks, stripped: strippedContent } = useMemo(
     () =>
       extractFilemapBlocks(typeof rawContent === 'string' ? rawContent : ''),
@@ -170,8 +170,8 @@ export const AIBubble: React.FC<
       bubbleRef={props.bubbleRef}
       content={contentForDisplay}
       key={messageDisplayKey}
-      data-id={props?.originData?.id}
-      avatar={props?.originData?.meta as BubbleMetaData}
+      data-id={props.originData?.id}
+      avatar={props.originData?.meta as BubbleMetaData}
       readonly={props.readonly ?? false}
       onReply={props.onReply}
       id={props.id}
@@ -181,7 +181,7 @@ export const AIBubble: React.FC<
       onDisLike={props.onDisLike}
       onDislike={props.onDislike}
       onLike={props.onLike}
-      customConfig={props?.bubbleRenderConfig?.customConfig}
+      customConfig={props.bubbleRenderConfig?.customConfig}
       pure={props.pure}
       onCancelLike={props.onCancelLike}
       onLikeCancel={props.onLikeCancel}
@@ -194,7 +194,7 @@ export const AIBubble: React.FC<
     />
   );
 
-  const hasFileMap = (props?.originData?.fileMap?.size || 0) > 0;
+  const hasFileMap = (props.originData?.fileMap?.size || 0) > 0;
 
   const fileViewDom = hasFileMap ? (
     <div
@@ -386,7 +386,7 @@ export const AIBubble: React.FC<
         hidePadding,
         setHidePadding,
         setMessage: (message) => {
-          props?.bubbleRef?.current?.setMessageItem?.(
+          props.bubbleRef?.current?.setMessageItem?.(
             props.id!,
             message as any,
           );
@@ -419,12 +419,12 @@ export const AIBubble: React.FC<
               </div>
             ),
             extra:
-              props?.bubbleRenderConfig?.extraRender === false ? null : (
+              props.bubbleRenderConfig?.extraRender === false ? null : (
                 <BubbleExtra
                   pure
                   style={props.styles?.bubbleListItemExtraStyle}
                   readonly={props.readonly}
-                  rightRender={props?.bubbleRenderConfig?.extraRightRender}
+                  rightRender={props.bubbleRenderConfig?.extraRightRender}
                   onReply={props.onReply}
                   onCancelLike={props.onCancelLike}
                   onLikeCancel={props.onLikeCancel}

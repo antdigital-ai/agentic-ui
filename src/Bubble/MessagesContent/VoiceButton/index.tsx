@@ -102,7 +102,7 @@ export const VoiceButton: React.FC<VoiceButtonProps> = ({
         label: (
           <div className={classNames(`${prefixCls}-rateItem`, hashId)}>
             <span>{`${r}x`}</span>
-            {r === rate ? <span>✓</span> : null}
+            {r === rate && <span>✓</span>}
           </div>
         ),
       })),

@@ -11,7 +11,7 @@ const HTML_EXTENSIONS = ['.html', '.htm'];
  * 判断是否为 HTML 文件：扩展名或 MIME 任一命中
  */
 export const isHtmlFile = (fileName: string, mimeType?: string): boolean => {
-  const name = fileName?.toLowerCase() || '';
+  const name = fileName.toLowerCase();
   const byExtension = HTML_EXTENSIONS.some((ext) => name.endsWith(ext));
   const byMimeType = mimeType === HTML_MIME_TYPE;
   return byExtension || byMimeType;

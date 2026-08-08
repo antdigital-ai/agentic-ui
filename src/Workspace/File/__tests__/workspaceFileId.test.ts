@@ -29,4 +29,13 @@ describe('workspaceFileId', () => {
     expect(FILE_TREE_LEAF_KEY_PREFIX).toBe('file:');
     expect(FILE_TREE_DIR_KEY_PREFIX).toBe('dir:');
   });
+
+  it('空字符串 idOrKey 返回 null', () => {
+    expect(fileIdOrTreeKeyToRelativePath('')).toBeNull();
+  });
+
+  it('前缀后无路径时返回 null', () => {
+    expect(fileIdOrTreeKeyToRelativePath('workspace:')).toBeNull();
+    expect(fileIdOrTreeKeyToRelativePath('file:')).toBeNull();
+  });
 });

@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render } from '@testing-library/react';
+import { cleanup, fireEvent, render } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -103,7 +103,7 @@ const renderSlateTable = (
 
 describe('SlateTable', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     mocks.storeState.readonly = false;
     mocks.storeState.markdownContainerRef = { current: null };
     mocks.scrollRef.current = null;
@@ -120,7 +120,8 @@ describe('SlateTable', () => {
   });
 
   afterEach(() => {
-    vi.useRealTimers();
+    cleanup();
+    vi.clearAllTimers();
     vi.restoreAllMocks();
   });
 

@@ -258,7 +258,7 @@ export function Media({
   const initial = useRefFunction(async () => {
     let type = getMediaType(element?.url, element.alt);
     type = !type ? 'image' : type;
-    const finalType = ['image', 'video', 'autio', 'attachment'].includes(type!)
+    const finalType = ['image', 'video', 'audio', 'attachment'].includes(type!)
       ? type!
       : 'other';
     setState({
@@ -583,12 +583,12 @@ export function Media({
                         element.otherProps?.collaborators
                           ?.map((item: { [key: string]: number }) => {
                             return {
-                              name: Object.keys(item)?.at(0) as string,
+                              name: Object.keys(item).at(0) as string,
                               collaboratorNumber:
-                                Object.values(item)?.at(0) || 0,
+                                Object.values(item).at(0) || 0,
                             };
                           })
-                          .slice(0, 5) || []
+                          .slice(0, 5)
                       }
                     />
                   </div>
@@ -616,7 +616,6 @@ export function Media({
           >
             <EyeOutlined
               onClick={() => {
-                if (typeof window === 'undefined') return;
                 window.open(state()?.url);
               }}
               style={{
@@ -632,6 +631,7 @@ export function Media({
   }, [
     state().type,
     state()?.url,
+    state().loadSuccess,
     element.finished,
     showAsText,
     (element as any)?.rawMarkdown,

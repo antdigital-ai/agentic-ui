@@ -225,11 +225,18 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
 
   // 状态管理，添加安全检查
   const [selectedFilter, setSelectedFilter] = useState(
-    () => categories.find((cat): cat is string => Boolean(cat)) || '',
+    () => categories[0] || '',
   );
   const [selectedFilterLabel, setSelectedFilterLabel] = useState(() =>
-    filterLabels && filterLabels.length > 0 ? filterLabels[0] : undefined,
+    filterLabels?.[0],
   );
+
+  // 当数据变化导致当前选中分类失效时，自动回退到首个有效分类或空（显示全部）
+  useEffect(() => {
+    if (selectedFilter && !categories.includes(selectedFilter)) {
+      setSelectedFilter(categories[0] || '');
+    }
+  }, [categories, selectedFilter]);
 
   // 根据选定的分类筛选数据，添加安全检查
   const filteredData = safeData.filter((item) => {
@@ -361,14 +368,13 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
   const datasets = datasetTypes.map((type, index) => {
     const typeData = filteredData.filter((item) => item?.type === type);
     const coordinates = typeData.map((item) => {
-      if (!item) return { x: 0, y: 0 };
-
       // 增强的 x, y 坐标处理
       let x = 0,
         y = 0;
 
       // 处理 x 坐标
-      if (item.x !== null && item.x !== undefined) {
+      // eslint-disable-next-line eqeqeq -- intentional nullish
+      if (item.x != null) {
         if (typeof item.x === 'number') {
           x = Number.isFinite(item.x) ? item.x : 0;
         } else if (typeof item.x === 'string') {
@@ -381,7 +387,8 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
       }
 
       // 处理 y 坐标
-      if (item.y !== null && item.y !== undefined) {
+      // eslint-disable-next-line eqeqeq -- intentional nullish
+      if (item.y != null) {
         if (typeof item.y === 'number') {
           y = Number.isFinite(item.y) ? item.y : 0;
         } else if (typeof item.y === 'string') {
@@ -404,7 +411,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
 
     // 确保颜色数组安全访问
     const safeIndex = Math.max(0, index % defaultColorList.length);
-    const safeDefaultColor = defaultColorList[safeIndex] || '#1677ff';
+    const safeDefaultColor = defaultColorList[safeIndex];
 
     const finalColor = baseColor || safeDefaultColor;
 
@@ -421,16 +428,11 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
     };
   });
 
-  // 筛选器的枚举，添加安全检查
-  const filterEnum =
-    categories.length > 0
-      ? categories
-          .filter((category): category is string => Boolean(category))
-          .map((category) => ({
-            label: category,
-            value: category,
-          }))
-      : [];
+  // categories 已 filter(Boolean)；空数据已 early-return
+  const filterEnum = categories.map((category) => ({
+    label: category,
+    value: category,
+  }));
 
   // 根据 filterLabel 筛选数据 - 只有当 filterLabels 存在时才生成
   const filteredDataByFilterLabel = filterLabels?.map((item) => ({
@@ -438,21 +440,9 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
     label: item,
   }));
 
-  // 处理数据，应用默认颜色，添加最终安全检查
+  // 空数据已在上方 early-return；此处 datasets 必非空
   const processedData: ChartData<'scatter'> = {
-    datasets:
-      datasets.length > 0
-        ? datasets
-        : [
-            {
-              label: '默认',
-              data: [{ x: 0, y: 0 }],
-              backgroundColor: `${defaultColorList[0] || '#1677ff'}99`,
-              borderColor: defaultColorList[0] || '#1677ff',
-              pointRadius: isMobile ? 4 : 6,
-              pointHoverRadius: isMobile ? 6 : 8,
-            },
-          ],
+    datasets,
   };
 
   // 图表配置选项
@@ -484,7 +474,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
               const seriesColor =
                 typeof ds?.borderColor === 'string' && ds.borderColor
                   ? ds.borderColor
-                  : defaultColorList[0] || '#1677ff';
+                  : defaultColorList[0];
               return {
                 ...label,
                 fillStyle: seriesColor,

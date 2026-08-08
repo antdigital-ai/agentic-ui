@@ -45,7 +45,7 @@ export const kbToSize = (kb: number) => {
  */
 export const isImageFile = (file: File): boolean => {
   // 首先检查 MIME 类型
-  if (file?.type?.startsWith('image/')) {
+  if (file.type.startsWith('image/')) {
     return true;
   }
 
@@ -81,7 +81,7 @@ const VIDEO_EXTENSIONS = [
 ];
 
 const hasVideoExtension = (pathOrName: string): boolean => {
-  const lower = pathOrName?.toLowerCase() || '';
+  const lower = pathOrName.toLowerCase();
   const beforeQuery = lower.split('?')[0];
   return VIDEO_EXTENSIONS.some((ext) => beforeQuery.endsWith(ext));
 };
@@ -94,7 +94,7 @@ const hasVideoExtension = (pathOrName: string): boolean => {
  * @returns {boolean} 是否为视频文件
  */
 export const isVideoFile = (file: File): boolean => {
-  if (file.type?.startsWith('video/')) {
+  if (file.type.startsWith('video/')) {
     return true;
   }
 

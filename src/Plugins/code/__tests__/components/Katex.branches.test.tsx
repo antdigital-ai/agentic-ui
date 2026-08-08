@@ -5,9 +5,14 @@
  * 空代码 else 分支、清理函数等在 test 环境下未执行的路径。
  */
 import '@testing-library/jest-dom';
-import { act, render } from '@testing-library/react';
+import { act, cleanup, render } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+function resetFakeTimers() {
+  cleanup();
+  vi.clearAllTimers();
+}
 
 /* ---------- hoisted mocks ---------- */
 const mockRender = vi.fn();
@@ -24,7 +29,7 @@ describe('Katex 分支覆盖', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     origEnv = process.env.NODE_ENV;
     mockRender.mockImplementation(() => {});
     mockLoadKatex.mockResolvedValue({ default: { render: mockRender } });
@@ -32,7 +37,7 @@ describe('Katex 分支覆盖', () => {
 
   afterEach(() => {
     process.env.NODE_ENV = origEnv;
-    vi.useRealTimers();
+    resetFakeTimers();
     vi.restoreAllMocks();
   });
 

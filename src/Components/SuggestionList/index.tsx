@@ -178,7 +178,7 @@ export const SuggestionList: React.FC<SuggestionListProps> = ({
       role="group"
       aria-label={locale?.['suggestion.area'] || '追问区域'}
     >
-      {derivedItems?.length > 0 ? (
+      {derivedItems.length > 0 ? (
         <div
           className={classNames(`${prefixCls}-suggestions`, hashId, {
             [`${prefixCls}-suggestions-${layout}`]: layout,
@@ -188,7 +188,7 @@ export const SuggestionList: React.FC<SuggestionListProps> = ({
           {showMore?.enable ? (
             <div className={classNames(`${prefixCls}-more`, hashId)}>
               <span className={classNames(`${prefixCls}-more-text`, hashId)}>
-                {showMore?.text ||
+                {showMore.text ||
                   locale?.['suggestion.searchMore'] ||
                   '搜索更多'}
               </span>
@@ -202,23 +202,23 @@ export const SuggestionList: React.FC<SuggestionListProps> = ({
                 role="button"
                 tabIndex={0}
                 aria-label={
-                  showMore?.text ||
+                  showMore.text ||
                   locale?.['suggestion.searchMore'] ||
                   '搜索更多'
                 }
-                onClick={() => showMore?.onClick?.()}
+                onClick={() => showMore.onClick?.()}
                 onKeyDown={(evt) => {
                   if (evt.key === 'Enter' || evt.key === ' ') {
                     evt.preventDefault();
-                    showMore?.onClick?.();
+                    showMore.onClick?.();
                   }
                 }}
               >
-                {showMore?.icon || <RefreshCcw width={14} height={14} />}
+                {showMore.icon || <RefreshCcw width={14} height={14} />}
               </span>
             </div>
           ) : null}
-          {derivedItems?.map((item) => {
+          {derivedItems.map((item) => {
             const label =
               typeof item?.text === 'string' ? item?.text : undefined;
             const isDisabled = submitting || item?.disabled;
@@ -268,7 +268,7 @@ export const SuggestionList: React.FC<SuggestionListProps> = ({
                   hashId={hashId}
                   forceShow={!!item?.tooltip}
                 >
-                  {item?.text}
+                  {item.text}
                 </OverflowTooltip>
                 <span
                   className={classNames(`${prefixCls}-arrow`, hashId, {

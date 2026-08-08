@@ -1,7 +1,12 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+function resetFakeTimers() {
+  cleanup();
+  vi.clearAllTimers();
+}
 import { TocHeading } from '../../../editor/tools/Leading';
 import type { Elements } from '../../../el';
 
@@ -72,7 +77,7 @@ vi.mock('../../../BaseMarkdownEditor', async () => {
 
 describe('Leading targeted coverage', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     configTargets.length = 0;
     document.body.innerHTML = '';
     const container = document.createElement('div');
@@ -85,7 +90,7 @@ describe('Leading targeted coverage', () => {
   });
 
   afterEach(() => {
-    vi.useRealTimers();
+    resetFakeTimers();
     vi.restoreAllMocks();
     mockContainerRef.current = null;
   });

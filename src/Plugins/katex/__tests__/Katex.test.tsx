@@ -12,7 +12,7 @@
  */
 
 import '@testing-library/jest-dom';
-import { act, render, screen } from '@testing-library/react';
+import { act, cleanup, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CodeNode } from '../../../MarkdownEditor/el';
@@ -39,14 +39,15 @@ describe('Katex', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     // 默认情况下 mock loadKatex 成功
     mockLoadKatex.mockResolvedValue({ default: mockKatex });
     mockRender.mockImplementation(() => {});
   });
 
   afterEach(() => {
-    vi.useRealTimers();
+    cleanup();
+    vi.clearAllTimers();
     vi.restoreAllMocks();
   });
 

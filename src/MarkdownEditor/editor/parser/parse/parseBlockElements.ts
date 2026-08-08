@@ -55,7 +55,7 @@ export const handleList = (currentElement: any, parseNodes: ParseNodesFn) => {
   const isOrdered = currentElement.ordered;
   const listType = isOrdered ? 'numbered-list' : 'bulleted-list';
   const children = parseNodes(currentElement.children, false, currentElement);
-  const hasTask = children?.some((s: any) => typeof s.checked === 'boolean');
+  const hasTask = children.some((s: any) => typeof s.checked === 'boolean');
 
   const el: any = {
     type: listType,
@@ -126,9 +126,9 @@ export const handleListItem = (
   let mentions = undefined;
   if (
     currentElement.children?.[0]?.children?.[0]?.type === 'link' &&
-    currentElement.children?.[0]?.children?.length > 1
+    currentElement.children[0].children.length > 1
   ) {
-    const item = children?.[0]?.children?.[0] as any;
+    const item = children[0]?.children?.[0] as any;
     const label = item?.text;
     if (label) {
       mentions = [
@@ -170,7 +170,7 @@ export const processParagraphChildren = (
   const elements = [];
   let textNodes: any[] = [];
 
-  for (let currentChild of currentElement.children || []) {
+  for (let currentChild of currentElement.children ?? []) {
     if (currentChild.type === 'image') {
       // 将累积的文本节点生成段落
       if (textNodes.length) {
@@ -373,7 +373,7 @@ export const applyInlineFormatting = (
 
   if (elementType === 'link') {
     try {
-      result.url = currentElement?.url;
+      result.url = currentElement.url;
       const shouldOpenInNewTab =
         config?.openLinksInNewTab || finished === false;
       if (shouldOpenInNewTab) {

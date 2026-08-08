@@ -92,24 +92,23 @@ export const TitleInfo = (props: {
       const meta = props.meta || {};
       if (tag.startsWith('${') && tag.endsWith('}')) {
         let infoTitle = tag;
-        const metaList =
-          [meta[tag.replaceAll('${', '')?.replaceAll('}', '')]].flat(1) || [];
+        const metaList = [
+          meta[tag.replaceAll('${', '').replaceAll('}', '')],
+        ].flat(1);
 
-        if (Array.isArray(metaList)) {
-          if (metaList.length > 1) {
-            if (props.category === 'RagRetrieval') {
-              infoTitle = locale?.multipleKnowledgeBases;
-            } else if (props.category === 'TableSql') {
-              infoTitle = metaList.at(0)?.name + locale?.multipleTables;
-            } else if (props.category === 'ToolCall') {
-              infoTitle = metaList.at(0)?.name + locale?.multipleTools;
-            } else {
-              infoTitle = metaList.at(0)?.name + locale?.multipleData;
-            }
+        if (metaList.length > 1) {
+          if (props.category === 'RagRetrieval') {
+            infoTitle = locale?.multipleKnowledgeBases;
+          } else if (props.category === 'TableSql') {
+            infoTitle = metaList.at(0)?.name + locale?.multipleTables;
+          } else if (props.category === 'ToolCall') {
+            infoTitle = metaList.at(0)?.name + locale?.multipleTools;
+          } else {
+            infoTitle = metaList.at(0)?.name + locale?.multipleData;
           }
-          if (metaList.length === 1) {
-            infoTitle = metaList.at(0)?.name || tag;
-          }
+        }
+        if (metaList.length === 1) {
+          infoTitle = metaList.at(0)?.name || tag;
         }
         return (
           <Popover

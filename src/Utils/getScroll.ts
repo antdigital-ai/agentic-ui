@@ -1,5 +1,6 @@
 export function isWindow(obj: any): obj is Window {
-  return obj !== null && obj !== undefined && obj === obj.window;
+  // eslint-disable-next-line eqeqeq -- intentional nullish (null | undefined)
+  return obj != null && obj === obj.window;
 }
 
 const getScroll = (target: HTMLElement | Window | Document | null): number => {

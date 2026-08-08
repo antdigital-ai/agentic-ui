@@ -18,7 +18,7 @@ const mdastFootnoteProcessor = unified()
 
 const mdastPlainText = (node: any): string => {
   if (!node) return '';
-  if (node.type === 'text') return node.value || '';
+  if (node.type === 'text') return node.value ?? '';
   if (Array.isArray(node.children)) {
     return node.children.map(mdastPlainText).join('');
   }

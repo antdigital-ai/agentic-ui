@@ -28,6 +28,7 @@ import { StatisticConfigType } from '../hooks/useChartStatistic';
 import type { ChartClassNames, ChartStyles } from '../types/classNames';
 import {
   ChartDataItem,
+  DEFAULT_CHART_DATASET_TYPE,
   extractAndSortXValues,
   findDataPointByXValue,
   hexToRgba,
@@ -275,7 +276,7 @@ const BarChart: React.FC<BarChartProps> = ({
   const categories = useMemo(() => {
     const uniqueCategories = [
       ...new Set(safeData.map((item) => item?.category)),
-    ].filter(Boolean);
+    ].filter((category): category is string => Boolean(category));
     return uniqueCategories;
   }, [safeData]);
 
@@ -296,16 +297,16 @@ const BarChart: React.FC<BarChartProps> = ({
 
   // 状态管理
   const [selectedFilter, setSelectedFilter] = useState<string>(
-    categories.find(Boolean) || '',
+    categories[0] || '',
   );
   const [selectedFilterLabel, setSelectedFilterLabel] = useState(
-    filterLabels && filterLabels.length > 0 ? filterLabels[0] : undefined,
+    filterLabels?.[0],
   );
 
   // 当数据变化导致当前选中分类失效时，自动回退到首个有效分类或空（显示全部）
   useEffect(() => {
     if (selectedFilter && !categories.includes(selectedFilter)) {
-      setSelectedFilter(categories.find(Boolean) || '');
+      setSelectedFilter(categories[0] || '');
     }
   }, [categories, selectedFilter]);
 
@@ -396,12 +397,16 @@ const BarChart: React.FC<BarChartProps> = ({
 
     const datasets = types.map((type, index) => {
       const provided = color;
-      const pickByIndex = (i: number) =>
-        Array.isArray(provided)
-          ? provided[i] ||
-            provided[0] ||
+      const pickByIndex = (i: number) => {
+        if (Array.isArray(provided)) {
+          return (
+            provided[i] ??
+            provided[0] ??
             defaultColorList[i % defaultColorList.length]
-          : provided || defaultColorList[i % defaultColorList.length];
+          );
+        }
+        return provided ?? defaultColorList[i % defaultColorList.length];
+      };
       const baseColor = pickByIndex(index);
 
       // 解析 CSS 变量为实际颜色值（Canvas 需要实际颜色值）
@@ -421,7 +426,7 @@ const BarChart: React.FC<BarChartProps> = ({
       });
 
       return {
-        label: type || '默认',
+        label: type || DEFAULT_CHART_DATASET_TYPE,
         data: typeData,
         borderColor: (ctx: ScriptableContext<'bar'>) => {
           const parsed: any = ctx.parsed as any;
@@ -437,11 +442,8 @@ const BarChart: React.FC<BarChartProps> = ({
           if (!color && isDiverging) {
             base = value >= 0 ? POSITIVE_COLOR_HEX : NEGATIVE_COLOR_HEX;
           } else if (resolvedProvidedColors && isDiverging) {
-            const pos = resolvedProvidedColors[0] || resolvedBaseColor;
-            const neg =
-              resolvedProvidedColors[1] ||
-              resolvedProvidedColors[0] ||
-              resolvedBaseColor;
+            const pos = resolvedProvidedColors[0] ?? resolvedBaseColor;
+            const neg = resolvedProvidedColors[1] ?? pos;
             base = value >= 0 ? pos : neg;
           }
           return hexToRgba(base, 0.95);
@@ -473,11 +475,8 @@ const BarChart: React.FC<BarChartProps> = ({
             if (!color && isDiverging) {
               base = value >= 0 ? POSITIVE_COLOR_HEX : NEGATIVE_COLOR_HEX;
             } else if (resolvedProvidedColors && isDiverging) {
-              const pos = resolvedProvidedColors[0] || resolvedBaseColor;
-              const neg =
-                resolvedProvidedColors[1] ||
-                resolvedProvidedColors[0] ||
-                resolvedBaseColor;
+              const pos = resolvedProvidedColors[0] ?? resolvedBaseColor;
+              const neg = resolvedProvidedColors[1] ?? pos;
               base = value >= 0 ? pos : neg;
             }
 
@@ -507,11 +506,8 @@ const BarChart: React.FC<BarChartProps> = ({
           if (!color && isDiverging) {
             base = value >= 0 ? POSITIVE_COLOR_HEX : NEGATIVE_COLOR_HEX;
           } else if (resolvedProvidedColors && isDiverging) {
-            const pos = resolvedProvidedColors[0] || resolvedBaseColor;
-            const neg =
-              resolvedProvidedColors[1] ||
-              resolvedProvidedColors[0] ||
-              resolvedBaseColor;
+            const pos = resolvedProvidedColors[0] ?? resolvedBaseColor;
+            const neg = resolvedProvidedColors[1] ?? pos;
             base = value >= 0 ? pos : neg;
           }
 
@@ -618,8 +614,8 @@ const BarChart: React.FC<BarChartProps> = ({
   // 筛选器选项
   const filterOptions = useMemo(() => {
     return categories.map((category) => ({
-      label: category || '默认',
-      value: category || '默认',
+      label: category,
+      value: category,
     }));
   }, [categories]);
 
@@ -671,7 +667,7 @@ const BarChart: React.FC<BarChartProps> = ({
           labelText = dataLabelFormatter({
             value,
             label: String(item.x),
-            datasetLabel: String(item.type || '默认'),
+            datasetLabel: String(item.type || DEFAULT_CHART_DATASET_TYPE),
             dataIndex: 0,
             datasetIndex: 0,
           });

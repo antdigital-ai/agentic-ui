@@ -1001,8 +1001,7 @@ export const ChartRender: React.FC<{
    */
   const handleCopyMarkdown = () => {
     const markdown = generateMarkdownTable();
-    if (markdown) {
-      copy(markdown);
+    if (markdown && copy(markdown)) {
       message.success(i18n?.locale?.copySuccess || '复制成功');
     }
   };

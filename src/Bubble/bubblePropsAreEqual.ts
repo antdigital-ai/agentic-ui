@@ -262,9 +262,10 @@ export const bubblePropsAreEqual = (
   if (prev.bubbleListRef !== next.bubbleListRef) return false;
   if (prev.bubbleRef !== next.bubbleRef) return false;
 
-  if (prev.avatar === next.avatar) {
-    // ok
-  } else if (!shallowEqualRecord(prev.avatar as any, next.avatar as any)) {
+  if (
+    prev.avatar !== next.avatar &&
+    !shallowEqualRecord(prev.avatar as any, next.avatar as any)
+  ) {
     return false;
   }
 

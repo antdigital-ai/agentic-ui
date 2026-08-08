@@ -160,7 +160,7 @@ export const getColumnAlignment = (
     const values = data
       .map((row: { [x: string]: any }) => row[col.dataIndex])
       .filter(Boolean);
-    values?.pop();
+    values.pop();
     // 如果检测到可能正在输入的数字，保持当前对齐状态
     if (hasIncompleteNumericInput(values)) {
       return prevAlignments[index] || null;
@@ -376,15 +376,16 @@ export const parseTableOrChart = (
     }
   }
 
-  // 计算合并单元格信息
-  const mergeCells = (config as CodeNode['otherProps'])?.mergeCells || [];
+  // config 恒为对象；mergeCells 缺省为空数组
+  const mergeCells =
+    (config as CodeNode['otherProps'])?.mergeCells || [];
 
   // 创建合并单元格映射，用于快速查找
   const mergeMap = new Map<
     string,
     { rowSpan: number; colSpan: number; hidden?: boolean }
   >();
-  mergeCells?.forEach(
+  mergeCells.forEach(
     ({ row, col, rowSpan, rowspan, colSpan, colspan }: any) => {
       let rawRowSpan = rowSpan || rowspan;
       let rawColSpan = colSpan || colspan;
@@ -460,7 +461,7 @@ export const parseTableOrChart = (
       : config),
     columns,
     dataSource: dataSource.map((item) => {
-      delete item?.chartType;
+      delete item.chartType;
       return {
         ...item,
       };
@@ -501,14 +502,14 @@ export const preprocessMarkdownTableNewlines = (markdown: string): string => {
 
   // 如果包含表格，处理换行符
   return processedMarkdown
-    ?.split('\n\n')
+    .split('\n\n')
     .map((line) => {
       if (line.includes('```')) return line; // 如果包含代码块，直接返回原始字符串
       // 检查是否包含表格
       if (!tableRegex.test(line)) return line; // 如果没有表格，直接返回原始字符串
       // 匹配所有表格的行（确保我们在表格行内匹配换行符）
       return line.replace(/\|([^|]+)\|/g, (match) => {
-        if (match.replaceAll('\n', '')?.length < MIN_TABLE_CELL_LENGTH)
+        if (match.replaceAll('\n', '').length < MIN_TABLE_CELL_LENGTH)
           return match;
         // 只替换每个表格单元格内的换行符
         return match.split('\n').join('<br>');

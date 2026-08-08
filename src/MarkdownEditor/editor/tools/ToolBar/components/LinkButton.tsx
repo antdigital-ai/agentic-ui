@@ -15,7 +15,7 @@ export const LinkButton = React.memo<LinkButtonProps>(
   ({ baseClassName, hashId, i18n, onInsertLink, isLinkActive }) => {
     return (
       <ToolBarItem
-        title={i18n?.locale?.insertLink || '插入链接'}
+        title={i18n.locale?.insertLink || '插入链接'}
         icon={<LinkOutlined />}
         onClick={onInsertLink}
         className={classNames(`${baseClassName}-item`, hashId)}

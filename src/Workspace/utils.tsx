@@ -26,9 +26,9 @@ export const formatFileSize = (size: number | string): string => {
  * @returns 格式化后的时间字符串 (MM-DD HH:mm)
  */
 export const formatLastModified = (date: string | number | Date): string => {
-  const formatted = dayjs(date)?.format('MM-DD HH:mm:ss');
+  const formatted = dayjs(date).format('MM-DD HH:mm:ss');
 
-  return formatted?.match('Invalid')
+  return formatted.match('Invalid')
     ? typeof date === 'string'
       ? date
       : '-'

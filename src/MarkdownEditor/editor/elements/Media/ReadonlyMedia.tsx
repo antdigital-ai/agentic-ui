@@ -155,8 +155,8 @@ export const ReadonlyMedia: React.FC<ElementProps<MediaNode>> = React.memo(
 
       return (
         <ReadonlyImage
-          src={state()?.url || element?.url}
-          alt={element?.alt || 'image'}
+          src={state().url || element.url}
+          alt={element.alt || 'image'}
           width={element.width}
           height={element.height}
           crossOrigin="anonymous"
@@ -205,10 +205,10 @@ export const ReadonlyMedia: React.FC<ElementProps<MediaNode>> = React.memo(
         if (!state().loadSuccess) {
           return (
             <MediaErrorLink
-              url={state()?.url}
-              fallbackUrl={element?.url}
+              url={state().url}
+              fallbackUrl={element.url}
               displayText={
-                element.alt || state()?.url || element?.url || '视频链接'
+                element.alt || state().url || element.url || '视频链接'
               }
             />
           );
@@ -229,10 +229,10 @@ export const ReadonlyMedia: React.FC<ElementProps<MediaNode>> = React.memo(
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
               display: 'block',
             }}
-            src={state()?.url || ''}
+            src={state().url || ''}
             preload="metadata"
             onError={() => {
-              console.warn('Video failed to load:', state()?.url);
+              console.warn('Video failed to load:', state().url);
               setState({ loadSuccess: false });
             }}
           />
@@ -284,7 +284,7 @@ export const ReadonlyMedia: React.FC<ElementProps<MediaNode>> = React.memo(
                   wordBreak: 'break-all',
                 }}
               >
-                {rawMarkdown || element?.alt || '音频加载中...'}
+                {rawMarkdown || element.alt || '音频加载中...'}
               </span>
             </div>
           );
@@ -293,10 +293,10 @@ export const ReadonlyMedia: React.FC<ElementProps<MediaNode>> = React.memo(
         if (!state().loadSuccess) {
           return (
             <MediaErrorLink
-              url={state()?.url}
-              fallbackUrl={element?.url}
+              url={state().url}
+              fallbackUrl={element.url}
               displayText={
-                element.alt || state()?.url || element?.url || '音频链接'
+                element.alt || state().url || element.url || '音频链接'
               }
             />
           );
@@ -309,9 +309,9 @@ export const ReadonlyMedia: React.FC<ElementProps<MediaNode>> = React.memo(
               width: '100%',
               height: 'auto',
             }}
-            src={state()?.url || ''}
+            src={state().url || ''}
             onError={() => {
-              console.warn('Audio failed to load:', state()?.url);
+              console.warn('Audio failed to load:', state().url);
               setState({ loadSuccess: false });
             }}
           >

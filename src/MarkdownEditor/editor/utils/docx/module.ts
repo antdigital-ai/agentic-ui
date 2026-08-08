@@ -64,7 +64,7 @@ export const makeDeserializer = (jsx: any) => {
       }
 
       if (el.textContent.match(/^[\s]*$/gm)) {
-        return el.textContent?.trim() || null;
+        return el.textContent.trim() || null;
       } else {
         // sometimes work adds line breaks when pasting
         const regex = /\n(?!\n)/g;
@@ -130,7 +130,7 @@ export const makeDeserializer = (jsx: any) => {
           {
             type: 'head',
             className: nodeName,
-            level: (attrs as any)?.level || Number(nodeName?.replace('H', '')),
+            level: (attrs as any)?.level || Number(nodeName.replace('H', '')),
             ...(align ? { align } : {}),
           },
           children,

@@ -103,7 +103,7 @@ export const BubbleMessageDisplay: React.FC<
     return (
       props.originData?.isAborted !== true &&
       props.originData?.isFinished === false &&
-      props?.originData?.extra?.isHistory === undefined &&
+      props.originData?.extra?.isHistory === undefined &&
       props.originData?.isFinished !== undefined
     );
   }, [
@@ -149,7 +149,7 @@ export const BubbleMessageDisplay: React.FC<
         ) || funRender(mdProps as { identifier?: string });
 
       if (!item) return;
-      if (!item?.origin_text) return null;
+      if (!item.origin_text) return null;
       return (
         <Popover
           title={
@@ -158,15 +158,15 @@ export const BubbleMessageDisplay: React.FC<
                 `${baseChatCls}-messages-content-popover-title`,
                 hashId,
               )}
-              style={props?.customConfig?.PopoverProps?.titleStyle}
+              style={props.customConfig?.PopoverProps?.titleStyle}
             >
               <div>
                 {locale?.['chat.message.referenceDocument'] || '参考文档'}
               </div>
-              {item?.origin_url ? (
+              {item.origin_url ? (
                 <ActionIconBox
                   title={locale?.['chat.message.viewOriginal'] || '查看原文'}
-                  tooltipProps={props?.customConfig?.TooltipProps}
+                  tooltipProps={props.customConfig?.TooltipProps}
                   onClick={() => {
                     if (
                       props.markdownRenderConfig?.fncProps?.onOriginUrlClick
@@ -190,7 +190,7 @@ export const BubbleMessageDisplay: React.FC<
                 `${baseChatCls}-messages-content-popover-content`,
                 hashId,
               )}
-              style={props?.customConfig?.PopoverProps?.contentStyle}
+              style={props.customConfig?.PopoverProps?.contentStyle}
             >
               <MarkdownEditor
                 style={{
@@ -207,9 +207,9 @@ export const BubbleMessageDisplay: React.FC<
                   padding: 0,
                   width: '100%',
                 }}
-                initValue={item?.origin_text?.trim()}
+                initValue={item.origin_text.trim()}
               />
-              {item?.docId && item.doc_name ? (
+              {item.docId && item.doc_name ? (
                 <Tooltip
                   mouseEnterDelay={0.3}
                   title={
@@ -240,7 +240,7 @@ export const BubbleMessageDisplay: React.FC<
                         hashId,
                       )}
                     >
-                      {item?.doc_name}
+                      {item.doc_name}
                     </div>
                   </div>
                 </Tooltip>
@@ -315,12 +315,12 @@ export const BubbleMessageDisplay: React.FC<
     }
 
     const defaultExtra =
-      props?.bubbleRenderConfig?.extraRender === false ? null : (
+      props.bubbleRenderConfig?.extraRender === false ? null : (
         <BubbleExtra
           placement={props.placement}
           style={props.bubbleListItemExtraStyle}
           readonly={readonly}
-          rightRender={props?.bubbleRenderConfig?.extraRightRender}
+          rightRender={props.bubbleRenderConfig?.extraRightRender}
           onReply={props.onReply}
           onCancelLike={props.onCancelLike}
           onLikeCancel={props.onLikeCancel}
@@ -369,9 +369,9 @@ export const BubbleMessageDisplay: React.FC<
       );
 
     const extra =
-      props?.bubbleRenderConfig?.extraRender !== false &&
-      props?.bubbleRenderConfig?.extraRender
-        ? props?.bubbleRenderConfig?.extraRender?.(
+      props.bubbleRenderConfig?.extraRender !== false &&
+      props.bubbleRenderConfig?.extraRender
+        ? props.bubbleRenderConfig.extraRender(
             props as BubbleProps,
             defaultExtra,
           )
@@ -398,7 +398,7 @@ export const BubbleMessageDisplay: React.FC<
 
     if (
       props.placement !== 'left' ||
-      props?.originData?.extra?.tags?.includes?.('REJECT_TO_ANSWER') ||
+      props.originData?.extra?.tags?.includes('REJECT_TO_ANSWER') ||
       props.originData?.role === 'bot'
     ) {
       return (
@@ -442,15 +442,14 @@ export const BubbleMessageDisplay: React.FC<
       );
     }
 
-    const docInfoList = [props?.originData?.extra?.white_box_process].flat(
+    const docInfoList = [props.originData?.extra?.white_box_process].flat(
       1,
     ) as WhiteBoxProcessInterface[];
     let docInfoDom = null;
 
     if (
-      Array.isArray(docInfoList) &&
       docInfoList.length > 0 &&
-      docInfoList?.some((item) => (item?.output?.chunks?.length || 0) > 0) &&
+      docInfoList.some((item) => (item?.output?.chunks?.length || 0) > 0) &&
       props.docListProps?.enable !== false
     ) {
       docInfoDom = (
@@ -485,7 +484,7 @@ export const BubbleMessageDisplay: React.FC<
         htmlRef={props.bubbleListRef}
         content={
           props.originData?.isFinished &&
-          props?.originData?.extra?.answerStatus === 'EXCEPTION'
+          props.originData?.extra?.answerStatus === 'EXCEPTION'
             ? (content as string) ||
               locale?.['chat.message.generateFailed'] ||
               '生成回答失败，请重试'
@@ -496,7 +495,7 @@ export const BubbleMessageDisplay: React.FC<
     );
   }, [
     content,
-    props?.originData?.feedback,
+    props.originData?.feedback,
     props.originData?.isFinished,
     props.originData?.isAborted,
     props.originData?.isLast,

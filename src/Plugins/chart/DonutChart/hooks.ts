@@ -72,7 +72,7 @@ export const useFilterLabels = (data: DonutChartData[]) => {
 
   const [selectedFilterLabel, setSelectedFilterLabel] = React.useState<
     string | undefined
-  >(filterLabels && filterLabels.length > 0 ? filterLabels[0] : undefined);
+  >(filterLabels?.[0]);
 
   // 当 data 变化导致 filterLabels 变化时，自动纠正选中项，避免残留无效选择
   React.useEffect(() => {
@@ -131,7 +131,7 @@ export const useAutoCategory = (
   React.useEffect(() => {
     if (autoCategoryData && !internalSelectedCategory) {
       setInternalSelectedCategory(
-        autoCategoryData.categories.find(Boolean) || '',
+        autoCategoryData.categories[0] || '',
       );
     }
   }, [autoCategoryData, internalSelectedCategory]);

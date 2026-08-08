@@ -464,7 +464,7 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
     }, [
       loading,
       collapse,
-      thoughtChainList?.at?.(-1)?.category,
+      thoughtChainList.at(-1)?.category,
       bubble?.isFinished,
       bubble?.isAborted,
       bubble?.endTime,

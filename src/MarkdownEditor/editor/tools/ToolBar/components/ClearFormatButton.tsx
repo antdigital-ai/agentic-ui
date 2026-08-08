@@ -32,7 +32,7 @@ export const ClearFormatButton = React.memo<ClearFormatButtonProps>(
   ({ baseClassName, hashId, i18n, onClear }) => {
     return (
       <ToolBarItem
-        title={i18n?.locale?.clearFormatting || '清除格式'}
+        title={i18n.locale?.clearFormatting || '清除格式'}
         icon={<ClearIcon />}
         onClick={onClear}
         className={classNames(`${baseClassName}-item`, hashId)}

@@ -49,11 +49,12 @@ const isValidMediaUrl = (url: string, type: string): boolean => {
     return true;
   }
 
-  const extensions = MEDIA_EXTENSIONS[type as MediaType] ?? [];
+  // 调用方仅传入 image/video/audio；未知 key 时取空数组即可
+  const extensions = MEDIA_EXTENSIONS[type as MediaType] || [];
   const lowerUrl = url.toLowerCase();
   const hasValidExtension = extensions.some((ext) => lowerUrl.includes(ext));
 
-  const paths = MEDIA_PATHS[type as MediaType] ?? [];
+  const paths = MEDIA_PATHS[type as MediaType] || [];
   const hasMediaPath = paths.some((mediaPath) => lowerUrl.includes(mediaPath));
 
   return hasValidExtension || hasMediaPath;
@@ -273,26 +274,25 @@ export const handleSpecialTextPaste = (
         });
         return true;
       }
-      if (text.startsWith('attach://')) {
-        Editor.withoutNormalizing(editor, () => {
-          Transforms.insertNodes(
-            editor,
-            {
-              type: 'attach',
-              name: urlObject.searchParams.get('name'),
-              size: Number(urlObject.searchParams.get('size') || 0),
-              url: url || undefined,
-              children: [{ text: '' }],
-            },
-            { select: true, at: path },
-          );
-          const next = Editor.next(editor, { at: path });
-          if (next && next[0].type === 'paragraph' && !Node.string(next[0])) {
-            Transforms.delete(editor, { at: selection! });
-          }
-        });
-        return true;
-      }
+      // outer 已限定 media:// | attach://，此处必为 attach://
+      Editor.withoutNormalizing(editor, () => {
+        Transforms.insertNodes(
+          editor,
+          {
+            type: 'attach',
+            name: urlObject.searchParams.get('name'),
+            size: Number(urlObject.searchParams.get('size') || 0),
+            url,
+            children: [{ text: '' }],
+          },
+          { select: true, at: path },
+        );
+        const next = Editor.next(editor, { at: path });
+        if (next && next[0].type === 'paragraph' && !Node.string(next[0])) {
+          Transforms.delete(editor, { at: selection! });
+        }
+      });
+      return true;
     }
   }
   return false;

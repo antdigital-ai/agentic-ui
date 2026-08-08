@@ -87,10 +87,7 @@ export const useMermaidRender = (
           return;
         }
 
-        const { svg } = await api.render(
-          id,
-          trimmedCode.endsWith('```') ? trimmedCode : trimmedCode,
-        );
+        const { svg } = await api.render(id, trimmedCode);
 
         if (latestRenderSignatureRef.current !== currentSignature) {
           timer.current = null;

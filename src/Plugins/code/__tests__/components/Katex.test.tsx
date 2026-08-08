@@ -3,7 +3,7 @@
  */
 
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Katex } from '../../CodeUI/Katex/Katex';
@@ -21,11 +21,12 @@ describe('Katex Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // 重置定时器
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
   });
 
   afterEach(() => {
-    vi.useRealTimers();
+    cleanup();
+    vi.clearAllTimers();
   });
 
   describe('基本渲染测试', () => {

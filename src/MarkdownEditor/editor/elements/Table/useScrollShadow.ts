@@ -51,7 +51,6 @@ const useSmartScrollShadow = (sensitivity = 1) => {
   }, [sensitivity]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
     if (typeof ResizeObserver === 'undefined') return;
 
     const element = elementRef.current;

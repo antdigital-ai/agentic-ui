@@ -27,13 +27,16 @@ export const columnKeyMatchesConfiguredField = (
   columnKey: string,
   configuredField: string,
 ): boolean => {
-  const ck = (columnKey || '').trim();
-  const f = (configuredField || '').trim();
+  // eslint-disable-next-line eqeqeq -- intentional nullish (null | undefined)
+  if (columnKey == null || configuredField == null) return false;
+  const ck = columnKey.trim();
+  const f = configuredField.trim();
   if (!ck || !f) return false;
   if (ck === f) return true;
   if (!ck.startsWith(f)) return false;
   const rest = ck.slice(f.length);
-  return rest === '' || TRAILING_UNIT_SUFFIX_PATTERN.test(rest);
+  // rest === '' already handled by `ck === f` above
+  return TRAILING_UNIT_SUFFIX_PATTERN.test(rest);
 };
 
 /**

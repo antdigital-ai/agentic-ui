@@ -134,7 +134,7 @@ export const ResizeImage = ({
     imgRef.current?.style.setProperty('width', `${size.width}px`);
     imgRef.current?.style.setProperty(
       'height',
-      `${(size.width || 0) / radio.current}px`,
+      `${size.width / radio.current}px`,
     );
   }, 160);
 
@@ -210,13 +210,13 @@ export const ResizeImage = ({
           imgRef.current?.style.setProperty('width', `${ele.clientWidth}px`);
           imgRef.current?.style.setProperty(
             'height',
-            `${(ele.clientWidth || 0) / radio.current}px`,
+            `${ele.clientWidth / radio.current}px`,
           );
 
           resize.cancel();
           resize.run({
             width: ele.clientWidth,
-            height: (ele.clientWidth || 0) / radio.current,
+            height: ele.clientWidth / radio.current,
           });
         }}
       >

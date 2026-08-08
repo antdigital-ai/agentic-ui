@@ -100,7 +100,7 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
       );
     }
 
-    const minWidth = content?.includes?.('chartType')
+    const minWidth = content.includes('chartType')
       ? standalone
         ? Math.max((htmlRef?.current?.clientWidth || 600) - 23, 500)
         : Math.min((htmlRef?.current?.clientWidth || 600) - 128, 500)

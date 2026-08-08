@@ -41,7 +41,7 @@ export const ReadonlyHead: React.FC<ElementProps<HeadNode>> = React.memo(
   ({ element, attributes, children }) => {
     debugInfo('ReadonlyHead - 渲染只读标题', {
       level: element.level,
-      text: Node.string(element)?.substring(0, 50),
+      text: Node.string(element).substring(0, 50),
       align: element.align,
     });
 
@@ -53,7 +53,7 @@ export const ReadonlyHead: React.FC<ElementProps<HeadNode>> = React.memo(
         ...attributes,
         id: slugify(str),
         ['data-be']: 'head',
-        ['data-head']: slugify(Node.string(element) || ''),
+        ['data-head']: slugify(str),
         ['data-title']: true, // 预览模式下不标记为标题
         ['data-align']: element.align,
         style: { textAlign: element.align },

@@ -52,7 +52,7 @@ describe('strip-utf8-bom', () => {
 
     expect(result.status).toBe(1);
     expect(result.output).toContain('strip-utf8-bom (check): 1 file(s)');
-    expect(result.output).toContain('src/with-bom.ts');
+    expect(result.output.replace(/\\/g, '/')).toContain('src/with-bom.ts');
     expect(result.output).not.toContain('dist/ignored.ts');
     expect(hasUtf8Bom(readFixture('src/with-bom.ts'))).toBe(true);
     expect(hasUtf8Bom(readFixture('dist/ignored.ts'))).toBe(true);
@@ -65,7 +65,7 @@ describe('strip-utf8-bom', () => {
 
     expect(result.status).toBe(0);
     expect(result.output).toContain('strip-utf8-bom (dry-run): 1 file(s)');
-    expect(result.output).toContain('package.json');
+    expect(result.output.replace(/\\/g, '/')).toContain('package.json');
     expect(hasUtf8Bom(readFixture('package.json'))).toBe(true);
   });
 
@@ -83,7 +83,7 @@ describe('strip-utf8-bom', () => {
 
     expect(result.status).toBe(0);
     expect(result.output).toContain('strip-utf8-bom (fixed): 1 file(s)');
-    expect(result.output).toContain('scripts/tool.mjs');
+    expect(result.output.replace(/\\/g, '/')).toContain('scripts/tool.mjs');
     expect(hasUtf8Bom(readFixture('scripts/tool.mjs'))).toBe(false);
     expect(readFixture('scripts/tool.mjs').toString('utf8')).toBe('tool\n');
     expect(hasUtf8Bom(readFixture('node_modules/pkg/index.js'))).toBe(true);

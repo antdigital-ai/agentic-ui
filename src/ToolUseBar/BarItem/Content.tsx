@@ -396,9 +396,10 @@ const ToolContentComponent: React.FC<ToolContentProps> = ({
   if (disableAnimation) {
     return showContent && expanded ? (
       <div
-        className={classNames(toolContainerClassName, {
-          [`${prefixCls}-tool-container-expanded`]: true,
-        })}
+        className={classNames(
+          toolContainerClassName,
+          `${prefixCls}-tool-container-expanded`,
+        )}
         data-testid="tool-user-item-tool-container"
         style={{ overflow: 'hidden' }}
       >

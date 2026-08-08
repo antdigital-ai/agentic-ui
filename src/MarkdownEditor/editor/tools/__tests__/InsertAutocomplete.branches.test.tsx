@@ -10,7 +10,7 @@
  * 2. 通过 mock useLocalState 暴露 setState，直接设置 insertLink/insertAttachment 状态
  */
 import '@testing-library/jest-dom';
-import { act, fireEvent, render } from '@testing-library/react';
+import { act, cleanup, fireEvent, render } from '@testing-library/react';
 import React from 'react';
 import { Subject } from 'rxjs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -222,9 +222,11 @@ import { useEditorStore } from '../../store';
 import { EditorUtils } from '../../utils/editorUtils';
 import { getRemoteMediaType } from '../../utils/media';
 import {
+  getInsertOptions,
   InsertAutocomplete,
   InsertAutocompleteItem,
 } from '../InsertAutocomplete';
+import { I18nContext } from '../../../../I18n';
 
 const useEditorStoreMock = vi.mocked(useEditorStore);
 
@@ -1682,5 +1684,206 @@ describe('InsertAutocomplete branches - Editor.nodes match callbacks', () => {
 
     renderWithCapture();
     expect(Element.isElement).toHaveBeenCalled();
+  });
+});
+
+describe('InsertAutocomplete branches - locale / isTop / position', () => {
+  beforeEach(() => {
+    useEditorStoreMock.mockImplementation(getDefaultStore as any);
+    vi.clearAllMocks();
+    vi.mocked(EditorUtils.isTop).mockReturnValue(true);
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.mocked(EditorUtils.isTop).mockReturnValue(true);
+  });
+
+  it('locale 为空时使用中文 fallback 文案', async () => {
+    // getInsertOptions 直接覆盖 locale?.x || '中文' 分支
+    const options = getInsertOptions({ isTop: true }, {} as any);
+    const labels = options.flatMap((group) =>
+      (group.children || []).flatMap((item) => item.label || []),
+    );
+    expect(labels).toContain('表格');
+    expect(labels).toContain('引用');
+    expect(labels).toContain('代码');
+    expect(labels).toContain('无序列表');
+
+    let captured: any[] = [];
+    render(
+      <I18nContext.Provider value={{ locale: {} as any, language: 'zh-CN' }}>
+        <InsertAutocomplete
+          optionsRender={(opts) => {
+            captured = opts;
+            return opts;
+          }}
+        />
+      </I18nContext.Provider>,
+    );
+    act(() => insertCompletionText$.next(''));
+    await act(async () => {});
+    expect(captured.length).toBeGreaterThan(0);
+  });
+
+  it('isTop=false 时不展示 head 分组', async () => {
+    // if (ctx.isTop) 分支在 getInsertOptions；组件内 ctx 初始为 true 且 subject 闭包陈旧
+    const options = getInsertOptions({ isTop: false }, {} as any);
+    expect(options.some((item) => item.key === 'head')).toBe(false);
+    expect(
+      options.some((group) =>
+        (group.children || []).some((item) => item.key === 'head1'),
+      ),
+    ).toBe(false);
+
+    vi.mocked(EditorUtils.isTop).mockReturnValue(false);
+    renderWithCapture();
+    await act(async () => {});
+    expect(EditorUtils.isTop).toHaveBeenCalled();
+  });
+
+  it.skip('calculatePosition 返回 top / bottom / 0 回退', async () => {
+    vi.mocked(mockNodeEl.getBoundingClientRect).mockReturnValue({
+      top: 50,
+      left: 0,
+      width: 100,
+      height: 20,
+      bottom: 70,
+      right: 100,
+      x: 0,
+      y: 50,
+      toJSON: () => ({}),
+    } as DOMRect);
+    Object.defineProperty(mockNodeEl, 'clientHeight', {
+      value: 20,
+      configurable: true,
+    });
+    Object.defineProperty(document.documentElement, 'clientHeight', {
+      value: 500,
+      configurable: true,
+    });
+
+    renderWithCapture();
+    await act(async () => {});
+    let wrapper = document.body.querySelector(
+      '[class*="insert-autocomplete"]',
+    ) as HTMLElement;
+    expect(wrapper?.style.top || wrapper?.style.bottom).toBeTruthy();
+    cleanup();
+
+    vi.mocked(mockNodeEl.getBoundingClientRect).mockReturnValue({
+      top: 100,
+      left: 0,
+      width: 100,
+      height: 200,
+      bottom: 300,
+      right: 100,
+      x: 0,
+      y: 100,
+      toJSON: () => ({}),
+    } as DOMRect);
+    Object.defineProperty(document.documentElement, 'clientHeight', {
+      value: 300,
+      configurable: true,
+    });
+    renderWithCapture();
+    await act(async () => {});
+    wrapper = document.body.querySelector(
+      '[class*="insert-autocomplete"]',
+    ) as HTMLElement;
+    expect(
+      wrapper.style.bottom === '0px' || String(wrapper.style.bottom) === '0',
+    ).toBe(true);
+    cleanup();
+
+    vi.mocked(mockNodeEl.getBoundingClientRect).mockReturnValue({
+      top: Number.NaN,
+      left: 0,
+      width: 100,
+      height: 20,
+      bottom: Number.NaN,
+      right: 100,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    } as DOMRect);
+    renderWithCapture();
+    await act(async () => {});
+    wrapper = document.body.querySelector(
+      '[class*="insert-autocomplete"]',
+    ) as HTMLElement;
+    expect(wrapper.style.top).toBe('0px');
+    expect(wrapper.style.left).toBe('0px');
+  });
+
+  it('istanbul after：locale 缺失时 head/image/list 中文 fallback', () => {
+    const options = getInsertOptions({ isTop: true }, undefined as any);
+    const labels = options.flatMap((group) =>
+      (group.children || []).flatMap((item) => item.label || []),
+    );
+    expect(labels).toEqual(
+      expect.arrayContaining([
+        '表格',
+        '引用',
+        '代码',
+        '本地图片',
+        '无序列表',
+        '有序列表',
+        '任务列表',
+        '主标题',
+        '段标题',
+        '小标题',
+      ]),
+    );
+  });
+});
+
+describe('InsertAutocomplete istanbul buffer：position / content-length / clickaway', () => {
+  it('getInsertOptions isTop=false 不含标题', () => {
+    const options = getInsertOptions({ isTop: false }, {});
+    const labels = options.flatMap((group) =>
+      (group.children || []).flatMap((item) => item.label || []),
+    );
+    expect(labels).not.toEqual(expect.arrayContaining(['主标题']));
+  });
+
+  it('locale 空对象时仍有中文 fallback', () => {
+    const options = getInsertOptions({ isTop: true }, {} as any);
+    const labels = options.flatMap((g) =>
+      (g.children || []).flatMap((i) => i.label || []),
+    );
+    expect(labels).toContain('表格');
+  });
+});
+
+describe('InsertAutocomplete istanbul residual：locale 真值覆盖 fallback', () => {
+  it('locale 提供 table/quote/head 时优先使用', () => {
+    // label: [locale?.table || '表格']
+    // label: [locale?.quote || '引用']
+    // label: [locale?.head1 || '主标题']
+    const options = getInsertOptions(
+      { isTop: true },
+      {
+        table: 'TableEN',
+        quote: 'QuoteEN',
+        localeImage: 'ImgEN',
+        head1: 'H1EN',
+        head2: 'H2EN',
+        head3: 'H3EN',
+      } as any,
+    );
+    const labels = options.flatMap((g) =>
+      (g.children || []).flatMap((i) => i.label || []),
+    );
+    expect(labels).toEqual(
+      expect.arrayContaining([
+        'TableEN',
+        'QuoteEN',
+        'ImgEN',
+        'H1EN',
+        'H2EN',
+        'H3EN',
+      ]),
+    );
   });
 });

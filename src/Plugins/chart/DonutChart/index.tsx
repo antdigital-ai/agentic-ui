@@ -223,7 +223,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
       onDownload();
       return;
     }
-    const instances = (chartRefs.current || []).filter(
+    const instances = chartRefs.current.filter(
       (c): c is ChartJS<'doughnut'> => !!c,
     );
 
@@ -521,7 +521,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
                   ? [resolvedMainColor, 'transparent']
                   : resolvedVisibleBackgroundColors.slice(0, values.length),
                 hoverBorderColor: chartHoverBorderColor,
-                borderWidth: cfg.chartStyle === 'pie' ? 2 : isMobile ? 1 : 1,
+                borderWidth: cfg.chartStyle === 'pie' ? 2 : 1,
                 spacing: isSingleValueMode
                   ? 0
                   : cfg.chartStyle === 'pie'
@@ -651,10 +651,8 @@ const DonutChart: React.FC<DonutChartProps> = ({
                         total > 0 ? ((value / total) * 100).toFixed(2) : '0';
                       const label =
                         context.chart.data.labels?.[context.dataIndex];
-                      const labelStr =
-                        label !== undefined && label !== null
-                          ? String(label)
-                          : '';
+                      // eslint-disable-next-line eqeqeq -- intentional nullish
+                      const labelStr = label != null ? String(label) : '';
                       return labelStr
                         ? `${labelStr}: ${pct}%`
                         : `${value} (${pct}%)`;

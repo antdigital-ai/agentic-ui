@@ -69,7 +69,7 @@ export const useSendHandler = ({
     // 纯空白视为空内容：trim 后为空时统一以空串处理，
     // 这样 allowEmptySubmit 场景下「只有空格」与「完全为空」语义一致。
     const trimmedMdValue = (mdValue ?? '').trim();
-    const effectiveValue = trimmedMdValue ? mdValue || '' : '';
+    const effectiveValue = trimmedMdValue ? mdValue! : '';
 
     // allowEmptySubmit 开启时即使内容为空也允许触发
     if (props.onSend && (props.allowEmptySubmit || trimmedMdValue)) {

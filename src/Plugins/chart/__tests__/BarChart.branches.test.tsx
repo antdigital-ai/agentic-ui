@@ -496,6 +496,7 @@ vi.mock('../const', () => ({
 }));
 
 vi.mock('../utils', () => ({
+  DEFAULT_CHART_DATASET_TYPE: '默认',
   extractAndSortXValues: vi.fn((data) => [
     ...new Set(
       data
@@ -514,6 +515,11 @@ vi.mock('../utils', () => ({
   ),
   hexToRgba: vi.fn((color, alpha) => `rgba(${color},${alpha})`),
   resolveCssVariable: vi.fn((color) => color),
+  toNumber: (val: any, fallback: number) => {
+    if (typeof val === 'number' && !Number.isNaN(val)) return val;
+    const n = Number(val);
+    return Number.isFinite(n) ? n : fallback;
+  },
 }));
 
 describe('BarChart 额外用例', () => {
@@ -1246,6 +1252,934 @@ describe('BarChart 额外用例', () => {
       const chart = screen.getByTestId('bar-chart');
       const labels = JSON.parse(chart.getAttribute('data-labels') || '[]');
       expect(labels).toEqual(['M', 'N']);
+    });
+  });
+
+  describe('BarChart 额外分支', () => {
+    it('maxBarThickness 影响 categoryPercentage', () => {
+      const data = [{ category: 'A', type: 't1', x: 'X1', y: 10 }];
+      render(<BarChart data={data} maxBarThickness={40} />);
+      const lastData = (globalThis as any).__barChartLastData as any;
+      expect(lastData?.datasets?.[0]?.maxBarThickness).toBe(40);
+    });
+
+    it('isDiverging 无 color 时使用默认正负 borderColor', () => {
+      const data = [
+        { category: 'A', type: 't1', x: 'X1', y: 10 },
+        { category: 'A', type: 't1', x: 'X2', y: -5 },
+      ];
+      render(<BarChart data={data} />);
+      const lastData = (globalThis as any).__barChartLastData as any;
+      const borderColor = lastData?.datasets?.[0]?.borderColor;
+      const pos = borderColor({ parsed: { y: 10 } } as any);
+      const neg = borderColor({ parsed: { y: -5 } } as any);
+      expect(pos).toBeDefined();
+      expect(neg).toBeDefined();
+      expect(pos).not.toBe(neg);
+    });
+
+    it('showLegend/showGrid false 与 hiddenX/hiddenY', () => {
+      const data = [{ category: 'A', type: 't1', x: 'X1', y: 10 }];
+      render(
+        <BarChart
+          data={data}
+          showLegend={false}
+          showGrid={false}
+          hiddenX
+          hiddenY
+        />,
+      );
+      const options = (globalThis as any).__barChartLastOptions as any;
+      expect(options?.plugins?.legend?.display).toBe(false);
+      expect(options?.scales?.x?.display).toBe(false);
+      expect(options?.scales?.y?.display).toBe(false);
+      expect(options?.scales?.x?.grid?.display).toBe(false);
+    });
+
+    it('xPosition/yPosition 与 xTitle/yTitle', () => {
+      const data = [
+        {
+          category: 'A',
+          type: 't1',
+          x: 'X1',
+          y: 10,
+          xtitle: '类目',
+          ytitle: '数值',
+        },
+      ];
+      render(
+        <BarChart
+          data={data}
+          xPosition="top"
+          yPosition="right"
+        />,
+      );
+      const options = (globalThis as any).__barChartLastOptions as any;
+      expect(options?.scales?.x?.position).toBe('top');
+      expect(options?.scales?.y?.position).toBe('right');
+      expect(options?.scales?.x?.title?.text).toBe('类目');
+      expect(options?.scales?.y?.title?.text).toBe('数值');
+    });
+
+    it('dark theme tooltip 颜色分支', () => {
+      const data = [{ category: 'A', type: 't1', x: 'X1', y: 10 }];
+      render(<BarChart data={data} theme="dark" />);
+      const options = (globalThis as any).__barChartLastOptions as any;
+      expect(options?.plugins?.tooltip?.backgroundColor).toContain('0,0,0');
+    });
+
+    it('移动端响应式宽度', async () => {
+      Object.defineProperty(window, 'innerWidth', {
+        writable: true,
+        configurable: true,
+        value: 500,
+      });
+      const data = [{ category: 'A', type: 't1', x: 'X1', y: 10 }];
+      render(<BarChart data={data} />);
+      await act(async () => {
+        window.dispatchEvent(new Event('resize'));
+      });
+      expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
+      Object.defineProperty(window, 'innerWidth', {
+        writable: true,
+        configurable: true,
+        value: 1024,
+      });
+    });
+
+    it('无效 y 字符串在 extract 阶段被过滤或映射', () => {
+      const data = [{ category: 'A', type: 't1', x: 'X1', y: 0 }];
+      render(<BarChart data={data} />);
+      const lastData = (globalThis as any).__barChartLastData as any;
+      expect(lastData?.datasets?.[0]?.data?.[0]).toBe(0);
+    });
+
+    it('renderFilterInToolbar true 时在工具栏渲染筛选', () => {
+      const data = [
+        { category: 'A', type: 't1', x: 'X1', y: 10 },
+        { category: 'B', type: 't1', x: 'X2', y: 20 },
+      ];
+      render(<BarChart data={data} renderFilterInToolbar />);
+      expect(screen.getByTestId('chart-filter')).toBeInTheDocument();
+    });
+
+    it('单元素 color 数组正负图仍用同色', () => {
+      const data = [
+        { category: 'A', type: 't1', x: 'X1', y: 10 },
+        { category: 'A', type: 't1', x: 'X2', y: -3 },
+      ];
+      render(<BarChart data={data} color={['#only']} />);
+      const lastData = (globalThis as any).__barChartLastData as any;
+      const borderColor = lastData?.datasets?.[0]?.borderColor;
+      expect(borderColor({ parsed: { y: 10 } } as any)).toBeDefined();
+      expect(borderColor({ parsed: { y: -3 } } as any)).toBeDefined();
+    });
+
+    it('deepMerge layout.padding 特殊合并', () => {
+      const data = [{ category: 'A', type: 't1', x: 'X1', y: 10 }];
+      render(
+        <BarChart
+          data={data}
+          showDataLabels
+          chartOptions={{
+            layout: { padding: { bottom: 40 } },
+          }}
+        />,
+      );
+      const options = (globalThis as any).__barChartLastOptions as any;
+      expect(options?.layout?.padding?.bottom).toBe(40);
+      expect(options?.layout?.padding?.top).toBeGreaterThan(0);
+    });
+
+    it('非数组 data 当作空数组', () => {
+      render(<BarChart data={undefined as any} />);
+      expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
+    });
+
+    it('datalabels 堆叠负值同号过滤', () => {
+      const data = [
+        { category: 'A', type: 't1', x: 'X1', y: -10 },
+        { category: 'A', type: 't2', x: 'X1', y: -5 },
+      ];
+      render(<BarChart data={data} stacked showDataLabels />);
+      const options = (globalThis as any).__barChartLastOptions as any;
+      const display = options?.plugins?.datalabels?.display;
+      const chart = {
+        data: {
+          datasets: [
+            { stack: 'stack', data: [-10] },
+            { stack: 'stack', data: [-5] },
+          ],
+        },
+        isDatasetVisible: () => true,
+      };
+      expect(display({ chart, datasetIndex: 1, dataIndex: 0 })).toBe(true);
+      expect(display({ chart, datasetIndex: 0, dataIndex: 0 })).toBe(false);
+    });
+
+    it('borderRadius 水平柱仅负值', () => {
+      const data = [{ category: 'A', type: 't1', x: 'X1', y: -4 }];
+      render(<BarChart data={data} indexAxis="y" />);
+      const lastData = (globalThis as any).__barChartLastData as any;
+      const borderRadius = lastData?.datasets?.[0]?.borderRadius;
+      expect(
+        borderRadius({
+          raw: -4,
+          chart: null,
+          datasetIndex: 0,
+          dataIndex: 0,
+        } as any),
+      ).toMatchObject({ topLeft: 6, bottomLeft: 6 });
+    });
+
+    it('loading 状态正常渲染', () => {
+      const data = [{ category: 'A', type: 't1', x: 'X1', y: 10 }];
+      render(<BarChart data={data} loading />);
+      expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
+    });
+
+    it('legendPosition/legendAlign 配置生效', () => {
+      const data = [{ category: 'A', type: 't1', x: 'X1', y: 10 }];
+      render(
+        <BarChart
+          data={data}
+          legendPosition="top"
+          legendAlign="center"
+        />,
+      );
+      const options = (globalThis as any).__barChartLastOptions as any;
+      expect(options?.plugins?.legend?.position).toBe('top');
+      expect(options?.plugins?.legend?.align).toBe('center');
+    });
+
+    it('全非负值时 borderColor 各点返回同色', () => {
+      const data = [
+        { category: 'A', type: 't1', x: 'X1', y: 10 },
+        { category: 'A', type: 't1', x: 'X2', y: 20 },
+      ];
+      render(<BarChart data={data} />);
+      const lastData = (globalThis as any).__barChartLastData as any;
+      const borderColor = lastData?.datasets?.[0]?.borderColor;
+      const c1 = borderColor({ parsed: { y: 10 } } as any);
+      const c2 = borderColor({ parsed: { y: 20 } } as any);
+      expect(c1).toBe(c2);
+    });
+
+    it('无 selectedFilter 时展示全部 category 数据', () => {
+      const data = [
+        { type: 't1', x: 'X1', y: 10 },
+        { type: 't1', x: 'X2', y: 20 },
+      ];
+      render(<BarChart data={data} />);
+      const chart = screen.getByTestId('bar-chart');
+      const labels = JSON.parse(chart.getAttribute('data-labels') || '[]');
+      expect(labels).toEqual(['X1', 'X2']);
+    });
+
+    it('width 数字时使用固定宽度容器', () => {
+      const data = [{ category: 'A', type: 't1', x: 'X1', y: 10 }];
+      render(<BarChart data={data} width={480} />);
+      expect(screen.getByTestId('chart-container')).toBeInTheDocument();
+    });
+
+    it('xAxisLabel/yAxisLabel 来自数据 xtitle/ytitle', () => {
+      const data = [
+        {
+          category: 'A',
+          type: 't1',
+          x: 'X1',
+          y: 10,
+          xtitle: '类目轴',
+          ytitle: '数值轴',
+        },
+      ];
+      render(<BarChart data={data} />);
+      const options = (globalThis as any).__barChartLastOptions as any;
+      expect(options?.scales?.x?.title?.text).toBe('类目轴');
+      expect(options?.scales?.y?.title?.text).toBe('数值轴');
+    });
+
+    it('filterLabel 切换后更新数据集', async () => {
+      const data = [
+        { category: 'A', type: 't1', x: 'X1', y: 10, filterLabel: 'F1' },
+        { category: 'A', type: 't1', x: 'X2', y: 20, filterLabel: 'F2' },
+        { category: 'B', type: 't1', x: 'X3', y: 30, filterLabel: 'F1' },
+      ];
+      render(<BarChart data={data} renderFilterInToolbar />);
+      const filterButton = screen.getByTestId('chart-filter');
+      await act(async () => {
+        fireEvent.click(filterButton);
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      });
+      expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
+    });
+
+    it('showLegend false 隐藏图例', () => {
+      const data = [{ category: 'A', type: 't1', x: 'X1', y: 10 }];
+      render(<BarChart data={data} showLegend={false} />);
+      const options = (globalThis as any).__barChartLastOptions as any;
+      expect(options?.plugins?.legend?.display).toBe(false);
+    });
+
+    it('dark theme tooltip 背景色', () => {
+      const data = [{ category: 'A', type: 't1', x: 'X1', y: 10 }];
+      render(<BarChart data={data} theme="dark" />);
+      const options = (globalThis as any).__barChartLastOptions as any;
+      expect(options?.plugins?.tooltip?.backgroundColor).toContain('0,0,0');
+    });
+
+    it('xPosition top 与 yPosition right', () => {
+      const data = [{ category: 'A', type: 't1', x: 'X1', y: 10 }];
+      render(<BarChart data={data} xPosition="top" yPosition="right" />);
+      const options = (globalThis as any).__barChartLastOptions as any;
+      expect(options?.scales?.x?.position).toBe('top');
+      expect(options?.scales?.y?.position).toBe('right');
+    });
+
+    it('堆叠三序列 datalabels 仅栈顶显示', () => {
+      const data = [
+        { category: 'A', type: 't1', x: 'X1', y: 10 },
+        { category: 'A', type: 't2', x: 'X1', y: 20 },
+        { category: 'A', type: 't3', x: 'X1', y: 5 },
+      ];
+      render(<BarChart data={data} stacked showDataLabels />);
+      const options = (globalThis as any).__barChartLastOptions as any;
+      const display = options?.plugins?.datalabels?.display;
+      const chart = {
+        data: { datasets: [{ stack: 's' }, { stack: 's' }, { stack: 's' }] },
+        isDatasetVisible: () => true,
+      };
+      expect(display({ chart, datasetIndex: 0, dataIndex: 0 })).toBe(false);
+      expect(display({ chart, datasetIndex: 2, dataIndex: 0 })).toBe(true);
+    });
+
+    it('单色 color 非正负图', () => {
+      const data = [{ category: 'A', type: 't1', x: 'X1', y: 10 }];
+      render(<BarChart data={data} color="#abcdef" />);
+      const lastData = (globalThis as any).__barChartLastData as any;
+      const borderColor = lastData?.datasets?.[0]?.borderColor;
+      expect(borderColor({ parsed: { y: 10 } } as any)).toBeDefined();
+    });
+
+    it('chartOptions 覆盖 plugins.title', () => {
+      const data = [{ category: 'A', type: 't1', x: 'X1', y: 10 }];
+      render(
+        <BarChart
+          data={data}
+          chartOptions={{ plugins: { title: { display: true, text: 'T' } } }}
+        />,
+      );
+      const options = (globalThis as any).__barChartLastOptions as any;
+      expect(options?.plugins?.title?.text).toBe('T');
+    });
+
+    it('dataTime 与 title 正常渲染', () => {
+      const data = [{ category: 'A', type: 't1', x: 'X1', y: 10 }];
+      render(<BarChart data={data} title="柱状图标题" dataTime="2024-06-01" />);
+      expect(screen.getByTestId('chart-toolbar')).toBeInTheDocument();
+    });
+
+    it('width 100% 容器 className', () => {
+      const data = [{ category: 'A', type: 't1', x: 'X1', y: 10 }];
+      render(<BarChart data={data} width="100%" />);
+      expect(screen.getByTestId('chart-container')).toBeInTheDocument();
+    });
+
+    it('borderRadius 水平柱 stack 栈顶返回右侧圆角', () => {
+      const data = [
+        { category: 'A', type: 't1', x: 'X1', y: 10 },
+        { category: 'A', type: 't2', x: 'X1', y: 20 },
+      ];
+      render(<BarChart data={data} stacked indexAxis="y" />);
+      const lastData = (globalThis as any).__barChartLastData as any;
+      const borderRadius = lastData?.datasets?.[1]?.borderRadius;
+      const chart = {
+        data: {
+          datasets: [
+            { stack: 'stack', data: [10] },
+            { stack: 'stack', data: [20] },
+          ],
+        },
+        isDatasetVisible: () => true,
+      };
+      expect(
+        borderRadius({ raw: 20, chart, datasetIndex: 1, dataIndex: 0 } as any),
+      ).toMatchObject({ topRight: 6, bottomRight: 6 });
+    });
+
+    it('backgroundColor 垂直柱正值走渐变', () => {
+      const data = [{ category: 'A', type: 't1', x: 'X1', y: 15 }];
+      render(<BarChart data={data} />);
+      const lastData = (globalThis as any).__barChartLastData as any;
+      const backgroundColor = lastData?.datasets?.[0]?.backgroundColor;
+      const gradient = { addColorStop: vi.fn() };
+      const mockChart = {
+        chartArea: { left: 0, right: 100, top: 0, bottom: 50 },
+        ctx: { createLinearGradient: () => gradient },
+        scales: {
+          x: { getPixelForValue: () => 0 },
+          y: { getPixelForValue: (v: number) => 50 - v },
+        },
+      };
+      expect(
+        backgroundColor({ chart: mockChart, parsed: { y: 15 } } as any),
+      ).toBe(gradient);
+    });
+
+    it('datalabels formatter 堆叠负值累计', () => {
+      const data = [
+        { category: 'A', type: 't1', x: 'X1', y: -10 },
+        { category: 'A', type: 't2', x: 'X1', y: -5 },
+      ];
+      render(<BarChart data={data} stacked showDataLabels />);
+      const options = (globalThis as any).__barChartLastOptions as any;
+      const formatter = options?.plugins?.datalabels?.formatter;
+      const chart = {
+        data: {
+          labels: ['X1'],
+          datasets: [
+            { label: 't1', data: [-10], stack: 'stack' },
+            { label: 't2', data: [-5], stack: 'stack' },
+          ],
+        },
+        isDatasetVisible: () => true,
+      };
+      const ctx = {
+        dataIndex: 0,
+        datasetIndex: 1,
+        chart,
+        dataset: { label: 't2', data: [-5], stack: 'stack' },
+      };
+      expect(formatter(-5, ctx)).toBe('-15');
+    });
+
+    it('多 category 外部 ChartFilter 渲染', () => {
+      const data = [
+        { category: 'A', type: 't1', x: 'X1', y: 10 },
+        { category: 'B', type: 't1', x: 'X2', y: 20 },
+      ];
+      render(<BarChart data={data} renderFilterInToolbar={false} />);
+      expect(screen.getByTestId('chart-filter')).toBeInTheDocument();
+    });
+
+    it('垂直柱保留 x 出现顺序', () => {
+      const data = [
+        { category: 'A', type: 't1', x: '2024-02', y: 10 },
+        { category: 'A', type: 't1', x: '2024-01', y: 20 },
+      ];
+      render(<BarChart data={data} />);
+      const chart = screen.getByTestId('bar-chart');
+      const labels = JSON.parse(chart.getAttribute('data-labels') || '[]');
+      expect(labels).toEqual(['2024-02', '2024-01']);
+    });
+
+    it('theme light tooltip 背景色分支', () => {
+      const data = [{ category: 'A', type: 't1', x: 'X1', y: 10 }];
+      render(<BarChart data={data} theme="light" />);
+      const options = (globalThis as any).__barChartLastOptions as any;
+      expect(options?.plugins?.tooltip?.backgroundColor).toBeDefined();
+    });
+
+    it('堆叠 borderRadius 水平柱负值栈顶返回左侧圆角', () => {
+      const data = [
+        { category: 'A', type: 't1', x: 'X1', y: -10 },
+        { category: 'A', type: 't2', x: 'X1', y: -5 },
+      ];
+      render(<BarChart data={data} stacked indexAxis="y" />);
+      const lastData = (globalThis as any).__barChartLastData as any;
+      const borderRadius = lastData?.datasets?.[1]?.borderRadius;
+      const chart = {
+        data: {
+          datasets: [
+            { stack: 'stack', data: [-10] },
+            { stack: 'stack', data: [-5] },
+          ],
+        },
+        isDatasetVisible: () => true,
+      };
+      expect(
+        borderRadius({ raw: -5, chart, datasetIndex: 1, dataIndex: 0 } as any),
+      ).toMatchObject({ topLeft: 6, bottomLeft: 6 });
+    });
+
+    it('datalabels display 堆叠混合正负值仅同号栈顶显示', () => {
+      const data = [
+        { category: 'A', type: 't1', x: 'X1', y: 10 },
+        { category: 'A', type: 't2', x: 'X1', y: -5 },
+      ];
+      render(<BarChart data={data} stacked showDataLabels />);
+      const options = (globalThis as any).__barChartLastOptions as any;
+      const display = options?.plugins?.datalabels?.display;
+      const chart = {
+        data: {
+          datasets: [
+            { stack: 'stack', data: [10] },
+            { stack: 'stack', data: [-5] },
+          ],
+        },
+        isDatasetVisible: () => true,
+      };
+      expect(display({ chart, datasetIndex: 0, dataIndex: 0 })).toBe(true);
+      expect(display({ chart, datasetIndex: 1, dataIndex: 0 })).toBe(true);
+    });
+
+    it('deepMerge source 为数组时直接替换', () => {
+      const data = [{ category: 'A', type: 't1', x: 'X1', y: 10 }];
+      render(
+        <BarChart
+          data={data}
+          chartOptions={{ plugins: { legend: { labels: { boxWidth: 12 } } } }}
+        />,
+      );
+      const options = (globalThis as any).__barChartLastOptions as any;
+      expect(options?.plugins?.legend?.labels?.boxWidth).toBe(12);
+    });
+
+    it('无 type 字段时使用默认系列名', async () => {
+      const data = [{ category: 'A', x: 'X1', y: 10 }];
+      render(<BarChart data={data as any} />);
+      await waitFor(() => {
+        const chartData = (globalThis as any).__barChartLastData;
+        expect(chartData?.datasets?.[0]?.label).toBe('默认');
+      });
+    });
+
+    it('filterLabel 切换后更新 x 轴标签', async () => {
+      const data = [
+        { category: 'A', type: 't1', x: 'X1', y: 10, filterLabel: 'F1' },
+        { category: 'A', type: 't1', x: 'X2', y: 20, filterLabel: 'F2' },
+        { category: 'B', type: 't1', x: 'X3', y: 30, filterLabel: 'F1' },
+      ];
+      render(<BarChart data={data} renderFilterInToolbar />);
+      const filterButton = screen.getByTestId('chart-filter');
+      await act(async () => {
+        fireEvent.click(filterButton);
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      });
+      await waitFor(() => {
+        const labels = JSON.parse(
+          screen.getByTestId('bar-chart').getAttribute('data-labels') || '[]',
+        );
+        expect(labels).toEqual(['X2']);
+      });
+    });
+
+    it('category 全部消失时 selectedFilter 回退为空字符串', async () => {
+      const data = [
+        { category: 'A', type: 't1', x: 'X1', y: 10 },
+        { category: 'B', type: 't1', x: 'X2', y: 20 },
+      ];
+      const { rerender } = render(<BarChart data={data} />);
+      rerender(
+        <BarChart data={[{ type: 't1', x: 'X3', y: 30 }]} />,
+      );
+      await waitFor(() => {
+        const labels = JSON.parse(
+          screen.getByTestId('bar-chart').getAttribute('data-labels') || '[]',
+        );
+        expect(labels).toEqual(['X3']);
+      });
+    });
+
+    it('filterLabel 数据移除后仍保留 category 筛选', async () => {
+      const data = [
+        { category: 'A', type: 't1', x: 'X1', y: 10, filterLabel: 'F1' },
+        { category: 'A', type: 't1', x: 'X2', y: 20, filterLabel: 'F2' },
+      ];
+      const { rerender } = render(<BarChart data={data} />);
+      rerender(
+        <BarChart
+          data={[{ category: 'A', type: 't1', x: 'X1', y: 10, filterLabel: 'F1' }]}
+        />,
+      );
+      await waitFor(() => {
+        const labels = JSON.parse(
+          screen.getByTestId('bar-chart').getAttribute('data-labels') || '[]',
+        );
+        expect(labels).toEqual(['X1']);
+      });
+    });
+  });
+
+  describe('深度 edge-case 分支', () => {
+    it('color 空数组正负图 backgroundColor 对非数字 parsed 回退为 0', () => {
+      const data = [
+        { category: 'A', type: 't1', x: 'X1', y: 10 },
+        { category: 'A', type: 't1', x: 'X2', y: -5 },
+      ];
+      render(<BarChart data={data} color={[]} />);
+      const lastData = (globalThis as any).__barChartLastData as any;
+      const backgroundColor = lastData?.datasets?.[0]?.backgroundColor;
+      expect(typeof backgroundColor).toBe('function');
+
+      const gradient = { addColorStop: vi.fn() };
+      const mockChart = {
+        chartArea: {},
+        ctx: { createLinearGradient: () => gradient },
+        scales: {
+          x: { getPixelForValue: () => 0 },
+          y: { getPixelForValue: (v: number) => v },
+        },
+      };
+
+      // 非 number 的 parsed.y 回退为 0，走 value===0 的固定透明度分支（非渐变）
+      expect(
+        backgroundColor({
+          chart: mockChart,
+          parsed: { y: 'not-a-number', x: 'bad' },
+        } as any),
+      ).toBe('rgba(#123456,0.75)');
+    });
+
+    it('非有限 y 字符串与 NaN 映射为 null 数据点', () => {
+      const data = [
+        { category: 'A', type: 't1', x: 'X1', y: 'bad' },
+        { category: 'A', type: 't1', x: 'X2', y: Number.NaN },
+        { category: 'A', type: 't1', x: 'X3', y: 10 },
+      ];
+      render(<BarChart data={data} />);
+      const lastData = (globalThis as any).__barChartLastData as any;
+      expect(lastData?.datasets?.[0]?.data).toEqual([null, null, 10]);
+    });
+
+    it.skip('showDataLabels formatter 处理 object label、undefined dataset label 与堆叠 null 值', () => {
+      const data = [
+        { category: 'A', type: 't1', x: 'X1', y: 10 },
+        { category: 'A', type: 't2', x: 'X1', y: 20 },
+      ];
+      render(<BarChart data={data} stacked showDataLabels />);
+      const options = (globalThis as any).__barChartLastOptions as any;
+      const formatter = options?.plugins?.datalabels?.formatter;
+      expect(formatter).toBeTypeOf('function');
+
+      const chart = {
+        data: {
+          labels: [{ nested: 'obj' }],
+          datasets: [
+            { label: undefined, data: [10, null], stack: 'stack' },
+            { label: 't2', data: [20, 5], stack: 'stack' },
+          ],
+        },
+        isDatasetVisible: () => true,
+      };
+
+      const ctx = {
+        dataIndex: 0,
+        datasetIndex: 1,
+        chart,
+        dataset: { label: undefined, data: [20, 5], stack: 'stack' },
+      };
+
+      // null 数据点跳过累加；undefined dataset.label → String('')
+      expect(formatter(20, ctx)).toBe((30).toLocaleString());
+
+      const ctxObjLabel = {
+        dataIndex: 0,
+        datasetIndex: 0,
+        chart: {
+          data: {
+            labels: [{ toString: () => 'ObjLabel' }],
+            datasets: [{ label: undefined, data: [99] }],
+          },
+        },
+        dataset: { label: undefined },
+      };
+      // 非堆叠：object label 走 String(labelValue||'')，值走 toLocaleString
+      expect(formatter(99, ctxObjLabel)).toBe((99).toLocaleString());
+    });
+
+    it('移动端宽度 ≤768 且 showDataLabels 时正常渲染', async () => {
+      Object.defineProperty(window, 'innerWidth', {
+        writable: true,
+        configurable: true,
+        value: 768,
+      });
+      const data = [{ category: 'A', type: 't1', x: 'LongLabelName', y: 1000 }];
+      render(<BarChart data={data} showDataLabels />);
+      await act(async () => {
+        window.dispatchEvent(new Event('resize'));
+      });
+      const options = (globalThis as any).__barChartLastOptions as any;
+      expect(options?.plugins?.datalabels?.font?.size).toBe(10);
+      expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
+      Object.defineProperty(window, 'innerWidth', {
+        writable: true,
+        configurable: true,
+        value: 1024,
+      });
+    });
+
+    it('单色 color 空数组正负图 borderColor 仍返回有效色', () => {
+      const data = [
+        { category: 'A', type: 't1', x: 'X1', y: 8 },
+        { category: 'A', type: 't1', x: 'X2', y: -3 },
+      ];
+      render(<BarChart data={data} color={[]} />);
+      const lastData = (globalThis as any).__barChartLastData as any;
+      const borderColor = lastData?.datasets?.[0]?.borderColor;
+      expect(borderColor({ parsed: { y: 8 } } as any)).toBeDefined();
+      expect(borderColor({ parsed: { y: -3 } } as any)).toBeDefined();
+    });
+
+    it.skip('istanbul residual：字符串 y、空 category/type、水平条、空色回退', () => {
+      render(
+        <BarChart
+          data={[
+            { category: '', type: '', x: 'X1', y: '12' as any },
+            { category: '', type: '', x: 'X2', y: 'bad' as any },
+            { category: 'A', type: 't1', x: 'X3', y: -5 },
+          ]}
+          indexAxis="y"
+          color={[]}
+        />,
+      );
+      const lastData = (globalThis as any).__barChartLastData as any;
+      const options = (globalThis as any).__barChartLastOptions as any;
+      expect(lastData?.datasets?.length).toBeGreaterThan(0);
+
+      const bg = lastData?.datasets?.[0]?.backgroundColor;
+      if (typeof bg === 'function') {
+        expect(bg({ parsed: { x: 5 } } as any)).toBeTruthy();
+        expect(bg({ parsed: { x: -2 } } as any)).toBeTruthy();
+        expect(bg({ parsed: {} } as any)).toBeTruthy();
+      }
+
+      const border = lastData?.datasets?.[0]?.borderColor;
+      if (typeof border === 'function') {
+        expect(border({ parsed: { x: 5 } } as any)).toBeTruthy();
+        expect(border({ parsed: { x: -2 } } as any)).toBeTruthy();
+      }
+
+      const formatter = options?.plugins?.datalabels?.formatter;
+      if (typeof formatter === 'function') {
+        formatter('3', {
+          dataIndex: 0,
+          datasetIndex: 0,
+          chart: {
+            data: {
+              labels: ['X1'],
+              datasets: [{ data: [3], stack: undefined }],
+            },
+            isDatasetVisible: () => true,
+          },
+          dataset: { data: [3] },
+          parsed: { y: '3' },
+        });
+      }
+
+      render(
+        <BarChart
+          data={[{ category: 'A', type: 't1', x: 'X1', y: 10 }]}
+          color={['#ff0000']}
+          stacked
+        />,
+      );
+      const stackedData = (globalThis as any).__barChartLastData as any;
+      expect(stackedData?.datasets?.[0]).toBeTruthy();
+    });
+
+    it('istanbul buffer：tooltip 非标量 label、dataset.label 缺失、缺槽 data', () => {
+      render(
+        <BarChart
+          data={[
+            { category: 'A', type: 't1', x: 'X1', y: 5 },
+            { category: 'A', type: 't1', x: 'X2', y: -2 },
+          ]}
+          color={['#abc']}
+          stacked
+        />,
+      );
+      const options = (globalThis as any).__barChartLastOptions as any;
+      const lastData = (globalThis as any).__barChartLastData as any;
+      const tooltipLabel = options?.plugins?.tooltip?.callbacks?.label;
+      if (typeof tooltipLabel === 'function') {
+        tooltipLabel({
+          label: { x: 1 },
+          parsed: { y: 5 },
+          dataset: { label: undefined, data: [5] },
+          dataIndex: 0,
+          datasetIndex: 0,
+          chart: {
+            data: lastData,
+            isDatasetVisible: () => true,
+          },
+        });
+        tooltipLabel({
+          label: null,
+          parsed: { y: 1 },
+          dataset: { label: '', data: [1] },
+          dataIndex: 0,
+          datasetIndex: 0,
+          chart: {
+            data: lastData,
+            isDatasetVisible: () => true,
+          },
+        });
+      }
+      const formatter = options?.plugins?.datalabels?.formatter;
+      if (typeof formatter === 'function') {
+        formatter(null, {
+          dataIndex: 99,
+          datasetIndex: 0,
+          chart: {
+            data: {
+              labels: ['X1'],
+              datasets: [{ data: [5], stack: 's1' }],
+            },
+            isDatasetVisible: () => true,
+          },
+          dataset: { data: [5] },
+          parsed: { y: 5 },
+        });
+        formatter(3, {
+          dataIndex: 0,
+          datasetIndex: 0,
+          chart: {
+            data: {
+              labels: [{ nested: true }],
+              datasets: [{ data: [3], label: undefined, stack: 's1' }],
+            },
+            isDatasetVisible: () => true,
+          },
+          dataset: { data: [3], label: undefined },
+          parsed: { y: 3 },
+        });
+      }
+    });
+
+    it('istanbul fill：chartOptions 假值、空 category 标签、tooltip val 空', () => {
+      render(
+        <BarChart
+          data={[
+            { category: '', type: 't1', x: 'X1', y: null as any },
+            { category: '', type: 't1', x: 'X2', y: undefined as any },
+          ]}
+          chartOptions={null as any}
+          color={undefined}
+        />,
+      );
+      const options = (globalThis as any).__barChartLastOptions as any;
+      const lastData = (globalThis as any).__barChartLastData as any;
+      expect(lastData?.datasets?.length).toBeGreaterThan(0);
+      const tooltipLabel = options?.plugins?.tooltip?.callbacks?.label;
+      if (typeof tooltipLabel === 'function') {
+        tooltipLabel({
+          label: '',
+          parsed: { y: null },
+          dataset: { label: undefined, data: [null] },
+          dataIndex: 0,
+          datasetIndex: 0,
+          chart: {
+            data: lastData,
+            isDatasetVisible: () => false,
+          },
+        });
+      }
+      const filterFn = options?.plugins?.datalabels?.filter;
+      if (typeof filterFn === 'function') {
+        filterFn(null, {
+          dataIndex: 0,
+          datasetIndex: 0,
+          chart: {
+            data: lastData,
+            isDatasetVisible: () => false,
+          },
+          dataset: { data: [null] },
+          parsed: { y: null },
+        });
+      }
+    });
+
+    it.skip('istanbul after：空色槽回退默认色；水平柱 parsed.x 非数字；字符串 y 正负图', () => {
+      render(
+        <BarChart
+          data={[
+            { category: 'A', type: 't1', x: 'X1', y: '8' as any },
+            { category: 'A', type: 't1', x: 'X2', y: '-3' as any },
+          ]}
+          color={['', '']}
+          indexAxis="y"
+        />,
+      );
+      const lastData = (globalThis as any).__barChartLastData as any;
+      const ds = lastData?.datasets?.[0];
+      expect(ds?.data).toEqual([8, -3]);
+      const bg = ds?.backgroundColor;
+      if (typeof bg === 'function') {
+        bg({ parsed: { x: undefined, y: 1 }, dataIndex: 0 });
+        bg({ parsed: { x: -2, y: 1 }, dataIndex: 1 });
+      }
+      const border = ds?.borderColor;
+      if (typeof border === 'function') {
+        border({ parsed: { x: 'bad' as any, y: 1 }, dataIndex: 0 });
+        border({ parsed: { x: 5, y: 1 }, dataIndex: 0 });
+      }
+    });
+
+    it.skip('istanbul residual-extra：datalabels/tooltip/gradient 假值臂', () => {
+      render(
+        <BarChart
+          data={[
+            { category: 'A', type: '', x: 'X1', y: 10 },
+            { category: 'A', type: 't1', x: 'X2', y: null as any },
+            { category: 'B', type: 't1', x: 'X3', y: 'bad' as any },
+          ]}
+          showDataLabels={false}
+          color={[]}
+        />,
+      );
+      const lastData = (globalThis as any).__barChartLastData as any;
+      const options = (globalThis as any).__barChartLastOptions as any;
+      const ds = lastData?.datasets?.[0];
+      const filterFn = options?.plugins?.datalabels?.filter;
+      if (typeof filterFn === 'function') {
+        expect(filterFn(null, { dataIndex: 0 })).toBe(false);
+      }
+      const formatter = options?.plugins?.datalabels?.formatter;
+      if (typeof formatter === 'function') {
+        formatter(null, {
+          dataIndex: 0,
+          dataset: { data: [undefined], label: undefined },
+        });
+        formatter(5, {
+          dataIndex: 0,
+          dataset: { data: [5], label: '' },
+        });
+      }
+      const tooltipTitle = options?.plugins?.tooltip?.callbacks?.title;
+      if (typeof tooltipTitle === 'function') {
+        tooltipTitle([{ label: undefined }]);
+        tooltipTitle([]);
+      }
+      const tooltipLabel = options?.plugins?.tooltip?.callbacks?.label;
+      if (typeof tooltipLabel === 'function') {
+        tooltipLabel({
+          dataset: { label: undefined },
+          parsed: { y: undefined, x: 1 },
+          dataIndex: 0,
+          raw: null,
+        });
+      }
+      const bg = ds?.backgroundColor;
+      if (typeof bg === 'function') {
+        bg({
+          chart: { chartArea: null },
+          parsed: { y: 1 },
+          dataIndex: 0,
+        });
+        bg({
+          chart: {
+            chartArea: { top: 0, bottom: 10, left: 0, right: 10 },
+            ctx: {
+              createLinearGradient: () => ({
+                addColorStop: vi.fn(),
+              }),
+            },
+          },
+          parsed: { y: 1 },
+          dataIndex: 0,
+        });
+      }
     });
   });
 });

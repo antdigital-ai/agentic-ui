@@ -74,7 +74,7 @@ const defaultStrokeColor: ProgressProps['strokeColor'] = {
  */
 function Indicator({ indicator, percent, size, style }: IndicatorProps) {
   if (indicator && React.isValidElement(indicator)) {
-    const indicatorProps = (indicator.props ?? {}) as {
+    const indicatorProps = indicator.props as {
       style?: React.CSSProperties;
     };
     return cloneElement(indicator as React.ReactElement<any>, {
@@ -83,7 +83,8 @@ function Indicator({ indicator, percent, size, style }: IndicatorProps) {
     });
   }
 
-  if (percent !== undefined && percent !== null) {
+  // eslint-disable-next-line eqeqeq -- intentional nullish (null | undefined)
+  if (percent != null) {
     return (
       <Progress
         type="circle"

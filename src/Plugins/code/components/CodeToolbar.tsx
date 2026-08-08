@@ -24,7 +24,7 @@ import { LoadImage } from './LoadImage';
  * @returns 如果包含 JavaScript 返回 true，否则返回 false
  */
 function containsJavaScript(htmlCode: string): boolean {
-  if (!htmlCode || typeof htmlCode !== 'string') {
+  if (!htmlCode) {
     return false;
   }
 
@@ -141,12 +141,12 @@ export const CodeToolbar = (props: CodeToolbarProps) => {
 
   // 检测 HTML 代码中是否包含 JavaScript
   const hasJavaScript = useMemo(() => {
-    const language = element?.language?.toLowerCase();
+    const language = element.language?.toLowerCase();
     if (language === 'html') {
-      return containsJavaScript(element?.value || '');
+      return containsJavaScript(element.value);
     }
     return false;
-  }, [element?.language, element?.value]);
+  }, [element.language, element.value]);
 
   // 如果禁用了 HTML 预览或包含 JavaScript，则禁用预览
   const shouldDisablePreview = disableHtmlPreview || hasJavaScript;
@@ -205,7 +205,7 @@ export const CodeToolbar = (props: CodeToolbarProps) => {
             contentEditable={false}
           >
             {/* 语言图标（如果存在且不是公式） */}
-            {langIconMap.get(element.language?.toLowerCase() || '') &&
+            {langIconMap.get((element.language || '').toLowerCase()) &&
               !element.katex && (
                 <div
                   style={{
@@ -220,7 +220,7 @@ export const CodeToolbar = (props: CodeToolbarProps) => {
                       height: '1em',
                       width: '1em',
                     }}
-                    src={langIconMap.get(element.language?.toLowerCase() || '')}
+                    src={langIconMap.get((element.language || '').toLowerCase())}
                   />
                 </div>
               )}
@@ -263,8 +263,8 @@ export const CodeToolbar = (props: CodeToolbarProps) => {
 
         {/* HTML/Markdown 视图模式切换按钮 */}
         {/* 如果禁用了 HTML 预览或包含 JavaScript，则不显示切换按钮 */}
-        {(element?.language === 'html' && !shouldDisablePreview) ||
-        element?.language === 'markdown' ? (
+        {(element.language === 'html' && !shouldDisablePreview) ||
+        element.language === 'markdown' ? (
           <Segmented
             className={theme === 'chaos' ? 'chaos-segmented' : ''}
             data-testid="preview"
@@ -318,7 +318,7 @@ export const CodeToolbar = (props: CodeToolbarProps) => {
         </ActionIconBox>
 
         {/* 本地预览按钮（HTML 和 Markdown 语言时显示） */}
-        {(element?.language === 'html' || element?.language === 'markdown') &&
+        {(element.language === 'html' || element.language === 'markdown') &&
           onLocalPreview && (
             <ActionIconBox
               title={i18n?.locale?.localPreview || '本地预览'}

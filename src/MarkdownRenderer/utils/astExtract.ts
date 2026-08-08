@@ -14,7 +14,7 @@ export const extractCellText = (cell: any): string => {
   if (!cell?.children) return '';
   return cell.children
     .map((child: any) => {
-      if (child.type === 'text') return child.value || '';
+      if (child.type === 'text') return child.value ?? '';
       if (child.children) return extractCellText(child);
       return '';
     })
@@ -157,7 +157,7 @@ export const extractTableData = (
   columns: { title: string; dataIndex: string }[];
   dataSource: Record<string, any>[];
 } | null => {
-  if (!tableNode.children?.length) return null;
+  if (!tableNode?.children?.length) return null;
 
   const headerRow = tableNode.children[0];
   if (!headerRow?.children?.length) return null;

@@ -214,7 +214,6 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
     (
       name: string | number,
       items: SchemaProperty | undefined,
-      isNested: boolean = false,
     ): React.ReactNode => {
       if (!items) {
         return (
@@ -235,7 +234,7 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
               <Form.Item
                 key={objKey}
                 label={getPropertyTitle(objProperty, objKey)}
-                name={isNested ? [name, objKey] : [name, objKey]}
+                name={[name, objKey]}
                 rules={generateRules(objProperty)}
                 style={{ margin: 0 }}
               >
@@ -285,7 +284,7 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
                     )
                   }
                 >
-                  {renderArrayItemContent(name, property.items, true)}
+                  {renderArrayItemContent(name, property.items)}
                 </Card>
               ))}
               {!readonly && (

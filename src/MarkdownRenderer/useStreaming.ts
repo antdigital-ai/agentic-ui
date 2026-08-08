@@ -99,7 +99,7 @@ const isTableIncomplete = (markdown: string) => {
   const isSeparatorValid = separatorCells.every(isTableSeparatorCell);
   if (!isSeparatorValid) return false;
 
-  const firstDataRowTrimmed = firstDataRow?.trim() || '';
+  const firstDataRowTrimmed = firstDataRow.trim();
   // 第三行仍为空，说明首行数据尚未到达，继续缓存避免提前渲染 table header
   if (!firstDataRowTrimmed) return true;
   // 第三行不是表格行，视为当前表格 token 已完成（例如 header-only 表格后接普通文本）
@@ -343,8 +343,8 @@ export const useStreaming = (input: string, enabled: boolean): string => {
       if (cache.token === StreamCacheTokenType.Text) {
         tryRecognizeFromText(cache);
       } else {
-        const recognizeForActive = recognizerByType.get(cache.token);
-        recognizeForActive?.(cache);
+        const recognizeForActive = recognizerByType.get(cache.token)!;
+        recognizeForActive(cache);
         if (
           (cache.token as StreamCacheTokenType) === StreamCacheTokenType.Text
         ) {

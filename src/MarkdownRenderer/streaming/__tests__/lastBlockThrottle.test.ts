@@ -56,6 +56,37 @@ describe('shouldReparseLastBlock', () => {
     expect(shouldReparseLastBlock(prev, next, true)).toBe(true);
   });
 
+  it('非流式始终重 parse', () => {
+    expect(shouldReparseLastBlock('a', 'ab', false)).toBe(true);
+  });
+
+  it('无 prev 时重 parse', () => {
+    expect(shouldReparseLastBlock(undefined, 'hello', true)).toBe(true);
+  });
+
+  it('内容缩短时重 parse', () => {
+    expect(shouldReparseLastBlock('hello world', 'hello', true)).toBe(true);
+  });
+
+  it('非前缀改写时重 parse', () => {
+    expect(shouldReparseLastBlock('abc', 'xbc', true)).toBe(true);
+  });
+
+  it('增量达到阈值字符时重 parse', () => {
+    const prev = 'start';
+    const next = `start${'x'.repeat(20)}`;
+    expect(shouldReparseLastBlock(prev, next, true)).toBe(true);
+  });
+
+  it('普通边界符触发重 parse', () => {
+    expect(shouldReparseLastBlock('hi', 'hi\n', true)).toBe(true);
+    expect(shouldReparseLastBlock('hi', 'hi`', true)).toBe(true);
+  });
+
+  it('行内起点触发重 parse', () => {
+    expect(shouldReparseLastBlock('hi ', 'hi [', true)).toBe(true);
+  });
+
   it('未闭合 think 内换行应立即重 parse', () => {
     const prev = '<think>\nreasoning';
     const next = '<think>\nreasoning\nmore';

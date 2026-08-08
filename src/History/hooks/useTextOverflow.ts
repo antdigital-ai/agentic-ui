@@ -50,13 +50,8 @@ export const useTextOverflow = (text: React.ReactNode) => {
   React.useEffect(() => {
     const el = textRef.current;
     if (!el) return;
-    // 环境特性检测：ResizeObserver 在现代浏览器普遍支持，但 jsdom 旧版 / 老浏览器没有
-    if (
-      typeof window === 'undefined' ||
-      typeof window.ResizeObserver !== 'function'
-    ) {
-      return;
-    }
+    // 挂载后必有 window；ResizeObserver 缺失时（旧 jsdom）静默跳过
+    if (typeof window.ResizeObserver !== 'function') return;
     const observer = new window.ResizeObserver(() => measure());
     observer.observe(el);
     return () => observer.disconnect();
