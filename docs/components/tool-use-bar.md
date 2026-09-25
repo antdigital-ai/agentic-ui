@@ -6,13 +6,13 @@ group:
   order: 3
 ---
 
-# ToolUseBar 组件
+# ToolUseBar 组件 {#toolusebar}
 
 ToolUseBar 是一个用于显示工具调用列表的组件，支持工具状态显示和交互功能。
 
-## 代码演示
+## 代码演示 {#demo}
 
-### 轻量思考
+### 轻量思考 {#thinking}
 
 ```tsx
 import { ToolUseBarThink } from '@ant-design/agentic-ui';
@@ -62,38 +62,38 @@ export default () => {
 
 ### ToolUseBarProps
 
-| 属性                 | 说明                                                         | 类型                                                    | 默认值 | 版本 |
-| -------------------- | ------------------------------------------------------------ | ------------------------------------------------------- | ------ | ---- |
-| tools                | 工具列表                                                     | ToolCall[]                                              | -      | -    |
-| onToolClick          | 工具点击回调                                                 | (id: string) => void                                    | -      | -    |
-| className            | 自定义类名                                                   | string                                                  | -      | -    |
-| activeKeys           | 激活的工具 ID 数组                                           | string[]                                                | []     | -    |
-| defaultActiveKeys    | 默认激活的工具 ID 数组                                       | string[]                                                | []     | -    |
-| onActiveKeysChange   | 激活状态变化回调                                             | (activeKeys: string[]) => void                          | -      | -    |
-| expandedKeys         | 展开的工具 ID 数组                                           | string[]                                                | []     | -    |
-| defaultExpandedKeys  | 默认展开的工具 ID 数组                                       | string[]                                                | []     | -    |
-| onExpandedKeysChange | 展开状态变化回调，`removedKeys` 为本次操作中被收起的工具项ID | (expandedKeys: string[], removedKeys: string[]) => void | -      | -    |
-| light                | 启用亮色/轻量模式                                            | boolean                                                 | false  | -    |
-| disableAnimation     | 关闭动画，在性能较弱设备上可减少卡顿                         | boolean                                                 | false  | -    |
-| testId               | 测试 ID                                                      | string                                                  | -      | -    |
-| style                | 自定义样式                                                   | React.CSSProperties                                     | -      | -    |
+| 属性                 | 说明                                                         | 类型                                                      | 默认值  | 版本 |
+| -------------------- | ------------------------------------------------------------ | --------------------------------------------------------- | ------- | ---- |
+| activeKeys           | 激活的工具 ID 数组                                           | `string[]`                                                | `[]`    | -    |
+| className            | 自定义类名                                                   | `string`                                                  | -       | -    |
+| defaultActiveKeys    | 默认激活的工具 ID 数组                                       | `string[]`                                                | `[]`    | -    |
+| defaultExpandedKeys  | 默认展开的工具 ID 数组                                       | `string[]`                                                | `[]`    | -    |
+| disableAnimation     | 关闭动画，在性能较弱设备上可减少卡顿                         | `boolean`                                                 | `false` | -    |
+| expandedKeys         | 展开的工具 ID 数组                                           | `string[]`                                                | `[]`    | -    |
+| light                | 启用亮色/轻量模式                                            | `boolean`                                                 | `false` | -    |
+| onActiveKeysChange   | 激活状态变化回调                                             | `(activeKeys: string[]) => void`                          | -       | -    |
+| onExpandedKeysChange | 展开状态变化回调，`removedKeys` 为本次操作中被收起的工具项ID | `(expandedKeys: string[], removedKeys: string[]) => void` | -       | -    |
+| onToolClick          | 工具点击回调                                                 | `(id: string) => void`                                    | -       | -    |
+| style                | 自定义样式                                                   | `React.CSSProperties`                                     | -       | -    |
+| testId               | 测试 ID                                                      | `string`                                                  | -       | -    |
+| tools                | 工具列表                                                     | `ToolCall[]`                                              | -       | -    |
 
 ### ToolCall
 
-| 属性         | 说明                               | 类型                                        | 默认值 | 版本 |
-| ------------ | ---------------------------------- | ------------------------------------------- | ------ | ---- |
-| id           | 工具唯一标识                       | string                                      | -      | -    |
-| toolName     | 工具名称                           | React.ReactNode                             | -      | -    |
-| toolTarget   | 工具目标                           | React.ReactNode                             | -      | -    |
-| time         | 时间信息                           | React.ReactNode                             | -      | -    |
-| icon         | 自定义图标                         | React.ReactNode                             | -      | -    |
-| status       | 工具状态                           | 'idle' \| 'loading' \| 'success' \| 'error' | -      | -    |
-| errorMessage | 错误信息，仅在 error 状态下有效    | string                                      | -      | -    |
-| content      | 工具详细内容，展开后显示           | React.ReactNode                             | -      | -    |
-| type         | 工具类型，'summary' 为特殊的总结项 | 'summary' \| 'normal' \| string             | -      | -    |
-| testId       | 测试 ID                            | string                                      | -      | -    |
+| 属性         | 说明                               | 类型                                          | 默认值 | 版本 |
+| ------------ | ---------------------------------- | --------------------------------------------- | ------ | ---- |
+| content      | 工具详细内容，展开后显示           | `React.ReactNode`                             | -      | -    |
+| errorMessage | 错误信息，仅在 error 状态下有效    | `string`                                      | -      | -    |
+| icon         | 自定义图标                         | `React.ReactNode`                             | -      | -    |
+| id           | 工具唯一标识                       | `string`                                      | -      | -    |
+| status       | 工具状态                           | `'idle' \| 'loading' \| 'success' \| 'error'` | -      | -    |
+| testId       | 测试 ID                            | `string`                                      | -      | -    |
+| time         | 时间信息                           | `React.ReactNode`                             | -      | -    |
+| toolName     | 工具名称                           | `React.ReactNode`                             | -      | -    |
+| toolTarget   | 工具目标                           | `React.ReactNode`                             | -      | -    |
+| type         | 工具类型，'summary' 为特殊的总结项 | `'summary' \| 'normal' \| string`             | -      | -    |
 
-## 状态样式
+## 状态样式 {#style-status}
 
 组件会根据工具状态显示不同的样式：
 
@@ -103,7 +103,7 @@ export default () => {
 - `error`: 错误状态
 - `active`: 激活状态（通过 activeKeys 控制）
 
-## ToolUseBarThink 独立组件
+## ToolUseBarThink 独立组件 {#toolusebarthink}
 
 `ToolUseBarThink` 是一个独立的「深度思考」展示组件，与 `ToolUseBar` 同属工具调用展示族但拥有独立的样式与交互（默认展开收起、Loading 浮动展开按钮、二级展开收起、`light` 轻量模式等）。
 
@@ -123,7 +123,7 @@ export default () => {
 | floatingExpanded / defaultFloatingExpanded | Loading 浮动展开按钮（受控 / 非受控） | `boolean`                             | `false` |
 | onFloatingExpandedChange                   | 浮动展开状态变化回调                  | `(floatingExpanded: boolean) => void` | -       |
 
-## 注意事项
+## 注意事项 {#notes}
 
 1. `activeKeys` 数组中的 ID 必须与 `tools` 中的 `id` 匹配
 2. 如果不提供 `onActiveKeysChange`，`activeKeys` 将不会生效

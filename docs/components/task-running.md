@@ -6,19 +6,19 @@ group:
   order: 3
 ---
 
-# AgentRunBar 任务运行状态
+# AgentRunBar 任务运行状态 {#status-agentrunbar}
 
 用于展示智能体任务的运行状态，包括运行时长、当前状态和操作按钮。支持运行中、暂停、停止、完成、出错、取消等多种状态切换和交互操作。
 
 > 历史名称为 `TaskRunning`，已重命名为 `AgentRunBar`，原 `TaskRunning` 仍以别名形式导出但已废弃，新代码请使用 `AgentRunBar`。
 
-## 何时使用
+## 何时使用 {#when-to-use}
 
 - 智能体执行后台任务时，向用户展示运行进度与可控操作
 - 需要呈现任务运行 / 暂停 / 停止 / 完成 / 错误 / 取消 等状态
 - 需要在状态发生变化时提供「暂停 / 继续 / 停止 / 重试 / 新建任务 / 查看结果」入口
 
-## 代码演示
+## 代码演示 {#demo}
 
 <code src="../demos/task-running.tsx">AgentRunBar - 全状态演示</code>
 
@@ -28,23 +28,23 @@ group:
 
 | 属性              | 说明                                                | 类型                                  | 默认值      | 版本 |
 | ----------------- | --------------------------------------------------- | ------------------------------------- | ----------- | ---- |
-| taskStatus        | 任务宏观状态（终态或主流程态）                      | `TaskStatus`                          | -           | -    |
-| taskRunningStatus | 任务运行过程态                                      | `TaskRunningStatus`                   | -           | -    |
-| title             | 标题文案                                            | `string`                              | -           | -    |
+| actionsRender     | 自定义操作按钮（不影响 stop/pause/resume 控制按钮） | `AgentRunBarActionsRender \| false`   | -           | -    |
+| className         | 自定义类名                                          | `string`                              | -           | -    |
 | description       | 描述文案                                            | `string`                              | -           | -    |
 | icon              | 自定义图标                                          | `React.ReactNode`                     | -           | -    |
 | iconTooltip       | 图标提示文案                                        | `string`                              | -           | -    |
-| variant           | 主题样式变体                                        | `'simple' \| 'default'`               | `'default'` | -    |
-| actionsRender     | 自定义操作按钮（不影响 stop/pause/resume 控制按钮） | `AgentRunBarActionsRender \| false`   | -           | -    |
+| locale            | 国际化配置（覆盖默认按钮文案）                      | `{ agentRunBar?: AgentRunBarLocale }` | -           | -    |
 | onCreateNewTask   | 创建新任务的回调                                    | `() => void`                          | -           | -    |
 | onPause           | 暂停任务的回调                                      | `() => void`                          | -           | -    |
+| onReplay          | 重新执行任务的回调                                  | `() => void`                          | -           | -    |
 | onResume          | 继续任务的回调                                      | `() => void`                          | -           | -    |
 | onStop            | 停止任务的回调                                      | `() => void`                          | -           | -    |
-| onReplay          | 重新执行任务的回调                                  | `() => void`                          | -           | -    |
 | onViewResult      | 查看任务结果的回调                                  | `() => void`                          | -           | -    |
-| locale            | 国际化配置（覆盖默认按钮文案）                      | `{ agentRunBar?: AgentRunBarLocale }` | -           | -    |
-| className         | 自定义类名                                          | `string`                              | -           | -    |
 | style             | 自定义样式                                          | `React.CSSProperties`                 | -           | -    |
+| taskRunningStatus | 任务运行过程态                                      | `TaskRunningStatus`                   | -           | -    |
+| taskStatus        | 任务宏观状态（终态或主流程态）                      | `TaskStatus`                          | -           | -    |
+| title             | 标题文案                                            | `string`                              | -           | -    |
+| variant           | 主题样式变体                                        | `'simple' \| 'default'`               | `'default'` | -    |
 
 > `actionsRender` 三态语义：
 >
@@ -52,7 +52,7 @@ group:
 > - `false`：不渲染任何自定义 `actionNode`；停止 / 暂停 / 继续控制按钮仍按状态显示
 > - 函数：调用并将其返回值作为 `actionNode` 渲染（返回 `false` / `null` 等同于不渲染）
 
-### 类型定义
+### 类型定义 {#type-definitions}
 
 #### TaskStatus
 
@@ -112,7 +112,7 @@ type AgentRunBarActionsRender = (props: {
 | newTask       | 新任务按钮文案   | `新任务`       |
 | submitTask    | 提交任务按钮文案 | `提交任务`     |
 
-## 别名（向后兼容）
+## 别名（向后兼容） {#aliases-backcompat}
 
 | 历史名称                   | 新名称                     | 说明             |
 | -------------------------- | -------------------------- | ---------------- |
