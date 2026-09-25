@@ -78,11 +78,9 @@ test.describe('MarkdownInputField 交互功能', () => {
 
       // 获取初始状态 (未放大)
       // 检查容器类名
-      const container = markdownInputFieldPage.page.locator(
-        '.ant-agentic-md-input-field',
-      );
+      const container = markdownInputFieldPage.inputField;
       await expect(container).not.toHaveClass(
-        /ant-agentic-md-input-field-enlarged/,
+        /agentic-md-input-field-enlarged/,
       );
 
       // 点击放大
@@ -90,7 +88,7 @@ test.describe('MarkdownInputField 交互功能', () => {
 
       // 验证已放大
       await expect(container).toHaveClass(
-        /ant-agentic-md-input-field-enlarged/,
+        /agentic-md-input-field-enlarged/,
       );
 
       // 验证按钮变为"缩小"
@@ -102,7 +100,7 @@ test.describe('MarkdownInputField 交互功能', () => {
 
       // 验证恢复未放大
       await expect(container).not.toHaveClass(
-        /ant-agentic-md-input-field-enlarged/,
+        /agentic-md-input-field-enlarged/,
       );
     });
   });

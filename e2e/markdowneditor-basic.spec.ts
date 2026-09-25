@@ -119,7 +119,7 @@ test.describe('MarkdownEditor 高级功能', () => {
     if (hasTagInput) {
       await tagInput.click();
       // 等待下拉菜单出现
-      const menuItems = page.locator('.ant-dropdown-menu-item');
+      const menuItems = page.getByRole('menuitem');
       const count = await menuItems.count();
       if (count > 0) {
         await expect(menuItems.first()).toBeVisible({ timeout: 3000 });

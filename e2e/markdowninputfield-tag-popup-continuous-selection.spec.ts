@@ -16,7 +16,7 @@ test.describe('TagPopup 连续选择功能', () => {
 
     // 等待 tag popup 输入区域出现
     const popupInputs = markdownInputFieldPage.root.locator(
-      '[data-tag-popup-input].ant-agentic-md-editor-tag-popup-has-arrow',
+      '[data-tag-popup-input]',
     );
     await expect(popupInputs.first()).toBeVisible({ timeout: 5000 });
 
@@ -36,7 +36,7 @@ test.describe('TagPopup 连续选择功能', () => {
       await popupInput.click();
 
       const menuItem = markdownInputFieldPage.keyboardTargetPage
-        .locator('.ant-dropdown-menu-item')
+        .getByRole('menuitem')
         .last();
       await expect
         .poll(async () => menuItem.count(), {
@@ -95,7 +95,7 @@ test.describe('TagPopup 连续选择功能', () => {
 
     // 等待 tag popup 输入区域出现
     const popupInputs = markdownInputFieldPage.root.locator(
-      '[data-tag-popup-input].ant-agentic-md-editor-tag-popup-has-arrow',
+      '[data-tag-popup-input]',
     );
     await expect(popupInputs.first()).toBeVisible({ timeout: 5000 });
 
@@ -116,7 +116,7 @@ test.describe('TagPopup 连续选择功能', () => {
       const popupInput = popupInputs.nth(i);
       await popupInput.click({ timeout: 5000 });
       const item = markdownInputFieldPage.keyboardTargetPage
-        .locator('.ant-dropdown-menu-item')
+        .getByRole('menuitem')
         .last();
       await expect
         .poll(async () => item.count(), { timeout: 5000 })
@@ -146,7 +146,7 @@ test.describe('TagPopup 连续选择功能', () => {
 
     // 等待 tag popup 输入区域出现
     const popupInput = markdownInputFieldPage.root
-      .locator('[data-tag-popup-input].ant-agentic-md-editor-tag-popup-has-arrow')
+      .locator('[data-tag-popup-input]')
       .first();
     await expect(popupInput).toBeVisible({ timeout: 5000 });
 
@@ -163,7 +163,7 @@ test.describe('TagPopup 连续选择功能', () => {
     // 第一次选择
     await popupInput.click();
     const firstItem = markdownInputFieldPage.keyboardTargetPage
-      .locator('.ant-dropdown-menu-item')
+      .getByRole('menuitem')
       .last();
     await expect
       .poll(async () => firstItem.count(), {
@@ -184,7 +184,7 @@ test.describe('TagPopup 连续选择功能', () => {
     // 立即再次打开下拉菜单（连续操作）
     await popupInput.click();
     const secondItem = markdownInputFieldPage.keyboardTargetPage
-      .locator('.ant-dropdown-menu-item')
+      .getByRole('menuitem')
       .last();
     await expect
       .poll(async () => secondItem.count(), {

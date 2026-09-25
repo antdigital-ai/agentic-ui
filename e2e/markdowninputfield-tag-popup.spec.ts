@@ -11,9 +11,9 @@ test.describe('MarkdownInputField Tag Popup', () => {
     );
 
     // 等待 tag popup 输入区域出现（这是实际可点击的元素）
-    // 选择有下拉箭头的 tag popup（有可选项的那个），使用 .first() 确保唯一匹配
+    // 使用语义属性而非宿主 prefixCls（文档站使用 otk，默认宿主使用 ant）。
     const popupInput = markdownInputFieldPage.root
-      .locator('[data-tag-popup-input].ant-agentic-md-editor-tag-popup-has-arrow')
+      .locator('[data-tag-popup-input]')
       .first();
     await expect(popupInput).toBeVisible();
 
@@ -27,7 +27,7 @@ test.describe('MarkdownInputField Tag Popup', () => {
     // 使用智能等待，等待菜单项数量大于 0（符合 Playwright 最佳实践）
     // 多个 Dropdown 会在 DOM 中残留隐藏菜单；取最后一个通常为当前打开的浮层
     const menuItem = markdownInputFieldPage.keyboardTargetPage
-      .locator('.ant-dropdown-menu-item')
+      .getByRole('menuitem')
       .last();
     await expect
       .poll(async () => menuItem.count(), {
