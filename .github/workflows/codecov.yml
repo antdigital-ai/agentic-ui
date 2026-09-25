@@ -32,7 +32,7 @@ jobs:
         run: pnpm run strip:bom:check
 
       - name: Run tests
-        run: npm run test:coverage:full
+        run: npm run test:coverage:full -- --reporter=default --reporter=github-actions
 
       - name: Upload results to Codecov
         uses: codecov/codecov-action@v4
