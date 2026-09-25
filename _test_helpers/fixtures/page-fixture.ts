@@ -1,6 +1,7 @@
 ﻿import { test as base } from '@playwright/test';
 import { MarkdownEditorPage } from '../pages/MarkdownEditorPage';
 import { MarkdownInputFieldPage } from '../pages/MarkdownInputFieldPage';
+import { SandboxRendererPage } from '../pages/SandboxRendererPage';
 import { ToolUseBarPage } from '../pages/ToolUseBarPage';
 
 /**
@@ -10,6 +11,7 @@ import { ToolUseBarPage } from '../pages/ToolUseBarPage';
 type TestFixtures = {
   markdownEditorPage: MarkdownEditorPage;
   markdownInputFieldPage: MarkdownInputFieldPage;
+  sandboxRendererPage: SandboxRendererPage;
   toolUseBarPage: ToolUseBarPage;
 };
 
@@ -30,6 +32,11 @@ export const test = base.extend<TestFixtures>({
   markdownInputFieldPage: async ({ page }, use) => {
     const markdownInputFieldPage = new MarkdownInputFieldPage(page);
     await use(markdownInputFieldPage);
+  },
+
+  sandboxRendererPage: async ({ page }, use) => {
+    const sandboxRendererPage = new SandboxRendererPage(page);
+    await use(sandboxRendererPage);
   },
 
   toolUseBarPage: async ({ page }, use) => {

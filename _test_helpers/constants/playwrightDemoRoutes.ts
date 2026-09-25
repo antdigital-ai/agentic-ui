@@ -5,6 +5,10 @@
 export const PLAYWRIGHT_FIXTURE_DEMOS = {
   markdownEditor:
     'docs-demos-pages-playwright-fixtures-demo-e2e-markdown-editor-editable',
+  markdownEditorDefault:
+    'docs-demos-pages-playwright-fixtures-demo-e2e-markdown-editor-default',
+  sandboxRenderer:
+    'docs-demos-pages-playwright-fixtures-demo-e2e-sandbox-renderer-basic',
   markdownInputFieldTags:
     'docs-demos-pages-playwright-fixtures-demo-e2e-markdown-input-field-tags',
   markdownInputFieldOnFocus:

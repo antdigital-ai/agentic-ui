@@ -14,6 +14,10 @@ group:
 
 <code src="../demos/e2e/markdown-editor-editable.tsx" id="e2e-markdown-editor-editable" background="var(--main-bg-color)" iframe=540></code>
 
+## MarkdownEditor（默认配置，验证即时转换边界） {#e2e-default}
+
+<code src="../demos/e2e/markdown-editor-default.tsx" id="e2e-markdown-editor-default" background="var(--main-bg-color)" iframe=540></code>
+
 ## MarkdownEditor（预览 / reportMode，非交互 E2E 勿用） {#reportmode-e2e}
 
 <code src="../demos/e2e/markdown-editor.tsx" id="e2e-markdown-editor" background="var(--main-bg-color)" iframe=540></code>
@@ -45,3 +49,7 @@ group:
 ## ToolUseBar — activeKeys
 
 <code src="../demos/e2e/tool-use-bar-active-keys.tsx" id="e2e-tool-use-bar-active-keys" background="var(--main-bg-color)" iframe=540></code>
+
+## SandboxRenderer — agent 代码渲染 {#sandboxrenderer}
+
+<code src="../demos/e2e/sandbox-renderer-basic.tsx" id="e2e-sandbox-renderer-basic" background="var(--main-bg-color)" iframe=540></code>
