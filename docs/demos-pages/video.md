@@ -7,19 +7,19 @@ group:
   order: 11
 ---
 
-# 视频支持
+# 视频支持 {#video-support}
 
 Markdown Editor 支持在 Markdown 中嵌入视频元素，支持多种视频格式和属性。
 
-## 基本用法
+## 基本用法 {#basic-usage}
 
-### 简单视频标签
+### 简单视频标签 {#simple-video-tag}
 
 ```html
 <video src="video.mp4" controls />
 ```
 
-### 带完整属性的视频
+### 带完整属性的视频 {#full-props}
 
 ```html
 <video
@@ -34,7 +34,7 @@ Markdown Editor 支持在 Markdown 中嵌入视频元素，支持多种视频格
 ></video>
 ```
 
-### 使用 source 标签的视频
+### 使用 source 标签的视频 {#source}
 
 ```html
 <video controls width="600">
@@ -43,7 +43,7 @@ Markdown Editor 支持在 Markdown 中嵌入视频元素，支持多种视频格
 </video>
 ```
 
-### 多个 source 标签的视频
+### 多个 source 标签的视频 {#source-2}
 
 ```html
 <video controls autoplay loop muted width="800" height="450">
@@ -53,7 +53,7 @@ Markdown Editor 支持在 Markdown 中嵌入视频元素，支持多种视频格
 </video>
 ```
 
-## 支持的属性
+## 支持的属性 {#props}
 
 | 属性       | 说明             | 类型      | 默认值 | 版本 |
 | ---------- | ---------------- | --------- | ------ | ---- |
@@ -67,9 +67,9 @@ Markdown Editor 支持在 Markdown 中嵌入视频元素，支持多种视频格
 | `height`   | 视频高度（像素） | `number`  | -      | -    |
 | `alt`      | 视频描述文本     | `string`  | -      | -    |
 
-## 特殊格式支持
+## 特殊格式支持 {#special-formats}
 
-### 带查询参数的URL
+### 带查询参数的URL {#params-url}
 
 ```html
 <video controls width="600">
@@ -80,7 +80,7 @@ Markdown Editor 支持在 Markdown 中嵌入视频元素，支持多种视频格
 </video>
 ```
 
-### 阿里云OSS视频
+### 阿里云OSS视频 {#oss}
 
 ```html
 <video controls width="600">
@@ -92,24 +92,24 @@ Markdown Editor 支持在 Markdown 中嵌入视频元素，支持多种视频格
 </video>
 ```
 
-## 渲染特性
+## 渲染特性 {#rendering-traits}
 
 - 视频元素会自动添加圆角和阴影效果
 - 支持预加载元数据以提升用户体验
 - 自动处理视频加载错误
 - 响应式设计，支持不同屏幕尺寸
 
-## 注意事项
+## 注意事项 {#notes}
 
 1. 视频URL中的特殊字符会被自动解码
 2. 当前版本主要支持MP4格式视频
 3. 视频加载失败时会在控制台输出警告信息
 4. 视频元素在编辑模式下支持调整大小
 
-## 示例
+## 示例 {#examples}
 
 ```markdown
-# 视频演示
+# 视频演示 {#demo}
 
 这是一个简单的视频：
 
@@ -131,7 +131,7 @@ const VideoDemo = () => {
     <MarkdownEditor
       readonly
       initValue={`
-# 视频演示
+# 视频演示 {#demo-2}
 
 这是一个简单的视频：
 

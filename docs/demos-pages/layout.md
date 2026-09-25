@@ -1,4 +1,4 @@
----
+﻿---
 nav:
   title: Demo
   order: 5
@@ -7,7 +7,7 @@ group:
   order: 2
 ---
 
-# 布局组件
+# 布局组件 {#layout}
 
 ## AgenticLayout
 
@@ -17,18 +17,18 @@ group:
 
 <code src="../demos/ChatBootPage/index.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-## 返回顶部/底部
+## 返回顶部/底部 {#back-to-top-bottom}19} {#back-to-top-bottom}
 
 <code src="../demos/back-to.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-## AI 标签
+## AI 标签 {#ai}
 
 <code src="../demos/ai-label.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-## 答案提示
+## 答案提示 {#answer-hint}
 
 <code src="../demos/answer-alert.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-## 机器人图标
+## 机器人图标 {#icon}
 
 <code src="../demos/robot.tsx" background="var(--main-bg-color)" iframe=540></code>

@@ -1,6 +1,6 @@
-# RFC：图表注释中 `x` / `y` 与表头列名的宽松匹配 {#rfc-chart-axis-column-name-matching}
+﻿# RFC：图表注释中 `x` / `y` 与表头列名的宽松匹配 {#rfc-chart-axis-column-name-matching}
 
-## 背景
+## 背景 {#background}
 
 Markdown 表格图表使用 HTML 注释配置轴字段，例如：
 
@@ -10,24 +10,24 @@ Markdown 表格图表使用 HTML 注释配置轴字段，例如：
 
 表头常把单位写在列名里，例如 `GDP总量（万亿元）`，而注释里为可读性只写 `GDP总量`。解析器原先要求 `x`、`y` 与列 `dataIndex` **完全一致**，否则将整张表降级为普通表格，导致图表无法渲染。
 
-## 目标
+## 目标 {#goals}
 
 - 在**不破坏**已有「注释与表头字符串完全一致」行为的前提下，支持「表头 = 注释中的逻辑名 + 括号内的单位或补充说明」的匹配。
 - 匹配成功后，将配置中的 `x` / `y` **规范化为表头实际列名**（即 `dataIndex`），保证后续 `ChartRender` 等仍用真实键访问 `dataSource`。
 
-## 非目标
+## 非目标 {#non-goals}
 
 - 不做模糊搜索或编辑距离（避免 `销量` 误匹配 `累计销量`）。
 - 不自动推断未在注释中出现的列；仅当注释中的名字是表头列名的**前缀**且后缀符合下文规则时匹配。
 
-## 规范
+## 规范 {#conventions}
 
-### 定义：逻辑列名与表头列名
+### 定义：逻辑列名与表头列名 {#logical-vs-header-column-name}24} {#logical-vs-header-column-name}
 
 - **逻辑列名** `F`：注释里 `x` / `y` 的非空字符串，首尾空白已 trim。
 - **表头列名** `C`：Markdown 表头经 `normalizeFieldName` 后的列名字符串（与当前 `dataIndex` 一致）。
 
-### 匹配规则
+### 匹配规则 {#rules}
 
 当且仅当满足以下之一时，认为 `C` 对应配置中的字段 `F`：
 
@@ -44,7 +44,7 @@ Markdown 表格图表使用 HTML 注释配置轴字段，例如：
 
 不满足前缀关系的一律不匹配（例如 `C = "GDP总量估算"` 与 `F = "GDP总量"`）。
 
-### 解析算法
+### 解析算法 {#parsing-algorithm}
 
 对每张表，在得到列 `dataIndex` 列表 `K` 后，对每个图表配置项的 `x`、`y`（若存在且为非空字符串）：
 
@@ -54,16 +54,16 @@ Markdown 表格图表使用 HTML 注释配置轴字段，例如：
 
 多图表配置（数组）时对每一项分别执行。
 
-## 实现参考
+## 实现参考 {#implementation-reference}
 
 - `src/MarkdownEditor/editor/parser/parse/parseTable.ts`：`columnKeyMatchesConfiguredField`、`resolveChartAxisFieldToColumnKey`、`normalizeChartConfigAxisFields`。
 
-## 兼容性
+## 兼容性 {#compatibility}
 
 - 表头与注释已完全一致的用例行为不变。
 - 仅当新增「前缀 + 合法括号后缀」形式时才会从「降级表格」变为「图表」；不会改写无关列名。
 
-## 测试用例建议
+## 测试用例建议 {#test-case-suggestions}
 
 | 表头列名                | 注释 `y`                | 是否匹配   |
 | ----------------------- | ----------------------- | ---------- |
@@ -73,6 +73,6 @@ Markdown 表格图表使用 HTML 注释配置轴字段，例如：
 | `累计销量`              | `销量`                  | 否         |
 | `GDP`                   | `GDP总量`               | 否         |
 
-## 状态
+## 状态 {#status}
 
 - **Implemented**：与本 RFC 同步合入解析逻辑与单元测试。

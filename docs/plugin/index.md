@@ -7,17 +7,17 @@ group:
   order: 3
 ---
 
-# 插件
+# 插件 {#plugins}
 
-## 概述
+## 概述 {#overview}
 
 Markdown 编辑器插件系统提供了灵活的方式来扩展编辑器的功能。它允许你自定义节点渲染、实现 Markdown 双向转换，以及扩展编辑器行为。
 
-## 插件接口
+## 插件接口 {#plugin-interface}
 
 插件是一个实现了 `MarkdownEditorPlugin` 接口的对象，包含以下可选属性：
 
-### 自定义节点渲染
+### 自定义节点渲染 {#custom}
 
 ```typescript | pure
 elements?: Record<string, React.ComponentType<ElementProps<any>>>
@@ -39,9 +39,9 @@ const customBlockquotePlugin: MarkdownEditorPlugin = {
 }
 ```
 
-### Markdown 转换
+### Markdown 转换 {#markdown}
 
-#### Markdown 解析 (`parseMarkdown`)
+#### Markdown 解析 (`parseMarkdown`) {#parsemarkdown}
 
 将 Markdown AST 节点转换为 Slate 元素。这个功能允许你自定义如何将 Markdown 语法解析为编辑器中的元素。
 
@@ -73,7 +73,7 @@ const customCodeBlockPlugin: MarkdownEditorPlugin = {
 };
 ```
 
-#### 转换为 Markdown (`toMarkdown`)
+#### 转换为 Markdown (`toMarkdown`) {#tomarkdown}
 
 将 Slate 元素转换回 Markdown AST 节点。这个功能用于将编辑器内容导出为 Markdown 格式。
 
@@ -101,7 +101,7 @@ const customCodeBlockPlugin: MarkdownEditorPlugin = {
 };
 ```
 
-#### 如何使用 toMarkdown 插件
+#### 如何使用 toMarkdown 插件 {#tomarkdown-2}
 
 要使用 `toMarkdown` 插件导出自定义格式的 Markdown，你需要通过编辑器实例调用 `getMDContent` 方法并传递插件：
 
@@ -124,9 +124,9 @@ const handleExportMarkdown = () => {
 />
 ```
 
-### 编辑器扩展
+### 编辑器扩展 {#editor-extensions}
 
-#### 扩展编辑器 (`withEditor`)
+#### 扩展编辑器 (`withEditor`) {#witheditor}
 
 自定义编辑器实例行为。通过这个功能，你可以修改或扩展编辑器的核心行为。
 
@@ -155,7 +155,7 @@ const customVoidNodePlugin: MarkdownEditorPlugin = {
 };
 ```
 
-#### 快捷键
+#### 快捷键 {#shortcuts}
 
 定义自定义键盘快捷键，用于触发特定的编辑器操作。
 
@@ -176,7 +176,7 @@ const customHotkeyPlugin: MarkdownEditorPlugin = {
 };
 ```
 
-#### 自定义粘贴处理 (`onPaste`)
+#### 自定义粘贴处理 (`onPaste`) {#custom-onpaste}
 
 使用自定义逻辑处理粘贴事件，可以用于实现特殊的粘贴行为。
 
@@ -198,7 +198,7 @@ const customPastePlugin: MarkdownEditorPlugin = {
 };
 ```
 
-## 使用方法
+## 使用方法 {#methods}
 
 插件通过 React Context 传递给编辑器。你可以组合多个插件来实现不同的功能：
 
@@ -220,9 +220,9 @@ function MarkdownEditorWithPlugins({ children }) {
 }
 ```
 
-## 完整示例
+## 完整示例 {#full-example}
 
-### 简单的 toMarkdown 插件示例
+### 简单的 toMarkdown 插件示例 {#example-tomarkdown}
 
 以下是一个完整的插件示例，展示了如何创建自定义的笔记代码块：
 
@@ -303,13 +303,13 @@ export default function SimpleToMarkdownExample() {
 
 这是一个简单的 toMarkdown 插件示例。
 
-## 普通代码块
+## 普通代码块 {#normal-code-block}
 
 \`\`\`javascript
 console.log("这是普通的 JavaScript 代码");
 \`\`\`
 
-## 自定义笔记代码块
+## 自定义笔记代码块 {#custom-2}
 
 下面的代码块会被插件特殊处理：
 
@@ -319,7 +319,7 @@ console.log("这是普通的 JavaScript 代码");
 使用 Ctrl+S 或 Cmd+S 保存文件。
 \`\`\`
 
-## 说明
+## 说明 {#notes}
 
 - 使用 \`note\` 语言标识的代码块会被转换为笔记框
 - 普通的代码块不会被插件影响
@@ -376,7 +376,7 @@ console.log("这是普通的 JavaScript 代码");
 }
 ```
 
-### 复杂插件示例
+### 复杂插件示例 {#example}
 
 以下是一个更复杂的插件示例，包含多种自定义元素：
 
@@ -481,7 +481,7 @@ export default function ComplexPluginDemo() {
 
 这个演示展示了如何使用多个插件来自定义 Markdown 输出格式。
 
-## 警告代码块
+## 警告代码块 {#warning-code-block}
 
 下面是一个警告代码块，它会被特殊处理：
 
@@ -491,13 +491,13 @@ export default function ComplexPluginDemo() {
 系统可能会因为不当操作而出现问题。
 \`\`\`
 
-## 提示引用块
+## 提示引用块 {#tip-quote-block}
 
 > 💡 提示: 这是一个特殊的提示引用块
 > 它会被渲染为蓝色的提示框
 > 用于提供有用的建议和信息
 
-## 普通内容
+## 普通内容 {#content}
 
 这些是普通的内容，不会被插件特殊处理：
 
@@ -508,7 +508,7 @@ console.log("这是普通的 JavaScript 代码");
 > 这是普通的引用块
 > 不会被特殊处理
 
-## 说明
+## 说明 {#notes-2}
 
 - 使用 \`warning\` 语言标识的代码块会被转换为警告框
 - 以 "💡 提示:" 开头的引用块会被转换为提示框
@@ -550,11 +550,11 @@ console.log("这是普通的 JavaScript 代码");
 }
 ```
 
-### 复杂例子
+### 复杂例子 {#complex-example}
 
 <code src="../demos/useCreateComponentPlugin.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-## 最佳实践
+## 最佳实践 {#best-practices}
 
 1. **模块化设计**：每个插件应该专注于一个特定的功能，这样可以更好地组织和维护代码。
 

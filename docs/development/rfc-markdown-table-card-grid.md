@@ -1,6 +1,6 @@
-# RFC：基于 `chartType` 注释 + Markdown 表格的文档站卡片列表 {#rfc-markdown-table-card-grid}
+﻿# RFC：基于 `chartType` 注释 + Markdown 表格的文档站卡片列表 {#rfc-markdown-table-card-grid}
 
-## 背景
+## 背景 {#background}
 
 业务上需要展示「多列信息卡」式内容（如优秀文档站：主标题、站点 URL、简介、标签/亮点），版式上常见为 **两列栅格**、白底圆角、标签为彩色胶囊。
 
@@ -8,25 +8,25 @@
 
 本 RFC 约定：在**不破坏**现有注释与解析行为的前提下，用与现有图表 **同一套作者写法** 支持「卡片列表」；若实现，则新增独立 `chartType`，由 `ChartRender`（或 chart 插件）专门渲染。
 
-## 目标
+## 目标 {#goals}
 
 - **作者侧**：与现有图表一致，在管道表上方写一行（或数组中一项）JSON 注释，包含 `chartType` 与可选 `title` 等公共字段。
 - **数据侧**：**一行 Markdown 表 = 一张卡片**；表头列名可配置为固定语义字段（见下文「列契约」）或通过配置映射到列。
 - **呈现侧**：默认 **桌面端两列** 卡片网格式布局；**窄屏** 可降为单列；卡片内需展示标题、副标题/URL、正文、可换行的标签组。
 - **可访问性**：整体为文档型列表时，使用合适标题层级或 `list`/`article` 语义（实现阶段再定，避免用「纯数据表」误导读屏，必要时 `role`/`aria` 与现有 chart 区一致由设计评审确认）。
 
-## 非目标
+## 非目标 {#non-goals}
 
 - 不把 **手写的 HTML `<table>`** 作为本能力的主数据入口；主路径保持 **GFM 表格**（与现有一致，便于 `parseTable` 统一产 `chart` 节点）。
 - 不在本 RFC 中规定具体像素级设计稿；仅规定 **信息架构与数据契约**。
 - 不强制与某个图表库（ECharts）复用；UI 为静态卡片时可仅用 React + token/CSS。
 
-## 建议命名
+## 建议命名 {#suggested-naming}
 
 - **chartType 取值（拟定）**：`docCards`（或 `infoCards`）。  
   命名需在实现前与 i18n、图类型切换器（若有）中展示文案一次对齐。
 
-## 列契约（拟定）
+## 列契约（拟定） {#column-contract-draft}28} {#column-contract-draft}
 
 在注释中不重复列举列名时，采用 **约定表头**（与 `x`/`y` 需匹配表头类似，可实现「宽松匹配」子 RFC 复用表头单位后缀规则）：
 
@@ -42,7 +42,7 @@
 - `columns` 或 `fieldMap`：将注释中的逻辑名映射到实际表头（当作者想用自定义列名时）。
 - `cardColumns`：每行卡片的列数，默认 `2`；`1` 用于全宽列表。
 
-## 注释示例
+## 注释示例 {#example}
 
 **单表、单种展示：**
 
@@ -67,7 +67,7 @@
 
 > 多配置时对 `docCards` 的**列集**与兄弟图表是否共用同一张表，需与现有多 `chartType` 对**列子集/校验**的行为保持一致（见 `parseTable` 中校验逻辑）。
 
-## 与现有类型的关系
+## 与现有类型的关系 {#types}
 
 | 类型             | 作用                                                              |
 | ---------------- | ----------------------------------------------------------------- |
@@ -75,20 +75,20 @@
 | `table`          | 高级表格能力，不进入图表渲染管线。                                |
 | `docCards`（拟） | **专用卡片栅格**，数据来源仍为同一套管道表。                      |
 
-## 解析与渲染（实现指导）
+## 解析与渲染（实现指导） {#parse-render-guidance}77} {#parse-render-guidance}
 
 - **parseTable / chart 节点**：`chartType === 'docCards'` 时参与图表节点生成；校验规则需定义「最少必需列」与失败时整表降级策略（与现有 `isChart` 行为对齐）。
 - **ChartRender**（或 `src/Plugins/chart` 下子模块）：新分支渲染卡片容器；**标签字符串** 拆分为 `Tag` 或自绘胶囊，颜色可用哈希或行索引轮换，与主题 token 一致。
 - **样式**：优先使用 `prefixCls` + CSS-in-JS/现有 chart 容器的边距，避免与 Slate 表格占位层 `z-index` 冲突（参考现有多图 `data-chart-box` 布局经验）。
 - **国际化**：若工具栏或空状态有 copy，在 `src/I18n/locales.ts` 中增加键值。
 
-## 兼容性
+## 兼容性 {#compatibility}
 
 - **未使用** `docCards` 的文档与现有表图行为不变。
 - 新类型占用了新的 `chartType` 字符串；不与现有 `pie`、`bar`、`descriptions` 等冲突。
 - 回滚：仅移除 `docCards` 分支与作者示例即可，解析器可保留「未知类型降级」的默认策略（以当前代码为准）。
 
-## 测试用例建议
+## 测试用例建议 {#test-case-suggestions}
 
 - 单表 + `docCards`：表头带单位后缀时是否仍能匹配到「简介」等逻辑列（若复用列名匹配 RFC）。
 - 无「亮点」列：卡片仅显示标题+简介，不抛错。
@@ -96,13 +96,13 @@
 - 多 `chartType` 数组里同时包含 `docCards` 时，与仅 `docCards` 的列校验一致。
 - 小视口下布局为单列（或横向滚动不溢出），与现有 chart 容器的 `minWidth` 行为不冲突。
 
-## 开放问题
+## 开放问题 {#open-questions}
 
 1. 标签列是否允许多行 Markdown 或内联 HTML，还是**纯文本**？建议第一版仅纯文本 + 固定分隔符。
 2. 卡片主链接：整卡可点还是仅 URL 可点？涉及 `pointer-events` 与编辑器内可编辑性。
 3. 是否需要与 **链接卡片**（`type: "card"` 注释 + Markdown 链接，见语法 skill）在视觉上统一；若统一，设计 token 是否从一处继承。
 
-## 状态
+## 状态 {#status}
 
 - **Implemented**：v2.33.0 起以 `chartType: "docCards"` 落地。实现细节：
   - 渲染：`src/Plugins/chart/DocCards/`（`DocCards.tsx` + `style.ts` + `utils.ts`）。

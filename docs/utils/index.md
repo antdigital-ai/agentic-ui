@@ -7,13 +7,13 @@ group:
   order: 1
 ---
 
-# 工具函数总览
+# 工具函数总览 {#utils-overview}
 
 agentic-ui 提供了丰富的工具函数，用于支持编辑器的各种功能。这些工具函数都是模块化设计的，可以独立使用。
 
-## 工具函数分类
+## 工具函数分类 {#utils-categories}
 
-### 🔤 文本处理工具
+### 🔤 文本处理工具 {#text-utils}
 
 #### [isMarkdown](./isMarkdown.md)
 
@@ -50,7 +50,7 @@ import { htmlToMarkdown } from '@ant-design/agentic-ui';
 const markdown = htmlToMarkdown('<h1>标题</h1><p>内容</p>');
 ```
 
-### 🎛️ 编辑器工具
+### 🎛️ 编辑器工具 {#editor-utils}
 
 #### [EditorUtils](./editorUtils.md)
 
@@ -69,9 +69,9 @@ EditorUtils.toggleFormat(editor, 'bold');
 const imageNode = EditorUtils.createMediaNode('image.jpg', 'image');
 ```
 
-### 🌐 国际化工具
+### 🌐 国际化工具 {#i18n}
 
-#### [国际化 (I18n)](./i18n.md)
+#### [国际化 (I18n)](./i18n.md) {#i18n-i18n}
 
 提供完整的国际化解决方案，支持中英文切换。
 
@@ -87,9 +87,9 @@ import { I18nProvide, useLanguage } from '@ant-design/agentic-ui';
 const { locale, toggleLanguage } = useLanguage();
 ```
 
-### 🌐 DOM 操作工具
+### 🌐 DOM 操作工具 {#dom}
 
-#### [DOM 工具](./dom.md)
+#### [DOM 工具](./dom.md) {#dom-md}
 
 提供 DOM 元素位置计算、字符串处理和媒体类型检测。
 
@@ -106,7 +106,7 @@ const slug = slugify('Hello World!'); // 'hello-world'
 const type = getMediaType('image.jpg'); // 'image'
 ```
 
-#### [Path 工具](./path.md)
+#### [Path 工具](./path.md) {#path-md}
 
 路径处理和链接检测工具。
 
@@ -123,9 +123,9 @@ const { path, hash } = parsePath('/file.md#section');
 const unixPath = toUnixPath('C:\\path\\to\\file'); // 'C:/path/to/file'
 ```
 
-### 📱 媒体处理工具
+### 📱 媒体处理工具 {#media-utils}
 
-#### [Media 工具](./media.md)
+#### [Media 工具](./media.md) {#media-md}
 
 远程媒体类型检测和图片处理。
 
@@ -142,9 +142,9 @@ const type = await getRemoteMediaType('https://example.com/image.jpg');
 await convertRemoteImages(editorNode, store);
 ```
 
-## 使用指南
+## 使用指南 {#usage-guide}
 
-### 基本导入
+### 基本导入 {#basic}
 
 ```typescript | pure
 import {
@@ -180,9 +180,9 @@ import {
 } from '@ant-design/agentic-ui';
 ```
 
-### 组合使用示例
+### 组合使用示例 {#example}
 
-#### 内容验证和处理
+#### 内容验证和处理 {#content}
 
 ```typescript | pure
 // 验证用户输入
@@ -200,7 +200,7 @@ const validateContent = (content: string) => {
 };
 ```
 
-#### 编辑器增强
+#### 编辑器增强 {#editor-enhancements}
 
 ```typescript | pure
 // 增强编辑器功能
@@ -226,7 +226,7 @@ const enhanceEditor = (editor: Editor) => {
 };
 ```
 
-#### 路径处理
+#### 路径处理 {#path-processing}
 
 ```typescript | pure
 // 处理文档链接
@@ -243,9 +243,9 @@ const processDocumentLinks = (links: string[]) => {
 };
 ```
 
-## 最佳实践
+## 最佳实践 {#best-practices}
 
-### 1. 错误处理
+### 1. 错误处理 {#error-handling}
 
 ```typescript | pure
 // 总是包含错误处理
@@ -259,7 +259,7 @@ const safeMarkdownToHtml = async (markdown: string) => {
 };
 ```
 
-### 2. 性能优化
+### 2. 性能优化 {#performance}
 
 ```typescript | pure
 // 使用防抖处理频繁操作
@@ -270,7 +270,7 @@ const debouncedValidation = debounce((content: string) => {
 }, 300);
 ```
 
-### 3. 类型安全
+### 3. 类型安全 {#types}
 
 ```typescript | pure
 // 使用 TypeScript 类型
@@ -282,7 +282,7 @@ const options: HtmlToMarkdownOptions = {
 };
 ```
 
-### 4. 模块化使用
+### 4. 模块化使用 {#modular-usage}
 
 ```typescript | pure
 // 按需导入，减少包大小
@@ -290,9 +290,9 @@ import { isMarkdown } from 'agentic-ui/utils/isMarkdown';
 import { htmlToMarkdown } from 'agentic-ui/utils/htmlToMarkdown';
 ```
 
-## 扩展开发
+## 扩展开发 {#extension-development}
 
-### 自定义工具函数
+### 自定义工具函数 {#custom}
 
 ```typescript | pure
 // 扩展 EditorUtils
@@ -303,7 +303,7 @@ class CustomEditorUtils extends EditorUtils {
 }
 ```
 
-### 工具函数组合
+### 工具函数组合 {#utils-composition}
 
 ```typescript | pure
 // 创建组合工具函数
@@ -322,7 +322,7 @@ const contentProcessor = {
 };
 ```
 
-## 注意事项
+## 注意事项 {#notes}
 
 1. **浏览器兼容性**：某些工具函数需要现代浏览器支持
 2. **网络依赖**：媒体工具函数需要网络连接
@@ -330,7 +330,7 @@ const contentProcessor = {
 4. **错误处理**：始终包含适当的错误处理机制
 5. **类型安全**：使用 TypeScript 确保类型安全
 
-## 贡献指南
+## 贡献指南 {#contributing-guide}
 
 欢迎为工具函数贡献代码：
 

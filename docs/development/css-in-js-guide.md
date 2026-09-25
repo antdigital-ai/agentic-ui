@@ -7,7 +7,7 @@ group:
   order: 6
 ---
 
-# CSS-in-JS 方案指南
+# CSS-in-JS 方案指南 {#css-in-js}
 
 > **方案简介**：`agentic-ui` 项目采用 `@ant-design/cssinjs` 作为 CSS-in-JS 解决方案，提供类型安全、主题定制、动态样式等现代化样式管理能力。
 
@@ -20,7 +20,7 @@ group:
   - 提供优秀的开发体验
 -->
 
-## 目录
+## 目录 {#toc}
 
 - [方案概述](#方案概述)
 - [@ant-design/cssinjs 介绍](#ant-designcssinjs-介绍)
@@ -30,7 +30,7 @@ group:
 - [性能优化](#性能优化)
 - [常见问题](#常见问题)
 
-## 方案概述
+## 方案概述 {#proposal-overview}
 
 <!--
   方案概述说明：
@@ -40,7 +40,7 @@ group:
   - 技术选型的考虑因素
 -->
 
-### 为什么选择 CSS-in-JS
+### 为什么选择 CSS-in-JS {#css-in-js-2}
 
 | 优势         | 说明                                | 项目中的应用                   |
 | ------------ | ----------------------------------- | ------------------------------ |
@@ -50,7 +50,7 @@ group:
 | **动态样式** | 基于 props 和状态动态生成样式       | 响应式设计，交互状态样式       |
 | **开发体验** | 热重载、智能提示、调试工具          | 提升开发效率，减少调试时间     |
 
-### 技术选型对比
+### 技术选型对比 {#comparison}
 
 | 方案                    | 优点                                     | 缺点                       | 适用场景           |
 | ----------------------- | ---------------------------------------- | -------------------------- | ------------------ |
@@ -59,7 +59,7 @@ group:
 | **emotion**             | 性能优秀、功能丰富                       | 配置复杂、学习曲线陡峭     | 高性能应用         |
 | **CSS Modules**         | 简单易用、零配置                         | 功能有限、动态样式困难     | 简单项目           |
 
-### 项目中的应用场景
+### 项目中的应用场景 {#project-use-cases}
 
 ```tsx | pure
 // 1. 组件样式定义
@@ -97,7 +97,7 @@ const useResponsiveStyles = createStyles(({ token, css }) => ({
 }));
 ```
 
-## @ant-design/cssinjs 介绍
+## @ant-design/cssinjs 介绍 {#ant-design-cssinjs}
 
 <!--
   @ant-design/cssinjs介绍说明：
@@ -107,9 +107,9 @@ const useResponsiveStyles = createStyles(({ token, css }) => ({
   - 配置和定制方法
 -->
 
-### 核心特性
+### 核心特性 {#core-features}
 
-#### 1. 类型安全
+#### 1. 类型安全 {#types}
 
 ```tsx | pure
 import { createStyles } from '@ant-design/cssinjs';
@@ -125,7 +125,7 @@ const useStyles = createStyles(({ token, css }) => ({
 }));
 ```
 
-#### 2. 主题集成
+#### 2. 主题集成 {#theme-integration}
 
 ```tsx | pure
 // 自动获取Ant Design主题token
@@ -146,7 +146,7 @@ const useStyles = createStyles(({ token }) => ({
 }));
 ```
 
-#### 3. 动态样式
+#### 3. 动态样式 {#style}
 
 ```tsx | pure
 // 基于props和状态生成样式
@@ -165,7 +165,7 @@ const useStyles = createStyles(({ token, css }) => ({
 }));
 ```
 
-### 与 Ant Design 集成
+### 与 Ant Design 集成 {#ant-design}
 
 ```tsx | pure
 // 1. 使用Ant Design的token系统
@@ -198,7 +198,7 @@ const useStyles = createStyles(({ token }) => ({
 }));
 ```
 
-## 基础用法
+## 基础用法 {#basic-usage}
 
 <!--
   基础用法说明：
@@ -208,9 +208,9 @@ const useStyles = createStyles(({ token }) => ({
   - 错误处理和调试
 -->
 
-### 创建样式
+### 创建样式 {#style-2}
 
-#### 1. 基本样式定义
+#### 1. 基本样式定义 {#basic-style}
 
 ```tsx | pure
 import { createStyles } from '@ant-design/cssinjs';
@@ -246,7 +246,7 @@ const useStyles = createStyles({
 });
 ```
 
-#### 2. 使用主题token
+#### 2. 使用主题token {#token}
 
 ```tsx | pure
 const useStyles = createStyles(({ token }) => ({
@@ -281,7 +281,7 @@ const useStyles = createStyles(({ token }) => ({
 }));
 ```
 
-#### 3. 动态样式
+#### 3. 动态样式 {#style-3}
 
 ```tsx | pure
 const useStyles = createStyles(({ token, css }) => ({
@@ -327,9 +327,9 @@ const useStyles = createStyles(({ token, css }) => ({
 }));
 ```
 
-### 在组件中使用
+### 在组件中使用 {#use-in-components}
 
-#### 1. 基本使用
+#### 1. 基本使用 {#basic-usage-2}
 
 ```tsx | pure
 import React from 'react';
@@ -361,7 +361,7 @@ const MyComponent: React.FC = () => {
 export default MyComponent;
 ```
 
-#### 2. 动态样式使用
+#### 2. 动态样式使用 {#style-4}
 
 ```tsx | pure
 import React, { useState } from 'react';
@@ -405,7 +405,7 @@ const DynamicButton: React.FC<{
 export default DynamicButton;
 ```
 
-#### 3. 组合样式
+#### 3. 组合样式 {#style-5}
 
 ```tsx | pure
 import React from 'react';
@@ -458,7 +458,7 @@ const Button: React.FC<{
 export default Button;
 ```
 
-## 高级特性
+## 高级特性 {#advanced-features}
 
 <!--
   高级特性说明：
@@ -469,7 +469,7 @@ export default Button;
   - 性能优化
 -->
 
-### 响应式设计
+### 响应式设计 {#responsive-design}
 
 ```tsx | pure
 import { createStyles } from '@ant-design/cssinjs';
@@ -522,7 +522,7 @@ const useStyles = createStyles(({ token, css }) => ({
 }));
 ```
 
-### 动画和过渡
+### 动画和过渡 {#animations-transitions}
 
 ```tsx | pure
 import { createStyles } from '@ant-design/cssinjs';
@@ -601,7 +601,7 @@ const useStyles = createStyles(({ token, css }) => ({
 }));
 ```
 
-### 全局样式
+### 全局样式 {#style-6}
 
 ```tsx | pure
 import { createGlobalStyle } from '@ant-design/cssinjs';
@@ -686,7 +686,7 @@ const App: React.FC = () => {
 };
 ```
 
-### 主题切换
+### 主题切换 {#theme-switching}
 
 ```tsx | pure
 import React, { useState } from 'react';
@@ -758,7 +758,7 @@ const ThemeToggle: React.FC = () => {
 export default ThemeToggle;
 ```
 
-## 最佳实践
+## 最佳实践 {#best-practices}
 
 <!--
   最佳实践说明：
@@ -769,9 +769,9 @@ export default ThemeToggle;
   - 团队协作
 -->
 
-### 样式组织原则
+### 样式组织原则 {#style-7}
 
-#### 1. 组件样式结构
+#### 1. 组件样式结构 {#style-8}
 
 ```tsx | pure
 // 推荐的样式文件结构
@@ -836,7 +836,7 @@ const useStyles = createStyles(({ token, css }) => ({
 }));
 ```
 
-#### 2. 样式复用
+#### 2. 样式复用 {#style-9}
 
 ```tsx | pure
 // 创建可复用的样式组合
@@ -913,9 +913,9 @@ const Button: React.FC<{
 };
 ```
 
-### 命名规范
+### 命名规范 {#naming-conventions}
 
-#### 1. 样式类名命名
+#### 1. 样式类名命名 {#style-10}
 
 ```tsx | pure
 const useStyles = createStyles(({ token }) => ({
@@ -952,7 +952,7 @@ const useStyles = createStyles(({ token }) => ({
 }));
 ```
 
-#### 2. 变量命名
+#### 2. 变量命名 {#variable-naming}
 
 ```tsx | pure
 const useStyles = createStyles(({ token }) => ({
@@ -978,9 +978,9 @@ const useStyles = createStyles(({ token }) => ({
 }));
 ```
 
-### 性能优化
+### 性能优化 {#performance}
 
-#### 1. 样式缓存
+#### 1. 样式缓存 {#style-11}
 
 ```tsx | pure
 // 使用useMemo缓存样式计算
@@ -1017,7 +1017,7 @@ const List: React.FC<{ items: string[] }> = ({ items }) => {
 };
 ```
 
-#### 2. 条件样式优化
+#### 2. 条件样式优化 {#style-12}
 
 ```tsx | pure
 // 避免在渲染时计算样式
@@ -1077,7 +1077,7 @@ const Button: React.FC<{
 };
 ```
 
-## 性能优化
+## 性能优化 {#performance-2}
 
 <!--
   性能优化说明：
@@ -1087,7 +1087,7 @@ const Button: React.FC<{
   - 运行时优化
 -->
 
-### 样式计算优化
+### 样式计算优化 {#style-13}
 
 ```tsx | pure
 // 1. 使用静态样式
@@ -1116,7 +1116,7 @@ const useStyles = createStyles(({ token }) => ({
 }));
 ```
 
-### 渲染性能优化
+### 渲染性能优化 {#rendering-performance}
 
 ```tsx | pure
 // 1. 使用React.memo避免不必要的重新渲染
@@ -1148,7 +1148,7 @@ const ParentComponent: React.FC = () => {
 };
 ```
 
-### 包体积优化
+### 包体积优化 {#bundle-size}
 
 ```tsx | pure
 // 1. 按需导入
@@ -1206,7 +1206,7 @@ const useStyles = createStyles(({ token }) => ({
 }));
 ```
 
-## 常见问题
+## 常见问题 {#faq}
 
 <!--
   常见问题说明：
@@ -1216,7 +1216,7 @@ const useStyles = createStyles(({ token }) => ({
   - 性能问题排查
 -->
 
-### 样式冲突解决
+### 样式冲突解决 {#style-14}
 
 ```tsx | pure
 // 1. 使用CSS Modules避免冲突
@@ -1243,7 +1243,7 @@ const useStyles = createStyles(({ token }) => ({
 }));
 ```
 
-### 调试技巧
+### 调试技巧 {#debugging-tips}
 
 ```tsx | pure
 // 1. 使用开发工具调试
@@ -1276,7 +1276,7 @@ const useStyles = createStyles(({ token }) => ({
 }));
 ```
 
-### 兼容性问题
+### 兼容性问题 {#compatibility-issues}
 
 ```tsx | pure
 // 1. 浏览器兼容性处理
@@ -1310,7 +1310,7 @@ const useStyles = createStyles(({ token, css }) => ({
 }));
 ```
 
-### 性能问题排查
+### 性能问题排查 {#performance-debugging}
 
 ```tsx | pure
 // 1. 性能监控
@@ -1337,7 +1337,7 @@ const useStyles = createStyles(({ token }) => ({
 }));
 ```
 
-## 总结
+## 总结 {#summary}
 
 <!--
   总结说明：
@@ -1347,7 +1347,7 @@ const useStyles = createStyles(({ token }) => ({
   - 未来发展方向
 -->
 
-### 方案优势总结
+### 方案优势总结 {#approach-summary}
 
 1. **类型安全**：完整的TypeScript支持，编译时检查样式属性
 2. **主题集成**：与Ant Design深度集成，支持动态主题切换
@@ -1355,21 +1355,21 @@ const useStyles = createStyles(({ token }) => ({
 4. **开发体验**：热重载、智能提示、调试工具支持
 5. **性能优化**：样式缓存、按需加载、渲染优化
 
-### 项目应用效果
+### 项目应用效果 {#project-results}
 
 - **开发效率提升**：类型安全减少调试时间，热重载提高开发速度
 - **代码质量改善**：统一的样式规范，减少样式冲突
 - **维护成本降低**：组件化样式管理，便于重构和扩展
 - **用户体验优化**：主题切换、响应式设计、动画效果
 
-### 团队协作建议
+### 团队协作建议 {#team-collaboration-tips}
 
 1. **制定规范**：建立统一的样式命名和组织规范
 2. **代码审查**：在PR中检查样式代码质量和性能
 3. **文档维护**：及时更新样式文档和最佳实践
 4. **培训分享**：定期进行CSS-in-JS技术分享和培训
 
-### 未来发展方向
+### 未来发展方向 {#future-directions}
 
 1. **性能优化**：持续优化样式计算和渲染性能
 2. **工具完善**：开发更多调试和优化工具

@@ -7,11 +7,11 @@ group:
   order: 5
 ---
 
-# DOM 工具函数
+# DOM 工具函数 {#dom}
 
 `dom.ts` 提供了一系列用于 DOM 操作和处理的工具函数。
 
-## 功能描述
+## 功能描述 {#description}
 
 这个模块包含以下主要功能：
 
@@ -20,9 +20,9 @@ group:
 - **媒体类型检测** - 根据文件名或 URL 判断媒体类型
 - **选区操作** - 获取选区矩形信息
 
-## API 参考
+## API 参考 {#api}
 
-### 位置计算
+### 位置计算 {#position-calculation}
 
 #### `getOffsetTop(dom: HTMLElement, target: HTMLElement = document.body): number`
 
@@ -66,7 +66,7 @@ const offsetLeft = getOffsetLeft(element);
 console.log(`元素距离左侧 ${offsetLeft}px`);
 ```
 
-### 字符串处理
+### 字符串处理 {#string-processing}
 
 #### `slugify(str: string): string`
 
@@ -98,7 +98,7 @@ console.log(slugify('Café & Résumé')); // 'cafe-resume'
 console.log(slugify('123 Number')); // '_123-number'
 ```
 
-### 媒体类型检测
+### 媒体类型检测 {#types}
 
 #### `getMediaType(name?: string, alt?: string): string`
 
@@ -138,7 +138,7 @@ console.log(getMediaType('file', 'data:image/png;base64,...')); // 'image'
 console.log(getMediaType('file', 'video:mp4')); // 'video'
 ```
 
-### 选区操作
+### 选区操作 {#selection-operations}
 
 #### `getSelRect(): DOMRect | null`
 
@@ -161,9 +161,9 @@ if (selection && !selection.isCollapsed) {
 }
 ```
 
-## 使用场景
+## 使用场景 {#use-cases}
 
-### 编辑器定位
+### 编辑器定位 {#editor-positioning}
 
 ```typescript | pure
 // 计算工具栏位置
@@ -180,7 +180,7 @@ if (editorElement && toolbarElement) {
 }
 ```
 
-### 媒体文件处理
+### 媒体文件处理 {#media-file-handling}
 
 ```typescript | pure
 // 处理文件上传
@@ -207,7 +207,7 @@ const handleFileUpload = (file: File) => {
 };
 ```
 
-### URL 友好化
+### URL 友好化 {#url}
 
 ```typescript | pure
 // 生成锚点链接
@@ -223,7 +223,7 @@ const generateFileName = (title: string) => {
 };
 ```
 
-### 选区操作
+### 选区操作 {#selection-operations-2}
 
 ```typescript | pure
 // 显示选区信息
@@ -243,14 +243,14 @@ const showSelectionInfo = () => {
 };
 ```
 
-## 注意事项
+## 注意事项 {#notes}
 
 1. **DOM 依赖**：这些函数需要在浏览器环境中使用
 2. **性能考虑**：`getOffsetTop` 和 `getOffsetLeft` 会遍历 DOM 树
 3. **兼容性**：确保目标浏览器支持相关 DOM API
 4. **错误处理**：函数会处理无效的 DOM 元素和参数
 
-## 扩展性
+## 扩展性 {#extensibility}
 
 这些工具函数可以进一步扩展：
 

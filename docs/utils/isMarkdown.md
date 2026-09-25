@@ -7,11 +7,11 @@ group:
   order: 6
 ---
 
-# isMarkdown 工具函数
+# isMarkdown 工具函数 {#ismarkdown}
 
 `isMarkdown` 是一个用于检测字符串是否包含 Markdown 格式的工具函数。
 
-## 功能描述
+## 功能描述 {#description}
 
 这个函数通过正则表达式检测文本中是否包含常见的 Markdown 语法元素，包括：
 
@@ -27,7 +27,7 @@ group:
 - 删除线（`~~text~~`）
 - 水平分割线（`---`、`===`、`***`）
 
-## API 参考
+## API 参考 {#api}
 
 ### `isMarkdown(text: string): boolean`
 
@@ -41,7 +41,7 @@ group:
 
 - `boolean` - 如果包含 Markdown 格式返回 `true`，否则返回 `false`
 
-## 使用示例
+## 使用示例 {#examples}
 
 ```typescript | pure
 import { isMarkdown } from '@ant-design/agentic-ui';
@@ -57,93 +57,93 @@ console.log(isMarkdown('')); // false
 console.log(isMarkdown('   ')); // false
 ```
 
-## 检测规则
+## 检测规则 {#rules}
 
-### 标题检测
+### 标题检测 {#title}
 
 ```typescript | pure
 // 匹配 # 到 ###### 开头的行
 /^#+\s+.+/m;
 ```
 
-### 表格检测
+### 表格检测 {#table}
 
 ```typescript | pure
 // 匹配包含 | 分隔符的表格
 /\|.+\|[\r\n]+\|[\s-:]+\|/m;
 ```
 
-### 链接检测
+### 链接检测 {#link-detection}
 
 ```typescript | pure
 // 匹配 [text](url) 格式的链接
 /\[.+\]\(.+\)/;
 ```
 
-### 图片检测
+### 图片检测 {#image-detection}
 
 ```typescript | pure
 // 匹配 ![alt](url) 格式的图片
 /!\[.+\]\(.+\)/;
 ```
 
-### 代码块检测
+### 代码块检测 {#code-block-detection}
 
 ````typescript | pure
 // 匹配 ``` 包围的代码块
 /```[\s\S]*```/;
 ````
 
-### 内联代码检测
+### 内联代码检测 {#inline-code-detection}
 
 ```typescript | pure
 // 匹配 `code` 格式的内联代码
 /`.+`/;
 ```
 
-### 引用块检测
+### 引用块检测 {#quote-block-detection}
 
 ```typescript | pure
 // 匹配 > 开头的引用行
 /^>\s+.+/m;
 ```
 
-### 粗体文本检测
+### 粗体文本检测 {#bold-text-detection}
 
 ```typescript | pure
 // 匹配 **text** 或 __text__ 格式
 /\*\*.+\*\*/.test(text) || /__.+__/.test(text);
 ```
 
-### 斜体文本检测
+### 斜体文本检测 {#italic-text-detection}
 
 ```typescript | pure
 // 匹配 *text* 格式（排除单独的 *）
 /\*.+\*/.test(text) && !/^\*$/.test(text);
 ```
 
-### 删除线检测
+### 删除线检测 {#strikethrough-detection}
 
 ```typescript | pure
 // 匹配 ~~text~~ 格式
 /~~.+~~/;
 ```
 
-### 水平分割线检测
+### 水平分割线检测 {#hr-detection}
 
 ```typescript | pure
 // 匹配 ---、===、*** 格式
 /^(---|===|\*\*\*)$/m;
 ```
 
-## 注意事项
+## 注意事项 {#notes}
 
 1. **性能考虑**：函数使用多个正则表达式进行检测，对于长文本可能会有性能影响
 2. **准确性**：检测基于常见的 Markdown 语法，可能无法识别所有变体
 3. **空值处理**：函数会正确处理空字符串和只包含空格的字符串
 4. **大小写敏感**：正则表达式是大小写敏感的
 
-## 使用场景
+## 使用场景 {#use-cases}
 
 - **内容类型检测**：在粘贴内容时判断是否为 Markdown 格式
 - **编辑器功能**：根据内容类型启用不同的编辑模式

@@ -7,11 +7,11 @@ group:
   order: 4
 ---
 
-# EditorUtils 工具类
+# EditorUtils 工具类 {#editorutils}
 
 `EditorUtils` 是一个提供编辑器操作工具方法的静态类，封装了常用的 Slate 编辑器操作。
 
-## 功能描述
+## 功能描述 {#description}
 
 `EditorUtils` 类提供了丰富的编辑器操作方法，包括：
 
@@ -22,9 +22,9 @@ group:
 - **选择操作** - 选区管理和操作
 - **DOM 操作** - DOM 元素和事件处理
 
-## 主要方法
+## 主要方法 {#methods}
 
-### 路径操作
+### 路径操作 {#path-operations}
 
 #### `hasPath(editor: Editor, path: Path): boolean`
 
@@ -66,7 +66,7 @@ const prevPath = EditorUtils.findPrev(editor, [0, 2]);
 const nextPath = EditorUtils.findNext(editor, [0, 1]);
 ```
 
-### 节点操作
+### 节点操作 {#node-operations}
 
 #### `replaceSelectedNode(editor: Editor, newNode: Elements[]): void`
 
@@ -105,7 +105,7 @@ EditorUtils.reset(editor, [
 ]);
 ```
 
-### 格式操作
+### 格式操作 {#format-operations}
 
 #### `clearMarks(editor: Editor, split = false): void`
 
@@ -157,7 +157,7 @@ EditorUtils.setAlignment(editor, 'right');
 const isCentered = EditorUtils.isAlignmentActive(editor, 'center');
 ```
 
-### 媒体操作
+### 媒体操作 {#media-operations}
 
 #### `createMediaNode(src: string | undefined, type: string, extraPros?: Record<string, any>): CardNode | { text: string }`
 
@@ -189,7 +189,7 @@ const cardNode = EditorUtils.wrapperCardNode(
 );
 ```
 
-### 选择操作
+### 选择操作 {#selection-actions}
 
 #### `focus(editor: Editor): void`
 
@@ -223,7 +223,7 @@ const text = EditorUtils.copyText(editor, { path: [0, 0], offset: 0 });
 const text = EditorUtils.cutText(editor, { path: [0, 0], offset: 0 });
 ```
 
-### 工具方法
+### 工具方法 {#methods-2}
 
 #### `copy(data: object): object`
 
@@ -249,7 +249,7 @@ const isAtEnd = EditorUtils.checkEnd(editor);
 const isSelEnd = EditorUtils.checkSelEnd(editor, [0, 1]);
 ```
 
-## 常量
+## 常量 {#constants}
 
 ### `p`
 
@@ -268,9 +268,9 @@ const paragraph = EditorUtils.p;
 const marks = ['bold', 'italic', 'code', 'strikethrough', 'url'];
 ```
 
-## 使用场景
+## 使用场景 {#use-cases}
 
-### 编辑器初始化
+### 编辑器初始化 {#editor-init}
 
 ```typescript | pure
 // 重置编辑器内容
@@ -279,7 +279,7 @@ EditorUtils.reset(editor, [
 ]);
 ```
 
-### 格式操作
+### 格式操作 {#format-operations-2}
 
 ```typescript | pure
 // 切换文本格式
@@ -292,7 +292,7 @@ const clearFormat = () => {
 };
 ```
 
-### 媒体插入
+### 媒体插入 {#media-insertion}
 
 ```typescript | pure
 // 插入图片
@@ -302,7 +302,7 @@ const insertImage = (src: string, alt: string) => {
 };
 ```
 
-### 内容操作
+### 内容操作 {#content}
 
 ```typescript | pure
 // 替换选中内容
@@ -312,7 +312,7 @@ const replaceContent = (newContent: string) => {
 };
 ```
 
-## 注意事项
+## 注意事项 {#notes}
 
 1. **错误处理**：所有方法都包含错误处理，不会抛出异常
 2. **路径验证**：使用前应验证路径的有效性
@@ -320,7 +320,7 @@ const replaceContent = (newContent: string) => {
 4. **性能考虑**：大量操作时注意性能影响
 5. **类型安全**：使用 TypeScript 确保类型安全
 
-## 扩展性
+## 扩展性 {#extensibility}
 
 `EditorUtils` 类设计为可扩展的，可以：
 

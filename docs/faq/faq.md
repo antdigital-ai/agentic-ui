@@ -7,11 +7,11 @@ group:
   order: 3
 ---
 
-# 常见问题与故障排除
+# 常见问题与故障排除 {#faq-troubleshooting}
 
 本页面整理了使用 agentic-ui 过程中经常遇到的问题和解决方案。
 
-## 📋 目录
+## 📋 目录 {#toc}
 
 - [安装和配置问题](#安装和配置问题)
 - [编辑器功能问题](#编辑器功能问题)
@@ -21,9 +21,9 @@ group:
 - [TypeScript 类型问题](#typescript-类型问题)
 - [构建和部署问题](#构建和部署问题)
 
-## 🔧 安装和配置问题
+## 🔧 安装和配置问题 {#config}
 
-### Q: 安装后出现 "Cannot resolve module '@ant-design/agentic-ui'" 错误
+### Q: 安装后出现 "Cannot resolve module '@ant-design/agentic-ui'" 错误 {#q-cannot-resolve-module-ant-design-agentic-ui}
 
 **A:** 检查以下几个方面：
 
@@ -52,7 +52,7 @@ group:
    node --version  # 需要 >= 16.0.0
    ```
 
-### Q: TypeScript 项目中出现类型错误
+### Q: TypeScript 项目中出现类型错误 {#types-q-typescript}
 
 **A:** 确保正确配置 TypeScript：
 
@@ -86,7 +86,7 @@ group:
    import MarkdownEditor from '@ant-design/agentic-ui';
    ```
 
-### Q: Webpack 构建时出现错误
+### Q: Webpack 构建时出现错误 {#q-webpack}
 
 **A:** 配置 Webpack 正确处理 agentic-ui：
 
@@ -111,9 +111,9 @@ module.exports = {
 };
 ```
 
-## ✏️ 编辑器功能问题
+## ✏️ 编辑器功能问题 {#editor-issues}
 
-### Q: 编辑器无法正常渲染或显示空白
+### Q: 编辑器无法正常渲染或显示空白 {#q}
 
 **A:** 检查以下配置：
 
@@ -144,7 +144,7 @@ module.exports = {
    </ErrorBoundary>
    ```
 
-### Q: 图片上传功能不工作
+### Q: 图片上传功能不工作 {#upload-q}
 
 **A:** 确保正确配置图片上传：
 
@@ -175,7 +175,7 @@ const handleImageUpload = async (files: File[]) => {
 />;
 ```
 
-### Q: 粘贴内容格式不正确
+### Q: 粘贴内容格式不正确 {#content-q}
 
 **A:** 自定义粘贴处理：
 
@@ -200,7 +200,7 @@ const customPastePlugin = {
 <MarkdownEditor plugins={[customPastePlugin]} />;
 ````
 
-### Q: 数学公式不显示
+### Q: 数学公式不显示 {#q-2}
 
 **A:** 确保 KaTeX 配置正确：
 
@@ -235,9 +235,9 @@ const customPastePlugin = {
    />;
    ```
 
-## ⚡ 性能和优化问题
+## ⚡ 性能和优化问题 {#performance-issues}
 
-### Q: 大文档编辑时出现卡顿
+### Q: 大文档编辑时出现卡顿 {#q-3}
 
 **A:** 实施性能优化策略：
 
@@ -272,7 +272,7 @@ const customPastePlugin = {
    <MarkdownEditor onChange={debouncedOnChange} />;
    ```
 
-### Q: 内存使用过高
+### Q: 内存使用过高 {#q-4}
 
 **A:** 优化内存使用：
 
@@ -308,9 +308,9 @@ const customPastePlugin = {
    };
    ```
 
-## 🎨 样式和主题问题
+## 🎨 样式和主题问题 {#style}
 
-### Q: 自定义主题不生效
+### Q: 自定义主题不生效 {#custom-q}
 
 **A:** 正确配置主题：
 
@@ -330,7 +330,7 @@ const customTheme = {
 </ConfigProvider>;
 ```
 
-### Q: CSS 样式冲突
+### Q: CSS 样式冲突 {#style-q-css}
 
 **A:** 解决样式冲突：
 
@@ -364,7 +364,7 @@ const customTheme = {
    }));
    ```
 
-### Q: 暗色主题不工作
+### Q: 暗色主题不工作 {#q-5}
 
 **A:** 配置暗色主题：
 
@@ -380,9 +380,9 @@ import { ConfigProvider, theme } from 'antd';
 </ConfigProvider>;
 ```
 
-## 🔌 插件相关问题
+## 🔌 插件相关问题 {#plugin-issues}
 
-### Q: 自定义插件不生效
+### Q: 自定义插件不生效 {#custom-q-2}
 
 **A:** 检查插件配置：
 
@@ -411,7 +411,7 @@ import { ConfigProvider, theme } from 'antd';
    />
    ```
 
-### Q: 插件之间冲突
+### Q: 插件之间冲突 {#q-6}
 
 **A:** 解决插件冲突：
 
@@ -433,9 +433,9 @@ import { ConfigProvider, theme } from 'antd';
    }, [enableAdvanced]);
    ```
 
-## 📘 TypeScript 类型问题
+## 📘 TypeScript 类型问题 {#types-typescript}
 
-### Q: 类型定义不完整或错误
+### Q: 类型定义不完整或错误 {#full-q}
 
 **A:** 解决类型问题：
 
@@ -475,9 +475,9 @@ import { ConfigProvider, theme } from 'antd';
    };
    ```
 
-## 🚀 构建和部署问题
+## 🚀 构建和部署问题 {#build-deploy-issues}
 
-### Q: 生产环境构建失败
+### Q: 生产环境构建失败 {#q-7}
 
 **A:** 解决构建问题：
 
@@ -513,7 +513,7 @@ import { ConfigProvider, theme } from 'antd';
    };
    ```
 
-### Q: 部署后功能异常
+### Q: 部署后功能异常 {#q-8}
 
 **A:** 检查部署环境：
 
@@ -538,9 +538,9 @@ import { ConfigProvider, theme } from 'antd';
    import 'regenerator-runtime/runtime';
    ```
 
-## 🔍 调试技巧
+## 🔍 调试技巧 {#debugging-tips}
 
-### 启用调试模式
+### 启用调试模式 {#mode-mode}
 
 ```tsx | pure
 // 开发环境启用详细日志
@@ -550,7 +550,7 @@ import { ConfigProvider, theme } from 'antd';
 />
 ```
 
-### 使用浏览器调试工具
+### 使用浏览器调试工具 {#browser-devtools}
 
 1. **React Developer Tools**
    - 安装 React DevTools 浏览器扩展
@@ -566,7 +566,7 @@ import { ConfigProvider, theme } from 'antd';
    window.editorInstance = editorRef.current;
    ```
 
-## 🆘 寻求帮助
+## 🆘 寻求帮助 {#getting-help}
 
 如果以上解决方案无法解决您的问题：
 
@@ -583,7 +583,7 @@ import { ConfigProvider, theme } from 'antd';
    - [GitHub Discussions](https://github.com/ant-design/agentic-ui/discussions)
    - 技术交流和经验分享
 
-## 📚 相关资源
+## 📚 相关资源 {#related-resources}
 
 - [API 文档](/components/api)
 - [开发指南](/development/development-guide)

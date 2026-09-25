@@ -1,10 +1,10 @@
 # RFC：基于 `chartType` 注释 + Markdown 表格的四象限图 {#rfc-quadrant-chart}
 
-## 背景
+## 背景 {#background}
 
 业务上需要展示「四象限矩阵」式内容（如优先级矩阵、技术评估矩阵、竞品分析矩阵等），版式上常见为 **2×2 网格**，每个象限带标签并包含条目列表。
 
-## 数据契约
+## 数据契约 {#data-contract}
 
 按行顺序，前 4 行 = 4 个象限：
 
@@ -13,7 +13,7 @@
 
 不足 4 行时自动补空占位。
 
-## 注释示例
+## 注释示例 {#example}
 
 ```markdown
 <!-- {"chartType": "quadrant", "title": "优先级矩阵"} -->
@@ -26,14 +26,14 @@
 | 不重要不紧急 | 整理桌面, 清理文档        |
 ```
 
-## 配置字段
+## 配置字段 {#config-fields}
 
 | 字段        | 类型     | 说明                |
 | ----------- | -------- | ------------------- |
 | `chartType` | `string` | 固定为 `"quadrant"` |
 | `title`     | `string` | 图表标题（可选）    |
 
-## 状态
+## 状态 {#status}
 
 - **Implemented**：以 `chartType: "quadrant"` 落地。
   - 渲染：`src/Plugins/chart/QuadrantChart/`。

@@ -7,7 +7,7 @@ group:
   order: 3
 ---
 
-# Markdown 输入框
+# Markdown 输入框 {#markdown}
 
 ## 基本用法（Tag + Mark）{#tag-mark-basic}
 
@@ -17,7 +17,7 @@ group:
 
 <code src="../demos/markdownInputField/ime-compose-enter.tsx" background="var(--main-bg-color)" iframe=640></code>
 
-## 圆角
+## 圆角 {#border-radius}
 
 <code src="../demos/markdownInputField/border-radius.tsx" background="var(--main-bg-color)" iframe=540></code>
 
@@ -25,54 +25,54 @@ group:
 
 <code src="../demos/markdownInputField/dropdown-render.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-## 自定义 Tag
+## 自定义 Tag {#custom-tag}
 
 <code src="../demos/markdownInputField/custom-tag.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-## 文件上传
+## 文件上传 {#upload}
 
 <code src="../demos/markdownInputField/attachment-basic.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-## 多行滚动
+## 多行滚动 {#multiline-scroll}
 
 <code src="../demos/markdownInputField/scroll.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-## 禁用
+## 禁用 {#disabled}
 
 <code src="../demos/markdownInputField/disabled.tsx" background="var(--main-bg-color)" iframe=420></code>
 
-## 焦点事件
+## 焦点事件 {#events}
 
 <code src="../demos/markdownInputField/on-focus.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-## webllm 助手集成
+## webllm 助手集成 {#webllm}
 
 <code src="../demos/markdownInputField/web-llm.tsx" background="var(--main-bg-color)" iframe=720></code>
 
-## 自定义发送按钮
+## 自定义发送按钮 {#custom}
 
 <code src="../demos/markdownInputField/custom-send-button.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-## 自定义发送（高级）
+## 自定义发送（高级） {#custom-2}
 
 <code src="../demos/markdownInputField/custom-send-advanced.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-## 自定义附件弹窗
+## 自定义附件弹窗 {#custom-attachment}
 
 <code src="../demos/markdownInputField/custom-attachment-popover.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-## 上传响应处理
+## 上传响应处理 {#upload-2}
 
 <code src="../demos/markdownInputField/upload-with-response.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-## 禁用悬停动画
+## 禁用悬停动画 {#disable-hover-animation}
 
 <code src="../demos/markdownInputField/disable-hover-animation.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-## 粘贴配置
+## 粘贴配置 {#config-paste}
 
 <code src="../demos/paste-config.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-## 引用输入
+## 引用输入 {#quote-input}
 
 <code src="../demos/quote-with-input-demo.tsx" background="var(--main-bg-color)" iframe=540></code>

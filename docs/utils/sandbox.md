@@ -7,13 +7,13 @@ group:
   order: 8
 ---
 
-# 沙箱系统 (ProxySandbox)
+# 沙箱系统 (ProxySandbox) {#proxysandbox}
 
-## 概述
+## 概述 {#overview}
 
 ProxySandbox 是一个强大的 JavaScript 代码执行沙箱系统，提供安全、受控的代码执行环境。它支持多种安全特性，包括代码注入防护、访问控制、资源限制和自定义参数注入等功能。
 
-### 核心特性
+### 核心特性 {#core-features}
 
 - 🔒 **安全执行环境** - 防止恶意代码访问敏感 API
 - ⏱️ **超时保护** - 防止无限循环和长时间运行的代码
@@ -22,9 +22,9 @@ ProxySandbox 是一个强大的 JavaScript 代码执行沙箱系统，提供安�
 - 🛡️ **访问控制** - 提供安全的 window 和 document 代理
 - 📊 **资源监控** - 内存使用限制和性能监控
 
-## 快速开始
+## 快速开始 {#quick-start}
 
-### Coding Agent 生成代码的支持边界
+### Coding Agent 生成代码的支持边界 {#coding-agent}
 
 ProxySandbox 可以执行 Coding Agent 生成的受限 JavaScript，并可将结果写入显式注入的 `shadowRoot`。它不会在浏览器内安装 npm 依赖、运行任意构建工具，或安全地执行未经审核的 Node.js/系统命令。
 
@@ -36,7 +36,7 @@ ProxySandbox 可以执行 Coding Agent 生成的受限 JavaScript，并可将结
 
 需要渲染完整 React/Vue 工程或安装第三方依赖时，应使用服务端容器或独立 iframe 构建沙箱；不要把这类代码直接交给 ProxySandbox。无论代码来源为何，都应保留超时、全局对象白名单和资源限制。
 
-### 基本使用
+### 基本使用 {#basic-usage}
 
 ```tsx | pure
 import { quickExecute } from '@/utils/sandbox/proxySandbox';
@@ -53,7 +53,7 @@ const result2 = await quickExecute(`
 console.log(result2); // 'HELLO, SANDBOX!'
 ```
 
-### 使用 ProxySandbox 实例
+### 使用 ProxySandbox 实例 {#proxysandbox-2}
 
 ```tsx | pure
 import { ProxySandbox } from '@/utils/sandbox/proxySandbox';
@@ -82,9 +82,9 @@ try {
 }
 ```
 
-## 安全特性
+## 安全特性 {#security-features}
 
-### 1. 代码注入防护
+### 1. 代码注入防护 {#code-injection-defense}
 
 沙箱会自动阻止危险的代码执行：
 
@@ -95,7 +95,7 @@ await quickExecute('new Function("return 1")()'); // ❌ 被阻止
 await quickExecute('this.constructor.constructor'); // ❌ 被阻止
 ```
 
-### 2. 安全的全局对象
+### 2. 安全的全局对象 {#safe-globals}
 
 提供安全的 `window` 和 `document` 代理：
 
@@ -116,7 +116,7 @@ const result = await quickExecute(`
 console.log(result.cookies); // ''（空字符串，保护隐私）
 ```
 
-### 3. 资源限制
+### 3. 资源限制 {#resource-limits}
 
 ```tsx | pure
 const sandbox = new ProxySandbox({
@@ -133,15 +133,15 @@ try {
 }
 ```
 
-## 自定义参数注入
+## 自定义参数注入 {#custom-injection}
 
-### shadowRoot 注入
+### shadowRoot 注入 {#shadowroot}
 
 ProxySandbox 支持注入自定义参数，特别适用于 Shadow DOM 操作：
 
-### shadowRoot 注入使用示例
+### shadowRoot 注入使用示例 {#example-shadowroot}
 
-#### 1. 基本 shadowRoot 操作
+#### 1. 基本 shadowRoot 操作 {#basic-shadowroot}
 
 ```tsx | pure
 import { ProxySandbox } from '@/utils/sandbox/proxySandbox';
@@ -181,7 +181,7 @@ console.log(result.result);
 // 输出: { success: true, elementCount: 1, headingText: 'Hello Shadow DOM!' }
 ```
 
-#### 2. 使用 quickExecute 便捷函数
+#### 2. 使用 quickExecute 便捷函数 {#quickexecute}
 
 ```tsx | pure
 import { quickExecute } from '@/utils/sandbox/proxySandbox';
@@ -218,7 +218,7 @@ const result = await quickExecute(
 console.log(result); // 'Content added successfully'
 ```
 
-#### 3. 在 React 组件中使用
+#### 3. 在 React 组件中使用 {#react}
 
 ```tsx | pure
 import React, { useEffect, useRef } from 'react';
@@ -289,9 +289,9 @@ const ShadowDOMComponent: React.FC = () => {
 export default ShadowDOMComponent;
 ```
 
-## 高级功能
+## 高级功能 {#advanced}
 
-### 1. 动态主题系统
+### 1. 动态主题系统 {#dynamic-theme-system}
 
 ```tsx | pure
 const applyTheme = async (shadowRoot: ShadowRoot, themeConfig: any) => {
@@ -333,7 +333,7 @@ const applyTheme = async (shadowRoot: ShadowRoot, themeConfig: any) => {
 };
 ```
 
-### 2. 动态组件生成器
+### 2. 动态组件生成器 {#dynamic-component-generator}
 
 ```tsx | pure
 const generateComponent = async (
@@ -391,9 +391,9 @@ const generateComponent = async (
 };
 ```
 
-## 配置选项
+## 配置选项 {#config-options}
 
-### SandboxConfig 接口
+### SandboxConfig 接口 {#sandboxconfig}
 
 ```tsx | pure
 interface SandboxConfig {
@@ -423,7 +423,7 @@ interface SandboxConfig {
 }
 ```
 
-### 预设配置
+### 预设配置 {#presets}
 
 系统提供了几种预设配置：
 
@@ -440,7 +440,7 @@ const secureSandbox = createConfiguredSandbox('secure');
 const restrictedSandbox = createConfiguredSandbox('restricted');
 ```
 
-## API 参考
+## API 参考 {#api}
 
 ### quickExecute
 
@@ -466,7 +466,7 @@ function runInSandbox(
 ): Promise<SandboxResult>;
 ```
 
-### ProxySandbox 类
+### ProxySandbox 类 {#proxysandbox-3}
 
 完整的沙箱类，提供更多控制选项：
 
@@ -484,9 +484,9 @@ class ProxySandbox {
 }
 ```
 
-## 错误处理
+## 错误处理 {#error-handling}
 
-### 常见错误类型
+### 常见错误类型 {#common-errors}
 
 ```tsx | pure
 try {
@@ -504,7 +504,7 @@ try {
 }
 ```
 
-### 结果类型
+### 结果类型 {#result-types}
 
 ```tsx | pure
 interface SandboxResult {
@@ -516,9 +516,9 @@ interface SandboxResult {
 }
 ```
 
-## 性能优化
+## 性能优化 {#performance}
 
-### 1. Worker 线程使用
+### 1. Worker 线程使用 {#worker}
 
 默认情况下，沙箱会尝试使用 Worker 线程执行代码：
 
@@ -528,7 +528,7 @@ const sandbox = new ProxySandbox({
 });
 ```
 
-### 2. 批量执行
+### 2. 批量执行 {#batch-execution}
 
 对于多个代码片段，建议复用沙箱实例：
 
@@ -546,7 +546,7 @@ try {
 }
 ```
 
-### 3. 内存管理
+### 3. 内存管理 {#memory-management}
 
 ```tsx | pure
 // 设置合理的内存限制
@@ -563,9 +563,9 @@ await sandbox.execute(`
 `);
 ```
 
-## 监控和调试
+## 监控和调试 {#monitoring-and-debugging}
 
-### 执行统计
+### 执行统计 {#execution-stats}
 
 ```tsx | pure
 const result = await sandbox.execute(code);
@@ -575,7 +575,7 @@ console.log('内存使用:', result.memoryUsage, 'bytes');
 console.log('执行成功:', result.success);
 ```
 
-### 调试模式
+### 调试模式 {#debug-mode}
 
 ```tsx | pure
 const sandbox = new ProxySandbox({
@@ -589,9 +589,9 @@ await sandbox.execute(`
 `);
 ```
 
-## 安全最佳实践
+## 安全最佳实践 {#security-best-practices}
 
-### 1. 输入验证
+### 1. 输入验证 {#input-validation}
 
 始终验证用户输入的代码：
 
@@ -614,7 +614,7 @@ function validateUserCode(code: string): boolean {
 }
 ```
 
-### 2. 权限最小化
+### 2. 权限最小化 {#least-privilege}
 
 只提供必要的功能：
 
@@ -628,7 +628,7 @@ const restrictedSandbox = new ProxySandbox({
 });
 ```
 
-### 3. 资源监控
+### 3. 资源监控 {#resource-monitoring}
 
 监控沙箱使用情况：
 
@@ -663,9 +663,9 @@ class SandboxMonitor {
 }
 ```
 
-## 常见使用场景
+## 常见使用场景 {#common-scenarios}
 
-### 1. 用户自定义脚本
+### 1. 用户自定义脚本 {#custom}
 
 ```tsx | pure
 // 允许用户编写自定义逻辑
@@ -686,7 +686,7 @@ const result = await quickExecute(userScript, {
 });
 ```
 
-### 2. 动态表达式求值
+### 2. 动态表达式求值 {#dynamic-expression-eval}
 
 ```tsx | pure
 // 计算用户输入的数学表达式
@@ -702,7 +702,7 @@ const result = await quickExecute(
 );
 ```
 
-### 3. 模板引擎
+### 3. 模板引擎 {#template-engine}
 
 ```tsx | pure
 // 简单的模板处理
@@ -722,9 +722,9 @@ const html = await quickExecute(template, {
 });
 ```
 
-## 迁移指南
+## 迁移指南 {#migration}
 
-### 从传统 eval 迁移
+### 从传统 eval 迁移 {#eval}
 
 ```tsx | pure
 // 之前: 不安全的 eval
@@ -734,7 +734,7 @@ const result = eval(userCode);
 const result = await quickExecute(userCode);
 ```
 
-### 从 Function 构造函数迁移
+### 从 Function 构造函数迁移 {#function}
 
 ```tsx | pure
 // 之前: 使用 Function 构造函数
@@ -745,9 +745,9 @@ const result = fn(data);
 const result = await quickExecute(userCode, { data });
 ```
 
-## 故障排除
+## 故障排除 {#troubleshooting}
 
-### 常见问题
+### 常见问题 {#faq}
 
 1. **代码执行超时**
    - 检查是否有无限循环
@@ -764,7 +764,7 @@ const result = await quickExecute(userCode, { data });
    - 检查浏览器兼容性
    - 确保 Worker 脚本正确加载
 
-### 调试技巧
+### 调试技巧 {#debugging-tips}
 
 ```tsx | pure
 // 启用详细日志

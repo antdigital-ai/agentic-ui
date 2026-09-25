@@ -1,4 +1,4 @@
-# MarkdownInputField 重构待办
+﻿# MarkdownInputField 重构待办 {#markdowninputfield}
 
 > 本文用于记录 `src/MarkdownInputField` 的架构 review 结论与后续重构计划。
 > 仅作为内部跟进 issue 使用，不发布到组件文档。
@@ -9,7 +9,7 @@
 
 ---
 
-## 概览
+## 概览 {#overview}
 
 | 维度           | 数据                                                                                         |
 | -------------- | -------------------------------------------------------------------------------------------- |
@@ -21,9 +21,9 @@
 
 ---
 
-## P0 / 高优先级（强烈建议尽快做）
+## P0 / 高优先级（强烈建议尽快做） {#p0}
 
-### #1 主组件 + Props 是「上帝接口」，没有真正的关注点分离
+### #1 主组件 + Props 是「上帝接口」，没有真正的关注点分离 {#props}
 
 **现状**
 
@@ -44,7 +44,7 @@
 
 ---
 
-### #2 hooks 拆分是「按代码行数」而非「按职责」
+### #2 hooks 拆分是「按代码行数」而非「按职责」 {#hooks}
 
 **现状**
 
@@ -71,7 +71,7 @@ useMarkdownInputFieldRefs         // 同时管 ref + useImperativeHandle + 外�
 
 ---
 
-### #3 类型定义重复发明轮子，多处 `as any`
+### #3 类型定义重复发明轮子，多处 `as any` {#types-as-any}
 
 **现状**
 
@@ -97,7 +97,7 @@ attachment?: { enable?: boolean; ... } & AttachmentButtonProps;
 
 ---
 
-### #4 状态分散、受控/非受控逻辑不一致
+### #4 状态分散、受控/非受控逻辑不一致 {#controlled-uncontrolled}
 
 **现状**
 
@@ -114,9 +114,9 @@ attachment?: { enable?: boolean; ... } & AttachmentButtonProps;
 
 ---
 
-## P1 / 中优先级
+## P1 / 中优先级 {#p1}
 
-### #5 交叉依赖 / 循环引用风险
+### #5 交叉依赖 / 循环引用风险 {#circular-dep-risks}118} {#circular-dep-risks}
 
 **现状**
 
@@ -148,7 +148,7 @@ FileUploadManager/index.tsx
 
 ---
 
-### #6 `Suggestion` 越界包裹根节点
+### #6 `Suggestion` 越界包裹根节点 {#suggestion}
 
 **现状**
 
@@ -171,7 +171,7 @@ FileUploadManager/index.tsx
 
 ---
 
-### #7 Refs hook 三个职责揉在一起，且包含运行时陷阱
+### #7 Refs hook 三个职责揉在一起，且包含运行时陷阱 {#refs-hook}
 
 **现状**
 
@@ -193,7 +193,7 @@ FileUploadManager/index.tsx
 
 ---
 
-### #8 Mobile 检测与 SSR / 测试分支散落各处
+### #8 Mobile 检测与 SSR / 测试分支散落各处 {#mobile-ssr}
 
 **现状**
 
@@ -208,7 +208,7 @@ FileUploadManager/index.tsx
 
 ---
 
-### #9 渲染层 / 样式层硬编码 magic number 太多
+### #9 渲染层 / 样式层硬编码 magic number 太多 {#style-magic-number}
 
 **现状**
 
@@ -225,7 +225,7 @@ FileUploadManager/index.tsx
 
 ---
 
-### #10 `BeforeToolContainer` 像独立组件被错误归位
+### #10 `BeforeToolContainer` 像独立组件被错误归位 {#beforetoolcontainer}
 
 **现状**
 
@@ -243,7 +243,7 @@ FileUploadManager/index.tsx
 
 ---
 
-### #11 useMemo 依赖膨胀，性能优化已失效
+### #11 useMemo 依赖膨胀，性能优化已失效 {#usememo}
 
 **现状**
 
@@ -258,7 +258,7 @@ FileUploadManager/index.tsx
 
 ---
 
-### #12 错误处理与可观测性
+### #12 错误处理与可观测性 {#error-observability}
 
 **现状**
 
@@ -275,7 +275,7 @@ FileUploadManager/index.tsx
 
 ---
 
-## P2 / 各模块小问题（top 收录）
+## P2 / 各模块小问题（top 收录） {#top}
 
 ### `SendButton`
 
@@ -340,7 +340,7 @@ FileUploadManager/index.tsx
 
 ---
 
-## 跨模块 API 一致性问题
+## 跨模块 API 一致性问题 {#api}
 
 | 类别            | 不一致                                                                                                                                                                                 |
 | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -352,7 +352,7 @@ FileUploadManager/index.tsx
 
 ---
 
-## 优先级建议
+## 优先级建议 {#priority-suggestions}
 
 如果只能挑 5 件事做：
 
@@ -364,7 +364,7 @@ FileUploadManager/index.tsx
 
 ---
 
-## 值得保留的设计 ✅
+## 值得保留的设计 ✅ {#designs-worth-keeping}366} {#designs-worth-keeping}
 
 - `useMarkdownInputFieldRefs` 里 `lastEditorValueRef` + 焦点检查的双重门禁，注释非常详细，是处理过真实 bug 的好设计。
 - `BorderBeamAnimation` 用 `React.useId` 解决多实例冲突。
@@ -375,7 +375,7 @@ FileUploadManager/index.tsx
 
 ---
 
-## 跟进建议
+## 跟进建议 {#follow-ups}
 
 - 推荐拆成 4~5 个 PR 提交，避免一次性大重构：
   - PR 1（low risk）：#5 类型集中 + 删除 `as any` + 抽 `src/Utils/env.ts`

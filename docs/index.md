@@ -28,7 +28,6 @@ export default () => {
         bottom: 0,
         paddingTop: 142,
         overflowX: 'hidden',
-        backgroundColor: '#fff',
       }}
     >
       <HomePage />

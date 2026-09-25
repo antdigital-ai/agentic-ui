@@ -7,11 +7,11 @@ group:
   order: 1
 ---
 
-# 组件开发规范
+# 组件开发规范 {#component-conventions}
 
 > 基于 `agentic-ui` 项目的实际开发经验，定义完整的组件开发规范。
 
-## 目录
+## 目录 {#toc}
 
 - [命名规范](#命名规范)
 - [文件组织](#文件组织)
@@ -22,9 +22,9 @@ group:
 - [代码质量](#代码质量)
 - [开发检查列表](#开发检查列表)
 
-## 命名规范
+## 命名规范 {#naming-conventions}
 
-### 组件命名
+### 组件命名 {#component-naming}
 
 - 使用 PascalCase
 - 语义化命名，避免通用名称
@@ -40,7 +40,7 @@ export const Item = () => {}; // 过于通用
 export const ActionsBox = () => {}; // 可能重名
 ```
 
-### 文件夹命名
+### 文件夹命名 {#folder-naming}
 
 - 使用 kebab-case
 - 模块根目录使用 PascalCase
@@ -57,16 +57,16 @@ src/
 │   └── index.tsx               # 主入口
 ```
 
-### className 命名
+### className 命名 {#classname}
 
 - 遵循 BEM 方法论
 - Block: `.history-item`
 - Element: `.history-item__title`
 - Modifier: `.history-item--selected`
 
-## 文件组织
+## 文件组织 {#file-organization}
 
-### 标准结构
+### 标准结构 {#standard-structure}
 
 ```bash
 ComponentName/
@@ -80,16 +80,16 @@ ComponentName/
 └── README.md           # 组件文档
 ```
 
-### 文件命名
+### 文件命名 {#file-naming}
 
 - 组件文件：`ComponentName.tsx`
 - 样式文件：`style.ts`
 - 测试文件：`ComponentName.test.tsx`
 - 类型文件：`types.ts`
 
-## 样式开发
+## 样式开发 {#style}
 
-### 使用 @ant-design/theme-token
+### 使用 @ant-design/theme-token {#ant-design-theme-token}
 
 ```tsx | pure
 import { createStyles } from '@ant-design/theme-token';
@@ -109,7 +109,7 @@ export const useStyles = createStyles(({ token }) => ({
 }));
 ```
 
-### 推荐：使用 `genStyleHooks` + 组件级 ComponentToken
+### 推荐：使用 `genStyleHooks` + 组件级 ComponentToken {#genstylehooks-componenttoken}
 
 与 antd 上游一致：每个组件在模块顶层调用一次 `genStyleHooks('ComponentName', genStyle)`
 得到一个 `useStyle(prefixCls)` hook，避免在每次渲染里重新构造样式注册器。
@@ -164,7 +164,7 @@ export function useStyle(prefixCls?: string) {
 > 1. 使用 agentic-ui 自有的 `AgenticComponentTokenMap`（组件可自由扩展）
 > 2. `hashId` 始终为 `''`，避免组件库选择器随宿主 antd 主题哈希变化
 
-#### 何时使用 `resetComponent`
+#### 何时使用 `resetComponent` {#resetcomponent}
 
 需要重置 box-sizing / margin / padding 等基础盒模型时，把 `resetComponent` 与
 自己的 `genStyle` 一起放进 styleFn：
@@ -182,7 +182,7 @@ const useGenStyle = genStyleHooks('ComponentName', (token, info) => [
 ]);
 ```
 
-#### 兼容入口：`useEditorStyleRegister`
+#### 兼容入口：`useEditorStyleRegister` {#useeditorstyleregister}
 
 少数场景（如气泡按 `bubbleNameClassName` 动态切换 cache、Editor 接受
 `propsToken` 运行时覆盖）无法在模块顶层一次性确定 styleFn，仍可使用旧接口：
@@ -201,7 +201,7 @@ export function useStyle(prefixCls?: string, extra?: Partial<ChatTokenType>) {
 `useStyleRegister`，与 `genStyleHooks` 共享同一套底层注入路径。新增样式时
 **优先使用 `genStyleHooks`**，仅在签名特殊时退回 `useEditorStyleRegister`。
 
-#### 组件中使用样式
+#### 组件中使用样式 {#style-2}
 
 ```tsx | pure
 import { ConfigProvider } from 'antd';
@@ -250,29 +250,29 @@ const Component: React.FC<ComponentProps> = ({
 };
 ```
 
-#### 样式系统核心概念
+#### 样式系统核心概念 {#style-3}
 
-##### Token 系统
+##### Token 系统 {#token}
 
 - `token.paddingSM`、`token.marginSM` 等设计变量
 - `token.borderRadius`、`token.colorBgTextHover` 等主题变量
 - `token.componentCls` 组件类名前缀
 
-##### 选择器命名规范
+##### 选择器命名规范 {#selector-naming}
 
 - 根选择器：`[token.componentCls]`
 - 子元素：`[${token.componentCls}-element]`
 - 状态修饰符：`&-state`（如 `&-dark`、`&-loading`）
 - 伪类：`&:hover`、`&:focus` 等
 
-##### 样式组织
+##### 样式组织 {#style-4}
 
 - 根容器样式在最外层
 - 子元素样式使用模板字符串
 - 主题变体使用 `&-theme` 格式
 - 响应式样式使用标准媒体查询
 
-##### 类名管理
+##### 类名管理 {#class-management}
 
 - 使用 `classNames` 工具函数组合类名
 - `prefixCls` 作为基础前缀
@@ -298,7 +298,7 @@ return (
 );
 ```
 
-#### 3. 样式开发检查列表
+#### 3. 样式开发检查列表 {#style-list}
 
 - [ ] 正确定义 `GenerateStyle` 函数
 - [ ] 使用 `ConfigProvider.ConfigContext` 获取 `prefixCls`
@@ -307,9 +307,9 @@ return (
 - [ ] 验证响应式样式工作正常
 - [ ] 检查编译错误并修复
 
-## API设计
+## API设计 {#api}
 
-### Props 命名规范
+### Props 命名规范 {#props}
 
 ```tsx | pure
 interface ComponentProps {
@@ -330,7 +330,7 @@ interface ComponentProps {
 }
 ```
 
-### 事件回调命名
+### 事件回调命名 {#events-callback}
 
 ```tsx | pure
 // 标准事件
@@ -342,9 +342,9 @@ onSelectionChange: (selectedIds: string[]) => void;
 onLoadMore: () => Promise<void>;
 ```
 
-## 功能开发
+## 功能开发 {#feature-development}
 
-### 组件开发流程
+### 组件开发流程 {#component-workflow}
 
 ```tsx | pure
 // 1. 定义类型
@@ -371,7 +371,7 @@ export const ComponentName: React.FC<ComponentProps> = (props) => {
 };
 ```
 
-### Hook 开发规范
+### Hook 开发规范 {#hook}
 
 ```tsx | pure
 export const useComponent = (props: ComponentProps) => {
@@ -399,9 +399,9 @@ export const useComponent = (props: ComponentProps) => {
 };
 ```
 
-## 测试规范
+## 测试规范 {#testing-conventions}
 
-### 测试文件结构
+### 测试文件结构 {#test-file-structure}
 
 ```tsx | pure
 // ComponentName.test.tsx
@@ -432,22 +432,22 @@ describe('ComponentName', () => {
 });
 ```
 
-### 测试覆盖率要求
+### 测试覆盖率要求 {#coverage-requirements}
 
 - 分支覆盖率：≥ 80%
 - 函数覆盖率：≥ 80%
 - 行覆盖率：≥ 80%
 
-## 代码质量
+## 代码质量 {#code-quality}
 
-### TypeScript 规范
+### TypeScript 规范 {#typescript}
 
 - 提供完整的类型定义
 - 避免使用 `any` 类型
 - 使用接口定义数据结构
 - 提供泛型支持
 
-### 性能优化
+### 性能优化 {#performance}
 
 ```tsx | pure
 // 使用 React.memo
@@ -466,7 +466,7 @@ const expensiveValue = useMemo(() => {
 }, [data]);
 ```
 
-### 错误处理
+### 错误处理 {#error-handling}
 
 ```tsx | pure
 // 异步操作错误处理
@@ -483,9 +483,9 @@ const handleAsync = async () => {
 };
 ```
 
-## Demo 开发规范
+## Demo 开发规范 {#demo}
 
-### Demo 文件组织
+### Demo 文件组织 {#demo-2}
 
 ```bash
 docs/demos/
@@ -495,16 +495,16 @@ docs/demos/
 │   └── custom.tsx             # 自定义用法
 ```
 
-### Demo 内容要求
+### Demo 内容要求 {#content-demo}
 
 - 完整的组件代码
 - 清晰的交互示例
 - 详细的API说明
 - 使用 `@ant-design/agentic-ui` 组件
 
-## 开发检查列表
+## 开发检查列表 {#list}
 
-### ✅ 命名规范检查
+### ✅ 命名规范检查 {#naming-convention-check}
 
 - [ ] 组件使用 PascalCase 命名
 - [ ] 组件名称语义化，避免通用名称
@@ -512,7 +512,7 @@ docs/demos/
 - [ ] 文件夹使用 kebab-case 命名
 - [ ] className 遵循 BEM 规范
 
-### ✅ 文件组织检查
+### ✅ 文件组织检查 {#file-organization-check}
 
 - [ ] 创建标准的文件夹结构
 - [ ] 组件文件命名为 `ComponentName.tsx`
@@ -520,7 +520,7 @@ docs/demos/
 - [ ] 测试文件命名为 `ComponentName.test.tsx`
 - [ ] 类型文件命名为 `types.ts`
 
-### ✅ 样式开发检查
+### ✅ 样式开发检查 {#style-5}
 
 - [ ] 使用 `genStyleHooks` + 组件级 `ComponentToken`（与 antd 上游一致）
 - [ ] 样式函数使用 `GenStyleFn<'ComponentName'>` 类型
@@ -528,7 +528,7 @@ docs/demos/
 - [ ] 样式变量使用 token 系统（AliasToken + 组件级 ComponentToken）
 - [ ] 支持主题切换和响应式设计
 
-#### ✅ .less 到 style.ts 迁移检查
+#### ✅ .less 到 style.ts 迁移检查 {#less-style-ts}
 
 - [ ] 创建对应的 `style.ts` 文件
 - [ ] 将 Less 样式转换为 CSS-in-JS 格式
@@ -542,7 +542,7 @@ docs/demos/
 - [ ] 样式选择器使用正确格式（`${token.componentCls}-element`）
 - [ ] 媒体查询放在根级别而不是嵌套在选择器内
 
-### ✅ API设计检查
+### ✅ API设计检查 {#api-2}
 
 - [ ] Props 接口定义完整
 - [ ] 事件回调使用 `on` 前缀
@@ -550,7 +550,7 @@ docs/demos/
 - [ ] 所有属性都有类型定义
 - [ ] 可选属性使用 `?` 标记
 
-### ✅ 功能开发检查
+### ✅ 功能开发检查 {#feature-dev-check}
 
 - [ ] 组件有完整的 JSDoc 注释
 - [ ] 使用 `React.FC` 定义组件类型
@@ -558,7 +558,7 @@ docs/demos/
 - [ ] 事件处理使用 `useCallback`
 - [ ] 数据获取使用 `useQuery` 或类似方案
 
-### ✅ Hook开发检查
+### ✅ Hook开发检查 {#hook-2}
 
 - [ ] Hook 使用 `use` 前缀命名
 - [ ] 返回组件需要的所有状态和方法
@@ -566,7 +566,7 @@ docs/demos/
 - [ ] 使用 `useMemo` 优化计算
 - [ ] 提供完整的类型定义
 
-### ✅ 测试规范检查
+### ✅ 测试规范检查 {#testing-convention-check}
 
 - [ ] 创建测试文件 `ComponentName.test.tsx`
 - [ ] 测试文件放在 `__tests__` 目录
@@ -574,7 +574,7 @@ docs/demos/
 - [ ] 使用 `@testing-library/react` 进行测试
 - [ ] 测试覆盖率达到 80% 以上
 
-### ✅ 代码质量检查
+### ✅ 代码质量检查 {#code-quality-check}
 
 - [ ] 所有代码都有 TypeScript 类型
 - [ ] 避免使用 `any` 类型
@@ -582,7 +582,7 @@ docs/demos/
 - [ ] 实现错误边界和异常处理
 - [ ] 代码通过 ESLint 检查
 
-### ✅ Demo开发检查
+### ✅ Demo开发检查 {#demo-3}
 
 - [ ] Demo 文件放在 `docs/demos` 目录
 - [ ] Demo 文件名以 `demo-` 开头
@@ -590,7 +590,7 @@ docs/demos/
 - [ ] 使用 `@ant-design/agentic-ui` 组件
 - [ ] 提供详细的 API 说明
 
-### ✅ 文档检查
+### ✅ 文档检查 {#docs-check}
 
 - [ ] 组件有 README.md 文档
 - [ ] API 文档完整且准确
@@ -598,7 +598,7 @@ docs/demos/
 - [ ] 说明组件的功能和限制
 - [ ] 文档通过拼写检查
 
-### ✅ 最终检查
+### ✅ 最终检查 {#final-check}
 
 - [ ] 所有检查项都已完成
 - [ ] 代码可以正常运行

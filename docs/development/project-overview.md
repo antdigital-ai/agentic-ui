@@ -7,7 +7,7 @@ group:
   order: 5
 ---
 
-# 项目技术栈与架构说明
+# 项目技术栈与架构说明 {#notes}
 
 > **项目简介**：`agentic-ui` 是一个基于 React + TypeScript 的现代化 Markdown 编辑器，提供丰富的编辑功能和插件系统，支持实时预览、语法高亮、数学公式渲染等特性。
 
@@ -19,7 +19,7 @@ group:
   - 提供良好的开发体验和用户界面
 -->
 
-## 目录
+## 目录 {#toc}
 
 - [技术栈概览](#技术栈概览)
 - [项目架构](#项目架构)
@@ -28,7 +28,7 @@ group:
 - [开发环境配置](#开发环境配置)
 - [构建与部署](#构建与部署)
 
-## 技术栈概览
+## 技术栈概览 {#tech-stack}
 
 <!--
   技术栈说明：
@@ -40,7 +40,7 @@ group:
   - 测试框架：Jest + Testing Library
 -->
 
-### 核心技术
+### 核心技术 {#core-tech}
 
 | 技术           | 版本  | 用途       | 说明                                       |
 | -------------- | ----- | ---------- | ------------------------------------------ |
@@ -60,7 +60,7 @@ group:
 
 两者可以在同一业务中按页面使用，但应统一宿主 `antd` 版本和主题配置，避免重复实现同一种聊天交互。
 
-### 开发工具
+### 开发工具 {#dev-tools}
 
 | 工具                | 版本 | 用途       | 说明                              |
 | ------------------- | ---- | ---------- | --------------------------------- |
@@ -70,7 +70,7 @@ group:
 | **ESLint**          | 8.x  | 代码检查   | JavaScript/TypeScript代码质量检查 |
 | **Prettier**        | 2.x  | 代码格式化 | 代码格式化工具                    |
 
-### 插件生态
+### 插件生态 {#plugin-ecosystem}
 
 | 插件          | 用途         | 说明                         |
 | ------------- | ------------ | ---------------------------- |
@@ -79,7 +79,7 @@ group:
 | **Reveal.js** | 幻灯片       | 支持Markdown转幻灯片演示     |
 | **Chart.js**  | 图表组件     | 支持各种数据图表的渲染       |
 
-## 项目架构
+## 项目架构 {#architecture}
 
 <!--
   架构设计说明：
@@ -89,7 +89,7 @@ group:
   - 提供完整的类型定义
 -->
 
-### 整体架构
+### 整体架构 {#overall-architecture}
 
 ```
 agentic-ui/
@@ -112,7 +112,7 @@ agentic-ui/
     └── 开发工具
 ```
 
-### 数据流架构
+### 数据流架构 {#data-flow-architecture}
 
 ```mermaid
 graph TD
@@ -127,7 +127,7 @@ graph TD
     I[插件配置] --> D
 ```
 
-## 文件夹结构
+## 文件夹结构 {#folder-structure}
 
 <!--
   文件夹结构说明：
@@ -137,7 +137,7 @@ graph TD
   - 遵循最佳实践
 -->
 
-### 根目录结构
+### 根目录结构 {#root-structure}
 
 ```
 agentic-ui/
@@ -167,9 +167,9 @@ agentic-ui/
 └── README.md              # 项目说明
 ```
 
-### 核心模块详解
+### 核心模块详解 {#core-modules}
 
-#### 1. MarkdownEditor 模块
+#### 1. MarkdownEditor 模块 {#markdowneditor}
 
 MarkdownEditor 是整个项目的核心模块，基于 Slate.js 构建，提供了强大而灵活的 Markdown 编辑功能。
 
@@ -226,7 +226,7 @@ src/MarkdownEditor/
 - **插件系统**: 可扩展的插件架构
 - **协作编辑**: 支持多人协作编辑功能
 
-#### 2. MarkdownInputField 模块
+#### 2. MarkdownInputField 模块 {#markdowninputfield}
 
 MarkdownInputField 提供了一个功能丰富的输入组件，专门为快速输入和处理 Markdown 内容而设计。
 
@@ -266,7 +266,7 @@ src/MarkdownInputField/
 - **智能建议**: 自动补全、模板建议、历史记录建议
 - **发送功能**: 快捷键发送、内容验证、发送状态提示
 
-#### 3. History 模块
+#### 3. History 模块 {#history}
 
 History 模块负责管理用户的编辑历史和会话记录，提供强大的历史管理功能。
 
@@ -300,7 +300,7 @@ src/History/
 - 批量操作
 - 分页加载
 
-#### 4. Bubble 模块
+#### 4. Bubble 模块 {#bubble}
 
 <!--
   气泡模块说明：
@@ -328,7 +328,7 @@ src/Bubble/
 - 列表展示
 - 配置管理
 
-#### 5. ThoughtChainList 模块
+#### 5. ThoughtChainList 模块 {#thoughtchainlist}
 
 <!--
   思维链模块说明：
@@ -357,7 +357,7 @@ src/ThoughtChainList/
 - 成本统计
 - 深度思考
 
-#### 6. Workspace 模块
+#### 6. Workspace 模块 {#workspace}
 
 <!--
   工作空间模块说明：
@@ -387,7 +387,7 @@ src/Workspace/
 - 实时跟随
 - 任务管理
 
-#### 7. Plugins 模块
+#### 7. Plugins 模块 {#plugins}
 
 <!--
   插件模块说明：
@@ -420,7 +420,7 @@ src/Plugins/
 - 幻灯片支持
 - 插件管理
 
-#### 8. Schema 模块
+#### 8. Schema 模块 {#schema}
 
 <!--
   模式模块说明：
@@ -447,7 +447,7 @@ src/schema/
 - 模板引擎
 - 数据验证
 
-## 核心模块说明
+## 核心模块说明 {#notes-2}
 
 <!--
   核心模块说明：
@@ -457,7 +457,7 @@ src/schema/
   - 提供完整的类型定义
 -->
 
-### 模块职责划分
+### 模块职责划分 {#module-responsibilities}
 
 | 模块                   | 主要职责   | 核心功能             | 依赖关系           |
 | ---------------------- | ---------- | -------------------- | ------------------ |
@@ -470,7 +470,7 @@ src/schema/
 | **Plugins**            | 功能扩展   | 插件管理、功能扩展   | 编辑器核心         |
 | **Schema**             | 数据模式   | 表单生成、内容渲染   | JSON Schema        |
 
-### 模块通信机制
+### 模块通信机制 {#module-communication}
 
 ```mermaid
 graph TD
@@ -483,7 +483,7 @@ graph TD
     H[Schema] --> A
 ```
 
-## 开发环境配置
+## 开发环境配置 {#config}
 
 <!--
   开发环境说明：
@@ -493,44 +493,44 @@ graph TD
   - 提供测试环境
 -->
 
-### 环境要求
+### 环境要求 {#requirements}
 
 - **Node.js**: 16.x 或更高版本
 - **npm**: 8.x 或更高版本
 - **Git**: 2.x 或更高版本
 
-### 安装依赖
+### 安装依赖 {#install-dependencies}
 
 ```bash
-# 安装项目依赖
+# 安装项目依赖 {#install-project-deps}
 npm install
 
-# 安装开发依赖
+# 安装开发依赖 {#install-dev-deps}
 npm install --save-dev
 ```
 
-### 开发命令
+### 开发命令 {#dev-commands}
 
 ```bash
-# 启动开发服务器
+# 启动开发服务器 {#start-dev-server}
 npm run dev
 
-# 构建生产版本
+# 构建生产版本 {#build-production}
 npm run build
 
-# 运行测试
+# 运行测试 {#run-tests}
 npm run test
 
-# 代码检查
+# 代码检查 {#linting}
 npm run lint
 
-# 代码格式化
+# 代码格式化 {#formatting}
 npm run format
 ```
 
-### 开发工具配置
+### 开发工具配置 {#config-2}
 
-#### Vite 配置
+#### Vite 配置 {#config-vite}
 
 ```tsx | pure
 // vite.config.ts
@@ -550,7 +550,7 @@ export default defineConfig({
 });
 ```
 
-#### TypeScript 配置
+#### TypeScript 配置 {#config-typescript}
 
 ```json
 // tsconfig.json
@@ -576,7 +576,7 @@ export default defineConfig({
 }
 ```
 
-## 构建与部署
+## 构建与部署 {#build-and-deploy}
 
 <!--
   构建部署说明：
@@ -586,37 +586,37 @@ export default defineConfig({
   - 提供部署指南
 -->
 
-### 构建模式
+### 构建模式 {#mode-mode}
 
-#### 开发构建
+#### 开发构建 {#development-build}
 
 ```bash
-# 开发模式构建
+# 开发模式构建 {#mode}
 npm run dev:build
 
-# 特点：
-# - 包含源码映射
-# - 未压缩代码
-# - 快速构建
-# - 便于调试
+# 特点： {#highlights}
+# - 包含源码映射 {#with-source-maps}
+# - 未压缩代码 {#unminified-code}
+# - 快速构建 {#fast-build}
+# - 便于调试 {#easy-debugging}
 ```
 
-#### 生产构建
+#### 生产构建 {#production-build}
 
 ```bash
-# 生产模式构建
+# 生产模式构建 {#mode-2}
 npm run build
 
-# 特点：
-# - 代码压缩
-# - 资源优化
-# - 性能优化
-# - 体积优化
+# 特点： {#highlights-2}
+# - 代码压缩 {#code-minification}
+# - 资源优化 {#asset-optimization}
+# - 性能优化 {#performance}
+# - 体积优化 {#size-optimization}
 ```
 
-### 环境配置
+### 环境配置 {#config-3}
 
-#### 开发环境
+#### 开发环境 {#development-env}
 
 ```bash
 # .env.development
@@ -625,7 +625,7 @@ VITE_APP_API_URL=http://localhost:8080
 VITE_APP_DEBUG=true
 ```
 
-#### 生产环境
+#### 生产环境 {#production-env}
 
 ```bash
 # .env.production
@@ -634,19 +634,19 @@ VITE_APP_API_URL=https://api.example.com
 VITE_APP_DEBUG=false
 ```
 
-### 部署指南
+### 部署指南 {#deployment-guide}
 
-#### 静态部署
+#### 静态部署 {#static-deployment}
 
 ```bash
-# 构建生产版本
+# 构建生产版本 {#build-production-2}
 npm run build
 
-# 部署到静态服务器
-# 将 dist/ 目录内容部署到 Web 服务器
+# 部署到静态服务器 {#deploy-static-server}
+# 将 dist/ 目录内容部署到 Web 服务器 {#content-dist-web}
 ```
 
-#### Docker 部署
+#### Docker 部署 {#docker}
 
 ```dockerfile
 # Dockerfile
@@ -663,9 +663,9 @@ EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
 ```
 
-### 性能优化
+### 性能优化 {#performance-2}
 
-#### 代码分割
+#### 代码分割 {#code-splitting}
 
 ```tsx | pure
 // 动态导入组件
@@ -673,7 +673,7 @@ const MarkdownEditor = lazy(() => import('./MarkdownEditor'));
 const History = lazy(() => import('./History'));
 ```
 
-#### 资源优化
+#### 资源优化 {#asset-optimization-2}
 
 ```tsx | pure
 // 图片优化
@@ -683,7 +683,7 @@ import { optimizeImage } from './utils/image';
 import { preloadFonts } from './utils/fonts';
 ```
 
-#### 缓存策略
+#### 缓存策略 {#caching-strategy}
 
 ```tsx | pure
 // 服务工作者缓存
@@ -692,7 +692,7 @@ if ('serviceWorker' in navigator) {
 }
 ```
 
-## 总结
+## 总结 {#summary}
 
 <!--
   总结说明：
@@ -704,7 +704,7 @@ if ('serviceWorker' in navigator) {
 
 `agentic-ui` 项目采用现代化的技术栈和架构设计，具有以下特点：
 
-### 技术优势
+### 技术优势 {#technical-advantages}
 
 1. **现代化技术栈**：React 18 + TypeScript + Vite
 2. **模块化架构**：清晰的模块划分和职责分离
@@ -712,14 +712,14 @@ if ('serviceWorker' in navigator) {
 4. **类型安全**：完整的 TypeScript 类型定义
 5. **开发体验**：热重载、代码检查、测试覆盖
 
-### 架构优势
+### 架构优势 {#architecture-advantages}
 
 1. **可维护性**：清晰的代码结构和模块划分
 2. **可扩展性**：插件化架构支持功能扩展
 3. **可测试性**：完整的测试体系和工具支持
 4. **性能优化**：代码分割、资源优化、缓存策略
 
-### 开发优势
+### 开发优势 {#development-advantages}
 
 1. **开发效率**：现代化的开发工具和流程
 2. **代码质量**：ESLint、Prettier、TypeScript 保障

@@ -7,9 +7,9 @@ group:
   order: 2
 ---
 
-# 图表配置文档
+# 图表配置文档 {#config}
 
-## 配置方式
+## 配置方式 {#config-2}
 
 图表配置通过 Markdown 注释的方式添加，格式如下：
 
@@ -21,9 +21,9 @@ group:
 | 数据1 | 数据2 | 数据3 |
 ```
 
-## 配置参数
+## 配置参数 {#config-params}
 
-### 筛选维度层次关系
+### 筛选维度层次关系 {#filter}
 
 图表支持三个层次的筛选维度，从高到低依次为：
 
@@ -42,7 +42,7 @@ group:
    - 决定图表中的线条/柱子的颜色区分
    - 展现形式：图例
 
-### 基础配置
+### 基础配置 {#basic-config}
 
 ```typescript | pure
 type ChartConfig = {
@@ -60,7 +60,7 @@ type ChartConfig = {
 };
 ```
 
-### 支持的图表类型
+### 支持的图表类型 {#types}
 
 1. **饼图 (pie)**
 
@@ -178,28 +178,28 @@ type ChartConfig = {
     | 不重要不紧急 | 整理桌面, 清理文档        |
     ```
 
-## 高级配置示例
+## 高级配置示例 {#example-config}
 
-### 1. 多图表配置
+### 1. 多图表配置 {#config-3}
 
 ```markdown
 <!-- [{"chartType": "bar", "title": "样本数据", "x": "sens_type", "y": "count"}, {"chartType": "column", "x": "sens_type", "y": "count"}, {"chartType": "pie", "x": "sens_type", "y": "percentage"}, {"chartType": "line", "x": "sens_type", "y": "percentage"}, {"chartType": "area", "x": "sens_type", "y": "percentage"}] -->
 ```
 
-### 2. 带分组的折线图
+### 2. 带分组的折线图 {#grouped-line-chart}
 
 ```markdown
 <!-- {"chartType": "line", "x": "日期", "y": "uv点击标记", "title": "UV 点击标记",
       "rest": {"colorLegend": "内容", "groupBy": "名称"}} -->
 ```
 
-### 3. 带标题的图表
+### 3. 带标题的图表 {#title}
 
 ```markdown
 <!-- {"chartType": "bar", "x": "业务", "y": "2021Q1", "title": "2021年第一季度业务数据"} -->
 ```
 
-### 3.1 带数据时间的图表
+### 3.1 带数据时间的图表 {#chart-with-time-data}
 
 通过 `dataTime` 参数可以在图表工具栏中显示数据时间：
 
@@ -207,7 +207,7 @@ type ChartConfig = {
 <!-- {"chartType": "bar", "x": "业务", "y": "2021Q1", "title": "2021年第一季度业务数据", "dataTime": "2025-10-30 10:00:00"} -->
 ```
 
-### 4. 带图例的图表
+### 4. 带图例的图表 {#chart-with-legend}
 
 图例用于区分不同的数据系列，通过 `colorLegend` 参数配置：
 
@@ -225,7 +225,7 @@ type ChartConfig = {
 | 3月  | 95   | B系列 |
 ```
 
-### 5. 带业务分组的图表
+### 5. 带业务分组的图表 {#chart-with-business-grouping}
 
 业务分组用于将数据按不同业务类别分组显示，通过 `groupBy` 参数配置：
 
@@ -243,7 +243,7 @@ type ChartConfig = {
 | 产品C | 90   | 线下业务 |
 ```
 
-### 6. 带主筛选的图表
+### 6. 带主筛选的图表 {#filter-2}
 
 主筛选提供最高维度的数据筛选，通过 `filterBy` 参数配置：
 
@@ -261,7 +261,7 @@ type ChartConfig = {
 | 类别C | 25   | 线上业务 | 华南 |
 ```
 
-### 7. 组合筛选图表
+### 7. 组合筛选图表 {#filter-3}
 
 可以同时使用数据系列、业务分组和主筛选：
 
@@ -279,7 +279,7 @@ type ChartConfig = {
 | 产品 | 95   | 目标能力 | 年龄 | 全球 |
 ```
 
-## 数据格式要求
+## 数据格式要求 {#data-format-requirements}
 
 1. **表格数据**
    - 必须包含表头
@@ -294,7 +294,7 @@ type ChartConfig = {
    - 支持数字格式化
    - 支持千分位显示
 
-## 特殊功能
+## 特殊功能 {#special-features}
 
 1. **图表切换**
    - 支持在图表类型之间切换
@@ -310,10 +310,10 @@ type ChartConfig = {
    - 自动适应容器宽度
    - 最小宽度为256px
 
-## 完整示例
+## 完整示例 {#full-example}
 
 ```markdown
-## 业务数据图表
+## 业务数据图表 {#business-charts}
 
 <!-- {"chartType": "bar", "x": "业务", "y": "2021Q1", "title": "2021年第一季度业务数据", "dataTime": "2025-10-30 10:00:00",
       "groupBy": "业务类型", "colorLegend": "数据系列", "filterBy": "地区"} -->
@@ -330,7 +330,7 @@ type ChartConfig = {
 | 云           | 162,012 | 111,521 | 111,353 | 112,799 |
 ```
 
-## 注意事项
+## 注意事项 {#notes}
 
 1. 配置必须放在表格之前
 2. 配置必须是有效的JSON格式

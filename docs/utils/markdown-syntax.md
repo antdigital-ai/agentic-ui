@@ -7,31 +7,31 @@ group:
   order: 1
 ---
 
-# Markdown 语法指南
+# Markdown 语法指南 {#markdown}
 
 本文档介绍了常用的 Markdown 语法，帮助你快速上手编写文档。
 
-## 标题 (Headers)
+## 标题 (Headers) {#title-headers}
 
 使用 `#` 号可表示 1-6 级标题。
 
 **快速输入技巧**：在行首输入 1-6 个 `#` 号并按下 **空格键**，可自动将其转换为对应的标题样式。
 
 ```markdown
-# 一级标题
+# 一级标题 {#title}
 
-## 二级标题
+## 二级标题 {#title-2}
 
-### 三级标题
+### 三级标题 {#title-3}
 
-#### 四级标题
+#### 四级标题 {#title-4}
 
-##### 五级标题
+##### 五级标题 {#title-5}
 
-###### 六级标题
+###### 六级标题 {#title-6}
 ```
 
-## 强调 (Emphasis)
+## 强调 (Emphasis) {#emphasis}
 
 - **加粗**：使用 `**` 或 `__` 包裹文本。
 - _斜体_：使用 `*` 或 `_` 包裹文本。
@@ -43,9 +43,9 @@ _斜体文本_
 ~~删除线文本~~
 ```
 
-## 列表 (Lists)
+## 列表 (Lists) {#list-lists}
 
-### 无序列表
+### 无序列表 {#list}
 
 使用 `*`、`+` 或 `-` 作为列表标记。
 
@@ -56,7 +56,7 @@ _斜体文本_
   - 子项目 2.2
 ```
 
-### 有序列表
+### 有序列表 {#list-2}
 
 使用数字并加上 `.` 号。
 
@@ -66,7 +66,7 @@ _斜体文本_
 3. 第三项
 ```
 
-## 引用 (Blockquotes)
+## 引用 (Blockquotes) {#blockquotes}
 
 使用 `>` 表示引用。
 
@@ -76,9 +76,9 @@ _斜体文本_
 > > 这是一个嵌套的引用块。
 ```
 
-## 代码 (Code)
+## 代码 (Code) {#code}
 
-### 行内代码
+### 行内代码 {#inline-code}
 
 使用反引号 `` ` `` 包裹代码。
 
@@ -86,7 +86,7 @@ _斜体文本_
 使用 `console.log()` 输出日志。
 ```
 
-### 代码块
+### 代码块 {#code-block}
 
 使用三个反引号 \`\`\` 包裹代码块，并可指定语言。
 
@@ -100,21 +100,21 @@ function hello() {
 ```
 ````
 
-## 链接与图片 (Links & Images)
+## 链接与图片 (Links & Images) {#links-images}
 
-### 链接
+### 链接 {#links}
 
 ```markdown
 [链接文本](https://www.example.com)
 ```
 
-### 图片
+### 图片 {#images}
 
 ```markdown
 ![图片描述](/path/to/image.png)
 ```
 
-## 表格 (Tables)
+## 表格 (Tables) {#table-tables}
 
 使用 `|` 分隔单元格，使用 `-` 分隔表头和内容。可以在分隔行上使用 `:` 来设置列的对齐方式。
 
@@ -125,7 +125,7 @@ function hello() {
 | 内容   |  内容  |   内容 |
 ```
 
-## 分割线 (Horizontal Rules)
+## 分割线 (Horizontal Rules) {#horizontal-rules}
 
 使用三个或以上的 `-`、`*` 或 `_`。
 
@@ -135,14 +135,14 @@ function hello() {
 ---
 ```
 
-## 任务列表 (Task Lists)
+## 任务列表 (Task Lists) {#list-task-lists}
 
 ```markdown
 - [x] 已完成任务
 - [ ] 未完成任务
 ```
 
-## 提示块 (Tip blocks)
+## 提示块 (Tip blocks) {#tip-blocks}
 
 使用容器语法创建不同类型的提示块，渲染为带样式的 `div.markdown-container`（兼容 markdown-it-container 风格）。支持两种等价写法：
 
@@ -190,9 +190,9 @@ function hello() {
 ::
 ```
 
-## 图表 (Charts)
+## 图表 (Charts) {#charts}
 
-### Mermaid 图表
+### Mermaid 图表 {#mermaid}
 
 支持使用 Mermaid 语法绘制流程图、时序图、甘特图等。
 
@@ -206,7 +206,7 @@ graph TD
 ```
 ````
 
-### 内嵌组件
+### 内嵌组件 {#embedded-components}
 
 你可以在 Markdown 中直接使用 React 组件（MDX），例如 Ant Design 的组件。
 
@@ -218,7 +218,7 @@ import { Card } from 'antd';
 </Card>
 ```
 
-### 高级表格配置
+### 高级表格配置 {#config-table}
 
 通过 HTML 注释 `<!-- { "chartType": "table" } -->` 可以将普通的 Markdown 表格配置为高级表格。
 
@@ -231,7 +231,7 @@ import { Card } from 'antd';
 | 李四 | 32   | 设计师 |
 ```
 
-### 其他图表类型
+### 其他图表类型 {#types}
 
 同样的方式支持渲染多种图表，例如柱状图 (`bar`)、饼图 (`pie`) 等。
 
@@ -245,7 +245,7 @@ import { Card } from 'antd';
 | C    | 80   |
 ```
 
-## 高级自定义组件 (aPaaSify)
+## 高级自定义组件 (aPaaSify) {#custom-apaasify}
 
 支持使用 `apaasify` 代码块来定义基于 Schema 的高级组件，适用于 aPaaS 场景下的自定义渲染。
 

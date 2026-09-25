@@ -31,7 +31,7 @@
 
 ### 批次 1：正确性回归 {#batch-1-correctness}
 
-#### #722 MarkdownEditor 流式松散列表重复
+#### #722 MarkdownEditor 流式松散列表重复 {#list-markdowneditor}
 
 建议实现：
 
@@ -47,7 +47,7 @@
 - 覆盖列表后跟标题、表格、引用的场景，避免后续节点反复删除和插入。
 - 新增 issue 提供的两个回归用例，并运行 MarkdownEditor、MarkdownRenderer 全量相关测试。
 
-#### #721 MarkdownInputField IME 删除残留
+#### #721 MarkdownInputField IME 删除残留 {#markdowninputfield-ime}
 
 建议实现：
 
@@ -64,7 +64,7 @@
 
 ### 批次 2：输入与复制集成 {#batch-2-integration}
 
-#### #682 Suggestion Dropdown 配置
+#### #682 Suggestion Dropdown 配置 {#config-suggestion-dropdown}
 
 建议实现：
 
@@ -78,7 +78,7 @@
 - Shadow DOM 中可将 popup 放入与 trigger 相同的 root。
 - API 类型、中文/英文文档、demo 和单元测试同步更新。
 
-#### #201 apaasify 自定义组件复制
+#### #201 apaasify 自定义组件复制 {#custom-apaasify}
 
 建议实现：
 

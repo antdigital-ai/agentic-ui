@@ -1,4 +1,4 @@
----
+﻿---
 nav:
   title: 项目研发
   order: 3
@@ -7,11 +7,11 @@ group:
   order: 2
 ---
 
-# 开发指南与最佳实践
+# 开发指南与最佳实践 {#dev-guide-best-practices}
 
 本指南涵盖了 agentic-ui 项目的开发流程、最佳实践、性能优化和常见问题解决方案。
 
-## 📋 目录
+## 📋 目录 {#toc}
 
 - [开发环境设置](#开发环境设置)
 - [项目结构说明](#项目结构说明)
@@ -22,39 +22,39 @@ group:
 - [常见问题](#常见问题)
 - [贡献指南](#贡献指南)
 
-## 📚 相关文档
+## 📚 相关文档 {#related-docs}
 
 - [多厂商聊天消息 → BubbleList 适配](./chat-message-bubble-adapters.md) - OpenAI / OpenClaw / Ollama `messages` 与 `BubbleList` 对接说明（[English](./chat-message-bubble-adapters.en-US.md)）
 - [Pull Request 提交指南](./pull-request-guide.md) - 了解如何正确提交 PR
 - [发布测试版本指南](./release-guide.md) - 学习如何发布和管理测试版本
 
-## 🛠️ 开发环境设置
+## 🛠️ 开发环境设置 {#dev-environment-setup}
 
-### 系统要求
+### 系统要求 {#system-requirements}
 
 - **Node.js**: >= 16.0.0 (推荐使用 LTS 版本)
 - **包管理器**: pnpm >= 7.0.0 (推荐) 或 npm >= 8.0.0
 - **操作系统**: Windows 10+, macOS 10.15+, 或 Linux
 
-### 环境配置
+### 环境配置 {#config}
 
 ```bash
-# 1. 克隆项目
+# 1. 克隆项目 {#clone-project}
 git clone git@github.com:ant-design/agentic-ui.git
 cd agentic-ui
 
-# 2. 安装依赖
+# 2. 安装依赖 {#install-dependencies}
 pnpm install
 
-# 3. 启动开发服务器
+# 3. 启动开发服务器 {#start-dev-server}
 pnpm start
 
-# 4. 在浏览器中打开 http://localhost:8000
+# 4. 在浏览器中打开 http://localhost:8000 {#http-localhost}
 ```
 
-### IDE 配置
+### IDE 配置 {#config-ide}
 
-#### VSCode 推荐插件
+#### VSCode 推荐插件 {#vscode}
 
 ```json
 {
@@ -69,7 +69,7 @@ pnpm start
 }
 ```
 
-#### 编辑器设置
+#### 编辑器设置 {#editor-setup}
 
 ```json
 {
@@ -81,9 +81,9 @@ pnpm start
 }
 ```
 
-## 📁 项目结构说明
+## 📁 项目结构说明 {#notes}
 
-### 核心目录结构
+### 核心目录结构 {#core-directory-structure}
 
 ```
 agentic-ui/
@@ -105,7 +105,7 @@ agentic-ui/
 └── scripts/                   # 构建脚本
 ```
 
-### 文件命名规范
+### 文件命名规范 {#file-naming}
 
 - **组件文件**: PascalCase (如 `MarkdownEditor.tsx`)
 - **工具函数**: camelCase (如 `parseMarkdown.ts`)
@@ -113,9 +113,9 @@ agentic-ui/
 - **样式文件**: camelCase + `.style.ts` (如 `editor.style.ts`)
 - **测试文件**: 原文件名 + `.test.tsx` (如 `Editor.test.tsx`)
 
-## 🔄 开发流程
+## 🔄 开发流程 {#development-workflow}
 
-### 功能开发流程
+### 功能开发流程 {#feature-workflow}
 
 1. **需求分析**
    - 明确功能需求和用户场景
@@ -148,37 +148,37 @@ agentic-ui/
    - 同行代码审查
    - 修改意见和优化建议
 
-### 代码提交规范
+### 代码提交规范 {#commit-conventions}
 
 使用 [Conventional Commits](https://www.conventionalcommits.org/) 规范：
 
 ```bash
-# 功能开发
+# 功能开发 {#feature-development}
 git commit -m "feat: add markdown table support"
 
-# Bug 修复
+# Bug 修复 {#bug}
 git commit -m "fix: resolve editor crash on empty content"
 
-# 文档更新
+# 文档更新 {#docs-update}
 git commit -m "docs: update API documentation"
 
-# 性能优化
+# 性能优化 {#performance}
 git commit -m "perf: improve rendering performance for large documents"
 
-# 重构
+# 重构 {#refactoring}
 git commit -m "refactor: extract common editor utilities"
 
-# 测试
+# 测试 {#testing}
 git commit -m "test: add unit tests for markdown parser"
 ```
 
-## ⚡ 性能优化
+## ⚡ 性能优化 {#performance-2}
 
-### React Hooks 依赖陷阱
+### React Hooks 依赖陷阱 {#react-hooks}
 
 以下模式是项目中实际出现并修复过的 bug，开发时务必注意。
 
-#### 1. 空数组/空对象字面量在依赖中导致死循环
+#### 1. 空数组/空对象字面量在依赖中导致死循环 {#literal-deps-infinite-loop}180} {#literal-deps-infinite-loop}
 
 `[]` 和 `{}` 每次渲染都是新引用，放入 `useEffect` / `useMemo` / `useCallback` 的依赖数组会导致无限重执行。
 
@@ -214,7 +214,7 @@ const result = useMemo(() => validate(safeSchema), [safeSchema]);
 
 > **关键规则**：凡是在 hook 依赖数组中使用的值，绝不能由 `|| []`、`|| {}`、`= []`、`= {}` 等字面量创建。必须使用模块级常量或 `useMemo` 稳定引用。
 
-#### 2. 状态既在依赖中又在 effect 内被设置 — 多余触发
+#### 2. 状态既在依赖中又在 effect 内被设置 — 多余触发 {#status-effect}
 
 当 `useEffect` 的依赖包含某个 state，而 effect 内部又调用了该 state 的 setter，会导致 effect 重复执行。
 
@@ -247,7 +247,7 @@ useEffect(() => {
 
 同样模式适用于：isEditorFocused、isControlled 等布尔状态在 event listener effect 中使用的情况。
 
-#### 3. 对象类型的 hook 依赖应提取为原始值
+#### 3. 对象类型的 hook 依赖应提取为原始值 {#types-hook}
 
 当 hook 依赖是对象时，每次父组件渲染都会产生新引用，导致 effect 过度触发。
 
@@ -265,7 +265,7 @@ useEffect(() => {
 }, [antdContext?.locale?.locale, autoDetect, language]);
 ```
 
-#### 4. props.children 作为依赖 — 过度触发
+#### 4. props.children 作为依赖 — 过度触发 {#props-children}
 
 `props.children` 在父组件每次渲染时都是新引用，不应直接作为 effect 依赖。
 
@@ -289,7 +289,7 @@ useEffect(() => {
 }, [childrenKeys]);
 ```
 
-#### 5. 闭包陈旧 — 缺失依赖
+#### 5. 闭包陈旧 — 缺失依赖 {#stale-closure-missing-deps}291} {#stale-closure-missing-deps}
 
 effect 内使用了变量但未列入依赖，导致闭包捕获旧值。
 
@@ -334,7 +334,7 @@ useEffect(() => {
 }, [aceLoaded]);
 ```
 
-#### 6. ref.current 不应作为 hook 依赖
+#### 6. ref.current 不应作为 hook 依赖 {#ref-current-hook}
 
 React 不会追踪 `ref.current` 的变化，将其放入依赖数组不可靠。
 
@@ -355,7 +355,7 @@ useEffect(() => {
 }, [props.instance]);
 ```
 
-#### 7. ref 同步应使用 useLayoutEffect
+#### 7. ref 同步应使用 useLayoutEffect {#ref-uselayouteffect}
 
 用无依赖 `useEffect` 同步 ref 值的模式应改为 `useLayoutEffect`，避免在 paint 后再做同步写入。
 
@@ -371,9 +371,9 @@ useLayoutEffect(() => {
 });
 ```
 
-### 渲染性能优化
+### 渲染性能优化 {#rendering-performance}
 
-#### 1. 组件 Memoization
+#### 1. 组件 Memoization {#memoization}
 
 ```tsx | pure
 // 使用 React.memo 避免不必要的重新渲染
@@ -391,7 +391,7 @@ const MElement = React.memo<ElementProps>(
 );
 ```
 
-#### 2. 虚拟滚动
+#### 2. 虚拟滚动 {#virtual-scrolling}
 
 ```tsx | pure
 // 对于大量内容，使用虚拟滚动优化性能
@@ -412,7 +412,7 @@ const VirtualizedEditor: React.FC = () => {
 };
 ```
 
-#### 3. 懒加载和代码分割
+#### 3. 懒加载和代码分割 {#lazy}
 
 ```tsx | pure
 // 插件懒加载
@@ -430,9 +430,9 @@ const Editor: React.FC = () => {
 };
 ```
 
-### 内存优化
+### 内存优化 {#memory-optimization}
 
-#### 1. 清理事件监听器
+#### 1. 清理事件监听器 {#events}
 
 ```tsx | pure
 const useEditorEvents = () => {
@@ -450,7 +450,7 @@ const useEditorEvents = () => {
 };
 ```
 
-#### 2. 避免内存泄漏
+#### 2. 避免内存泄漏 {#avoid-memory-leaks}
 
 ```tsx | pure
 const useAsyncOperation = () => {
@@ -487,9 +487,9 @@ const useAsyncOperation = () => {
 };
 ```
 
-## 🧪 测试策略
+## 🧪 测试策略 {#test-strategy}
 
-### 测试金字塔
+### 测试金字塔 {#test-pyramid}
 
 ```
     E2E Tests (少量)
@@ -499,7 +499,7 @@ const useAsyncOperation = () => {
 Unit Tests (大量)
 ```
 
-### 单元测试
+### 单元测试 {#unit-tests}
 
 ```tsx | pure
 // Editor.test.tsx
@@ -525,7 +525,7 @@ describe('MarkdownEditor', () => {
 });
 ```
 
-### 集成测试
+### 集成测试 {#integration-tests}
 
 ```tsx | pure
 // EditorIntegration.test.tsx
@@ -540,7 +540,7 @@ describe('Editor Integration', () => {
 });
 ```
 
-### E2E 测试
+### E2E 测试 {#e2e}
 
 ```typescript | pure
 // e2e/editor.spec.ts
@@ -563,9 +563,9 @@ test('complete editing workflow', async ({ page }) => {
 });
 ```
 
-## 🔍 调试技巧
+## 🔍 调试技巧 {#debugging-tips}
 
-### 浏览器调试
+### 浏览器调试 {#browser-debugging}
 
 #### 1. React Developer Tools
 
@@ -585,7 +585,7 @@ const Editor: React.FC = () => {
 };
 ```
 
-#### 2. 性能分析
+#### 2. 性能分析 {#profiling}
 
 ```tsx | pure
 // 使用 React Profiler 分析性能
@@ -600,7 +600,7 @@ const onRenderCallback = (id, phase, actualDuration) => {
 </Profiler>;
 ```
 
-#### 3. 错误边界
+#### 3. 错误边界 {#error-boundaries}
 
 ```tsx | pure
 class ErrorBoundary extends React.Component {
@@ -628,7 +628,7 @@ class ErrorBoundary extends React.Component {
 }
 ```
 
-### 日志系统
+### 日志系统 {#logging}
 
 ```tsx | pure
 // utils/logger.ts
@@ -654,11 +654,11 @@ export const logger = {
 };
 ```
 
-## ❓ 常见问题
+## ❓ 常见问题 {#faq}
 
-### 开发环境问题
+### 开发环境问题 {#dev-env-issues}
 
-#### Q: 启动项目时出现 "Cannot resolve module" 错误
+#### Q: 启动项目时出现 "Cannot resolve module" 错误 {#q-cannot-resolve-module}
 
 A: 检查以下几点：
 
@@ -667,12 +667,12 @@ A: 检查以下几点：
 3. 检查 Node.js 版本是否符合要求
 
 ```bash
-# 清理并重新安装
+# 清理并重新安装 {#clean-reinstall}
 rm -rf node_modules pnpm-lock.yaml
 pnpm install
 ```
 
-#### Q: TypeScript 类型错误
+#### Q: TypeScript 类型错误 {#types-q-typescript}
 
 A: 常见解决方案：
 
@@ -680,9 +680,9 @@ A: 常见解决方案：
 2. 检查类型导入路径是否正确
 3. 确保所有依赖的类型包已安装
 
-### 性能问题
+### 性能问题 {#performance-issues}
 
-#### Q: 大文档编辑时出现卡顿
+#### Q: 大文档编辑时出现卡顿 {#q}
 
 A: 优化建议：
 
@@ -704,7 +704,7 @@ const OptimizedEditor = React.memo(() => {
 });
 ```
 
-#### Q: 插件加载慢
+#### Q: 插件加载慢 {#q-2}
 
 A: 优化策略：
 
@@ -712,9 +712,9 @@ A: 优化策略：
 2. 实现插件预加载机制
 3. 缓存插件资源
 
-### 兼容性问题
+### 兼容性问题 {#compatibility-issues}
 
-#### Q: 在某些浏览器中功能异常
+#### Q: 在某些浏览器中功能异常 {#q-3}
 
 A: 检查清单：
 
@@ -723,9 +723,9 @@ A: 检查清单：
 3. CSS 兼容性问题
 4. JavaScript API 兼容性
 
-## 🤝 贡献指南
+## 🤝 贡献指南 {#contributing-guide}
 
-### 贡献流程
+### 贡献流程 {#contributing-workflow}
 
 1. **Fork 项目**
 
@@ -766,14 +766,14 @@ A: 检查清单：
    - 填写详细的描述和变更说明
    - 等待代码审查和合并
 
-### 代码质量要求
+### 代码质量要求 {#code-quality-standards}
 
 - **测试覆盖率**: 新功能需要有相应的测试，保持覆盖率在 80% 以上
 - **代码风格**: 遵循项目的 ESLint 和 Prettier 配置
 - **文档更新**: 新功能需要更新相应的文档和示例
 - **向后兼容**: 避免破坏性变更，如有必要需要提供迁移指南
 
-### 提问和讨论
+### 提问和讨论 {#questions-and-discussions}
 
 - **GitHub Issues**: 报告 Bug 和功能请求
 - **GitHub Discussions**: 技术讨论和问答

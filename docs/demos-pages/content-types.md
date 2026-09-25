@@ -7,79 +7,79 @@ group:
   order: 10
 ---
 
-# 内容类型
+# 内容类型 {#content-types}
 
 <code src="../demos/markdown-editor-readonly-compare.tsx"></code>
 
-## 基础内容类型
+## 基础内容类型 {#basic-content}
 
-### 表格
+### 表格 {#table}
 
 <code src="../demos/test-table.tsx" background="var(--main-bg-color)"  iframe=540></code>
 
-### 图片
+### 图片 {#images}
 
 <code src="../demos/image.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-### 图片错误处理
+### 图片错误处理 {#image-error-handling}
 
 <code src="../demos/image-error-handling.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-### 视频
+### 视频 {#videos}
 
 <code src="../demos/video-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-### 脚注
+### 脚注 {#footnote}
 
 <code src="../demos/footnoteReference.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-## 图表与可视化
+## 图表与可视化 {#charts-visualization}
 
-### 图表列表
+### 图表列表 {#list}
 
 <code src="../demos/chart-list.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-### 图表性能优化
+### 图表性能优化 {#chart-performance}
 
 <code src="../demos/max-chart.tsx" background="var(--main-bg-color)"  iframe=540></code>
 
-## 文件与媒体
+## 文件与媒体 {#files-and-media}
 
-### HTML 运行
+### HTML 运行 {#html}
 
 <code src="../demos/htmlrun.tsx"  background="var(--main-bg-color)" iframe=540 ></code>
 
-### html 混排
+### html 混排 {#html-2}
 
 <code src="../demos/dance-effect.tsx"  background="var(--main-bg-color)" iframe=540 ></code>
 
-### HTML / Markdown 本地预览
+### HTML / Markdown 本地预览 {#html-markdown}
 
 展示在只读模式下，HTML 和 Markdown 代码块支持内联预览切换与在新标签页中打开本地预览。
 
 <code src="../demos/code-local-preview-demo.tsx" background="var(--main-bg-color)" iframe=640></code>
 
-## 特殊功能
+## 特殊功能 {#special-features}
 
-### 引用展示
+### 引用展示 {#quote-display}
 
 <code src="../demos/FncTooltip.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-### 目录测试
+### 目录测试 {#toc-testing}
 
 <code src="../demos/toc-simple-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-### 列表代码
+### 列表代码 {#list-2}
 
 <code src="../demos/li-code.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-### 表格行
+### 表格行 {#table-2}
 
 <code src="../demos/table_line.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-## AI 辅助功能
+## AI 辅助功能 {#ai}
 
-### 思考过程展示
+### 思考过程展示 {#thinking}
 
 支持两种方式展示 AI 的思考过程：使用 `<think>` 标签格式或代码块格式。
 
@@ -87,11 +87,11 @@ group:
 
 <code src="../demos/ThinkTagDemo.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-### 思考块自定义渲染
+### 思考块自定义渲染 {#custom-thinking}
 
 <code src="../demos/eleItemRender-think-block-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-### HTML 标签解析
+### HTML 标签解析 {#html-3}
 
 展示编辑器如何处理各种 HTML 标签：
 
