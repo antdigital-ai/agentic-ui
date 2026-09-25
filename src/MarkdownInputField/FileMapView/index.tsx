@@ -125,7 +125,7 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
     if (!props.fileMap) {
       return [];
     }
-    return Array.from(props.fileMap?.values() || []);
+    return Array.from(props.fileMap.values());
   }, [props.fileMap]);
 
   const isImageListEntry = (file: AttachmentFile) =>

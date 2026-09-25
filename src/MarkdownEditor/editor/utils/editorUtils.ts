@@ -71,7 +71,7 @@ export class EditorUtils {
     nodes: Node[],
     options?: { withoutHistory?: boolean },
   ) {
-    const { withoutHistory = true } = options || {};
+    const { withoutHistory = true } = options ?? {};
 
     const doReplace = () => {
       const normalized = EditorUtils.coalesceRootAllEmptyParagraphs(nodes);
@@ -147,7 +147,7 @@ export class EditorUtils {
       leaf.italic ||
       leaf.strikethrough ||
       leaf.mark ||
-      !!leaf?.url ||
+      !!leaf.url ||
       leaf.fnd ||
       leaf.fnc ||
       leaf.html ||
@@ -180,13 +180,13 @@ export class EditorUtils {
     });
     if (!cur) return null;
     let path = cur[1];
-    if (cur?.[0]?.type === 'table-cell') {
+    if (cur[0].type === 'table-cell') {
       path = Path.next(Path.parent(Path.parent(cur[1])));
     }
-    if (cur?.[0]?.type === 'head') {
+    if (cur[0].type === 'head') {
       path = Path.next(path);
     }
-    if (cur?.[0]?.type === 'paragraph' && Node.string(cur[0])) {
+    if (cur[0].type === 'paragraph' && Node.string(cur[0])) {
       path = Path.next(cur[1]);
     }
     return path;
@@ -363,7 +363,7 @@ export class EditorUtils {
 
     const extractParagraphs = (children: any[]) => {
       children.forEach((item) => {
-        if (!item?.children) return;
+        if (!item.children) return;
 
         item.children.forEach((child: any) => {
           if (child.type === 'paragraph') {
@@ -522,7 +522,7 @@ export class EditorUtils {
     let text = '';
 
     // Handle first leaf node from start offset
-    text += leaf.text?.slice(start.offset) || '';
+    text += (leaf.text ?? '').slice(start.offset);
 
     // Get next nodes until we reach the end point
     let next = Editor.next(editor, { at: leafPath });
@@ -530,11 +530,11 @@ export class EditorUtils {
     while (next) {
       if (endLeafPath && Path.equals(next[1], endLeafPath)) {
         // If we reach the end path, slice until end offset
-        text += next[0].text?.slice(0, end!.offset) || '';
+        text += (next[0].text ?? '').slice(0, end!.offset);
         break;
       } else {
         // Add full text content of intermediate nodes
-        text += next[0].text || '';
+        text += next[0].text ?? '';
         next = Editor.next(editor, { at: next[1] });
       }
     }
@@ -553,7 +553,7 @@ export class EditorUtils {
   static cutText(editor: Editor, start: Point, end?: Point) {
     const [leaf, leafPath] = Editor.leaf(editor, start);
     let texts: CustomLeaf[] = [
-      { ...leaf, text: leaf.text?.slice(start.offset) || '' },
+      { ...leaf, text: (leaf.text ?? '').slice(start.offset) },
     ];
     const endLeafPath = end ? Editor.leaf(editor, end)[1] : null;
     let next = Editor.next(editor, { at: leafPath });
@@ -561,7 +561,7 @@ export class EditorUtils {
       if (endLeafPath && Path.equals(next[1], endLeafPath)) {
         texts.push({
           ...next[0],
-          text: next[0].text?.slice(0, end!.offset) || '',
+          text: (next[0].text ?? '').slice(0, end!.offset),
         });
         break;
       } else {
@@ -592,7 +592,8 @@ export class EditorUtils {
       if (nodeEntries.length === 0) return false;
 
       const [node] = nodeEntries[0];
-      return value ? (node as any)[format] === value : !!(node as any)[format];
+      // match 已要求 !!n[format]，无 value 时格式必然激活
+      return value ? (node as any)[format] === value : true;
     } catch (error) {
       console.error('Error checking format active:', error);
       return false;
@@ -609,13 +610,13 @@ export class EditorUtils {
     try {
       const nodeEntries = Array.from(
         Editor.nodes<any>(editor, {
-          match: (n) => Text.isText(n) && !!n?.url,
+          match: (n) => Text.isText(n) && !!n.url,
           mode: 'lowest',
         }),
       );
 
       return nodeEntries.length > 0
-        ? (nodeEntries[0][0]?.url as string) || ''
+        ? (nodeEntries[0][0].url as string) || ''
         : '';
     } catch (error) {
       console.error('Error getting URL:', error);
@@ -719,9 +720,9 @@ export class EditorUtils {
       const [node, path] = nodeEntries[0];
       const nodeString = Node.string(node);
       const hasMediaChild =
-        node?.children?.length === 1 && node?.children[0]?.type === 'media';
+        node.children?.length === 1 && node.children[0]?.type === 'media';
 
-      if (node?.type !== 'paragraph' || nodeString || hasMediaChild) {
+      if (node.type !== 'paragraph' || nodeString || hasMediaChild) {
         Transforms.insertNodes(editor, EditorUtils.p, {
           at: Path.next(path),
         });
@@ -771,7 +772,11 @@ export class EditorUtils {
       return ReactEditor.findPath(editor, el);
     } catch (error) {
       console.error('find path error', error);
-      return Editor.start(editor, []).path;
+      try {
+        return Editor.start(editor, []).path;
+      } catch {
+        return [];
+      }
     }
   }
 
@@ -972,7 +977,7 @@ function checkText(domPoint: any) {
   if (!isDOMNode(domPoint)) {
     return false;
   }
-  let leafNode = domPoint?.parentElement?.closest('[data-slate-leaf]');
+  let leafNode = domPoint.parentElement?.closest('[data-slate-leaf]');
   if (!leafNode) {
     return false;
   }
@@ -1129,15 +1134,12 @@ export function getSelectionFromDomSelection(
   domSelection: Selection,
 ): Range | null {
   // 检查 Selection 是否有有效的 Range
-  if (!domSelection.rangeCount || domSelection.rangeCount === 0) {
+  if (!domSelection.rangeCount) {
     return null;
   }
 
   try {
     const range = domSelection.getRangeAt(0);
-    if (!range) {
-      return null;
-    }
 
     // 获取起始和结束容器节点
     const anchorNode = range.startContainer;
@@ -1201,7 +1203,6 @@ export function getRelativePath(path: string | any[], anther: string | any[]) {
     newAnther.unshift(new Array(relativeLen).fill(0));
   } else if (relativeLen < 0) {
     return new Array(anther.length).fill(0);
-    newPath.unshift(new Array(-relativeLen).fill(0));
   }
 
   const relativePath = [];
@@ -1246,7 +1247,6 @@ export function findLeafPath(editor: Editor, path: Path) {
   const node = Editor.leaf(editor, path, {
     edge: 'end',
   });
-  if (!node) return path;
   return node[1];
 }
 
@@ -1422,17 +1422,17 @@ export function findByPathAndText(
       );
     }
 
-    // 遍历文本节点查找匹配
+    // 遍历文本节点查找匹配（生成器已过滤 Text + 非空 text）
     for (const [node, path] of textNodesGenerator) {
-      if (!Text.isText(node) || !node.text) continue;
+      const text = (node as Text).text ?? '';
       // 对每个搜索变体进行匹配
       for (const { variant, pattern } of patterns) {
         let match: RegExpExecArray | null;
         pattern.lastIndex = 0;
 
-        while ((match = pattern.exec(node.text)) !== null) {
+        while ((match = pattern.exec(text)) !== null) {
           // 获取父节点信息
-          let lineContent = node.text;
+          let lineContent = text;
           let nodeType = 'text';
 
           try {
@@ -1479,7 +1479,7 @@ export function findByPathAndText(
                 start: matchIndex,
                 end: matchIndex + matchLength,
               },
-              lineContent: lineContent.trim(),
+              lineContent: (lineContent ?? '').trim(),
               nodeType,
               searchVariant:
                 variant !== searchText.trim() ? variant : undefined,

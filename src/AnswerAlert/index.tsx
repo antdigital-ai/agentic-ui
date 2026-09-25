@@ -274,22 +274,22 @@ const AnswerAlertComponent: React.FC<AnswerAlertProps> = ({
       }
     >
       <div className={classNames(`${prefixCls}-content`, hashId)}>
-        {showIcon ? (
+        {showIcon && (
           <IconNode
             icon={icon}
             prefixCls={prefixCls}
             type={type}
             hashId={hashId}
           />
-        ) : null}
+        )}
         <div className={classNames(`${prefixCls}-message`, hashId)}>
           {message}
         </div>
-        {action ? (
+        {action && (
           <div className={classNames(`${prefixCls}-action`, hashId)}>
             {action}
           </div>
-        ) : null}
+        )}
         {closable && (
           <button
             type="button"
@@ -302,11 +302,11 @@ const AnswerAlertComponent: React.FC<AnswerAlertProps> = ({
           </button>
         )}
       </div>
-      {description ? (
+      {description && (
         <div className={classNames(`${prefixCls}-description`, hashId)}>
           {description}
         </div>
-      ) : null}
+      )}
     </div>
   );
 };

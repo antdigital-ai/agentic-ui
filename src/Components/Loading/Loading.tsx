@@ -164,7 +164,8 @@ export const Loading = ({
 
   const mergedSize = size ?? (isNestedPattern ? 32 : '1em');
 
-  const showPercent = percent !== undefined && percent !== null;
+  // eslint-disable-next-line eqeqeq -- intentional nullish (null | undefined)
+  const showPercent = percent != null;
   const showTip =
     tip !== false && tip !== null && (showPercent || tip !== undefined);
 

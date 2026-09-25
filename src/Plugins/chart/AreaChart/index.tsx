@@ -28,6 +28,7 @@ import { StatisticConfigType } from '../hooks/useChartStatistic';
 import type { ChartClassNames, ChartStyles } from '../types/classNames';
 import {
   ChartDataItem,
+  DEFAULT_CHART_DATASET_TYPE,
   extractAndSortXValues,
   findDataPointByXValue,
   hexToRgba,
@@ -312,13 +313,13 @@ const AreaChart: React.FC<AreaChartProps> = ({
       // 为每个类型收集数据点
       const typeData = xValues.map((x) => {
         const dataPoint = findDataPointByXValue(filteredData, x, type);
-        const v = dataPoint?.y;
-        const n = typeof v === 'number' ? v : Number(v);
+        if (!dataPoint) return null;
+        const n = Number(dataPoint.y);
         return Number.isFinite(n) ? n : null;
       });
 
       return {
-        label: type || '默认',
+        label: type || DEFAULT_CHART_DATASET_TYPE,
         data: typeData,
         borderColor: resolvedColor,
         backgroundColor: (ctx: ScriptableContext<'line'>) => {

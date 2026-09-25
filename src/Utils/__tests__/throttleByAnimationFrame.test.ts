@@ -3,11 +3,11 @@ import throttleByAnimationFrame from '../throttleByAnimationFrame';
 
 describe('throttleByAnimationFrame', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
   });
 
   afterEach(() => {
-    vi.useRealTimers();
+    vi.clearAllTimers();
   });
 
   it('should call the function on the first invocation', () => {

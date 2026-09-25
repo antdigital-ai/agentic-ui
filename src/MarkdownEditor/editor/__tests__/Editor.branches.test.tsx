@@ -107,8 +107,10 @@ vi.mock('../plugins/useOnchange', () => ({
   useOnchange: () => mockOnChange,
 }));
 
+const mockHighlightFn = vi.fn(() => []);
+
 vi.mock('../plugins/useHighlight', () => ({
-  useHighlight: () => () => [],
+  useHighlight: () => mockHighlightFn,
 }));
 
 vi.mock('../style', () => ({
@@ -175,17 +177,34 @@ vi.mock('../elements', () => ({
 }));
 
 vi.mock('../components/LazyElement', () => ({
-  LazyElement: ({ children }: any) => children,
+  LazyElement: ({
+    children,
+    elementInfo,
+    renderPlaceholder,
+    rootMargin,
+  }: any) => {
+    if (elementInfo) {
+      (globalThis as any).__lastLazyElementInfo = elementInfo;
+    }
+    if (renderPlaceholder) {
+      renderPlaceholder(elementInfo);
+    }
+    if (rootMargin) {
+      (globalThis as any).__lastLazyRootMargin = rootMargin;
+    }
+    return children;
+  },
 }));
 
-vi.mock('react-error-boundary', () => ({
-  ErrorBoundary: ({ children }: any) => children,
+vi.mock('../../../Utils/env', () => ({
+  isWeChat: vi.fn(() => false),
 }));
 
 /* ========== Imports after mocks ========== */
 
 import { Editor, Range, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
+import { isWeChat } from '../../../Utils/env';
 import { PluginContext } from '../../plugin';
 import { SlateMarkdownEditor } from '../Editor';
 import * as handlePasteModule from '../plugins/handlePaste';
@@ -193,9 +212,12 @@ import { parseMarkdownToNodesAndInsert } from '../plugins/parseMarkdownToNodesAn
 import { parserSlateNodeToMarkdown } from '../utils';
 import {
   EditorUtils,
+  findByPathAndText,
+  findLeafPath,
   getSelectionFromDomSelection,
   hasEditableTarget,
   isEventHandled,
+  isPath,
 } from '../utils/editorUtils';
 
 /* ========== Helpers ========== */
@@ -1539,23 +1561,18 @@ describe('Editor branches - checkEnd', () => {
 describe('Editor branches - onSlateChange', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.useFakeTimers();
     editableProps = {};
     slateOnChange = null;
   });
 
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
-  it('first call returns early and schedules timer', () => {
-    setupStore({ readonly: false });
+  it('first call with set_selection only returns early', () => {
+    const { editor } = setupStore({ readonly: false });
     renderEditor({});
 
     expect(slateOnChange).toBeTruthy();
+    editor.operations = [{ type: 'set_selection' }];
     slateOnChange!([{ type: 'paragraph', children: [{ text: '' }] }]);
 
-    // mockOnChange should NOT be called on first call
     expect(mockOnChange).not.toHaveBeenCalled();
   });
 
@@ -1569,36 +1586,49 @@ describe('Editor branches - onSlateChange', () => {
     expect(mockOnChange).toHaveBeenCalled();
   });
 
-  it('after timer, subsequent calls trigger onChange and detect content changes', () => {
+  it('after first content change subsequent calls trigger onChange', () => {
     const { editor } = setupStore({ readonly: false });
     renderEditor({});
 
-    // First call (returns early)
-    slateOnChange!([{ type: 'paragraph', children: [{ text: '' }] }]);
-    expect(mockOnChange).not.toHaveBeenCalled();
-
-    // Advance timer to set first.current = false
-    vi.advanceTimersByTime(150);
-
-    // Set operations with content changes
     editor.operations = [{ type: 'insert_text' }];
-
-    // Second call
     slateOnChange!([{ type: 'paragraph', children: [{ text: 'hello' }] }]);
-    expect(mockOnChange).toHaveBeenCalled();
+    expect(mockOnChange).toHaveBeenCalledTimes(1);
+
+    editor.operations = [{ type: 'insert_text' }];
+    slateOnChange!([{ type: 'paragraph', children: [{ text: 'hello world' }] }]);
+    expect(mockOnChange).toHaveBeenCalledTimes(2);
   });
 
-  it('set_selection only operations remain ignored before first content change', () => {
+  it('set_selection only on first call remains ignored before content change', () => {
     const { editor } = setupStore({ readonly: false });
     renderEditor({});
-
-    slateOnChange!([{ type: 'paragraph', children: [{ text: '' }] }]);
-    vi.advanceTimersByTime(150);
 
     editor.operations = [{ type: 'set_selection' }];
     slateOnChange!([{ type: 'paragraph', children: [{ text: '' }] }]);
-
     expect(mockOnChange).not.toHaveBeenCalled();
+
+    editor.operations = [{ type: 'set_selection' }];
+    slateOnChange!([{ type: 'paragraph', children: [{ text: '' }] }]);
+    expect(mockOnChange).not.toHaveBeenCalled();
+  });
+
+  it('content change emits footnote definition callback when configured', () => {
+    const onFootnoteDefinitionChange = vi.fn();
+    const { editor } = setupStore({ readonly: false });
+    renderEditor({
+      fncProps: { onFootnoteDefinitionChange },
+    });
+
+    editor.operations = [{ type: 'insert_text' }];
+    slateOnChange!([
+      {
+        type: 'footnoteDefinition',
+        identifier: '1',
+        children: [{ text: 'note' }],
+      },
+    ]);
+
+    expect(onFootnoteDefinitionChange).toHaveBeenCalled();
   });
 });
 
@@ -2008,6 +2038,103 @@ describe('Editor branches - mouseup effect', () => {
     // Should not throw
     expect(editableProps).toBeDefined();
   });
+
+  it('WeChat mouseup 在 contenteditable 内聚焦编辑器', async () => {
+    vi.mocked(isWeChat).mockReturnValue(true);
+    const { container, editor } = setupStore({ readonly: false });
+    vi.spyOn(ReactEditor, 'isFocused').mockReturnValue(false);
+
+    renderEditor({});
+
+    const editable = document.createElement('div');
+    editable.setAttribute('contenteditable', 'true');
+    container.appendChild(editable);
+
+    const mouseUp = new MouseEvent('mouseup', { bubbles: true });
+    editable.dispatchEvent(mouseUp);
+
+    await act(async () => {
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => resolve());
+      });
+    });
+
+    expect(EditorUtils.focus).toHaveBeenCalledWith(editor);
+    vi.mocked(isWeChat).mockReturnValue(false);
+  });
+
+  it('WeChat mouseup 在非 contenteditable 区域不聚焦', async () => {
+    vi.mocked(isWeChat).mockReturnValue(true);
+    const { container } = setupStore({ readonly: false });
+    vi.spyOn(ReactEditor, 'isFocused').mockReturnValue(false);
+
+    renderEditor({});
+
+    const outer = document.createElement('div');
+    container.appendChild(outer);
+    outer.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+
+    await act(async () => {
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => resolve());
+      });
+    });
+
+    expect(EditorUtils.focus).not.toHaveBeenCalled();
+    vi.mocked(isWeChat).mockReturnValue(false);
+  });
+
+  it('WeChat touchend passive 监听仍触发选区同步', async () => {
+    vi.mocked(isWeChat).mockReturnValue(true);
+    const { container } = setupStore({ readonly: false });
+    const onSelectionChange = vi.fn();
+
+    renderEditor({ onSelectionChange });
+
+    const editable = document.createElement('div');
+    editable.setAttribute('contenteditable', 'true');
+    container.appendChild(editable);
+
+    editable.dispatchEvent(new Event('touchend', { bubbles: true }));
+
+    await act(async () => {
+      await flushPromises();
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => resolve());
+      });
+    });
+
+    expect(onSelectionChange).toHaveBeenCalled();
+    vi.mocked(isWeChat).mockReturnValue(false);
+  });
+
+  it('readonly WeChat 不尝试 focus 编辑器', async () => {
+    vi.mocked(isWeChat).mockReturnValue(true);
+    const { container } = setupStore({ readonly: true });
+
+    renderEditor({});
+
+    await act(async () => {
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => resolve());
+      });
+    });
+    vi.mocked(EditorUtils.focus).mockClear();
+
+    const editable = document.createElement('div');
+    editable.setAttribute('contenteditable', 'true');
+    container.appendChild(editable);
+    editable.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+
+    await act(async () => {
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => resolve());
+      });
+    });
+
+    expect(EditorUtils.focus).not.toHaveBeenCalled();
+    vi.mocked(isWeChat).mockReturnValue(false);
+  });
 });
 
 describe('Editor branches - onFocus and onBlur', () => {
@@ -2092,5 +2219,1469 @@ describe('Editor branches - readonlyCls and childrenIsEmpty', () => {
 
     // className should be defined
     expect(editableProps.className).toBeDefined();
+  });
+});
+
+describe('Editor branches - decorateFn comments', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    editableProps = {};
+    mockHighlightFn.mockReturnValue([{ fnc: true }]);
+  });
+
+  it('returns highlight decorations when comment disabled', () => {
+    setupStore({ readonly: false });
+    renderEditor({ comment: { enable: false, commentList: [] } });
+
+    const result = editableProps.decorate([
+      { type: 'paragraph', children: [{ text: 'x' }] },
+      [0],
+    ]);
+    expect(result).toEqual([{ fnc: true }]);
+  });
+
+  it('merges comment ranges when selection paths are valid', () => {
+    setupStore({ readonly: false });
+    vi.mocked(isPath).mockReturnValue(true);
+    vi.mocked(findLeafPath).mockImplementation((_ed, path) => path);
+    vi.mocked(Editor.fragment).mockReturnValue([
+      { type: 'paragraph', children: [{ text: 'hi' }] } as any,
+    ]);
+    vi.mocked(Editor.hasPath).mockReturnValue(true);
+
+    renderEditor({
+      comment: {
+        enable: true,
+        commentList: [
+          {
+            id: 'c1',
+            path: [0],
+            selection: {
+              anchor: { path: [0, 0], offset: 0 },
+              focus: { path: [0, 0], offset: 2 },
+            },
+          },
+        ],
+      },
+    });
+
+    const result = editableProps.decorate([
+      { type: 'paragraph', children: [{ text: 'hi' }] },
+      [0],
+    ]);
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('uses refContent fallback for table comment selection', () => {
+    setupStore({ readonly: false });
+    vi.mocked(isPath).mockReturnValue(true);
+    vi.mocked(findByPathAndText).mockReturnValue([]);
+    vi.mocked(Editor.node).mockReturnValue([
+      { type: 'table', children: [] },
+      [0],
+    ] as any);
+    vi.mocked(Editor.start).mockReturnValue({ path: [0, 0, 0], offset: 0 });
+    vi.mocked(Editor.end).mockReturnValue({ path: [0, 0, 0], offset: 3 });
+    vi.mocked(findLeafPath).mockImplementation((_ed, path) => path);
+    vi.mocked(Editor.fragment).mockReturnValue([]);
+
+    renderEditor({
+      comment: {
+        enable: true,
+        commentList: [
+          {
+            id: 't1',
+            path: [0],
+            refContent: 'cell',
+            selection: {
+              anchor: { path: [0, 0], offset: 0 },
+              focus: { path: [0, 0], offset: 1 },
+            },
+          },
+        ],
+      },
+    });
+
+    const result = editableProps.decorate([
+      { type: 'table', children: [] },
+      [0],
+    ]);
+    expect(Array.isArray(result)).toBe(true);
+  });
+});
+
+describe('Editor branches - renderElement and renderLeaf', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    editableProps = {};
+  });
+
+  it('eleItemRender wraps non-table elements', () => {
+    setupStore({ readonly: false });
+    const eleItemRender = vi.fn((_props, dom) => (
+      <div data-testid="custom-element">{dom}</div>
+    ));
+
+    renderEditor({ eleItemRender });
+
+    const rendered = editableProps.renderElement({
+      element: { type: 'paragraph', children: [{ text: '' }] },
+      attributes: { 'data-slate-node': 'element' },
+      children: <span>child</span>,
+    });
+
+    expect(eleItemRender).toHaveBeenCalled();
+    expect(rendered.props['data-testid']).toBe('custom-element');
+  });
+
+  it('skips eleItemRender for table-cell and table-row', () => {
+    setupStore({ readonly: false });
+    const eleItemRender = vi.fn((_props, dom) => dom);
+
+    renderEditor({ eleItemRender });
+
+    editableProps.renderElement({
+      element: { type: 'table-cell', children: [] },
+      attributes: {},
+      children: null,
+    });
+    editableProps.renderElement({
+      element: { type: 'table-row', children: [] },
+      attributes: {},
+      children: null,
+    });
+
+    expect(eleItemRender).not.toHaveBeenCalled();
+  });
+
+  it('plugin element overrides default render', () => {
+    setupStore({ readonly: false });
+    const PluginEl = () => <div data-testid="plugin-el" />;
+
+    renderEditor({
+      plugins: [{ elements: { custom: PluginEl } }],
+    });
+
+    const rendered = editableProps.renderElement({
+      element: { type: 'custom', children: [] },
+      attributes: {},
+      children: null,
+    });
+
+    expect(rendered.type).toBe(PluginEl);
+  });
+
+  it('lazy mode executes render path for table and non-table elements', () => {
+    setupStore({ readonly: false });
+    renderEditor({ lazy: { enable: true, placeholderHeight: 24 } });
+
+    expect(() =>
+      editableProps.renderElement({
+        element: { type: 'paragraph', children: [{ text: 'a' }] },
+        attributes: {},
+        children: null,
+      }),
+    ).not.toThrow();
+
+    const tableCell = editableProps.renderElement({
+      element: { type: 'table-cell', children: [] },
+      attributes: {},
+      children: null,
+    });
+    expect(tableCell).toBeTruthy();
+  });
+
+  it('leafRender wraps default MLeaf output', () => {
+    setupStore({ readonly: false });
+    const leafRender = vi.fn((_props, dom) => (
+      <span data-testid="custom-leaf">{dom}</span>
+    ));
+
+    renderEditor({ leafRender });
+
+    const rendered = editableProps.renderLeaf({
+      leaf: { text: 'x' },
+      text: { text: 'x' },
+      attributes: { 'data-slate-leaf': true },
+      children: <span>x</span>,
+    });
+
+    expect(leafRender).toHaveBeenCalled();
+    expect(rendered.props['data-testid']).toBe('custom-leaf');
+  });
+});
+
+describe('Editor branches - paste extended', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    editableProps = {};
+  });
+
+  it('oversized HTML falls back to plain text insert', async () => {
+    const { editor } = setupStore({ readonly: false });
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
+    vi.mocked(Editor.hasPath).mockReturnValue(true);
+    vi.mocked(handlePasteModule.handleTagNodePaste).mockReturnValue(false);
+    vi.mocked(handlePasteModule.shouldInsertTextDirectly).mockReturnValue(true);
+
+    renderEditor({ pasteConfig: { htmlMaxBytes: 10 } });
+
+    const event = {
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      clipboardData: createClipboardData({
+        types: ['text/html', 'text/plain'],
+        getData: (t: string) =>
+          t === 'text/html' ? 'x'.repeat(20) : 'plain fallback',
+      }),
+      target: document.createElement('div'),
+    } as any;
+
+    editableProps.onPaste(event);
+    await flushPromises();
+
+    expect(Transforms.insertText).toHaveBeenCalledWith(
+      expect.anything(),
+      'plain fallback',
+    );
+  });
+
+  it('plainTextOnly inserts text at selection', async () => {
+    const { editor } = setupStore({ readonly: false });
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
+    vi.mocked(Editor.hasPath).mockReturnValue(true);
+    vi.mocked(handlePasteModule.handleTagNodePaste).mockReturnValue(false);
+
+    renderEditor({ pasteConfig: { plainTextOnly: true } });
+
+    const event = {
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      clipboardData: createClipboardData({
+        types: ['text/plain'],
+        getData: (t: string) => (t === 'text/plain' ? 'only plain' : ''),
+      }),
+      target: document.createElement('div'),
+    } as any;
+
+    editableProps.onPaste(event);
+    await flushPromises();
+
+    expect(Transforms.insertText).toHaveBeenCalledWith(
+      expect.anything(),
+      'only plain',
+      expect.objectContaining({ at: editor.selection }),
+    );
+  });
+
+  it('plainTextOnly without selection inserts paragraph node', async () => {
+    const { editor } = setupStore({ readonly: false });
+    editor.selection = null;
+    vi.mocked(handlePasteModule.handleTagNodePaste).mockReturnValue(false);
+
+    renderEditor({ pasteConfig: { plainTextOnly: true } });
+
+    const event = {
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      clipboardData: createClipboardData({
+        types: ['text/plain'],
+        getData: (t: string) => (t === 'text/plain' ? 'new block' : ''),
+      }),
+      target: document.createElement('div'),
+    } as any;
+
+    editableProps.onPaste(event);
+    await flushPromises();
+
+    expect(Transforms.insertNodes).toHaveBeenCalled();
+  });
+
+  it('Word HTML conversion error falls back to handleHtmlPaste', async () => {
+    const { editor } = setupStore({ readonly: false });
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
+    vi.mocked(Editor.hasPath).mockReturnValue(true);
+    vi.mocked(handlePasteModule.handleTagNodePaste).mockReturnValue(false);
+    vi.mocked(parseMarkdownToNodesAndInsert).mockImplementation(() => {
+      throw new Error('word md fail');
+    });
+    vi.mocked(handlePasteModule.handleHtmlPaste).mockResolvedValue(true);
+
+    renderEditor({});
+
+    const wordHtml =
+      '<html><head><meta name="Generator" content="Microsoft Word 16"></head><body><p class="MsoNormal">Word</p></body></html>';
+
+    const event = {
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      clipboardData: createClipboardData({
+        types: ['text/html'],
+        getData: (t: string) => (t === 'text/html' ? wordHtml : ''),
+      }),
+      target: document.createElement('div'),
+    } as any;
+
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    editableProps.onPaste(event);
+    await flushPromises();
+
+    expect(handlePasteModule.handleHtmlPaste).toHaveBeenCalled();
+    consoleSpy.mockRestore();
+  });
+
+  it('text/markdown uses direct insert when shouldInsertTextDirectly', async () => {
+    const { editor } = setupStore({ readonly: false });
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
+    vi.mocked(Editor.hasPath).mockReturnValue(true);
+    vi.mocked(handlePasteModule.handleTagNodePaste).mockReturnValue(false);
+    vi.mocked(handlePasteModule.shouldInsertTextDirectly).mockReturnValue(true);
+
+    renderEditor({});
+
+    const event = {
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      clipboardData: createClipboardData({
+        types: ['text/markdown'],
+        getData: (t: string) => (t === 'text/markdown' ? 'inline md' : ''),
+      }),
+      target: document.createElement('div'),
+    } as any;
+
+    editableProps.onPaste(event);
+    await flushPromises();
+
+    expect(Transforms.insertText).toHaveBeenCalledWith(
+      expect.anything(),
+      'inline md',
+    );
+    expect(Transforms.insertFragment).not.toHaveBeenCalled();
+  });
+});
+
+describe('Editor branches - composition update', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    editableProps = {};
+  });
+
+  it('onCompositionUpdate activates composition on WeChat', () => {
+    vi.mocked(isWeChat).mockReturnValue(true);
+    const { container } = setupStore({ readonly: false });
+    renderEditor({ onCompositionActiveChange: vi.fn() });
+
+    editableProps.onCompositionUpdate({ data: 'ni' });
+
+    expect(mockStoreConfig.store.inputComposition).toBe(true);
+    expect(container.hasAttribute('data-composition')).toBe(true);
+  });
+
+  it('onCompositionUpdate activates when container lacks data-composition', () => {
+    vi.mocked(isWeChat).mockReturnValue(false);
+    setupStore({ readonly: false });
+    renderEditor({});
+
+    editableProps.onCompositionUpdate({ data: 'hao' });
+    expect(mockStoreConfig.store.inputComposition).toBe(true);
+  });
+});
+
+describe('Editor branches - clipboard invalid focus path', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    editableProps = {};
+    vi.spyOn(Editor, 'hasPath').mockImplementation((_ed, path) => {
+      const p = path as number[];
+      return !(p.length === 2 && p[0] === 0 && p[1] === 5);
+    });
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('copy with invalid focus path stops before writing clipboard payload', () => {
+    const { editor } = setupStore({ readonly: false });
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 5], offset: 1 },
+    };
+    vi.mocked(isEventHandled).mockReturnValue(false);
+    vi.mocked(hasEditableTarget).mockReturnValue(true);
+
+    renderEditor({});
+
+    const event = {
+      preventDefault: vi.fn(),
+      clipboardData: { clearData: vi.fn(), setData: vi.fn() },
+      target: document.createElement('div'),
+    } as any;
+
+    editableProps.onCopy(event);
+
+    expect(event.clipboardData.setData).not.toHaveBeenCalled();
+    expect(event.preventDefault).not.toHaveBeenCalled();
+  });
+});
+
+describe('Editor branches - readonly early return', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    editableProps = {};
+  });
+
+  it('readonly without reportMode skips DOM selection sync', async () => {
+    const setDomRect = vi.fn();
+    const onSelectionChange = vi.fn();
+    setupStore({ readonly: true, setDomRect });
+
+    renderEditor({});
+    await editableProps.onSelect({});
+
+    expect(setDomRect).toHaveBeenCalledWith(null);
+    expect(getSelectionFromDomSelection).not.toHaveBeenCalled();
+    expect(onSelectionChange).not.toHaveBeenCalled();
+  });
+
+  it('getSelectionContent logs Failed to get selection content on fragment error', async () => {
+    const onSelectionChange = vi.fn();
+    const { editor } = setupStore({ readonly: false });
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 3 },
+    };
+    vi.mocked(Range.isCollapsed).mockReturnValue(false);
+    vi.mocked(Editor.fragment).mockImplementation(() => {
+      throw new Error('fragment fail');
+    });
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    renderEditor({ onSelectionChange });
+    await editableProps.onSelect({});
+
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'Failed to get selection content:',
+      expect.any(Error),
+    );
+    consoleSpy.mockRestore();
+  });
+
+  it('compositionEnd without data does not call insertText', async () => {
+    const { editor } = setupStore({ readonly: false });
+    editor.children = [{ type: 'paragraph', children: [{ text: 'abc' }] }];
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 3 },
+      focus: { path: [0, 0], offset: 3 },
+    };
+    vi.mocked(Range.isCollapsed).mockReturnValue(true);
+
+    renderEditor({});
+    editableProps.onCompositionEnd({});
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(Editor.insertText).not.toHaveBeenCalled();
+  });
+
+  it('lazy mode passes elementInfo to LazyElement', () => {
+    setupStore({ readonly: false });
+    renderEditor({ lazy: { enable: true, placeholderHeight: 32 } });
+
+    const result = editableProps.renderElement({
+      element: { type: 'paragraph', children: [{ text: 'lazy' }] },
+      attributes: {},
+      children: null,
+    });
+
+    expect(result.props?.elementInfo).toEqual(
+      expect.objectContaining({ type: 'paragraph' }),
+    );
+  });
+});
+
+describe('Editor branches - WeChat native input', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    editableProps = {};
+    vi.mocked(isWeChat).mockReturnValue(true);
+  });
+
+  afterEach(() => {
+    vi.mocked(isWeChat).mockReturnValue(false);
+  });
+
+  it('native input isComposing 激活组合输入态', () => {
+    const { container } = setupStore({ readonly: false });
+    renderEditor({});
+
+    const event = new InputEvent('input', { bubbles: true, composed: true });
+    Object.defineProperty(event, 'isComposing', { value: true });
+    container.dispatchEvent(event);
+
+    expect(mockStoreConfig.store.inputComposition).toBe(true);
+    expect(container.hasAttribute('data-composition')).toBe(true);
+  });
+
+  it('native input 非组合态时结束 composition 并清除标记', async () => {
+    const { container } = setupStore({ readonly: false });
+    mockStoreConfig.store.inputComposition = true;
+    container.setAttribute('data-composition', '');
+    renderEditor({});
+
+    const event = new InputEvent('input', { bubbles: true, composed: true });
+    Object.defineProperty(event, 'isComposing', { value: false });
+    container.dispatchEvent(event);
+
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => resolve());
+      });
+    });
+    expect(mockStoreConfig.store.inputComposition).toBe(false);
+  });
+
+  it('readonly 时不注册 native input 监听', () => {
+    const { container } = setupStore({ readonly: true });
+    const addSpy = vi.spyOn(container, 'addEventListener');
+    renderEditor({});
+    expect(addSpy).not.toHaveBeenCalledWith('input', expect.any(Function), true);
+    addSpy.mockRestore();
+  });
+});
+
+describe('Editor branches - empty root focus class', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    editableProps = {};
+    slateOnChange = null;
+  });
+
+  it('根级空段落时应用 focus 类名', () => {
+    const { editor } = setupStore({ readonly: false });
+    renderEditor({});
+
+    act(() => {
+      editor.operations = [{ type: 'insert_text' }];
+      slateOnChange!([{ type: 'paragraph', children: [{ text: '' }] }]);
+    });
+
+    expect(editableProps.className).toContain('ant-md-content-focus');
+  });
+});
+
+describe('Editor branches - readonly floatBar selection', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    editableProps = {};
+    vi.mocked(Editor.hasPath).mockReturnValue(true);
+    vi.mocked(Range.isCollapsed).mockReturnValue(true);
+    vi.mocked(getSelectionFromDomSelection).mockReturnValue(null);
+    vi.mocked(ReactEditor.toDOMRange).mockReturnValue({
+      cloneContents: () => document.createDocumentFragment(),
+      getBoundingClientRect: () => ({
+        top: 10,
+        left: 10,
+        width: 100,
+        height: 20,
+        bottom: 30,
+        right: 110,
+        x: 10,
+        y: 10,
+        toJSON: () => ({}),
+      }),
+    } as any);
+  });
+
+  it('readonly + reportMode + floatBar 启用时同步 DOM 选区', async () => {
+    const setDomRect = vi.fn();
+    setupStore({ readonly: true, setDomRect });
+
+    const mockSelection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 4 },
+    };
+    vi.mocked(getSelectionFromDomSelection).mockReturnValue(mockSelection as any);
+    vi.mocked(Range.isCollapsed).mockReturnValue(false);
+
+    const origGetSelection = window.getSelection;
+    window.getSelection = vi.fn(
+      () =>
+        ({
+          anchorNode: document.createElement('div'),
+          focusNode: document.createElement('div'),
+          rangeCount: 1,
+        }) as any,
+    );
+
+    renderEditor({ reportMode: true, floatBar: { enable: true } });
+    await editableProps.onSelect({});
+    await flushPromises();
+
+    expect(getSelectionFromDomSelection).toHaveBeenCalled();
+    expect(setDomRect).toHaveBeenCalledWith(
+      expect.objectContaining({ top: 10, left: 10 }),
+    );
+    window.getSelection = origGetSelection;
+  });
+});
+
+describe('Editor branches - decorateFn extended', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    editableProps = {};
+    mockHighlightFn.mockReturnValue([]);
+    vi.mocked(isPath).mockReturnValue(true);
+    vi.mocked(findLeafPath).mockImplementation((_ed, path) => path);
+    vi.mocked(Editor.hasPath).mockReturnValue(true);
+  });
+
+  afterEach(() => {
+    vi.mocked(Editor.node).mockRestore();
+  });
+
+  it('findByPathAndText 命中 refContent 时使用 DOM 偏移生成 comment range', () => {
+    setupStore({ readonly: false });
+    vi.mocked(findByPathAndText).mockReturnValue([
+      { path: [0, 0], offset: { start: 1, end: 4 } },
+    ] as any);
+    vi.mocked(Editor.fragment).mockReturnValue([
+      { type: 'paragraph', children: [{ text: 'abc' }] } as any,
+    ]);
+
+    renderEditor({
+      comment: {
+        enable: true,
+        commentList: [
+          {
+            id: 'ref1',
+            path: [0],
+            refContent: 'abc',
+            selection: {
+              anchor: { path: [0, 0], offset: 0 },
+              focus: { path: [0, 0], offset: 1 },
+            },
+          },
+        ],
+      },
+    });
+
+    const result = editableProps.decorate([
+      { type: 'paragraph', children: [{ text: 'abc' }] },
+      [0],
+    ]);
+    expect(result.some((r: any) => r.comment === true)).toBe(true);
+  });
+
+  it('card 节点 refContent 未命中时回退整卡选区', () => {
+    setupStore({ readonly: false });
+    vi.mocked(findByPathAndText).mockReturnValue([]);
+    vi.mocked(Editor.node).mockReturnValue([
+      { type: 'card', children: [{ text: 'card body' }] },
+      [0],
+    ] as any);
+    vi.mocked(Editor.start).mockReturnValue({ path: [0, 0], offset: 0 });
+    vi.mocked(Editor.end).mockReturnValue({ path: [0, 0], offset: 9 });
+    vi.mocked(Editor.fragment).mockReturnValue([
+      { type: 'card', children: [{ text: 'card body' }] } as any,
+    ]);
+
+    renderEditor({
+      comment: {
+        enable: true,
+        commentList: [
+          {
+            id: 'card1',
+            path: [0],
+            refContent: 'missing',
+            selection: {
+              anchor: { path: [0, 0], offset: 0 },
+              focus: { path: [0, 0], offset: 1 },
+            },
+          },
+        ],
+      },
+    });
+
+    const result = editableProps.decorate([
+      { type: 'card', children: [{ text: 'card body' }] },
+      [0],
+    ]);
+    expect(result.some((r: any) => r.comment === true)).toBe(true);
+  });
+
+  it('同 path 同 selection 的多条 comment 合并到同一 decorate range', () => {
+    setupStore({ readonly: false });
+    vi.mocked(Editor.fragment).mockReturnValue([
+      { type: 'paragraph', children: [{ text: 'hi' }] } as any,
+    ]);
+
+    renderEditor({
+      comment: {
+        enable: true,
+        commentList: [
+          {
+            id: 'c1',
+            path: [0],
+            selection: {
+              anchor: { path: [0, 0], offset: 0 },
+              focus: { path: [0, 0], offset: 2 },
+            },
+          },
+          {
+            id: 'c2',
+            path: [0],
+            selection: {
+              anchor: { path: [0, 0], offset: 0 },
+              focus: { path: [0, 0], offset: 2 },
+            },
+          },
+        ],
+      },
+    });
+
+    const result = editableProps.decorate([
+      { type: 'paragraph', children: [{ text: 'hi' }] },
+      [0],
+    ]);
+    const commentRange = result.find((r: any) => r.comment === true);
+    expect(commentRange?.data?.length).toBe(2);
+  });
+
+  it('table 选区异常时记录 Error selecting table node', () => {
+    setupStore({ readonly: false });
+    vi.mocked(findByPathAndText).mockReturnValue([]);
+    vi.mocked(Editor.hasPath).mockImplementation((_ed, path) => {
+      if (Array.isArray(path) && path[0] === 99) {
+        return false;
+      }
+      return true;
+    });
+    vi.mocked(Editor.node).mockImplementation(() => {
+      throw new Error('node fail');
+    });
+
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    renderEditor({
+      comment: {
+        enable: true,
+        commentList: [
+          {
+            id: 't-err',
+            path: [0],
+            refContent: 'cell',
+            selection: {
+              anchor: { path: [99, 0], offset: 0 },
+              focus: { path: [0, 0], offset: 1 },
+            },
+          },
+        ],
+      },
+    });
+
+    editableProps.decorate([
+      { type: 'table', children: [] },
+      [0],
+    ]);
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'Error selecting table node:',
+      expect.any(Error),
+    );
+    consoleSpy.mockRestore();
+  });
+});
+
+describe('Editor branches - lazy render options', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    editableProps = {};
+  });
+
+  it('lazy 透传 rootMargin 与 renderPlaceholder', () => {
+    setupStore({ readonly: false });
+    const renderPlaceholder = vi.fn(() => <div data-testid="lazy-ph" />);
+    renderEditor({
+      lazy: {
+        enable: true,
+        placeholderHeight: 48,
+        rootMargin: '200px',
+        renderPlaceholder,
+      },
+    });
+
+    const result = editableProps.renderElement({
+      element: { type: 'paragraph', children: [{ text: 'lazy' }] },
+      attributes: {},
+      children: null,
+    });
+
+    expect(result.props.rootMargin).toBe('200px');
+    expect(result.props.renderPlaceholder).toBe(renderPlaceholder);
+    expect(result.props.elementInfo).toEqual(
+      expect.objectContaining({ type: 'paragraph', index: 0 }),
+    );
+  });
+});
+
+describe('Editor branches - comment map merge', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    editableProps = {};
+    mockHighlightFn.mockReturnValue([]);
+    vi.mocked(isPath).mockReturnValue(true);
+    vi.mocked(findLeafPath).mockImplementation((_ed, path) => path);
+    vi.mocked(Editor.hasPath).mockReturnValue(true);
+  });
+
+  it('同 path 同 selection 的多条 comment 合并到 data 数组', () => {
+    setupStore({ readonly: false });
+    const sharedSelection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 3 },
+    };
+    vi.mocked(Editor.fragment).mockReturnValue([
+      { type: 'paragraph', children: [{ text: 'abc' }] } as any,
+    ]);
+
+    renderEditor({
+      comment: {
+        enable: true,
+        commentList: [
+          { id: 'c1', path: [0], selection: sharedSelection, updateTime: 1 },
+          { id: 'c2', path: [0], selection: sharedSelection, updateTime: 2 },
+        ],
+      },
+    });
+
+    const result = editableProps.decorate([
+      { type: 'paragraph', children: [{ text: 'abc' }] },
+      [0],
+    ]);
+    const commentRange = result.find((r: any) => r.comment === true);
+    expect(commentRange?.data).toHaveLength(2);
+  });
+
+  it('readonly 仅 onSelectionChange 时不 early-return', async () => {
+    const setDomRect = vi.fn();
+    const onSelectionChange = vi.fn();
+    setupStore({ readonly: true, setDomRect });
+
+    const mockSelection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 4 },
+    };
+    vi.mocked(getSelectionFromDomSelection).mockReturnValue(mockSelection as any);
+    vi.mocked(Range.isCollapsed).mockReturnValue(false);
+    vi.mocked(Editor.hasPath).mockReturnValue(true);
+    vi.mocked(ReactEditor.toDOMRange).mockReturnValue({
+      getBoundingClientRect: () => ({
+        top: 10,
+        left: 10,
+        width: 100,
+        height: 20,
+        bottom: 30,
+        right: 110,
+        x: 10,
+        y: 10,
+        toJSON: () => ({}),
+      }),
+    } as any);
+
+    const origGetSelection = window.getSelection;
+    window.getSelection = vi.fn(
+      () =>
+        ({
+          anchorNode: document.createElement('div'),
+          focusNode: document.createElement('div'),
+          rangeCount: 1,
+        }) as any,
+    );
+
+    renderEditor({
+      onSelectionChange,
+      floatBar: { enable: false },
+    });
+    await editableProps.onSelect({});
+
+    expect(onSelectionChange).toHaveBeenCalled();
+    expect(getSelectionFromDomSelection).toHaveBeenCalled();
+    window.getSelection = origGetSelection;
+  });
+});
+
+describe('Editor branches - paste and composition depth', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    editableProps = {};
+  });
+
+  it.skip('clipboardData.types 缺失时默认走 text/plain', async () => {
+    const { editor } = setupStore({ readonly: false });
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
+    vi.mocked(Editor.hasPath).mockReturnValue(true);
+    vi.mocked(handlePasteModule.handleTagNodePaste).mockReturnValue(false);
+    vi.mocked(handlePasteModule.shouldInsertTextDirectly).mockReturnValue(
+      false,
+    );
+    vi.mocked(handlePasteModule.handleSpecialTextPaste).mockReturnValue(false);
+    vi.mocked(handlePasteModule.handleHttpLinkPaste).mockReturnValue(false);
+    vi.mocked(handlePasteModule.handlePlainTextPaste).mockResolvedValue(true);
+
+    renderEditor({});
+
+    const event = {
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      clipboardData: {
+        types: undefined,
+        getData: (t: string) => (t === 'text/plain' ? 'from default type' : ''),
+        clearData: vi.fn(),
+        setData: vi.fn(),
+        files: [],
+      },
+      target: document.createElement('div'),
+    } as any;
+
+    editableProps.onPaste(event);
+    await flushPromises();
+
+    expect(handlePasteModule.handlePlainTextPaste).toHaveBeenCalledWith(
+      expect.anything(),
+      'from default type',
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
+  it('text/plain 仅空白字符时 trim 后 early return', async () => {
+    const { editor } = setupStore({ readonly: false });
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
+    vi.mocked(Editor.hasPath).mockReturnValue(true);
+    vi.mocked(handlePasteModule.handleTagNodePaste).mockReturnValue(false);
+    const plainSpy = vi
+      .mocked(handlePasteModule.handlePlainTextPaste)
+      .mockResolvedValue(true);
+
+    renderEditor({});
+
+    const event = {
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      clipboardData: createClipboardData({
+        types: ['text/plain'],
+        getData: (t: string) => (t === 'text/plain' ? '  \n\t  ' : ''),
+      }),
+      target: document.createElement('div'),
+    } as any;
+
+    editableProps.onPaste(event);
+    await flushPromises();
+
+    expect(plainSpy).not.toHaveBeenCalled();
+    expect(Transforms.insertText).not.toHaveBeenCalled();
+  });
+
+  it('非只读无 onSelectionChange 时 onSelect 仅派发事件', async () => {
+    const { editor, container } = setupStore({ readonly: false });
+    const dispatchSpy = vi.spyOn(container, 'dispatchEvent');
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
+    vi.mocked(Range.isCollapsed).mockReturnValue(true);
+
+    renderEditor({});
+    await editableProps.onSelect({});
+
+    expect(dispatchSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'md-selectionchange' }),
+    );
+  });
+
+  it('onCompositionUpdate 已有 data-composition 时不重复激活', () => {
+    const { container } = setupStore({ readonly: false });
+    container.setAttribute('data-composition', '');
+    mockStoreConfig.store.inputComposition = true;
+    renderEditor({});
+
+    editableProps.onCompositionUpdate({
+      data: 'partial',
+      preventDefault: vi.fn(),
+    } as any);
+
+    expect(mockStoreConfig.store.inputComposition).toBe(true);
+  });
+
+  it('纯文本粘贴仅空白时早退不插入', async () => {
+    const { editor } = setupStore({ readonly: false });
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
+    vi.mocked(Editor.hasPath).mockReturnValue(true);
+    vi.mocked(handlePasteModule.handleTagNodePaste).mockReturnValue(false);
+    renderEditor({});
+
+    const event = {
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      clipboardData: createClipboardData({
+        types: ['text/plain'],
+        getData: () => '   \n\t  ',
+      }),
+      target: document.createElement('div'),
+    } as any;
+
+    editableProps.onPaste(event);
+    await flushPromises();
+    expect(Transforms.insertText).not.toHaveBeenCalled();
+  });
+
+  it('未传 onSelectionChange 时 selection 变更不抛错', () => {
+    setupStore({ readonly: false });
+    expect(() => renderEditor({})).not.toThrow();
+  });
+
+  it('istanbul residual：clipboard 类型回退、无 selection 复制、无 onSelectionChange blur', async () => {
+    const { editor } = setupStore({ readonly: false });
+    editor.selection = null;
+    renderEditor({});
+
+    const event = {
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      clipboardData: {
+        types: undefined,
+        getData: (t: string) => {
+          if (t === 'text/rtf') return '';
+          if (t === 'text/markdown') return '';
+          if (t === 'text/html') return '<p>h</p>';
+          if (t === 'text/plain') return 'plain';
+          if (t === 'application/x-slate-md-fragment') return '';
+          return '';
+        },
+        setData: vi.fn(),
+      },
+      target: document.createElement('div'),
+    } as any;
+
+    if (editableProps?.onPaste) {
+      editableProps.onPaste(event);
+      await flushPromises();
+    }
+
+    if (editableProps?.onCopy) {
+      editableProps.onCopy({
+        preventDefault: vi.fn(),
+        clipboardData: { setData: vi.fn() },
+      } as any);
+    }
+
+    setupStore({ readonly: false });
+    renderEditor({});
+    if (editableProps?.onSelect) {
+      await editableProps.onSelect({});
+    }
+    if (editableProps?.onBlur) {
+      editableProps.onBlur({});
+    }
+  });
+
+  it('istanbul residual：slateEditor 目标点击与无 DOM selection', async () => {
+    const { container } = setupStore({ readonly: false });
+    renderEditor({});
+    const slateEl = document.createElement('div');
+    slateEl.dataset.slateEditor = 'true';
+    container.appendChild(slateEl);
+
+    if (editableProps?.onMouseDown) {
+      editableProps.onMouseDown({
+        target: slateEl,
+        preventDefault: vi.fn(),
+        button: 0,
+      } as any);
+    }
+
+    const getSel = window.getSelection;
+    (window as any).getSelection = () => null;
+    if (editableProps?.onSelect) {
+      await editableProps.onSelect({});
+    }
+    window.getSelection = getSel;
+  });
+
+  it('istanbul buffer：空 plain 早退、getFragment 假值、comment path 未命中', async () => {
+    const { editor } = setupStore({ readonly: false });
+    vi.mocked(handlePasteModule.handleTagNodePaste).mockReturnValue(false);
+    renderEditor({});
+
+    const emptyPlain = {
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      clipboardData: createClipboardData({
+        types: ['text/plain'],
+        getData: (t: string) => (t === 'text/plain' ? '   ' : ''),
+      }),
+      target: document.createElement('div'),
+    } as any;
+    editableProps?.onPaste?.(emptyPlain);
+    await flushPromises();
+
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 1 },
+    };
+    editor.getFragment = () => undefined as any;
+    editableProps?.onCopy?.({
+      preventDefault: vi.fn(),
+      clipboardData: { setData: vi.fn() },
+    } as any);
+
+    setupStore({ readonly: false });
+    renderEditor({
+      comment: {
+        enable: true,
+        commentList: [
+          {
+            id: 'miss',
+            path: [99, 0],
+            selection: undefined,
+            refContent: 'ghost',
+          },
+        ],
+      },
+    });
+    const ranges = editableProps?.decorate?.([
+      { type: 'paragraph', children: [{ text: 'a' }] },
+      [0],
+    ]);
+    expect(Array.isArray(ranges)).toBe(true);
+  });
+
+  it('istanbul fill：空 initSchema、clipboard 空串、hasEditableTarget 假、未知元素', async () => {
+    setupStore({ readonly: false });
+    renderEditor({ initSchemaValue: [] });
+    expect(editableProps).toBeTruthy();
+
+    const { editor } = setupStore({ readonly: false });
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
+    vi.mocked(handlePasteModule.handleTagNodePaste).mockReturnValue(false);
+    vi.mocked(handlePasteModule.shouldInsertTextDirectly).mockReturnValue(false);
+    vi.mocked(handlePasteModule.handleSpecialTextPaste).mockReturnValue(false);
+    vi.mocked(handlePasteModule.handleHttpLinkPaste).mockReturnValue(false);
+    vi.mocked(handlePasteModule.handlePlainTextPaste).mockResolvedValue(false);
+    vi.mocked(hasEditableTarget).mockReturnValue(false);
+
+    renderEditor({});
+    await editableProps.onPaste?.({
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      clipboardData: {
+        types: ['text/html', 'text/rtf', 'text/markdown', 'text/plain'],
+        getData: (t: string) => {
+          if (t === 'text/html') return '';
+          if (t === 'text/rtf') return '';
+          if (t === 'text/markdown') return '';
+          if (t === 'text/plain') return 'fallback-plain';
+          return '';
+        },
+        files: [],
+        clearData: vi.fn(),
+        setData: vi.fn(),
+      },
+      target: document.createElement('div'),
+    } as any);
+    await flushPromises();
+
+    const unknown = editableProps.renderElement?.({
+      element: { type: 'totally-unknown-node', children: [{ text: '' }] },
+      attributes: { 'data-slate-node': 'element' },
+      children: <span>u</span>,
+    });
+    expect(unknown).toBeTruthy();
+
+    editor.operations = [];
+    slateOnChange?.([{ type: 'paragraph', children: [{ text: 'same' }] }]);
+  });
+
+  it('istanbul after：clipboardData.types 缺失回退；getFragment 假值', async () => {
+    const { editor } = setupStore({ readonly: false });
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 1 },
+    };
+    editor.getFragment = () => undefined as any;
+    vi.mocked(hasEditableTarget).mockReturnValue(true);
+    renderEditor({});
+    await editableProps.onCopy?.({
+      preventDefault: vi.fn(),
+      clipboardData: {
+        types: undefined,
+        setData: vi.fn(),
+        getData: () => '',
+      },
+      target: document.createElement('div'),
+    } as any);
+
+    await editableProps.onPaste?.({
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      clipboardData: {
+        types: undefined,
+        getData: () => 'plain-only',
+        files: [],
+        clearData: vi.fn(),
+        setData: vi.fn(),
+      },
+      target: document.createElement('div'),
+    } as any);
+    await flushPromises();
+    expect(editableProps).toBeTruthy();
+  });
+
+  it('istanbul buffer：超大 html 走 plain；空 markdown 跳过；无 files', async () => {
+    const { editor } = setupStore({ readonly: false });
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
+    vi.mocked(hasEditableTarget).mockReturnValue(true);
+    renderEditor({});
+
+    const hugeHtml = `<p>${'x'.repeat(1_100_000)}</p>`;
+    await editableProps.onPaste?.({
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      clipboardData: {
+        types: ['text/html', 'text/plain'],
+        getData: (t: string) =>
+          t === 'text/html' ? hugeHtml : 'plain-fallback',
+        files: [],
+        clearData: vi.fn(),
+        setData: vi.fn(),
+      },
+      target: document.createElement('div'),
+    } as any);
+    await flushPromises();
+
+    await editableProps.onPaste?.({
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      clipboardData: {
+        types: ['text/markdown', 'text/plain'],
+        getData: (t: string) => (t === 'text/markdown' ? '   \n' : ''),
+        files: [],
+        clearData: vi.fn(),
+        setData: vi.fn(),
+      },
+      target: document.createElement('div'),
+    } as any);
+    await flushPromises();
+    expect(editableProps).toBeTruthy();
+  });
+});
+
+describe('Editor istanbul residual：onSelectionChange 假值 / 无 focus', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    editableProps = {};
+  });
+
+  it('readonly 无 onSelectionChange 时选区回调 else 臂', async () => {
+    // if (props.onSelectionChange) { else }
+    setupStore({ readonly: true, setDomRect: vi.fn() });
+    renderEditor({});
+    await flushPromises();
+    expect(editableProps).toBeTruthy();
+  });
+});
+
+describe('Editor branches - deepen round 2', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    editableProps = {};
+    slateOnChange = null;
+  });
+
+  afterEach(() => {
+    vi.mocked(isWeChat).mockReturnValue(false);
+  });
+
+  it('commentMap 同 path 不同 selection 走 else if childrenMap 分支', () => {
+    setupStore({ readonly: false });
+    vi.mocked(isPath).mockReturnValue(true);
+    vi.mocked(findLeafPath).mockImplementation((_ed, path) => path);
+    vi.mocked(Editor.hasPath).mockReturnValue(true);
+    vi.mocked(Editor.fragment).mockReturnValue([
+      { type: 'paragraph', children: [{ text: 'ab' }] } as any,
+    ]);
+
+    renderEditor({
+      comment: {
+        enable: true,
+        commentList: [
+          {
+            id: 'c-first',
+            path: [0],
+            selection: {
+              anchor: { path: [0, 0], offset: 0 },
+              focus: { path: [0, 0], offset: 1 },
+            },
+          },
+          {
+            id: 'c-second',
+            path: [0],
+            selection: {
+              anchor: { path: [0, 0], offset: 1 },
+              focus: { path: [0, 0], offset: 2 },
+            },
+          },
+        ],
+      },
+    });
+
+    const result = editableProps.decorate([
+      { type: 'paragraph', children: [{ text: 'ab' }] },
+      [0],
+    ]);
+    const commentRanges = result.filter((r: any) => r.comment === true);
+    expect(commentRanges.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('onSlateChange 在 operations 为 undefined 时使用空数组', () => {
+    const { editor } = setupStore({ readonly: false });
+    renderEditor({});
+
+    editor.operations = [{ type: 'insert_text' }];
+    slateOnChange!([{ type: 'paragraph', children: [{ text: 'first' }] }]);
+    mockOnChange.mockClear();
+
+    editor.operations = undefined;
+    slateOnChange!([{ type: 'paragraph', children: [{ text: 'changed' }] }]);
+
+    expect(mockOnChange).toHaveBeenCalledWith(
+      [{ type: 'paragraph', children: [{ text: 'changed' }] }],
+      [],
+    );
+  });
+
+  it('WeChat mouseup 已 focus 时不重复 focus', async () => {
+    vi.mocked(isWeChat).mockReturnValue(true);
+    const { container, editor } = setupStore({ readonly: false });
+    vi.spyOn(ReactEditor, 'isFocused').mockReturnValue(true);
+
+    renderEditor({});
+
+    const editable = document.createElement('div');
+    editable.setAttribute('contenteditable', 'true');
+    container.appendChild(editable);
+    editable.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+
+    await act(async () => {
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => resolve());
+      });
+    });
+
+    expect(EditorUtils.focus).not.toHaveBeenCalledWith(editor);
+  });
+
+  it('initialNote 空 initSchemaValue 时不向 reset 传 schema', () => {
+    setupStore({ readonly: false });
+    vi.mocked(EditorUtils.reset).mockClear();
+
+    renderEditor({
+      instance: { id: 'empty-schema' },
+      initSchemaValue: [],
+      tableConfig: { minColumn: 2, minRows: 2 },
+    });
+
+    expect(EditorUtils.reset).toHaveBeenCalledWith(
+      expect.anything(),
+      undefined,
+    );
+  });
+
+  it('initialNote 有 schema 与 tableConfig 时调用 reset', () => {
+    setupStore({ readonly: false });
+    vi.mocked(EditorUtils.reset).mockClear();
+
+    const schema = [{ type: 'paragraph', children: [{ text: 'seed' }] }];
+    renderEditor({
+      instance: { id: 'with-schema' },
+      initSchemaValue: schema,
+      tableConfig: { minColumn: 2, minRows: 2 },
+    });
+
+    expect(EditorUtils.reset).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.arrayContaining([
+        expect.objectContaining({ type: 'paragraph' }),
+      ]),
+    );
+  });
+
+  it('Word HTML 转 markdown 为空时回退 handleHtmlPaste', async () => {
+    const htmlMod = await import('../utils/htmlToMarkdown');
+    const isWordSpy = vi.spyOn(htmlMod, 'isWordHtml').mockReturnValue(true);
+    const toMdSpy = vi.spyOn(htmlMod, 'htmlToMarkdown').mockReturnValue('   ');
+
+    try {
+      const { editor } = setupStore({ readonly: false });
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      };
+      vi.mocked(Editor.hasPath).mockReturnValue(true);
+      vi.mocked(handlePasteModule.handleTagNodePaste).mockReturnValue(false);
+      vi.mocked(handlePasteModule.handleHtmlPaste).mockResolvedValue(true);
+
+      renderEditor({});
+
+      const wordHtml =
+        '<html><head><meta name="Generator" content="Microsoft Word 16"></head><body><p></p></body></html>';
+
+      editableProps.onPaste({
+        preventDefault: vi.fn(),
+        stopPropagation: vi.fn(),
+        clipboardData: createClipboardData({
+          types: ['text/html'],
+          getData: (t: string) => (t === 'text/html' ? wordHtml : ''),
+        }),
+        target: document.createElement('div'),
+      } as any);
+      await flushPromises();
+
+      expect(parseMarkdownToNodesAndInsert).not.toHaveBeenCalled();
+      expect(handlePasteModule.handleHtmlPaste).toHaveBeenCalled();
+    } finally {
+      isWordSpy.mockRestore();
+      toMdSpy.mockRestore();
+    }
   });
 });

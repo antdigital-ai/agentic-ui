@@ -17,7 +17,7 @@ export class TemplateEngine {
     const escapedData = Object.entries(data).reduce((acc, [key, value]) => {
       acc[key] = typeof value === 'string' ? this.escapeHtml(value) : value;
 
-      if (typeof value === 'object' && value !== null && value !== undefined) {
+      if (typeof value === 'object' && value !== null) {
         acc[key] = JSON.stringify(value);
       }
       return acc;

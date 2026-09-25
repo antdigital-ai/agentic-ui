@@ -116,7 +116,7 @@ export const RagRetrievalInfo = (
                 new Set(
                   props.output?.chunks?.map((query) => query.docMeta?.doc_name),
                 ),
-              )?.map((query, index) => {
+              ).map((query, index) => {
                 const chunk = props.output?.chunks?.find(
                   (item) => item.docMeta?.doc_name === query,
                 );

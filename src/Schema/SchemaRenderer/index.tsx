@@ -99,13 +99,13 @@ const createSandboxInstance = (sandboxConfig: any): ProxySandbox => {
 const createSandboxContext = (
   shadowRoot: ShadowRoot | null,
 ): Record<string, any> => {
+  // 沙箱脚本仅在浏览器 Shadow DOM 路径执行，window 恒存在
   return {
     shadowRoot: shadowRoot,
     safeWindow: {
-      devicePixelRatio:
-        typeof window !== 'undefined' ? window.devicePixelRatio : 1,
-      innerWidth: typeof window !== 'undefined' ? window.innerWidth : 1024,
-      innerHeight: typeof window !== 'undefined' ? window.innerHeight : 768,
+      devicePixelRatio: window.devicePixelRatio,
+      innerWidth: window.innerWidth,
+      innerHeight: window.innerHeight,
     },
   };
 };
@@ -382,15 +382,15 @@ const SchemaRendererComponent: React.FC<SchemaRendererProps> = ({
 
   // 从 schema 中提取数据和模板
   const { properties = {}, type = 'html' } = safeComponent;
-  const templateHtml = safeComponent.schema || '';
+  const templateHtml = safeComponent.schema ?? '';
 
   // 准备模板数据
   const templateData = useMemo(() => {
     try {
       const defaultValues = useDefaultValues
-        ? Object.entries(properties || {}).reduce(
+        ? Object.entries(properties).reduce(
             (data, [key, value]) => {
-              if (value && 'default' in value) {
+              if ('default' in value) {
                 data[key] = value.default;
               }
               return data;
@@ -400,14 +400,10 @@ const SchemaRendererComponent: React.FC<SchemaRendererProps> = ({
         : {};
 
       // 先合并 values
-      const mergedData = merge(
-        defaultValues,
-        initialValues || {},
-        values || {},
-      );
+      const mergedData = merge(defaultValues, initialValues, values);
 
       // 类型转换：如果 properties 定义为 array/object，但 values 里是 string，则尝试转换
-      Object.entries(properties || {}).forEach(([key, property]) => {
+      Object.entries(properties).forEach(([key, property]) => {
         const val = mergedData[key];
         if (property.type === 'array' && typeof val === 'string') {
           try {
@@ -422,13 +418,9 @@ const SchemaRendererComponent: React.FC<SchemaRendererProps> = ({
         }
         if (property.type === 'object' && typeof val === 'string') {
           try {
-            try {
-              mergedData[key] = partialParse(val);
-            } catch (error) {
-              mergedData[key] = val;
-            }
+            mergedData[key] = partialParse(val);
           } catch {
-            mergedData[key] = {};
+            mergedData[key] = val;
           }
         }
       });
@@ -436,12 +428,15 @@ const SchemaRendererComponent: React.FC<SchemaRendererProps> = ({
       // 添加 fallback 值：如果数据在 properties 定义但是 mergedData 中没有
       const dataWithFallbacks = { ...mergedData };
 
-      Object.entries(properties || {}).forEach(([key, property]) => {
-        if (
+      Object.entries(properties).forEach(([key, property]) => {
+        const value = dataWithFallbacks[key];
+        const isMissingValue =
           !(key in dataWithFallbacks) ||
-          dataWithFallbacks[key] === undefined ||
-          dataWithFallbacks[key] === null
-        ) {
+          value === undefined ||
+          value === null ||
+          (property.type === 'string' && value === '');
+
+        if (isMissingValue) {
           switch (property.type) {
             case 'array':
               dataWithFallbacks[key] = [];
@@ -465,7 +460,7 @@ const SchemaRendererComponent: React.FC<SchemaRendererProps> = ({
       return dataWithFallbacks;
     } catch (error) {
       console.error('Error preparing template data:', error);
-      return values || {};
+      return values;
     }
   }, [properties, values, useDefaultValues, initialValues]);
 
@@ -500,9 +495,9 @@ const SchemaRendererComponent: React.FC<SchemaRendererProps> = ({
   // 应用主题样式
   const containerStyle = useMemo(() => {
     try {
-      const safeTheme = safeSchema.theme || {};
-      const safeTypography = safeTheme.typography || {};
-      const safeSpacing = safeTheme.spacing || {};
+      const safeTheme = safeSchema.theme ?? {};
+      const safeTypography = safeTheme.typography ?? {};
+      const safeSpacing = safeTheme.spacing ?? {};
 
       return {
         fontFamily: safeTypography.fontFamily,
@@ -549,12 +544,12 @@ const SchemaRendererComponent: React.FC<SchemaRendererProps> = ({
       // 添加样式
       try {
         const style = document.createElement('style');
-        const safeTheme = safeSchema.theme || {};
-        const safeTypography = safeTheme.typography || {};
+        const safeTheme = safeSchema.theme ?? {};
+        const safeTypography = safeTheme.typography ?? {};
         style.innerHTML = `
 :host {
   display: block;
-  font-family: ${safeTypography.fontFamily || 'inherit'};
+  font-family: ${safeTypography.fontFamily ?? 'inherit'};
   font-size: ${safeTypography.fontSizes?.[2] ?? '14'}px;
   line-height: ${safeTypography.lineHeights?.normal ?? 1.6};
 }
@@ -767,6 +762,10 @@ a:active {
         </div>
       )
     );
+  }
+
+  if (!validationResult?.valid && !debug) {
+    return null;
   }
 
   return (

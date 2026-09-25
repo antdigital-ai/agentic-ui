@@ -150,7 +150,7 @@ export const Suggestion: React.FC<{
         ...item,
         onClick: () => {
           setOpen(false);
-          onSelectRef.current?.(`${key}` || '');
+          onSelectRef.current?.(`${key}`);
         },
       };
     });
@@ -194,7 +194,7 @@ export const Suggestion: React.FC<{
                 ...item,
                 onClick: () => {
                   setOpen(false);
-                  onSelectRef.current?.(`${key}` || '');
+                  onSelectRef.current?.(`${key}`);
                 },
               };
             }),
@@ -241,7 +241,7 @@ export const Suggestion: React.FC<{
                 ...props,
                 ...triggerNodeContext.current,
                 onSelect: (value: string, path?: number[]) => {
-                  onSelectRef.current?.(`${value}` || '', path);
+                  onSelectRef.current?.(`${value}`, path);
                   setOpen(false);
                 },
               })

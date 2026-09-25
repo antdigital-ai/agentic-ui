@@ -63,7 +63,7 @@ const renderSiteAvatar = (site: string, icon?: string) => {
       />
     );
   }
-  const letter = (site[0] || 'W').toUpperCase();
+  const letter = (site?.[0] || 'W').toUpperCase();
   return <Avatar size={20}>{letter}</Avatar>;
 };
 
@@ -261,7 +261,6 @@ export const BrowserList: React.FC<BrowserListProps> = ({
 }) => {
   const { prefixCls, hashId } = useBrowserContext();
   const { locale } = useContext(I18nContext);
-
   const safeItems = Array.isArray(items) ? items : [];
 
   const mergedEmptyText =

@@ -114,7 +114,7 @@ export class KeyboardTask {
     const sel = this.editor.selection;
     if (sel && Range.isCollapsed(sel)) {
       const [leaf] = Editor.leaf(this.editor, sel.anchor);
-      const text = leaf?.text || '';
+      const text = leaf.text || '';
       let start = sel.anchor.offset;
       let end = start;
       const next = text.slice(start);
@@ -220,7 +220,7 @@ export class KeyboardTask {
         }
         const url =
           (await this.props.image.upload(
-            (Array.from(e.target.files) as File[]) || [],
+            Array.from(e.target.files) as File[],
           )) || [];
         [url].flat().forEach((u: string) => {
           if (u) {

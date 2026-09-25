@@ -103,7 +103,7 @@ function calculateBoxPlotStats(values: number[]): {
   mean: number;
   outliers: number[];
 } {
-  if (!values || values.length === 0) {
+  if (values.length === 0) {
     return { min: 0, q1: 0, median: 0, q3: 0, max: 0, mean: 0, outliers: [] };
   }
 
@@ -215,10 +215,8 @@ const BoxPlotChart: React.FC<BoxPlotChartProps> = ({
       setWindowWidth(window.innerWidth);
     };
 
-    if (typeof window !== 'undefined') {
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const chartRef = useRef<any>(null);
@@ -230,7 +228,7 @@ const BoxPlotChart: React.FC<BoxPlotChartProps> = ({
   const categories = useMemo(() => {
     const uniqueCategories = [
       ...new Set(safeData.map((item) => item?.category)),
-    ].filter(Boolean);
+    ].filter((category): category is string => Boolean(category));
     return uniqueCategories;
   }, [safeData]);
 
@@ -251,16 +249,16 @@ const BoxPlotChart: React.FC<BoxPlotChartProps> = ({
 
   // 状态管理
   const [selectedFilter, setSelectedFilter] = useState<string>(
-    categories.find(Boolean) || '',
+    categories[0] || '',
   );
   const [selectedFilterLabel, setSelectedFilterLabel] = useState(
-    filterLabels && filterLabels.length > 0 ? filterLabels[0] : undefined,
+    filterLabels?.[0],
   );
 
   // 当数据变化导致当前选中分类失效时，自动回退
   useEffect(() => {
     if (selectedFilter && !categories.includes(selectedFilter)) {
-      setSelectedFilter(categories.find(Boolean) || '');
+      setSelectedFilter(categories[0] || '');
     }
   }, [categories, selectedFilter]);
 
@@ -484,8 +482,8 @@ const BoxPlotChart: React.FC<BoxPlotChartProps> = ({
   // 筛选器选项
   const filterOptions = useMemo(() => {
     return categories.map((category) => ({
-      label: category || '默认',
-      value: category || '默认',
+      label: category,
+      value: category,
     }));
   }, [categories]);
 

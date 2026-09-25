@@ -81,7 +81,7 @@ export const InlineKatex = ({
     if (!katexLoaded || !katexRef.current || selected) return;
 
     const value = Node.string(element);
-    if (renderEl.current && katexRef.current) {
+    if (renderEl.current) {
       katexRef.current.render(`${value}`, renderEl.current, {
         strict: false,
         output: 'html',

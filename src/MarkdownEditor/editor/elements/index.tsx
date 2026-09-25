@@ -679,22 +679,23 @@ const MLeafComponent = (
           selectFormat();
         }
         if (props.linkConfig?.onClick) {
-          const res = props.linkConfig?.onClick(leaf.url);
+          const res = props.linkConfig.onClick(leaf.url);
           if (res === false) {
             return;
           }
         }
-        if (leaf.url && props.linkConfig?.openInNewTab !== false) {
-          window.open(leaf.url, '_blank');
-        }
-        if (leaf.url && props.linkConfig?.openInNewTab === false) {
-          window.location.href = leaf.url;
+        if (leaf.url) {
+          if (props.linkConfig?.openInNewTab === false) {
+            window.location.href = leaf.url;
+          } else {
+            window.open(leaf.url, '_blank');
+          }
         }
       }}
       data-comment={leaf.comment ? 'comment' : undefined}
       data-url={leaf.url ? 'url' : undefined}
       style={style}
-      className={prefixClassName?.trim() ? prefixClassName?.trim() : undefined}
+      className={prefixClassName?.trim() || undefined}
     >
       {restoreJinjaDollarInChildren(children)}
     </span>

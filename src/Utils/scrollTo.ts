@@ -21,17 +21,13 @@ export default function scrollTo(y: number, options: ScrollToOptions = {}) {
 
   // Early return if running in Node.js environment without proper DOM setup
   if (typeof window === 'undefined') {
-    if (typeof callback === 'function') {
-      callback();
-    }
+    callback?.();
     return;
   }
 
   // Early return if container is undefined
   if (!container) {
-    if (typeof callback === 'function') {
-      callback();
-    }
+    callback?.();
     return;
   }
 
@@ -39,22 +35,6 @@ export default function scrollTo(y: number, options: ScrollToOptions = {}) {
   const startTime = Date.now();
 
   const frameFunc = () => {
-    // Check if we're still in a browser environment
-    if (typeof window === 'undefined') {
-      if (typeof callback === 'function') {
-        callback();
-      }
-      return;
-    }
-
-    // Additional check for container (should not happen due to early return above)
-    if (!container) {
-      if (typeof callback === 'function') {
-        callback();
-      }
-      return;
-    }
-
     const timestamp = Date.now();
     const time = timestamp - startTime;
     const nextScrollTop = easeInOutCubic(
@@ -75,8 +55,8 @@ export default function scrollTo(y: number, options: ScrollToOptions = {}) {
     }
     if (time < duration) {
       raf(frameFunc);
-    } else if (typeof callback === 'function') {
-      callback();
+    } else {
+      callback?.();
     }
   };
   raf(frameFunc);

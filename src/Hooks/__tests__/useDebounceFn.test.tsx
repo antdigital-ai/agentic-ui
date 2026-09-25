@@ -1,14 +1,15 @@
-import { act, renderHook } from '@testing-library/react';
+import { act, cleanup, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useDebounceFn } from '../useDebounceFn';
 
 describe('useDebounceFn', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
   });
 
   afterEach(() => {
-    vi.useRealTimers();
+    cleanup();
+    vi.clearAllTimers();
     vi.clearAllMocks();
   });
 

@@ -140,4 +140,57 @@ describe('useElementSize', () => {
 
     expect(result.current).toMatchObject({ width: 100, height: 80 });
   });
+
+  it('无 ResizeObserver 时回退 getBoundingClientRect', () => {
+    const original = globalThis.ResizeObserver;
+    // @ts-expect-error test stub
+    delete globalThis.ResizeObserver;
+    const div = document.createElement('div');
+    div.getBoundingClientRect = vi.fn(() => mockRect(44, 22));
+    const { result } = renderHook(() => useElementSize());
+    act(() => {
+      result.current.ref(div);
+    });
+    expect(result.current).toMatchObject({ width: 44, height: 22 });
+    globalThis.ResizeObserver = original;
+  });
+
+  it('ref(null) 重置为空尺寸；同节点再挂载跳过 setState', () => {
+    const div = document.createElement('div');
+    div.getBoundingClientRect = vi.fn(() => mockRect(10, 10));
+    createResizeObserverMock();
+    const { result } = renderHook(() => useElementSize());
+    act(() => {
+      result.current.ref(div);
+    });
+    act(() => {
+      result.current.ref(div);
+    });
+    act(() => {
+      result.current.ref(null);
+    });
+    expect(result.current).toMatchObject({ width: 0, height: 0 });
+  });
+
+  it('ResizeObserver 空 entries 与 contentRect 回退', async () => {
+    const div = document.createElement('div');
+    div.getBoundingClientRect = vi.fn(() => mockRect(1, 1));
+    const { triggerResize } = createResizeObserverMock();
+    const { result } = renderHook(() => useElementSize());
+    act(() => {
+      result.current.ref(div);
+    });
+    // manually invoke via trigger with contentRect only
+    act(() => {
+      triggerResize({
+        contentRect: { width: 55, height: 33 },
+      } as unknown as ResizeObserverEntry);
+    });
+    await act(async () => {
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => resolve());
+      });
+    });
+    expect(result.current).toMatchObject({ width: 55, height: 33 });
+  });
 });

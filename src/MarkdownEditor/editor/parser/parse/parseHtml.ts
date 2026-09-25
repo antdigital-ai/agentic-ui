@@ -258,6 +258,7 @@ export const createMediaNodeFromElement = (
     img: 'image',
   };
 
+  // 未知标签回退为 image，与历史 createMediaNodeFromElement 行为一致
   const mediaType = mediaTypeMap[mediaElement.tagName] || 'image';
 
   return EditorUtils.createMediaNode(
@@ -407,8 +408,8 @@ const parseCommentContextProps = (
 ): any => {
   const isComment =
     value &&
-    processedValue?.trim()?.endsWith('-->') &&
-    processedValue.trim()?.startsWith('<!--');
+    processedValue.trim().endsWith('-->') &&
+    processedValue.trim().startsWith('<!--');
 
   if (!isComment) {
     return {};
@@ -476,7 +477,7 @@ const handleBlockHtml = (
   }
 
   const blockOnlyMarkMatch =
-    typeof currentElement?.value === 'string' &&
+    typeof currentElement.value === 'string' &&
     currentElement.value.match(/^\s*<mark(?:\s[^>]*)?>([\s\S]*?)<\/mark>\s*$/i);
   if (blockOnlyMarkMatch) {
     const innerMd = blockOnlyMarkMatch[1];
@@ -520,7 +521,7 @@ const handleBlockHtml = (
   // 块级 `<div data-card="true">…</div>` —— 与 handleCard 的序列化对称，
   // 还原 card 包裹。内部用 parseMarkdownFn 递归解析后塞回 wrapperCardNode。
   const blockOnlyCardMatch =
-    typeof currentElement?.value === 'string' &&
+    typeof currentElement.value === 'string' &&
     currentElement.value.match(
       /^\s*<div[^>]*\bdata-card\s*=\s*["']true["'][^>]*>([\s\S]*?)<\/div>\s*$/i,
     );
@@ -869,13 +870,13 @@ export const handleHtml = (
   htmlTag: any[],
   parseMarkdownFn?: ParseMarkdownFn,
 ) => {
-  const trimmedValue = currentElement?.value?.trim() || '';
+  const trimmedValue = currentElement.value?.trim() || '';
   const isUnclosedComment =
     trimmedValue.startsWith('<!--') && !trimmedValue.endsWith('-->');
 
   let processedValue = isUnclosedComment
     ? trimmedValue + '-->'
-    : currentElement?.value || '';
+    : currentElement.value || '';
 
   // 检查是否是对象格式的图表配置，如果是则转换为数组格式
   const isComment =
@@ -907,7 +908,7 @@ export const handleHtml = (
   }
 
   const value =
-    processedValue?.replace('<!--', '').replace('-->', '').trim() || '{}';
+    processedValue.replace('<!--', '').replace('-->', '').trim() || '{}';
 
   const contextProps = parseCommentContextProps(value, processedValue);
 
@@ -953,12 +954,12 @@ export function preprocessSpecialTags(
 ): string {
   const tagRegex = new RegExp(`<${tagName}>([\\s\\S]*?)<\\/${tagName}>`, 'g');
 
-  return markdown?.replace(tagRegex, (match, content) => {
+  return markdown.replace(tagRegex, (match, content) => {
     const trimmedContent = content.trim();
 
     // 如果内容中包含代码块标记（三个反引号），需要进行转义
     // 策略：使用特殊标记替换代码块，保持原始格式
-    const processedContent = trimmedContent?.replace(
+    const processedContent = trimmedContent.replace(
       /```(\w*)\n?([\s\S]*?)```/g,
       (_: string, lang: string, code: string) => {
         // 使用特殊标记包裹，保留语言和代码内容

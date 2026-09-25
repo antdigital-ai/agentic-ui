@@ -220,10 +220,8 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
       setWindowWidth(window.innerWidth);
     };
 
-    if (typeof window !== 'undefined') {
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const chartRef = useRef<ChartJS<'bar'>>(null);
@@ -235,7 +233,7 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
   const categories = useMemo(() => {
     const uniqueCategories = [
       ...new Set(safeData.map((item) => item?.category)),
-    ].filter(Boolean);
+    ].filter((category): category is string => Boolean(category));
     return uniqueCategories;
   }, [safeData]);
 
@@ -256,16 +254,16 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
 
   // 状态管理
   const [selectedFilter, setSelectedFilter] = useState<string>(
-    categories.find(Boolean) || '',
+    categories[0] || '',
   );
   const [selectedFilterLabel, setSelectedFilterLabel] = useState(
-    filterLabels && filterLabels.length > 0 ? filterLabels[0] : undefined,
+    filterLabels?.[0],
   );
 
   // 当数据变化导致当前选中分类失效时，自动回退
   useEffect(() => {
     if (selectedFilter && !categories.includes(selectedFilter)) {
-      setSelectedFilter(categories.find(Boolean) || '');
+      setSelectedFilter(categories[0] || '');
     }
   }, [categories, selectedFilter]);
 
@@ -548,8 +546,8 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
   // 筛选器选项
   const filterOptions = useMemo(() => {
     return categories.map((category) => ({
-      label: category || '默认',
-      value: category || '默认',
+      label: category,
+      value: category,
     }));
   }, [categories]);
 

@@ -89,63 +89,63 @@ const MenuItem: React.FC<{
     }
   });
 
-  // 分组类型但子项为空时不展示
-  if (item.type === 'group' && (!item.children || !item.children.length)) {
-    return null;
-  }
-
-  // 如果是分组且有子项，并且嵌套层级小于2
-  if (item.type === 'group' && item.children && level < 2) {
-    return (
-      <div
-        className={classNames(
-          `${prefixCls}-submenu`,
-          hashId,
-          customClassNames?.submenuClassName,
-        )}
-      >
+  // 分组类型：无子项不展示；嵌套层级 < 2 时渲染子菜单
+  if (item.type === 'group') {
+    if (!item.children?.length) {
+      return null;
+    }
+    if (level < 2) {
+      return (
         <div
-          className={classNames(hashId, customClassNames?.menuItemClassName, {
-            [`${baseClass}-group`]: true,
-          })}
+          className={classNames(
+            `${prefixCls}-submenu`,
+            hashId,
+            customClassNames?.submenuClassName,
+          )}
         >
           <div
-            className={classNames(
-              `${baseClass}-content`,
-              hashId,
-              customClassNames?.menuItemContentClassName,
-            )}
+            className={classNames(hashId, customClassNames?.menuItemClassName, {
+              [`${baseClass}-group`]: true,
+            })}
           >
-            {item.icon && (
-              <span
-                className={classNames(
-                  `${baseClass}-icon`,
-                  hashId,
-                  customClassNames?.menuItemIconClassName,
-                )}
-              >
-                {item.icon}
-              </span>
-            )}
-            {item.label}
+            <div
+              className={classNames(
+                `${baseClass}-content`,
+                hashId,
+                customClassNames?.menuItemContentClassName,
+              )}
+            >
+              {item.icon && (
+                <span
+                  className={classNames(
+                    `${baseClass}-icon`,
+                    hashId,
+                    customClassNames?.menuItemIconClassName,
+                  )}
+                >
+                  {item.icon}
+                </span>
+              )}
+              {item.label}
+            </div>
           </div>
+          {item.children.map((child) => (
+            <MenuItem
+              key={child.key}
+              item={child}
+              isSelected={currentSelectedKey === child.key}
+              inlineIndent={inlineIndent}
+              onSelect={onSelect}
+              level={level + 1}
+              prefixCls={prefixCls}
+              hashId={hashId}
+              currentSelectedKey={currentSelectedKey}
+              classNames={customClassNames}
+            />
+          ))}
         </div>
-        {item.children.map((child) => (
-          <MenuItem
-            key={child.key}
-            item={child}
-            isSelected={currentSelectedKey === child.key}
-            inlineIndent={inlineIndent}
-            onSelect={onSelect}
-            level={level + 1}
-            prefixCls={prefixCls}
-            hashId={hashId}
-            currentSelectedKey={currentSelectedKey}
-            classNames={customClassNames}
-          />
-        ))}
-      </div>
-    );
+      );
+    }
   }
 
   return (
@@ -212,11 +212,8 @@ export const GroupMenu: React.FC<GroupMenuProps> = (props) => {
   // 注册样式
   const { hashId } = useStyle(prefixCls);
 
-  // 确定当前选中的键
-  const currentSelectedKey = selectedKeys && selectedKeys[0];
-
-  // 直接使用传入的 items，支持最多双层嵌套
-  const dataSource = items || [];
+  // items / selectedKeys 已有默认值 []
+  const currentSelectedKey = selectedKeys[0];
 
   const handleSelect = useRefFunction((key: string) => {
     onSelect?.({ key });
@@ -244,7 +241,7 @@ export const GroupMenu: React.FC<GroupMenuProps> = (props) => {
           <Spin />
         </div>
       ) : (
-        dataSource.map((item) => (
+        items.map((item) => (
           <MenuItem
             key={item.key}
             item={item}

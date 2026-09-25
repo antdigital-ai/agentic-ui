@@ -1,6 +1,7 @@
-import { act, render } from '@testing-library/react';
+import { act, cleanup, render } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { EditorStoreContext } from '../../MarkdownEditor/editor/store';
 import { MarkdownRenderer } from '../index';
 import { STREAM_TOKEN_CLASS } from '../streaming/rehypeStreamingTokens';
 import type { MarkdownRendererRef } from '../types';
@@ -15,14 +16,29 @@ vi.mock('mermaid', () => ({
   },
 }));
 
+/** FncLeaf（经 FncRefForMarkdown）需要 EditorStoreContext */
+const editorStoreValue = {
+  store: { footnoteDefinitionMap: new Map() },
+  editorProps: {},
+  readonly: true,
+} as any;
+
+const renderWithEditorStore = (ui: React.ReactElement) =>
+  render(
+    <EditorStoreContext.Provider value={editorStoreValue}>
+      {ui}
+    </EditorStoreContext.Provider>,
+  );
+
 describe('MarkdownRenderer', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     installRafStub();
   });
 
   afterEach(() => {
-    vi.useRealTimers();
+    cleanup();
+    vi.clearAllTimers();
     vi.unstubAllGlobals();
   });
 
@@ -377,7 +393,7 @@ describe('MarkdownRenderer', () => {
   });
 
   it('应渲染裸脚注引用（无定义，AI 对话场景）', () => {
-    const { container } = render(
+    const { container } = renderWithEditorStore(
       <MarkdownRenderer
         content={'公司营收达 776.73 亿美元。[^2] Cloud 收入同比增长 22%。[^3]'}
       />,
@@ -390,7 +406,7 @@ describe('MarkdownRenderer', () => {
   });
 
   it('流式模式下应渲染裸脚注引用（无定义）', () => {
-    const { container } = render(
+    const { container } = renderWithEditorStore(
       <MarkdownRenderer
         content={
           'Microsoft Corporation 是一家领先的技术公司，专注于云计算、生产力软件、业务应用程序和消费技术。公司的核心业务模式围绕三大分部展开：Productivity and Business Processes（生产力和业务流程）、Intelligent Cloud（智能云）、以及 More Personal Computing（更多个人计算）。[^1]'
@@ -408,17 +424,19 @@ describe('MarkdownRenderer', () => {
   it('流式追加 [^1] 时不应丢失脚注引用节点', () => {
     const baseContent =
       'Microsoft Corporation 是一家领先的技术公司，专注于云计算、生产力软件、业务应用程序和消费技术。';
-    const { container, rerender } = render(
+    const { container, rerender } = renderWithEditorStore(
       <MarkdownRenderer content={baseContent} streaming={true} />,
     );
 
     // 流式进行中内容按节奏渐显，初始渲染可能尚未刷新；此处聚焦验证追加 [^1] 后脚注节点不丢失
     rerender(
-      <MarkdownRenderer
-        content={`${baseContent}[^1]`}
-        streaming={true}
-        isFinished
-      />,
+      <EditorStoreContext.Provider value={editorStoreValue}>
+        <MarkdownRenderer
+          content={`${baseContent}[^1]`}
+          streaming={true}
+          isFinished
+        />
+      </EditorStoreContext.Provider>,
     );
 
     const fncElements = container.querySelectorAll('[data-fnc="fnc"]');

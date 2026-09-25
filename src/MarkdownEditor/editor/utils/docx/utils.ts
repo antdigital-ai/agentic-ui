@@ -60,11 +60,9 @@ const extractFromRtf = (rtfContent: string) => {
       }
 
       ret.push({
-        hex: imageType
-          ? wholeImages[i]
-              .replace(rePictureHeader, '')
-              .replace(/[^\da-fA-F]/g, '')
-          : null,
+        hex: wholeImages[i]
+          .replace(rePictureHeader, '')
+          .replace(/[^\da-fA-F]/g, ''),
         type: imageType,
       });
     }

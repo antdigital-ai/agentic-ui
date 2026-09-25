@@ -40,7 +40,7 @@ const walkAndIndex = (
   nodes: FileTreeNode[],
   map: Map<string, FileTreeNode>,
 ) => {
-  for (const n of nodes) {
+  for (const n of nodes || []) {
     map.set(n.key, n);
     if (n.children?.length) {
       walkAndIndex(n.children, map);
@@ -76,7 +76,7 @@ const mapTreeToDataNodes = (
   },
 ): DataNode[] =>
   nodes.map((node) => {
-    const hasChildren = Boolean(node.children && node.children.length > 0);
+    const hasChildren = Boolean(node.children?.length);
     const resolvedIsLeaf = node.isLeaf ?? !hasChildren;
 
     if (resolvedIsLeaf) {
@@ -173,7 +173,7 @@ const filterFileTreeByExpandedKeyword = (
 
   const visit = (node: FileTreeNode): FileTreeNode | null => {
     const selfMatch = node.name.toLowerCase().includes(q);
-    const hasChildren = Boolean(node.children && node.children.length > 0);
+    const hasChildren = Boolean(node.children?.length);
     const resolvedIsLeaf = node.isLeaf ?? !hasChildren;
 
     if (resolvedIsLeaf) {
@@ -244,15 +244,15 @@ const FileTreeComponent: FC<FileTreeProps> = ({
   const { hashId: fileItemStyleHashId } = useFileStyle(fileItemPrefixCls);
   const fileItemHashId = fileItemHashIdProp ?? fileItemStyleHashId;
 
-  const [innerTree, setInnerTree] = useState<FileTreeNode[]>(treeData);
+  const [innerTree, setInnerTree] = useState<FileTreeNode[]>(treeData || []);
   const [expandedKeys, setExpandedKeys] = useState<Key[]>([]);
 
-  const nodeMap = useMemo(() => buildMap(innerTree), [innerTree]);
+  const nodeMap = useMemo(() => buildMap(innerTree || []), [innerTree]);
 
   const onLoadChildrenRef = useRefFunction(onLoadChildren);
 
   useEffect(() => {
-    setInnerTree(treeData);
+    setInnerTree(treeData || []);
   }, [treeData]);
 
   useEffect(() => {
@@ -327,13 +327,10 @@ const FileTreeComponent: FC<FileTreeProps> = ({
     if (source.isLeaf === true) {
       return Promise.resolve();
     }
-    if (
-      source.isLeaf === undefined &&
-      (!source.children || source.children.length === 0)
-    ) {
+    if (source.isLeaf === undefined && !source.children?.length) {
       return Promise.resolve();
     }
-    if (source.children && source.children.length > 0) {
+    if (source.children?.length) {
       return Promise.resolve();
     }
 

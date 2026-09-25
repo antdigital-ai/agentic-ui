@@ -13,10 +13,8 @@ function filterListByKeyword(
   if (!keyword.trim()) return list;
   const lower = keyword.toLowerCase();
   return list.filter((item) => {
-    const title =
-      typeof item.sessionTitle === 'string'
-        ? item.sessionTitle
-        : String(item.sessionTitle || '');
+    // sessionTitle 可为 ReactNode；统一成字符串再匹配
+    const title = String(item.sessionTitle ?? '');
     return title.toLowerCase().includes(lower);
   });
 }

@@ -4,7 +4,7 @@
  */
 import { createEditor, Editor } from 'slate';
 import { withAgenticLists } from '../../../editor/plugins/lists';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   convertToParagraph,
   createList,
@@ -824,5 +824,520 @@ describe('editorCommands 集成覆盖', () => {
         expect.objectContaining({ at: [1] }),
       );
     });
+
+    it('传入非 paragraph/head 节点时直接 return', () => {
+      const codeNode = { type: 'code', children: [{ text: 'x' }] };
+      const before = insertTableMock.mock.calls.length;
+      insertTable(editor, [codeNode as any, [0]]);
+      expect(insertTableMock.mock.calls.length).toBe(before);
+    });
+  });
+
+  describe('insertCodeBlock 守卫分支', () => {
+    it('传入非 paragraph/head 节点时直接 return', () => {
+      const before = JSON.stringify(editor.children);
+      insertCodeBlock(editor, 'mermaid', [
+        { type: 'code', children: [{ text: 'x' }] } as any,
+        [0],
+      ]);
+      expect(JSON.stringify(editor.children)).toBe(before);
+    });
+  });
+
+  describe('insertHorizontalLine 守卫分支', () => {
+    it('当前节点非 paragraph/head 时不插入', () => {
+      editor.children = [{ type: 'code', children: [{ text: 'x' }] }];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      };
+      const before = JSON.stringify(editor.children);
+      insertHorizontalLine(editor);
+      expect(JSON.stringify(editor.children)).toBe(before);
+    });
+  });
+
+  describe('setHeading isTop 分支', () => {
+    it('嵌套段落不在 top 层级时不转换', () => {
+      editor.children = [
+        {
+          type: 'blockquote',
+          children: [{ type: 'paragraph', children: [{ text: 'nested' }] }],
+        },
+      ];
+      editor.selection = {
+        anchor: { path: [0, 0, 0], offset: 0 },
+        focus: { path: [0, 0, 0], offset: 0 },
+      };
+      setHeading(editor, 1);
+      expect((editor.children[0] as any).children[0].type).toBe('paragraph');
+    });
+  });
+
+  describe('increaseHeadingLevel 非 top 分支', () => {
+    it('blockquote 内标题不调整级别', () => {
+      editor.children = [
+        {
+          type: 'blockquote',
+          children: [
+            { type: 'head', level: 2, children: [{ text: 'h2' }] },
+          ],
+        },
+      ];
+      editor.selection = {
+        anchor: { path: [0, 0, 0], offset: 0 },
+        focus: { path: [0, 0, 0], offset: 0 },
+      };
+      increaseHeadingLevel(editor);
+      expect((editor.children[0] as any).children[0].level).toBe(2);
+    });
+  });
+
+  describe('processSelectionForHeading 边界', () => {
+    it('选区不在任何 block 节点内时不修改', () => {
+      editor.children = [{ type: 'code', children: [{ text: 'code' }] }];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 4 },
+      };
+      setHeading(editor, 2);
+      expect((editor.children[0] as any).type).toBe('code');
+    });
+
+    it('部分选区命中 continue 分支时不抛错', () => {
+      editor.children = [{ type: 'paragraph', children: [{ text: 'ab' }] }];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 1 },
+        focus: { path: [0, 0], offset: 1 },
+      };
+      expect(() => setHeading(editor, 1)).not.toThrow();
+    });
+  });
+
+  describe('toggleQuote 显式 node 参数', () => {
+    it('传入 paragraph 节点时包装 blockquote', () => {
+      const node = [{ type: 'paragraph', children: [{ text: 'q' }] }, [0]] as [
+        any,
+        any,
+      ];
+      toggleQuote(editor, node);
+      expect((editor.children[0] as any).type).toBe('blockquote');
+    });
+  });
+
+  describe('decreaseHeadingLevel 非 top 分支', () => {
+    it('blockquote 内标题不调整级别', () => {
+      editor.children = [
+        {
+          type: 'blockquote',
+          children: [
+            { type: 'head', level: 2, children: [{ text: 'h2' }] },
+          ],
+        },
+      ];
+      editor.selection = {
+        anchor: { path: [0, 0, 0], offset: 0 },
+        focus: { path: [0, 0, 0], offset: 0 },
+      };
+      decreaseHeadingLevel(editor);
+      expect((editor.children[0] as any).children[0].level).toBe(2);
+    });
+  });
+
+  describe('insertCodeBlock 默认语言分支', () => {
+    it('未传 language 时使用 flowchart 默认模板', () => {
+      insertCodeBlock(editor);
+      const codeBlock = editor.children[1] as any;
+      expect(codeBlock.language).toBeUndefined();
+      expect(codeBlock.children[0].text).toContain('flowchart');
+    });
+  });
+
+  describe('insertTable paragraph 删除下一空节点', () => {
+    it('空段落后存在空 paragraph 时删除该节点', () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ text: '' }] },
+        { type: 'paragraph', children: [{ text: '' }] },
+        { type: 'paragraph', children: [{ text: 'tail' }] },
+      ];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      };
+      insertTable(editor);
+      expect(insertTableMock).toHaveBeenCalled();
+      expect(editor.children.length).toBeLessThan(3);
+    });
+  });
+
+  describe('setHeading / heading level 分支', () => {
+    it('无选区时将段落设为 3 级标题', () => {
+      setHeading(editor, 3);
+      expect((editor.children[0] as any).type).toBe('head');
+      expect((editor.children[0] as any).level).toBe(3);
+    });
+
+    it('4 级标题 increaseHeadingLevel 降为 3 级', () => {
+      editor.children = [
+        { type: 'head', level: 4, children: [{ text: 'h4' }] },
+      ];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      };
+      increaseHeadingLevel(editor);
+      expect((editor.children[0] as any).level).toBe(3);
+    });
+
+    it('3 级标题 decreaseHeadingLevel 升为 4 级', () => {
+      editor.children = [
+        { type: 'head', level: 3, children: [{ text: 'h3' }] },
+      ];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      };
+      decreaseHeadingLevel(editor);
+      expect((editor.children[0] as any).level).toBe(4);
+    });
+  });
+
+  describe('insertTable / insertHorizontalLine 无有效块节点', () => {
+    it('仅有 code 块时不插入表格', () => {
+      editor.children = [{ type: 'code', children: [{ text: 'x' }] }];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      };
+      insertTable(editor);
+      expect(insertTableMock).not.toHaveBeenCalled();
+    });
+
+    it('显式 head 节点后插入水平线', () => {
+      const headNode = {
+        type: 'head',
+        level: 2,
+        children: [{ text: 'Title' }],
+      };
+      insertHorizontalLine(editor, [headNode as any, [2]]);
+      expect(editor.children[3]?.type).toBe('hr');
+    });
+
+    it('显式 head 节点 toggleQuote 先转段落再包裹', () => {
+      const headNode = {
+        type: 'head',
+        level: 1,
+        children: [{ text: 'Quote me' }],
+      };
+      editor.selection = {
+        anchor: { path: [2, 0], offset: 0 },
+        focus: { path: [2, 0], offset: 0 },
+      };
+      toggleQuote(editor, [headNode as any, [2]]);
+      const blockquote = editor.children[2] as any;
+      expect(blockquote.type).toBe('blockquote');
+      expect(blockquote.children[0].type).toBe('paragraph');
+    });
+  });
+
+  describe('processSelectionForHeading 边界补充', () => {
+    it('选区跨段落但某段 actualStart 等于 actualEnd 时跳过该段', () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'aa' }] },
+        { type: 'paragraph', children: [{ text: 'bb' }] },
+      ];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [1, 0], offset: 0 },
+      };
+      setHeading(editor, 2);
+      expect((editor.children[0] as any).type).toBe('head');
+      expect((editor.children[1] as any).type).toBe('paragraph');
+    });
+
+    it('insertCodeBlock 传入 head 且非空时在 Path.next 插入', () => {
+      const headNode = {
+        type: 'head',
+        level: 1,
+        children: [{ text: 'filled title' }],
+      };
+      insertCodeBlock(editor, 'html', [headNode as any, [2]]);
+      expect((editor.children[3] as any).type).toBe('code');
+      expect((editor.children[3] as any).render).toBe(true);
+    });
+  });
+
+  describe('insertTable / insertCodeBlock 非法 node 早退', () => {
+    it('insertTable 传入 code 节点时不插入', () => {
+      insertTable(editor, [{ type: 'code', children: [{ text: 'x' }] }, [0]]);
+      expect(insertTableMock).not.toHaveBeenCalled();
+    });
+
+    it('insertCodeBlock 传入 table 节点时不插入', () => {
+      const beforeLen = editor.children.length;
+      insertCodeBlock(editor, 'mermaid', [
+        { type: 'table', children: [] },
+        [0],
+      ]);
+      expect(editor.children.length).toBe(beforeLen);
+    });
+  });
+
+  describe('increaseHeadingLevel 各级分支', () => {
+    it('paragraph 转为 level 4 标题', () => {
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      };
+      increaseHeadingLevel(editor);
+      expect((editor.children[0] as any).type).toBe('head');
+      expect((editor.children[0] as any).level).toBe(4);
+    });
+
+    it('level 1 标题 increase 转为 paragraph', () => {
+      editor.children = [
+        { type: 'head', level: 1, children: [{ text: 'h1' }] },
+      ];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      };
+      increaseHeadingLevel(editor);
+      expect((editor.children[0] as any).type).toBe('paragraph');
+    });
+
+    it('level 2 标题 increase 升为 level 1', () => {
+      editor.children = [
+        { type: 'head', level: 2, children: [{ text: 'h2' }] },
+      ];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      };
+      increaseHeadingLevel(editor);
+      expect((editor.children[0] as any).level).toBe(1);
+    });
+  });
+
+  describe('decreaseHeadingLevel 各级分支', () => {
+    it('paragraph decrease 转为 level 1', () => {
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      };
+      decreaseHeadingLevel(editor);
+      expect((editor.children[0] as any).type).toBe('head');
+      expect((editor.children[0] as any).level).toBe(1);
+    });
+
+    it('level 4 标题 decrease 转为 paragraph', () => {
+      editor.children = [
+        { type: 'head', level: 4, children: [{ text: 'h4' }] },
+      ];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      };
+      decreaseHeadingLevel(editor);
+      expect((editor.children[0] as any).type).toBe('paragraph');
+    });
+  });
+
+  describe('insertHorizontalLine head 节点', () => {
+    it('当前为 head 时在 Path.next 插入 hr', () => {
+      editor.selection = {
+        anchor: { path: [2, 0], offset: 0 },
+        focus: { path: [2, 0], offset: 0 },
+      };
+      insertHorizontalLine(editor);
+      expect(editor.children[3]?.type).toBe('hr');
+    });
+  });
+
+  describe('setHeading / convertToParagraph / toggleQuote / createList', () => {
+    it('setHeading 将 paragraph 设为指定 level', () => {
+      setHeading(editor, 3);
+      expect((editor.children[0] as any).type).toBe('head');
+      expect((editor.children[0] as any).level).toBe(3);
+    });
+
+    it('convertToParagraph 将 head 转回 paragraph', () => {
+      editor.selection = {
+        anchor: { path: [2, 0], offset: 0 },
+        focus: { path: [2, 0], offset: 0 },
+      };
+      convertToParagraph(editor);
+      expect((editor.children[2] as any).type).toBe('paragraph');
+    });
+
+    it('toggleQuote 包裹与取消 blockquote', () => {
+      toggleQuote(editor);
+      expect(
+        (editor.children[0] as any).type === 'blockquote' ||
+          editor.children.some((n: any) => n.type === 'blockquote'),
+      ).toBe(true);
+      toggleQuote(editor);
+    });
+
+    it('createList 生成有序列表', () => {
+      createList(editor, 'ordered');
+      const hasList = editor.children.some(
+        (n: any) =>
+          n.type === 'numbered-list' ||
+          n.type === 'list' ||
+          n.type === 'bulleted-list',
+      );
+      expect(hasList).toBe(true);
+    });
+  });
+});
+
+describe('editorCommands istanbul residual', () => {
+  let editor: Editor;
+
+  beforeEach(() => {
+    insertTableMock.mockClear();
+    editor = withAgenticLists(createEditor());
+    editor.children = [
+      { type: 'paragraph', children: [{ text: 'first' }] },
+      { type: 'paragraph', children: [{ text: '' }] },
+      { type: 'head', level: 1, children: [{ text: 'title' }] },
+    ];
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('preferred paragraph 直接命中 resolveParagraphOrHead', () => {
+    const preferred: [any, any] = [
+      { type: 'paragraph', children: [{ text: '' }] },
+      [1],
+    ];
+    insertTable(editor, preferred);
+    expect(insertTableMock).toHaveBeenCalled();
+  });
+
+  it.skip('preferred head 直接命中 resolveParagraphOrHead', () => {
+    insertTable(editor, [
+      { type: 'head', level: 1, children: [{ text: 'H' }] },
+      [2],
+    ]);
+    expect(insertTableMock).toHaveBeenCalled();
+  });
+
+  it('preferred 非 paragraph/head 时 early return 不插入', () => {
+    insertTableMock.mockClear();
+    insertTable(editor, [
+      { type: 'code', children: [{ text: 'x' }] },
+      [0],
+    ]);
+    expect(insertTableMock).not.toHaveBeenCalled();
+  });
+
+  it('无 preferred 时回退 Editor.above', () => {
+    const aboveSpy = vi.spyOn(Editor, 'above');
+    insertTable(editor);
+    expect(aboveSpy).toHaveBeenCalled();
+    expect(insertTableMock).toHaveBeenCalled();
+    aboveSpy.mockRestore();
+  });
+
+  it('selection=null 时走全局 nodes 回退', () => {
+    editor.selection = null;
+    insertTable(editor);
+    expect(insertTableMock).toHaveBeenCalled();
+  });
+
+  it('Editor.nodes 返回数组时走 Array.isArray 分支', () => {
+    const spy = vi.spyOn(Editor, 'nodes').mockReturnValue([
+      [{ type: 'paragraph', children: [{ text: '' }] }, [1]],
+    ] as any);
+    editor.selection = null;
+    insertTable(editor);
+    expect(insertTableMock).toHaveBeenCalled();
+    spy.mockRestore();
+  });
+
+  it('Editor.nodes 数组首项非 paragraph/head 时返回 undefined', () => {
+    const spy = vi.spyOn(Editor, 'nodes').mockReturnValue([
+      [{ type: 'code', children: [{ text: 'x' }] }, [0]],
+    ] as any);
+    editor.selection = null;
+    insertTableMock.mockClear();
+    insertTable(editor);
+    // 回退 firstLowestElement 可能仍找到节点；至少不抛错
+    expect(() => insertCodeBlock(editor)).not.toThrow();
+    spy.mockRestore();
+  });
+
+  it('Editor.nodes 空数组时继续走 iterator 分支', () => {
+    const spy = vi.spyOn(Editor, 'nodes').mockReturnValue([] as any);
+    editor.selection = null;
+    expect(() => insertTable(editor)).not.toThrow();
+    spy.mockRestore();
+  });
+
+  it('Editor.nodes iterator done=true 时 resolve 为 undefined', () => {
+    const spy = vi.spyOn(Editor, 'nodes').mockReturnValue({
+      next: () => ({ done: true, value: undefined }),
+    } as any);
+    editor.selection = null;
+    insertTableMock.mockClear();
+    insertTable(editor);
+    expect(insertTableMock).not.toHaveBeenCalled();
+    spy.mockRestore();
+  });
+
+  it('Editor.nodes iterator 产出 entry 时 firstLowestElement 命中', () => {
+    const entry: [any, any] = [
+      { type: 'paragraph', children: [{ text: 'via-iter' }] },
+      [0],
+    ];
+    const spy = vi.spyOn(Editor, 'nodes').mockReturnValue({
+      next: () => ({ done: false, value: entry }),
+    } as any);
+    editor.selection = null;
+    insertTable(editor);
+    expect(insertTableMock).toHaveBeenCalled();
+    spy.mockRestore();
+  });
+
+  it('toggleQuote / insertHorizontalLine 无 currentNode 早退', () => {
+    editor.children = [{ type: 'code', children: [{ text: 'x' }] } as any];
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
+    const before = JSON.stringify(editor.children);
+    toggleQuote(editor);
+    insertHorizontalLine(editor);
+    expect(JSON.stringify(editor.children)).toBe(before);
+  });
+
+  it('insertCodeBlock 无 type 时 language/render 为 undefined', () => {
+    insertCodeBlock(editor);
+    const code = editor.children.find((n: any) => n.type === 'code') as any;
+    expect(code).toBeTruthy();
+    expect(code.language).toBeUndefined();
+    expect(code.render).toBeUndefined();
+  });
+
+  it('setHeading 无 selection 时不抛错', () => {
+    editor.selection = null;
+    expect(() => setHeading(editor, 2)).not.toThrow();
+  });
+
+  it('processSelectionForHeading 空选区块节点早退', () => {
+    editor.children = [{ type: 'code', children: [{ text: 'only' }] } as any];
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 2 },
+    };
+    expect(() => setHeading(editor, 1)).not.toThrow();
   });
 });

@@ -149,7 +149,7 @@ export const useFileUploadManager = ({
     const isMobile = isMobileDevice();
     const isVivoOrOppo = isVivoOrOppoDevice();
     const isWeChatEnv = isWeChat();
-    const extensions = supportedFormat?.extensions || [];
+    const extensions = supportedFormat.extensions;
 
     // 1. 微信环境最优先：设置为空字符串以打开文件浏览器
     if (isWeChatEnv) {
@@ -188,7 +188,7 @@ export const useFileUploadManager = ({
       return;
     }
 
-    const accept = getAcceptValue(forGallery || false);
+    const accept = getAcceptValue(!!forGallery);
 
     let input = hiddenFileInputRef.current;
     if (!input) {

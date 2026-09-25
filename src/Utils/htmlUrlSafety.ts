@@ -68,7 +68,7 @@ export const looksLikeHtmlSnippet = (value: string): boolean =>
  * URL / 属性值是否应降级为纯文本展示（非法 HTML URL 或含事件处理器）。
  */
 export const shouldRenderUrlAsPlainText = (url: string): boolean => {
-  if (!url || typeof url !== 'string') return false;
+  if (!url) return false;
   const trimmed = url.trim();
   if (!trimmed) return false;
   if (hasDangerousEventHandlers(trimmed)) return true;
@@ -91,7 +91,7 @@ export const serializeHastElement = (node: {
   children?: Array<{ type: string; value?: string; tagName?: string }>;
 }): string => {
   const tag = node.tagName;
-  const props = node.properties || {};
+  const props = node.properties ?? {};
   const attrPart = Object.entries(props)
     .map(([key, value]) => `${key}="${formatAttrValue(value)}"`)
     .join(' ');
@@ -101,7 +101,7 @@ export const serializeHastElement = (node: {
     return `<${tag}${attrStr}>`;
   }
 
-  const inner = (node.children || [])
+  const inner = (node.children ?? [])
     .map((child) => {
       if (child.type === 'text') return child.value ?? '';
       if (child.type === 'element' && child.tagName) {
@@ -119,7 +119,6 @@ export const serializeHastElement = (node: {
 const elementHasDangerousProperties = (
   properties: Record<string, unknown>,
 ): boolean => {
-  if (!properties) return false;
   for (const [key, value] of Object.entries(properties)) {
     if (key.startsWith('on')) return true;
     if (typeof value !== 'string') continue;
@@ -139,5 +138,5 @@ export const shouldElementRenderAsPlainText = (node: {
 }): boolean => {
   if (node.type !== 'element' || !node.tagName) return false;
   if (!PLAIN_TEXT_ELEMENT_TAGS.has(node.tagName)) return false;
-  return elementHasDangerousProperties(node.properties || {});
+  return elementHasDangerousProperties(node.properties ?? {});
 };

@@ -203,9 +203,9 @@ const VisualListComponent: React.FC<VisualListProps> = ({
   // 使用 useMemo 优化过滤后的数据计算
   const displayList = useMemo(() => {
     if (!filter) {
-      return data || ([] as VisualListItem[]);
+      return data;
     }
-    return data?.filter(filter) || [];
+    return data.filter(filter);
   }, [data, filter]);
 
   // 使用 useMemo 优化容器类名计算

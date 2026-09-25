@@ -64,7 +64,7 @@ export function convertParagraphToImage() {
         if (!textContent || !index || !parent) {
           return;
         }
-        const nextNode = parent?.children?.[index + 1];
+        const nextNode = parent.children[index + 1];
 
         // 检查是否以 ! 开头（图片）
         if (textContent.startsWith('!') && !nextNode) {
@@ -81,13 +81,7 @@ export function convertParagraphToImage() {
             };
 
             // 替换父节点中的 paragraph 节点为 image 节点
-            if (
-              parent &&
-              Array.isArray(parent.children) &&
-              typeof index === 'number'
-            ) {
-              parent.children[index] = imageNode;
-            }
+            parent.children[index] = imageNode;
           }
           return;
         }
@@ -126,13 +120,7 @@ export function convertParagraphToImage() {
           };
 
           // 替换父节点中的 paragraph 节点为 table 节点
-          if (
-            parent &&
-            Array.isArray(parent.children) &&
-            typeof index === 'number'
-          ) {
-            parent.children[index] = tableNode;
-          }
+          parent.children[index] = tableNode;
           return;
         }
         if (textContent.startsWith('[') && !nextNode) {
@@ -146,13 +134,7 @@ export function convertParagraphToImage() {
               finished: false,
               children: paragraphNode.children,
             };
-            if (
-              parent &&
-              Array.isArray(parent.children) &&
-              typeof index === 'number'
-            ) {
-              parent.children[index] = linkNode;
-            }
+            parent.children[index] = linkNode;
           }
         }
         return;
@@ -176,11 +158,7 @@ export function fixStrongWithSpecialChars() {
         for (let i = 0; i < paragraphNode.children.length; i++) {
           const child = paragraphNode.children[i];
 
-          if (
-            child.type === 'text' &&
-            child.value &&
-            typeof child.value === 'string'
-          ) {
+          if (child.type === 'text' && child.value) {
             // 匹配完整的加粗文本（**text**）
             const strongPattern =
               /\*\*([^*\n]*[$%#@&+\-=\w\d.，。、；：！？""''（）【】《》]+[^*\n]*?)\*\*/g;
@@ -283,7 +261,7 @@ export function fixStrongWithSpecialChars() {
 
     // 处理所有文本节点（作为备用方案）
     visit(tree, 'text', (node: any, index: number | undefined, parent: any) => {
-      if (node.value && typeof node.value === 'string') {
+      if (node.value) {
         // 匹配完整的加粗文本（**text**）
         const strongPattern =
           /\*\*([^*\n]*[$%#@&+\-=\w\d.，。、；：！？""''（）【】《》]+[^*\n]*?)\*\*/g;
@@ -357,20 +335,18 @@ export function fixStrongWithSpecialChars() {
         }
         // 如果没有完整匹配，检查是否是不完整的加粗
         else if (incompleteStrongPattern.test(node.value)) {
-          const incompleteMatch = incompleteStrongPattern.exec(node.value);
-          if (incompleteMatch) {
-            hasMatch = true;
-            newNodes.push({
-              type: 'strong',
-              finished: false,
-              children: [
-                {
-                  type: 'text',
-                  value: incompleteMatch[1],
-                },
-              ],
-            });
-          }
+          const incompleteMatch = incompleteStrongPattern.exec(node.value)!;
+          hasMatch = true;
+          newNodes.push({
+            type: 'strong',
+            finished: false,
+            children: [
+              {
+                type: 'text',
+                value: incompleteMatch[1],
+              },
+            ],
+          });
         }
 
         // 替换原节点

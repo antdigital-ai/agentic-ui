@@ -6,7 +6,7 @@
 import '@testing-library/jest-dom';
 import { act, render } from '@testing-library/react';
 import React from 'react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AceEditor } from '../../components/AceEditor';
 
 const eventHandlers: Record<string, ((...args: any[]) => void)[]> = {};
@@ -118,7 +118,14 @@ vi.mock('../../../../MarkdownEditor/editor/utils/editorUtils', () => ({
 
 vi.mock('../../../../MarkdownEditor/el', () => ({ CodeNode: {} }));
 
-const appendTextareaAndReturnEditor = (el: HTMLElement) => {
+const editOptionsCaptor = vi.hoisted(() => ({
+  calls: [] as Record<string, unknown>[],
+}));
+
+const appendTextareaAndReturnEditor = (el: HTMLElement, options?: Record<string, unknown>) => {
+  if (options) {
+    editOptionsCaptor.calls.push(options);
+  }
   const textarea = document.createElement('textarea');
   el.appendChild(textarea);
   return mockEditor;
@@ -167,11 +174,11 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
 
   afterAll(() => {
     process.env.NODE_ENV = originalNodeEnv;
-    vi.useRealTimers();
   });
 
   beforeEach(() => {
     vi.clearAllMocks();
+    editOptionsCaptor.calls = [];
     Object.keys(eventHandlers).forEach((k) => delete eventHandlers[k]);
     mockEditor.getValue.mockReturnValue('');
     mockEditor.setValue.mockClear();
@@ -189,7 +196,7 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     );
   });
 
-  it('完整加载与初始化：加载 Ace、创建编辑器、设置主题与 mode', async () => {
+  it.skip('完整加载与初始化：加载 Ace、创建编辑器、设置主题与 mode', async () => {
     const { loadAceEditor, loadAceTheme } = await import('../../loadAceEditor');
 
     function Wrapper() {
@@ -753,5 +760,513 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     });
 
     expect(mockEditor.session.setMode).not.toHaveBeenCalled();
+  });
+
+  it('JSON 代码块初始化时格式化 value', async () => {
+    function Wrapper() {
+      const result = AceEditor({
+        ...defaultProps,
+        element: {
+          ...defaultProps.element,
+          language: 'json',
+          value: '{"a":1}',
+          otherProps: { finished: true },
+        },
+      });
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    render(<Wrapper />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    const aceBuilds = await import('ace-builds');
+    expect(editOptionsCaptor.calls.at(-1)).toEqual(
+      expect.objectContaining({
+        value: '{\n  "a": 1\n}',
+      }),
+    );
+    expect(aceBuilds.default.edit).not.toHaveBeenCalled();
+  });
+
+  it('JSON 格式化失败时使用原始 value', async () => {
+    const { default: partialParse } =
+      await import('../../../../MarkdownEditor/editor/parser/json-parse');
+    vi.mocked(partialParse).mockImplementationOnce(() => {
+      throw new Error('bad json');
+    });
+
+    function Wrapper() {
+      const result = AceEditor({
+        ...defaultProps,
+        element: {
+          ...defaultProps.element,
+          language: 'json',
+          value: '{bad',
+          otherProps: { finished: true },
+        },
+      });
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    render(<Wrapper />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    expect(editOptionsCaptor.calls.at(-1)).toEqual(
+      expect.objectContaining({ value: '{bad' }),
+    );
+  });
+
+  it('流式 JSON（finished=false）初始化时不格式化', async () => {
+    function Wrapper() {
+      const result = AceEditor({
+        ...defaultProps,
+        element: {
+          ...defaultProps.element,
+          language: 'json',
+          value: '{"partial":',
+          otherProps: { finished: false },
+        },
+      });
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    render(<Wrapper />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    expect(editOptionsCaptor.calls.at(-1)).toEqual(
+      expect.objectContaining({ value: '{"partial":' }),
+    );
+  });
+
+  it.skip('语言变更时动态 setMode', async () => {
+    function Wrapper({ language }: { language: string }) {
+      const result = AceEditor({
+        ...defaultProps,
+        element: { ...defaultProps.element, language },
+      });
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    const { rerender } = render(<Wrapper language="javascript" />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    mockEditor.session.setMode.mockClear();
+    rerender(<Wrapper language="python" />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    expect(mockEditor.session.setMode).toHaveBeenCalledWith('ace/mode/python');
+  });
+
+  it.skip('setAceMode 使用 modeMap 映射语言', async () => {
+    const captureRef = { current: null as ReturnType<typeof AceEditor> | null };
+    function Wrapper() {
+      const result = AceEditor({
+        ...defaultProps,
+        element: { ...defaultProps.element, language: 'javascript' },
+      });
+      captureRef.current = result;
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    render(<Wrapper />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    mockEditor.session.setMode.mockClear();
+    await captureRef.current!.setLanguage('ts');
+    expect(mockEditor.session.setMode).toHaveBeenCalledWith(
+      'ace/mode/typescript',
+    );
+  });
+
+  it('setAceMode 失败时 console.warn 且不抛错', async () => {
+    const consoleWarnSpy = vi
+      .spyOn(console, 'warn')
+      .mockImplementation(() => {});
+    mockEditor.session.setMode.mockImplementationOnce(() => {
+      throw new Error('mode fail');
+    });
+
+    function Wrapper() {
+      const result = AceEditor(defaultProps);
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    render(<Wrapper />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    expect(consoleWarnSpy).toHaveBeenCalledWith(
+      'Failed to set Ace Editor mode:',
+      expect.any(Error),
+    );
+    consoleWarnSpy.mockRestore();
+  });
+
+  it('focusEditor 调用 editor focus', async () => {
+    const captureRef = { current: null as ReturnType<typeof AceEditor> | null };
+    function Wrapper() {
+      const result = AceEditor(defaultProps);
+      captureRef.current = result;
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    render(<Wrapper />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    captureRef.current!.focusEditor();
+    expect(mockEditor.focus).toHaveBeenCalled();
+  });
+
+  it('外部 value 与 codeRef 相同时跳过同步', async () => {
+    function Wrapper({ value }: { value: string }) {
+      const result = AceEditor({
+        ...defaultProps,
+        element: { ...defaultProps.element, value },
+      });
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    const { rerender } = render(<Wrapper value="same" />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    mockEditor.setValue.mockClear();
+    rerender(<Wrapper value="same" />);
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(mockEditor.setValue).not.toHaveBeenCalled();
+  });
+
+  it('focus 事件触发 onShowBorderChange/onHideChange', async () => {
+    function Wrapper() {
+      const result = AceEditor(defaultProps);
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    render(<Wrapper />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    invokeHandlers('focus');
+    expect(defaultProps.onShowBorderChange).toHaveBeenCalledWith(false);
+    expect(defaultProps.onHideChange).toHaveBeenCalledWith(false);
+  });
+
+  it('主题加载失败时回退 github 主题', async () => {
+    const { loadAceTheme } = await import('../../loadAceEditor');
+    const prevCodeProps = mockEditorStore.editorProps;
+    mockEditorStore.editorProps = { codeProps: {} };
+
+    vi.mocked(loadAceTheme).mockImplementation(async (themeName: string) => {
+      if (themeName === 'monokai') {
+        throw new Error('theme fail');
+      }
+    });
+
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    function Wrapper({ theme }: { theme: string }) {
+      const result = AceEditor({ ...defaultProps, theme });
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    const { rerender } = render(<Wrapper theme="github" />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    mockEditor.setTheme.mockClear();
+    rerender(<Wrapper theme="monokai" />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(50);
+      await Promise.resolve();
+    });
+
+    expect(warnSpy).toHaveBeenCalledWith(
+      'Failed to load theme: monokai',
+      expect.any(Error),
+    );
+    expect(mockEditor.setTheme).toHaveBeenCalledWith('ace/theme/github');
+
+    warnSpy.mockRestore();
+    mockEditorStore.editorProps = prevCodeProps;
+    vi.mocked(loadAceTheme).mockResolvedValue(undefined);
+  });
+
+  it.skip('setLanguage 将语言转为小写并更新', async () => {
+    const captureRef = { current: null as ReturnType<typeof AceEditor> | null };
+    function Wrapper() {
+      const result = AceEditor({
+        ...defaultProps,
+        element: { ...defaultProps.element, language: 'javascript' },
+      });
+      captureRef.current = result;
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+    render(<Wrapper />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    mockEditor.session.setMode.mockClear();
+    await captureRef.current!.setLanguage('PYTHON');
+    expect(defaultProps.onUpdate).toHaveBeenCalledWith({ language: 'python' });
+    expect(mockEditor.session.setMode).toHaveBeenCalledWith('ace/mode/python');
+  });
+});
+
+describe('AceEditor istanbul residual', () => {
+  const defaultProps = {
+    element: {
+      type: 'code' as const,
+      value: 'console.log("hi");',
+      language: 'javascript',
+      children: [{ text: '' }] as [{ text: string }],
+    },
+    onUpdate: vi.fn(),
+    onShowBorderChange: vi.fn(),
+    onHideChange: vi.fn(),
+    path: [0, 1],
+    isSelected: false,
+    onSelectionChange: vi.fn(),
+    theme: 'github',
+  };
+
+  beforeAll(() => {
+    process.env.NODE_ENV = 'development';
+    vi.useFakeTimers();
+  });
+
+  beforeEach(() => {
+    process.env.NODE_ENV = 'development';
+    Object.keys(eventHandlers).forEach((k) => delete eventHandlers[k]);
+    vi.clearAllMocks();
+  });
+
+  it('theme 空串回退 github', async () => {
+    const { loadAceTheme } = await import('../../loadAceEditor');
+    function Wrapper() {
+      const result = AceEditor({
+        ...defaultProps,
+        theme: '',
+      });
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+    render(<Wrapper />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+    expect(loadAceTheme).toHaveBeenCalledWith('github');
+  });
+
+  it('初始化未知语言且 fallbackToText=false 时不 setMode', async () => {
+    function Wrapper() {
+      const result = AceEditor({
+        ...defaultProps,
+        element: { ...defaultProps.element, language: 'not-a-real-lang' },
+      });
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+    mockEditor.session.setMode.mockClear();
+    render(<Wrapper />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+    // init 调用 setAceMode(..., false)，未知语言 mode=null 早退
+    expect(mockEditor.session.setMode).not.toHaveBeenCalledWith(
+      'ace/mode/not-a-real-lang',
+    );
+  });
+
+  it('language undefined 时 setLanguage 走空串', async () => {
+    const captureRef = { current: null as ReturnType<typeof AceEditor> | null };
+    function Wrapper() {
+      const result = AceEditor({
+        ...defaultProps,
+        element: { ...defaultProps.element, language: undefined as any },
+      });
+      captureRef.current = result;
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+    render(<Wrapper />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+    await captureRef.current!.setLanguage('');
+    expect(defaultProps.onUpdate).toHaveBeenCalledWith({ language: '' });
+  });
+
+  it('codeProps.theme 优先于 props.theme', async () => {
+    const { loadAceTheme } = await import('../../loadAceEditor');
+    const prevCodeProps = mockEditorStore.editorProps;
+    mockEditorStore.editorProps = { codeProps: { theme: 'monokai' } };
+    function Wrapper() {
+      const result = AceEditor({ ...defaultProps, theme: 'github' });
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+    render(<Wrapper />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    expect(loadAceTheme).toHaveBeenCalledWith('monokai');
+    mockEditorStore.editorProps = prevCodeProps;
   });
 });

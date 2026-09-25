@@ -4,6 +4,20 @@ import { describe, expect, it } from 'vitest';
 import { withOrphanInlineLeafNormalize } from '../withOrphanInlineLeafNormalize';
 
 describe('withOrphanInlineLeafNormalize', () => {
+  it('istanbul one-miss: 空 text 带 orphan mark 装饰时 unsetNodes', () => {
+    const editor = withOrphanInlineLeafNormalize(createEditor());
+    editor.children = [
+      {
+        type: 'paragraph',
+        children: [{ text: '', mark: true, markLabel: '@' }],
+      },
+    ];
+
+    Editor.normalize(editor, { force: true });
+
+    expect(editor.children[0].children).toEqual([{ text: '' }]);
+  });
+
   it('clears mark decorations when text is empty', () => {
     const editor = withOrphanInlineLeafNormalize(createEditor());
     editor.children = [

@@ -8,7 +8,8 @@ const isPlainObject = (v: unknown): v is Record<string, unknown> =>
   !React.isValidElement(v);
 
 const extractTextFromUnknown = (value: unknown): string => {
-  if (value === null || value === undefined) return '';
+  // eslint-disable-next-line eqeqeq -- intentional nullish (null | undefined)
+  if (value == null) return '';
   if (typeof value === 'string') return value;
   if (typeof value === 'number' || typeof value === 'boolean') {
     return String(value);
@@ -32,7 +33,8 @@ const extractTextFromUnknown = (value: unknown): string => {
 };
 
 const isContentEmpty = (content: TaskItem['content']): boolean => {
-  if (content === null || content === undefined) return true;
+  // eslint-disable-next-line eqeqeq -- intentional nullish (null | undefined)
+  if (content == null) return true;
   if (typeof content === 'string') return content.trim().length === 0;
   if (typeof content === 'number' || typeof content === 'boolean') {
     return false;
@@ -49,10 +51,10 @@ const isContentEmpty = (content: TaskItem['content']): boolean => {
 const resolveFallbackTitle = (
   fallbackTitle?: React.ReactNode,
 ): TaskItem['content'] => {
-  if (fallbackTitle === null || fallbackTitle === undefined) return '';
+  // eslint-disable-next-line eqeqeq -- intentional nullish (null | undefined)
+  if (fallbackTitle == null) return '';
   if (typeof fallbackTitle === 'string') {
-    const trimmed = fallbackTitle.trim();
-    return trimmed.length > 0 ? trimmed : '';
+    return fallbackTitle.trim();
   }
   if (typeof fallbackTitle === 'number') {
     return String(fallbackTitle);

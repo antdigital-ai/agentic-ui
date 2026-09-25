@@ -30,7 +30,7 @@ export const Code = ({ attributes, children, element }: RenderElementProps) => {
             contentEditable={false}
             dangerouslySetInnerHTML={{
               __html: DOMPurify.sanitize(
-                getSlateElementPlainText(element).trim() || '',
+                getSlateElementPlainText(element).trim(),
               ),
             }}
           />

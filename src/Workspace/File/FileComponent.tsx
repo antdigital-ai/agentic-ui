@@ -363,7 +363,7 @@ export const FileComponent: FC<{
       },
       backToList: () => handleBackToList(),
       updatePreviewHeader: (partial) => {
-        setHeaderFileOverride((prev) => ({ ...(prev || {}), ...partial }));
+        setHeaderFileOverride((prev) => ({ ...(prev ?? {}), ...partial }));
       },
     };
     return () => {

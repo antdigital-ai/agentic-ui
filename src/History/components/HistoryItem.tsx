@@ -180,7 +180,7 @@ const HistoryItemSingle = React.memo<HistoryItemProps>(
     );
     const { textRef, isTextOverflow } = useTextOverflow(displayText);
     const isRunning = React.useMemo(
-      () => runningId?.includes(String(item.id || '')),
+      () => Boolean(runningId?.includes(String(item.id ?? ''))),
       [runningId, item.id],
     );
     const isSelected = React.useMemo(
@@ -393,7 +393,7 @@ const HistoryItemMulti = React.memo<HistoryItemProps>(
       [isTask, item.description],
     );
     const isRunning = React.useMemo(
-      () => runningId?.includes(String(item.id || '')),
+      () => Boolean(runningId?.includes(String(item.id ?? ''))),
       [runningId, item.id],
     );
     const isSelected = React.useMemo(

@@ -270,14 +270,14 @@ export const renderSvgToContainer = (
   const svgElement = svgDoc.querySelector('svg');
 
   if (svgElement) {
-    const existingStyle = svgElement.getAttribute('style') || '';
+    const existingStyle = svgElement.getAttribute('style') ?? '';
     const newStyle =
       `${existingStyle}; display: block; max-width: 100%; width: 100%; height: auto; overflow: visible;`.trim();
     svgElement.setAttribute('style', newStyle);
     svgElement.setAttribute('data-mermaid-svg', 'true');
     svgElement.setAttribute(
       'class',
-      (svgElement.getAttribute('class') || '') + ' mermaid-isolated',
+      (svgElement.getAttribute('class') ?? '') + ' mermaid-isolated',
     );
 
     const allElements = svgElement.querySelectorAll('*');

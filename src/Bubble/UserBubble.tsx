@@ -81,7 +81,7 @@ export const UserBubble: React.FC<
 
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const context = useContext(BubbleConfigContext);
-  const { compact, standalone, extraShowOnHover } = context || {};
+  const { compact, standalone, extraShowOnHover } = context!;
 
   const prefixClass = getPrefixCls('agentic');
   const { hashId } = useStyle(prefixClass, classNames);
@@ -306,7 +306,7 @@ export const UserBubble: React.FC<
         hidePadding,
         setHidePadding,
         setMessage: (message) => {
-          props?.bubbleRef?.current?.setMessageItem?.(
+          props.bubbleRef?.current?.setMessageItem?.(
             props.id!,
             message as any,
           );
@@ -321,12 +321,12 @@ export const UserBubble: React.FC<
             title: null,
             header: null,
             extra:
-              props?.bubbleRenderConfig?.extraRender === false ? null : (
+              props.bubbleRenderConfig?.extraRender === false ? null : (
                 <BubbleExtra
                   pure
                   style={props.styles?.bubbleListItemExtraStyle}
                   readonly={props.readonly}
-                  rightRender={props?.bubbleRenderConfig?.extraRightRender}
+                  rightRender={props.bubbleRenderConfig?.extraRightRender}
                   shouldShowCopy={props.shouldShowCopy}
                   useSpeech={props.useSpeech}
                   shouldShowVoice={props.shouldShowVoice}

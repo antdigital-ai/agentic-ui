@@ -46,7 +46,7 @@ const ATTACHMENT_ITEM_EXIT_DURATION_MS =
   process.env.NODE_ENV === 'test' ? 0 : 250;
 
 const getFileKey = (file: AttachmentFile, index: number) => {
-  return file?.uuid || file?.name || index;
+  return file.uuid || file.name || index;
 };
 
 /**

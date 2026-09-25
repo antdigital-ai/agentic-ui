@@ -48,10 +48,8 @@ export const rehypeFootnoteRef = () => {
         children.push({ type: 'text', value: value.slice(lastIndex) });
       }
 
-      if (children.length > 0) {
-        parent.children.splice(index, 1, ...children);
-        return index + children.length;
-      }
+      parent.children.splice(index, 1, ...children);
+      return index + children.length;
     });
   };
 };

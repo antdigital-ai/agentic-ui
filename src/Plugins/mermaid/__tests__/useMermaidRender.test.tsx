@@ -2,7 +2,7 @@
  * useMermaidRender Hook 测试用例
  */
 
-import { act, renderHook } from '@testing-library/react';
+import { act, cleanup, renderHook } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useMermaidRender } from '../useMermaidRender';
@@ -26,7 +26,7 @@ describe('useMermaidRender', () => {
   let mockCleanupTempElement: ReturnType<typeof vi.fn>;
 
   beforeEach(async () => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     vi.clearAllMocks();
     divElement = document.createElement('div');
     divRef = { current: divElement };
@@ -42,7 +42,8 @@ describe('useMermaidRender', () => {
   });
 
   afterEach(() => {
-    vi.useRealTimers();
+    cleanup();
+    vi.clearAllTimers();
   });
 
   describe('基本功能', () => {

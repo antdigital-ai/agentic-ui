@@ -81,4 +81,24 @@ describe('BorderBeamAnimation', () => {
     );
     expect(container.firstChild).toBeInTheDocument();
   });
+
+  it('尺寸可用时将自定义 gradientId 用于路径', () => {
+    const originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'development';
+
+    const { container } = render(
+      <BorderBeamAnimation
+        isVisible
+        borderRadius={8}
+        gradientId="branch-gradient"
+      />,
+    );
+
+    expect(container.querySelector('linearGradient')).toHaveAttribute(
+      'id',
+      'branch-gradient',
+    );
+    expect(container.querySelectorAll('path')).toHaveLength(2);
+    process.env.NODE_ENV = originalNodeEnv;
+  });
 });

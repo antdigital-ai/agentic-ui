@@ -94,10 +94,12 @@ const TYPE_CONFIGS: Record<
   },
 };
 
-const ICON_TYPE_CLASSES: Record<string, string> = {
+const ICON_TYPE_CLASSES: Record<RealtimeFollowMode, string> = {
   html: 'html',
   markdown: 'md',
   md: 'md',
+  shell: 'default',
+  default: 'default',
 };
 
 const getTypeConfig = (type: RealtimeFollowMode, locale?: any) => {
@@ -227,7 +229,10 @@ const SHELL_CODE_PROPS = {
 
 const VISIBLE_OVERFLOW_STYLE = { overflow: 'visible' };
 
-const EDITOR_CONFIGS: Record<string, Partial<MarkdownEditorProps>> = {
+const EDITOR_CONFIGS: Record<
+  RealtimeFollowMode,
+  Partial<MarkdownEditorProps>
+> = {
   shell: {
     ...BASE_EDITOR_CONFIG,
     contentStyle: { padding: 0, ...VISIBLE_OVERFLOW_STYLE },
@@ -238,6 +243,13 @@ const EDITOR_CONFIGS: Record<string, Partial<MarkdownEditorProps>> = {
     contentStyle: { padding: 16, ...VISIBLE_OVERFLOW_STYLE },
     height: '100%',
   },
+  md: {
+    ...BASE_EDITOR_CONFIG,
+    contentStyle: { padding: 16, ...VISIBLE_OVERFLOW_STYLE },
+    height: '100%',
+  },
+  html: BASE_EDITOR_CONFIG,
+  default: BASE_EDITOR_CONFIG,
 };
 
 const getEditorConfig = (
@@ -363,7 +375,7 @@ export const RealtimeFollow: React.FC<{
     const customNode = renderNode(data.customContent);
     return (
       <div className={classNames(`${finalPrefixCls}-content`, hashId)}>
-        {customNode || null}
+        {customNode}
       </div>
     );
   }

@@ -115,7 +115,7 @@ const QuoteComponent: React.FC<QuoteProps> = ({
   const { hashId } = useStyle(prefixCls);
 
   const handleFileClick = useRefFunction(() => {
-    if (onFileClick && fileName) {
+  if (onFileClick && fileName) {
       onFileClick(fileName, lineRange);
     }
   });

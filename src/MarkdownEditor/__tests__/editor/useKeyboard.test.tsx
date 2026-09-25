@@ -592,12 +592,12 @@ describe('useKeyboard Hook Tests', () => {
 
     beforeEach(() => {
       vi.clearAllMocks();
-      vi.useFakeTimers();
+      vi.useFakeTimers({ shouldAdvanceTime: true });
       vi.mocked(useEditorStore).mockReturnValue(defaultStoreReturn);
     });
 
     afterEach(() => {
-      vi.useRealTimers();
+      vi.clearAllTimers();
       vi.mocked(useEditorStore).mockReturnValue(defaultStoreReturn);
     });
 

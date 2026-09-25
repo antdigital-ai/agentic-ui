@@ -76,7 +76,7 @@ export function clearTableSelection(editor: Editor, tablePath: number[]) {
         editor,
         cellNode as unknown as Node,
       );
-      domNode?.removeAttribute('data-select');
+      domNode.removeAttribute('data-select');
     } catch {
       // cell may not be mounted yet
     }
@@ -113,7 +113,7 @@ export function selectTableRow(
         editor,
         tableCellNode as unknown as Node,
       );
-      domNode?.setAttribute('data-select', 'true');
+      domNode.setAttribute('data-select', 'true');
     } catch {
       // cell may not be mounted yet
     }
@@ -144,7 +144,7 @@ export function selectTableColumn(
         editor,
         tableCellNode as unknown as Node,
       );
-      domNode?.setAttribute('data-select', 'true');
+      domNode.setAttribute('data-select', 'true');
     } catch {
       // cell may not be mounted yet
     }
@@ -158,7 +158,7 @@ export function selectWholeTable(editor: Editor, tablePath: number[]) {
         editor,
         cellNode as unknown as Node,
       );
-      domNode?.setAttribute('data-select', 'true');
+      domNode.setAttribute('data-select', 'true');
     } catch {
       // cell may not be mounted yet
     }

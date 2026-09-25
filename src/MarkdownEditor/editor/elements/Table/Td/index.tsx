@@ -25,13 +25,13 @@ const TdComponent: React.FC<TdProps> = ({
     throw new Error('Element "Td" must be of type "table-cell"');
   }
 
-  const align = element?.align;
-  const width = element?.width;
+  const align = element.align;
+  const width = element.width;
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefix = getPrefixCls('agentic-md-editor-table-td');
 
   const handleRef = (node: HTMLTableDataCellElement | null) => {
-    if (attributes?.ref) {
+    if (attributes.ref) {
       if (typeof attributes.ref === 'function') {
         attributes.ref(node);
       }
@@ -56,8 +56,8 @@ const TdComponent: React.FC<TdProps> = ({
         width: width || 'auto',
         ...style,
       }}
-      rowSpan={element?.rowSpan}
-      colSpan={element?.colSpan}
+      rowSpan={element.rowSpan}
+      colSpan={element.colSpan}
       {...attributes}
       ref={handleRef}
     >

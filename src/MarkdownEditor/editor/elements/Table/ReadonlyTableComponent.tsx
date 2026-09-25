@@ -43,8 +43,8 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
     const [previewOpen, setPreviewOpen] = useState(false);
     const i18n = useContext(I18nContext);
 
-    const columnCount = element?.children?.[0]?.children?.length || 0;
-    const otherProps = element?.otherProps as
+    const columnCount = element.children?.[0]?.children?.length || 0;
+    const otherProps = element.otherProps as
       | { colWidths?: ColWidthValue[] }
       | undefined;
 
@@ -62,10 +62,10 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
         let contentToCopy = '';
 
         // 根据复制类型确定要复制的内容
-        if (actions?.copy === 'html') {
+        if (actions.copy === 'html') {
           contentToCopy = tableTargetRef.current?.innerHTML || '';
-        } else if (actions?.copy === 'csv') {
-          const otherProps = element?.otherProps as any;
+        } else if (actions.copy === 'csv') {
+          const otherProps = element.otherProps as any;
           if (otherProps?.columns && otherProps?.dataSource) {
             contentToCopy =
               otherProps.columns
@@ -124,7 +124,7 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
     const popoverContent = useMemo(
       () => (
         <div className={classNames(`${baseCls}-readonly-table-actions`)}>
-          {actions?.fullScreen && (
+          {actions.fullScreen && (
             <ActionIconBox
               title={i18n?.locale?.fullScreen || '全屏'}
               onClick={handleFullScreen}
@@ -132,7 +132,7 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
               <FullscreenOutlined />
             </ActionIconBox>
           )}
-          {actions?.copy && (
+          {actions.copy && (
             <ActionIconBox
               title={i18n?.locale?.copy || '复制'}
               onClick={handleCopy}
@@ -143,8 +143,8 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
         </div>
       ),
       [
-        actions?.fullScreen,
-        actions?.copy,
+        actions.fullScreen,
+        actions.copy,
         i18n?.locale,
         handleFullScreen,
         handleCopy,

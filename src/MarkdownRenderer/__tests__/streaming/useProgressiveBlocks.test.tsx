@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react';
+import { act, cleanup, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useProgressiveBlocks } from '../../streaming/useProgressiveBlocks';
 import { installRafStub } from '../installRafStub';
@@ -12,14 +12,15 @@ const setDocumentHidden = (hidden: boolean) => {
 
 describe('useProgressiveBlocks', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     installRafStub();
     vi.stubGlobal('requestIdleCallback', undefined);
     setDocumentHidden(false);
   });
 
   afterEach(() => {
-    vi.useRealTimers();
+    cleanup();
+    vi.clearAllTimers();
     vi.unstubAllGlobals();
     setDocumentHidden(false);
   });

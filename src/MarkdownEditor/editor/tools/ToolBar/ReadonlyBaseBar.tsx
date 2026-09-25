@@ -53,7 +53,6 @@ export const ReadonlyBaseBar = (props: { prefix?: string }) => {
           key="highlight"
           className={classNames(`${baseClassName}-item`)}
           onClick={async () => {
-            if (typeof window === 'undefined') return;
             const domSelection = window.getSelection();
             const editor = markdownEditorRef.current;
             let selection = editor.selection;
@@ -119,7 +118,6 @@ export const ReadonlyBaseBar = (props: { prefix?: string }) => {
           key="comment"
           className={classNames(`${baseClassName}-item`)}
           onClick={() => {
-            if (typeof window === 'undefined') return;
             const domSelection = window.getSelection();
             const editor = markdownEditorRef.current;
             let selection = editor.selection;

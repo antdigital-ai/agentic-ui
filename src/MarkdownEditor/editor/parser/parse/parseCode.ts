@@ -173,8 +173,9 @@ export const handleCode = (currentElement: any, config?: any): CodeElement => {
 
   // 只保留必要的属性，不添加 data-block、data-state、data-language 到 otherProps
   // 这些属性会被序列化为 HTML 注释，造成冗余
+  // object spread 对 undefined 安全，无需 || {}
   const otherProps: Record<string, any> = {
-    ...(currentElement.otherProps || {}),
+    ...currentElement.otherProps,
   };
 
   // 只有未完成时才添加 finished 属性
@@ -187,7 +188,7 @@ export const handleCode = (currentElement: any, config?: any): CodeElement => {
     language: effectiveLang === 'apaasify' ? 'apaasify' : effectiveLang || null,
     render: currentElement.meta === 'render',
     value: currentElement.value,
-    isConfig: currentElement?.value.trim()?.startsWith('<!--'),
+    isConfig: currentElement.value?.trim()?.startsWith('<!--'),
     children: VOID_CODE_BLOCK_PLACEHOLDER_CHILDREN,
     // 添加流式状态支持
     otherProps,
@@ -215,17 +216,17 @@ export const handleCode = (currentElement: any, config?: any): CodeElement => {
   if (baseCodeElement.otherProps && !resultWithProps.otherProps) {
     resultWithProps.otherProps = {
       ...baseCodeElement.otherProps,
-      ...(config || {}),
+      ...config,
     };
   } else if (baseCodeElement.otherProps && resultWithProps.otherProps) {
     resultWithProps.otherProps = {
       ...resultWithProps.otherProps,
       ...baseCodeElement.otherProps,
-      ...(config || {}),
+      ...config,
     };
   } else if (config && Object.keys(config).length > 0) {
     resultWithProps.otherProps = {
-      ...(resultWithProps.otherProps || {}),
+      ...resultWithProps.otherProps,
       ...config,
     };
   }

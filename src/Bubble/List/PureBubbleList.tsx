@@ -335,9 +335,9 @@ export const PureBubbleList = React.memo<PureBubbleListProps>((props) => {
       style={style}
       ref={bubbleListRef}
       onScroll={onScroll}
-      onWheel={(event) => onWheel?.(event, bubbleListRef?.current || null)}
+      onWheel={(event) => onWheel?.(event, bubbleListRef?.current ?? null)}
       onTouchMove={(event) =>
-        onTouchMove?.(event, bubbleListRef?.current || null)
+        onTouchMove?.(event, bubbleListRef?.current ?? null)
       }
     >
       {listDom}

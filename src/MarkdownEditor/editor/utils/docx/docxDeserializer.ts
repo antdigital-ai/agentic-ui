@@ -49,8 +49,8 @@ export const docxDeserializer = (rtf: string, html: string): any[] => {
           ) {
             const linkText = fragment.children.at(0).text;
             fragment.children[0] = {
-              text: linkText?.replace(/\[([^\]]+)\]\(([^)]+)\)/, '$1'),
-              url: linkText?.replace(/\[([^\]]+)\]\(([^)]+)\)/, '$2'),
+              text: linkText.replace(/\[([^\]]+)\]\(([^)]+)\)/, '$1'),
+              url: linkText.replace(/\[([^\]]+)\]\(([^)]+)\)/, '$2'),
               originalText: linkText,
             };
           }

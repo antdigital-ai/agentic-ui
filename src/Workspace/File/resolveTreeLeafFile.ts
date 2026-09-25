@@ -78,7 +78,7 @@ export const resolveTreeLeafFile = (
   node: FileTreeNode,
   options?: ResolveTreeLeafFileOptions,
 ): FileNode | null => {
-  const hasChildren = Boolean(node.children && node.children.length > 0);
+  const hasChildren = Boolean(node.children?.length);
   const resolvedIsLeaf = node.isLeaf ?? !hasChildren;
   if (!resolvedIsLeaf) {
     return null;

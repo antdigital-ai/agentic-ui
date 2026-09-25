@@ -14,7 +14,7 @@ import { useStyle } from './docInfoStyle';
 
 const replaceAllPlaceHolder = (str: string, placeholder: any[]) => {
   let message = str;
-  placeholder?.forEach((item) => {
+  placeholder.forEach((item) => {
     message = message
       .replaceAll(`\`\${${item.placeholder}}\``, `(${item.url || item.doc_id})`)
       .replaceAll(`$${item.placeholder}`, `(${item.url || item.doc_id})`)
@@ -52,7 +52,7 @@ export const DocInfoList: React.FC<DocInfoListProps> = ({
   const { locale } = useContext(I18nContext);
   const { hashId } = useStyle(baseCls);
 
-  const docInfoList = props.options?.filter((item) => item) || [];
+  const docInfoList = (props.options || []).filter((item) => item);
 
   const [docMeta, setDocMeta] = React.useState<DocMeta | null>(null);
 
@@ -284,10 +284,8 @@ export const DocInfoList: React.FC<DocInfoListProps> = ({
                       onClick={(e) => {
                         e.stopPropagation();
                         e.preventDefault();
-                        if (item?.originUrl) {
-                          return props.onOriginUrlClick?.(item.originUrl);
-                        }
-                        window.open(item.originUrl);
+                        // originUrl 已在外层条件保证存在
+                        props.onOriginUrlClick?.(item.originUrl!);
                       }}
                     >
                       <ExportOutlined />
@@ -296,7 +294,7 @@ export const DocInfoList: React.FC<DocInfoListProps> = ({
                 </div>
               </div>
             );
-            if ((item?.content?.trim()?.length || 0) < 20) {
+            if ((item?.content?.trim().length || 0) < 20) {
               return dom;
             }
 

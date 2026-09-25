@@ -421,7 +421,7 @@ export class EditorStore {
     const separator = options?.separator ?? /\n\n/;
     const useRAF = options?.useRAF ?? false;
     const batchSize = options?.batchSize ?? 50;
-    const targetPlugins = plugins || this.plugins;
+    const targetPlugins = plugins ?? this.plugins ?? [];
 
     if (md.length <= chunkSize) {
       return this._setShortContent(md, targetPlugins, options?.onProgress);
@@ -441,7 +441,7 @@ export class EditorStore {
       this._currentAbortController = new AbortController();
       return this._parseAndSetContentWithRAF(
         chunks,
-        targetPlugins || [],
+        targetPlugins,
         batchSize,
         options?.onProgress,
         this._currentAbortController.signal,
@@ -573,8 +573,8 @@ export class EditorStore {
     chunks: string[],
     plugins: MarkdownEditorPlugin[],
     batchSize: number,
-    onProgress?: (progress: number) => void,
-    signal?: AbortSignal,
+    onProgress: ((progress: number) => void) | undefined,
+    signal: AbortSignal,
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       let currentChunkIndex = 0;
@@ -587,7 +587,7 @@ export class EditorStore {
       const parseAndInsertNextBatch = () => {
         try {
           // 检查是否被取消
-          if (signal?.aborted) {
+          if (signal.aborted) {
             if (rafId) {
               cancelAnimationFrame(rafId);
               rafId = null;
@@ -644,13 +644,11 @@ export class EditorStore {
           currentChunkIndex = endIndex;
           // 更新进度
           const progress = currentChunkIndex / totalChunks;
-          if (onProgress) {
-            try {
-              onProgress(progress);
-            } catch (progressError) {
-              // 进度回调失败不应该中断整个流程
-              console.warn('Progress callback failed:', progressError);
-            }
+          try {
+            onProgress?.(progress);
+          } catch (progressError) {
+            // 进度回调失败不应该中断整个流程
+            console.warn('Progress callback failed:', progressError);
           }
 
           if (currentChunkIndex < totalChunks) {
@@ -826,7 +824,7 @@ export class EditorStore {
       cursor += 1;
     }
 
-    if (cursor < content.length && content[cursor] === '\n') {
+    if (cursor < content.length) {
       return cursor + 1;
     }
 
@@ -869,7 +867,7 @@ export class EditorStore {
       nodeList,
       '',
       [{ root: true }],
-      plugins || this.plugins,
+      plugins ?? this.plugins,
     );
     return md;
   }

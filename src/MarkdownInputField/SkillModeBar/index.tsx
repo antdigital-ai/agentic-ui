@@ -100,14 +100,14 @@ export interface SkillModeBarProps {
 
 /**
  * 技能模式条内部组件
- * @description 包含所有hooks和渲染逻辑的内部实现组件
+ * @description 包含所有hooks和渲染逻辑的内部实现组件；仅在 skillMode 已启用时挂载
  * @param props - 组件属性
  * @returns React 组件
  */
-const SkillModeBarInner: React.FC<SkillModeBarProps> = ({
-  skillMode,
-  onSkillModeOpenChange,
-}) => {
+const SkillModeBarInner: React.FC<{
+  skillMode: SkillModeConfig;
+  onSkillModeOpenChange?: (open: boolean) => void;
+}> = ({ skillMode, onSkillModeOpenChange }) => {
   // 获取样式前缀和配置
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-skill-mode');
@@ -127,14 +127,14 @@ const SkillModeBarInner: React.FC<SkillModeBarProps> = ({
   // 提取常用判断条件，消除重复逻辑
   // 将 rightContent 统一转换为数组处理
   const rightContentArray = React.useMemo(() => {
-    if (!skillMode?.rightContent) return [];
+    if (!skillMode.rightContent) return [];
     return Array.isArray(skillMode.rightContent)
       ? skillMode.rightContent
       : [skillMode.rightContent];
-  }, [skillMode?.rightContent]);
+  }, [skillMode.rightContent]);
 
   const hasRightContent = rightContentArray.length > 0;
-  const isClosable = skillMode?.closable !== false;
+  const isClosable = skillMode.closable !== false;
   const shouldShowDivider = hasRightContent && isClosable;
 
   const handleCloseClick = (e: React.MouseEvent) => {
@@ -146,7 +146,7 @@ const SkillModeBarInner: React.FC<SkillModeBarProps> = ({
 
   // 替代 framer-motion 的 AnimatePresence + motion.div height/opacity/padding 动画。
   // 通过 shouldRender + dataState（enter/exit）配合 CSS 过渡，实现入场动画与"延迟卸载"的退出动画。
-  const isOpen = !!skillMode?.open;
+  const isOpen = !!skillMode.open;
   const isTestEnv = process.env.NODE_ENV === 'test';
   const [shouldRender, setShouldRender] = useState<boolean>(isOpen);
   const [dataState, setDataState] = useState<'enter' | 'exit'>(
@@ -190,13 +190,13 @@ const SkillModeBarInner: React.FC<SkillModeBarProps> = ({
           data-state={dataState}
         >
           <div
-            style={skillMode?.style}
-            className={classNames(`${prefixCls}`, hashId, skillMode?.className)}
+            style={skillMode.style}
+            className={classNames(`${prefixCls}`, hashId, skillMode.className)}
             data-state={dataState}
           >
             {/* 左侧区域 - 技能模式标题 */}
             <div className={classNames(`${prefixCls}-title`, hashId)}>
-              {skillMode?.title}
+              {skillMode.title}
             </div>
 
             {/* 右侧区域 */}

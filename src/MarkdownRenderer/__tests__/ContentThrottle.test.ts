@@ -11,13 +11,13 @@ const setDocumentVisibility = (visibilityState: DocumentVisibilityState) => {
 
 describe('ContentThrottle', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     installRafStub();
     setDocumentVisibility('visible');
   });
 
   afterEach(() => {
-    vi.useRealTimers();
+    vi.clearAllTimers();
     vi.unstubAllGlobals();
     setDocumentVisibility('visible');
   });

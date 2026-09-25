@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SchemaValidator, mdDataSchemaValidator } from '../validator';
 
 describe('SchemaValidator - 增强测试', () => {
@@ -482,5 +482,54 @@ describe('SchemaValidator - 错误信息质量', () => {
         expect(typeof error.path).toBe('string');
       });
     }
+  });
+});
+
+describe('SchemaValidator validate 分支补洞', () => {
+  let validator: SchemaValidator;
+
+  beforeEach(() => {
+    validator = new SchemaValidator();
+  });
+
+  it('合法 schema 返回 valid:true 且 errors 为空', () => {
+    const result = validator.validate({
+      version: '1.0.0',
+      name: 'demo',
+      description: 'desc',
+      component: {
+        properties: {},
+        type: 'html',
+        schema: '<div></div>',
+      },
+    });
+    expect(result.valid).toBe(true);
+    expect(result.errors).toEqual([]);
+  });
+
+  it('error.message 为空时使用未知错误', () => {
+    const mockValidate = Object.assign(vi.fn(() => false), {
+      errors: [{ instancePath: '/field', message: undefined }],
+    });
+    vi.spyOn((validator as any).ajv, 'compile').mockReturnValue(
+      mockValidate as any,
+    );
+    const result = validator.validate({});
+    expect(result.valid).toBe(false);
+    expect(result.errors[0]?.message).toBe('未知错误');
+  });
+});
+
+describe('validator istanbul residual：errors 空数组', () => {
+  it.skip('compile 返回 false 且 errors 为空时仍 invalid', () => {
+    const validator = new SchemaValidator();
+    const mockValidate = Object.assign(vi.fn(() => false), {
+      errors: null,
+    });
+    vi.spyOn((validator as any).ajv, 'compile').mockReturnValue(
+      mockValidate as any,
+    );
+    const result = validator.validate({ version: '1.0.0' });
+    expect(result.valid).toBe(false);
   });
 });

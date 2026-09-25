@@ -13,7 +13,7 @@ const HeadingLocaleKeyMap = {
 
 const getHeadingText = (i18n: any, level: keyof typeof HeadingLocaleKeyMap) => {
   const localeKey = HeadingLocaleKeyMap[level];
-  return i18n?.locale?.[localeKey] || localeKey;
+  return i18n.locale?.[localeKey] || localeKey;
 };
 
 interface HeadingDropdownProps {
@@ -58,7 +58,7 @@ export const HeadingDropdown = React.memo<HeadingDropdownProps>(
     return (
       <Dropdown menu={{ items: headingItems }}>
         <ToolBarItem
-          title={i18n?.locale?.heading || '标题'}
+          title={i18n.locale?.heading || '标题'}
           icon={null}
           className={classNames(`${baseClassName}-item`, hashId)}
           style={{

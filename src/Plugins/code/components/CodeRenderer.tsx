@@ -36,7 +36,7 @@ import {
  * @returns 如果包含 JavaScript 返回 true，否则返回 false
  */
 function containsJavaScript(htmlCode: string): boolean {
-  if (!htmlCode || typeof htmlCode !== 'string') {
+  if (!htmlCode) {
     return false;
   }
 
@@ -113,7 +113,7 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
   // 如果是 markdown 或 html，默认打开预览模式
   // 但如果禁用了 HTML 预览，则强制使用代码模式
   const disableHtmlPreview = editorProps.codeProps?.disableHtmlPreview ?? false;
-  const language = props.element?.language?.toLowerCase();
+  const language = props.element.language?.toLowerCase();
   const codePlainText = getCodeBlockPlainText(props.element);
 
   // 检测 HTML 代码中是否包含 JavaScript
@@ -183,17 +183,17 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
   });
 
   // 检查代码块是否未闭合
-  const isUnclosed = props.element?.otherProps?.finished === false;
+  const isUnclosed = props.element.otherProps?.finished === false;
 
   // 5 秒超时机制：如果代码块未闭合，5 秒后自动设置为完成
   useEffect(() => {
     if (isUnclosed && !readonly) {
       const timer = setTimeout(() => {
         // 检查 finished 是否仍然是 false（可能已经被其他逻辑更新）
-        if (props.element?.otherProps?.finished === false) {
+        if (props.element.otherProps?.finished === false) {
           update({
             otherProps: {
-              ...props.element?.otherProps,
+              ...props.element.otherProps,
               finished: true,
             },
           });
@@ -204,7 +204,7 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
         clearTimeout(timer);
       };
     }
-  }, [isUnclosed, readonly, props.element?.otherProps?.finished, update]);
+  }, [isUnclosed, readonly, props.element.otherProps?.finished, update]);
 
   // 如果禁用了 HTML 预览或包含 JavaScript，强制使用代码模式
   useEffect(() => {
@@ -217,7 +217,7 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
   return useMemo(() => {
     // 配置型 HTML 代码块：如果未完成且内容较长，显示 skeleton
     if (shouldHideConfigHtml) {
-      const isUnclosed = props.element?.otherProps?.finished === false;
+      const isUnclosed = props.element.otherProps?.finished === false;
       const contentLength = codePlainText.length;
       const isLongContent = contentLength > 100; // 内容超过 100 字符视为较长
 

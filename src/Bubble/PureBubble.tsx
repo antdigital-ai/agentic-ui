@@ -117,7 +117,7 @@ export const PureBubble: React.FC<
         pure
         style={styles?.bubbleListItemExtraStyle}
         readonly={props.readonly}
-        rightRender={props?.bubbleRenderConfig?.extraRightRender}
+        rightRender={props.bubbleRenderConfig?.extraRightRender}
         onReply={props.onReply}
         onCancelLike={props.onCancelLike}
         onLikeCancel={props.onLikeCancel}

@@ -80,10 +80,7 @@ const toolFromRecord = (x: Record<string, unknown>): ToolCall | null => {
     time: x.time !== undefined && x.time !== null ? String(x.time) : undefined,
     errorMessage:
       typeof x.errorMessage === 'string' ? x.errorMessage : undefined,
-    type:
-      x.type === 'summary' || x.type === 'normal' || typeof x.type === 'string'
-        ? x.type
-        : undefined,
+    type: typeof x.type === 'string' ? x.type : undefined,
     content:
       x.content !== undefined && x.content !== null
         ? String(x.content)

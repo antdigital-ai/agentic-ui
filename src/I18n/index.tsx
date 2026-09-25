@@ -31,7 +31,8 @@ export function detectUserLanguage(): 'zh-CN' | 'en-US' {
     const browserLanguages = navigator.languages || [navigator.language];
 
     for (const lang of browserLanguages) {
-      const langLower = lang?.toLowerCase() || 'zh-CN';
+      if (!lang || typeof lang !== 'string') continue;
+      const langLower = lang.toLowerCase() || 'zh-CN';
       if (langLower.startsWith('zh')) {
         return 'zh-CN';
       }

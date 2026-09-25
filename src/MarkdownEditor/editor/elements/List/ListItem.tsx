@@ -47,8 +47,8 @@ const MentionsUser = (props: {
     if (readonly) {
       return (
         <Space>
-          {selectedUsers?.length
-            ? selectedUsers?.map((u) => (
+          {selectedUsers.length
+            ? selectedUsers.map((u) => (
                 <div
                   key={u.name}
                   style={{
@@ -114,8 +114,8 @@ const MentionsUser = (props: {
             <LoadingOutlined spin />
           ) : (
             <Space>
-              {selectedUsers?.length ? (
-                selectedUsers?.map((u) => (
+              {selectedUsers.length ? (
+                selectedUsers.map((u) => (
                   <div
                     key={u.name}
                     style={{

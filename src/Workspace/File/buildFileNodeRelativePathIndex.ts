@@ -2,10 +2,10 @@ import type { FileNode, GroupNode } from '../types';
 import { fileIdOrTreeKeyToRelativePath } from './workspaceFileId';
 
 const walkFileNodes = (
-  nodes: (FileNode | GroupNode)[],
+  nodes: (FileNode | GroupNode)[] | null | undefined,
   index: Map<string, FileNode>,
 ) => {
-  for (const node of nodes) {
+  for (const node of nodes || []) {
     if ('children' in node) {
       walkFileNodes(node.children, index);
       continue;
@@ -26,7 +26,7 @@ const walkFileNodes = (
  * @description 供文件树叶子与 `Workspace.File` 的 `nodes` 对齐（如 `file:` 树 key 与 `workspace:` 列表 id）
  */
 export const buildFileNodeRelativePathIndex = (
-  nodes: (FileNode | GroupNode)[],
+  nodes: (FileNode | GroupNode)[] | null | undefined,
 ): Map<string, FileNode> => {
   const index = new Map<string, FileNode>();
   walkFileNodes(nodes, index);

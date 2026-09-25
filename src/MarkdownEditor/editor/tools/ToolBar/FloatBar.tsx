@@ -71,14 +71,14 @@ export const FloatBar = (props: { readonly: boolean }) => {
       }
     };
     if (markdownContainerRef.current) {
-      markdownContainerRef.current?.addEventListener(
+      markdownContainerRef.current.addEventListener(
         MARKDOWN_EDITOR_EVENTS.SELECTIONCHANGE,
         resizeFn as EventListener,
       );
     }
     return () => {
       if (markdownContainerRef.current) {
-        markdownContainerRef.current?.removeEventListener(
+        markdownContainerRef.current.removeEventListener(
           MARKDOWN_EDITOR_EVENTS.SELECTIONCHANGE,
           resizeFn as EventListener,
         );
@@ -87,7 +87,6 @@ export const FloatBar = (props: { readonly: boolean }) => {
   }, [isOpen]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
     const close = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();

@@ -122,8 +122,7 @@ export const ReadonlyLinkCard: React.FC<
             flex: 1,
           }}
           onClick={() => {
-            if (typeof window === 'undefined') return;
-            window.open(element?.url);
+            window.open(element.url);
           }}
           className={classNames(`${blockCls}__container`)}
         >
@@ -145,36 +144,33 @@ export const ReadonlyLinkCard: React.FC<
               }}
             >
               <a
-                href={element?.url}
+                href={element.url}
                 className={classNames(`${blockCls}__title`)}
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
-                  if (typeof window === 'undefined') return;
-                  window.open(element?.url);
+                  window.open(element.url);
                 }}
                 download={element.title || element.name || 'no title'}
               >
                 {element.title || element.name || 'no title'}
               </a>
               <div className={classNames(`${blockCls}__description`)}>
-                {element.description ? element.description : element?.url}
+                {element.description ? element.description : element.url}
               </div>
               <div className={classNames(`${blockCls}__collaborators`)}>
                 {element.otherProps?.collaborators ? (
                   <div>
                     <AvatarList
-                      displayList={
-                        element.otherProps?.collaborators
-                          ?.map((item: { [key: string]: number }) => {
-                            return {
-                              name: Object.keys(item)?.at(0) as string,
-                              collaboratorNumber:
-                                Object.values(item)?.at(0) || 0,
-                            };
-                          })
-                          .slice(0, 5) || []
-                      }
+                      displayList={element.otherProps.collaborators
+                        .map((item: { [key: string]: number }) => {
+                          return {
+                            name: Object.keys(item).at(0) as string,
+                            collaboratorNumber:
+                              Object.values(item).at(0) || 0,
+                          };
+                        })
+                        .slice(0, 5)}
                     />
                   </div>
                 ) : (

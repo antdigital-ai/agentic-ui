@@ -17,8 +17,9 @@ describe('Chart Utils - Missing Coverage', () => {
 
     // 添加测试用例以覆盖第45行和第47行
     it('应该处理非字符串非数字值并返回原值', () => {
-      expect(stringFormatNumber(true as any)).toBe(true);
+      // falsy 非 number 仍走 early return；truthy 非 string 按 number 格式化
       expect(stringFormatNumber(false as any)).toBe(false);
+      expect(stringFormatNumber(true as any)).toBe('1');
     });
   });
 

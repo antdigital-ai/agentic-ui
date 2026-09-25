@@ -16,13 +16,13 @@ export const UndoRedoButtons = React.memo<UndoRedoButtonsProps>(
     return (
       <>
         <ToolBarItem
-          title={i18n?.locale?.undo || '撤销'}
+          title={i18n.locale?.undo || '撤销'}
           icon={<UndoOutlined />}
           onClick={onUndo}
           className={classNames(`${baseClassName}-item`, hashId)}
         />
         <ToolBarItem
-          title={i18n?.locale?.redo || '重做'}
+          title={i18n.locale?.redo || '重做'}
           icon={<RedoOutlined />}
           onClick={onRedo}
           className={classNames(`${baseClassName}-item`, hashId)}

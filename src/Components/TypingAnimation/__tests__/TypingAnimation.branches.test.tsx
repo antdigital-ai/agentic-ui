@@ -1,6 +1,11 @@
-import { act, render } from '@testing-library/react';
+import { act, cleanup, render } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+function resetFakeTimers() {
+  cleanup();
+  vi.clearAllTimers();
+}
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
@@ -43,11 +48,11 @@ import { TypingAnimation } from '../index';
 
 describe('TypingAnimation 分支覆盖', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
   });
 
   afterEach(() => {
-    vi.useRealTimers();
+    resetFakeTimers();
   });
 
   /**
@@ -330,5 +335,26 @@ describe('TypingAnimation 分支覆盖', () => {
       vi.advanceTimersByTime(20);
     });
     expect(container.textContent).toBe('');
+  });
+
+  it('IntersectionObserver 不可用时立即开始', () => {
+    const originalObserver = globalThis.IntersectionObserver;
+    vi.stubGlobal('IntersectionObserver', undefined);
+
+    const { container } = render(
+      <TypingAnimation
+        words={['A']}
+        delay={0}
+        duration={20}
+        loop={false}
+        showCursor={false}
+      />,
+    );
+    act(() => {
+      vi.advanceTimersByTime(20);
+    });
+
+    expect(container.textContent).toContain('A');
+    vi.stubGlobal('IntersectionObserver', originalObserver);
   });
 });

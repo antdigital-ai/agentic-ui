@@ -164,11 +164,7 @@ export const useToolBarLogic = ({
     if (!sel) return;
 
     setDomRect(getSelRect()!);
-    if (
-      typeof window === 'undefined' ||
-      typeof window.matchMedia === 'undefined'
-    )
-      return;
+    if (typeof window.matchMedia === 'undefined') return;
     openInsertLink$.next(sel);
   }, [markdownEditorRef, setDomRect, openInsertLink$]);
 

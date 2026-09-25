@@ -40,11 +40,7 @@ export const stringFormatNumber = (value: string | number) => {
   if (!value) return value;
   try {
     if (typeof value === 'string') return value;
-
-    if (typeof value === 'number') {
-      return intl.format(Number(value));
-    }
-    return value;
+    return intl.format(Number(value));
   } catch (error) {
     return value;
   }
@@ -194,7 +190,6 @@ export const parseChartDataYValue = (
     if (Number.isFinite(parsed) && parsed >= 0) {
       return parsed;
     }
-    return 0;
   }
   return 0;
 };
@@ -385,10 +380,6 @@ const CHART_X_ISO_DATE_PATTERN = /^(\d{4})[-/](\d{1,2})(?:[-/](\d{1,2}))?/;
 export const parseChartXDateSortKey = (
   value: number | string,
 ): number | null => {
-  if (value === null || value === undefined) {
-    return null;
-  }
-
   if (typeof value === 'number') {
     if (value >= 1000 && value <= 9999) {
       return dayjs(`${value}-01-01`).valueOf();
@@ -474,7 +465,7 @@ export const uniqueChartXValuesPreservingOrder = (
 
   for (const item of data) {
     const x = item.x;
-    if (x === null || x === undefined || x === '' || String(x).trim() === '') {
+    if (x === null || x === undefined || String(x).trim() === '') {
       continue;
     }
     const normalized = normalizeXValue(x);
@@ -747,7 +738,7 @@ export const toNumber = (val: any, fallback: number): number => {
   if (Number.isFinite(n)) return n;
   if (typeof val === 'string') {
     const cn = parseChineseCurrencyToNumber(val);
-    if (cn !== null && Number.isFinite(cn)) return cn;
+    if (cn !== null) return cn;
   }
   return fallback;
 };
@@ -797,7 +788,7 @@ export const isNotEmpty = (val: any) => {
  */
 export const getDataHash = (data: any[]): string => {
   if (!Array.isArray(data) || data.length === 0) {
-    return `0-${data?.length || 0}`;
+    return '0-0';
   }
   // 使用长度和最后一个元素的引用作为快速哈希
   // 对于流式数据，通常只有新增，所以比较最后一个元素即可
@@ -898,7 +889,7 @@ export const resolveCssVariable = (() => {
 
   return (cssVar: string): string => {
     // 如果不是 CSS 变量，直接返回
-    if (!cssVar.trim().startsWith('var(')) {
+    if (!cssVar?.trim?.() || !cssVar.trim().startsWith('var(')) {
       return cssVar;
     }
 

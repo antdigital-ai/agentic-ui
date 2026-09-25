@@ -14,7 +14,7 @@ export function Head({
 }: ElementProps<HeadNode>) {
   debugInfo('Head - 渲染标题', {
     level: element.level,
-    text: Node.string(element)?.substring(0, 50),
+    text: Node.string(element).substring(0, 50),
     align: element.align,
   });
   const { store = {} as Record<string, any>, markdownContainerRef } =
@@ -28,7 +28,7 @@ export function Head({
       ...attributes,
       id: slugify(str),
       ['data-be']: 'head',
-      ['data-head']: slugify(Node.string(element) || ''),
+      ['data-head']: slugify(str),
       ['data-title']: path?.[0] === 0,
       onDragStart: (e) => {
         store.dragStart(e, markdownContainerRef.current!);

@@ -107,7 +107,7 @@ export const LanguageSelector = (props: LanguageSelectorProps) => {
           // 弹层打开时，延时聚焦到搜索框
           setTimeout(() => {
             (
-              props?.containerRef?.current?.querySelector(
+              props.containerRef?.current?.querySelector(
                 '.lang-select input',
               ) as HTMLInputElement
             )?.focus();
@@ -132,7 +132,7 @@ export const LanguageSelector = (props: LanguageSelectorProps) => {
             style={{ width: 200 }}
             filterOption={(text, item) => {
               // 根据输入的文本过滤语言选项
-              return item?.value.includes(text) || false;
+              return !!item?.value.includes(text);
             }}
             onSelect={(selectedLanguage) => {
               // 选择语言后执行回调并关闭弹层
@@ -173,7 +173,7 @@ export const LanguageSelector = (props: LanguageSelectorProps) => {
         size="small"
         icon={
           // 如果有语言图标且不是公式，则显示图标
-          langIconMap.get(safeElement.language?.toLowerCase() || '') &&
+          langIconMap?.get?.((safeElement.language || '').toLowerCase()) &&
           !safeElement.katex && (
             <div
               style={{
@@ -186,8 +186,8 @@ export const LanguageSelector = (props: LanguageSelectorProps) => {
               }}
             >
               <LoadImage
-                src={langIconMap.get(
-                  safeElement.language?.toLowerCase() || 'html',
+                src={langIconMap?.get?.(
+                  (safeElement.language || 'html').toLowerCase(),
                 )}
               />
             </div>

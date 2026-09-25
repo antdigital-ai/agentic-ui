@@ -81,7 +81,7 @@ describe('JinjaTemplatePanel', () => {
 
   it('renders nothing when openJinjaTemplate is false', () => {
     const { container } = render(
-      <I18nProvide>
+      <I18nProvide autoDetect={false} defaultLanguage="zh-CN">
         <JinjaTemplatePanel />
       </I18nProvide>,
     );
@@ -96,7 +96,7 @@ describe('JinjaTemplatePanel', () => {
     } as any);
 
     render(
-      <I18nProvide>
+      <I18nProvide autoDetect={false} defaultLanguage="zh-CN">
         <JinjaTemplatePanel />
       </I18nProvide>,
     );
@@ -119,7 +119,7 @@ describe('JinjaTemplatePanel', () => {
     } as any);
 
     render(
-      <I18nProvide>
+      <I18nProvide autoDetect={false} defaultLanguage="zh-CN">
         <JinjaTemplatePanel />
       </I18nProvide>,
     );
@@ -148,7 +148,7 @@ describe('JinjaTemplatePanel', () => {
     } as any);
 
     render(
-      <I18nProvide>
+      <I18nProvide autoDetect={false} defaultLanguage="zh-CN">
         <JinjaTemplatePanel />
       </I18nProvide>,
     );
@@ -176,7 +176,7 @@ describe('JinjaTemplatePanel', () => {
     } as any);
 
     render(
-      <I18nProvide>
+      <I18nProvide autoDetect={false} defaultLanguage="zh-CN">
         <JinjaTemplatePanel />
       </I18nProvide>,
     );
@@ -204,7 +204,7 @@ describe('JinjaTemplatePanel', () => {
     } as any);
 
     render(
-      <I18nProvide>
+      <I18nProvide autoDetect={false} defaultLanguage="zh-CN">
         <JinjaTemplatePanel />
       </I18nProvide>,
     );
@@ -232,7 +232,7 @@ describe('JinjaTemplatePanel', () => {
     } as any);
 
     render(
-      <I18nProvide>
+      <I18nProvide autoDetect={false} defaultLanguage="zh-CN">
         <JinjaTemplatePanel />
       </I18nProvide>,
     );
@@ -250,7 +250,7 @@ describe('JinjaTemplatePanel', () => {
     } as any);
 
     render(
-      <I18nProvide>
+      <I18nProvide autoDetect={false} defaultLanguage="zh-CN">
         <JinjaTemplatePanel />
       </I18nProvide>,
     );
@@ -277,7 +277,7 @@ describe('JinjaTemplatePanel', () => {
     } as any);
 
     render(
-      <I18nProvide>
+      <I18nProvide autoDetect={false} defaultLanguage="zh-CN">
         <JinjaTemplatePanel />
       </I18nProvide>,
     );
