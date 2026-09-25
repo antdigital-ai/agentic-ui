@@ -37,6 +37,12 @@ export interface SandboxConfig {
   allowDOM?: boolean;
   /** 最大内存使用限制（字节） */
   maxMemoryUsage?: number;
+  /**
+   * 作用域渲染根节点（如 ShadowRoot）
+   * 提供后沙箱内的 document 将把节点创建/查询能力限定在该根节点内，
+   * 使 coding agent 生成的 DOM 脚本可以安全渲染真实节点
+   */
+  renderRoot?: ShadowRoot | HTMLElement | null;
 }
 
 /**
@@ -215,10 +221,84 @@ export class ProxySandbox {
       customGlobals: config.customGlobals || {},
       allowDOM: config.allowDOM ?? false,
       maxMemoryUsage: config.maxMemoryUsage || 10 * 1024 * 1024, // 10MB
+      renderRoot: config.renderRoot ?? null,
     };
 
     this.sandboxGlobal = this.createSandboxGlobal();
     this.globalProxy = this.createGlobalProxy();
+  }
+
+  /**
+   * 创建作用域受限的 document 代理
+   *
+   * 与 createSafeDocument 的 mock 实现不同，本方法让节点创建/查询走真实 DOM，
+   * 但所有查询都被限定在 renderRoot（ShadowRoot 或挂载元素）内部，
+   * 脚本无法触达宿主页面的其它节点。
+   */
+  private createScopedDocument(renderRoot: ShadowRoot | HTMLElement): any {
+    const isShadow = renderRoot instanceof ShadowRoot;
+    const scoped: any = {
+      createElement: (tagName: string) =>
+        document.createElement(tagName) as any,
+      createElementNS: (ns: string, tagName: string) =>
+        document.createElementNS(ns, tagName) as any,
+      createTextNode: (data: string) => document.createTextNode(data) as any,
+      createDocumentFragment: () =>
+        document.createDocumentFragment() as any,
+      createComment: (data: string) => document.createComment(data) as any,
+      // 查询能力全部限定在 renderRoot 内
+      getElementById: (id: string) =>
+        (renderRoot as any).getElementById?.(id) ??
+          (isShadow
+            ? null
+            : (renderRoot as HTMLElement).querySelector(`#${CSS.escape(id)}`)),
+      querySelector: (selector: string) =>
+        (renderRoot as any).querySelector(selector),
+      querySelectorAll: (selector: string) =>
+        Array.from((renderRoot as any).querySelectorAll(selector)),
+      // renderRoot 自身即为可视文档，title 等元信息只读
+      title: 'Sandbox Document',
+      readyState: 'complete',
+    };
+
+    return new Proxy(scoped, {
+      get: (target, prop, receiver) => {
+        // 阻止逃逸与写入宿主文档的入口
+        const blockedProps = [
+          'body',
+          'head',
+          'documentElement',
+          'location',
+          'defaultView',
+          'parentWindow',
+          'write',
+          'writeln',
+          'open',
+          'close',
+          'execCommand',
+          'cookie',
+        ];
+        if (blockedProps.includes(String(prop))) {
+          return String(prop) === 'cookie' ? '' : undefined;
+        }
+        if (prop in target) {
+          return Reflect.get(target, prop, receiver);
+        }
+        return undefined;
+      },
+      has: (target, prop) => {
+        const blockedProps = [
+          'body',
+          'head',
+          'documentElement',
+          'location',
+          'write',
+          'writeln',
+          'cookie',
+        ];
+        return !blockedProps.includes(String(prop)) && prop in target;
+      },
+    });
   }
 
   /**
@@ -574,8 +654,10 @@ export class ProxySandbox {
     // 添加自定义全局变量
     Object.assign(sandboxGlobal, this.config.customGlobals);
 
-    // 创建安全的 document 对象（确保只创建一次）
-    const safeDocument = this.createSafeDocument();
+    // 指定 renderRoot 时使用作用域 document（真实节点、查询限定在根节点内）
+    const safeDocument = this.config.renderRoot
+      ? this.createScopedDocument(this.config.renderRoot)
+      : this.createSafeDocument();
 
     // 添加安全的 window 对象（总是可用）
     const safeWindow = this.createSafeWindow(safeDocument);
@@ -583,6 +665,11 @@ export class ProxySandbox {
 
     // 添加安全的 document 对象（总是可用）
     sandboxGlobal.document = safeDocument;
+
+    // renderRoot 同时以 shadowRoot 名称暴露给脚本，便于 agent 生成的脚本直接挂载内容
+    if (this.config.renderRoot) {
+      sandboxGlobal.shadowRoot = this.config.renderRoot;
+    }
 
     // 条件性添加 console
     if (this.config.allowConsole) {

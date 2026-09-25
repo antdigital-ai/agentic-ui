@@ -34,6 +34,8 @@ ProxySandbox 可以执行 Coding Agent 生成的受限 JavaScript，并可将结
 - 输出本项目的低代码 Schema，交给 `SchemaRenderer` 渲染。
 - 输出不含外部依赖的 DOM 脚本，并只操作注入的 `shadowRoot`。
 
+对于第三种协议，可直接使用 [`SandboxRenderer` 组件](/components/sandbox-renderer)：传入 `code` 即可在内置 Shadow DOM 容器中安全渲染 agent 生成的 DOM 脚本（节点创建走真实 DOM，查询限定在容器内）。
+
 需要渲染完整 React/Vue 工程或安装第三方依赖时，应使用服务端容器或独立 iframe 构建沙箱；不要把这类代码直接交给 ProxySandbox。无论代码来源为何，都应保留超时、全局对象白名单和资源限制。
 
 ### 基本使用 {#basic-usage}

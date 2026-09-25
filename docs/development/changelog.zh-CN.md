@@ -9,6 +9,12 @@ group:
 
 # Changelog
 
+## v2.32.47
+
+- SandboxRenderer
+  - 🆕 新增 `SandboxRenderer` 组件，安全渲染 coding agent 生成的 JavaScript 代码：节点创建走真实 DOM、查询限定在 Shadow DOM 容器内，继承 `ProxySandbox` 超时中断与全局对象白名单。Closes #330
+  - 🆕 `ProxySandbox` 新增 `renderRoot` 配置：指定后沙箱内 `document` 切换为作用域实现（`createElement` 等返回真实节点，`querySelector` / `getElementById` 限定在根节点内），并以 `shadowRoot` 名称暴露给脚本。
+
 ## v2.32.31
 
 - MarkdownRenderer

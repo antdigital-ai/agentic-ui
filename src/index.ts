@@ -636,6 +636,12 @@ export {
   GradientText,
   type GradientTextProps,
 } from './Components/GradientText';
+
+export {
+  SandboxRenderer,
+  type SandboxRendererProps,
+  type SandboxRendererStatus,
+} from './Components/SandboxRenderer';
 export {
   LayoutHeader,
   type LayoutHeaderConfig,

@@ -121,6 +121,7 @@ export class SecurityContextManager {
       customGlobals: config.customGlobals || {},
       allowDOM: config.allowDOM ?? false,
       maxMemoryUsage: config.maxMemoryUsage || 10 * 1024 * 1024,
+      renderRoot: config.renderRoot ?? null,
 
       // 权限配置
       permissions: {

@@ -9,6 +9,12 @@ group:
 
 # Changelog
 
+## v2.32.47
+
+- SandboxRenderer
+  - 🆕 Added `SandboxRenderer` component to safely render coding-agent-generated JavaScript: node creation uses the real DOM while queries are scoped to the Shadow DOM container, inheriting `ProxySandbox` timeout and global whitelist. Closes #330
+  - 🆕 `ProxySandbox` now accepts a `renderRoot` config: when provided, the sandbox `document` switches to a scoped implementation (`createElement` returns real nodes; `querySelector` / `getElementById` are limited to the root) and exposes it to scripts as `shadowRoot`.
+
 ## v2.32.31
 
 - MarkdownRenderer
