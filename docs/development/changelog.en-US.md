@@ -11,6 +11,9 @@ group:
 
 ## v2.32.47
 
+- Test
+  - ✅ Added E2E specs: SandboxRenderer sandbox rendering (Shadow DOM render/interaction/scoped isolation, #330), MarkdownEditor WYSIWYG instant conversion (default-config conversion matrix, #59), and homepage footer visibility (#397).
+
 - MarkdownEditor
   - 🐞 Improved WYSIWYG experience: `# ` heading conversion no longer limited to the first paragraph; `- `/`[ ] ` list conversion now applies to body paragraphs even when `matchInputToNode` is off by default (first-paragraph guard retained to protect chat inputs). Closes #59
 

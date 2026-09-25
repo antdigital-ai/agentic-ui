@@ -11,6 +11,9 @@ group:
 
 ## v2.32.47
 
+- Test
+  - ✅ 新增 E2E：SandboxRenderer 沙箱渲染（Shadow DOM 渲染/交互/作用域隔离，#330）、MarkdownEditor WYSIWYG 即时转换（默认配置转换矩阵，#59）、首页 footer 可见性（#397）。
+
 - MarkdownEditor
   - 🐞 改进所见即所得体验：`# ` 标题转换不再限制文档首段，任何正文段落输入即转；`- `/`[ ] ` 列表转换在 `matchInputToNode` 默认关闭时也放开正文段落（首段保护保留，避免聊天输入框误转）。Closes #59
 
