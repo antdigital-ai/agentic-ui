@@ -15,7 +15,10 @@ vi.mock('chart.js', () => ({
         legend: {
           labels: {
             generateLabels: vi.fn(() => [
-              { text: '超长序列名称需要被截断显示省略号', fillStyle: '#1677ff' },
+              {
+                text: '超长序列名称需要被截断显示省略号',
+                fillStyle: '#1677ff',
+              },
             ]),
           },
         },
@@ -102,7 +105,9 @@ describe('RadarChart more residual branches', () => {
     const external = opts?.plugins?.tooltip?.external;
     if (typeof external === 'function') {
       external({
-        chart: { canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) } },
+        chart: {
+          canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) },
+        },
         tooltip: {
           opacity: 1,
           caretX: 10,
@@ -119,20 +124,26 @@ describe('RadarChart more residual branches', () => {
       expect(document.getElementById('custom-radar-tooltip')).toBeTruthy();
 
       external({
-        chart: { canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) } },
+        chart: {
+          canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) },
+        },
         tooltip: { opacity: 0, dataPoints: [{ label: 'x' }] },
       });
-      expect(document.getElementById('custom-radar-tooltip')?.style.opacity).toBe(
-        '0',
-      );
+      expect(
+        document.getElementById('custom-radar-tooltip')?.style.opacity,
+      ).toBe('0');
 
       external({
-        chart: { canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) } },
+        chart: {
+          canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) },
+        },
         tooltip: { opacity: 1, caretX: 10, caretY: 20, dataPoints: [] },
       });
 
       external({
-        chart: { canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) } },
+        chart: {
+          canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) },
+        },
         tooltip: {
           opacity: 1,
           caretX: 10,
@@ -293,14 +304,13 @@ describe('RadarChart more residual branches', () => {
     if (typeof gen === 'function') {
       const labels = gen({
         data: {
-          datasets: [
-            { label: '系列A超级超级超级长标签文字' },
-            { label: '短' },
-          ],
+          datasets: [{ label: '系列A超级超级超级长标签文字' }, { label: '短' }],
         },
         isDatasetVisible: () => true,
       });
-      expect(Array.isArray(labels) || labels === null || labels === undefined).toBe(true);
+      expect(
+        Array.isArray(labels) || labels === null || labels === undefined,
+      ).toBe(true);
     }
     const external = (globalThis as any).__radarMoreOptions?.plugins?.tooltip
       ?.external;

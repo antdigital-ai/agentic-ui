@@ -202,9 +202,7 @@ describe('TitleInfo 分支覆盖', () => {
           collapse={false}
           isFinished
           setCollapse={vi.fn()}
-          titleExtraRender={(dom) => (
-            <div data-testid="extra-wrap">{dom}</div>
-          )}
+          titleExtraRender={(dom) => <div data-testid="extra-wrap">{dom}</div>}
         />
       </I18nContext.Provider>,
     );

@@ -266,7 +266,11 @@ describe('htmlUrlSafety branches', () => {
           properties: { className: ['a', 'b'] as unknown as string },
           children: [
             { type: 'text', value: 'hi' },
-            { type: 'element', tagName: 'span', children: [{ type: 'text', value: 'x' }] },
+            {
+              type: 'element',
+              tagName: 'span',
+              children: [{ type: 'text', value: 'x' }],
+            },
             { type: 'comment' as any },
           ],
         }),

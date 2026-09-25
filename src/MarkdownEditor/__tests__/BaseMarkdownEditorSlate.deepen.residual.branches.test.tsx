@@ -2,7 +2,13 @@
  * BaseMarkdownEditorSlate deepen residual：plugin remount 失败、jinja 组合、comment/toc 分支。
  */
 import '@testing-library/jest-dom';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { MarkdownEditorPlugin } from '../plugin';
@@ -14,7 +20,9 @@ const mocks = vi.hoisted(() => ({
 }));
 
 let slateEditorProps: Record<string, any> = {};
-let mockEditorChildren: any[] = [{ type: 'paragraph', children: [{ text: 'hello' }] }];
+let mockEditorChildren: any[] = [
+  { type: 'paragraph', children: [{ text: 'hello' }] },
+];
 
 const mockEditor = {
   get children() {
@@ -24,7 +32,10 @@ const mockEditor = {
 };
 
 vi.mock('../Hooks/useDebounceFn', () => ({
-  useDebounceFn: (fn: (...args: any[]) => void) => ({ run: fn, cancel: vi.fn() }),
+  useDebounceFn: (fn: (...args: any[]) => void) => ({
+    run: fn,
+    cancel: vi.fn(),
+  }),
 }));
 
 vi.mock('../Hooks/useRefFunction', () => ({
@@ -38,7 +49,9 @@ vi.mock('../Config', () => ({
 vi.mock('../editor/Editor', () => ({
   SlateMarkdownEditor: (props: Record<string, any>) => {
     slateEditorProps = props;
-    return <div data-testid="slate-editor">{props.initSchemaValue?.length}</div>;
+    return (
+      <div data-testid="slate-editor">{props.initSchemaValue?.length}</div>
+    );
   },
 }));
 
@@ -149,8 +162,8 @@ vi.mock('../editor/store', () => {
 });
 
 import BaseMarkdownEditorSlate from '../BaseMarkdownEditorSlate';
-import { EditorUtils } from '../editor/utils/editorUtils';
 import { copy } from '../editor/utils';
+import { EditorUtils } from '../editor/utils/editorUtils';
 
 describe('BaseMarkdownEditorSlate deepen residual branches', () => {
   beforeEach(() => {
@@ -168,8 +181,14 @@ describe('BaseMarkdownEditorSlate deepen residual branches', () => {
 
   it('plugin remount：copy 失败时不保留 schema', async () => {
     mocks.copyThrows = true;
-    const p1: MarkdownEditorPlugin = { withEditorKey: 'a', withEditor: (e) => e };
-    const p2: MarkdownEditorPlugin = { withEditorKey: 'b', withEditor: (e) => e };
+    const p1: MarkdownEditorPlugin = {
+      withEditorKey: 'a',
+      withEditor: (e) => e,
+    };
+    const p2: MarkdownEditorPlugin = {
+      withEditorKey: 'b',
+      withEditor: (e) => e,
+    };
     const { rerender } = render(
       <BaseMarkdownEditorSlate initValue="x" plugins={[p1]} />,
     );
@@ -180,8 +199,14 @@ describe('BaseMarkdownEditorSlate deepen residual branches', () => {
 
   it('plugin remount：preservedSchema 空数组时不 reset', async () => {
     mockEditorChildren = [];
-    const p1: MarkdownEditorPlugin = { withEditorKey: 'e1', withEditor: (e) => e };
-    const p2: MarkdownEditorPlugin = { withEditorKey: 'e2', withEditor: (e) => e };
+    const p1: MarkdownEditorPlugin = {
+      withEditorKey: 'e1',
+      withEditor: (e) => e,
+    };
+    const p2: MarkdownEditorPlugin = {
+      withEditorKey: 'e2',
+      withEditor: (e) => e,
+    };
     const { rerender } = render(
       <BaseMarkdownEditorSlate initValue="x" plugins={[p1]} />,
     );
@@ -190,7 +215,10 @@ describe('BaseMarkdownEditorSlate deepen residual branches', () => {
   });
 
   it('jinja 插件无 jinjaConfig 时仍启用 templatePanel', () => {
-    const plugin: MarkdownEditorPlugin = { jinja: true, withEditorKey: 'j' } as any;
+    const plugin: MarkdownEditorPlugin = {
+      jinja: true,
+      withEditorKey: 'j',
+    } as any;
     render(<BaseMarkdownEditorSlate initValue="{{ x }}" plugins={[plugin]} />);
     expect(screen.getByTestId('jinja-panel')).toBeInTheDocument();
   });
@@ -251,7 +279,10 @@ describe('BaseMarkdownEditorSlate deepen residual branches', () => {
 
   it('toolBar.enable 非 true 时不渲染 toolbar', () => {
     render(
-      <BaseMarkdownEditorSlate initValue="" toolBar={{ enable: false as any }} />,
+      <BaseMarkdownEditorSlate
+        initValue=""
+        toolBar={{ enable: false as any }}
+      />,
     );
     expect(screen.queryByTestId('toolbar')).not.toBeInTheDocument();
   });
@@ -266,7 +297,9 @@ describe('BaseMarkdownEditorSlate deepen residual branches', () => {
   it('debounced schema：toc 开启时 onChange 触发 debounce', async () => {
     const onChange = vi.fn();
     render(<BaseMarkdownEditorSlate initValue="# t" onChange={onChange} toc />);
-    slateEditorProps.onChange?.('md', [{ type: 'head', children: [{ text: 'H' }] }]);
+    slateEditorProps.onChange?.('md', [
+      { type: 'head', children: [{ text: 'H' }] },
+    ]);
     expect(onChange).toHaveBeenCalled();
     await act(async () => {
       vi.advanceTimersByTime(250);

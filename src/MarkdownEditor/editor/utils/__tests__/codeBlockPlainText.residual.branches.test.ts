@@ -32,7 +32,11 @@ describe('codeBlockPlainText residual branches', () => {
       } as any),
     ).toBe('fallback');
     expect(
-      getSlateElementPlainText({ __throw: true, children: [], value: 'x' } as any),
+      getSlateElementPlainText({
+        __throw: true,
+        children: [],
+        value: 'x',
+      } as any),
     ).toBe('x');
     expect(getSlateElementPlainText({ value: 1 as any })).toBe('');
   });

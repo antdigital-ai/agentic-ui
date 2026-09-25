@@ -1,8 +1,8 @@
 import { createEditor, Editor } from 'slate';
 import { describe, expect, it } from 'vitest';
-import { withAgenticLists } from '../withAgenticLists';
 import { createListFromToolbar } from '../createListFromToolbar';
 import { ListType } from '../types';
+import { withAgenticLists } from '../withAgenticLists';
 
 describe('createListFromToolbar 分支覆盖', () => {
   it('istanbul one-miss: selection 为 null 时早退', () => {
@@ -55,9 +55,7 @@ describe('createListFromToolbar 分支覆盖', () => {
         children: [
           {
             type: 'list-item',
-            children: [
-              { type: 'paragraph', children: [{ text: 'item' }] },
-            ],
+            children: [{ type: 'paragraph', children: [{ text: 'item' }] }],
           },
         ],
       },

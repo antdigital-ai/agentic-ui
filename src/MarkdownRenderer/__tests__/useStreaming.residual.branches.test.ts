@@ -66,16 +66,12 @@ describe('useStreaming residual branches', () => {
   });
 
   it('图片半开括号暂缓', () => {
-    const { result } = renderHook(() =>
-      useStreaming('![alt](https://x', true),
-    );
+    const { result } = renderHook(() => useStreaming('![alt](https://x', true));
     expect(result.current).toBe('...');
   });
 
   it('链接半开括号直接输出', () => {
-    const { result } = renderHook(() =>
-      useStreaming('[lab](https://x', true),
-    );
+    const { result } = renderHook(() => useStreaming('[lab](https://x', true));
     expect(result.current).toBe('[lab](https://x');
   });
 

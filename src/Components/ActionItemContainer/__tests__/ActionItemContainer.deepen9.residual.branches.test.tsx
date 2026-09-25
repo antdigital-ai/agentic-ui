@@ -66,11 +66,16 @@ describe('ActionItemContainer deepen9 residual branches', () => {
     const { container } = wrap(
       <ActionItemContainer>{items}</ActionItemContainer>,
     );
-    const scroll = (container.querySelector(
-      '[class*="overflow-container"]',
-    ) || container.firstElementChild) as HTMLElement;
-    Object.defineProperty(scroll, 'scrollWidth', { value: 800, configurable: true });
-    Object.defineProperty(scroll, 'clientWidth', { value: 200, configurable: true });
+    const scroll = (container.querySelector('[class*="overflow-container"]') ||
+      container.firstElementChild) as HTMLElement;
+    Object.defineProperty(scroll, 'scrollWidth', {
+      value: 800,
+      configurable: true,
+    });
+    Object.defineProperty(scroll, 'clientWidth', {
+      value: 200,
+      configurable: true,
+    });
     fireEvent.pointerDown(scroll, {
       button: 0,
       clientX: 100,

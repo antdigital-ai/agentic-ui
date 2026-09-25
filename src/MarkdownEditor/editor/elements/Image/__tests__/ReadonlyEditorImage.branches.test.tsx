@@ -163,8 +163,7 @@ describe('ReadonlyEditorImage 分支覆盖', () => {
         }
       />,
     );
-    const probeImg =
-      imgs.find((img) => !document.contains(img)) ?? imgs[0];
+    const probeImg = imgs.find((img) => !document.contains(img)) ?? imgs[0];
     await act(async () => {
       probeImg?.onload?.({} as Event);
     });

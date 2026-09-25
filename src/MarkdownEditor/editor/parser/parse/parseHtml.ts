@@ -482,9 +482,7 @@ const handleBlockHtml = (
   if (blockOnlyMarkMatch) {
     const innerMd = blockOnlyMarkMatch[1];
     // 提取 mark 标签属性：color、bg、label
-    const tagAttrs = currentElement.value.match(
-      /^<mark([^>]*)>/i,
-    );
+    const tagAttrs = currentElement.value.match(/^<mark([^>]*)>/i);
     const attrStr = tagAttrs?.[1] || '';
     const colorMatch = attrStr.match(/\bcolor\s*=\s*["']([^"']*)["']/i);
     const bgMatch = attrStr.match(/\bbg\s*=\s*["']([^"']*)["']/i);

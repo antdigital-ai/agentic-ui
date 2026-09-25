@@ -101,7 +101,9 @@ describe('Workspace index deepen4 residual branches', () => {
 
   it('空 Workspace 渲染 emptyContent', () => {
     wrap(
-      <Workspace emptyContent={<div data-testid="empty">e</div>}>{null}</Workspace>,
+      <Workspace emptyContent={<div data-testid="empty">e</div>}>
+        {null}
+      </Workspace>,
     );
     expect(screen.getByTestId('empty')).toBeInTheDocument();
   });

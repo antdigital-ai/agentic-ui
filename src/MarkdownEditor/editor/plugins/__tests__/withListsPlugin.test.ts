@@ -28,9 +28,7 @@ describe('withListsPlugin', () => {
       },
     ] as any;
 
-    expect(() =>
-      editor.normalizeNode([editor.children[0], [0]]),
-    ).not.toThrow();
+    expect(() => editor.normalizeNode([editor.children[0], [0]])).not.toThrow();
   });
 
   it('should wrap bare text child of list-item in list-item-text', () => {

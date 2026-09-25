@@ -4,14 +4,27 @@ import { describe, expect, it, vi } from 'vitest';
 import { ReadonlySchema } from '../ReadonlySchema';
 
 const editorProps = vi.hoisted(() => ({ current: {} as any }));
-vi.mock('../../../store', () => ({ useEditorStore: () => ({ editorProps: editorProps.current }) }));
-vi.mock('../../../../../Schema', () => ({ SchemaRenderer: () => <div data-testid="schema-renderer" /> }));
+vi.mock('../../../store', () => ({
+  useEditorStore: () => ({ editorProps: editorProps.current }),
+}));
+vi.mock('../../../../../Schema', () => ({
+  SchemaRenderer: () => <div data-testid="schema-renderer" />,
+}));
 
 describe('ReadonlySchema residual branches', () => {
   it('renders agentar schemas and falls back when custom rendering returns undefined', () => {
     editorProps.current = { codeProps: { render: () => undefined } };
     render(
-      <ReadonlySchema attributes={{}} element={{ type: 'schema', language: 'agentar-card', value: { initialValues: {} } } as any}>
+      <ReadonlySchema
+        attributes={{}}
+        element={
+          {
+            type: 'schema',
+            language: 'agentar-card',
+            value: { initialValues: {} },
+          } as any
+        }
+      >
         hidden
       </ReadonlySchema>,
     );
@@ -19,8 +32,21 @@ describe('ReadonlySchema residual branches', () => {
   });
 
   it('falls back to default JSON when custom rendering throws', () => {
-    editorProps.current = { codeProps: { render: () => { throw new Error('bad'); } } };
-    render(<ReadonlySchema attributes={{}} element={{ type: 'schema', value: { a: 1 } } as any}>hidden</ReadonlySchema>);
+    editorProps.current = {
+      codeProps: {
+        render: () => {
+          throw new Error('bad');
+        },
+      },
+    };
+    render(
+      <ReadonlySchema
+        attributes={{}}
+        element={{ type: 'schema', value: { a: 1 } } as any}
+      >
+        hidden
+      </ReadonlySchema>,
+    );
     expect(screen.getByText(/"a": 1/)).toBeInTheDocument();
   });
 

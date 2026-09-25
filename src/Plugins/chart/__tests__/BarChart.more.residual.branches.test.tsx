@@ -214,9 +214,9 @@ describe('BarChart more residual branches', () => {
         theme="light"
       />,
     );
-    expect(
-      (globalThis as any).__barMoreData?.datasets?.length,
-    ).toBeGreaterThan(0);
+    expect((globalThis as any).__barMoreData?.datasets?.length).toBeGreaterThan(
+      0,
+    );
   });
 
   it('borderColor 回调：indexAxis x/y + 发散色单色/双色数组', () => {
@@ -295,7 +295,8 @@ describe('BarChart more residual branches', () => {
         title="grad"
       />,
     );
-    const bg = (globalThis as any).__barMoreData?.datasets?.[0]?.backgroundColor;
+    const bg = (globalThis as any).__barMoreData?.datasets?.[0]
+      ?.backgroundColor;
     expect(typeof bg).toBe('function');
     expect(
       bg({
@@ -467,7 +468,8 @@ describe('BarChart more residual branches', () => {
     act(() => {
       window.dispatchEvent(new Event('resize'));
     });
-    const bg = (globalThis as any).__barMoreData?.datasets?.[0]?.backgroundColor;
+    const bg = (globalThis as any).__barMoreData?.datasets?.[0]
+      ?.backgroundColor;
     if (typeof bg === 'function') {
       expect(bg(chartCtx({ x: -5, y: 0 }, 'y'))).toBeTruthy();
       expect(bg(chartCtx({ x: 8, y: 0 }, 'y'))).toBeTruthy();

@@ -38,9 +38,7 @@ describe('astExtract residual branches', () => {
   it('extractTableData：空表/无表头/跳过无 children 行/越界单元格', () => {
     expect(extractTableData(null, noCn)).toBeNull();
     expect(extractTableData({ children: [] }, noCn)).toBeNull();
-    expect(
-      extractTableData({ children: [{ children: [] }] }, noCn),
-    ).toBeNull();
+    expect(extractTableData({ children: [{ children: [] }] }, noCn)).toBeNull();
 
     const table = {
       children: [
@@ -74,9 +72,7 @@ describe('astExtract residual branches', () => {
     expect(extractChildrenText(3)).toBe('3');
     expect(extractChildrenText(['a', 1])).toBe('a1');
     expect(
-      extractChildrenText(
-        React.createElement('span', null, 'nested'),
-      ),
+      extractChildrenText(React.createElement('span', null, 'nested')),
     ).toBe('nested');
     expect(extractChildrenText(null)).toBe('');
     const cn = vi.fn().mockReturnValue(null);

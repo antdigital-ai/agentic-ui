@@ -151,7 +151,10 @@ describe('AIBubble deepen residual branches', () => {
       <AIBubble
         {...baseProps({
           preMessage: { role: 'user', id: 'p' } as any,
-          originData: origin({ id: undefined as any, createAt: undefined as any }),
+          originData: origin({
+            id: undefined as any,
+            createAt: undefined as any,
+          }),
           avatar: { title: 'Fallback' },
           time: 88,
         })}
@@ -195,7 +198,9 @@ describe('AIBubble deepen residual branches', () => {
     fireEvent.click(screen.getByTestId('dislike-legacy-btn'));
     await Promise.resolve();
     expect(onDisLike).toHaveBeenCalled();
-    expect(setMessageItem).toHaveBeenCalledWith('m1', { feedback: 'thumbsDown' });
+    expect(setMessageItem).toHaveBeenCalledWith('m1', {
+      feedback: 'thumbsDown',
+    });
   });
 
   it('custom render 槽位 extraRender=false；shouldRenderBeforeContent bot 跳过', () => {

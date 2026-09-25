@@ -3,7 +3,13 @@
  * collapsed floating 点击、受控 floatingExpanded。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -69,7 +75,9 @@ describe('ToolUseBarThink deepen3 safe residual branches', () => {
     await act(async () => {
       vi.advanceTimersByTime(10);
     });
-    const floating = screen.getAllByTestId('tool-use-bar-think-floating-expand');
+    const floating = screen.getAllByTestId(
+      'tool-use-bar-think-floating-expand',
+    );
     fireEvent.click(floating[0]);
     expect(floating[0]).toBeInTheDocument();
   });

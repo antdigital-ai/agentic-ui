@@ -132,13 +132,14 @@ describe('handlePaste residual branches', () => {
         editor.selection,
       ),
     ).toBeTruthy();
-    expect(handleSpecialTextPaste(editor, 'plain', editor.selection)).toBeFalsy();
+    expect(
+      handleSpecialTextPaste(editor, 'plain', editor.selection),
+    ).toBeFalsy();
   });
 
   it('handleSlateMarkdownFragment：无效 JSON / card 节点', () => {
     const clip = {
-      getData: (t: string) =>
-        t.includes('slate') ? 'not-json' : '',
+      getData: (t: string) => (t.includes('slate') ? 'not-json' : ''),
     } as any;
     expect(handleSlateMarkdownFragment(editor, clip, null)).toBeFalsy();
 
@@ -146,7 +147,10 @@ describe('handlePaste residual branches', () => {
       getData: (t: string) =>
         t.includes('slate')
           ? JSON.stringify([
-              { type: 'card', children: [{ type: 'paragraph', children: [{ text: 'c' }] }] },
+              {
+                type: 'card',
+                children: [{ type: 'paragraph', children: [{ text: 'c' }] }],
+              },
               { text: 'leaf' },
             ])
           : '',
@@ -160,9 +164,7 @@ describe('handlePaste residual branches', () => {
     const emptyClip = {
       getData: () => '',
     } as DataTransfer;
-    expect(
-      await handleHtmlPaste(editor, emptyClip, {} as any),
-    ).toBeFalsy();
+    expect(await handleHtmlPaste(editor, emptyClip, {} as any)).toBeFalsy();
     const htmlClip = {
       getData: (type: string) => (type === 'text/html' ? '<p>x</p>' : ''),
     } as DataTransfer;
@@ -259,14 +261,9 @@ describe('handlePaste residual branches', () => {
   it('handlePlainTextPaste：关闭 markdown 解析；html 分支', async () => {
     mocks.isMarkdown.mockReturnValue(false);
     mocks.isHtml.mockReturnValue(true);
-    await handlePlainTextPaste(
-      editor,
-      '<p>h</p>',
-      null,
-      [] as any,
-      undefined,
-      { parseMarkdownInPlainText: true },
-    );
+    await handlePlainTextPaste(editor, '<p>h</p>', null, [] as any, undefined, {
+      parseMarkdownInPlainText: true,
+    });
     expect(mocks.insertParsedHtmlNodes).toHaveBeenCalled();
 
     mocks.isHtml.mockReturnValue(false);
@@ -315,12 +312,10 @@ describe('handlePaste residual branches', () => {
   });
 
   it('handleSpecialTextPaste：空串 / 普通文本', () => {
-    expect(handleSpecialTextPaste(editor, '', {} as any)).toBeTypeOf(
+    expect(handleSpecialTextPaste(editor, '', {} as any)).toBeTypeOf('boolean');
+    expect(handleSpecialTextPaste(editor, 'just text', {} as any)).toBeTypeOf(
       'boolean',
     );
-    expect(
-      handleSpecialTextPaste(editor, 'just text', {} as any),
-    ).toBeTypeOf('boolean');
   });
 
   it('shouldInsertTextDirectly：更多 DIRECT_INSERT 类型', () => {
@@ -381,12 +376,10 @@ describe('handlePaste residual branches', () => {
       getData: () => 'pasted-tag',
     } as any;
     expect(
-      handleTagNodePaste(
-        editor,
-        editor.selection as any,
-        clip,
-        { text: '', tag: true } as any,
-      ),
+      handleTagNodePaste(editor, editor.selection as any, clip, {
+        text: '',
+        tag: true,
+      } as any),
     ).toBe(true);
     expect(insertText).toHaveBeenCalled();
     insertText.mockRestore();
@@ -408,10 +401,9 @@ describe('handlePaste residual branches', () => {
   });
 
   it('exclusive deepen：files/html/fragment/special；direct insert 矩阵', async () => {
-    const upload = vi.fn().mockResolvedValue([
-      'https://cdn/a.png',
-      'https://cdn/b.txt',
-    ]);
+    const upload = vi
+      .fn()
+      .mockResolvedValue(['https://cdn/a.png', 'https://cdn/b.txt']);
     const img = new File(['x'], 'a.png', { type: 'image/png' });
     const txt = new File(['y'], 'b.txt', { type: 'text/plain' });
     const vid = new File(['z'], 'c.mp4', { type: 'video/mp4' });

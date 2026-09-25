@@ -130,9 +130,7 @@ export const useAutoCategory = (
   // 初始化：当存在多类目时，选中第一个有效类目
   React.useEffect(() => {
     if (autoCategoryData && !internalSelectedCategory) {
-      setInternalSelectedCategory(
-        autoCategoryData.categories[0] || '',
-      );
+      setInternalSelectedCategory(autoCategoryData.categories[0] || '');
     }
   }, [autoCategoryData, internalSelectedCategory]);
 

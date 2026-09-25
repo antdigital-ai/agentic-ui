@@ -12,6 +12,8 @@ describe('workspaceFileId.branches', () => {
     expect(fileIdOrTreeKeyToRelativePath('workspace:a/b.md')).toBe('a/b.md');
     expect(fileIdOrTreeKeyToRelativePath('workspace:')).toBeNull();
     expect(fileIdOrTreeKeyToRelativePath('file:a/b.md')).toBe('a/b.md');
-    expect(fileIdOrTreeKeyToRelativePath('plain/path.md')).toBe('plain/path.md');
+    expect(fileIdOrTreeKeyToRelativePath('plain/path.md')).toBe(
+      'plain/path.md',
+    );
   });
 });

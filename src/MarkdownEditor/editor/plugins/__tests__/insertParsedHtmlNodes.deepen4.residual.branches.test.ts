@@ -22,9 +22,8 @@ describe('insertParsedHtmlNodes deepen4 residual branches', () => {
   });
 
   it('空 html / 空 fragments：早退 false', async () => {
-    const { docxDeserializer } = await import(
-      '../../utils/docx/docxDeserializer'
-    );
+    const { docxDeserializer } =
+      await import('../../utils/docx/docxDeserializer');
     vi.mocked(docxDeserializer).mockReturnValueOnce([] as any);
     const editor = createEditor();
     editor.children = [{ type: 'paragraph', children: [{ text: '' }] }] as any;
@@ -33,13 +32,14 @@ describe('insertParsedHtmlNodes deepen4 residual branches', () => {
       focus: { path: [0, 0], offset: 0 },
     };
     const r = await insertParsedHtmlNodes(editor, '', {} as any, [0]);
-    expect(r === false || r === true || r === null || r === undefined).toBe(true);
+    expect(r === false || r === true || r === null || r === undefined).toBe(
+      true,
+    );
   });
 
   it('大批量节点：分段插入 select 条件', async () => {
-    const { docxDeserializer } = await import(
-      '../../utils/docx/docxDeserializer'
-    );
+    const { docxDeserializer } =
+      await import('../../utils/docx/docxDeserializer');
     const many = Array.from({ length: 60 }, (_, i) => ({
       type: 'paragraph',
       children: [{ text: `p${i}` }],
@@ -51,21 +51,16 @@ describe('insertParsedHtmlNodes deepen4 residual branches', () => {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [0, 0], offset: 0 },
     };
-    const r = await insertParsedHtmlNodes(
-      editor,
-      '<p>x</p>',
-      {} as any,
-      [0],
-      { select: true },
-    );
+    const r = await insertParsedHtmlNodes(editor, '<p>x</p>', {} as any, [0], {
+      select: true,
+    });
     expect(editor.children.length).toBeGreaterThan(0);
     expect(r === true || r === false).toBe(true);
   });
 
   it('selection 非 Range：走 path 插入', async () => {
-    const { docxDeserializer } = await import(
-      '../../utils/docx/docxDeserializer'
-    );
+    const { docxDeserializer } =
+      await import('../../utils/docx/docxDeserializer');
     vi.mocked(docxDeserializer).mockReturnValueOnce([
       { type: 'paragraph', children: [{ text: 'only' }] },
     ] as any);

@@ -13,7 +13,12 @@ describe('rehypeSanitizeUserHtml residual branches', () => {
           tagName: 'form',
           properties: {},
           children: [
-            { type: 'element', tagName: 'button', properties: {}, children: [{ type: 'text', value: 'ok' }] },
+            {
+              type: 'element',
+              tagName: 'button',
+              properties: {},
+              children: [{ type: 'text', value: 'ok' }],
+            },
           ],
         },
       ],
@@ -29,10 +34,19 @@ describe('rehypeSanitizeUserHtml residual branches', () => {
         {
           type: 'element',
           tagName: 'input',
-          properties: { type: 'checkbox', onclick: 'bad', href: 'javascript:bad' },
+          properties: {
+            type: 'checkbox',
+            onclick: 'bad',
+            href: 'javascript:bad',
+          },
           children: [],
         },
-        { type: 'element', tagName: 'input', properties: { type: 'text' }, children: [] },
+        {
+          type: 'element',
+          tagName: 'input',
+          properties: { type: 'text' },
+          children: [],
+        },
       ],
     };
     rehypeSanitizeUserHtml()(tree);

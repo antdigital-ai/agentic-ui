@@ -4,12 +4,20 @@ import { describe, expect, it, vi } from 'vitest';
 import { BubbleFileView } from '../FileView';
 
 vi.mock('../../MarkdownInputField/FileMapView', () => ({
-  FileMapView: (props: any) => <div data-testid="files">{props.renderMoreAction?.({ name: 'f' })}</div>,
+  FileMapView: (props: any) => (
+    <div data-testid="files">{props.renderMoreAction?.({ name: 'f' })}</div>
+  ),
 }));
 
 describe('BubbleFileView residual branches', () => {
   it('returns null for missing and empty file maps', () => {
-    const { container } = render(<BubbleFileView bubble={{ originData: {} } as any} placement="left" bubbleListRef={null} />);
+    const { container } = render(
+      <BubbleFileView
+        bubble={{ originData: {} } as any}
+        placement="left"
+        bubbleListRef={null}
+      />,
+    );
     expect(container).toBeEmptyDOMElement();
   });
 
@@ -17,18 +25,37 @@ describe('BubbleFileView residual branches', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const { rerender } = render(
       <BubbleFileView
-        bubble={{
-          originData: { fileMap: new Map([['f', { name: 'f' }]]) },
-          fileViewEvents: () => { throw new Error('ignored'); },
-          fileViewConfig: { renderFileMoreAction: () => (file: any) => <span>{file.name}</span> },
-        } as any}
+        bubble={
+          {
+            originData: { fileMap: new Map([['f', { name: 'f' }]]) },
+            fileViewEvents: () => {
+              throw new Error('ignored');
+            },
+            fileViewConfig: {
+              renderFileMoreAction: () => (file: any) => (
+                <span>{file.name}</span>
+              ),
+            },
+          } as any
+        }
         placement="right"
         bubbleListRef={null}
       />,
     );
     expect(screen.getByText('f')).toBeInTheDocument();
     expect(warn).toHaveBeenCalled();
-    rerender(<BubbleFileView bubble={{ originData: { fileMap: new Map([['f', {}]]) }, fileViewConfig: { renderFileMoreAction: false } } as any} placement="left" bubbleListRef={null} />);
+    rerender(
+      <BubbleFileView
+        bubble={
+          {
+            originData: { fileMap: new Map([['f', {}]]) },
+            fileViewConfig: { renderFileMoreAction: false },
+          } as any
+        }
+        placement="left"
+        bubbleListRef={null}
+      />,
+    );
     expect(screen.getByTestId('files')).toBeEmptyDOMElement();
     warn.mockRestore();
   });

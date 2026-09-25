@@ -27,10 +27,7 @@ describe('Suggestion deepen residual branches', () => {
 
   it('items 有数据时可打开', () => {
     render(
-      <Suggestion
-        items={[{ key: '1', label: 'One' }]}
-        open
-      >
+      <Suggestion items={[{ key: '1', label: 'One' }]} open>
         <button type="button">t</button>
       </Suggestion>,
     );

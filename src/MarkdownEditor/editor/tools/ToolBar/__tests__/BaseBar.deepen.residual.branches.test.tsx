@@ -25,7 +25,12 @@ vi.mock('../../InsertAutocomplete', () => ({
   getInsertOptions: () => [
     {
       children: [
-        { key: 'uploadImage', label: ['upload'], icon: 'U', task: 'uploadImage' },
+        {
+          key: 'uploadImage',
+          label: ['upload'],
+          icon: 'U',
+          task: 'uploadImage',
+        },
         { key: 'list', label: ['list'], icon: 'L', task: 'list' },
       ],
     },
@@ -78,8 +83,8 @@ vi.mock('../../../store', () => ({
   useEditorStore: vi.fn(),
 }));
 
-import { useToolBarLogic } from '../hooks/useToolBarLogic';
 import { Node } from 'slate';
+import { useToolBarLogic } from '../hooks/useToolBarLogic';
 
 const baseLogic = {
   highColor: null,

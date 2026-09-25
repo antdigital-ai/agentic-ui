@@ -163,8 +163,6 @@ describe('AceEditor deepen6 light residual branches', () => {
       await Promise.resolve();
       vi.advanceTimersByTime(20);
     });
-    expect(mockEd.session.setMode).toHaveBeenCalledWith(
-      'ace/mode/javascript',
-    );
+    expect(mockEd.session.setMode).toHaveBeenCalledWith('ace/mode/javascript');
   });
 });

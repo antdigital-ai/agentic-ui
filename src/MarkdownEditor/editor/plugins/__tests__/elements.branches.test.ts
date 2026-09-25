@@ -11,8 +11,13 @@ import {
 describe('markdown elements gated and dirt branches', () => {
   it('does not transform dirty formatted leaves', () => {
     const editor = createEditor();
-    editor.children = [{ type: 'paragraph', children: [{ text: '**bold**' }] }] as any;
-    editor.selection = { anchor: { path: [0, 0], offset: 8 }, focus: { path: [0, 0], offset: 8 } };
+    editor.children = [
+      { type: 'paragraph', children: [{ text: '**bold**' }] },
+    ] as any;
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 8 },
+      focus: { path: [0, 0], offset: 8 },
+    };
     const dirty = vi.spyOn(EditorUtils, 'isDirtLeaf').mockReturnValue(true);
     expect(
       MdElements.bold.run({
@@ -29,11 +34,25 @@ describe('markdown elements gated and dirt branches', () => {
 
   it('keeps repeated match delimiters and gates task/list transforms', () => {
     const editor = createEditor();
-    editor.children = [{ type: 'paragraph', children: [{ text: '***x***' }] }] as any;
-    editor.selection = { anchor: { path: [0, 0], offset: 7 }, focus: { path: [0, 0], offset: 7 } };
+    editor.children = [
+      { type: 'paragraph', children: [{ text: '***x***' }] },
+    ] as any;
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 7 },
+      focus: { path: [0, 0], offset: 7 },
+    };
     const insert = vi.spyOn(Transforms, 'insertNodes');
     const match = '***x***'.match(MdElements.bold.reg)!;
-    expect(MdElements.bold.run({ editor, path: [0], sel: editor.selection, match, el: editor.children[0], startText: '***x***' } as any)).toBe(false);
+    expect(
+      MdElements.bold.run({
+        editor,
+        path: [0],
+        sel: editor.selection,
+        match,
+        el: editor.children[0],
+        startText: '***x***',
+      } as any),
+    ).toBe(false);
     expect(MdElements.task.gatedByMatchInputToNode).toBe(true);
     expect(MdElements.list.gatedByMatchInputToNode).toBe(true);
     expect(insert).not.toHaveBeenCalled();

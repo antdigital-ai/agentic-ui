@@ -16,9 +16,8 @@ vi.mock('../AttachmentFileIcon', () => ({
 }));
 
 vi.mock('../../utils', async () => {
-  const actual = await vi.importActual<typeof import('../../utils')>(
-    '../../utils',
-  );
+  const actual =
+    await vi.importActual<typeof import('../../utils')>('../../utils');
   return {
     ...actual,
     isFileMetaPlaceholderState: (file: any) =>
@@ -86,7 +85,9 @@ describe('AttachmentFileListItem midtail branches', () => {
     const onDelete = vi.fn();
     wrap(
       <AttachmentFileListItem
-        file={{ name: 'c.pdf', status: 'done', size: 2048, url: 'https://x' } as any}
+        file={
+          { name: 'c.pdf', status: 'done', size: 2048, url: 'https://x' } as any
+        }
         onDelete={onDelete}
         onPreview={onPreview}
         prefixCls="att-item"

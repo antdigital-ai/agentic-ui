@@ -59,7 +59,9 @@ describe('ReadonlyMedia 分支覆盖', () => {
     vi.clearAllMocks();
     vi.spyOn(console, 'warn').mockImplementation(() => {});
     vi.mocked(domUtils.getMediaType).mockReturnValue('image');
-    vi.spyOn(htmlUrlSafety, 'shouldRenderUrlAsPlainText').mockReturnValue(false);
+    vi.spyOn(htmlUrlSafety, 'shouldRenderUrlAsPlainText').mockReturnValue(
+      false,
+    );
   });
 
   afterEach(() => {
@@ -69,7 +71,9 @@ describe('ReadonlyMedia 分支覆盖', () => {
   it('unsafe URL 渲染纯文本分支', () => {
     vi.spyOn(htmlUrlSafety, 'shouldRenderUrlAsPlainText').mockReturnValue(true);
     renderMedia({ ...baseElement, url: 'javascript:alert(1)' });
-    expect(screen.getByTestId('media-unsafe-url-plain-text')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('media-unsafe-url-plain-text'),
+    ).toBeInTheDocument();
     expect(screen.getByText('javascript:alert(1)')).toBeInTheDocument();
   });
 
@@ -90,7 +94,9 @@ describe('ReadonlyMedia 分支覆盖', () => {
         </TestSlateWrapper>
       </ConfigProvider>,
     );
-    expect(document.querySelector('.ant-skeleton-image')).not.toBeInTheDocument();
+    expect(
+      document.querySelector('.ant-skeleton-image'),
+    ).not.toBeInTheDocument();
   });
 
   it('audio finished=false 超时后显示链接文本', async () => {
@@ -197,7 +203,9 @@ describe('ReadonlyMedia 分支覆盖', () => {
     await act(async () => {
       await Promise.resolve();
     });
-    const inner = document.querySelector('[data-be="media-container"]') as HTMLElement;
+    const inner = document.querySelector(
+      '[data-be="media-container"]',
+    ) as HTMLElement;
     expect(inner.style.width).toBe('');
   });
 
@@ -303,7 +311,9 @@ describe('ReadonlyMedia 分支覆盖', () => {
     await act(async () => {
       vi.advanceTimersByTime(5000);
     });
-    expect(screen.getByText('https://example.com/pending.png')).toBeInTheDocument();
+    expect(
+      screen.getByText('https://example.com/pending.png'),
+    ).toBeInTheDocument();
     vi.useRealTimers();
   });
 
@@ -336,7 +346,9 @@ describe('ReadonlyMedia 分支覆盖', () => {
     await act(async () => {
       await Promise.resolve();
     });
-    expect(document.querySelector('[data-be="media-container"]')).toBeInTheDocument();
+    expect(
+      document.querySelector('[data-be="media-container"]'),
+    ).toBeInTheDocument();
   });
 
   it('video finished=false 超时后展示 url 文案', async () => {
@@ -351,7 +363,9 @@ describe('ReadonlyMedia 分支覆盖', () => {
     await act(async () => {
       vi.advanceTimersByTime(5000);
     });
-    expect(screen.getByText('https://example.com/pending.mp4')).toBeInTheDocument();
+    expect(
+      screen.getByText('https://example.com/pending.mp4'),
+    ).toBeInTheDocument();
     vi.useRealTimers();
   });
 

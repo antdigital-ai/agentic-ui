@@ -8,9 +8,11 @@ import { useOnchange } from '../useOnchange';
 
 const { storeState } = vi.hoisted(() => ({
   storeState: {
-    setRefreshFloatBar: vi.fn((updater?: boolean | ((prev: boolean) => boolean)) => {
-      if (typeof updater === 'function') updater(false);
-    }),
+    setRefreshFloatBar: vi.fn(
+      (updater?: boolean | ((prev: boolean) => boolean)) => {
+        if (typeof updater === 'function') updater(false);
+      },
+    ),
     bumpFloatBarRevision: undefined as undefined | ReturnType<typeof vi.fn>,
     setDomRect: vi.fn(),
     readonly: false,
@@ -69,8 +71,8 @@ describe('useOnchange deepen residual branches', () => {
       configurable: true,
       value: vi.fn(() => ({ getRangeAt })),
     });
-    vi.spyOn(Editor, 'nodes').mockImplementation(() =>
-      [[{ type: 'paragraph' }, [0, 0]]] as any,
+    vi.spyOn(Editor, 'nodes').mockImplementation(
+      () => [[{ type: 'paragraph' }, [0, 0]]] as any,
     );
     const { result } = renderHook(() => useOnchange());
     result.current([], [{ type: 'set_selection' } as any]);
@@ -94,8 +96,8 @@ describe('useOnchange deepen residual branches', () => {
       anchor: { path: [0, 0], offset: 1 },
       focus: { path: [0, 0], offset: 1 },
     };
-    vi.spyOn(Editor, 'nodes').mockImplementation(() =>
-      [[{ type: 'paragraph' }, [0, 0]]] as any,
+    vi.spyOn(Editor, 'nodes').mockImplementation(
+      () => [[{ type: 'paragraph' }, [0, 0]]] as any,
     );
     const { result } = renderHook(() => useOnchange());
     result.current([], [{ type: 'set_selection' } as any]);
@@ -103,8 +105,8 @@ describe('useOnchange deepen residual branches', () => {
   });
 
   it('code 节点忽略 floatBar；自定义 wait 仍触发 onChange', () => {
-    vi.spyOn(Editor, 'nodes').mockImplementation(() =>
-      [[{ type: 'code' }, [0, 0]]] as any,
+    vi.spyOn(Editor, 'nodes').mockImplementation(
+      () => [[{ type: 'code' }, [0, 0]]] as any,
     );
     const onChange = vi.fn();
     const { result } = renderHook(() => useOnchange(onChange, { wait: 50 }));
@@ -130,8 +132,8 @@ describe('useOnchange deepen residual branches', () => {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [1, 0], offset: 0 },
     };
-    vi.spyOn(Editor, 'nodes').mockImplementation(() =>
-      [[{ type: 'paragraph' }, [0, 0]]] as any,
+    vi.spyOn(Editor, 'nodes').mockImplementation(
+      () => [[{ type: 'paragraph' }, [0, 0]]] as any,
     );
     const { result } = renderHook(() => useOnchange());
     result.current([], [{ type: 'set_selection' } as any]);

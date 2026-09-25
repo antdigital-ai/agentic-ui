@@ -55,12 +55,7 @@ export const withSanitizeInvalidChildren = (editor: Editor) => {
     if (!Editor.isEditor(node) && !Text.isText(node)) {
       const rawChildren = (node as { children?: unknown }).children;
       if (!Array.isArray(rawChildren)) {
-        normalizeElementMissingChildrenArray(
-          editor,
-          node,
-          path,
-          normalizeNode,
-        );
+        normalizeElementMissingChildrenArray(editor, node, path, normalizeNode);
         return;
       }
     }

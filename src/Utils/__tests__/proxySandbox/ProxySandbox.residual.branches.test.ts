@@ -42,7 +42,14 @@ describe('ProxySandbox residual branches', () => {
   it.skip('strictMode 与 allowedGlobals 白名单', async () => {
     sandbox = new ProxySandbox({
       strictMode: true,
-      allowedGlobals: ['Object', 'Array', 'Number', 'String', 'Boolean', 'Math'],
+      allowedGlobals: [
+        'Object',
+        'Array',
+        'Number',
+        'String',
+        'Boolean',
+        'Math',
+      ],
     });
     const result = await sandbox.execute('return Math.max(1,2)');
     expect(result.success).toBe(true);

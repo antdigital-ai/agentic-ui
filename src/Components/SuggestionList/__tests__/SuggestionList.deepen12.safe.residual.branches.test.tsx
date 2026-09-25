@@ -38,10 +38,7 @@ describe('SuggestionList deepen12 safe residual branches', () => {
     const onItemClick = vi.fn();
     wrap(
       <SuggestionList
-        items={[
-          { text: 'A', disabled: true },
-          { text: 'B' },
-        ]}
+        items={[{ text: 'A', disabled: true }, { text: 'B' }]}
         onItemClick={onItemClick}
       />,
     );

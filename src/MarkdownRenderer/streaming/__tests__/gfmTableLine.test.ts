@@ -24,8 +24,6 @@ describe('isGfmTableLine', () => {
 
 describe('endsInsideGfmTable', () => {
   it('treats a pipe-less table row as an active streaming table tail', () => {
-    expect(endsInsideGfmTable('name | value\n--- | ---\nalpha | 1')).toBe(
-      true,
-    );
+    expect(endsInsideGfmTable('name | value\n--- | ---\nalpha | 1')).toBe(true);
   });
 });

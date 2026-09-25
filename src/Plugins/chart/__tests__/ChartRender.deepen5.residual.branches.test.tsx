@@ -169,7 +169,7 @@ describe('ChartRender deepen5 residual branches', () => {
     });
   });
 
-  it('descriptions：列 title 空串仍映射 label ||\'\'', async () => {
+  it("descriptions：列 title 空串仍映射 label ||''", async () => {
     wrap(
       <ChartRender
         chartType="descriptions"
@@ -201,9 +201,9 @@ describe('ChartRender deepen5 residual branches', () => {
       />,
     );
     await waitFor(() => {
-      expect(runtimeProps.histogram.length + runtimeProps.bar.length).toBeGreaterThanOrEqual(
-        0,
-      );
+      expect(
+        runtimeProps.histogram.length + runtimeProps.bar.length,
+      ).toBeGreaterThanOrEqual(0);
     });
 
     cleanup();

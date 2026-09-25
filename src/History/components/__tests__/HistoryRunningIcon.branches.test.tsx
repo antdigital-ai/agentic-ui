@@ -4,21 +4,20 @@
 import { render } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
-import { HistoryRunningIcon, HistoryRunningIconContainer } from '../HistoryRunningIcon';
+import {
+  HistoryRunningIcon,
+  HistoryRunningIconContainer,
+} from '../HistoryRunningIcon';
 
 describe('HistoryRunningIcon branches', () => {
   it('默认动画注入 keyframes', () => {
     const { container } = render(<HistoryRunningIcon />);
     expect(container.querySelector('svg')).toBeTruthy();
-    expect(
-      document.querySelector('[data-history-running-icon]'),
-    ).toBeTruthy();
+    expect(document.querySelector('[data-history-running-icon]')).toBeTruthy();
   });
 
   it('animated false 不旋转', () => {
-    const { container } = render(
-      <HistoryRunningIcon animated={false} />,
-    );
+    const { container } = render(<HistoryRunningIcon animated={false} />);
     const svg = container.querySelector('svg') as SVGElement;
     expect(svg.style.animation).toBeFalsy();
   });

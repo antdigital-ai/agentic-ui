@@ -20,7 +20,10 @@ describe('applyTableMinSizeToSchema residual branches', () => {
               {
                 type: 'table-head',
                 children: [
-                  { type: 'table-row', children: [{ type: 'table-cell', children: [] }] },
+                  {
+                    type: 'table-row',
+                    children: [{ type: 'table-cell', children: [] }],
+                  },
                 ],
               },
             ],
@@ -32,7 +35,9 @@ describe('applyTableMinSizeToSchema residual branches', () => {
     const table = schema[0].children[0];
     expect(table.children[0].children[0].children).toHaveLength(3);
     expect(table.children).toHaveLength(3);
-    expect(table.children.slice(1).every((row: any) => row.children.length === 3)).toBe(true);
+    expect(
+      table.children.slice(1).every((row: any) => row.children.length === 3),
+    ).toBe(true);
   });
 
   it('table-footer / 无 children / config 早退', () => {
@@ -48,7 +53,10 @@ describe('applyTableMinSizeToSchema residual branches', () => {
           {
             type: 'table-footer',
             children: [
-              { type: 'table-row', children: [{ type: 'table-cell', children: [] }] },
+              {
+                type: 'table-row',
+                children: [{ type: 'table-cell', children: [] }],
+              },
               { type: 'paragraph', children: [] },
             ],
           },

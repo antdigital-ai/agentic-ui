@@ -68,7 +68,9 @@ describe('ReadonlyTableComponent deepen2 residual', () => {
   const wrap = (ui: React.ReactNode, locale: any = null) =>
     render(
       <ConfigProvider>
-        <I18nContext.Provider value={{ locale } as any}>{ui}</I18nContext.Provider>
+        <I18nContext.Provider value={{ locale } as any}>
+          {ui}
+        </I18nContext.Provider>
       </ConfigProvider>,
     );
 
@@ -85,8 +87,11 @@ describe('ReadonlyTableComponent deepen2 residual', () => {
     expect(screen.getByTitle('复制')).toBeInTheDocument();
     fireEvent.click(screen.getByTitle('全屏'));
     expect(await screen.findByText('预览表格')).toBeInTheDocument();
-    const modalBody = document.querySelector('.ant-modal-body') || document.body;
-    fireEvent.mouseDown(modalBody.querySelector('[class*="md-table"]') || modalBody);
+    const modalBody =
+      document.querySelector('.ant-modal-body') || document.body;
+    fireEvent.mouseDown(
+      modalBody.querySelector('[class*="md-table"]') || modalBody,
+    );
     fireEvent.doubleClick(modalBody);
     fireEvent.click(document.body);
   });
@@ -128,7 +133,9 @@ describe('ReadonlyTableComponent deepen2 residual', () => {
 
     cleanup();
     vi.mocked(editorStore.useEditorStore).mockReturnValue({
-      editorProps: { tableConfig: { actions: { copy: 'html', fullScreen: false } } },
+      editorProps: {
+        tableConfig: { actions: { copy: 'html', fullScreen: false } },
+      },
     } as any);
     wrap(
       <ReadonlyTableComponent element={tableElement as any} baseCls="md-table">

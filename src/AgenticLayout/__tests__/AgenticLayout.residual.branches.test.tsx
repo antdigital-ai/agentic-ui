@@ -30,7 +30,11 @@ describe('AgenticLayout residual branches', () => {
           left={<div>L</div>}
           center={<div>C</div>}
           right={<div>R</div>}
-          header={{ title: 'Hdr', leftCollapsible: true, rightCollapsible: true }}
+          header={{
+            title: 'Hdr',
+            leftCollapsible: true,
+            rightCollapsible: true,
+          }}
         />
       </ConfigProvider>,
     );
@@ -43,7 +47,11 @@ describe('AgenticLayout residual branches', () => {
   it('无 header 时仍渲染三栏', () => {
     render(
       <ConfigProvider>
-        <AgenticLayout left={<span>A</span>} center={<span>B</span>} right={<span>C</span>} />
+        <AgenticLayout
+          left={<span>A</span>}
+          center={<span>B</span>}
+          right={<span>C</span>}
+        />
       </ConfigProvider>,
     );
     expect(screen.getByText('A')).toBeInTheDocument();

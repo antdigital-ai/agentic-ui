@@ -89,15 +89,13 @@ describe('chart/index deepen residual branches', () => {
   it('末行 keys 不一致时丢弃最后一行', () => {
     render(
       <ChartElement
-        element={
-          baseElement({
-            dataSource: [
-              { name: 'A', value: 1 },
-              { name: 'B', value: 2 },
-              { extra: 'only' },
-            ],
-          })
-        }
+        element={baseElement({
+          dataSource: [
+            { name: 'A', value: 1 },
+            { name: 'B', value: 2 },
+            { extra: 'only' },
+          ],
+        })}
         attributes={{ 'data-slate-node': 'element' } as any}
       >
         <span />
@@ -109,22 +107,20 @@ describe('chart/index deepen residual branches', () => {
   it('subgraphBy 分组渲染多图；空组返回 null', () => {
     render(
       <ChartElement
-        element={
-          baseElement({
-            dataSource: [
-              { name: 'A', value: 1, group: 'G1' },
-              { name: 'B', value: 2, group: 'G2' },
-            ],
-            config: [
-              {
-                chartType: 'line',
-                x: 'name',
-                y: 'value',
-                subgraphBy: 'group',
-              },
-            ],
-          })
-        }
+        element={baseElement({
+          dataSource: [
+            { name: 'A', value: 1, group: 'G1' },
+            { name: 'B', value: 2, group: 'G2' },
+          ],
+          config: [
+            {
+              chartType: 'line',
+              x: 'name',
+              y: 'value',
+              subgraphBy: 'group',
+            },
+          ],
+        })}
         attributes={{ 'data-slate-node': 'element' } as any}
       >
         <span />
@@ -140,12 +136,10 @@ describe('chart/index deepen residual branches', () => {
   it('numberString 解析本地化数字与日期字段', () => {
     render(
       <ChartElement
-        element={
-          baseElement({
-            dataSource: [{ name: '2024-01-15', value: '1,234.5' }],
-            config: [{ chartType: 'bar', x: 'name', y: 'value' }],
-          })
-        }
+        element={baseElement({
+          dataSource: [{ name: '2024-01-15', value: '1,234.5' }],
+          config: [{ chartType: 'bar', x: 'name', y: 'value' }],
+        })}
         attributes={{ 'data-slate-node': 'element' } as any}
       >
         <span />
@@ -203,14 +197,12 @@ describe('chart/index deepen residual branches', () => {
     });
     render(
       <ChartElement
-        element={
-          baseElement({
-            config: [
-              { chartType: 'bar', x: 'name', y: 'value' },
-              { chartType: 'line', x: 'name', y: 'value' },
-            ],
-          })
-        }
+        element={baseElement({
+          config: [
+            { chartType: 'bar', x: 'name', y: 'value' },
+            { chartType: 'line', x: 'name', y: 'value' },
+          ],
+        })}
         attributes={{ 'data-slate-node': 'element' } as any}
       >
         <span />

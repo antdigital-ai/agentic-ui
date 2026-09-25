@@ -12,7 +12,10 @@ describe('LazyElement 分支覆盖', () => {
   beforeEach(() => {
     observe = vi.fn();
     disconnect = vi.fn();
-    ObserverCtor = vi.fn(function (this: any, cb: IntersectionObserverCallback) {
+    ObserverCtor = vi.fn(function (
+      this: any,
+      cb: IntersectionObserverCallback,
+    ) {
       this.cb = cb;
       this.observe = observe;
       this.disconnect = disconnect;

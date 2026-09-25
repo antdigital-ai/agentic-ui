@@ -2,7 +2,13 @@
  * BaseMarkdownEditorSlate deepen2：reset 失败、onBlur 触发、reportMode floatBar、commentList 纯净。
  */
 import '@testing-library/jest-dom';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { MarkdownEditorPlugin } from '../plugin';
@@ -171,9 +177,7 @@ describe('BaseMarkdownEditorSlate deepen2 residual branches', () => {
     mocks.resetThrows = false;
     vi.clearAllMocks();
     vi.useFakeTimers({ shouldAdvanceTime: true });
-    mockEditorChildren = [
-      { type: 'paragraph', children: [{ text: 'hello' }] },
-    ];
+    mockEditorChildren = [{ type: 'paragraph', children: [{ text: 'hello' }] }];
   });
 
   afterEach(() => {
@@ -200,9 +204,7 @@ describe('BaseMarkdownEditorSlate deepen2 residual branches', () => {
 
   it('onBlur：readonly 时不注册外部点击', () => {
     const onBlur = vi.fn();
-    render(
-      <BaseMarkdownEditorSlate initValue="x" readonly onBlur={onBlur} />,
-    );
+    render(<BaseMarkdownEditorSlate initValue="x" readonly onBlur={onBlur} />);
     const outside = document.createElement('div');
     document.body.appendChild(outside);
     fireEvent.mouseDown(outside);

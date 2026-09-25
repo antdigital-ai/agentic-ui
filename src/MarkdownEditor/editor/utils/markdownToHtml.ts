@@ -338,9 +338,7 @@ const createMarkdownProcessor = (
   const formulaConfig = config?.formula;
   const remarkPlugins = resolveRemarkPlugins(plugins, formulaConfig);
   applyPlugins(processor, remarkPlugins);
-  processor
-    .use(rehypeRaw)
-    .use(rehypeSanitizeUserHtml as unknown as Plugin);
+  processor.use(rehypeRaw).use(rehypeSanitizeUserHtml as unknown as Plugin);
 
   if (isFormulaEnabled(formulaConfig)) {
     processor.use(rehypeKatex as unknown as Plugin);

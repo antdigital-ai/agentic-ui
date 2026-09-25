@@ -71,10 +71,7 @@ describe('SuggestionList 分支覆盖', () => {
   it('showMore：Enter/Space 键盘触发 onClick', () => {
     const onClick = vi.fn();
     const { container } = render(
-      <SuggestionList
-        items={items}
-        showMore={{ enable: true, onClick }}
-      />,
+      <SuggestionList items={items} showMore={{ enable: true, onClick }} />,
     );
     const icon = container.querySelector('.ant-follow-up-more-icon')!;
     fireEvent.keyDown(icon, { key: 'Enter' });
@@ -131,7 +128,9 @@ describe('SuggestionList 分支覆盖', () => {
 
   it('无 locale 时使用中文默认 aria-label', () => {
     render(
-      <I18nContext.Provider value={{ locale: undefined as any, language: 'zh-CN' }}>
+      <I18nContext.Provider
+        value={{ locale: undefined as any, language: 'zh-CN' }}
+      >
         <SuggestionList items={[{ key: '1', text: '追问' }]} />
       </I18nContext.Provider>,
     );

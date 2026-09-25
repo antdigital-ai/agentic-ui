@@ -159,5 +159,4 @@ describe('enter.ts 分支覆盖', () => {
       expect(result).toBe(true);
     });
   });
-
 });

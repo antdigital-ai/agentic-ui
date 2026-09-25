@@ -13,9 +13,7 @@ import React, {
 } from 'react';
 import { MessagesContext } from '../../../Bubble/MessagesContent/BubbleContext';
 import { I18nContext } from '../../../I18n';
-import {
-  EditorStoreContext,
-} from '../../../MarkdownEditor/editor/editorStoreContext';
+import { EditorStoreContext } from '../../../MarkdownEditor/editor/editorStoreContext';
 import { getSlateElementPlainText } from '../../../MarkdownEditor/editor/utils/codeBlockPlainText';
 import { EditorUtils } from '../../../MarkdownEditor/editor/utils/editorUtils';
 import { CodeNode, ElementProps } from '../../../MarkdownEditor/el';

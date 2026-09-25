@@ -132,9 +132,7 @@ describe('bubblePropsAreEqual more residual branches', () => {
     expect(
       bubblePropsAreEqual(props({ className: 'a' }), props({ className: 'b' })),
     ).toBe(false);
-    expect(
-      bubblePropsAreEqual(props({ style }), props({ style })),
-    ).toBe(true);
+    expect(bubblePropsAreEqual(props({ style }), props({ style }))).toBe(true);
   });
 
   it('shallowEqualRecord / Styles 空对象与假值', () => {

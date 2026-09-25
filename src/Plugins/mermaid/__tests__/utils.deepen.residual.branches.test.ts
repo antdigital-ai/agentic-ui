@@ -2,10 +2,7 @@
  * mermaid utils deepen：无效颜色；renderSvg 无 svg 标签回退。
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  createMermaidThemeConfig,
-  renderSvgToContainer,
-} from '../utils';
+import { createMermaidThemeConfig, renderSvgToContainer } from '../utils';
 
 describe('mermaid utils deepen residual branches', () => {
   beforeEach(() => {

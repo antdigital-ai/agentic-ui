@@ -2,10 +2,7 @@
  * AttachmentButton utils deepen：视频扩展名 / url 扩展名 / isMediaFile。
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  isMediaFile,
-  isVideoFile,
-} from '../utils';
+import { isMediaFile, isVideoFile } from '../utils';
 
 describe('AttachmentButton utils deepen residual branches', () => {
   beforeEach(() => {

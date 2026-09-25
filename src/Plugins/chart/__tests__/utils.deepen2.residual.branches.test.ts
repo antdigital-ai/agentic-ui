@@ -71,8 +71,8 @@ describe('chart/utils deepen2 residual branches', () => {
       } as CSSStyleDeclaration;
     });
     const hex = resolveCssVariable('var(--deepen2-blue-unique)');
-    expect(hex === '#1d7afc' || hex.startsWith('#') || hex.includes('var')).toBe(
-      true,
-    );
+    expect(
+      hex === '#1d7afc' || hex.startsWith('#') || hex.includes('var'),
+    ).toBe(true);
   });
 });

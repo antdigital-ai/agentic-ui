@@ -47,23 +47,21 @@ describe('EditorUtils deepen4 residual branches', () => {
     editor.children = [
       {
         type: 'paragraph',
-        children: [
-          { text: 'ab' },
-          { text: undefined as any },
-          { text: 'cd' },
-        ],
+        children: [{ text: 'ab' }, { text: undefined as any }, { text: 'cd' }],
       },
     ];
-    const spy = vi.spyOn(Editor, 'next').mockImplementation((ed: any, opts: any) => {
-      const at = opts?.at;
-      if (Path.equals(at, [0, 0])) {
-        return [{ text: undefined as any }, [0, 1]] as any;
-      }
-      if (Path.equals(at, [0, 1])) {
-        return [{ text: 'cd' }, [0, 2]] as any;
-      }
-      return undefined as any;
-    });
+    const spy = vi
+      .spyOn(Editor, 'next')
+      .mockImplementation((ed: any, opts: any) => {
+        const at = opts?.at;
+        if (Path.equals(at, [0, 0])) {
+          return [{ text: undefined as any }, [0, 1]] as any;
+        }
+        if (Path.equals(at, [0, 1])) {
+          return [{ text: 'cd' }, [0, 2]] as any;
+        }
+        return undefined as any;
+      });
     const leafSpy = vi
       .spyOn(Editor, 'leaf')
       .mockImplementation((_ed: any, point: any) => {

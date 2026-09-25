@@ -24,9 +24,7 @@ describe('ThinkBlock deepen2 residual branches', () => {
   it('undefined locale key 用默认深度思考', async () => {
     const mod = await import('../ThinkBlock');
     const Comp =
-      (mod as any).ThinkBlock ||
-      (mod as any).default ||
-      Object.values(mod)[0];
+      (mod as any).ThinkBlock || (mod as any).default || Object.values(mod)[0];
     try {
       render(
         <Comp

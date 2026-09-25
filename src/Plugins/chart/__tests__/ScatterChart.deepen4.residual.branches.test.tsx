@@ -93,9 +93,7 @@ describe('ScatterChart deepen4 residual branches', () => {
     expect(screen.getByText(/暂无|无有效|empty/i)).toBeInTheDocument();
 
     cleanup();
-    render(
-      <ScatterChart title="One" data={[{ x: 1, y: 2, type: 'A' }]} />,
-    );
+    render(<ScatterChart title="One" data={[{ x: 1, y: 2, type: 'A' }]} />);
     expect(
       screen.queryByTestId('scatter4') || screen.getByTestId('sc4-c'),
     ).toBeTruthy();

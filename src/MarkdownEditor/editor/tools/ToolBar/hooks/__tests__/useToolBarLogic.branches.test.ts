@@ -3,10 +3,7 @@
  */
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import {
-  useToolBarLogic,
-  type UseToolBarLogicProps,
-} from '../useToolBarLogic';
+import { useToolBarLogic, type UseToolBarLogicProps } from '../useToolBarLogic';
 
 vi.mock('../../../../../editor/utils/editorUtils', () => ({
   EditorUtils: {

@@ -3,7 +3,10 @@ import { rehypeFootnoteRef } from '../plugins/rehypeFootnoteRef';
 
 describe('rehypeFootnoteRef residual branches', () => {
   it('leaves non-matching text and orphan text nodes untouched', () => {
-    const tree: any = { type: 'root', children: [{ type: 'text', value: 'plain' }] };
+    const tree: any = {
+      type: 'root',
+      children: [{ type: 'text', value: 'plain' }],
+    };
     rehypeFootnoteRef()(tree);
     expect(tree.children).toEqual([{ type: 'text', value: 'plain' }]);
   });
@@ -33,8 +36,8 @@ describe('rehypeFootnoteRef residual branches', () => {
       ],
     };
     rehypeFootnoteRef()(tree);
-    expect(tree.children.some((n: any) => n.properties?.['data-fnc-name'] === 'z')).toBe(
-      true,
-    );
+    expect(
+      tree.children.some((n: any) => n.properties?.['data-fnc-name'] === 'z'),
+    ).toBe(true);
   });
 });

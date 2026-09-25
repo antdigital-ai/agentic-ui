@@ -1,8 +1,8 @@
 /**
  * keyboard deepen：useSystemKeyboard media/attach 复制剪切、backspace、方向键、keyMap。
  */
-import copy from 'copy-to-clipboard';
 import { renderHook } from '@testing-library/react';
+import copy from 'copy-to-clipboard';
 import { Subject } from 'rxjs';
 import { createEditor, Transforms } from 'slate';
 import { ReactEditor, withReact } from 'slate-react';
@@ -97,7 +97,10 @@ describe('useSystemKeyboard deepen branches', () => {
         children: [{ text: '' }],
       },
     ];
-    editor.selection = { anchor: { path: [0, 0], offset: 0 }, focus: { path: [0, 0], offset: 0 } };
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
     dispatch({ key: 'c', ctrlKey: true });
     expect(copy).toHaveBeenCalledWith(
       expect.stringContaining('media://file?url=https://img.test/a.png'),
@@ -115,7 +118,10 @@ describe('useSystemKeyboard deepen branches', () => {
         children: [{ text: '' }],
       },
     ];
-    editor.selection = { anchor: { path: [0, 0], offset: 0 }, focus: { path: [0, 0], offset: 0 } };
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
     dispatch({ key: 'x', ctrlKey: true });
     expect(copy).toHaveBeenCalledWith(
       expect.stringContaining('attach://file?size=100'),
@@ -131,7 +137,10 @@ describe('useSystemKeyboard deepen branches', () => {
     editor.children = [
       { type: 'media', url: 'https://x.png', children: [{ text: '' }] },
     ];
-    editor.selection = { anchor: { path: [0, 0], offset: 0 }, focus: { path: [0, 0], offset: 0 } };
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
     expect(() => dispatch({ key: 'c', ctrlKey: true })).not.toThrow();
     vi.mocked(copy).mockReturnValue(true);
   });
@@ -142,7 +151,10 @@ describe('useSystemKeyboard deepen branches', () => {
     editor.children = [
       { type: 'media', url: 'https://x.png', children: [{ text: '' }] },
     ];
-    editor.selection = { anchor: { path: [0, 0], offset: 0 }, focus: { path: [0, 0], offset: 0 } };
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
     const e = dispatch({ key: 'Backspace' });
     expect(e.preventDefault).toHaveBeenCalled();
     expect(removeSpy).toHaveBeenCalled();
@@ -175,7 +187,10 @@ describe('useSystemKeyboard deepen branches', () => {
       { type: 'paragraph', children: [{ text: 'hello' }] },
       { type: 'paragraph', children: [{ text: 'world' }] },
     ];
-    editor.selection = { anchor: { path: [0, 0], offset: 0 }, focus: { path: [0, 0], offset: 0 } };
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
     const e = dispatch({ key: 'a', ctrlKey: true });
     expect(e.preventDefault).toHaveBeenCalled();
     expect(editor.selection).toBeTruthy();
@@ -192,7 +207,10 @@ describe('useSystemKeyboard deepen branches', () => {
 
   it('非 media/attach 时 mod+c 不复制', () => {
     editor.children = [{ type: 'paragraph', children: [{ text: 'text' }] }];
-    editor.selection = { anchor: { path: [0, 0], offset: 0 }, focus: { path: [0, 0], offset: 0 } };
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
     vi.mocked(copy).mockClear();
     dispatch({ key: 'c', ctrlKey: true });
     expect(copy).not.toHaveBeenCalled();

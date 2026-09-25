@@ -227,8 +227,8 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
   const [selectedFilter, setSelectedFilter] = useState(
     () => categories[0] || '',
   );
-  const [selectedFilterLabel, setSelectedFilterLabel] = useState(() =>
-    filterLabels?.[0],
+  const [selectedFilterLabel, setSelectedFilterLabel] = useState(
+    () => filterLabels?.[0],
   );
 
   // 当数据变化导致当前选中分类失效时，自动回退到首个有效分类或空（显示全部）

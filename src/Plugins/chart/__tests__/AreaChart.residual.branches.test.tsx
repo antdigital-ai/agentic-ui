@@ -100,9 +100,9 @@ describe('AreaChart residual prop/config branches', () => {
         className="ac"
       />,
     );
-    expect((globalThis as any).__areaResidualData?.datasets?.length).toBeGreaterThan(
-      0,
-    );
+    expect(
+      (globalThis as any).__areaResidualData?.datasets?.length,
+    ).toBeGreaterThan(0);
   });
 
   it('非数组 data 不抛错', () => {

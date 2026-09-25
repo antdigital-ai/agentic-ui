@@ -12,16 +12,12 @@ import {
 
 describe('markdownReactShared deepen8 residual', () => {
   it('行内闭标签后跟正文拆块', () => {
-    const blocks = splitMarkdownBlocks(
-      '<think>思考</think>正文紧跟\n下一段',
-    );
+    const blocks = splitMarkdownBlocks('<think>思考</think>正文紧跟\n下一段');
     expect(blocks.length).toBeGreaterThan(0);
   });
 
   it('独占闭标签后 blanks', () => {
-    const blocks = splitMarkdownBlocks(
-      '<think>\nbody\n</think>\n\n\nnext',
-    );
+    const blocks = splitMarkdownBlocks('<think>\nbody\n</think>\n\n\nnext');
     expect(blocks.some((b) => b.includes('next') || b.includes('body'))).toBe(
       true,
     );
@@ -42,7 +38,7 @@ describe('markdownReactShared deepen8 residual', () => {
           throw new Error('boom-err');
         },
       });
-      expect(out !== null && out !== undefined || out === null).toBe(true);
+      expect((out !== null && out !== undefined) || out === null).toBe(true);
     } catch {
       // ok
     }

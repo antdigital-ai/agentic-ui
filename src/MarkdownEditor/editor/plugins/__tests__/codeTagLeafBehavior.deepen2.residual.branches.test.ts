@@ -6,10 +6,10 @@ import { createEditor, Editor, Node, Text, Transforms } from 'slate';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   handleMarkRemoveTextOperation,
+  handleTagDeleteBackward,
   moveSelectionOutOfMarkLeaf,
   tryInsertTextOutsideMarkOnDoubleSpace,
   tryInsertTextOutsideTagOnDoubleSpace,
-  handleTagDeleteBackward,
 } from '../codeTagLeafBehavior';
 
 const tagNode = (text: string, extra: Record<string, unknown> = {}) => ({
@@ -114,9 +114,7 @@ describe('codeTagLeafBehavior deepen2 residual branches', () => {
     };
     expect(tryInsertTextOutsideMarkOnDoubleSpace(editor, ' ')).toBe(false);
 
-    editor.children = [
-      { type: 'paragraph', children: [tagNode('a ')] },
-    ];
+    editor.children = [{ type: 'paragraph', children: [tagNode('a ')] }];
     editor.selection = {
       anchor: { path: [0, 0], offset: 1 },
       focus: { path: [0, 0], offset: 1 },

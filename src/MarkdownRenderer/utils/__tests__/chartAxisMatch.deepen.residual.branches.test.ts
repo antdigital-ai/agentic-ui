@@ -26,7 +26,9 @@ describe('chartAxisMatch deepen residual branches', () => {
     expect(resolveChartAxisFieldToColumnKey(undefined, ['a'])).toBeUndefined();
     expect(resolveChartAxisFieldToColumnKey(null as any, ['a'])).toBeNull();
     expect(resolveChartAxisFieldToColumnKey('  ', ['a'])).toBe('  ');
-    expect(resolveChartAxisFieldToColumnKey('时段', ['时段', '值'])).toBe('时段');
+    expect(resolveChartAxisFieldToColumnKey('时段', ['时段', '值'])).toBe(
+      '时段',
+    );
     expect(
       resolveChartAxisFieldToColumnKey('客单价', ['客单价(元)', '量']),
     ).toBe('客单价(元)');
@@ -37,10 +39,10 @@ describe('chartAxisMatch deepen residual branches', () => {
     const cfg = { chartType: 'line' as const };
     expect(normalizeChartConfigAxisFields(cfg as any, ['a'])).toEqual(cfg);
     expect(
-      normalizeChartConfigAxisFields(
-        { x: '客单价', y: '量' },
-        ['客单价(元)', '量'],
-      ),
+      normalizeChartConfigAxisFields({ x: '客单价', y: '量' }, [
+        '客单价(元)',
+        '量',
+      ]),
     ).toEqual({ x: '客单价(元)', y: '量' });
   });
 });

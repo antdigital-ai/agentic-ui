@@ -24,7 +24,9 @@ describe('loadAceEditor 分支覆盖', () => {
     // @ts-expect-error simulate SSR
     delete globalThis.window;
     const { loadAceEditor } = await import('../loadAceEditor');
-    await expect(loadAceEditor()).rejects.toThrow('Ace Editor 仅在浏览器环境中可用');
+    await expect(loadAceEditor()).rejects.toThrow(
+      'Ace Editor 仅在浏览器环境中可用',
+    );
   });
 
   it('loadAceEditor 两次调用返回同一模块实例', async () => {
@@ -72,7 +74,8 @@ describe('loadAceEditor 分支覆盖', () => {
   });
 
   it('preloadAceEditor 触发预加载', async () => {
-    const { preloadAceEditor, loadAceEditor } = await import('../loadAceEditor');
+    const { preloadAceEditor, loadAceEditor } =
+      await import('../loadAceEditor');
     preloadAceEditor();
     await expect(loadAceEditor()).resolves.toBeDefined();
   });

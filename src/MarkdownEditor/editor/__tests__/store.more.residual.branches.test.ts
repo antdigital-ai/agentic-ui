@@ -40,9 +40,10 @@ describe('EditorStore more residual branches', () => {
   });
 
   it('setMDContent 大 chunk 与 useRAF false', () => {
-    const md = Array.from({ length: 30 }, (_, i) => `## H${i}\n\npara ${i}\n`).join(
-      '\n',
-    );
+    const md = Array.from(
+      { length: 30 },
+      (_, i) => `## H${i}\n\npara ${i}\n`,
+    ).join('\n');
     expect(() =>
       store.setMDContent(md, [], { useRAF: false, chunkSize: 2 }),
     ).not.toThrow();
@@ -84,7 +85,11 @@ describe('EditorStore more residual branches', () => {
     const dragEvent = {
       stopPropagation: vi.fn(),
       preventDefault: vi.fn(),
-      dataTransfer: { setData: vi.fn(), effectAllowed: '', setDragImage: vi.fn() },
+      dataTransfer: {
+        setData: vi.fn(),
+        effectAllowed: '',
+        setDragImage: vi.fn(),
+      },
     };
     const container = document.createElement('div');
     expect(() =>
@@ -133,7 +138,9 @@ describe('EditorStore more residual branches', () => {
         ]),
       ).not.toThrow();
     }
-    expect(() => store.setMDContent('# a\n\nb\n', [], { useRAF: false })).not.toThrow();
+    expect(() =>
+      store.setMDContent('# a\n\nb\n', [], { useRAF: false }),
+    ).not.toThrow();
   });
 
   it('updateNodeList 同构文本 / 增删节点 / 非数组早退', () => {
@@ -192,9 +199,10 @@ describe('EditorStore more residual branches', () => {
   });
 
   it('setMDContent RAF 多 chunk 推进；skip 重复', () => {
-    const md = Array.from({ length: 20 }, (_, i) => `## S${i}\n\nbody ${i}\n`).join(
-      '\n',
-    );
+    const md = Array.from(
+      { length: 20 },
+      (_, i) => `## S${i}\n\nbody ${i}\n`,
+    ).join('\n');
     store.setMDContent(md, [], { useRAF: true, chunkSize: 3 });
     act(() => {
       vi.advanceTimersByTime(200);
@@ -353,9 +361,10 @@ describe('EditorStore more residual branches', () => {
   });
 
   it('istanbul deepen：超大 chunks>10；相对路径附件；skip 空白 chunk', () => {
-    const big = Array.from({ length: 40 }, (_, i) => `## T${i}\n\np${i}\n`).join(
-      '\n',
-    );
+    const big = Array.from(
+      { length: 40 },
+      (_, i) => `## T${i}\n\np${i}\n`,
+    ).join('\n');
     expect(() =>
       store.setMDContent(big, [], {
         useRAF: true,
@@ -473,9 +482,9 @@ describe('EditorStore more residual branches', () => {
     if (leaf) {
       expect(typeof store.isLatestNode(leaf)).toBe('boolean');
     }
-    expect(store.isLatestNode({ type: 'paragraph', children: [{ text: 'x' }] })).toBe(
-      false,
-    );
+    expect(
+      store.isLatestNode({ type: 'paragraph', children: [{ text: 'x' }] }),
+    ).toBe(false);
 
     editor.selection = {
       anchor: { path: [1, 0], offset: 0 },
@@ -504,7 +513,10 @@ describe('EditorStore more residual branches', () => {
     });
     expect(store.replaceText('', 'x')).toBe(0);
     expect(
-      store.replaceText('hello', 'hi', { replaceAll: true, caseSensitive: false }),
+      store.replaceText('hello', 'hi', {
+        replaceAll: true,
+        caseSensitive: false,
+      }),
     ).toBeGreaterThan(0);
     store.setMDContent('Abc abc ABC\n', [], { useRAF: false });
     expect(
@@ -519,9 +531,7 @@ describe('EditorStore more residual branches', () => {
       expect(() => (store as any).replaceAll('aa', 'zz')).not.toThrow();
     }
     if (typeof (store as any).findByPathAndText === 'function') {
-      expect(() =>
-        (store as any).findByPathAndText([0], 'zz'),
-      ).not.toThrow();
+      expect(() => (store as any).findByPathAndText([0], 'zz')).not.toThrow();
     }
     if (typeof (store as any).replaceTextInSelection === 'function') {
       editor.selection = {
@@ -543,11 +553,9 @@ describe('EditorStore more residual branches', () => {
   });
 
   it('exclusive deepen：updateNodeList 表格/列表结构差；insertNodes；setState', () => {
-    store.setMDContent(
-      '| a | b |\n| - | - |\n| 1 | 2 |\n\n- x\n- y\n',
-      [],
-      { useRAF: false },
-    );
+    store.setMDContent('| a | b |\n| - | - |\n| 1 | 2 |\n\n- x\n- y\n', [], {
+      useRAF: false,
+    });
     const next = store.getContent();
     expect(() => store.updateNodeList(next as any)).not.toThrow();
     expect(() =>
@@ -575,9 +583,7 @@ describe('EditorStore more residual branches', () => {
           children: [
             {
               type: 'list-item',
-              children: [
-                { type: 'paragraph', children: [{ text: 'z' }] },
-              ],
+              children: [{ type: 'paragraph', children: [{ text: 'z' }] }],
             },
           ],
         },

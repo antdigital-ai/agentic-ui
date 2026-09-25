@@ -62,9 +62,7 @@ describe('remarkParse deepen residual branches', () => {
       children: [{ type: 'text', value: '| a | b |' }],
     });
     run(convertParagraphToImage, table);
-    expect(['table', 'paragraph']).toContain(
-      (table.children[1] as any).type,
-    );
+    expect(['table', 'paragraph']).toContain((table.children[1] as any).type);
 
     const notLink = withLead({
       type: 'paragraph',

@@ -69,9 +69,7 @@ describe('parserSlateNodeToMarkdown deepen4 residual', () => {
               markdownContainerType: 'tip',
               markdownContainerTitle: '  Hello  ',
             },
-            children: [
-              { type: 'paragraph', children: [{ text: 'inside' }] },
-            ],
+            children: [{ type: 'paragraph', children: [{ text: 'inside' }] }],
           },
         ],
       },
@@ -89,9 +87,7 @@ describe('parserSlateNodeToMarkdown deepen4 residual', () => {
               markdownContainerType: 'info',
               markdownContainerTitle: '   ',
             },
-            children: [
-              { type: 'paragraph', children: [{ text: 'body' }] },
-            ],
+            children: [{ type: 'paragraph', children: [{ text: 'body' }] }],
           },
         ],
       },

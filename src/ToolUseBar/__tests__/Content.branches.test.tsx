@@ -1,7 +1,13 @@
 /**
  * ToolUseBar BarItem/Content 分支覆盖：ToolImage、Header、Expand、Content。
  */
-import { cleanup, fireEvent, render, screen, act } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
@@ -393,7 +399,9 @@ describe('ToolUseBar Content branches', () => {
 
     it('ResizeObserver 检测到超高内容时展示展开按钮', async () => {
       const roCallbacks: ResizeObserverCallback[] = [];
-      global.ResizeObserver = vi.fn(function MockRO(cb: ResizeObserverCallback) {
+      global.ResizeObserver = vi.fn(function MockRO(
+        cb: ResizeObserverCallback,
+      ) {
         roCallbacks.push(cb);
         return { observe: vi.fn(), unobserve: vi.fn(), disconnect: vi.fn() };
       }) as unknown as typeof ResizeObserver;
@@ -414,9 +422,7 @@ describe('ToolUseBar Content branches', () => {
       );
 
       await act(async () => {
-        roCallbacks.forEach((cb) =>
-          cb([], {} as unknown as ResizeObserver),
-        );
+        roCallbacks.forEach((cb) => cb([], {} as unknown as ResizeObserver));
       });
 
       const expandBtn = screen.queryByTestId('tool-content-expand');

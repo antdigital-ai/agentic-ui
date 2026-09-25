@@ -4,6 +4,7 @@
  */
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { useHistoryData } from '../History/hooks/useHistoryData';
 import {
   isAttachmentFileLoading,
   isFileMetaPlaceholderState,
@@ -19,6 +20,12 @@ import {
   renderSvgToContainer,
 } from '../Plugins/mermaid/utils';
 import {
+  hasDangerousUrlScheme,
+  looksLikeHtmlSnippet,
+  serializeHastElement,
+  shouldRenderUrlAsPlainText,
+} from '../Utils/htmlUrlSafety';
+import {
   createConfiguredSandbox,
   DEFAULT_SANDBOX_CONFIG,
   DEFAULT_SECURITY_CONFIG,
@@ -27,13 +34,6 @@ import {
   SandboxHealthChecker,
   sandboxHealthChecker,
 } from '../Utils/proxySandbox';
-import {
-  hasDangerousUrlScheme,
-  looksLikeHtmlSnippet,
-  serializeHastElement,
-  shouldRenderUrlAsPlainText,
-} from '../Utils/htmlUrlSafety';
-import { useHistoryData } from '../History/hooks/useHistoryData';
 
 describe('midtail batch H pure branches', () => {
   afterEach(() => {
@@ -94,9 +94,7 @@ describe('midtail batch H pure branches', () => {
         name: 'a',
       } as any),
     ).toBe(false);
-    expect(
-      isFileMetaPlaceholderState({ name: 'a' } as any),
-    ).toBe(false);
+    expect(isFileMetaPlaceholderState({ name: 'a' } as any)).toBe(false);
   });
 
   it('createConfiguredSandbox / DEFAULT configs / safeMathEval / quickExecute', async () => {
@@ -169,10 +167,7 @@ describe('midtail batch H pure branches', () => {
     expect(initialize).toHaveBeenCalledTimes(2);
 
     const container = document.createElement('div');
-    renderSvgToContainer(
-      '<svg style="color:red"><circle /></svg>',
-      container,
-    );
+    renderSvgToContainer('<svg style="color:red"><circle /></svg>', container);
     expect(container.querySelector('[data-mermaid-svg]')).toBeTruthy();
 
     cleanupTempElement('missing-h');

@@ -106,7 +106,9 @@ describe('KeyboardTask residual branches', () => {
 
   it('format / clear / select 相关任务容错矩阵', () => {
     const editor = createEditor();
-    editor.children = [{ type: 'paragraph', children: [{ text: 'hello world' }] }];
+    editor.children = [
+      { type: 'paragraph', children: [{ text: 'hello world' }] },
+    ];
     Transforms.select(editor, {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [0, 0], offset: 5 },

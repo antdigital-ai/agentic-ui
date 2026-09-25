@@ -41,10 +41,7 @@ describe('AILabel 分支覆盖', () => {
     const onOpenChange = vi.fn();
     render(
       <ConfigProvider>
-        <AILabel
-          status="watermark"
-          tooltip={{ title: 'AI', onOpenChange }}
-        />
+        <AILabel status="watermark" tooltip={{ title: 'AI', onOpenChange }} />
       </ConfigProvider>,
     );
     const trigger = screen.getByTestId('graphic-off').parentElement!;

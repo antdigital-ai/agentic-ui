@@ -45,9 +45,7 @@ describe('markdownReactShared deepen9 safe residual', () => {
   });
 
   it('pendingBlankLines + current 空：else-if 推 blanks（同行 think 对）', () => {
-    const blocks = splitMarkdownBlocks(
-      '\n\n<think>inline</think>',
-    );
+    const blocks = splitMarkdownBlocks('\n\n<think>inline</think>');
     expect(blocks.some((b) => b.includes('think'))).toBe(true);
   });
 
@@ -66,19 +64,15 @@ describe('markdownReactShared deepen9 safe residual', () => {
     const inlineTail = splitMarkdownBlocks(
       'prefix<think>in</think>tail on line\nnext',
     );
-    expect(inlineTail.some((b) => b.includes('tail') || b.includes('next'))).toBe(
-      true,
-    );
+    expect(
+      inlineTail.some((b) => b.includes('tail') || b.includes('next')),
+    ).toBe(true);
   });
 
   it('独占闭标签 pending blanks；行末闭标签 pending blanks', () => {
-    const closeOnly = splitMarkdownBlocks(
-      '<think>\nline\n\n</think>\nafter',
-    );
+    const closeOnly = splitMarkdownBlocks('<think>\nline\n\n</think>\nafter');
     expect(closeOnly.some((b) => b.includes('after'))).toBe(true);
-    const endInline = splitMarkdownBlocks(
-      '<think>\nonly</think>\n\nend',
-    );
+    const endInline = splitMarkdownBlocks('<think>\nonly</think>\n\nend');
     expect(endInline.some((b) => b.includes('end'))).toBe(true);
   });
 });

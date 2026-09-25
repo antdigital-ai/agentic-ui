@@ -57,14 +57,18 @@ describe('MarkdownRenderer 分支覆盖（无 fake timers）', () => {
         plugins={[{ renderer: { remarkPlugins: [pluginRemark as any] } }]}
       />,
     );
-    await waitFor(() => expect(screen.getByTestId('markdown-renderer')).toBeTruthy());
+    await waitFor(() =>
+      expect(screen.getByTestId('markdown-renderer')).toBeTruthy(),
+    );
 
     const external = vi.fn(() => (tree: unknown) => tree);
     rerender(
       <MarkdownRenderer content="b" remarkPlugins={[external as any]} />,
     );
     await waitFor(() =>
-      expect(screen.getByTestId('markdown-renderer').textContent).toContain('b'),
+      expect(screen.getByTestId('markdown-renderer').textContent).toContain(
+        'b',
+      ),
     );
   });
 
@@ -101,6 +105,8 @@ describe('MarkdownRenderer 分支覆盖（无 fake timers）', () => {
         }}
       />,
     );
-    await waitFor(() => expect(screen.getByTestId('markdown-renderer')).toBeTruthy());
+    await waitFor(() =>
+      expect(screen.getByTestId('markdown-renderer')).toBeTruthy(),
+    );
   });
 });

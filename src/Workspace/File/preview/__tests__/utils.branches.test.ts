@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  buildMarkdownContent,
-  getContentStatus,
-  isHtmlFile,
-} from '../utils';
+import { buildMarkdownContent, getContentStatus, isHtmlFile } from '../utils';
 
 describe('preview utils residual branches', () => {
   it('recognizes HTML by case-insensitive extension or MIME type', () => {
@@ -14,7 +10,9 @@ describe('preview utils residual branches', () => {
 
   it('maps loading, error, and completed states', () => {
     expect(getContentStatus({ status: 'loading' } as any)).toBe('loading');
-    expect(getContentStatus({ error: new Error('failed') } as any)).toBe('error');
+    expect(getContentStatus({ error: new Error('failed') } as any)).toBe(
+      'error',
+    );
     expect(getContentStatus({ status: 'success' } as any)).toBe('done');
   });
 

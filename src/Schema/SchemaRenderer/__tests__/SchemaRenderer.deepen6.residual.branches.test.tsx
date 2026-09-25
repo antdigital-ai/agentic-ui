@@ -20,9 +20,7 @@ const mockCreateSandbox = vi.hoisted(() =>
     destroy: mockSandboxDestroy,
   })),
 );
-const mockTemplateRender = vi.hoisted(() =>
-  vi.fn((tpl: string) => tpl),
-);
+const mockTemplateRender = vi.hoisted(() => vi.fn((tpl: string) => tpl));
 
 vi.mock('../../validator', () => ({
   mdDataSchemaValidator: {
@@ -90,9 +88,7 @@ describe('SchemaRenderer deepen6 residual branches', () => {
   it('unsafe：空 textContent 脚本 || ""；sandbox 空脚本', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const err = vi.spyOn(console, 'error').mockImplementation(() => {});
-    mockTemplateRender.mockReturnValue(
-      '<div>x</div><script></script>',
-    );
+    mockTemplateRender.mockReturnValue('<div>x</div><script></script>');
     render(
       <SchemaRenderer
         schema={baseSchema()}
@@ -104,16 +100,9 @@ describe('SchemaRenderer deepen6 residual branches', () => {
     await flush();
 
     cleanup();
-    mockTemplateRender.mockReturnValue(
-      '<div>y</div><script></script>',
-    );
+    mockTemplateRender.mockReturnValue('<div>y</div><script></script>');
     render(
-      <SchemaRenderer
-        schema={baseSchema()}
-        values={{}}
-        useSandbox
-        debug
-      />,
+      <SchemaRenderer schema={baseSchema()} values={{}} useSandbox debug />,
     );
     await flush();
     warn.mockRestore();
@@ -184,9 +173,7 @@ describe('SchemaRenderer deepen6 residual branches', () => {
     await flush();
     mockValidate.mockReturnValue({ valid: true, errors: [] });
     mockTemplateRender.mockReturnValue('<div>ok</div>');
-    rerender(
-      <SchemaRenderer schema={baseSchema()} values={{}} debug />,
-    );
+    rerender(<SchemaRenderer schema={baseSchema()} values={{}} debug />);
     await flush();
     expect(document.body).toBeTruthy();
   });

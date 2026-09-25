@@ -520,9 +520,9 @@ describe('FileTreeComponent 分支覆盖', () => {
   });
 
   it('handleLoadData 成功后合并 children', async () => {
-    const onLoadChildren = vi.fn().mockResolvedValue([
-      { key: 'new', name: 'new.txt', isLeaf: true },
-    ]);
+    const onLoadChildren = vi
+      .fn()
+      .mockResolvedValue([{ key: 'new', name: 'new.txt', isLeaf: true }]);
     render(
       <TestWrapper>
         <FileTree
@@ -535,7 +535,9 @@ describe('FileTreeComponent 分支覆盖', () => {
     );
     fireEvent.click(document.querySelector('.ant-tree-switcher')!);
     await waitFor(() => expect(onLoadChildren).toHaveBeenCalled());
-    await waitFor(() => expect(screen.getByText('new.txt')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText('new.txt')).toBeInTheDocument(),
+    );
   });
 
   it('filterKeyword 大小写不敏感匹配', () => {
@@ -611,10 +613,7 @@ describe('FileTreeComponent 分支覆盖', () => {
   it('locale undefined 使用中文空态回退', () => {
     render(
       <TestWrapper>
-        <FileTree
-          treeData={[]}
-          onLoadChildren={vi.fn()}
-        />
+        <FileTree treeData={[]} onLoadChildren={vi.fn()} />
       </TestWrapper>,
     );
     expect(screen.getByTestId('workspace-file-tree')).toBeInTheDocument();
@@ -694,9 +693,9 @@ describe('FileTreeComponent 分支覆盖', () => {
   });
 
   it('isLeaf 为 undefined 且无 children 时视为叶子不触发懒加载', async () => {
-    const onLoadChildren = vi.fn().mockResolvedValue([
-      { key: 'c', name: 'child.txt', isLeaf: true },
-    ]);
+    const onLoadChildren = vi
+      .fn()
+      .mockResolvedValue([{ key: 'c', name: 'child.txt', isLeaf: true }]);
     render(
       <TestWrapper>
         <FileTree
@@ -716,7 +715,9 @@ describe('FileTreeComponent 分支覆盖', () => {
     render(
       <TestWrapper>
         <FileTree
-          treeData={[{ key: 'd', name: 'dir', isLeaf: false, children: [] as any }]}
+          treeData={[
+            { key: 'd', name: 'dir', isLeaf: false, children: [] as any },
+          ]}
           onLoadChildren={onLoadChildren}
         />
       </TestWrapper>,
@@ -1067,8 +1068,8 @@ describe('FileTree istanbul residual：filter / select / leaf 假值矩阵', () 
     await act(async () => {
       await Promise.resolve();
     });
-    expect(onPreview.mock.calls.length + onSelect.mock.calls.length).toBeGreaterThan(
-      0,
-    );
+    expect(
+      onPreview.mock.calls.length + onSelect.mock.calls.length,
+    ).toBeGreaterThan(0);
   });
 });

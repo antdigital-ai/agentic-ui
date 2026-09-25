@@ -7,9 +7,7 @@ import { useOpenAIMessageBubbleData } from '../useOpenAIMessageBubbleData';
 describe('useOpenAIMessageBubbleData', () => {
   it('mapOptions 省略时使用空对象默认值', () => {
     const messages: OpenAIChatMessage[] = [{ role: 'user', content: 'hi' }];
-    const { result } = renderHook(() =>
-      useOpenAIMessageBubbleData(messages),
-    );
+    const { result } = renderHook(() => useOpenAIMessageBubbleData(messages));
     expect(result.current).toHaveLength(1);
     expect(result.current[0].originContent).toBe('hi');
   });

@@ -1,11 +1,11 @@
-import { describe, expect, it, vi } from 'vitest';
 import { createEditor, Editor, Transforms } from 'slate';
+import { describe, expect, it, vi } from 'vitest';
 import {
+  clearImeEnterCommitGuard,
   commitImeCompositionTextIfMissing,
   getEditorTextSnapshot,
   IME_PROCESSING_KEY_CODE,
   isImeComposing,
-  clearImeEnterCommitGuard,
   markImeEnterCommitGuard,
   resetImeEnterCommitGuardForTests,
   scheduleClearInputComposition,

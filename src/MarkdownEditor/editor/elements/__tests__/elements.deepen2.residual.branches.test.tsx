@@ -92,7 +92,9 @@ vi.mock('../TagPopup', () => ({
   ),
 }));
 vi.mock('../FncLeaf', () => ({
-  FncLeaf: ({ children }: any) => <span data-testid="fnc-leaf">{children}</span>,
+  FncLeaf: ({ children }: any) => (
+    <span data-testid="fnc-leaf">{children}</span>
+  ),
 }));
 vi.mock('antd', async (importOriginal) => {
   const actual = await importOriginal<typeof import('antd')>();

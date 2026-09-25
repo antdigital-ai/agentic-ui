@@ -1,13 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useRef } from 'react';
-import {
-  BaseOperation,
-  Editor,
-  Element,
-  NodeEntry,
-  Path,
-  Range,
-} from 'slate';
+import { BaseOperation, Editor, Element, NodeEntry, Path, Range } from 'slate';
 import { useDebounceFn } from '../../../Hooks/useDebounceFn';
 import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { Elements } from '../../el';
@@ -62,82 +55,80 @@ export function useOnchange(
     );
   }, wait);
 
-  return useRefFunction(
-    (_value: any, _operations: BaseOperation[]) => {
-      const editor = markdownEditorRef.current;
-      if (!editor) return;
+  return useRefFunction((_value: any, _operations: BaseOperation[]) => {
+    const editor = markdownEditorRef.current;
+    if (!editor) return;
 
-      const hasContentChange = _operations.some(
-        (o) => o.type !== 'set_selection',
-      );
+    const hasContentChange = _operations.some(
+      (o) => o.type !== 'set_selection',
+    );
 
-      if (readonly && !hasContentChange) {
-        return;
-      }
+    if (readonly && !hasContentChange) {
+      return;
+    }
 
-      if (!hasContentChange && !selectionTrackingEnabled) {
-        return;
-      }
+    if (!hasContentChange && !selectionTrackingEnabled) {
+      return;
+    }
 
-      if (hasContentChange && onChange) {
-        onChangeDebounce.run();
-      }
+    if (hasContentChange && onChange) {
+      onChangeDebounce.run();
+    }
 
-      if (!selectionTrackingEnabled) return;
+    if (!selectionTrackingEnabled) return;
 
-      const sel = editor.selection;
+    const sel = editor.selection;
 
-      try {
-        const [node] = Editor.nodes<Element>(editor, {
-          match: (n) => Element.isElement(n),
-          mode: 'lowest',
+    try {
+      const [node] = Editor.nodes<Element>(editor, {
+        match: (n) => Element.isElement(n),
+        mode: 'lowest',
+      });
+
+      setTimeout(() => {
+        selChange$.next({
+          sel,
+          node: node as NodeEntry<any>,
         });
+      });
 
-        setTimeout(() => {
-          selChange$.next({
-            sel,
-            node: node as NodeEntry<any>,
-          });
-        });
+      if (!node) return;
 
-        if (!node) return;
+      if (
+        _operations.some((o) => o.type === 'set_selection') &&
+        sel &&
+        !floatBarIgnoreNode.has(node?.[0]?.type) &&
+        !Range.isCollapsed(sel) &&
+        Path.equals(Path.parent(sel.focus.path), Path.parent(sel.anchor.path))
+      ) {
+        if (typeof window === 'undefined') return;
+        const domSelection = window.getSelection();
+        const domRange = domSelection?.getRangeAt(0);
 
-        if (
-          _operations.some((o) => o.type === 'set_selection') &&
-          sel &&
-          !floatBarIgnoreNode.has(node?.[0]?.type) &&
-          !Range.isCollapsed(sel) &&
-          Path.equals(Path.parent(sel.focus.path), Path.parent(sel.anchor.path))
-        ) {
-          if (typeof window === 'undefined') return;
-          const domSelection = window.getSelection();
-          const domRange = domSelection?.getRangeAt(0);
-
-          if (!domRange?.toString()?.trim()) return;
-          if (rangeContent.current === domRange?.toString()) {
-            if (bumpFloatBarRevision) {
-              bumpFloatBarRevision();
-            } else {
-              setRefreshFloatBar?.((prev: boolean) => !prev);
-            }
-            return;
-          }
-          rangeContent.current = domRange?.toString() || '';
-          const rect = domRange?.getBoundingClientRect();
-          if (rect) {
-            setDomRect?.(rect);
+        if (!domRange?.toString()?.trim()) return;
+        if (rangeContent.current === domRange?.toString()) {
+          if (bumpFloatBarRevision) {
+            bumpFloatBarRevision();
           } else {
-            setDomRect?.(null);
+            setRefreshFloatBar?.((prev: boolean) => !prev);
           }
+          return;
+        }
+        rangeContent.current = domRange?.toString() || '';
+        const rect = domRange?.getBoundingClientRect();
+        if (rect) {
+          setDomRect?.(rect);
         } else {
-          rangeContent.current = '';
           setDomRect?.(null);
         }
-      } catch (error) {
-        if (process.env.NODE_ENV !== 'production') {
-          console.error('[useOnchange] selection tracking failed:', error);
-        }
+      } else {
+        rangeContent.current = '';
+        setDomRect?.(null);
       }
-    },
-  );
+    } catch (error) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('[useOnchange] selection tracking failed:', error);
+      }
+    }
+  });
 }

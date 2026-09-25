@@ -1618,7 +1618,9 @@ describe('Editor branches - onSlateChange', () => {
     expect(mockOnChange).toHaveBeenCalledTimes(1);
 
     editor.operations = [{ type: 'insert_text' }];
-    slateOnChange!([{ type: 'paragraph', children: [{ text: 'hello world' }] }]);
+    slateOnChange!([
+      { type: 'paragraph', children: [{ text: 'hello world' }] },
+    ]);
     expect(mockOnChange).toHaveBeenCalledTimes(2);
   });
 
@@ -2782,7 +2784,11 @@ describe('Editor branches - WeChat native input', () => {
     const { container } = setupStore({ readonly: true });
     const addSpy = vi.spyOn(container, 'addEventListener');
     renderEditor({});
-    expect(addSpy).not.toHaveBeenCalledWith('input', expect.any(Function), true);
+    expect(addSpy).not.toHaveBeenCalledWith(
+      'input',
+      expect.any(Function),
+      true,
+    );
     addSpy.mockRestore();
   });
 });
@@ -2838,7 +2844,9 @@ describe('Editor branches - readonly floatBar selection', () => {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [0, 0], offset: 4 },
     };
-    vi.mocked(getSelectionFromDomSelection).mockReturnValue(mockSelection as any);
+    vi.mocked(getSelectionFromDomSelection).mockReturnValue(
+      mockSelection as any,
+    );
     vi.mocked(Range.isCollapsed).mockReturnValue(false);
 
     const origGetSelection = window.getSelection;
@@ -3016,10 +3024,7 @@ describe('Editor branches - decorateFn extended', () => {
       },
     });
 
-    editableProps.decorate([
-      { type: 'table', children: [] },
-      [0],
-    ]);
+    editableProps.decorate([{ type: 'table', children: [] }, [0]]);
     expect(consoleSpy).toHaveBeenCalledWith(
       'Error selecting table node:',
       expect.any(Error),
@@ -3107,7 +3112,9 @@ describe('Editor branches - comment map merge', () => {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [0, 0], offset: 4 },
     };
-    vi.mocked(getSelectionFromDomSelection).mockReturnValue(mockSelection as any);
+    vi.mocked(getSelectionFromDomSelection).mockReturnValue(
+      mockSelection as any,
+    );
     vi.mocked(Range.isCollapsed).mockReturnValue(false);
     vi.mocked(Editor.hasPath).mockReturnValue(true);
     vi.mocked(ReactEditor.toDOMRange).mockReturnValue({
@@ -3414,7 +3421,9 @@ describe('Editor branches - paste and composition depth', () => {
       focus: { path: [0, 0], offset: 0 },
     };
     vi.mocked(handlePasteModule.handleTagNodePaste).mockReturnValue(false);
-    vi.mocked(handlePasteModule.shouldInsertTextDirectly).mockReturnValue(false);
+    vi.mocked(handlePasteModule.shouldInsertTextDirectly).mockReturnValue(
+      false,
+    );
     vi.mocked(handlePasteModule.handleSpecialTextPaste).mockReturnValue(false);
     vi.mocked(handlePasteModule.handleHttpLinkPaste).mockReturnValue(false);
     vi.mocked(handlePasteModule.handlePlainTextPaste).mockResolvedValue(false);
@@ -3663,9 +3672,7 @@ describe('Editor branches - deepen round 2', () => {
 
     expect(EditorUtils.reset).toHaveBeenCalledWith(
       expect.anything(),
-      expect.arrayContaining([
-        expect.objectContaining({ type: 'paragraph' }),
-      ]),
+      expect.arrayContaining([expect.objectContaining({ type: 'paragraph' })]),
     );
   });
 

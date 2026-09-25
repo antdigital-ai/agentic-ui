@@ -46,7 +46,11 @@ function mockFileInput() {
   });
   vi.spyOn(document.body, 'appendChild').mockImplementation((n) => n);
 
-  return { input, click, getOnchange: () => onchange as ((e: Event) => void) | null };
+  return {
+    input,
+    click,
+    getOnchange: () => onchange as ((e: Event) => void) | null,
+  };
 }
 
 describe('useFileUploadManager deepen residual branches', () => {

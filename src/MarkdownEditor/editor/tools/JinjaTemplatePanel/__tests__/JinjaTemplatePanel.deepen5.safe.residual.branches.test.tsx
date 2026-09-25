@@ -37,7 +37,9 @@ vi.mock('../style', () => ({
 
 const mockBefore = vi.fn(() => ({ path: [0, 0], offset: 0 }));
 const mockEnd = vi.fn(() => ({ path: [0, 0], offset: 2 }));
-const mockNode = vi.fn(() => [{ type: 'paragraph', children: [{ text: '{{' }] }]);
+const mockNode = vi.fn(() => [
+  { type: 'paragraph', children: [{ text: '{{' }] },
+]);
 
 vi.mock('slate', () => ({
   Editor: {

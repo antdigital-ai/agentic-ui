@@ -2,6 +2,7 @@
  * remarkParse 分支覆盖：段落转 image/table/link、加粗修复、Jinja 保护与解析器缓存。
  */
 import { describe, expect, it } from 'vitest';
+import { JINJA_DOLLAR_PLACEHOLDER } from '../constants';
 import {
   convertParagraphToImage,
   createMarkdownParser,
@@ -9,7 +10,6 @@ import {
   getMarkdownParser,
   protectJinjaDollarInText,
 } from '../remarkParse';
-import { JINJA_DOLLAR_PLACEHOLDER } from '../constants';
 
 const runTransform = (transformer: () => (tree: any) => void, tree: any) => {
   transformer()(tree);

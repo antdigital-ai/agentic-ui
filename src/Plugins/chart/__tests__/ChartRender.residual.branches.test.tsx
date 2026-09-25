@@ -2,7 +2,13 @@
  * ChartRender 残留：runtime 映射、height/title 回退、i18n、copy、字段规范化。
  */
 import '@testing-library/jest-dom';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { I18nContext } from '../../../I18n';
@@ -22,12 +28,10 @@ vi.mock('../../../Hooks/useIntersectionOnce', () => ({
   useIntersectionOnce: () => true,
 }));
 
-const mk =
-  (testId: string, bucket: any[]) =>
-  (props: any) => {
-    bucket.push(props);
-    return <div data-testid={testId} />;
-  };
+const mk = (testId: string, bucket: any[]) => (props: any) => {
+  bucket.push(props);
+  return <div data-testid={testId} />;
+};
 
 vi.mock('../loadChartRuntime', () => ({
   loadChartRuntime: vi.fn(async () => ({
@@ -66,7 +70,9 @@ const i18nFull = {
 const wrap = (ui: React.ReactElement) => {
   cleanup();
   return render(
-    <I18nContext.Provider value={i18nFallback as any}>{ui}</I18nContext.Provider>,
+    <I18nContext.Provider value={i18nFallback as any}>
+      {ui}
+    </I18nContext.Provider>,
   );
 };
 
@@ -120,7 +126,9 @@ describe('ChartRender residual data/config branches', () => {
         title={undefined as any}
       />,
     );
-    await waitFor(() => expect(screen.getByTestId('radar')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByTestId('radar')).toBeInTheDocument(),
+    );
     expect(runtimeProps.radar[0]?.height).toBe(400);
     expect(runtimeProps.radar[0]?.title).toBe('');
     expect(runtimeProps.radar[0]?.data).toEqual([]);
@@ -175,9 +183,7 @@ describe('ChartRender residual data/config branches', () => {
         config={{ columns: titledConfig.columns, x: 'name', y: 'value' } as any}
       />,
     );
-    await waitFor(() =>
-      expect(runtimeProps.pie.length).toBeGreaterThan(0),
-    );
+    await waitFor(() => expect(runtimeProps.pie.length).toBeGreaterThan(0));
     expect(runtimeProps.pie[0]?.loading).toBe(false);
     expect(runtimeProps.pie[0]?.width ?? runtimeProps.pie[0]?.height).toBe(400);
 
@@ -224,14 +230,18 @@ describe('ChartRender residual data/config branches', () => {
     wrap(
       <ChartRender
         chartType="radar"
-        chartData={[{ name: 'dim', value: 5, cat: 'C1', series: 'S1', fl: 'F1' }]}
+        chartData={[
+          { name: 'dim', value: 5, cat: 'C1', series: 'S1', fl: 'F1' },
+        ]}
         config={titledConfig as any}
         groupBy="cat"
         colorLegend="series"
         filterBy="fl"
       />,
     );
-    await waitFor(() => expect(screen.getByTestId('radar')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByTestId('radar')).toBeInTheDocument(),
+    );
     expect(runtimeProps.radar.at(-1)?.data[0]).toEqual(
       expect.objectContaining({
         category: 'C1',
@@ -244,7 +254,14 @@ describe('ChartRender residual data/config branches', () => {
       <ChartRender
         chartType="funnel"
         chartData={[
-          { name: 'step', value: 100, ratio: 50, cat: 'C1', series: 'S1', fl: 'F1' },
+          {
+            name: 'step',
+            value: 100,
+            ratio: 50,
+            cat: 'C1',
+            series: 'S1',
+            fl: 'F1',
+          },
         ]}
         config={titledConfig as any}
         groupBy="cat"
@@ -356,7 +373,9 @@ describe('ChartRender residual data/config branches', () => {
       </I18nContext.Provider>,
     );
     await waitFor(() => {
-      const tables = document.querySelectorAll('.ant-agentic-plugin-chart__table');
+      const tables = document.querySelectorAll(
+        '.ant-agentic-plugin-chart__table',
+      );
       expect(tables.length).toBeGreaterThan(0);
     });
     const copyIcons = document.querySelectorAll('.anticon-copy');
@@ -400,7 +419,11 @@ describe('ChartRender residual data/config branches', () => {
       );
       await waitFor(() => {
         const id =
-          chartType === 'column' ? 'bar' : chartType === 'area' ? 'area' : 'line';
+          chartType === 'column'
+            ? 'bar'
+            : chartType === 'area'
+              ? 'area'
+              : 'line';
         expect(screen.getByTestId(id)).toBeInTheDocument();
       });
     }
@@ -501,7 +524,9 @@ describe('ChartRender residual data/config branches', () => {
         title="hist-map"
       />,
     );
-    await waitFor(() => expect(runtimeProps.histogram.length).toBeGreaterThan(0));
+    await waitFor(() =>
+      expect(runtimeProps.histogram.length).toBeGreaterThan(0),
+    );
     expect(runtimeProps.histogram.at(-1)?.height).toBe(280);
 
     wrap(
@@ -690,9 +715,7 @@ describe('ChartRender residual data/config branches', () => {
         title=""
       />,
     );
-    await waitFor(() =>
-      expect(runtimeProps.scatter.length).toBeGreaterThan(0),
-    );
+    await waitFor(() => expect(runtimeProps.scatter.length).toBeGreaterThan(0));
     expect(runtimeProps.scatter.at(-1)?.data?.[0]).toEqual(
       expect.objectContaining({ x: 2, y: 4 }),
     );
@@ -747,10 +770,7 @@ describe('ChartRender residual data/config branches', () => {
         chartData={[{ name: 'A', value: null, key: '1' }]}
         config={
           {
-            columns: [
-              { title: '', dataIndex: 'name' },
-              { dataIndex: 'value' },
-            ],
+            columns: [{ title: '', dataIndex: 'name' }, { dataIndex: 'value' }],
             x: 'name',
             y: 'value',
           } as any

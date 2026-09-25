@@ -95,9 +95,7 @@ describe('parserSlateNodeToMarkdown deepen5 residual', () => {
         children: [
           {
             type: 'list-item',
-            children: [
-              { type: 'paragraph', children: [{ text: 'one' }] },
-            ],
+            children: [{ type: 'paragraph', children: [{ text: 'one' }] }],
           },
         ],
       },

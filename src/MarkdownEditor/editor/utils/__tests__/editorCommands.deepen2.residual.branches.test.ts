@@ -41,9 +41,7 @@ describe('editorCommands deepen2 residual branches', () => {
 
   it('中间选区拆分后仍可再设标题（path 变化容错）', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: 'ABCDEFGH' }] },
-    ];
+    editor.children = [{ type: 'paragraph', children: [{ text: 'ABCDEFGH' }] }];
     Transforms.select(editor, {
       anchor: { path: [0, 0], offset: 2 },
       focus: { path: [0, 0], offset: 6 },

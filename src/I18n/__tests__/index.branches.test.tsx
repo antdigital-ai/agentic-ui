@@ -77,7 +77,9 @@ describe('I18n 分支覆盖', () => {
   it('useMergedLocale 无 override 返回原 locale', () => {
     const Probe = () => {
       const locale = useMergedLocale();
-      return <span data-testid="loc">{locale === cnLabels ? 'cn' : 'other'}</span>;
+      return (
+        <span data-testid="loc">{locale === cnLabels ? 'cn' : 'other'}</span>
+      );
     };
     render(
       <I18nContext.Provider value={{ locale: cnLabels, language: 'zh-CN' }}>

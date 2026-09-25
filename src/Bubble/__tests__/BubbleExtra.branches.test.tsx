@@ -50,7 +50,11 @@ vi.mock('../MessagesContent/CopyButton', () => ({
 }));
 
 vi.mock('../MessagesContent/VoiceButton', () => ({
-  VoiceButton: () => <button type="button" data-testid="voice-button">voice</button>,
+  VoiceButton: () => (
+    <button type="button" data-testid="voice-button">
+      voice
+    </button>
+  ),
 }));
 
 vi.mock('../../Components/Loading', () => ({
@@ -144,7 +148,9 @@ describe('BubbleExtra 分支覆盖', () => {
 
   it('rightRender=false 时不渲染右侧 dom', () => {
     render(<BubbleExtra {...baseProps} rightRender={false} />);
-    expect(screen.queryByTestId('chat-item-copy-button')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('chat-item-copy-button'),
+    ).not.toBeInTheDocument();
     expect(screen.getByTestId('reply-button')).toBeInTheDocument();
   });
 
@@ -229,7 +235,10 @@ describe('BubbleExtra 分支覆盖', () => {
         bubble={makeBubble({ feedback: 'thumbsUp' })}
       />,
     );
-    expect(screen.getByTestId('like-button')).toHaveAttribute('title', '已反馈');
+    expect(screen.getByTestId('like-button')).toHaveAttribute(
+      'title',
+      '已反馈',
+    );
   });
 
   it('copy 与 like 同时存在时渲染 Divider', () => {
@@ -261,7 +270,11 @@ describe('BubbleExtra 分支覆盖', () => {
       <BubbleConfigContext.Provider value={{ compact: true }}>
         <BubbleExtra
           {...baseProps}
-          bubble={makeBubble({ isFinished: false, isAborted: false, content: 'gen' })}
+          bubble={makeBubble({
+            isFinished: false,
+            isAborted: false,
+            content: 'gen',
+          })}
         />
       </BubbleConfigContext.Provider>,
     );
@@ -283,12 +296,7 @@ describe('BubbleExtra 分支覆盖', () => {
   });
 
   it('无 preMessage 时不渲染 reSend', () => {
-    render(
-      <BubbleExtra
-        {...baseProps}
-        bubble={makeBubble({ extra: {} })}
-      />,
-    );
+    render(<BubbleExtra {...baseProps} bubble={makeBubble({ extra: {} })} />);
     expect(screen.queryByTestId('reply-button')).not.toBeInTheDocument();
   });
 
@@ -357,24 +365,27 @@ describe('BubbleExtra 分支覆盖', () => {
   });
 
   it('shouldShowCopy 函数返回 false 时隐藏复制', () => {
-    render(
-      <BubbleExtra
-        {...baseProps}
-        shouldShowCopy={() => false}
-      />,
-    );
-    expect(screen.queryByTestId('chat-item-copy-button')).not.toBeInTheDocument();
+    render(<BubbleExtra {...baseProps} shouldShowCopy={() => false} />);
+    expect(
+      screen.queryByTestId('chat-item-copy-button'),
+    ).not.toBeInTheDocument();
   });
 
   it('shouldShowCopy 布尔 false 时隐藏复制', () => {
     render(<BubbleExtra {...baseProps} shouldShowCopy={false} />);
-    expect(screen.queryByTestId('chat-item-copy-button')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('chat-item-copy-button'),
+    ).not.toBeInTheDocument();
   });
 
   it('onDisLike 废弃回调仍可触发点踩', async () => {
     const onDisLike = vi.fn();
     render(
-      <BubbleExtra {...baseProps} onDislike={undefined} onDisLike={onDisLike} />,
+      <BubbleExtra
+        {...baseProps}
+        onDislike={undefined}
+        onDisLike={onDisLike}
+      />,
     );
     fireEvent.click(screen.getByTestId('dislike-button'));
     await waitFor(() => expect(onDisLike).toHaveBeenCalled());
@@ -462,7 +473,9 @@ describe('BubbleExtra 分支覆盖', () => {
         shouldShowCopy={false}
       />,
     );
-    expect(screen.queryByTestId('chat-item-copy-button')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('chat-item-copy-button'),
+    ).not.toBeInTheDocument();
   });
 
   it('rightRender 函数返回自定义节点', () => {
@@ -509,7 +522,10 @@ describe('BubbleExtra 分支覆盖', () => {
       </BubbleConfigContext.Provider>,
     );
     const extra = container.querySelector('.chat-item-extra');
-    expect(extra).toHaveAttribute('style', expect.stringContaining('padding: 0'));
+    expect(extra).toHaveAttribute(
+      'style',
+      expect.stringContaining('padding: 0'),
+    );
   });
 
   it('shouldShowVoice 为 false 时不渲染语音按钮', () => {
@@ -527,9 +543,7 @@ describe('BubbleExtra 分支覆盖', () => {
     const onReply = vi.fn();
     render(<BubbleExtra {...baseProps} onReply={onReply} />);
     fireEvent.click(screen.getByTestId('reply-button'));
-    await waitFor(() =>
-      expect(onReply).toHaveBeenCalledWith('retry prompt'),
-    );
+    await waitFor(() => expect(onReply).toHaveBeenCalledWith('retry prompt'));
   });
 
   it('点踩失败时静默 catch', async () => {
@@ -593,12 +607,7 @@ describe('BubbleExtra 分支覆盖', () => {
   });
 
   it('shouldShowCopy 函数返回 true 时显示复制', () => {
-    render(
-      <BubbleExtra
-        {...baseProps}
-        shouldShowCopy={() => true}
-      />,
-    );
+    render(<BubbleExtra {...baseProps} shouldShowCopy={() => true} />);
     expect(screen.getByTestId('chat-item-copy-button')).toBeInTheDocument();
   });
 

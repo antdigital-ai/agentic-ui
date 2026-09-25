@@ -56,10 +56,7 @@ describe('codeTagLeafBehavior more residual branches', () => {
     editor.children = [
       {
         type: 'paragraph',
-        children: [
-          { text: 'x', tag: true, code: true },
-          { text: 'y' },
-        ],
+        children: [{ text: 'x', tag: true, code: true }, { text: 'y' }],
       },
     ];
     editor.selection = {

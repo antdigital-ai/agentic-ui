@@ -4,6 +4,7 @@ import { ConfigProvider, Dropdown, Flex, Tooltip } from 'antd';
 import classNames from 'clsx';
 import React, { useMemo, useState } from 'react';
 import { useSpeechSynthesis } from '../../../Hooks/useSpeechSynthesis';
+import { useLocale } from '../../../I18n';
 import VoicingLottie from '../../../Icons/animated/VoicingLottie';
 import { useStyle } from './style';
 import { UseSpeechAdapter } from './types';
@@ -39,6 +40,7 @@ export const VoiceButton: React.FC<VoiceButtonProps> = ({
   const prefixCls =
     configContext?.getPrefixCls(`agent-voice-button`) || 'agent-voice-button';
   const { hashId } = useStyle(prefixCls);
+  const locale = useLocale();
   const [isPlayHover, setIsPlayHover] = useState<boolean>(false);
   const [isPlayingHovered, setIsPlayingHovered] = useState(false);
 
@@ -86,9 +88,9 @@ export const VoiceButton: React.FC<VoiceButtonProps> = ({
   };
 
   const tooltipText = useMemo(() => {
-    if (!isFeatureSupported) return '当前环境不支持语音播报';
-    return isPlaying ? '停止播报' : '语音播报';
-  }, [isFeatureSupported, isPlaying]);
+    if (!isFeatureSupported) return locale['voice.unsupported'];
+    return isPlaying ? locale['voice.stop'] : locale['voice.play'];
+  }, [isFeatureSupported, isPlaying, locale]);
 
   const normalizedRateOptions = useMemo(() => {
     const set = new Set<number>([...rateOptions, 1]);
@@ -127,7 +129,7 @@ export const VoiceButton: React.FC<VoiceButtonProps> = ({
           className={classNames(`${prefixCls}-playBox`, hashId)}
           role="button"
           tabIndex={0}
-          aria-label={'语音播报'}
+          aria-label={locale['voice.play']}
           aria-disabled={!isFeatureSupported || !text}
         >
           <Tooltip title={tooltipText} mouseEnterDelay={0.1}>

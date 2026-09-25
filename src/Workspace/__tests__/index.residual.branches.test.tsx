@@ -42,7 +42,11 @@ describe('Workspace index residual branches', () => {
     wrap(
       <Workspace
         title={<span data-testid="ws-title">W</span>}
-        headerExtra={<button type="button" data-testid="ws-extra">E</button>}
+        headerExtra={
+          <button type="button" data-testid="ws-extra">
+            E
+          </button>
+        }
       >
         <Workspace.Browser url="https://a.com" />
         <Workspace.File nodes={[]} />

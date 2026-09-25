@@ -18,16 +18,18 @@ describe('LayoutHeader 额外分支', () => {
   it('默认 title；leftCollapsible=false 时点击不切换', async () => {
     const onLeft = vi.fn();
     renderHeader(
-      <LayoutHeader title="T" leftCollapsible={false} onLeftCollapse={onLeft} />,
+      <LayoutHeader
+        title="T"
+        leftCollapsible={false}
+        onLeftCollapse={onLeft}
+      />,
     );
     expect(screen.getByText('T')).toBeInTheDocument();
     expect(onLeft).not.toHaveBeenCalled();
   });
 
   it('leftDefaultCollapsed 初始折叠图标', () => {
-    renderHeader(
-      <LayoutHeader leftCollapsible leftDefaultCollapsed />,
-    );
+    renderHeader(<LayoutHeader leftCollapsible leftDefaultCollapsed />);
     expect(
       screen.getByRole('button', { name: /折叠左侧|collapse/i }),
     ).toBeInTheDocument();

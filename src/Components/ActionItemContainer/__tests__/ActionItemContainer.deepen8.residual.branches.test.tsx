@@ -74,7 +74,6 @@ describe('ActionItemContainer deepen8 residual branches', () => {
     expect(screen.getByText('One')).toBeInTheDocument();
   });
 
-
   it('追加子项：merged.length !== incoming.length', () => {
     const a = [
       <button key="1" type="button">

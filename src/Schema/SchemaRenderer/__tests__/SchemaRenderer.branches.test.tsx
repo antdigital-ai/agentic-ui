@@ -1841,7 +1841,13 @@ describe('SchemaRenderer targeted coverage', () => {
 
   it('debug=false 时仍正常渲染有效 schema', async () => {
     mockValidate.mockImplementation(() => ({ valid: true, errors: [] }));
-    render(<SchemaRenderer schema={baseSchema} values={{ name: 'OK' }} debug={false} />);
+    render(
+      <SchemaRenderer
+        schema={baseSchema}
+        values={{ name: 'OK' }}
+        debug={false}
+      />,
+    );
     await waitFor(() => {
       expect(screen.getByTestId('schema-renderer')).toBeInTheDocument();
     });
@@ -2201,7 +2207,9 @@ describe('SchemaRenderer targeted coverage', () => {
         values={{ name: 'T' }}
       />,
     );
-    expect(container.querySelector('.schemaRenderer') || container.firstChild).toBeTruthy();
+    expect(
+      container.querySelector('.schemaRenderer') || container.firstChild,
+    ).toBeTruthy();
   });
 
   it.skip('validation 失败 debug=true 展示 errors 列表', () => {
@@ -2212,18 +2220,14 @@ describe('SchemaRenderer targeted coverage', () => {
         { message: 'bad-b', path: 'age' },
       ],
     }));
-    render(
-      <SchemaRenderer schema={baseSchema} values={{}} debug />,
-    );
+    render(<SchemaRenderer schema={baseSchema} values={{}} debug />);
     expect(screen.getByText(/bad-a|bad-b|invalid|错误/i)).toBeTruthy();
   });
 
   it('schema/component 为 null 时使用 EMPTY 回退', () => {
     mockValidate.mockImplementation(() => ({ valid: true, errors: [] }));
     expect(() =>
-      render(
-        <SchemaRenderer schema={null as any} values={{}} debug={false} />,
-      ),
+      render(<SchemaRenderer schema={null as any} values={{}} debug={false} />),
     ).not.toThrow();
   });
 });
@@ -2409,7 +2413,9 @@ describe('SchemaRenderer istanbul residual', () => {
     const { container } = render(
       <SchemaRenderer schema={baseSchema} values={{}} debug={false} />,
     );
-    expect(container.querySelector('[data-testid="schema-renderer"]')).toBeNull();
+    expect(
+      container.querySelector('[data-testid="schema-renderer"]'),
+    ).toBeNull();
 
     mockValidate.mockImplementation(() => ({ valid: true, errors: [] }));
     render(

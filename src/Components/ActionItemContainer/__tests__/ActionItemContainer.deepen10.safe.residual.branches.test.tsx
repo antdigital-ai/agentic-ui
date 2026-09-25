@@ -47,7 +47,9 @@ describe('ActionItemContainer deepen10 safe residual branches', () => {
     ) as HTMLElement | null;
     if (popupItem) {
       const evt = new MouseEvent('mousedown', { bubbles: true });
-      Object.defineProperty(evt, 'target', { value: document.createTextNode('x') });
+      Object.defineProperty(evt, 'target', {
+        value: document.createTextNode('x'),
+      });
       popupItem.dispatchEvent(evt);
       fireEvent.mouseUp(popupItem);
     }
@@ -96,9 +98,7 @@ describe('ActionItemContainer deepen10 safe residual branches', () => {
       <ActionItemContainer>{items}</ActionItemContainer>,
     );
     const root = container.firstElementChild as HTMLElement;
-    const scroll = container.querySelector(
-      '[class*="scroll"]',
-    ) as HTMLElement;
+    const scroll = container.querySelector('[class*="scroll"]') as HTMLElement;
     Object.defineProperty(scroll, 'scrollLeft', {
       value: 0,
       writable: true,
@@ -127,10 +127,20 @@ describe('ActionItemContainer deepen10 safe residual branches', () => {
     const root = container.firstElementChild as HTMLElement;
     const scroll = (container.querySelector('[class*="scroll"]') ||
       container.firstElementChild) as HTMLElement;
-    Object.defineProperty(scroll, 'scrollWidth', { value: 900, configurable: true });
-    Object.defineProperty(scroll, 'clientWidth', { value: 200, configurable: true });
+    Object.defineProperty(scroll, 'scrollWidth', {
+      value: 900,
+      configurable: true,
+    });
+    Object.defineProperty(scroll, 'clientWidth', {
+      value: 200,
+      configurable: true,
+    });
     fireEvent.pointerDown(root, { button: 0, clientX: 200, pointerId: 4 });
-    fireEvent.pointerMove(root, { clientX: 100, pointerId: 4, cancelable: false });
+    fireEvent.pointerMove(root, {
+      clientX: 100,
+      pointerId: 4,
+      cancelable: false,
+    });
     fireEvent.pointerUp(root, { pointerId: 4 });
     expect(screen.getByText('Pan')).toBeInTheDocument();
   });

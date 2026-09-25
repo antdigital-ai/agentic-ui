@@ -40,10 +40,7 @@ describe('bubblePropsAreEqual deepen4 residual branches', () => {
 
   it('originData 一侧 undefined', () => {
     expect(
-      bubblePropsAreEqual(
-        { id: 'm1' } as any,
-        props({ originData: origin() }),
-      ),
+      bubblePropsAreEqual({ id: 'm1' } as any, props({ originData: origin() })),
     ).toBe(false);
   });
 
@@ -82,10 +79,7 @@ describe('bubblePropsAreEqual deepen4 residual branches', () => {
       ),
     ).toBe(false);
     expect(
-      bubblePropsAreEqual(
-        props({ className: 'a' }),
-        props({ className: 'b' }),
-      ),
+      bubblePropsAreEqual(props({ className: 'a' }), props({ className: 'b' })),
     ).toBe(false);
   });
 });

@@ -76,7 +76,10 @@ describe('TableCellIndex deepen2 residual branches', () => {
             ...ctx,
           }}
         >
-          <Slate editor={currentTestEditor || withReact(createEditor())} initialValue={[]}>
+          <Slate
+            editor={currentTestEditor || withReact(createEditor())}
+            initialValue={[]}
+          >
             <table>
               <tbody>
                 <tr>
@@ -162,10 +165,7 @@ describe('TableCellIndex deepen2 residual branches', () => {
       { deleteIconPosition: { rowIndex: 0 } },
     );
     // icons may not show without rowIndex match; force via matching position
-    renderCell(
-      { rowIndex: 1 },
-      { deleteIconPosition: { rowIndex: 0 } },
-    );
+    renderCell({ rowIndex: 1 }, { deleteIconPosition: { rowIndex: 0 } });
     expect(document.querySelector('td')).toBeTruthy();
   });
 

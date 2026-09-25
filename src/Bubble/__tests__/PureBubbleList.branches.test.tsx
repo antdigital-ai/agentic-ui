@@ -6,8 +6,8 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
-import { LOADING_FLAT } from '../MessagesContent';
 import { PureBubbleList } from '../List/PureBubbleList';
+import { LOADING_FLAT } from '../MessagesContent';
 
 vi.mock('../List/SkeletonList', () => ({
   default: () => <div data-testid="skeleton">loading</div>,
@@ -28,11 +28,7 @@ vi.mock('../../MarkdownEditor/editor/components/LazyElement', () => ({
   ),
 }));
 
-const msg = (
-  id: string,
-  role: 'user' | 'assistant',
-  content: string,
-) => ({
+const msg = (id: string, role: 'user' | 'assistant', content: string) => ({
   id,
   role,
   content,
@@ -143,10 +139,7 @@ describe('PureBubbleList branches', () => {
 
   it('readonly 应用 readonly 类名', () => {
     const { container } = render(
-      <PureBubbleList
-        bubbleList={[msg('1', 'assistant', 'r')]}
-        readonly
-      />,
+      <PureBubbleList bubbleList={[msg('1', 'assistant', 'r')]} readonly />,
     );
     expect(container.firstChild?.className).toContain('readonly');
   });

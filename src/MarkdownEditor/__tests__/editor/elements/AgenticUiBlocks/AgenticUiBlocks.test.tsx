@@ -112,7 +112,9 @@ describe('AgenticUiTaskBlock / AgenticUiToolUseBarBlock', () => {
         element={
           {
             type: 'agentic-ui-toolusebar',
-            value: { tools: [{ id: 'ro', toolName: 'ro-tool', toolTarget: '' }] },
+            value: {
+              tools: [{ id: 'ro', toolName: 'ro-tool', toolTarget: '' }],
+            },
           } as any
         }
       >

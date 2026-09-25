@@ -41,7 +41,9 @@ describe('EditorUtils deepen2 residual branches', () => {
 
   it('clearMarks：无 selection 早退；非 list-item 父', () => {
     const editor = createEditor();
-    editor.children = [{ type: 'paragraph', children: [{ text: 'hi', bold: true }] }];
+    editor.children = [
+      { type: 'paragraph', children: [{ text: 'hi', bold: true }] },
+    ];
     editor.selection = null;
     expect(() => EditorUtils.clearMarks(editor)).not.toThrow();
 
@@ -57,9 +59,7 @@ describe('EditorUtils deepen2 residual branches', () => {
     editor.children = [
       {
         type: 'paragraph',
-        children: [
-          { text: 'hello link hello', url: 'https://ex.com' },
-        ],
+        children: [{ text: 'hello link hello', url: 'https://ex.com' }],
       },
     ];
     const hits = findByPathAndText(editor as any, [0], 'hello', {

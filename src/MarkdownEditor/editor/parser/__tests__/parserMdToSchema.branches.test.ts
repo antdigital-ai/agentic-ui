@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { parserMdToSchema } from '../parserMdToSchema';
 import type { MarkdownEditorPlugin } from '../../../plugin';
+import { parserMdToSchema } from '../parserMdToSchema';
 
 describe('parserMdToSchema 分支覆盖', () => {
   it('istanbul one-miss: 过滤 html+isConfig 节点', () => {
@@ -22,9 +22,7 @@ describe('parserMdToSchema 分支覆盖', () => {
     const result = parserMdToSchema('# heading', [plugin]);
 
     expect(
-      result.schema.some(
-        (s: any) => s.language === 'html' && s.isConfig,
-      ),
+      result.schema.some((s: any) => s.language === 'html' && s.isConfig),
     ).toBe(false);
   });
 

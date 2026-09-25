@@ -382,9 +382,7 @@ describe('BackspaceKey - Markdown 输出测试', () => {
           children: [{ text: '' }],
         },
       ]);
-      expect(getMarkdown()).toBe(
-        '```ts\nconst existing = true;\nText\n```',
-      );
+      expect(getMarkdown()).toBe('```ts\nconst existing = true;\nText\n```');
     });
   });
 

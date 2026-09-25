@@ -25,9 +25,7 @@ describe('markdownReactShared deepen12 safe residual', () => {
   });
 
   it('pendingBlankLines + current 非空：同行 think 对先提交 block', () => {
-    const blocks = splitMarkdownBlocks(
-      'para one\n\n<think>inline</think>',
-    );
+    const blocks = splitMarkdownBlocks('para one\n\n<think>inline</think>');
     expect(blocks.length).toBeGreaterThan(1);
   });
 
@@ -39,22 +37,16 @@ describe('markdownReactShared deepen12 safe residual', () => {
   });
 
   it('think 闭标签 pending blanks current 空', () => {
-    const blocks = splitMarkdownBlocks(
-      '\n\n</think>\nafter close',
-    );
+    const blocks = splitMarkdownBlocks('\n\n</think>\nafter close');
     expect(blocks.some((b) => b.includes('after') || b.length >= 0)).toBe(true);
   });
 
   it('think 内 pending blanks；行内闭标签后正文', () => {
-    const inline = splitMarkdownBlocks(
-      'head<think>in</think> tail\nnext',
-    );
+    const inline = splitMarkdownBlocks('head<think>in</think> tail\nnext');
     expect(inline.some((b) => b.includes('tail') || b.includes('next'))).toBe(
       true,
     );
-    const openClose = splitMarkdownBlocks(
-      '<think>\n\nline\n</think>\n\nend',
-    );
+    const openClose = splitMarkdownBlocks('<think>\n\nline\n</think>\n\nend');
     expect(openClose.some((b) => b.includes('end'))).toBe(true);
   });
 

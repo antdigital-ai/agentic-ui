@@ -2,7 +2,13 @@
  * HistogramChart deepen residual：空分箱、同值、预分箱、频率、色回退、mobile。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import HistogramChart from '../index';
@@ -119,7 +125,10 @@ describe('HistogramChart deepen residual branches', () => {
     );
     const ds = (globalThis as any).__histResData?.datasets;
     expect(ds?.length).toBeGreaterThan(0);
-    const sum = (ds?.[0]?.data || []).reduce((a: number, b: number) => a + b, 0);
+    const sum = (ds?.[0]?.data || []).reduce(
+      (a: number, b: number) => a + b,
+      0,
+    );
     expect(sum).toBeLessThanOrEqual(1.01);
   });
 

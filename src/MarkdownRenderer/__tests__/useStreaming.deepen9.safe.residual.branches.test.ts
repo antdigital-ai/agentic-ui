@@ -23,9 +23,10 @@ describe('useStreaming deepen9 safe residual branches', () => {
     const partialPipes = renderHook(() =>
       useStreaming('| A | B |\n| --- | --- |\n| x', true),
     );
-    expect(partialPipes.result.current === '...' || partialPipes.result.current.length > 0).toBe(
-      true,
-    );
+    expect(
+      partialPipes.result.current === '...' ||
+        partialPipes.result.current.length > 0,
+    ).toBe(true);
   });
 
   it('第三行未收口 |；列数不匹配', () => {
@@ -36,18 +37,20 @@ describe('useStreaming deepen9 safe residual branches', () => {
     const mismatch = renderHook(() =>
       useStreaming('| A | B |\n| --- | --- |\n| 1 | 2 | 3 |', true),
     );
-    expect(mismatch.result.current === '...' || typeof mismatch.result.current === 'string').toBe(
-      true,
-    );
+    expect(
+      mismatch.result.current === '...' ||
+        typeof mismatch.result.current === 'string',
+    ).toBe(true);
   });
 
   it('listPrefix 假值臂；仅 pending → placeholder', () => {
     const listPlain = renderHook(() => useStreaming('- plain', true));
     expect(typeof listPlain.result.current).toBe('string');
     const incomplete = renderHook(() => useStreaming('[link', true));
-    expect(incomplete.result.current === '...' || incomplete.result.current.length >= 0).toBe(
-      true,
-    );
+    expect(
+      incomplete.result.current === '...' ||
+        incomplete.result.current.length >= 0,
+    ).toBe(true);
   });
 
   it('同文 rerender 空 chunk；前缀重置 processedLength=0', () => {
@@ -67,13 +70,17 @@ describe('useStreaming deepen9 safe residual branches', () => {
       ({ text }) => useStreaming(text, true),
       { initialProps: { text: '```js\n' } },
     );
-    expect(result.current === '...' || result.current.includes('```')).toBe(true);
+    expect(result.current === '...' || result.current.includes('```')).toBe(
+      true,
+    );
     rerender({ text: 'plain text' });
     expect(result.current).toContain('plain');
   });
 
   it('非 Text token 早退：emphasis 未完成', () => {
     const { result } = renderHook(() => useStreaming('*bold', true));
-    expect(result.current === '...' || typeof result.current === 'string').toBe(true);
+    expect(result.current === '...' || typeof result.current === 'string').toBe(
+      true,
+    );
   });
 });

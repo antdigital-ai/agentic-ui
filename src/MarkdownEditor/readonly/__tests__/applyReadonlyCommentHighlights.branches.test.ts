@@ -26,7 +26,11 @@ describe('applyReadonlyCommentHighlights 分支覆盖', () => {
   it('root 为 null 时 clear/apply/bind 均安全短路', () => {
     expect(() => clearReadonlyCommentHighlights(null)).not.toThrow();
     expect(() =>
-      applyReadonlyCommentHighlights(null, [{ id: '1', content: 'c' }] as any, PREFIX),
+      applyReadonlyCommentHighlights(
+        null,
+        [{ id: '1', content: 'c' }] as any,
+        PREFIX,
+      ),
     ).not.toThrow();
     const unbind = bindReadonlyCommentClick(null, vi.fn(), []);
     expect(typeof unbind).toBe('function');
@@ -192,14 +196,10 @@ describe('applyReadonlyCommentHighlights 分支覆盖', () => {
       PREFIX,
     );
     const onShow = vi.fn();
-    const unbind = bindReadonlyCommentClick(
-      root,
-      onShow,
-      [
-        { id: 'm', content: 'keep', refContent: 'ME' },
-        { id: 'empty', content: '', refContent: 'ME' },
-      ] as any,
-    );
+    const unbind = bindReadonlyCommentClick(root, onShow, [
+      { id: 'm', content: 'keep', refContent: 'ME' },
+      { id: 'empty', content: '', refContent: 'ME' },
+    ] as any);
     const mark = root.querySelector('mark')!;
     mark.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(onShow).toHaveBeenCalledWith([
@@ -330,16 +330,18 @@ describe('applyReadonlyCommentHighlights 分支覆盖', () => {
     const unbind = bindReadonlyCommentClick(host, onShow, [
       { id: 'out', content: 'keep', refContent: 'OUT' },
     ] as any);
-    foreign.querySelector('mark')!.dispatchEvent(
-      new MouseEvent('click', { bubbles: true }),
-    );
+    foreign
+      .querySelector('mark')!
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(onShow).not.toHaveBeenCalled();
     unbind();
     foreign.remove();
   });
 
   it('shouldSkipTextNode：parentElement 为 null 的文本被 walker 拒绝', () => {
-    const root = makeRoot('<div data-be="paragraph">prefix HIDDEN suffix</div>');
+    const root = makeRoot(
+      '<div data-be="paragraph">prefix HIDDEN suffix</div>',
+    );
     const block = root.querySelector('[data-be="paragraph"]')!;
     // TreeWalker 只遍历树内节点；appendChild(fragment) 会把 orphan 挂到 block。
     // 用 defineProperty 强制 parentElement=null，覆盖 shouldSkipTextNode 早退分支。

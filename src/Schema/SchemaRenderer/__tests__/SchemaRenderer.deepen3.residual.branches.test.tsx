@@ -174,11 +174,7 @@ describe('SchemaRenderer deepen3 residual branches', () => {
       throw 'string-boom';
     });
     render(
-      <SchemaRenderer
-        schema={baseSchema()}
-        values={{ name: 'x' }}
-        debug
-      />,
+      <SchemaRenderer schema={baseSchema()} values={{ name: 'x' }} debug />,
     );
     await waitFor(() => {
       expect(document.body.textContent).toMatch(/string-boom|渲染|error/i);
@@ -189,9 +185,7 @@ describe('SchemaRenderer deepen3 residual branches', () => {
       valid: false,
       errors: [{ message: 'path-only', path: '/instance.age' }],
     });
-    render(
-      <SchemaRenderer schema={baseSchema()} values={{}} debug />,
-    );
+    render(<SchemaRenderer schema={baseSchema()} values={{}} debug />);
     await waitFor(() => {
       expect(document.body.textContent).toMatch(/path-only|验证失败|age/);
     });

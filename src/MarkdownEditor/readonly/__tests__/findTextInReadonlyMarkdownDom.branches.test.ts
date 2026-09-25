@@ -40,9 +40,7 @@ describe('findTextInReadonlyMarkdownDom 分支覆盖', () => {
   it('空搜索 / 空白块返回空', () => {
     const root = buildRoot();
     expect(findTextInReadonlyMarkdownDom(root, [], '   ')).toEqual([]);
-    expect(
-      findTextInReadonlyMarkdownDom(root, [3], 'Hello'),
-    ).toEqual([]);
+    expect(findTextInReadonlyMarkdownDom(root, [3], 'Hello')).toEqual([]);
   });
 
   it('全量搜索命中多块并跳过 code/pre', () => {

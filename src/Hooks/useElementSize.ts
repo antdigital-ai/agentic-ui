@@ -12,7 +12,9 @@ const readElementSize = (target: Element): ElementSize => {
   return { width: rect.width, height: rect.height };
 };
 
-const readResizeObserverEntrySize = (entry: ResizeObserverEntry): ElementSize => {
+const readResizeObserverEntrySize = (
+  entry: ResizeObserverEntry,
+): ElementSize => {
   const borderBox = entry.borderBoxSize?.[0];
   return {
     width: borderBox?.inlineSize ?? entry.contentRect.width,

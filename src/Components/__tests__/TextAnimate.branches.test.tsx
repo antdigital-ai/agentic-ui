@@ -124,7 +124,9 @@ describe('TextAnimate branches', () => {
       );
       const spans = getSegments();
       expect(spans[0]).toHaveAttribute('data-animation', 'custom');
-      expect(spans[0].style.getPropertyValue('--text-animate-delay')).toBeTruthy();
+      expect(
+        spans[0].style.getPropertyValue('--text-animate-delay'),
+      ).toBeTruthy();
     });
 
     it('accessible=false 且非字符串 children 不设 aria-label', () => {

@@ -75,7 +75,7 @@ describe('PreviewComponent deepen2 safe residual branches', () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
   });
 
-  it('html ready + 空 rawContent → ||\'\'；error 走 Alert locale', () => {
+  it("html ready + 空 rawContent → ||''；error 走 Alert locale", () => {
     // getContentStatus：`'error' in state` 为真即 error，ready 态勿带 error 键
     vi.mocked(usePreviewContent).mockReturnValue({
       processResult: {
@@ -90,10 +90,10 @@ describe('PreviewComponent deepen2 safe residual branches', () => {
         mdContent: '',
       },
     } as any);
-    wrap(
-      <PreviewComponent file={{ name: 'b.html', key: 'b' } as any} />,
+    wrap(<PreviewComponent file={{ name: 'b.html', key: 'b' } as any} />);
+    expect(screen.getByTestId('html-preview').textContent).toMatch(
+      /done:|ready:/,
     );
-    expect(screen.getByTestId('html-preview').textContent).toMatch(/done:|ready:/);
 
     cleanup();
     vi.mocked(usePreviewContent).mockReturnValue({
@@ -110,10 +110,7 @@ describe('PreviewComponent deepen2 safe residual branches', () => {
         mdContent: '',
       },
     } as any);
-    wrap(
-      <PreviewComponent file={{ name: 'a.html', key: 'a' } as any} />,
-      {},
-    );
+    wrap(<PreviewComponent file={{ name: 'a.html', key: 'a' } as any} />, {});
     expect(document.body.textContent).toMatch(/失败|e/);
   });
 
@@ -127,10 +124,7 @@ describe('PreviewComponent deepen2 safe residual branches', () => {
         mdContent: '',
       },
     } as any);
-    wrap(
-      <PreviewComponent file={{ name: 'c.md', key: 'c' } as any} />,
-      {},
-    );
+    wrap(<PreviewComponent file={{ name: 'c.md', key: 'c' } as any} />, {});
     expect(document.body.textContent).toMatch(/加载|loading|处理/i);
 
     cleanup();
@@ -143,10 +137,7 @@ describe('PreviewComponent deepen2 safe residual branches', () => {
         mdContent: '',
       },
     } as any);
-    wrap(
-      <PreviewComponent file={{ name: 'd.md', key: 'd' } as any} />,
-      {},
-    );
+    wrap(<PreviewComponent file={{ name: 'd.md', key: 'd' } as any} />, {});
     expect(document.body.textContent).toMatch(/失败|fail|处理/);
 
     cleanup();

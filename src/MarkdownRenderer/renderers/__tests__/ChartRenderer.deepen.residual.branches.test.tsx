@@ -64,6 +64,8 @@ describe('ChartRenderer deepen residual branches', () => {
     act(() => {
       pending.forEach((cb) => cb(0));
     });
-    expect(container.querySelector('[data-be="chart"]') || container).toBeTruthy();
+    expect(
+      container.querySelector('[data-be="chart"]') || container,
+    ).toBeTruthy();
   });
 });

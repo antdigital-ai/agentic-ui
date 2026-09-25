@@ -11,9 +11,7 @@ describe('parser/constants residual branches', () => {
   it('空串早退', () => {
     expect(preprocessNormalizeLeafToContainerDirective('')).toBe('');
     expect(preprocessProtectTimeFromDirective('')).toBe('');
-    expect(preprocessNormalizeLeafToContainerDirective(null as any)).toBe(
-      null,
-    );
+    expect(preprocessNormalizeLeafToContainerDirective(null as any)).toBe(null);
   });
 
   it('::name / :: 关闭行规范化；围栏内跳过', () => {

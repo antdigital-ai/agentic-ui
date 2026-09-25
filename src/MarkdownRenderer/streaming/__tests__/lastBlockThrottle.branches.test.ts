@@ -13,9 +13,7 @@ describe('lastBlockThrottle residual branches', () => {
   });
 
   it('阈值字符与边界符 / 行内起点', () => {
-    expect(
-      shouldReparseLastBlock('p', `p${'y'.repeat(20)}`, true),
-    ).toBe(true);
+    expect(shouldReparseLastBlock('p', `p${'y'.repeat(20)}`, true)).toBe(true);
     expect(shouldReparseLastBlock('p', 'p#', true)).toBe(true);
     expect(shouldReparseLastBlock('p ', 'p $', true)).toBe(true);
     expect(shouldReparseLastBlock('p', 'pabc', true)).toBe(false);

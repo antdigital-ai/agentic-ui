@@ -52,10 +52,7 @@ describe('Plugins/code index deepen residual', () => {
 
   it('CodeElement：无 element / readonly 空 / csv / 非 csv / 可编辑', () => {
     const { container, rerender } = render(
-      <CodeElement
-        element={null as any}
-        attributes={{} as any}
-      >
+      <CodeElement element={null as any} attributes={{} as any}>
         <span />
       </CodeElement>,
     );

@@ -7,11 +7,7 @@ import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { cnLabels, I18nContext } from '../../I18n';
-import {
-  AgentRunBar,
-  TASK_RUNNING_STATUS,
-  TASK_STATUS,
-} from '../index';
+import { AgentRunBar, TASK_RUNNING_STATUS, TASK_STATUS } from '../index';
 
 vi.mock('framer-motion', () => ({
   motion: {
@@ -22,9 +18,7 @@ vi.mock('framer-motion', () => ({
 const wrap = (ui: React.ReactElement) =>
   render(
     <ConfigProvider>
-      <I18nContext.Provider
-        value={{ locale: cnLabels, language: 'zh-CN' }}
-      >
+      <I18nContext.Provider value={{ locale: cnLabels, language: 'zh-CN' }}>
         {ui}
       </I18nContext.Provider>
     </ConfigProvider>,

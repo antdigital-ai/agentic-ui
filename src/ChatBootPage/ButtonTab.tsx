@@ -115,7 +115,11 @@ const ButtonTabComponent: React.FC<ButtonTabProps> = ({
           onKeyDown={onIconClick && !disabled ? handleIconKeyDown : undefined}
           role={onIconClick && !disabled ? 'button' : undefined}
           tabIndex={onIconClick && !disabled ? 0 : undefined}
-          aria-label={onIconClick && !disabled ? locale['chatBootPage.tabIconAction'] : undefined}
+          aria-label={
+            onIconClick && !disabled
+              ? locale['chatBootPage.tabIconAction']
+              : undefined
+          }
         >
           {icon}
         </span>

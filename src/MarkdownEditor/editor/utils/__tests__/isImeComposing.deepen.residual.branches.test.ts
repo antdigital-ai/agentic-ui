@@ -22,7 +22,9 @@ describe('isImeComposing deepen residual branches', () => {
 
   it('microtask 时 selection 已清空则跳过', async () => {
     const editor = createEditor();
-    editor.children = [{ type: 'paragraph', children: [{ text: 'ab' }] } as any];
+    editor.children = [
+      { type: 'paragraph', children: [{ text: 'ab' }] } as any,
+    ];
     Transforms.select(editor, { path: [0, 0], offset: 2 });
     const insertSpy = vi.spyOn(Transforms, 'insertText');
     commitImeCompositionTextIfMissing(editor, '中', () => 'ab');
@@ -34,7 +36,9 @@ describe('isImeComposing deepen residual branches', () => {
 
   it('microtask 时文本已变长但不含 composed 则不插入', async () => {
     const editor = createEditor();
-    editor.children = [{ type: 'paragraph', children: [{ text: 'ab' }] } as any];
+    editor.children = [
+      { type: 'paragraph', children: [{ text: 'ab' }] } as any,
+    ];
     Transforms.select(editor, { path: [0, 0], offset: 2 });
     let snap = 'ab';
     commitImeCompositionTextIfMissing(editor, '中', () => snap);

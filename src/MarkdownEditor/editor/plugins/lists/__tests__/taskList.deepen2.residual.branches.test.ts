@@ -17,9 +17,7 @@ describe('taskList deepen2 residual branches', () => {
 
   it('路径指向 text 节点时跳过', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: 'x' }] },
-    ];
+    editor.children = [{ type: 'paragraph', children: [{ text: 'x' }] }];
     expect(() =>
       syncListMetadataForMode(editor, 'ordered', [[0, 0]]),
     ).not.toThrow();

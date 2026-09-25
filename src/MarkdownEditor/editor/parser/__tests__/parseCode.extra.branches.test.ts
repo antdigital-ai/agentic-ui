@@ -60,7 +60,8 @@ describe('istanbul residual：parseCode 假值 / 别名 / 标点 lang', () => {
 
   it('configLanguage 假值回退 lang；lang 假值回退 null', () => {
     expect(
-      handleCode({ value: 'x\n', lang: 'ts' }, { 'data-language': null }).language,
+      handleCode({ value: 'x\n', lang: 'ts' }, { 'data-language': null })
+        .language,
     ).toBe('ts');
     expect(
       handleCode({ value: 'x\n', lang: '' }, { 'data-language': false as any })
@@ -79,11 +80,11 @@ describe('istanbul residual：parseCode 假值 / 别名 / 标点 lang', () => {
     expect(handleCode({ value: '', lang: 'apaasify' }).type).toBe('apaasify');
     expect(handleCode({ value: '', lang: 'apassify' }).type).toBe('apaasify');
     // 双侧 parse 都失败时走 _parseError
-    const bad = handleCode({ value: 'not-json-@@@', lang: 'agentic-ui-task' })
-      .value;
-    expect(
-      bad?._parseError === true || typeof bad === 'object',
-    ).toBe(true);
+    const bad = handleCode({
+      value: 'not-json-@@@',
+      lang: 'agentic-ui-task',
+    }).value;
+    expect(bad?._parseError === true || typeof bad === 'object').toBe(true);
     const schemaPartial = handleCode({ value: '[', lang: 'schema' }).value;
     expect(schemaPartial === '[' || Array.isArray(schemaPartial)).toBe(true);
   });
@@ -101,9 +102,9 @@ describe('istanbul residual：parseCode 假值 / 别名 / 标点 lang', () => {
 
 describe('istanbul residual：parseCode LANGUAGE_HANDLERS / finish / render', () => {
   it('agentic 别名与空 {} / [] 回退；html render；apaasify 语言', () => {
-    expect(
-      handleCode({ value: '', lang: 'agentic-ui-usertoolbar' }).type,
-    ).toBe('agentic-ui-toolusebar');
+    expect(handleCode({ value: '', lang: 'agentic-ui-usertoolbar' }).type).toBe(
+      'agentic-ui-toolusebar',
+    );
     expect(handleCode({ value: '', lang: 'agentic-ui-filemap' }).type).toBe(
       'agentic-ui-filemap',
     );
@@ -135,9 +136,9 @@ describe('istanbul residual：parseCode LANGUAGE_HANDLERS / finish / render', ()
       }).otherProps?.finished,
     ).toBeUndefined();
 
-    expect(
-      handleCode({ value: '<!--cfg-->\n', lang: 'js' }).isConfig,
-    ).toBe(true);
+    expect(handleCode({ value: '<!--cfg-->\n', lang: 'js' }).isConfig).toBe(
+      true,
+    );
     expect(handleCode({ value: 'plain\n', lang: 'js' }).isConfig).toBe(false);
 
     expect(

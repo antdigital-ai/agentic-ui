@@ -22,7 +22,9 @@ describe('adaptiveTooltip deepen2 residual branches', () => {
   it('订阅环境并读取 informational/interactive props', () => {
     const unsub = subscribeAdaptiveTooltipEnvironment(() => undefined);
     expect(typeof shouldUseInformationalTooltipClickTrigger()).toBe('boolean');
-    expect(getAdaptiveTooltipTriggerPropsSnapshot('informational')).toBeTruthy();
+    expect(
+      getAdaptiveTooltipTriggerPropsSnapshot('informational'),
+    ).toBeTruthy();
     expect(getAdaptiveTooltipProps('interactive')).toBeTruthy();
     unsub();
   });

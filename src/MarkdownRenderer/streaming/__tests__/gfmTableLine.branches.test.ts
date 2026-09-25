@@ -18,9 +18,9 @@ describe('gfmTableLine 分支覆盖', () => {
   });
 
   it('endsInsideGfmTable 表格结束后非表格行', () => {
-    expect(endsInsideGfmTable('| a | b |\n| --- | --- |\n| 1 | 2 |\n\nDone')).toBe(
-      false,
-    );
+    expect(
+      endsInsideGfmTable('| a | b |\n| --- | --- |\n| 1 | 2 |\n\nDone'),
+    ).toBe(false);
   });
 });
 

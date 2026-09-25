@@ -6,9 +6,9 @@ import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { SchemaForm } from '..';
 import { I18nContext } from '../../../I18n';
 import type { LowCodeSchema } from '../../types';
-import { SchemaForm } from '..';
 
 const baseSchema = (properties: any): LowCodeSchema =>
   ({
@@ -172,7 +172,9 @@ describe('SchemaForm deepen residual branches (enabled)', () => {
     );
     expect(screen.getByText('S')).toBeInTheDocument();
     expect(screen.getByText('F')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /添加/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /添加/i }),
+    ).not.toBeInTheDocument();
   });
 
   it('嵌套 object 无 properties 渲染 disabled Input；patternMessage 自定义', () => {
@@ -228,7 +230,9 @@ describe('SchemaForm deepen residual branches (enabled)', () => {
     const user = userEvent.setup();
     render(
       <I18nContext.Provider
-        value={{ locale: { inputPlaceholder: '请输入' }, language: 'zh-CN' } as any}
+        value={
+          { locale: { inputPlaceholder: '请输入' }, language: 'zh-CN' } as any
+        }
       >
         <SchemaForm
           schema={baseSchema({

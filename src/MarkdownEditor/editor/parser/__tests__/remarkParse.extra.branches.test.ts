@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { JINJA_DOLLAR_PLACEHOLDER } from '../constants';
 import {
   convertParagraphToImage,
   createMarkdownParser,
@@ -6,7 +7,6 @@ import {
   getMarkdownParser,
   protectJinjaDollarInText,
 } from '../remarkParse';
-import { JINJA_DOLLAR_PLACEHOLDER } from '../constants';
 
 const runTransform = (transformer: () => (tree: any) => void, tree: any) => {
   transformer()(tree);
@@ -93,10 +93,7 @@ describe('istanbul residual：convertParagraph / extractParagraph 假值臂', ()
             { type: 'text', value: undefined },
             {
               type: 'emphasis',
-              children: [
-                { type: 'text', value: '' },
-                { type: 'break' },
-              ],
+              children: [{ type: 'text', value: '' }, { type: 'break' }],
             },
             { type: 'image', url: 'x' },
           ],
@@ -233,8 +230,6 @@ describe('remarkParse istanbul residual：空树 / 混合 inline', () => {
       ],
     };
     expect(() => runTransform(protectJinjaDollarInText, mixed)).not.toThrow();
-    expect(() =>
-      runTransform(fixStrongWithSpecialChars, mixed),
-    ).not.toThrow();
+    expect(() => runTransform(fixStrongWithSpecialChars, mixed)).not.toThrow();
   });
 });

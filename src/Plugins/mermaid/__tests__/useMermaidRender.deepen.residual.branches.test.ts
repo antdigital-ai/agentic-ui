@@ -86,7 +86,8 @@ describe('useMermaidRender deepen residual branches', () => {
   it('不可见且 signature 已渲染时跳过重跑', async () => {
     const divRef = { current: document.createElement('div') };
     const { result, rerender } = renderHook(
-      ({ visible }) => useMermaidRender('graph TD\nA-->B', divRef, 'm-vis', visible),
+      ({ visible }) =>
+        useMermaidRender('graph TD\nA-->B', divRef, 'm-vis', visible),
       { initialProps: { visible: true } },
     );
     await vi.advanceTimersByTimeAsync(100);

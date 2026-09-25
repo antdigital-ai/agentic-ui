@@ -2,10 +2,7 @@
  * parseHtml residual：think 别名归一、decodeURI、空 markdown。
  */
 import { describe, expect, it, vi } from 'vitest';
-import {
-  decodeURIComponentUrl,
-  normalizeThinkTagAliases,
-} from '../parseHtml';
+import { decodeURIComponentUrl, normalizeThinkTagAliases } from '../parseHtml';
 
 describe('parseHtml residual branches', () => {
   it('normalizeThinkTagAliases：空串早退；别名成对替换', () => {

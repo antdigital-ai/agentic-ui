@@ -35,9 +35,7 @@ describe('useStreaming deepen branches', () => {
   });
 
   it('表格不足 3 行暂缓', () => {
-    const { result } = renderHook(() =>
-      useStreaming('| H |\n| - |', true),
-    );
+    const { result } = renderHook(() => useStreaming('| H |\n| - |', true));
     expect(result.current).toBe('...');
   });
 

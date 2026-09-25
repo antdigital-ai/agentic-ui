@@ -62,11 +62,13 @@ describe('MarkdownPreview residual branches', () => {
             extra={null}
             typing
             originData={{ isLast: true, isFinished: false } as any}
-            markdownRenderConfig={{
-              renderMode: 'slate',
-              streaming: true,
-              typewriter: true,
-            } as any}
+            markdownRenderConfig={
+              {
+                renderMode: 'slate',
+                streaming: true,
+                typewriter: true,
+              } as any
+            }
           />
         </MessagesContext.Provider>
       </BubbleConfigContext.Provider>,

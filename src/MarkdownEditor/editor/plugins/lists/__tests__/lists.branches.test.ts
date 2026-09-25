@@ -3,30 +3,30 @@
  */
 import { createEditor, Editor, Node, Path } from 'slate';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { agenticListsSchema } from '../schema';
-import { withAgenticLists } from '../withAgenticLists';
 import { getCursorPosition } from '../lib/getCursorPosition';
 import { getCursorPositionInNode } from '../lib/getCursorPositionInNode';
+import { getListItems } from '../lib/getListItems';
+import { getListType } from '../lib/getListType';
+import { getPrevSibling } from '../lib/getPrevSibling';
 import { isAtEmptyListItem } from '../lib/isAtEmptyListItem';
 import { isAtStartOfListItem } from '../lib/isAtStartOfListItem';
 import { isInList } from '../lib/isInList';
 import { isListItemContainingText } from '../lib/isListItemContainingText';
-import { increaseListItemDepth } from '../transformations/increaseListItemDepth';
-import { moveListItemsToAnotherList } from '../transformations/moveListItemsToAnotherList';
-import { splitListItem } from '../transformations/splitListItem';
-import { wrapInList } from '../transformations/wrapInList';
-import { unwrapList } from '../transformations/unwrapList';
-import { setListType } from '../transformations/setListType';
-import { increaseDepth } from '../transformations/increaseDepth';
+import { agenticListsSchema } from '../schema';
 import { decreaseDepth } from '../transformations/decreaseDepth';
 import { decreaseListItemDepth } from '../transformations/decreaseListItemDepth';
+import { increaseDepth } from '../transformations/increaseDepth';
+import { increaseListItemDepth } from '../transformations/increaseListItemDepth';
 import { mergeListWithPreviousSiblingList } from '../transformations/mergeListWithPreviousSiblingList';
+import { moveListItemsToAnotherList } from '../transformations/moveListItemsToAnotherList';
 import { moveListToListItem } from '../transformations/moveListToListItem';
-import { patchRangeCloneContents } from '../util/patchRangeCloneContents';
-import { getListItems } from '../lib/getListItems';
-import { getListType } from '../lib/getListType';
-import { getPrevSibling } from '../lib/getPrevSibling';
+import { setListType } from '../transformations/setListType';
+import { splitListItem } from '../transformations/splitListItem';
+import { unwrapList } from '../transformations/unwrapList';
+import { wrapInList } from '../transformations/wrapInList';
 import { ListType } from '../types';
+import { patchRangeCloneContents } from '../util/patchRangeCloneContents';
+import { withAgenticLists } from '../withAgenticLists';
 
 const listItem = (text: string, extra?: Record<string, unknown>) => ({
   type: 'list-item' as const,
@@ -52,9 +52,7 @@ function createListEditor(
 ) {
   const editor = withAgenticLists(createEditor());
   editor.children = [
-    Array.isArray(structure)
-      ? bulletedList(...structure)
-      : structure,
+    Array.isArray(structure) ? bulletedList(...structure) : structure,
   ] as Editor['children'];
   return editor;
 }
@@ -73,9 +71,9 @@ describe('lists lib 分支覆盖', () => {
 
     it('折叠 Range 返回 focus', () => {
       const point = { path: [0, 0, 0, 0], offset: 2 };
-      expect(getCursorPosition(editor, { anchor: point, focus: point })).toEqual(
-        point,
-      );
+      expect(
+        getCursorPosition(editor, { anchor: point, focus: point }),
+      ).toEqual(point);
     });
 
     it('展开 Range 返回 null', () => {
@@ -151,11 +149,7 @@ describe('lists lib 分支覆盖', () => {
 
     it('空 list-item 返回 false', () => {
       expect(
-        isListItemContainingText(
-          editor,
-          agenticListsSchema,
-          listItem(''),
-        ),
+        isListItemContainingText(editor, agenticListsSchema, listItem('')),
       ).toBe(false);
     });
 
@@ -246,7 +240,11 @@ describe('lists lib 分支覆盖', () => {
         isEnd: true,
       });
       expect(
-        getCursorPositionInNode(editor, { path: [0, 0, 0, 0], offset: 2 }, path),
+        getCursorPositionInNode(
+          editor,
+          { path: [0, 0, 0, 0], offset: 2 },
+          path,
+        ),
       ).toEqual({ isStart: false, isEnd: false });
     });
   });
@@ -276,9 +274,9 @@ describe('lists transformations 分支覆盖', () => {
         focus: { path: [0, 0, 0, 0], offset: 0 },
       };
       expect(splitListItem(editor, agenticListsSchema)).toBe(true);
-      expect((editor.children[0] as { children: unknown[] }).children).toHaveLength(
-        2,
-      );
+      expect(
+        (editor.children[0] as { children: unknown[] }).children,
+      ).toHaveLength(2);
     });
 
     it('光标在 list-item 末尾插入新项并移动选区', () => {
@@ -288,9 +286,9 @@ describe('lists transformations 分支覆盖', () => {
         focus: { path: [0, 0, 0, 0], offset: 5 },
       };
       expect(splitListItem(editor, agenticListsSchema)).toBe(true);
-      expect((editor.children[0] as { children: unknown[] }).children).toHaveLength(
-        2,
-      );
+      expect(
+        (editor.children[0] as { children: unknown[] }).children,
+      ).toHaveLength(2);
       expect(editor.selection?.anchor.path.slice(0, 2)).toEqual([0, 1]);
     });
 
@@ -342,16 +340,15 @@ describe('lists transformations 分支覆盖', () => {
     });
 
     it('task list-item 拆分时新项继承 checked: false', () => {
-      const editor = createListEditor([
-        listItem('task', { checked: true }),
-      ]);
+      const editor = createListEditor([listItem('task', { checked: true })]);
       editor.selection = {
         anchor: { path: [0, 0, 0, 0], offset: 0 },
         focus: { path: [0, 0, 0, 0], offset: 0 },
       };
       expect(splitListItem(editor, agenticListsSchema)).toBe(true);
-      const newItem = (editor.children[0] as { children: { checked?: boolean }[] })
-        .children[0];
+      const newItem = (
+        editor.children[0] as { children: { checked?: boolean }[] }
+      ).children[0];
       expect(newItem.checked).toBe(false);
     });
 
@@ -379,7 +376,8 @@ describe('lists transformations 分支覆盖', () => {
       expect(increaseListItemDepth(editor, agenticListsSchema, [0, 1])).toBe(
         true,
       );
-      const firstItem = (editor.children[0] as { children: unknown[] }).children[0] as {
+      const firstItem = (editor.children[0] as { children: unknown[] })
+        .children[0] as {
         children: unknown[];
       };
       expect(firstItem.children.length).toBe(2);
@@ -399,7 +397,8 @@ describe('lists transformations 分支覆盖', () => {
       expect(increaseListItemDepth(editor, agenticListsSchema, [0, 1])).toBe(
         true,
       );
-      const firstItem = (editor.children[0] as { children: unknown[] }).children[0] as {
+      const firstItem = (editor.children[0] as { children: unknown[] })
+        .children[0] as {
         children: { children: unknown[] }[];
       };
       const nested = firstItem.children[1] as { children: unknown[] };
@@ -426,7 +425,9 @@ describe('lists transformations 分支覆盖', () => {
       const targetList = bulletedList(listItem('target'));
       const editor = withAgenticLists(createEditor());
       editor.children = [sourceList, targetList] as Editor['children'];
-      const moveSpy = vi.spyOn(editor, 'moveNodes').mockImplementation(() => {});
+      const moveSpy = vi
+        .spyOn(editor, 'moveNodes')
+        .mockImplementation(() => {});
 
       const moved = moveListItemsToAnotherList(editor, agenticListsSchema, {
         at: [sourceList, [0]],
@@ -461,9 +462,9 @@ describe('lists transformations 分支覆盖', () => {
   describe('wrapInList / unwrapList / setListType', () => {
     it('wrapInList at 为 null 返回 false', () => {
       const editor = createListEditor([listItem('a')]);
-      expect(wrapInList(editor, agenticListsSchema, ListType.UNORDERED, null)).toBe(
-        false,
-      );
+      expect(
+        wrapInList(editor, agenticListsSchema, ListType.UNORDERED, null),
+      ).toBe(false);
     });
 
     it('wrapInList 将顶层段落包裹为列表', () => {
@@ -473,7 +474,9 @@ describe('lists transformations 分支覆盖', () => {
         anchor: { path: [0, 0], offset: 0 },
         focus: { path: [0, 0], offset: 0 },
       };
-      expect(wrapInList(editor, agenticListsSchema, ListType.UNORDERED)).toBe(true);
+      expect(wrapInList(editor, agenticListsSchema, ListType.UNORDERED)).toBe(
+        true,
+      );
       expect((editor.children[0] as { type: string }).type).toBe(
         ListType.UNORDERED,
       );
@@ -503,9 +506,9 @@ describe('lists transformations 分支覆盖', () => {
 
     it('setListType at 为 null 返回 false', () => {
       const editor = createListEditor([listItem('a')]);
-      expect(setListType(editor, agenticListsSchema, ListType.ORDERED, null)).toBe(
-        false,
-      );
+      expect(
+        setListType(editor, agenticListsSchema, ListType.ORDERED, null),
+      ).toBe(false);
     });
 
     it('setListType 无列表时返回 false', () => {
@@ -567,7 +570,9 @@ describe('lists transformations 分支覆盖', () => {
           ],
         },
       ]);
-      expect(decreaseDepth(editor, agenticListsSchema, [0, 0, 1, 0])).toBe(true);
+      expect(decreaseDepth(editor, agenticListsSchema, [0, 0, 1, 0])).toBe(
+        true,
+      );
     });
 
     it('decreaseListItemDepth 无 parent list 返回 false', () => {
@@ -581,7 +586,9 @@ describe('lists transformations 分支覆盖', () => {
 
     it('decreaseListItemDepth 根级列表项提升为段落', () => {
       const editor = createListEditor([listItem('root')]);
-      expect(decreaseListItemDepth(editor, agenticListsSchema, [0, 0])).toBe(true);
+      expect(decreaseListItemDepth(editor, agenticListsSchema, [0, 0])).toBe(
+        true,
+      );
       expect((editor.children[0] as { type: string }).type).toBe('paragraph');
     });
   });
@@ -640,7 +647,9 @@ describe('lists transformations 分支覆盖', () => {
 
     it('moveListToListItem 非法节点类型时不移动', () => {
       const editor = createListEditor([listItem('a')]);
-      const moveSpy = vi.spyOn(editor, 'moveNodes').mockImplementation(() => {});
+      const moveSpy = vi
+        .spyOn(editor, 'moveNodes')
+        .mockImplementation(() => {});
       moveListToListItem(editor, agenticListsSchema, {
         at: [{ type: 'paragraph', children: [{ text: 'x' }] }, [0]],
         to: [editor.children[0], [0, 0]],
@@ -656,13 +665,15 @@ describe('lists transformations 分支覆盖', () => {
         bulletedList(listItem('source')),
       ] as Editor['children'];
       const sourceList = editor.children[1];
-      const targetItem = (editor.children[0] as { children: unknown[] }).children[0];
+      const targetItem = (editor.children[0] as { children: unknown[] })
+        .children[0];
       moveListToListItem(editor, agenticListsSchema, {
         at: [sourceList, [1]],
         to: [targetItem, [0, 0]],
       });
-      const nested = (editor.children[0] as { children: { children: unknown[] }[] })
-        .children[0];
+      const nested = (
+        editor.children[0] as { children: { children: unknown[] }[] }
+      ).children[0];
       expect(nested.children.length).toBeGreaterThan(1);
     });
   });
@@ -806,9 +817,7 @@ describe('lists lib 额外分支', () => {
   it('istanbul one-miss: Path.previous 成功但 Node.has 为 false 返回 null', () => {
     const editor = createListEditor([listItem('a'), listItem('b')]);
     const hasSpy = vi.spyOn(Node, 'has').mockReturnValue(false);
-    const prevSpy = vi
-      .spyOn(Path, 'previous')
-      .mockReturnValue([0, 0] as Path);
+    const prevSpy = vi.spyOn(Path, 'previous').mockReturnValue([0, 0] as Path);
 
     expect(getPrevSibling(editor, [0, 1])).toBeNull();
 
@@ -832,7 +841,10 @@ describe('lists lib 额外分支', () => {
       ]).length,
     ).toBe(2);
     expect(
-      getListItems(editor, agenticListsSchema, { path: [0, 0, 0, 0], offset: 0 }),
+      getListItems(editor, agenticListsSchema, {
+        path: [0, 0, 0, 0],
+        offset: 0,
+      }),
     ).toHaveLength(1);
   });
 });

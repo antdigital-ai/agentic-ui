@@ -3,7 +3,13 @@
  * loadData isLeaf/undefined/已有 children、select 无 node。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -33,11 +39,7 @@ describe('FileTreeComponent deepen5 residual branches', () => {
   it('filterKeyword 仅空白：不过滤；空 treeData []', () => {
     render(
       <Wrapper>
-        <FileTree
-          treeData={[]}
-          filterKeyword="   "
-          onLoadChildren={vi.fn()}
-        />
+        <FileTree treeData={[]} filterKeyword="   " onLoadChildren={vi.fn()} />
       </Wrapper>,
     );
     expect(screen.getByTestId('workspace-file-tree')).toBeInTheDocument();
@@ -65,7 +67,9 @@ describe('FileTreeComponent deepen5 residual branches', () => {
   });
 
   it('loadData：isLeaf true / undefined 无 children / 已有 children 早退', async () => {
-    const onLoad = vi.fn(async () => [{ key: 'c', name: 'c.txt', isLeaf: true }]);
+    const onLoad = vi.fn(async () => [
+      { key: 'c', name: 'c.txt', isLeaf: true },
+    ]);
     const { container } = render(
       <Wrapper>
         <FileTree
@@ -112,9 +116,7 @@ describe('FileTreeComponent deepen5 residual branches', () => {
     render(
       <Wrapper>
         <FileTree
-          treeData={
-            [{ key: 'f1', name: 'a.md', isLeaf: true }] as any
-          }
+          treeData={[{ key: 'f1', name: 'a.md', isLeaf: true }] as any}
           onLoadChildren={vi.fn()}
           onSelect={onSelect}
         />
@@ -142,10 +144,7 @@ describe('FileTreeComponent deepen5 residual branches', () => {
           onDownload={onDownload}
           fileNodeByRelativePath={
             new Map([
-              [
-                'path/to/f.md',
-                { id: '1', name: 'f.md', content: 'x' } as any,
-              ],
+              ['path/to/f.md', { id: '1', name: 'f.md', content: 'x' } as any],
             ])
           }
         />

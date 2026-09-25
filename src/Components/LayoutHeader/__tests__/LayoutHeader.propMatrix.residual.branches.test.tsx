@@ -25,9 +25,9 @@ describe('LayoutHeader prop matrix residual', () => {
     expect(screen.getByText('AI 助手')).toBeInTheDocument();
     const buttons = screen.getAllByRole('button');
     buttons.forEach((btn) => fireEvent.click(btn));
-    expect(onLeft.mock.calls.length + onRight.mock.calls.length).toBeGreaterThan(
-      0,
-    );
+    expect(
+      onLeft.mock.calls.length + onRight.mock.calls.length,
+    ).toBeGreaterThan(0);
   });
 
   it('showShare / extras / 自定义 title', () => {

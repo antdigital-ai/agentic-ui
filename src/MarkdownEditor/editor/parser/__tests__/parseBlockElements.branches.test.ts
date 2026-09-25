@@ -164,10 +164,7 @@ describe('parseBlockElements 分支覆盖', () => {
     parseNodes.mockReturnValueOnce([
       {
         type: 'paragraph',
-        children: [
-          { text: 'Bob', url: 'https://u.test/b' },
-          { text: ' x' },
-        ],
+        children: [{ text: 'Bob', url: 'https://u.test/b' }, { text: ' x' }],
       },
     ]);
     const result = handleListItem(
@@ -343,7 +340,10 @@ describe('parseBlockElements 分支覆盖', () => {
       ),
     ).toMatchObject({
       url: 'https://x.com',
-      otherProps: expect.objectContaining({ target: '_blank', finished: false }),
+      otherProps: expect.objectContaining({
+        target: '_blank',
+        finished: false,
+      }),
     });
     expect(
       applyInlineFormatting(
@@ -354,8 +354,8 @@ describe('parseBlockElements 分支覆盖', () => {
     ).toMatchObject({
       otherProps: expect.objectContaining({ target: '_blank' }),
     });
-    expect(
-      applyInlineFormatting({ text: 'a' }, { type: 'unknown' }),
-    ).toEqual({ text: 'a' });
+    expect(applyInlineFormatting({ text: 'a' }, { type: 'unknown' })).toEqual({
+      text: 'a',
+    });
   });
 });

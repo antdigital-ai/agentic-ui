@@ -21,16 +21,25 @@ vi.mock('@galacean/effects', () => ({
 
 describe('EffectPlayer residual branches', () => {
   it.skip('pauses when autoplay is false and resizes after size changes', () => {
-    const { rerender } = render(<EffectPlayer sceneUrl={'scene' as any} autoplay={false} size={20} />);
+    const { rerender } = render(
+      <EffectPlayer sceneUrl={'scene' as any} autoplay={false} size={20} />,
+    );
     expect(player.loadScene).toHaveBeenCalledWith('scene', { autoplay: false });
     expect(player.pause).toHaveBeenCalled();
-    rerender(<EffectPlayer sceneUrl={'scene' as any} autoplay={false} size={30} />);
+    rerender(
+      <EffectPlayer sceneUrl={'scene' as any} autoplay={false} size={30} />,
+    );
     expect(player.resize).toHaveBeenCalled();
   });
 
   it.skip('shows the configured fallback image when the player errors', () => {
-    render(<EffectPlayer sceneUrl={'scene' as any} downgradeImage="/fallback.png" />);
+    render(
+      <EffectPlayer sceneUrl={'scene' as any} downgradeImage="/fallback.png" />,
+    );
     player.onError?.();
-    expect(screen.getByAltText('fallback')).toHaveAttribute('src', '/fallback.png');
+    expect(screen.getByAltText('fallback')).toHaveAttribute(
+      'src',
+      '/fallback.png',
+    );
   });
 });

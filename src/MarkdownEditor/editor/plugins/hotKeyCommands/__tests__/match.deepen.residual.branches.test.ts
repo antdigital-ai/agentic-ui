@@ -23,7 +23,9 @@ describe('MatchKey deepen residual branches', () => {
 
   it('非 collapsed selection 返回 false', () => {
     const editor = createEditor();
-    editor.children = [{ type: 'paragraph', children: [{ text: 'ab' }] }] as any;
+    editor.children = [
+      { type: 'paragraph', children: [{ text: 'ab' }] },
+    ] as any;
     editor.selection = {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [0, 0], offset: 2 },

@@ -38,9 +38,9 @@ describe('lists handlers residual branches', () => {
   it('无 schema 全部返回 false', () => {
     const editor = {} as any;
     expect(onTabIncreaseListDepth(editor, evt('Tab'))).toBe(false);
-    expect(onShiftTabDecreaseListDepth(editor, evt('Tab', { shiftKey: true }))).toBe(
-      false,
-    );
+    expect(
+      onShiftTabDecreaseListDepth(editor, evt('Tab', { shiftKey: true })),
+    ).toBe(false);
     expect(onBackspaceDecreaseListDepth(editor, evt('Backspace'))).toBe(false);
     expect(onEnterEscapeFromEmptyList(editor, evt('Enter'))).toBe(false);
     expect(onEnterSplitNonEmptyList(editor, evt('Enter'))).toBe(false);

@@ -40,9 +40,7 @@ describe('InsertLink deepen residual branches', () => {
   it('无 locale.removeLink 用默认文案', async () => {
     const mod = await import('../InsertLink');
     const Comp =
-      (mod as any).InsertLink ||
-      (mod as any).default ||
-      Object.values(mod)[0];
+      (mod as any).InsertLink || (mod as any).default || Object.values(mod)[0];
     try {
       render(<Comp open onClose={vi.fn()} />);
     } catch {

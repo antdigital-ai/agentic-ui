@@ -29,9 +29,7 @@ describe('AttachmentFileListItem deepen residual branches', () => {
   it('status 缺失默认 done；pending 显示 Uploading 默认文案', () => {
     const { rerender } = render(
       <ConfigProvider>
-        <I18nContext.Provider
-          value={{ locale: {} as any, language: 'en-US' }}
-        >
+        <I18nContext.Provider value={{ locale: {} as any, language: 'en-US' }}>
           <AttachmentFileListItem
             file={{ name: 'a.txt' } as any}
             onDelete={vi.fn()}
@@ -44,9 +42,7 @@ describe('AttachmentFileListItem deepen residual branches', () => {
 
     rerender(
       <ConfigProvider>
-        <I18nContext.Provider
-          value={{ locale: {} as any, language: 'en-US' }}
-        >
+        <I18nContext.Provider value={{ locale: {} as any, language: 'en-US' }}>
           <AttachmentFileListItem
             file={{ name: 'b.txt', status: 'pending' } as any}
             onDelete={vi.fn()}
@@ -61,9 +57,7 @@ describe('AttachmentFileListItem deepen residual branches', () => {
   it('error 无 errorMessage 回退 Upload failed', () => {
     render(
       <ConfigProvider>
-        <I18nContext.Provider
-          value={{ locale: {} as any, language: 'zh-CN' }}
-        >
+        <I18nContext.Provider value={{ locale: {} as any, language: 'zh-CN' }}>
           <AttachmentFileListItem
             file={{ name: 'e.txt', status: 'error' } as any}
             onDelete={vi.fn()}

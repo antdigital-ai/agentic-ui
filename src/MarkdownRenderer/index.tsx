@@ -1,4 +1,3 @@
-export type { UseMarkdownToReactOptions } from './markdownReactShared';
 export {
   collectRendererComponents,
   collectRendererRehypePlugins,
@@ -11,6 +10,7 @@ export {
   type CodeBlockRenderFn,
 } from './createRendererCodeBlockPlugin';
 export { extractBlockTextContent } from './extractBlockTextContent';
+export type { UseMarkdownToReactOptions } from './markdownReactShared';
 export { default as MarkdownRenderer } from './MarkdownRenderer';
 export { AgenticUiFileMapBlockRenderer } from './renderers/AgenticUiFileMapBlockRenderer';
 export { AgenticUiTaskBlockRenderer } from './renderers/AgenticUiTaskBlockRenderer';

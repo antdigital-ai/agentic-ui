@@ -1,15 +1,13 @@
 import { createEditor } from 'slate';
 import { describe, expect, it } from 'vitest';
+import { normalizeListChildren } from '../normalizations/normalizeListChildren';
 import { agenticListsSchema } from '../schema';
 import { ListType } from '../types';
-import { normalizeListChildren } from '../normalizations/normalizeListChildren';
 
 describe('normalizeListChildren 分支覆盖', () => {
   it('非 list 节点返回 false', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: '' }] },
-    ] as any;
+    editor.children = [{ type: 'paragraph', children: [{ text: '' }] }] as any;
     expect(
       normalizeListChildren(editor, agenticListsSchema, [
         editor.children[0],
@@ -27,9 +25,7 @@ describe('normalizeListChildren 分支覆盖', () => {
           { text: '   ' },
           {
             type: 'list-item',
-            children: [
-              { type: 'paragraph', children: [{ text: 'keep' }] },
-            ],
+            children: [{ type: 'paragraph', children: [{ text: 'keep' }] }],
           },
         ],
       },
@@ -102,9 +98,7 @@ describe('normalizeListChildren 分支覆盖', () => {
             children: [
               {
                 type: 'list-item',
-                children: [
-                  { type: 'paragraph', children: [{ text: 'n' }] },
-                ],
+                children: [{ type: 'paragraph', children: [{ text: 'n' }] }],
               },
             ],
           },
@@ -141,9 +135,7 @@ describe('normalizeListChildren 分支覆盖', () => {
         children: [
           {
             type: 'list-item',
-            children: [
-              { type: 'paragraph', children: [{ text: 'ok' }] },
-            ],
+            children: [{ type: 'paragraph', children: [{ text: 'ok' }] }],
           },
         ],
       },
@@ -162,9 +154,7 @@ describe('normalizeListChildren istanbul residual：text 子节点 / 非 list', 
     // if (!schema.isListNode(node)) return false;
     // if (Text.isText(childNode))
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: 'p' }] },
-    ] as any;
+    editor.children = [{ type: 'paragraph', children: [{ text: 'p' }] }] as any;
     expect(
       normalizeListChildren(editor, agenticListsSchema, [
         editor.children[0],

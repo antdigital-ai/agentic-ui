@@ -17,7 +17,10 @@ vi.mock('slate-react', () => ({
   useSelected: () => true,
   useFocused: () => true,
   useSlate: () => ({
-    selection: { anchor: { path: [0, 0], offset: 0 }, focus: { path: [0, 0], offset: 0 } },
+    selection: {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    },
     children: [{ type: 'paragraph', children: [{ text: '' }] }],
   }),
   ReactEditor: { findPath: () => [0] },
@@ -47,7 +50,9 @@ describe('TagPopup residual branches', () => {
   it('基础渲染 + children', () => {
     render(
       <TagPopup
-        element={{ type: 'tag-popup', value: 'tag', children: [{ text: '' }] } as any}
+        element={
+          { type: 'tag-popup', value: 'tag', children: [{ text: '' }] } as any
+        }
         attributes={{ 'data-slate-node': 'element' } as any}
       >
         <span data-testid="child">c</span>

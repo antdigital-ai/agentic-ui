@@ -2,8 +2,8 @@ import React from 'react';
 import { Editor, Transforms } from 'slate';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import type { MarkdownEditorInstance } from '../../MarkdownEditor';
-import { isImeComposing } from '../../MarkdownEditor/editor/utils/isImeComposing';
 import { isCodeBlockAceInputTarget } from '../../MarkdownEditor/editor/utils/codeBlockBehavior';
+import { isImeComposing } from '../../MarkdownEditor/editor/utils/isImeComposing';
 import { isMobileDevice } from '../AttachmentButton/utils';
 import type { MarkdownInputFieldProps } from '../types/MarkdownInputFieldProps';
 

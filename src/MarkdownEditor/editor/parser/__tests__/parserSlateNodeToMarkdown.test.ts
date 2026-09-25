@@ -28,9 +28,7 @@ describe('parserSlateNodeToMarkdown', () => {
             children: [
               {
                 type: 'table-row',
-                children: [
-                  { type: 'table-cell', children: [{ text: 'A' }] },
-                ],
+                children: [{ type: 'table-cell', children: [{ text: 'A' }] }],
               },
             ],
           },

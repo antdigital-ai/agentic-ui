@@ -1,19 +1,17 @@
 import { Editor, Node, Operation, Path, Range, Text, Transforms } from 'slate';
 import type { CustomLeaf } from '../../el';
-import { hasRange } from './utils';
 import {
   getOrphanTagStripProps,
   MARK_DECORATION_KEYS,
   type CodeTagTextLeaf,
 } from './inlineLeafNormalizeUtils';
+import { hasRange } from './utils';
 
 export type { CodeTagTextLeaf } from './inlineLeafNormalizeUtils';
 
 const MARK_LEAF_KEYS = MARK_DECORATION_KEYS;
 
-export const isCodeTagTextLeaf = (
-  node: Node,
-): node is CodeTagTextLeaf =>
+export const isCodeTagTextLeaf = (node: Node): node is CodeTagTextLeaf =>
   Text.isText(node) && !!(node.tag || node.code);
 
 const tagPlaceholderLeaf = (source: CodeTagTextLeaf): CodeTagTextLeaf => ({
@@ -85,7 +83,8 @@ export const handleMarkRemoveTextOperation = (
   const text = currentNode.text ?? '';
   const removed = operation.text ?? '';
   const nextText =
-    text.slice(0, operation.offset) + text.slice(operation.offset + removed.length);
+    text.slice(0, operation.offset) +
+    text.slice(operation.offset + removed.length);
 
   if (nextText.length > 0 && nextText.trim() !== '') {
     return false;
@@ -324,7 +323,11 @@ export const handleTagDeleteBackward = (
   deleteBackward: Editor['deleteBackward'],
 ): boolean => {
   const { selection } = editor;
-  if (!selection || !hasRange(editor, selection) || !Range.isCollapsed(selection)) {
+  if (
+    !selection ||
+    !hasRange(editor, selection) ||
+    !Range.isCollapsed(selection)
+  ) {
     return false;
   }
 
@@ -337,11 +340,7 @@ export const handleTagDeleteBackward = (
 
     if (previous) {
       const [previousNode, previousPath] = previous;
-      if (
-        isCodeTagTextLeaf(previousNode) &&
-        previousNode.tag &&
-        isBeforeTag
-      ) {
+      if (isCodeTagTextLeaf(previousNode) && previousNode.tag && isBeforeTag) {
         if (
           Text.isText(curNode) &&
           curNode.text?.trim() &&
@@ -363,7 +362,11 @@ export const handleTagDeleteBackward = (
           return true;
         }
 
-        if (Text.isText(curNode) && curNode.text?.trim() && selection.anchor.offset > 0) {
+        if (
+          Text.isText(curNode) &&
+          curNode.text?.trim() &&
+          selection.anchor.offset > 0
+        ) {
           deleteBackward(unit);
           return true;
         }

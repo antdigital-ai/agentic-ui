@@ -28,9 +28,7 @@ vi.mock('../RealtimeFollow', () => ({
 
 describe('Workspace index branches', () => {
   it('无 children 时渲染 emptyContent', () => {
-    render(
-      <Workspace emptyContent={<div data-testid="empty">empty</div>} />,
-    );
+    render(<Workspace emptyContent={<div data-testid="empty">empty</div>} />);
     expect(screen.getByTestId('empty')).toBeInTheDocument();
   });
 

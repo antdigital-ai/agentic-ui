@@ -7,10 +7,16 @@ import {
   onTabIncreaseListDepth,
 } from '../handlers';
 
-vi.mock('../../ListsEditor', () => ({ ListsEditor: { getListsSchema: vi.fn(() => undefined) } }));
+vi.mock('../../ListsEditor', () => ({
+  ListsEditor: { getListsSchema: vi.fn(() => undefined) },
+}));
 
 describe('list key handlers early returns', () => {
-  const event = { nativeEvent: new KeyboardEvent('keydown'), preventDefault: vi.fn(), shiftKey: false } as any;
+  const event = {
+    nativeEvent: new KeyboardEvent('keydown'),
+    preventDefault: vi.fn(),
+    shiftKey: false,
+  } as any;
 
   it('returns false for every key when no list schema is registered', () => {
     const editor = {} as any;

@@ -2,7 +2,13 @@
  * HistogramChart deepen2：window 缺失、预分箱、frequency、色回退、mobile resize。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import HistogramChart from '../index';

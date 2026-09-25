@@ -63,9 +63,9 @@ describe('adaptiveTooltip', () => {
 
   it('server snapshot 恒为保守默认值', () => {
     expect(getAdaptiveEnvironmentServerSnapshot()).toBe(false);
-    expect(getAdaptiveTooltipTriggerPropsServerSnapshot('informational')).toEqual(
-      EMPTY_TOOLTIP_TRIGGER_PROPS,
-    );
+    expect(
+      getAdaptiveTooltipTriggerPropsServerSnapshot('informational'),
+    ).toEqual(EMPTY_TOOLTIP_TRIGGER_PROPS);
     expect(getAdaptiveTooltipTriggerPropsServerSnapshot('interactive')).toEqual(
       EMPTY_TOOLTIP_TRIGGER_PROPS,
     );

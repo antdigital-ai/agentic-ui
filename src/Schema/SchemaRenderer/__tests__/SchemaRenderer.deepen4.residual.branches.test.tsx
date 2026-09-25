@@ -219,9 +219,7 @@ describe('SchemaRenderer deepen4 residual branches', () => {
   });
 
   it('schema null 走 EMPTY；component 缺省', async () => {
-    render(
-      <SchemaRenderer schema={null as any} values={{}} debug={false} />,
-    );
+    render(<SchemaRenderer schema={null as any} values={{}} debug={false} />);
     await flush();
     expect(document.body).toBeTruthy();
   });

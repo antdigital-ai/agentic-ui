@@ -112,7 +112,9 @@ describe('VoiceInputButton 分支覆盖', () => {
     it('无 locale 时回退中文默认 tooltip', async () => {
       render(
         <ConfigProvider>
-          <I18nContext.Provider value={{ locale: undefined, language: 'zh-CN' }}>
+          <I18nContext.Provider
+            value={{ locale: undefined, language: 'zh-CN' }}
+          >
             <VoiceInputButton
               recording={false}
               onStart={vi.fn()}

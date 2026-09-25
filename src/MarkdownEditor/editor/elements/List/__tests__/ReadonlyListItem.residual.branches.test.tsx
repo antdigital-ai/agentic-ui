@@ -5,7 +5,14 @@ import { ReadonlyListItem } from '../ReadonlyListItem';
 
 describe('ReadonlyListItem residual branches', () => {
   it('renders a plain list item without task controls', () => {
-    render(<ReadonlyListItem attributes={{}} element={{ type: 'list-item', children: [{ text: '' }] } as any}>plain</ReadonlyListItem>);
+    render(
+      <ReadonlyListItem
+        attributes={{}}
+        element={{ type: 'list-item', children: [{ text: '' }] } as any}
+      >
+        plain
+      </ReadonlyListItem>,
+    );
     expect(screen.getByRole('listitem')).not.toHaveClass('task');
   });
 
@@ -13,12 +20,17 @@ describe('ReadonlyListItem residual branches', () => {
     render(
       <ReadonlyListItem
         attributes={{}}
-        element={{
-          type: 'list-item',
-          checked: true,
-          mentions: [{ id: 'a', name: 'Ada', avatar: 'https://avatar' }, { id: 'b', name: 'Bob', avatar: '/local' }],
-          children: [{ text: '' }],
-        } as any}
+        element={
+          {
+            type: 'list-item',
+            checked: true,
+            mentions: [
+              { id: 'a', name: 'Ada', avatar: 'https://avatar' },
+              { id: 'b', name: 'Bob', avatar: '/local' },
+            ],
+            children: [{ text: '' }],
+          } as any
+        }
       >
         task
       </ReadonlyListItem>,

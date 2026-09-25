@@ -84,9 +84,9 @@ describe('ReadonlyMarkdownEditorStore 分支覆盖', () => {
       createObjectURL,
       revokeObjectURL: revoke,
     });
-    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(
-      () => {},
-    );
+    const click = vi
+      .spyOn(HTMLAnchorElement.prototype, 'click')
+      .mockImplementation(() => {});
 
     const ref = { current: null as HTMLDivElement | null };
     const instance = createReadonlyMarkdownEditorInstance({

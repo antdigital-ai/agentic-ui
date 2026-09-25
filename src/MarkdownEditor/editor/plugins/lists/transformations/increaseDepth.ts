@@ -1,5 +1,4 @@
-import type { Editor } from 'slate';
-import type { Location } from 'slate';
+import type { Editor, Location } from 'slate';
 
 import { getListItems, getPrevSibling, pickSubtreesRoots } from '../lib';
 import type { ListsSchema } from '../types';
@@ -15,38 +14,40 @@ import { wrapInList } from './wrapInList';
  * @returns {boolean} True, if the editor state has been changed.
  */
 export function increaseDepth(
-    editor: Editor,
-    schema: ListsSchema,
-    at: Location | null = editor.selection,
+  editor: Editor,
+  schema: ListsSchema,
+  at: Location | null = editor.selection,
 ): boolean {
-    if (!at) {
-        return false;
-    }
-    const listItems = getListItems(editor, schema, at);
-    const indentableListItems = listItems.filter(([, listItemPath]) => {
-        const previousListItem = getPrevSibling(editor, listItemPath);
-        return previousListItem !== null;
+  if (!at) {
+    return false;
+  }
+  const listItems = getListItems(editor, schema, at);
+  const indentableListItems = listItems.filter(([, listItemPath]) => {
+    const previousListItem = getPrevSibling(editor, listItemPath);
+    return previousListItem !== null;
+  });
+
+  if (indentableListItems.length === 0) {
+    return false;
+  }
+
+  // When calling `increaseListItemDepth` the paths and references to list items
+  // can change, so we need a way of marking the list items scheduled for transformation.
+  const refs = pickSubtreesRoots(indentableListItems).map(([_, path]) =>
+    editor.pathRef(path),
+  );
+
+  editor.withoutNormalizing(() => {
+    // Before we indent "list-items", we want to convert every non list-related block in selection to a "list".
+    wrapInList(editor, schema, ListType.UNORDERED);
+
+    refs.forEach((ref) => {
+      if (ref.current) {
+        increaseListItemDepth(editor, schema, ref.current);
+      }
+      ref.unref();
     });
+  });
 
-    if (indentableListItems.length === 0) {
-        return false;
-    }
-
-    // When calling `increaseListItemDepth` the paths and references to list items
-    // can change, so we need a way of marking the list items scheduled for transformation.
-    const refs = pickSubtreesRoots(indentableListItems).map(([_, path]) => editor.pathRef(path));
-
-    editor.withoutNormalizing(() => {
-        // Before we indent "list-items", we want to convert every non list-related block in selection to a "list".
-        wrapInList(editor, schema, ListType.UNORDERED);
-
-        refs.forEach((ref) => {
-            if (ref.current) {
-                increaseListItemDepth(editor, schema, ref.current);
-            }
-            ref.unref();
-        });
-    });
-
-    return true;
+  return true;
 }

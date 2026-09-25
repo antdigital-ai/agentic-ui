@@ -31,9 +31,7 @@ describe('markdownReactShared deepen2 residual', () => {
     );
     expect(nested.length).toBeGreaterThan(1);
 
-    const closeBlank = splitMarkdownBlocks(
-      '<think>\nx\n\n\n</think>\nafter',
-    );
+    const closeBlank = splitMarkdownBlocks('<think>\nx\n\n\n</think>\nafter');
     expect(closeBlank.some((b) => b.includes('</think>'))).toBe(true);
 
     const closeInlineTrail = splitMarkdownBlocks(
@@ -46,15 +44,10 @@ describe('markdownReactShared deepen2 residual', () => {
   });
 
   it('buildEditorAlignedComponents：unsafe url / linkConfig onClick false / task li', () => {
-    const comps = buildEditorAlignedComponents(
-      'ant-md',
-      {},
-      false,
-      {
-        openInNewTab: false,
-        onClick: () => false,
-      },
-    );
+    const comps = buildEditorAlignedComponents('ant-md', {}, false, {
+      openInNewTab: false,
+      onClick: () => false,
+    });
     expect(comps.a).toBeTruthy();
     expect(comps.li).toBeTruthy();
     expect(comps.img).toBeTruthy();

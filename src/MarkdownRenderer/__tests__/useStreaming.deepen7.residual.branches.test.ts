@@ -40,9 +40,9 @@ describe('useStreaming deepen7 residual branches', () => {
   });
 
   it('streaming false 直通；空串', () => {
-    expect(
-      renderHook(() => useStreaming('hello', false)).result.current,
-    ).toBe('hello');
+    expect(renderHook(() => useStreaming('hello', false)).result.current).toBe(
+      'hello',
+    );
     expect(renderHook(() => useStreaming('', true)).result.current).toBe('');
   });
 });

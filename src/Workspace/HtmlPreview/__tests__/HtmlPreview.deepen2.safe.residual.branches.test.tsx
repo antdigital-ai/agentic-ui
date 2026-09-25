@@ -55,9 +55,7 @@ describe('HtmlPreview deepen2 safe residual branches', () => {
     expect(onViewModeChange).toHaveBeenCalled();
 
     cleanup();
-    wrap(
-      <HtmlPreview html="<p>x</p>" status="done" defaultViewMode="code" />,
-    );
+    wrap(<HtmlPreview html="<p>x</p>" status="done" defaultViewMode="code" />);
     expect(screen.getByTestId('md').textContent).toContain('html');
 
     cleanup();

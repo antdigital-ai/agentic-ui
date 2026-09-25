@@ -41,7 +41,13 @@ describe('parseTable deepen3 residual branches', () => {
   it('docCards：可解析标题列 → chart；缺标题列降级 table', () => {
     const ok = unwrap(
       parseTableOrChart(
-        namedTable(['名称', 'desc'], [['a', 'b'], ['c', 'd']]),
+        namedTable(
+          ['名称', 'desc'],
+          [
+            ['a', 'b'],
+            ['c', 'd'],
+          ],
+        ),
         { type: 'paragraph' } as any,
         [],
         parseNodes,
@@ -91,7 +97,13 @@ describe('parseTable deepen3 residual branches', () => {
   });
 
   it('mergeCells：rowspan/colspan 小写别名 + 空单元格 children', () => {
-    const table = namedTable(['x', 'y'], [['', '2'], ['3', '4']]);
+    const table = namedTable(
+      ['x', 'y'],
+      [
+        ['', '2'],
+        ['3', '4'],
+      ],
+    );
     const node = unwrap(
       parseTableOrChart(
         table,
@@ -120,7 +132,13 @@ describe('parseTable deepen3 residual branches', () => {
     };
     const r = unwrap(
       parseTableOrChart(
-        namedTable(['x', 'y'], [['1', '2'], ['3', '4']]),
+        namedTable(
+          ['x', 'y'],
+          [
+            ['1', '2'],
+            ['3', '4'],
+          ],
+        ),
         pre as any,
         [],
         parseNodes,
@@ -147,8 +165,7 @@ describe('parseTable deepen3 residual branches', () => {
 
   it('preprocessMarkdownTableNewlines：无表直通；有表补换行', () => {
     expect(preprocessMarkdownTableNewlines('plain')).toBe('plain');
-    const md =
-      '| a | b |\n| --- | --- |\n| 1 | 2 |\nnext';
+    const md = '| a | b |\n| --- | --- |\n| 1 | 2 |\nnext';
     const out = preprocessMarkdownTableNewlines(md);
     expect(out).toContain('|');
     expect(typeof out).toBe('string');

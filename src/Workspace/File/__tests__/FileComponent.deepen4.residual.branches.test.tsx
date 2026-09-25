@@ -26,7 +26,11 @@ vi.mock('antd', async () => {
   };
 });
 
-const file = (id: string, name: string, extra?: Partial<FileNode>): FileNode => ({
+const file = (
+  id: string,
+  name: string,
+  extra?: Partial<FileNode>,
+): FileNode => ({
   id,
   name,
   content: 'body',
@@ -34,14 +38,13 @@ const file = (id: string, name: string, extra?: Partial<FileNode>): FileNode => 
   ...extra,
 });
 
-const wrap = (
-  ui: React.ReactNode,
-  locale?: Record<string, string>,
-) =>
+const wrap = (ui: React.ReactNode, locale?: Record<string, string>) =>
   render(
     <ConfigProvider>
       {locale ? (
-        <I18nContext.Provider value={{ locale: locale as any, language: 'zh-CN' }}>
+        <I18nContext.Provider
+          value={{ locale: locale as any, language: 'zh-CN' }}
+        >
           {ui}
         </I18nContext.Provider>
       ) : (
@@ -173,11 +176,7 @@ describe('FileComponent deepen4 residual branches', () => {
         <button type="button" data-testid="share-slot" onClick={props.share}>
           share
         </button>
-        <button
-          type="button"
-          data-testid="dl-slot"
-          onClick={props.download}
-        >
+        <button type="button" data-testid="dl-slot" onClick={props.download}>
           dl
         </button>
       </div>
@@ -187,7 +186,7 @@ describe('FileComponent deepen4 residual branches', () => {
         nodes={[file('e1', 'el.md')]}
         onShare={onShare}
         onDownload={vi.fn()}
-        onPreview={async () => <PreviewSlot key="p" /> as any}
+        onPreview={async () => (<PreviewSlot key="p" />) as any}
       />,
     );
     fireEvent.click(await screen.findByText('el.md'));

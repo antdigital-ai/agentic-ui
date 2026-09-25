@@ -79,9 +79,7 @@ describe('Browser branches', () => {
     });
 
     it.skip('items 非数组时按空列表处理', () => {
-      renderWithProvider(
-        <BrowserList items={null as any} activeLabel="Q" />,
-      );
+      renderWithProvider(<BrowserList items={null as any} activeLabel="Q" />);
       expect(screen.getByText('No results')).toBeInTheDocument();
     });
   });
@@ -99,9 +97,7 @@ describe('Browser branches', () => {
 
     it('站点区域 Enter 键触发打开', () => {
       const onOpen = vi.fn();
-      renderWithProvider(
-        <BrowserItemComponent item={item} onOpen={onOpen} />,
-      );
+      renderWithProvider(<BrowserItemComponent item={item} onOpen={onOpen} />);
       const site = screen.getByRole('link', { name: 'example.com' });
       fireEvent.keyDown(site, { key: 'Enter' });
       expect(onOpen).toHaveBeenCalled();
@@ -129,9 +125,7 @@ describe('Browser branches', () => {
     it('onBack 点击触发', async () => {
       const user = userEvent.setup();
       const onBack = vi.fn();
-      renderWithProvider(
-        <BrowserHeader activeLabel="Label" onBack={onBack} />,
-      );
+      renderWithProvider(<BrowserHeader activeLabel="Label" onBack={onBack} />);
       await user.click(screen.getByRole('button'));
       expect(onBack).toHaveBeenCalled();
     });

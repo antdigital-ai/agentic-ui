@@ -62,8 +62,12 @@ describe('UndoRedoButtons branches', () => {
         onRedo={onRedo}
       />,
     );
-    fireEvent.click(screen.getByTestId('tip-撤销').querySelector('[role="button"]')!);
-    fireEvent.click(screen.getByTestId('tip-重做').querySelector('[role="button"]')!);
+    fireEvent.click(
+      screen.getByTestId('tip-撤销').querySelector('[role="button"]')!,
+    );
+    fireEvent.click(
+      screen.getByTestId('tip-重做').querySelector('[role="button"]')!,
+    );
     expect(onUndo).toHaveBeenCalled();
     expect(onRedo).toHaveBeenCalled();
   });

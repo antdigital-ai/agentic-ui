@@ -1,8 +1,8 @@
-import { createRendererCodeBlockPlugin } from '../createRendererCodeBlockPlugin';
-import { DefaultCodeRouter } from '../DefaultCodeRouter';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
+import { createRendererCodeBlockPlugin } from '../createRendererCodeBlockPlugin';
+import { DefaultCodeRouter } from '../DefaultCodeRouter';
 import type { RendererBlockProps } from '../types';
 
 describe('DefaultCodeRouter custom language plugins', () => {
@@ -20,7 +20,9 @@ describe('DefaultCodeRouter custom language plugins', () => {
       </DefaultCodeRouter>,
     );
 
-    expect(screen.getByTestId('insight-card')).toHaveTextContent('insight-card');
+    expect(screen.getByTestId('insight-card')).toHaveTextContent(
+      'insight-card',
+    );
     expect(InsightCard).toHaveBeenCalled();
   });
 });

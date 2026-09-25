@@ -7,7 +7,9 @@ import {
 } from '../bubblePropsAreEqual';
 import type { BubbleProps, MessageBubbleData } from '../type';
 
-const baseOrigin = (overrides?: Partial<MessageBubbleData>): MessageBubbleData => ({
+const baseOrigin = (
+  overrides?: Partial<MessageBubbleData>,
+): MessageBubbleData => ({
   id: 'm1',
   role: 'assistant',
   content: 'hello',
@@ -18,7 +20,9 @@ const baseOrigin = (overrides?: Partial<MessageBubbleData>): MessageBubbleData =
   ...overrides,
 });
 
-const baseProps = (overrides?: Partial<BubbleProps>): BubbleProps & { deps?: unknown[] } => ({
+const baseProps = (
+  overrides?: Partial<BubbleProps>,
+): BubbleProps & { deps?: unknown[] } => ({
   id: 'm1',
   originData: baseOrigin(),
   ...overrides,
@@ -154,14 +158,11 @@ describe('bubblePropsAreEqual branches', () => {
     { key: 'className', a: 'a', b: 'b' },
   ];
 
-  it.each(scalarFields)(
-    'returns false when $key differs',
-    ({ key, a, b }) => {
-      expect(
-        bubblePropsAreEqual(baseProps({ [key]: a }), baseProps({ [key]: b })),
-      ).toBe(false);
-    },
-  );
+  it.each(scalarFields)('returns false when $key differs', ({ key, a, b }) => {
+    expect(
+      bubblePropsAreEqual(baseProps({ [key]: a }), baseProps({ [key]: b })),
+    ).toBe(false);
+  });
 
   it('returns false when shouldShowCopy differs', () => {
     expect(
@@ -363,10 +364,7 @@ describe('bubblePropsAreEqual branches', () => {
   it('skips avatar compare when references are equal', () => {
     const avatar = { title: 'same' };
     expect(
-      bubblePropsAreEqual(
-        baseProps({ avatar }),
-        baseProps({ avatar }),
-      ),
+      bubblePropsAreEqual(baseProps({ avatar }), baseProps({ avatar })),
     ).toBe(true);
   });
 
@@ -436,10 +434,7 @@ describe('bubblePropsAreEqual branches', () => {
       ),
     ).toBe(false);
     expect(
-      bubblePropsAreEqual(
-        baseProps({ deps: [1] }),
-        baseProps({ deps: [2] }),
-      ),
+      bubblePropsAreEqual(baseProps({ deps: [1] }), baseProps({ deps: [2] })),
     ).toBe(false);
   });
 
@@ -461,10 +456,7 @@ describe('bubblePropsAreEqual branches', () => {
   it('returns true when classNames references are equal', () => {
     const classNames = { root: 'r', content: 'c' };
     expect(
-      bubblePropsAreEqual(
-        baseProps({ classNames }),
-        baseProps({ classNames }),
-      ),
+      bubblePropsAreEqual(baseProps({ classNames }), baseProps({ classNames })),
     ).toBe(true);
   });
 
@@ -481,7 +473,9 @@ describe('bubblePropsAreEqual branches', () => {
     expect(
       bubblePropsAreEqual(
         baseProps({ styles: { root: { padding: 1 } } }),
-        baseProps({ styles: { root: { padding: 1 }, content: undefined } as any }),
+        baseProps({
+          styles: { root: { padding: 1 }, content: undefined } as any,
+        }),
       ),
     ).toBe(true);
   });

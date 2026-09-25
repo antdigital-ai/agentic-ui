@@ -2,7 +2,13 @@
  * BoxPlotChart index 补洞：全异常值 min/max、toolbar filter、legend 位、色回退。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import BoxPlotChart from '../index';
@@ -132,9 +138,9 @@ describe('BoxPlotChart index deepen branches', () => {
     );
     const point = (globalThis as any).__boxDeepenData?.datasets?.[0]?.data?.[0];
     expect(point?.outliers).toBeUndefined();
-    expect(
-      (globalThis as any).__boxDeepenData?.datasets?.[0]?.itemRadius,
-    ).toBe(3);
+    expect((globalThis as any).__boxDeepenData?.datasets?.[0]?.itemRadius).toBe(
+      3,
+    );
   });
 
   it('renderFilterInToolbar + filterLabel；legend 多 type 显示', () => {
@@ -175,9 +181,9 @@ describe('BoxPlotChart index deepen branches', () => {
     act(() => {
       fireEvent.click(screen.getByTestId('fl-east'));
     });
-    expect((globalThis as any).__boxDeepenData?.datasets?.length).toBeGreaterThan(
-      1,
-    );
+    expect(
+      (globalThis as any).__boxDeepenData?.datasets?.length,
+    ).toBeGreaterThan(1);
   });
 
   it('color 数组索引回退 provided[0] 与 defaultColorList', () => {

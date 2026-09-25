@@ -1,4 +1,10 @@
-import { act, fireEvent, render, renderHook, screen } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import useAutoScroll from '../useAutoScroll';
@@ -1805,7 +1811,8 @@ describe('useAutoScroll targeted coverage (aligned with current impl)', () => {
     });
     act(() => {
       (
-        result.current.containerRef as React.MutableRefObject<HTMLDivElement | null>
+        result.current
+          .containerRef as React.MutableRefObject<HTMLDivElement | null>
       ).current = div;
     });
     act(() => {
@@ -1824,7 +1831,8 @@ describe('useAutoScroll targeted coverage (aligned with current impl)', () => {
     });
     act(() => {
       (
-        result.current.containerRef as React.MutableRefObject<HTMLDivElement | null>
+        result.current
+          .containerRef as React.MutableRefObject<HTMLDivElement | null>
       ).current = div;
     });
     act(() => {
@@ -1849,7 +1857,8 @@ describe('useAutoScroll targeted coverage (aligned with current impl)', () => {
     });
     act(() => {
       (
-        result.current.containerRef as React.MutableRefObject<HTMLDivElement | null>
+        result.current
+          .containerRef as React.MutableRefObject<HTMLDivElement | null>
       ).current = div;
     });
     act(() => {
@@ -2191,9 +2200,7 @@ describe('useAutoScroll 深度边界', () => {
   });
 
   it('istanbul fill：无 container 早退；scrollBehavior 缺省；smooth 滚动', () => {
-    const { result } = renderHook(() =>
-      useAutoScroll({ scrollTolerance: 10 }),
-    );
+    const { result } = renderHook(() => useAutoScroll({ scrollTolerance: 10 }));
     expect(() => result.current.scrollToBottom('auto')).not.toThrow();
     expect(() => result.current.scrollToBottom()).not.toThrow();
 
@@ -2461,9 +2468,7 @@ describe('useAutoScroll 深度边界', () => {
     });
 
     expect(
-      onScrollStateChange.mock.calls.some(
-        ([s]) => s.isPinned === false,
-      ),
+      onScrollStateChange.mock.calls.some(([s]) => s.isPinned === false),
     ).toBe(true);
   });
 });

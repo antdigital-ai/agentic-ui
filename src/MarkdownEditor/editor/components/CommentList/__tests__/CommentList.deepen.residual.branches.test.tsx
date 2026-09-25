@@ -3,7 +3,13 @@
  * onDelete/onEdit/跳转、locale 缺省、无 element 跳转。
  */
 import '@testing-library/jest-dom';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -66,9 +72,9 @@ describe('CommentList deepen residual branches', () => {
     expect(spacers.length).toBeGreaterThan(0);
     // CloseOutlined 可点击
     const header = screen.getByText(/划词评论/);
-    const closeEl = header.parentElement?.querySelector('.anticon-close') as
-      | HTMLElement
-      | null;
+    const closeEl = header.parentElement?.querySelector(
+      '.anticon-close',
+    ) as HTMLElement | null;
     if (closeEl) {
       fireEvent.click(closeEl);
       expect(setShowComment).toHaveBeenCalledWith([]);
@@ -135,11 +141,7 @@ describe('CommentList deepen residual branches', () => {
     render(
       <ConfigProvider>
         <I18nContext.Provider value={{ locale: {}, language: 'en-US' } as any}>
-          <CommentList
-            pure
-            commentList={[commentItem]}
-            comment={{ onClick }}
-          />
+          <CommentList pure commentList={[commentItem]} comment={{ onClick }} />
         </I18nContext.Provider>
       </ConfigProvider>,
     );

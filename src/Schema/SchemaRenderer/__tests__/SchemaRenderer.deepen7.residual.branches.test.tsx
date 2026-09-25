@@ -117,7 +117,9 @@ describe('SchemaRenderer deepen7 residual branches', () => {
       <SchemaRenderer schema={baseSchema()} values={{ name: 'b' }} debug />,
     );
     await flush();
-    expect(container.querySelector('[data-testid="schema-renderer"]')).toBeTruthy();
+    expect(
+      container.querySelector('[data-testid="schema-renderer"]'),
+    ).toBeTruthy();
     err.mockRestore();
   });
 
@@ -138,9 +140,10 @@ describe('SchemaRenderer deepen7 residual branches', () => {
     expect(
       container.querySelector('[data-testid="fb7"]') ||
         container.textContent?.includes('plain-string') ||
-        err.mock.calls.some((c) =>
-          String(c[0]).includes('Critical') ||
-          String(c[1]).includes('plain-string'),
+        err.mock.calls.some(
+          (c) =>
+            String(c[0]).includes('Critical') ||
+            String(c[1]).includes('plain-string'),
         ),
     ).toBeTruthy();
     err.mockRestore();

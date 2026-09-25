@@ -71,7 +71,10 @@ describe('EnterKey residual branches', () => {
       focus: { path: [0, 0], offset: 2 },
     });
     const backspace = { range: vi.fn() };
-    const key = new EnterKey({ editor, inputComposition: false } as any, backspace as any);
+    const key = new EnterKey(
+      { editor, inputComposition: false } as any,
+      backspace as any,
+    );
     const e = { preventDefault: vi.fn() } as any;
     key.run(e);
     expect(e.preventDefault).toHaveBeenCalled();

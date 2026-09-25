@@ -104,7 +104,9 @@ export class TabKey {
           this.editor,
           Editor.end(this.editor, Path.next(nodePath)),
         );
-      } else if (Editor.hasPath(this.editor, Path.next(Path.parent(nodePath)))) {
+      } else if (
+        Editor.hasPath(this.editor, Path.next(Path.parent(nodePath)))
+      ) {
         Transforms.select(
           this.editor,
           Editor.end(this.editor, [...Path.next(Path.parent(nodePath)), 0]),

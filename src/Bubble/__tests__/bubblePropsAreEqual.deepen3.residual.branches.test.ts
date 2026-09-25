@@ -63,18 +63,12 @@ describe('bubblePropsAreEqual deepen3 residual branches', () => {
       bubblePropsAreEqual(
         props({
           originData: origin({
-            meta: metaWithProtoMetadata(
-              { title: 't' },
-              { x: 1 },
-            ) as any,
+            meta: metaWithProtoMetadata({ title: 't' }, { x: 1 }) as any,
           }),
         }),
         props({
           originData: origin({
-            meta: metaWithProtoMetadata(
-              { title: 't' },
-              { x: 1 },
-            ) as any,
+            meta: metaWithProtoMetadata({ title: 't' }, { x: 1 }) as any,
           }),
         }),
       ),

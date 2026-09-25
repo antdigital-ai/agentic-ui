@@ -19,10 +19,10 @@ describe('parseText residual branches', () => {
     );
     expect(strong.some((l) => l.bold && l.text === '')).toBe(true);
 
-    const em = parseText(
-      [{ type: 'emphasis', children: [] } as any],
-      { data: {}, italic: true } as any,
-    );
+    const em = parseText([{ type: 'emphasis', children: [] } as any], {
+      data: {},
+      italic: true,
+    } as any);
     expect(em.some((l) => l.italic)).toBe(true);
 
     const del = parseText([{ type: 'delete', children: [] } as any]);

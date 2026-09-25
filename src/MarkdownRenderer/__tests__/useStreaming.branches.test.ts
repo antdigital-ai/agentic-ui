@@ -7,9 +7,7 @@ import { useStreaming } from '../useStreaming';
 
 describe('useStreaming branches', () => {
   it('enabled=false 时直接透传 input', () => {
-    const { result } = renderHook(() =>
-      useStreaming('hello **world**', false),
-    );
+    const { result } = renderHook(() => useStreaming('hello **world**', false));
     expect(result.current).toBe('hello **world**');
   });
 

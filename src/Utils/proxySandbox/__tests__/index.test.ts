@@ -501,9 +501,9 @@ describe('proxySandbox/index.ts', () => {
         const result = await checker.testBasicFunctionality();
 
         expect(result.results.basicExecution).toBe(false);
-        expect(result.errors.some((msg) => msg.includes('Basic execution failed'))).toBe(
-          true,
-        );
+        expect(
+          result.errors.some((msg) => msg.includes('Basic execution failed')),
+        ).toBe(true);
 
         vi.restoreAllMocks();
       });

@@ -124,7 +124,10 @@ describe('parseHtml deepen2 residual branches', () => {
   });
 
   it('preprocessSpecialTags：无语言 fence 仍转义', () => {
-    const out = preprocessSpecialTags('<answer>```\ncode\n```</answer>', 'answer');
+    const out = preprocessSpecialTags(
+      '<answer>```\ncode\n```</answer>',
+      'answer',
+    );
     expect(out).toContain('```answer');
     expect(out).toContain('CODE_BLOCK:');
   });

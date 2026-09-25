@@ -21,11 +21,7 @@ describe('CommentList branches', () => {
   it('pure true 不渲染 spacer', () => {
     const { container } = render(
       <ConfigProvider>
-        <CommentList
-          pure
-          commentList={[]}
-          comment={{}}
-        />
+        <CommentList pure commentList={[]} comment={{}} />
       </ConfigProvider>,
     );
     const spacers = Array.from(container.querySelectorAll('div')).filter(

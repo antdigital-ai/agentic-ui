@@ -28,16 +28,14 @@ describe('HtmlPreview deepen residual branches', () => {
   it('空 html + 空 locale 显示 No data', () => {
     const { container } = render(
       <ConfigProvider>
-        <I18nContext.Provider
-          value={{ locale: {} as any, language: 'en-US' }}
-        >
+        <I18nContext.Provider value={{ locale: {} as any, language: 'en-US' }}>
           <HtmlPreview html="   " status="done" />
         </I18nContext.Provider>
       </ConfigProvider>,
     );
-    expect(
-      container.querySelector('.ant-empty-description')?.textContent,
-    ).toBe('No data');
+    expect(container.querySelector('.ant-empty-description')?.textContent).toBe(
+      'No data',
+    );
   });
 
   it('code 模式非空 html 走 MarkdownEditor fence', () => {

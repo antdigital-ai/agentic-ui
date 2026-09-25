@@ -10,9 +10,8 @@ import { FileItem } from '../components/FileItem';
 import * as handlers from '../handlers';
 
 vi.mock('../handlers', async () => {
-  const actual = await vi.importActual<typeof import('../handlers')>(
-    '../handlers',
-  );
+  const actual =
+    await vi.importActual<typeof import('../handlers')>('../handlers');
   return {
     ...actual,
     handleFileDownload: vi.fn(),

@@ -78,9 +78,9 @@ describe('htmlUrlSafety residual branches', () => {
 
   it('shouldElementRenderAsPlainText：非 element / 无 tag / 安全媒体', () => {
     expect(shouldElementRenderAsPlainText({ type: 'text' })).toBe(false);
-    expect(
-      shouldElementRenderAsPlainText({ type: 'element' } as any),
-    ).toBe(false);
+    expect(shouldElementRenderAsPlainText({ type: 'element' } as any)).toBe(
+      false,
+    );
     expect(
       shouldElementRenderAsPlainText({
         type: 'element',

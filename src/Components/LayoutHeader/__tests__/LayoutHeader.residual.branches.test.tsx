@@ -20,11 +20,7 @@ describe('LayoutHeader residual branches', () => {
   it('leftCollapsible 点击切换回调', () => {
     const onLeft = vi.fn();
     wrap(
-      <LayoutHeader
-        title="Header"
-        leftCollapsible
-        onLeftCollapse={onLeft}
-      />,
+      <LayoutHeader title="Header" leftCollapsible onLeftCollapse={onLeft} />,
     );
     const btn = screen.getByRole('button', { name: /折叠左侧|collapse/i });
     fireEvent.click(btn);

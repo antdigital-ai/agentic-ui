@@ -49,12 +49,12 @@ describe('avatarGroupHover', () => {
     expect(items[2].style.getPropertyValue('--visual-list-shift')).toBe(
       '-1.800px',
     );
-    expect(
-      items[1].style.getPropertyValue('--visual-list-scale-active'),
-    ).toBe('1.05');
-    expect(
-      items[0].style.getPropertyValue('--visual-list-scale-active'),
-    ).toBe('1');
+    expect(items[1].style.getPropertyValue('--visual-list-scale-active')).toBe(
+      '1.05',
+    );
+    expect(items[0].style.getPropertyValue('--visual-list-scale-active')).toBe(
+      '1',
+    );
     group.remove();
   });
 
@@ -66,9 +66,7 @@ describe('avatarGroupHover', () => {
     applyAvatarGroupHover(group, null);
 
     expect(item.style.getPropertyValue('--visual-list-shift')).toBe('0px');
-    expect(item.style.getPropertyValue('--visual-list-scale-active')).toBe(
-      '1',
-    );
+    expect(item.style.getPropertyValue('--visual-list-scale-active')).toBe('1');
     expect(item.style.transitionTimingFunction).toBe('ease-out-test');
     group.remove();
   });

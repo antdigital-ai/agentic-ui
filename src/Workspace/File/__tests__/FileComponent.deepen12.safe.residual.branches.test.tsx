@@ -29,7 +29,11 @@ vi.mock('antd', async () => {
 vi.mock('../PreviewComponent', () => ({
   PreviewComponent: (props: any) => (
     <div data-testid="preview-d12">
-      <button type="button" data-testid="back-d12" onClick={() => props.onBack?.()}>
+      <button
+        type="button"
+        data-testid="back-d12"
+        onClick={() => props.onBack?.()}
+      >
         back
       </button>
       <span>{props.file?.name}</span>
@@ -45,7 +49,11 @@ vi.mock('../FileTree/FileTreeComponent', () => ({
   ),
 }));
 
-const file = (id: string, name: string, extra?: Partial<FileNode>): FileNode => ({
+const file = (
+  id: string,
+  name: string,
+  extra?: Partial<FileNode>,
+): FileNode => ({
   id,
   name,
   content: 'body',
@@ -115,7 +123,12 @@ describe('FileComponent deepen12 safe residual branches', () => {
   it('图片 preview 分支；受控 panelView tree + keyword', async () => {
     wrap(
       <FileComponent
-        nodes={[file('img1', 'pic.png', { type: 'image', content: 'https://x/p.png' })]}
+        nodes={[
+          file('img1', 'pic.png', {
+            type: 'image',
+            content: 'https://x/p.png',
+          }),
+        ]}
         panelView="tree"
         keyword={undefined}
         fileTreeSwitch={{ enabled: true }}

@@ -3,8 +3,8 @@
  */
 import { describe, expect, it } from 'vitest';
 import {
-  splitMarkdownBlocks,
   buildEditorAlignedComponents,
+  splitMarkdownBlocks,
 } from '../markdownReactShared';
 
 describe('markdownReactShared residual branches', () => {
@@ -24,12 +24,9 @@ describe('markdownReactShared residual branches', () => {
   });
 
   it('buildEditorAlignedComponents：返回组件映射', () => {
-    const comps = buildEditorAlignedComponents(
-      'ant-md',
-      {},
-      false,
-      { openInNewTab: true },
-    );
+    const comps = buildEditorAlignedComponents('ant-md', {}, false, {
+      openInNewTab: true,
+    });
     expect(comps).toBeTruthy();
     expect(typeof comps).toBe('object');
   });

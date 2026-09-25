@@ -65,9 +65,7 @@ describe('codeTagLeafBehavior deepen5 residual branches', () => {
 
   it('tag deleteBackward：非 tag / 非折叠返回 false；tag 处理', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: 'x' }] },
-    ] as any;
+    editor.children = [{ type: 'paragraph', children: [{ text: 'x' }] }] as any;
     editor.selection = {
       anchor: { path: [0, 0], offset: 1 },
       focus: { path: [0, 0], offset: 1 },
@@ -108,9 +106,7 @@ describe('codeTagLeafBehavior deepen5 residual branches', () => {
 
   it('handleMarkInsertBreak：非 mark 返回 false；mark 插入', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: 'x' }] },
-    ] as any;
+    editor.children = [{ type: 'paragraph', children: [{ text: 'x' }] }] as any;
     editor.selection = {
       anchor: { path: [0, 0], offset: 1 },
       focus: { path: [0, 0], offset: 1 },

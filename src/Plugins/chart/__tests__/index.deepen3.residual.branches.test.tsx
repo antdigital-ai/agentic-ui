@@ -127,14 +127,12 @@ describe('chart/index deepen3 residual branches', () => {
   it('ISO 日期经 dayjs 默认解析回退（非格式表）', () => {
     render(
       <ChartElement
-        element={
-          baseElement({
-            dataSource: [
-              { name: '2024-01-15T12:00:00.000Z', value: '10' },
-              { name: 'B', value: '20' },
-            ],
-          })
-        }
+        element={baseElement({
+          dataSource: [
+            { name: '2024-01-15T12:00:00.000Z', value: '10' },
+            { name: 'B', value: '20' },
+          ],
+        })}
         attributes={{ 'data-slate-node': 'element' } as any}
       >
         <span />
@@ -146,24 +144,22 @@ describe('chart/index deepen3 residual branches', () => {
   it('subgraphBy 多组含空组：null 项被过滤', () => {
     render(
       <ChartElement
-        element={
-          baseElement({
-            dataSource: [
-              { name: 'A', value: 1, g: 'ok' },
-              { name: 'B', value: 2, g: 'ok' },
-              { name: 'C', value: 3, g: undefined as any },
-            ],
-            config: [
-              {
-                chartType: 'bar',
-                x: 'name',
-                y: 'value',
-                subgraphBy: 'g',
-                title: 'sub',
-              },
-            ],
-          })
-        }
+        element={baseElement({
+          dataSource: [
+            { name: 'A', value: 1, g: 'ok' },
+            { name: 'B', value: 2, g: 'ok' },
+            { name: 'C', value: 3, g: undefined as any },
+          ],
+          config: [
+            {
+              chartType: 'bar',
+              x: 'name',
+              y: 'value',
+              subgraphBy: 'g',
+              title: 'sub',
+            },
+          ],
+        })}
         attributes={{ 'data-slate-node': 'element' } as any}
       >
         <span />

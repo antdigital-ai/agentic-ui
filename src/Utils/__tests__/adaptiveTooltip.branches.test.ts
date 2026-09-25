@@ -23,7 +23,9 @@ describe('adaptiveTooltip branches', () => {
   it('navigator 未定义时 isInformationalClickContext 为 false', () => {
     vi.stubGlobal('window', {});
     vi.stubGlobal('navigator', undefined);
-    expect(adaptiveTooltipEnvironment.isInformationalClickContext()).toBe(false);
+    expect(adaptiveTooltipEnvironment.isInformationalClickContext()).toBe(
+      false,
+    );
   });
 
   it('桌面无触摸时 informational 不附加 click trigger', () => {
@@ -75,9 +77,9 @@ describe('adaptiveTooltip branches', () => {
 
   it('server snapshot 恒为 false / 空 trigger', () => {
     expect(getAdaptiveEnvironmentServerSnapshot()).toBe(false);
-    expect(getAdaptiveTooltipTriggerPropsServerSnapshot('informational')).toEqual(
-      EMPTY_TOOLTIP_TRIGGER_PROPS,
-    );
+    expect(
+      getAdaptiveTooltipTriggerPropsServerSnapshot('informational'),
+    ).toEqual(EMPTY_TOOLTIP_TRIGGER_PROPS);
     expect(getAdaptiveTooltipTriggerPropsServerSnapshot('interactive')).toEqual(
       EMPTY_TOOLTIP_TRIGGER_PROPS,
     );
@@ -129,8 +131,9 @@ describe('adaptiveTooltip branches', () => {
     it('resize 环境未变时不重复广播', () => {
       const listener = vi.fn();
       subscribeAdaptiveTooltipEnvironment(listener);
-      const resizeHandler = (window.addEventListener as ReturnType<typeof vi.fn>)
-        .mock.calls.find(([event]) => event === 'resize')?.[1] as () => void;
+      const resizeHandler = (
+        window.addEventListener as ReturnType<typeof vi.fn>
+      ).mock.calls.find(([event]) => event === 'resize')?.[1] as () => void;
       listener.mockClear();
       resizeHandler?.();
       listener.mockClear();

@@ -40,9 +40,7 @@ describe('normalizeListChildren deepen3 residual branches', () => {
           { text: '   ' },
           {
             type: 'list-item',
-            children: [
-              { type: 'list-item-text', children: [{ text: 'a' }] },
-            ],
+            children: [{ type: 'list-item-text', children: [{ text: 'a' }] }],
           },
         ],
       },

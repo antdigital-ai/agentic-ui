@@ -5,6 +5,7 @@ import { createEditor, Editor, Path, Point, Range, Transforms } from 'slate';
 import { withHistory } from 'slate-history';
 import { ReactEditor } from 'slate-react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { READONLY_MARKDOWN_CONTAINER_KEY } from '../../../readonly/findTextInReadonlyMarkdownDom';
 import * as domUtils from '../dom';
 import {
   createDomRangeFromNodes,
@@ -15,7 +16,6 @@ import {
   getRelativePath,
   getSelectionFromDomSelection,
 } from '../editorUtils';
-import { READONLY_MARKDOWN_CONTAINER_KEY } from '../../../readonly/findTextInReadonlyMarkdownDom';
 
 vi.mock('slate-react', () => ({
   ReactEditor: {
@@ -102,7 +102,9 @@ describe('editorUtils 分支覆盖', () => {
 
   describe('moveNodes', () => {
     it('超过 100 次移动后中断循环', () => {
-      const moveSpy = vi.spyOn(Transforms, 'moveNodes').mockImplementation(() => {});
+      const moveSpy = vi
+        .spyOn(Transforms, 'moveNodes')
+        .mockImplementation(() => {});
       vi.spyOn(Editor, 'hasPath').mockReturnValue(true);
       EditorUtils.moveNodes(editor, [0], [1], 0);
       expect(moveSpy.mock.calls.length).toBeLessThanOrEqual(101);
@@ -140,7 +142,10 @@ describe('editorUtils 分支覆盖', () => {
             {
               type: 'list-item',
               children: [
-                { type: 'paragraph', children: [{ text: 'Nested', italic: true }] },
+                {
+                  type: 'paragraph',
+                  children: [{ text: 'Nested', italic: true }],
+                },
               ],
             },
           ],
@@ -251,7 +256,9 @@ describe('editorUtils 分支覆盖', () => {
 
   describe('isDirtLeaf', () => {
     it('mark 属性视为脏 leaf', () => {
-      expect(EditorUtils.isDirtLeaf({ text: 'x', mark: true } as any)).toBe(true);
+      expect(EditorUtils.isDirtLeaf({ text: 'x', mark: true } as any)).toBe(
+        true,
+      );
     });
   });
 
@@ -277,7 +284,10 @@ describe('editorUtils 分支覆盖', () => {
       vi.spyOn(domUtils, 'getMediaType').mockImplementation(() => {
         throw new Error('getMediaType failed');
       });
-      const result = EditorUtils.createMediaNode('https://example.com/x.mp4', 'video');
+      const result = EditorUtils.createMediaNode(
+        'https://example.com/x.mp4',
+        'video',
+      );
       expect(result).toMatchObject({ type: 'card' });
       expect((result as any).children[1].type).toBe('media');
       consoleSpy.mockRestore();
@@ -476,7 +486,9 @@ describe('editorUtils 分支覆盖', () => {
       const moveSpy = vi
         .spyOn(Transforms, 'moveNodes')
         .mockImplementation(() => {});
-      vi.spyOn(Editor, 'hasPath').mockReturnValueOnce(true).mockReturnValue(false);
+      vi.spyOn(Editor, 'hasPath')
+        .mockReturnValueOnce(true)
+        .mockReturnValue(false);
       EditorUtils.moveNodes(editor, [0], [2]);
       expect(moveSpy).toHaveBeenCalledWith(
         editor,
@@ -585,26 +597,19 @@ describe('editorUtils 分支覆盖', () => {
         focus: { path: [0, 0, 0, 0, 0], offset: 0 },
       };
       vi.spyOn(Editor, 'nodes').mockImplementation(function* () {
-        yield [
-          editor.children[0].children[0].children[0],
-          [0, 0, 0],
-        ];
+        yield [editor.children[0].children[0].children[0], [0, 0, 0]];
       } as any);
       expect(EditorUtils.findMediaInsertPath(editor)).toBeTruthy();
       vi.mocked(Editor.nodes).mockRestore();
 
-      editor.children = [
-        { type: 'head', level: 1, children: [{ text: 'H' }] },
-      ];
+      editor.children = [{ type: 'head', level: 1, children: [{ text: 'H' }] }];
       vi.spyOn(Editor, 'nodes').mockImplementation(function* () {
         yield [editor.children[0], [0]];
       } as any);
       expect(EditorUtils.findMediaInsertPath(editor)).toBeTruthy();
       vi.mocked(Editor.nodes).mockRestore();
 
-      editor.children = [
-        { type: 'paragraph', children: [{ text: 'filled' }] },
-      ];
+      editor.children = [{ type: 'paragraph', children: [{ text: 'filled' }] }];
       vi.spyOn(Editor, 'nodes').mockImplementation(function* () {
         yield [editor.children[0], [0]];
       } as any);
@@ -619,10 +624,7 @@ describe('editorUtils 分支覆盖', () => {
       EditorUtils.moveAfterSpace(editor, [0, 0]);
       expect(insertSpy).toHaveBeenCalled();
 
-      vi.spyOn(Editor, 'next').mockReturnValue([
-        { text: 'x' },
-        [0, 1],
-      ] as any);
+      vi.spyOn(Editor, 'next').mockReturnValue([{ text: 'x' }, [0, 1]] as any);
       EditorUtils.moveAfterSpace(editor, [0, 0]);
       expect(moveSpy).toHaveBeenCalled();
 
@@ -653,7 +655,9 @@ describe('editorUtils 分支覆盖', () => {
         focus: { path: [0, 0, 0, 0], offset: 2 },
       };
       // liftNodes 在 list-item 路径上可能因结构抛错；mock 掉以稳定走到 list→paragraph
-      vi.spyOn(Transforms, 'liftNodes').mockImplementation(() => undefined as any);
+      vi.spyOn(Transforms, 'liftNodes').mockImplementation(
+        () => undefined as any,
+      );
       vi.spyOn(Editor, 'nodes').mockImplementation(function* () {
         yield [editor.children[0], [0]];
       } as any);
@@ -745,9 +749,7 @@ describe('editorUtils 分支覆盖', () => {
     });
 
     it('collapsed 空选区 toggleFormat 早退', () => {
-      editor.children = [
-        { type: 'paragraph', children: [{ text: '' }] },
-      ];
+      editor.children = [{ type: 'paragraph', children: [{ text: '' }] }];
       editor.selection = {
         anchor: { path: [0, 0], offset: 0 },
         focus: { path: [0, 0], offset: 0 },
@@ -842,9 +844,7 @@ describe('editorUtils 分支覆盖', () => {
     });
 
     it('istanbul after：moveAfterSpace 插入空 text；moveBeforeSpace 无 previous', () => {
-      editor.children = [
-        { type: 'paragraph', children: [{ text: 'only' }] },
-      ];
+      editor.children = [{ type: 'paragraph', children: [{ text: 'only' }] }];
       const insertSpy = vi
         .spyOn(Transforms, 'transform')
         .mockImplementation(() => {});
@@ -870,19 +870,21 @@ describe('editorUtils 分支覆盖', () => {
       const emptyList = { type: 'list', children: [] } as any;
       expect(EditorUtils.listToParagraph(editor, emptyList)).toEqual([]);
 
-      expect(() =>
-        EditorUtils.deleteAll(editor, null as any),
-      ).not.toThrow();
+      expect(() => EditorUtils.deleteAll(editor, null as any)).not.toThrow();
 
       expect(() =>
         EditorUtils.reset(editor, undefined as any, false),
       ).not.toThrow();
 
       expect(() =>
-        EditorUtils.reset(editor, undefined as any, {
-          undos: [],
-          redos: [],
-        } as any),
+        EditorUtils.reset(
+          editor,
+          undefined as any,
+          {
+            undos: [],
+            redos: [],
+          } as any,
+        ),
       ).not.toThrow();
     });
 
@@ -914,10 +916,7 @@ describe('editorUtils 分支覆盖', () => {
         { type: 'paragraph', children: [{ text: 'ab' }, { text: 'cd' }] },
       ];
       const moveSpy = vi.spyOn(Transforms, 'move').mockImplementation(() => {});
-      vi.spyOn(Editor, 'next').mockReturnValue([
-        { text: 'cd' },
-        [0, 1],
-      ] as any);
+      vi.spyOn(Editor, 'next').mockReturnValue([{ text: 'cd' }, [0, 1]] as any);
 
       EditorUtils.moveAfterSpace(editor, [0, 0]);
 
@@ -958,9 +957,7 @@ describe('editorUtils 分支覆盖', () => {
           children: [
             {
               type: 'table-row',
-              children: [
-                { type: 'table-cell', children: [{ text: 'c' }] },
-              ],
+              children: [{ type: 'table-cell', children: [{ text: 'c' }] }],
             },
           ],
         },
@@ -996,16 +993,12 @@ describe('editorUtils 分支覆盖', () => {
         { type: 'paragraph', children: [{ text: 'x' }] } as any,
         [1],
       ] as any);
-      expect(() =>
-        EditorUtils.moveAfterSpace(editor, [0, 0]),
-      ).not.toThrow();
+      expect(() => EditorUtils.moveAfterSpace(editor, [0, 0])).not.toThrow();
       vi.mocked(Editor.next).mockRestore();
 
       // if (!Path.hasPrevious(path))
       vi.spyOn(Path, 'hasPrevious').mockReturnValue(false);
-      expect(() =>
-        EditorUtils.moveBeforeSpace(editor, [0, 0]),
-      ).not.toThrow();
+      expect(() => EditorUtils.moveBeforeSpace(editor, [0, 0])).not.toThrow();
       vi.mocked(Path.hasPrevious).mockRestore();
 
       // if (!listNode.children || listNode.children.length === 0)
@@ -1022,9 +1015,7 @@ describe('editorUtils 分支覆盖', () => {
         EditorUtils.reset(editor, undefined as any, true),
       ).not.toThrow();
 
-      editor.children = [
-        { type: 'paragraph', children: [{ text: 'abc' }] },
-      ];
+      editor.children = [{ type: 'paragraph', children: [{ text: 'abc' }] }];
       editor.selection = {
         anchor: { path: [0, 0], offset: 0 },
         focus: { path: [0, 0], offset: 3 },

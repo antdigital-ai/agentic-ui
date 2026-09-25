@@ -2,7 +2,13 @@
  * FunnelChart index 补洞：SSR、filter 解析、bottomLayerMinWidth、legend/梯形插件。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import FunnelChart from '../index';
@@ -147,7 +153,9 @@ describe('FunnelChart index deepen branches', () => {
         title="layer"
       />,
     );
-    expect((globalThis as any).__funnelDeepenData?.datasets?.[0]?.data).toBeTruthy();
+    expect(
+      (globalThis as any).__funnelDeepenData?.datasets?.[0]?.data,
+    ).toBeTruthy();
 
     act(() => {
       fireEvent.click(screen.getByTestId('cat-filter'));
@@ -155,9 +163,9 @@ describe('FunnelChart index deepen branches', () => {
     act(() => {
       fireEvent.click(screen.getByTestId('fl-east'));
     });
-    expect((globalThis as any).__funnelDeepenData?.labels?.length).toBeGreaterThan(
-      0,
-    );
+    expect(
+      (globalThis as any).__funnelDeepenData?.labels?.length,
+    ).toBeGreaterThan(0);
 
     rerender(
       <FunnelChart
@@ -244,7 +252,15 @@ describe('FunnelChart index deepen branches', () => {
       ctx,
       data: {
         labels: ['A', 'B', 'C'],
-        datasets: [{ data: [[-50, 50], [-30, 30], [-10, 10]] }],
+        datasets: [
+          {
+            data: [
+              [-50, 50],
+              [-30, 30],
+              [-10, 10],
+            ],
+          },
+        ],
       },
       scales: {},
       getDatasetMeta: () => ({

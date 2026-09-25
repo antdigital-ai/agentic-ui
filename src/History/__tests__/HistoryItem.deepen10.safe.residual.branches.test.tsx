@@ -61,7 +61,11 @@ vi.mock('../components/HistoryActionsBox', () => ({
     <div data-testid="actions-box">
       {children}
       {onDeleteItem ? (
-        <button type="button" data-testid="delete-btn" onClick={() => onDeleteItem()}>
+        <button
+          type="button"
+          data-testid="delete-btn"
+          onClick={() => onDeleteItem()}
+        >
           del
         </button>
       ) : null}

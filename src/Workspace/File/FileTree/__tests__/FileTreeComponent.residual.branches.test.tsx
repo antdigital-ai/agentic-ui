@@ -155,7 +155,11 @@ describe('FileTreeComponent residual branches', () => {
           <button type="button" onClick={() => setKw('zzz')}>
             filter
           </button>
-          <FileTree treeData={treeData} onLoadChildren={vi.fn()} filterKeyword={kw} />
+          <FileTree
+            treeData={treeData}
+            onLoadChildren={vi.fn()}
+            filterKeyword={kw}
+          />
         </Wrapper>
       );
     };
@@ -185,7 +189,11 @@ describe('FileTreeComponent residual branches', () => {
           <button type="button" onClick={() => setKw('match')}>
             filter
           </button>
-          <FileTree treeData={treeData} onLoadChildren={vi.fn()} filterKeyword={kw} />
+          <FileTree
+            treeData={treeData}
+            onLoadChildren={vi.fn()}
+            filterKeyword={kw}
+          />
         </Wrapper>
       );
     };
@@ -280,9 +288,7 @@ describe('FileTreeComponent residual branches', () => {
     render(
       <Wrapper>
         <FileTree
-          treeData={
-            [{ key: 'lazy', name: 'lazy', isLeaf: false }] as any
-          }
+          treeData={[{ key: 'lazy', name: 'lazy', isLeaf: false }] as any}
           onLoadChildren={rejectTree}
         />
       </Wrapper>,
@@ -339,8 +345,7 @@ describe('FileTreeComponent residual branches', () => {
       <Wrapper
         locale={{
           'workspace.empty': 'EMPTY_CUSTOM',
-          'workspace.treeFilterNoMatchVisibleRoots':
-            'NO_ROOT ${keyword}',
+          'workspace.treeFilterNoMatchVisibleRoots': 'NO_ROOT ${keyword}',
         }}
       >
         <FileTree
@@ -665,9 +670,11 @@ describe('FileTreeComponent residual branches', () => {
   });
 
   it('deepen：嵌套懒加载 replaceNodeChildren；resetKey 清空展开', async () => {
-    const onLoadChildren = vi.fn().mockResolvedValue([
-      { key: 'nested-child', name: 'nested.txt', isLeaf: true },
-    ]);
+    const onLoadChildren = vi
+      .fn()
+      .mockResolvedValue([
+        { key: 'nested-child', name: 'nested.txt', isLeaf: true },
+      ]);
     const { rerender } = render(
       <Wrapper>
         <FileTree
@@ -736,7 +743,10 @@ describe('FileTreeComponent residual branches', () => {
           onDownload={onDownload}
           fileNodeByRelativePath={fileMap}
         />
-        <FileTree treeData={[]} emptyRender={<div data-testid="empty-node">E</div>} />
+        <FileTree
+          treeData={[]}
+          emptyRender={<div data-testid="empty-node">E</div>}
+        />
       </Wrapper>,
     );
     expect(screen.getByTestId('empty-node')).toBeInTheDocument();
@@ -751,13 +761,15 @@ describe('FileTreeComponent residual branches', () => {
         }}
       >
         <FileTree
-          treeData={[
-            {
-              key: 'dir-match',
-              name: 'target-folder',
-              children: [{ key: 'f', name: 'other.txt', isLeaf: true }],
-            },
-          ] as any}
+          treeData={
+            [
+              {
+                key: 'dir-match',
+                name: 'target-folder',
+                children: [{ key: 'f', name: 'other.txt', isLeaf: true }],
+              },
+            ] as any
+          }
           onLoadChildren={vi.fn()}
           filterKeyword="target"
         />
@@ -846,14 +858,17 @@ describe('FileTreeComponent residual branches', () => {
       return (
         <Wrapper
           locale={{
-            'workspace.treeFilterNoMatchInExpanded':
-              'EXPANDED_MISS ${keyword}',
+            'workspace.treeFilterNoMatchInExpanded': 'EXPANDED_MISS ${keyword}',
           }}
         >
           <button type="button" onClick={() => setKw('nomatch')}>
             filter
           </button>
-          <FileTree treeData={treeData} onLoadChildren={vi.fn()} filterKeyword={kw} />
+          <FileTree
+            treeData={treeData}
+            onLoadChildren={vi.fn()}
+            filterKeyword={kw}
+          />
         </Wrapper>
       );
     };

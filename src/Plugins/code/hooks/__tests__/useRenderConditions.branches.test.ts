@@ -13,9 +13,7 @@ describe('useRenderConditions branches', () => {
       isConfig: true,
       children: [{ text: '' }],
     } as any;
-    const { result } = renderHook(() =>
-      useRenderConditions(element, false),
-    );
+    const { result } = renderHook(() => useRenderConditions(element, false));
     expect(result.current.shouldHideConfigHtml).toBe(true);
     expect(result.current.shouldRenderAsCodeEditor).toBe(false);
   });

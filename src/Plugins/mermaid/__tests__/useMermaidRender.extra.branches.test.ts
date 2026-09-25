@@ -4,7 +4,9 @@ import { useMermaidRender } from '../useMermaidRender';
 
 vi.mock('../utils', () => ({
   createMermaidThemeConfig: vi.fn((token?: any) => ({
-    cacheKey: token?.colorPrimary ? `theme-${token.colorPrimary}` : 'theme-default',
+    cacheKey: token?.colorPrimary
+      ? `theme-${token.colorPrimary}`
+      : 'theme-default',
     theme: 'default',
   })),
   loadMermaid: vi.fn(async () => ({

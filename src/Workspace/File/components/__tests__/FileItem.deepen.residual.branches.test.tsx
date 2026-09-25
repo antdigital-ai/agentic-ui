@@ -19,9 +19,7 @@ describe('FileItem deepen residual branches', () => {
   it('最小 props 渲染', async () => {
     const mod = await import('../FileItem');
     const Comp =
-      (mod as any).FileItem ||
-      (mod as any).default ||
-      Object.values(mod)[0];
+      (mod as any).FileItem || (mod as any).default || Object.values(mod)[0];
     try {
       render(
         <Comp

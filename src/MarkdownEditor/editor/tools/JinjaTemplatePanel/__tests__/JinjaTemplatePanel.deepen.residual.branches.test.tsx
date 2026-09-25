@@ -4,9 +4,9 @@
 import '@testing-library/jest-dom';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Editor, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { I18nProvide } from '../../../../../I18n';
 import { useEditorStore } from '../../../store';
 import { JinjaTemplatePanel } from '../index';

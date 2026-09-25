@@ -51,9 +51,10 @@ describe('MarkdownRenderer SchemaRenderer deepen safe residual', () => {
         container.innerHTML.length > 0,
     ).toBeTruthy();
     expect(
-      debugInfo.mock.calls.some((c) =>
-        String(c[0] || '').includes('异常') ||
-        String(c[1]?.error || '').includes('plain-fail'),
+      debugInfo.mock.calls.some(
+        (c) =>
+          String(c[0] || '').includes('异常') ||
+          String(c[1]?.error || '').includes('plain-fail'),
       ) || container.innerHTML.length > 0,
     ).toBeTruthy();
   });

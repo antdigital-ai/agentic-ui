@@ -27,9 +27,9 @@ describe('sanitizeInvalidChildrenBehavior 分支覆盖', () => {
     expect(isValidChild({ text: '' })).toBe(true);
     expect(getChildList({ text: 'x' } as any)).toEqual([]);
     expect(getChildList({ type: 'p', children: 'bad' } as any)).toEqual([]);
-    expect(getChildList({ type: 'p', children: [{ text: '' }] } as any)).toHaveLength(
-      1,
-    );
+    expect(
+      getChildList({ type: 'p', children: [{ text: '' }] } as any),
+    ).toHaveLength(1);
     expect(createDefaultBlock().type).toBe('paragraph');
   });
 
@@ -116,9 +116,7 @@ describe('sanitizeInvalidChildrenBehavior 分支覆盖', () => {
   it('normalizeEditorRootEntry 与 stripInvalidChildrenOnTextLeaf', () => {
     const editor = createEditor();
     const normalizeNode = vi.fn();
-    expect(
-      normalizeEditorRootEntry(editor, [], normalizeNode),
-    ).toBe(true);
+    expect(normalizeEditorRootEntry(editor, [], normalizeNode)).toBe(true);
     expect(normalizeNode).toHaveBeenCalled();
 
     const editor2 = createEditor();
@@ -127,11 +125,7 @@ describe('sanitizeInvalidChildrenBehavior 分支覆盖', () => {
       { type: 'paragraph', children: [{ text: '' }] },
     ] as any;
     Transforms.select(editor2, { path: [0, 0], offset: 0 });
-    normalizeEditorRootEntry(
-      editor2,
-      editor2.children as any,
-      vi.fn(),
-    );
+    normalizeEditorRootEntry(editor2, editor2.children as any, vi.fn());
 
     const leafEditor = createEditor();
     leafEditor.children = [

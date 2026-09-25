@@ -22,8 +22,7 @@ const loadMermaidMock = vi.fn(async () => ({
 }));
 
 vi.mock('../utils', () => ({
-  createMermaidThemeConfig: (...a: unknown[]) =>
-    createMermaidThemeConfig(...a),
+  createMermaidThemeConfig: (...a: unknown[]) => createMermaidThemeConfig(...a),
   loadMermaid: (...args: unknown[]) => loadMermaidMock(...args),
   applyMermaidTheme: (...a: unknown[]) => applyMermaidTheme(...a),
   renderSvgToContainer: (...a: unknown[]) => renderSvgToContainer(...a),
@@ -122,8 +121,7 @@ describe('useMermaidRender deepen2 residual branches', () => {
   it('不可见时不调度；code 空且无 div 安全', async () => {
     const divRef = { current: null as HTMLDivElement | null };
     const { result, rerender } = renderHook(
-      ({ visible, code }) =>
-        useMermaidRender(code, divRef, 'm-vis2', visible),
+      ({ visible, code }) => useMermaidRender(code, divRef, 'm-vis2', visible),
       { initialProps: { visible: false, code: 'graph TD\nA-->B' } },
     );
     await vi.advanceTimersByTimeAsync(100);

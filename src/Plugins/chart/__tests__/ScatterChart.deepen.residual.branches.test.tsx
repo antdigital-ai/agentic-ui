@@ -68,11 +68,7 @@ describe('ScatterChart deepen residual branches', () => {
 
   it('非数组/含 null item 过滤；statistic 空数组为 null', () => {
     render(
-      <ScatterChart
-        data={null as any}
-        statistic={[] as any}
-        title="empty"
-      />,
+      <ScatterChart data={null as any} statistic={[] as any} title="empty" />,
     );
     expect(document.body.textContent).toMatch(/暂无|有效|数据|/);
 
@@ -126,9 +122,9 @@ describe('ScatterChart deepen residual branches', () => {
         }),
       ).not.toThrow();
     }
-    expect((globalThis as any).__scatterDeepenData?.datasets?.length).toBeGreaterThan(
-      0,
-    );
+    expect(
+      (globalThis as any).__scatterDeepenData?.datasets?.length,
+    ).toBeGreaterThan(0);
   });
 
   it('移动端尺寸；filterLabel 筛选', () => {

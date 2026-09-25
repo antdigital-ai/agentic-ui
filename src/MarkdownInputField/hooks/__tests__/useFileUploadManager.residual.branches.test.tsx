@@ -114,9 +114,7 @@ describe('useFileUploadManager residual branches', () => {
   });
 
   it('fileUploadStatus：error / uploading / done；supportedFormat 默认', () => {
-    const errMap = new Map([
-      ['a', { status: 'error', name: 'a.png' } as any],
-    ]);
+    const errMap = new Map([['a', { status: 'error', name: 'a.png' } as any]]);
     const { result, rerender } = renderHook(
       ({ fileMap }) =>
         useFileUploadManager({
@@ -128,9 +126,7 @@ describe('useFileUploadManager residual branches', () => {
     expect(result.current.fileUploadStatus).toBe('error');
 
     rerender({
-      fileMap: new Map([
-        ['b', { status: 'uploading', name: 'b.png' } as any],
-      ]),
+      fileMap: new Map([['b', { status: 'uploading', name: 'b.png' } as any]]),
     });
     expect(result.current.fileUploadStatus).toBe('uploading');
 

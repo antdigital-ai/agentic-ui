@@ -84,7 +84,9 @@ describe('EditorUtils more residual branches', () => {
   });
 
   it('createMediaNode / deleteAll / reset / highColor / setAlignment', () => {
-    expect(EditorUtils.createMediaNode('https://x/a.png', 'image')).toBeTruthy();
+    expect(
+      EditorUtils.createMediaNode('https://x/a.png', 'image'),
+    ).toBeTruthy();
     expect(EditorUtils.createMediaNode('', 'image')).toBeTruthy();
 
     const editor = createEditor();
@@ -124,9 +126,9 @@ describe('EditorUtils more residual branches', () => {
       anchor: start,
       focus: end,
     };
-    expect(
-      EditorUtils.includeAll(editor, editor.selection!, [0]),
-    ).toBeTypeOf('boolean');
+    expect(EditorUtils.includeAll(editor, editor.selection!, [0])).toBeTypeOf(
+      'boolean',
+    );
     expect(
       EditorUtils.coalesceRootAllEmptyParagraphs([
         { type: 'paragraph', children: [{ text: '' }] },
@@ -232,15 +234,21 @@ describe('EditorUtils more residual branches', () => {
 
   it('p 常量；createMediaNode video/other；toggleFormat 无 marks', () => {
     expect(EditorUtils.p).toBeTruthy();
-    expect(EditorUtils.createMediaNode('https://x/a.mp4', 'video')).toBeTruthy();
-    expect(EditorUtils.createMediaNode('https://x/a.bin', 'other' as any)).toBeTruthy();
+    expect(
+      EditorUtils.createMediaNode('https://x/a.mp4', 'video'),
+    ).toBeTruthy();
+    expect(
+      EditorUtils.createMediaNode('https://x/a.bin', 'other' as any),
+    ).toBeTruthy();
     const editor = createEditor();
     editor.children = [{ type: 'paragraph', children: [{ text: 'm' }] }];
     editor.selection = {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [0, 0], offset: 1 },
     };
-    expect(() => EditorUtils.toggleFormat(editor, 'strikethrough')).not.toThrow();
+    expect(() =>
+      EditorUtils.toggleFormat(editor, 'strikethrough'),
+    ).not.toThrow();
   });
 
   it('istanbul deepen：无 selection 早退；相邻 path；空 list；clearMarks', () => {
@@ -257,9 +265,7 @@ describe('EditorUtils more residual branches', () => {
         children: [
           {
             type: 'list-item',
-            children: [
-              { type: 'list-item-text', children: [{ text: 'li' }] },
-            ],
+            children: [{ type: 'list-item-text', children: [{ text: 'li' }] }],
           },
         ],
       },
@@ -284,9 +290,7 @@ describe('EditorUtils more residual branches', () => {
       expect.any(Array),
     );
 
-    expect(() =>
-      EditorUtils.reset(editor, null as any),
-    ).not.toThrow();
+    expect(() => EditorUtils.reset(editor, null as any)).not.toThrow();
     expect(() =>
       EditorUtils.reset(editor, [
         { type: 'paragraph', children: [{ text: 'ok' }] },
@@ -332,9 +336,9 @@ describe('EditorUtils more residual branches', () => {
 
     expect(EditorUtils.isFormatActive(editor, 'bold')).toBeDefined();
     expect(EditorUtils.isDirtLeaf({ text: 'x', code: true } as any)).toBe(true);
-    expect(EditorUtils.isDirtLeaf({ text: 'x', strikethrough: true } as any)).toBe(
-      true,
-    );
+    expect(
+      EditorUtils.isDirtLeaf({ text: 'x', strikethrough: true } as any),
+    ).toBe(true);
     expect(EditorUtils.hasPath(editor, [0, 0])).toBe(true);
     expect(EditorUtils.hasPath(editor, [99, 0])).toBe(false);
 
@@ -361,7 +365,9 @@ describe('EditorUtils more residual branches', () => {
       }
     }
     expect(() => EditorUtils.clearMarks(editor, false)).not.toThrow();
-    expect(() => EditorUtils.toggleFormat(editor, 'strikethrough')).not.toThrow();
+    expect(() =>
+      EditorUtils.toggleFormat(editor, 'strikethrough'),
+    ).not.toThrow();
     expect(() => EditorUtils.toggleFormat(editor, 'bold')).not.toThrow();
 
     editor.selection = {
@@ -466,19 +472,25 @@ describe('EditorUtils more residual branches', () => {
     };
     expect(() => EditorUtils.setAlignment(editor, 'left')).not.toThrow();
     expect(() => EditorUtils.setAlignment(editor, 'right')).not.toThrow();
-    expect(EditorUtils.isAlignmentActive(editor, 'right')).toBeTypeOf('boolean');
+    expect(EditorUtils.isAlignmentActive(editor, 'right')).toBeTypeOf(
+      'boolean',
+    );
     expect(EditorUtils.getUrl(editor)).toBeTypeOf('string');
     expect(() => EditorUtils.highColor(editor, '#0f0')).not.toThrow();
     expect(() => EditorUtils.highColor(editor)).not.toThrow();
 
-    expect(EditorUtils.copyText(editor, { path: [0, 0], offset: 0 })).toBeTypeOf(
-      'string',
-    );
+    expect(
+      EditorUtils.copyText(editor, { path: [0, 0], offset: 0 }),
+    ).toBeTypeOf('string');
     expect(() =>
-      EditorUtils.cutText(editor, { path: [0, 0], offset: 0 }, {
-        path: [0, 0],
-        offset: 2,
-      }),
+      EditorUtils.cutText(
+        editor,
+        { path: [0, 0], offset: 0 },
+        {
+          path: [0, 0],
+          offset: 2,
+        },
+      ),
     ).not.toThrow();
 
     try {

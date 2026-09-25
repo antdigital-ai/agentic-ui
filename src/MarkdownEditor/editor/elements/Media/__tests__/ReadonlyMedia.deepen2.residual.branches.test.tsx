@@ -3,13 +3,19 @@
  * audio finished 无 rawMarkdown、loadSuccess false MediaErrorLink。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { MediaNode } from '../../../../el';
-import { ReadonlyMedia } from '../ReadonlyMedia';
 import * as editorUtils from '../../../utils';
 import * as domUtils from '../../../utils/dom';
+import { ReadonlyMedia } from '../ReadonlyMedia';
 
 vi.mock('antd', () => ({
   Skeleton: { Image: () => <div data-testid="skeleton" /> },
@@ -85,7 +91,9 @@ describe('ReadonlyMedia deepen2 residual branches', () => {
     act(() => {
       vi.advanceTimersByTime(5000);
     });
-    expect(screen.getByText('https://example.com/late.png')).toBeInTheDocument();
+    expect(
+      screen.getByText('https://example.com/late.png'),
+    ).toBeInTheDocument();
   });
 
   it('video finished=false 超时后默认「视频链接」；loadSuccess false 错误链', () => {
@@ -120,9 +128,7 @@ describe('ReadonlyMedia deepen2 residual branches', () => {
         }),
     );
     // 直接用默认 mock 实现
-    const actual = vi.importActual
-      ? null
-      : null;
+    const actual = vi.importActual ? null : null;
     void actual;
     vi.mocked(editorUtils.useGetSetState).mockImplementation(((init: any) => {
       const state = { ...init };

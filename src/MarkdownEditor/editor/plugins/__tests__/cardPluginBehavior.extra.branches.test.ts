@@ -1,3 +1,4 @@
+import { createEditor } from 'slate';
 import { describe, expect, it } from 'vitest';
 import {
   handleCardDeleteBackward,
@@ -5,7 +6,6 @@ import {
   safeGetNode,
   safeParentPath,
 } from '../cardPluginBehavior';
-import { createEditor } from 'slate';
 
 describe('cardPluginBehavior 额外分支', () => {
   it('isCardSlotElement 非元素 / 无 type', () => {

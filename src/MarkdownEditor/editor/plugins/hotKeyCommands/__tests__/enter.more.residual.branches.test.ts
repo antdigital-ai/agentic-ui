@@ -28,7 +28,10 @@ describe('EnterKey more residual branches', () => {
       focus: { path: [0, 0], offset: 4 },
     };
     const backspace = { range: vi.fn() };
-    const key = new EnterKey({ editor, inputComposition: false } as any, backspace as any);
+    const key = new EnterKey(
+      { editor, inputComposition: false } as any,
+      backspace as any,
+    );
     const e = { preventDefault: vi.fn() } as any;
     key.run(e);
     expect(e.preventDefault).toHaveBeenCalled();
@@ -48,8 +51,6 @@ describe('EnterKey more residual branches', () => {
       backspace as any,
     );
     // with isImeComposing mocked false, still shouldn't throw
-    expect(() =>
-      key.run({ preventDefault: vi.fn() } as any),
-    ).not.toThrow();
+    expect(() => key.run({ preventDefault: vi.fn() } as any)).not.toThrow();
   });
 });

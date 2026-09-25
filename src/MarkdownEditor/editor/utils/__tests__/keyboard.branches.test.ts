@@ -1,6 +1,6 @@
-import { createEditor, Editor, Transforms } from 'slate';
 import { renderHook } from '@testing-library/react';
 import { Subject } from 'rxjs';
+import { createEditor, Editor, Transforms } from 'slate';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { KeyboardTask, useSystemKeyboard } from '../keyboard';
 
@@ -83,9 +83,7 @@ describe('KeyboardTask 分支覆盖', () => {
   });
 
   it('increaseHead/decreaseHead 调整标题', () => {
-    editor.children = [
-      { type: 'head', level: 2, children: [{ text: 'h' }] },
-    ];
+    editor.children = [{ type: 'head', level: 2, children: [{ text: 'h' }] }];
     editor.selection = {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [0, 0], offset: 0 },
@@ -143,9 +141,7 @@ describe('KeyboardTask 分支覆盖', () => {
         children: [
           {
             type: 'table-row',
-            children: [
-              { type: 'table-cell', children: [{ text: 'cell' }] },
-            ],
+            children: [{ type: 'table-cell', children: [{ text: 'cell' }] }],
           },
         ],
       },
@@ -341,7 +337,12 @@ describe('useSystemKeyboard 分支覆盖', () => {
     const ref = { current: document.createElement('div') };
     expect(() =>
       renderHook(() =>
-        useSystemKeyboard(keyTask$, null as any, { readonly: false } as any, ref),
+        useSystemKeyboard(
+          keyTask$,
+          null as any,
+          { readonly: false } as any,
+          ref,
+        ),
       ),
     ).not.toThrow();
   });

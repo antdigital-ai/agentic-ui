@@ -10,8 +10,8 @@ import React, {
 } from 'react';
 import { Subject } from 'rxjs';
 import { Selection } from 'slate';
-import { resolveContainerContentStyle } from '../Constants/contentPaddingVars';
 import { useFormulaConfig } from '../Config';
+import { resolveContainerContentStyle } from '../Constants/contentPaddingVars';
 import { useDebounceFn } from '../Hooks/useDebounceFn';
 import { useRefFunction } from '../Hooks/useRefFunction';
 import { CommentList } from './editor/components/CommentList';
@@ -230,8 +230,7 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
     }
 
     const schema =
-      props.initSchemaValue ||
-      (initValue ? list : copy([EditorUtils.p]));
+      props.initSchemaValue || (initValue ? list : copy([EditorUtils.p]));
 
     const filtered =
       schema?.filter((item: any) => {
@@ -314,14 +313,12 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
   const setSchemaDebounce = useDebounceFn((next: Elements[]) => {
     setSchema(next);
   }, 200);
-  const handleChildChange = useRefFunction(
-    (value: string, s: Elements[]) => {
-      if (tocEnabled) {
-        setSchemaDebounce.run(s);
-      }
-      rest?.onChange?.(value, s);
-    },
-  );
+  const handleChildChange = useRefFunction((value: string, s: Elements[]) => {
+    if (tocEnabled) {
+      setSchemaDebounce.run(s);
+    }
+    rest?.onChange?.(value, s);
+  });
 
   const [openInsertCompletion, setOpenInsertCompletion] = useState(false);
   const [floatBarRevision, setFloatBarRevision] = useState(0);

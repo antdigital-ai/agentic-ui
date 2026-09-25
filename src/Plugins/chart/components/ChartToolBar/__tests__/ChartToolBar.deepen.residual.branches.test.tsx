@@ -40,7 +40,9 @@ describe('ChartToolBar deepen residual branches', () => {
     const onCopy = vi.fn();
     const { rerender } = render(
       <ConfigProvider>
-        <I18nContext.Provider value={{ locale: null, language: 'zh-CN' } as any}>
+        <I18nContext.Provider
+          value={{ locale: null, language: 'zh-CN' } as any}
+        >
           <ChartToolBar
             title="T"
             onCopyMarkdown={onCopy}
@@ -49,7 +51,9 @@ describe('ChartToolBar deepen residual branches', () => {
         </I18nContext.Provider>
       </ConfigProvider>,
     );
-    const copyBtn = document.querySelector('.ant-chart-toolbar-copy-btn') as HTMLElement;
+    const copyBtn = document.querySelector(
+      '.ant-chart-toolbar-copy-btn',
+    ) as HTMLElement;
     expect(copyBtn).toBeTruthy();
     fireEvent.click(copyBtn);
     expect(onCopy).toHaveBeenCalled();

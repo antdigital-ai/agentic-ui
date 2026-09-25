@@ -27,17 +27,14 @@ describe('InsertAutocomplete residual branches', () => {
   });
 
   it('getInsertOptions：locale 有值时优先 locale', () => {
-    const opts = getInsertOptions(
-      { isTop: true },
-      {
-        table: 'Table',
-        quote: 'Quote',
-        localeImage: 'LocalImg',
-        head1: 'H1',
-        head2: 'H2',
-        head3: 'H3',
-      } as any,
-    );
+    const opts = getInsertOptions({ isTop: true }, {
+      table: 'Table',
+      quote: 'Quote',
+      localeImage: 'LocalImg',
+      head1: 'H1',
+      head2: 'H2',
+      head3: 'H3',
+    } as any);
     const labels = opts
       .flatMap((g) => g.children || [])
       .map((c) => c.label?.[0]);
@@ -56,9 +53,7 @@ describe('InsertAutocomplete residual branches', () => {
     const labels = opts
       .flatMap((g) => g.children || [])
       .map((c) => c.label?.[0]);
-    expect(labels).toEqual(
-      expect.arrayContaining(['CodeX', 'UL', 'OL', 'TL']),
-    );
+    expect(labels).toEqual(expect.arrayContaining(['CodeX', 'UL', 'OL', 'TL']));
     expect(opts.some((g) => g.key === 'head')).toBe(false);
   });
 
@@ -98,9 +93,20 @@ describe('InsertAutocomplete residual branches', () => {
       table: 'T',
       'b-list': 'UL',
     } as any);
-    const labels = half.flatMap((g) => g.children || []).map((c) => c.label?.[0]);
+    const labels = half
+      .flatMap((g) => g.children || [])
+      .map((c) => c.label?.[0]);
     expect(labels).toEqual(
-      expect.arrayContaining(['T', '引用', '代码', '本地图片', 'UL', '有序列表', '任务列表', '主标题']),
+      expect.arrayContaining([
+        'T',
+        '引用',
+        '代码',
+        '本地图片',
+        'UL',
+        '有序列表',
+        '任务列表',
+        '主标题',
+      ]),
     );
 
     const top = getInsertOptions({ isTop: true }, null as any);

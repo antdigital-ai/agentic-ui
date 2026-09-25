@@ -1,4 +1,10 @@
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import React, { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { ChatLayout, type ChatLayoutRef } from '../index';

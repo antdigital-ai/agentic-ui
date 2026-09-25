@@ -151,12 +151,7 @@ describe('parseHtml deepen residual branches', () => {
   });
 
   it('handleHtml：未闭合注释 finished=false', () => {
-    const open = handleHtml(
-      { value: '<!--{"key":' },
-      null,
-      [],
-      undefined,
-    );
+    const open = handleHtml({ value: '<!--{"key":' }, null, [], undefined);
     expect(open.el?.otherProps?.finished).toBe(false);
   });
 
@@ -184,7 +179,12 @@ describe('parseHtml deepen residual branches', () => {
   });
 
   it('handleHtml：内联 br / 闭合 tag / iframe 媒体', () => {
-    const br = handleHtml({ value: '<br/>' }, { type: 'paragraph' }, [], undefined);
+    const br = handleHtml(
+      { value: '<br/>' },
+      { type: 'paragraph' },
+      [],
+      undefined,
+    );
     expect(br.el?.type).toBe('break');
 
     const close = handleHtml(
@@ -205,13 +205,11 @@ describe('parseHtml deepen residual branches', () => {
   });
 
   it('findImageElement：iframe / img 自闭合 / video source', () => {
-    expect(findImageElement('<iframe src="https://x.com"></iframe>')?.tagName).toBe(
-      'iframe',
-    );
+    expect(
+      findImageElement('<iframe src="https://x.com"></iframe>')?.tagName,
+    ).toBe('iframe');
     expect(findImageElement('<img src="a.png"/>')?.tagName).toBe('img');
-    const video = findImageElement(
-      '<video><source src="v.mp4"/></video>',
-    );
+    const video = findImageElement('<video><source src="v.mp4"/></video>');
     expect(video?.tagName).toBe('video');
   });
 

@@ -16,11 +16,7 @@ vi.mock('../../MarkdownEditor/BaseMarkdownEditor', () => ({
 }));
 
 vi.mock('../MessagesContent/BubbleExtra', () => ({
-  BubbleExtra: ({
-    onLike,
-  }: {
-    onLike?: () => void | Promise<void>;
-  }) => (
+  BubbleExtra: ({ onLike }: { onLike?: () => void | Promise<void> }) => (
     <div data-testid="bubble-extra">
       <button type="button" data-testid="like-btn" onClick={() => onLike?.()}>
         like

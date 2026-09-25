@@ -38,7 +38,9 @@ describe('LanguageSelector midtail branches', () => {
 
   it('katex 不因空 language 崩溃；有 language 显示', () => {
     const { rerender } = render(
-      <LanguageSelector element={{ language: undefined, katex: true } as any} />,
+      <LanguageSelector
+        element={{ language: undefined, katex: true } as any}
+      />,
     );
     expect(document.body).toBeTruthy();
 

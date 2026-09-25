@@ -3,7 +3,13 @@
  * filter 内外、statistic、legend 截断、tooltip external 全路径、dark/light。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -88,7 +94,11 @@ vi.mock('../components', () => ({
       <span>{title}</span>
       {extra}
       {filter}
-      <button type="button" data-testid="radar-dl" onClick={() => onDownload?.()}>
+      <button
+        type="button"
+        data-testid="radar-dl"
+        onClick={() => onDownload?.()}
+      >
         dl
       </button>
     </div>
@@ -200,7 +210,10 @@ describe('RadarChart deepen residual branches', () => {
         color={['#111', '#222']}
         theme="dark"
         textMaxWidth={20}
-        statistic={[{ title: 's1', value: 1 }, { title: 's2', value: 2 }]}
+        statistic={[
+          { title: 's1', value: 1 },
+          { title: 's2', value: 2 },
+        ]}
       />,
     );
     expect(screen.getByTestId('radar-container')).toHaveAttribute(

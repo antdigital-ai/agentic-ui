@@ -18,9 +18,7 @@ const tableElement = (colWidths?: Array<number | string>): TableNode =>
         ],
       },
     ],
-    ...(colWidths
-      ? { otherProps: { colWidths } }
-      : {}),
+    ...(colWidths ? { otherProps: { colWidths } } : {}),
   }) as TableNode;
 
 describe('editableTableWidth 分支覆盖', () => {

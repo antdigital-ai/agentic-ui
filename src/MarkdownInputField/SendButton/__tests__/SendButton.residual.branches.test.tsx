@@ -8,7 +8,10 @@ describe('SendButton residual prop matrix', () => {
     [undefined, 'done', false],
     [{ disabled: true }, 'done', true],
     [{ disabled: false }, 'uploading', false],
-  ] as const)('resolves explicit disabled and upload states', (props, status, expected) => {
-    expect(resolveSendDisabled(props, status as any)).toBe(expected);
-  });
+  ] as const)(
+    'resolves explicit disabled and upload states',
+    (props, status, expected) => {
+      expect(resolveSendDisabled(props, status as any)).toBe(expected);
+    },
+  );
 });

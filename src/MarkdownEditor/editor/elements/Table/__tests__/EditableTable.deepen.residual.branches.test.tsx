@@ -77,7 +77,9 @@ describe('EditableTable deepen residual branches', () => {
         tableNode={
           {
             type: 'table',
-            children: [{ type: 'table-row', children: [{ type: 'table-cell' }] }],
+            children: [
+              { type: 'table-row', children: [{ type: 'table-cell' }] },
+            ],
           } as any
         }
         tableCssVariables={{ '--tbl-w': '100%' } as any}

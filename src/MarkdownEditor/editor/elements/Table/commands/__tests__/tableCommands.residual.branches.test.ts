@@ -12,7 +12,9 @@ import {
 
 describe('tableCommands invalid paths and empty rows', () => {
   it.skip('returns without transforms when the selected node is not a table', () => {
-    const editor = { children: [{ type: 'paragraph', children: [{ text: '' }] }] } as any;
+    const editor = {
+      children: [{ type: 'paragraph', children: [{ text: '' }] }],
+    } as any;
     const remove = vi.spyOn(Transforms, 'removeNodes');
     removeTableRow(editor, [0], 0);
     removeTableColumn(editor, [0], 0);
@@ -22,9 +24,13 @@ describe('tableCommands invalid paths and empty rows', () => {
   });
 
   it.skip('removes single row or column tables and ignores empty rows', () => {
-    const removeTable = vi.spyOn(NativeTableEditor, 'removeTable').mockImplementation(() => {});
+    const removeTable = vi
+      .spyOn(NativeTableEditor, 'removeTable')
+      .mockImplementation(() => {});
     const editor = {
-      children: [{ type: 'table', children: [{ type: 'table-row', children: [] }] }],
+      children: [
+        { type: 'table', children: [{ type: 'table-row', children: [] }] },
+      ],
     } as any;
     removeTableRow(editor, [0], 0);
     removeTableColumn(editor, [0], 0);
@@ -40,13 +46,21 @@ describe('tableCommands invalid paths and empty rows', () => {
         {
           type: 'table',
           children: [
-            { type: 'table-row', children: [{ type: 'table-cell', children: [] }] },
-            { type: 'table-row', children: [{ type: 'paragraph', children: [] }] },
+            {
+              type: 'table-row',
+              children: [{ type: 'table-cell', children: [] }],
+            },
+            {
+              type: 'table-row',
+              children: [{ type: 'paragraph', children: [] }],
+            },
           ],
         },
       ],
     } as any;
-    const insert = vi.spyOn(Transforms, 'insertNodes').mockImplementation(() => undefined as any);
+    const insert = vi
+      .spyOn(Transforms, 'insertNodes')
+      .mockImplementation(() => undefined as any);
     insertTableColumn(editor, [0], 0, 'after');
     selectTableColumn(editor, [0], 0);
     expect(insert).toHaveBeenCalledTimes(2);

@@ -1,17 +1,13 @@
 import { describe, expect, it } from 'vitest';
+import { agenticListsSchema, getListType, isListType } from '../schema';
 import { ListType } from '../types';
-import {
-  agenticListsSchema,
-  getListType,
-  isListType,
-} from '../schema';
 
 describe('lists/schema 分支覆盖', () => {
   it('isListType / getListType', () => {
     expect(isListType({ text: 'x' } as any)).toBe(false);
-    expect(
-      isListType({ type: ListType.UNORDERED, children: [] } as any),
-    ).toBe(true);
+    expect(isListType({ type: ListType.UNORDERED, children: [] } as any)).toBe(
+      true,
+    );
     expect(isListType({ type: ListType.ORDERED, children: [] } as any)).toBe(
       true,
     );
@@ -35,7 +31,10 @@ describe('lists/schema 分支覆盖', () => {
     );
     expect(s.isListNode({ text: 'x' } as any)).toBe(false);
     expect(
-      s.isListNode({ type: ListType.ORDERED, children: [] } as any, ListType.ORDERED),
+      s.isListNode(
+        { type: ListType.ORDERED, children: [] } as any,
+        ListType.ORDERED,
+      ),
     ).toBe(true);
     expect(
       s.isListNode(
@@ -49,15 +48,15 @@ describe('lists/schema 分支覆盖', () => {
         ListType.UNORDERED,
       ),
     ).toBe(true);
-    expect(
-      s.isListNode({ type: ListType.ORDERED, children: [] } as any),
-    ).toBe(true);
+    expect(s.isListNode({ type: ListType.ORDERED, children: [] } as any)).toBe(
+      true,
+    );
     expect(s.isListItemNode({ type: 'list-item', children: [] } as any)).toBe(
       true,
     );
-    expect(s.isListItemTextNode({ type: 'paragraph', children: [] } as any)).toBe(
-      true,
-    );
+    expect(
+      s.isListItemTextNode({ type: 'paragraph', children: [] } as any),
+    ).toBe(true);
     expect(s.createDefaultTextNode({ id: '1' }).type).toBe('paragraph');
     expect(s.createListNode(ListType.ORDERED).type).toBe(ListType.ORDERED);
     expect(s.createListNode().type).toBe(ListType.UNORDERED);

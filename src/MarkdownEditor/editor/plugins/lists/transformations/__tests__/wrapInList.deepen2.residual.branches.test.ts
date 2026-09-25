@@ -4,8 +4,8 @@
 import { createEditor } from 'slate';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { agenticListsSchema } from '../../schema';
-import { wrapInList } from '../wrapInList';
 import { ListType } from '../../types';
+import { wrapInList } from '../wrapInList';
 
 describe('wrapInList deepen2 residual branches', () => {
   beforeEach(() => {

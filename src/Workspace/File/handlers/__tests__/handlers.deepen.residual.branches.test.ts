@@ -25,10 +25,12 @@ describe('handlers deepen residual branches', () => {
 
   it('download：无 name 时用 File.name', () => {
     const click = vi.fn();
-    const append = vi.spyOn(document.body, 'appendChild').mockImplementation((n: any) => {
-      n.click = click;
-      return n;
-    });
+    const append = vi
+      .spyOn(document.body, 'appendChild')
+      .mockImplementation((n: any) => {
+        n.click = click;
+        return n;
+      });
     vi.spyOn(document.body, 'removeChild').mockImplementation((n: any) => n);
     const file = new File(['x'], 'from-file.txt', { type: 'text/plain' });
     handleFileDownload({ name: '', file } as any);

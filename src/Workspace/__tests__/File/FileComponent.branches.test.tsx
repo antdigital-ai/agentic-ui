@@ -14,9 +14,7 @@ import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { I18nContext, I18nProvide } from '../../../I18n';
 import { FileComponent } from '../../File/FileComponent';
-import {
-  GROUP_INITIAL_PAGE_SIZE,
-} from '../../File/components/FileGroup';
+import { GROUP_INITIAL_PAGE_SIZE } from '../../File/components/FileGroup';
 import type { FileNode, GroupNode } from '../../types';
 
 const mockClipboard = { writeText: vi.fn() };
@@ -104,10 +102,14 @@ describe('FileComponent 分支覆盖', () => {
       </TestWrapper>,
     );
 
-    expect(screen.queryByText(`flat-${GROUP_INITIAL_PAGE_SIZE}.txt`)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(`flat-${GROUP_INITIAL_PAGE_SIZE}.txt`),
+    ).not.toBeInTheDocument();
     const showMore = screen.getByRole('button', { name: /查看更多/ });
     fireEvent.keyDown(showMore, { key: 'Enter' });
-    expect(screen.getByText(`flat-${GROUP_INITIAL_PAGE_SIZE}.txt`)).toBeInTheDocument();
+    expect(
+      screen.getByText(`flat-${GROUP_INITIAL_PAGE_SIZE}.txt`),
+    ).toBeInTheDocument();
   });
 
   it.skip('扁平列表查看更多：空格键加载下一页', () => {
@@ -120,7 +122,9 @@ describe('FileComponent 分支覆盖', () => {
 
     const showMore = screen.getByRole('button', { name: /查看更多/ });
     fireEvent.keyDown(showMore, { key: ' ' });
-    expect(screen.getByText(`flat-${GROUP_INITIAL_PAGE_SIZE}.txt`)).toBeInTheDocument();
+    expect(
+      screen.getByText(`flat-${GROUP_INITIAL_PAGE_SIZE}.txt`),
+    ).toBeInTheDocument();
   });
 
   it.skip('onPreview 返回字符串作为自定义预览内容', async () => {
@@ -331,8 +335,12 @@ describe('FileComponent 分支覆盖', () => {
   });
 
   it.skip('nodes 更新时按 name+type 匹配同步 previewFile', async () => {
-    const initial: FileNode[] = [{ name: 'match.txt', type: 'plainText', content: 'v1' }];
-    const updated: FileNode[] = [{ name: 'match.txt', type: 'plainText', content: 'v2' }];
+    const initial: FileNode[] = [
+      { name: 'match.txt', type: 'plainText', content: 'v1' },
+    ];
+    const updated: FileNode[] = [
+      { name: 'match.txt', type: 'plainText', content: 'v2' },
+    ];
 
     const { rerender } = render(
       <TestWrapper>
@@ -369,7 +377,9 @@ describe('FileComponent 分支覆盖', () => {
     );
 
     fireEvent.click(screen.getByRole('button', { name: /查看更多/ }));
-    expect(screen.getByText(`flat-${GROUP_INITIAL_PAGE_SIZE}.txt`)).toBeInTheDocument();
+    expect(
+      screen.getByText(`flat-${GROUP_INITIAL_PAGE_SIZE}.txt`),
+    ).toBeInTheDocument();
 
     rerender(
       <TestWrapper>
@@ -383,7 +393,9 @@ describe('FileComponent 分支覆盖', () => {
       </TestWrapper>,
     );
 
-    expect(screen.queryByText(`flat-${GROUP_INITIAL_PAGE_SIZE + 4}.txt`)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(`flat-${GROUP_INITIAL_PAGE_SIZE + 4}.txt`),
+    ).not.toBeInTheDocument();
   });
 
   it('分组折叠状态由 collapsedGroups 本地 state 驱动', async () => {
@@ -514,9 +526,9 @@ describe('FileComponent istanbul residual', () => {
   });
 
   it.skip('onPreview 返回 ReactElement 时作为自定义预览内容', async () => {
-    const onPreview = vi.fn().mockResolvedValue(
-      <div data-testid="custom-preview-el">custom</div>,
-    );
+    const onPreview = vi
+      .fn()
+      .mockResolvedValue(<div data-testid="custom-preview-el">custom</div>);
     render(
       <TestWrapper>
         <FileComponent
@@ -730,8 +742,7 @@ describe('FileComponent istanbul buffer：locale / nodes / preview 假值臂', (
       </TestWrapper>,
     );
     const more =
-      screen.queryByText(/查看更多|更多/) ||
-      screen.queryByText(/还有/);
+      screen.queryByText(/查看更多|更多/) || screen.queryByText(/还有/);
     expect(more || screen.getByText(/\.txt/)).toBeTruthy();
   });
 });

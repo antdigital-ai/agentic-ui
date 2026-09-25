@@ -31,6 +31,8 @@ describe('ActionIconBox deepen safe residual branches', () => {
         {orphan as any}
       </ActionIconBox>,
     );
-    expect(container.querySelector('span') || container.firstChild).toBeTruthy();
+    expect(
+      container.querySelector('span') || container.firstChild,
+    ).toBeTruthy();
   });
 });

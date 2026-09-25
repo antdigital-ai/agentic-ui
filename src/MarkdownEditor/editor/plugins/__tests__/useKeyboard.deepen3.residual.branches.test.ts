@@ -30,8 +30,7 @@ vi.mock('is-hotkey', () => {
     const map: Record<string, (e: any) => boolean> = {
       up: (e) => e.key === 'ArrowUp',
       down: (e) => e.key === 'ArrowDown',
-      'mod+ArrowDown': (e) =>
-        e.key === 'ArrowDown' && (e.metaKey || e.ctrlKey),
+      'mod+ArrowDown': (e) => e.key === 'ArrowDown' && (e.metaKey || e.ctrlKey),
       'mod+ArrowUp': (e) => e.key === 'ArrowUp' && (e.metaKey || e.ctrlKey),
       backspace: (e) => e.key === 'Backspace',
       'mod+shift+v': () => false,
@@ -174,10 +173,7 @@ describe('useKeyboard deepen3 residual branches', () => {
       [
         {
           type: 'paragraph',
-          children: [
-            { text: 'chip', tag: true },
-            { text: 'after' },
-          ],
+          children: [{ text: 'chip', tag: true }, { text: 'after' }],
         },
       ],
       {
@@ -236,9 +232,7 @@ describe('useKeyboard deepen3 residual branches', () => {
     result.current(keyEvent({ key: 'ArrowRight' }));
 
     // 末叶子无 next sibling
-    editor.children = [
-      { type: 'paragraph', children: [{ text: 'solo' }] },
-    ];
+    editor.children = [{ type: 'paragraph', children: [{ text: 'solo' }] }];
     editor.selection = {
       anchor: { path: [0, 0], offset: 4 },
       focus: { path: [0, 0], offset: 4 },

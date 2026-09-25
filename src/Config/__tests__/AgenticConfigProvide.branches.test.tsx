@@ -54,14 +54,15 @@ describe('AgenticConfigProvide branches', () => {
 
   it('useFormulaConfig override 覆盖 context', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <AgenticConfigProvide formula={{ enable: true, singleDollarTextMath: true }}>
+      <AgenticConfigProvide
+        formula={{ enable: true, singleDollarTextMath: true }}
+      >
         {children}
       </AgenticConfigProvide>
     );
-    const { result } = renderHook(
-      () => useFormulaConfig({ enable: false }),
-      { wrapper },
-    );
+    const { result } = renderHook(() => useFormulaConfig({ enable: false }), {
+      wrapper,
+    });
     expect(result.current.enable).toBe(false);
   });
 });

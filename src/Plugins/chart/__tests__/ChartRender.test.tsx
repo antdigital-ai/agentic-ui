@@ -21,7 +21,13 @@ vi.mock('antd', async (importOriginal) => {
       menu,
       children,
     }: {
-      menu?: { items?: Array<{ key: React.Key; label: React.ReactNode; onClick?: () => void }> };
+      menu?: {
+        items?: Array<{
+          key: React.Key;
+          label: React.ReactNode;
+          onClick?: () => void;
+        }>;
+      };
       children?: React.ReactNode;
     }) => (
       <div data-testid="chart-dropdown">
@@ -59,8 +65,8 @@ vi.mock('copy-to-clipboard', () => ({
   default: vi.fn(() => true),
 }));
 
-import { ChartRender } from '../ChartRender';
 import copy from 'copy-to-clipboard';
+import { ChartRender } from '../ChartRender';
 
 vi.mock('../../../Hooks/useIntersectionOnce', () => ({
   useIntersectionOnce: () => true,
@@ -202,7 +208,9 @@ vi.mock('../DocCards', () => ({
         <span data-testid="doc-cards-columns">{cardColumns}</span>
       )}
       {fieldMap && (
-        <span data-testid="doc-cards-field-map">{JSON.stringify(fieldMap)}</span>
+        <span data-testid="doc-cards-field-map">
+          {JSON.stringify(fieldMap)}
+        </span>
       )}
       <span data-testid="doc-cards-data">{JSON.stringify(data)}</span>
     </div>
@@ -661,7 +669,9 @@ describe('ChartRender', () => {
         </I18nContext.Provider>,
       );
 
-      const menuItems = document.body.querySelectorAll('.ant-dropdown-menu-item');
+      const menuItems = document.body.querySelectorAll(
+        '.ant-dropdown-menu-item',
+      );
       const columnOption = Array.from(menuItems).find(
         (item) => item.textContent === '2',
       );
@@ -683,7 +693,9 @@ describe('ChartRender', () => {
 
       await screen.findByTestId('bar-chart', {}, { timeout: 3000 });
 
-      const menuItems = document.body.querySelectorAll('.ant-dropdown-menu-item');
+      const menuItems = document.body.querySelectorAll(
+        '.ant-dropdown-menu-item',
+      );
       const lineOption = Array.from(menuItems).find(
         (item) => item.textContent === '折线图',
       );
@@ -1482,8 +1494,12 @@ describe('ChartRender', () => {
       expect(descriptionView).toBeInTheDocument();
 
       // 应该只渲染有效的列（限定在 Descriptions 组件内，避免工具栏配置表单干扰）
-      expect(within(descriptionView as HTMLElement).getByText('Name')).toBeInTheDocument();
-      expect(within(descriptionView as HTMLElement).getByText('Valid')).toBeInTheDocument();
+      expect(
+        within(descriptionView as HTMLElement).getByText('Name'),
+      ).toBeInTheDocument();
+      expect(
+        within(descriptionView as HTMLElement).getByText('Valid'),
+      ).toBeInTheDocument();
     });
   });
 
@@ -1520,7 +1536,9 @@ describe('ChartRender', () => {
       expect(
         container.querySelector('.ant-agentic-plugin-chart__doc-cards'),
       ).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: '配置图表' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: '配置图表' }),
+      ).toBeInTheDocument();
     });
 
     it('应该渲染 docCards 且 rest 缺省时仍正常展示', () => {
@@ -1543,7 +1561,9 @@ describe('ChartRender', () => {
 
       expect(screen.getByTestId('doc-cards')).toBeInTheDocument();
       expect(screen.queryByTestId('doc-cards-columns')).not.toBeInTheDocument();
-      expect(screen.queryByTestId('doc-cards-field-map')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('doc-cards-field-map'),
+      ).not.toBeInTheDocument();
     });
 
     it('应该渲染 quadrant 图表并传递 columns 与 toolbar', () => {
@@ -1567,7 +1587,9 @@ describe('ChartRender', () => {
       expect(
         container.querySelector('.ant-agentic-plugin-chart__quadrant-chart'),
       ).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: '配置图表' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: '配置图表' }),
+      ).toBeInTheDocument();
     });
   });
 });

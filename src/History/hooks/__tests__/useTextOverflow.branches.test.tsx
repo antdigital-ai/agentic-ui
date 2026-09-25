@@ -28,7 +28,10 @@ describe('useTextOverflow branches', () => {
   it('溢出时写入 CSS 变量与 data-overflow', () => {
     const { getByTestId, rerender } = render(<Probe text="abcdefghijklmnop" />);
     const el = getByTestId('ov');
-    Object.defineProperty(el, 'scrollWidth', { value: 200, configurable: true });
+    Object.defineProperty(el, 'scrollWidth', {
+      value: 200,
+      configurable: true,
+    });
     Object.defineProperty(el, 'clientWidth', { value: 40, configurable: true });
     rerender(<Probe text="abcdefghijklmnop!!" />);
     const el2 = getByTestId('ov');

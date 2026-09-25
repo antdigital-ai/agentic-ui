@@ -22,9 +22,8 @@ describe('insertParsedHtmlNodes deepen3 residual branches', () => {
   });
 
   it('嵌套 media blob：有 upload 时 fetch+upload', async () => {
-    const { docxDeserializer } = await import(
-      '../../utils/docx/docxDeserializer'
-    );
+    const { docxDeserializer } =
+      await import('../../utils/docx/docxDeserializer');
     global.fetch = vi.fn().mockResolvedValue({
       blob: async () => new Blob(['x'], { type: 'image/png' }),
     }) as any;
@@ -58,9 +57,8 @@ describe('insertParsedHtmlNodes deepen3 residual branches', () => {
   });
 
   it('嵌套 media：无 upload 时 removeMediaFragments 不抛', async () => {
-    const { docxDeserializer } = await import(
-      '../../utils/docx/docxDeserializer'
-    );
+    const { docxDeserializer } =
+      await import('../../utils/docx/docxDeserializer');
     vi.mocked(docxDeserializer).mockReturnValueOnce([
       {
         type: 'paragraph',
@@ -83,9 +81,8 @@ describe('insertParsedHtmlNodes deepen3 residual branches', () => {
   });
 
   it('嵌套 media http：非 blob 上传分支', async () => {
-    const { docxDeserializer } = await import(
-      '../../utils/docx/docxDeserializer'
-    );
+    const { docxDeserializer } =
+      await import('../../utils/docx/docxDeserializer');
     const upload = vi.fn().mockResolvedValue(['https://cdn.example/u.png']);
     vi.mocked(docxDeserializer).mockReturnValueOnce([
       {
@@ -109,9 +106,8 @@ describe('insertParsedHtmlNodes deepen3 residual branches', () => {
   });
 
   it('无选区大批量节点触发 insertNodesBatch 分段', async () => {
-    const { docxDeserializer } = await import(
-      '../../utils/docx/docxDeserializer'
-    );
+    const { docxDeserializer } =
+      await import('../../utils/docx/docxDeserializer');
     const many = Array.from({ length: 12 }, (_, i) => ({
       type: 'paragraph',
       children: [{ text: `p${i}` }],
@@ -126,9 +122,8 @@ describe('insertParsedHtmlNodes deepen3 residual branches', () => {
   });
 
   it('list-item 空列表片段返回 false', async () => {
-    const { docxDeserializer } = await import(
-      '../../utils/docx/docxDeserializer'
-    );
+    const { docxDeserializer } =
+      await import('../../utils/docx/docxDeserializer');
     vi.mocked(docxDeserializer).mockReturnValueOnce([
       { type: 'list', children: [] },
     ] as any);

@@ -30,7 +30,11 @@ vi.mock('antd', async () => {
 vi.mock('../PreviewComponent', () => ({
   PreviewComponent: (props: any) => (
     <div data-testid="preview-d10">
-      <button type="button" data-testid="back-d10" onClick={() => props.onBack?.()}>
+      <button
+        type="button"
+        data-testid="back-d10"
+        onClick={() => props.onBack?.()}
+      >
         back
       </button>
       <span>{props.file?.name}</span>
@@ -46,7 +50,11 @@ vi.mock('../FileTree/FileTreeComponent', () => ({
   ),
 }));
 
-const file = (id: string, name: string, extra?: Partial<FileNode>): FileNode => ({
+const file = (
+  id: string,
+  name: string,
+  extra?: Partial<FileNode>,
+): FileNode => ({
   id,
   name,
   content: 'body',
@@ -169,8 +177,6 @@ describe('FileComponent deepen10 safe residual branches', () => {
     await act(async () => {
       vi.advanceTimersByTime(30);
     });
-    expect(
-      screen.queryByTestId('tree-d10') || document.body,
-    ).toBeTruthy();
+    expect(screen.queryByTestId('tree-d10') || document.body).toBeTruthy();
   });
 });

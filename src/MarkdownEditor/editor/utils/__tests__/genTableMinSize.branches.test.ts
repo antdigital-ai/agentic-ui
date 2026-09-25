@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { applyTableMinSizeToSchema } from '../genTableMinSize';
 import type { Elements } from '../../../el';
+import { applyTableMinSizeToSchema } from '../genTableMinSize';
 
 describe('genTableMinSize 分支覆盖', () => {
   const makeTable = (rows: number, cols: number): Elements =>

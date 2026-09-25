@@ -1,5 +1,4 @@
-import type { Editor } from 'slate';
-import type { Element, NodeEntry, Path } from 'slate';
+import type { Editor, Element, NodeEntry, Path } from 'slate';
 
 import type { ListsSchema } from '../types';
 
@@ -8,14 +7,14 @@ import type { ListsSchema } from '../types';
  * Returns null if there is no parent "list-item".
  */
 export function getParentListItem(
-    editor: Editor,
-    schema: ListsSchema,
-    path: Path,
+  editor: Editor,
+  schema: ListsSchema,
+  path: Path,
 ): NodeEntry<Element> | null {
-    const parentListItem = editor.above({
-        at: path,
-        match: (node) => schema.isListItemNode(node),
-    });
+  const parentListItem = editor.above({
+    at: path,
+    match: (node) => schema.isListItemNode(node),
+  });
 
-    return parentListItem ?? null;
+  return parentListItem ?? null;
 }

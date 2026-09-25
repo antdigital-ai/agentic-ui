@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { createMediaNodeFromElement, findImageElement } from '../parseHtml';
 import { handleAttachmentLink, handleImage } from '../parseMedia';
-import {
-  createMediaNodeFromElement,
-  findImageElement,
-} from '../parseHtml';
 
 describe('parseMedia residual branches', () => {
   it('handleImage：finished 有值写入；无 finished 不展开', () => {

@@ -17,9 +17,7 @@ describe('parserMarkdownToSlateNode.branches', () => {
   });
 
   it('空 md / 仅空白；缓存命中二次解析', () => {
-    expect(parserMarkdownToSlateNode('').schema).toEqual(
-      expect.any(Array),
-    );
+    expect(parserMarkdownToSlateNode('').schema).toEqual(expect.any(Array));
     expect(parserMarkdownToSlateNode('   \n\n  ').schema).toEqual(
       expect.any(Array),
     );

@@ -53,9 +53,7 @@ describe('ChartMark Area/Line residual branches', () => {
   });
 
   it('Line：同矩阵', () => {
-    render(
-      <Line data={[{ x: 'a', y: 2 }]} xField="x" yField="y" index={1} />,
-    );
+    render(<Line data={[{ x: 'a', y: 2 }]} xField="x" yField="y" index={1} />);
     expect(document.querySelector('[data-testid="cm-line"]')).toBeTruthy();
   });
 });

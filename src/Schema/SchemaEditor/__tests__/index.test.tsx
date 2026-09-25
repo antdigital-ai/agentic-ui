@@ -638,9 +638,7 @@ describe('SchemaEditor', () => {
       });
 
       await waitFor(() => {
-        expect(
-          screen.getByText(/⚠️.*must match pattern/i),
-        ).toBeInTheDocument();
+        expect(screen.getByText(/⚠️.*must match pattern/i)).toBeInTheDocument();
       });
     });
 

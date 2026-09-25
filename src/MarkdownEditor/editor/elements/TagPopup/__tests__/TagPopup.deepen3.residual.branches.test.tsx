@@ -141,9 +141,7 @@ describe('TagPopup deepen3 residual branches', () => {
       items: [{ label: 'A', key: 'a' }],
       children: <span>c</span>,
     });
-    const el = document.querySelector(
-      '[data-tag-popup-input]',
-    ) as HTMLElement;
+    const el = document.querySelector('[data-tag-popup-input]') as HTMLElement;
     expect(el).toBeTruthy();
     fireEvent.mouseEnter(el);
     expect(el.hasAttribute('data-no-focus')).toBe(false);

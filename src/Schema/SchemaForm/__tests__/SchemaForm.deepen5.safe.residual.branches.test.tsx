@@ -7,9 +7,9 @@ import '@testing-library/jest-dom';
 import { cleanup, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { SchemaForm } from '..';
 import { I18nContext } from '../../../I18n';
 import type { LowCodeSchema } from '../../types';
-import { SchemaForm } from '..';
 
 const baseSchema = (properties: any): LowCodeSchema =>
   ({

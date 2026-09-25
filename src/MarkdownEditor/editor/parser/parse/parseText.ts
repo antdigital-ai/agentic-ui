@@ -1,7 +1,7 @@
 import type { RootContent } from 'mdast';
 import { CustomLeaf } from '../../../el';
-import { handleFootnoteReference } from './parseFootnote';
 import { handleInlineCode } from './parseElements';
+import { handleFootnoteReference } from './parseFootnote';
 
 /**
  * 设置节点的 finished 属性

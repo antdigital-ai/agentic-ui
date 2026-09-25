@@ -1,10 +1,13 @@
-import type { Editor } from 'slate';
 import type { KeyboardEvent } from 'react';
+import type { Editor } from 'slate';
 
 import { ListsEditor } from './ListsEditor';
 import * as handlers from './on-key-down/handlers';
 
-export function onKeyDown(editor: Editor, event: KeyboardEvent): boolean | void {
+export function onKeyDown(
+  editor: Editor,
+  event: KeyboardEvent,
+): boolean | void {
   if (!ListsEditor.isListsEnabled(editor)) {
     return;
   }

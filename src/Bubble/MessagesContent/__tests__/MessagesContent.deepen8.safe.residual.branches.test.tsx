@@ -6,8 +6,8 @@ import '@testing-library/jest-dom';
 import { cleanup, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { BubbleConfigContext } from '../../BubbleConfigProvide';
 import { I18nContext } from '../../../I18n';
+import { BubbleConfigContext } from '../../BubbleConfigProvide';
 import { BubbleMessageDisplay, LOADING_FLAT } from '../index';
 
 let capturedRender: ((mdProps: any, node: any) => React.ReactNode) | null =

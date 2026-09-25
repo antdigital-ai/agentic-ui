@@ -36,7 +36,11 @@ describe('useShallowMemo', () => {
     const { result, rerender } = renderHook(
       ({ value }: { value: Record<string, unknown> | undefined }) =>
         useShallowMemo(value),
-      { initialProps: { value: undefined as Record<string, unknown> | undefined } },
+      {
+        initialProps: {
+          value: undefined as Record<string, unknown> | undefined,
+        },
+      },
     );
 
     expect(result.current).toBeUndefined();

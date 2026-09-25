@@ -3,7 +3,13 @@
  * 删除 Popover 无 locale 默认文案、getMediaType 空→image。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import React from 'react';
 import { Transforms } from 'slate';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -25,7 +31,9 @@ vi.mock('antd', () => {
     Popover: ({ children, content, open }: any) => (
       <div data-testid="popover" data-open={String(open)}>
         {children}
-        {open !== false ? <div data-testid="popover-content">{content}</div> : null}
+        {open !== false ? (
+          <div data-testid="popover-content">{content}</div>
+        ) : null}
       </div>
     ),
     Space: ({ children }: any) => <div>{children}</div>,
@@ -143,8 +151,14 @@ describe('Image deepen3 residual branches', () => {
       />,
     );
     const img = screen.getByAltText('load') as HTMLImageElement;
-    Object.defineProperty(img, 'naturalWidth', { configurable: true, value: 800 });
-    Object.defineProperty(img, 'naturalHeight', { configurable: true, value: 400 });
+    Object.defineProperty(img, 'naturalWidth', {
+      configurable: true,
+      value: 800,
+    });
+    Object.defineProperty(img, 'naturalHeight', {
+      configurable: true,
+      value: 400,
+    });
     fireEvent.load(img);
     expect(img).toBeInTheDocument();
   });

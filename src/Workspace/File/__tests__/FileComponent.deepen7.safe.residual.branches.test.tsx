@@ -29,7 +29,11 @@ vi.mock('antd', async () => {
 vi.mock('../PreviewComponent', () => ({
   PreviewComponent: (props: any) => (
     <div data-testid="preview-stub">
-      <button type="button" data-testid="stub-back" onClick={() => props.onBack?.()}>
+      <button
+        type="button"
+        data-testid="stub-back"
+        onClick={() => props.onBack?.()}
+      >
         back
       </button>
       <button
@@ -42,9 +46,7 @@ vi.mock('../PreviewComponent', () => ({
       <button
         type="button"
         data-testid="stub-share"
-        onClick={() =>
-          props.onShare?.(props.file, { anchorEl: document.body })
-        }
+        onClick={() => props.onShare?.(props.file, { anchorEl: document.body })}
       >
         share
       </button>
@@ -53,7 +55,11 @@ vi.mock('../PreviewComponent', () => ({
   ),
 }));
 
-const file = (id: string, name: string, extra?: Partial<FileNode>): FileNode => ({
+const file = (
+  id: string,
+  name: string,
+  extra?: Partial<FileNode>,
+): FileNode => ({
   id,
   name,
   content: 'body',
@@ -91,9 +97,7 @@ describe('FileComponent deepen7 safe residual branches', () => {
       .fn()
       .mockResolvedValueOnce(undefined)
       .mockResolvedValueOnce(false);
-    wrap(
-      <FileComponent nodes={[file('a', 'a.md')]} onBack={onBack} />,
-    );
+    wrap(<FileComponent nodes={[file('a', 'a.md')]} onBack={onBack} />);
     fireEvent.click(await screen.findByText('a.md'));
     await act(async () => {
       await Promise.resolve();
@@ -106,9 +110,7 @@ describe('FileComponent deepen7 safe residual branches', () => {
     expect(onBack).toHaveBeenCalled();
 
     cleanup();
-    wrap(
-      <FileComponent nodes={[file('b', 'b.md')]} onBack={onBack} />,
-    );
+    wrap(<FileComponent nodes={[file('b', 'b.md')]} onBack={onBack} />);
     fireEvent.click(await screen.findByText('b.md'));
     await act(async () => {
       await Promise.resolve();
@@ -122,9 +124,7 @@ describe('FileComponent deepen7 safe residual branches', () => {
 
   it('预览下载无 onDownload；有 onShare / 无 onShare', async () => {
     const onShare = vi.fn();
-    wrap(
-      <FileComponent nodes={[file('c', 'c.md')]} onShare={onShare} />,
-    );
+    wrap(<FileComponent nodes={[file('c', 'c.md')]} onShare={onShare} />);
     fireEvent.click(await screen.findByText('c.md'));
     await act(async () => {
       await Promise.resolve();
@@ -151,9 +151,7 @@ describe('FileComponent deepen7 safe residual branches', () => {
         children: [file('n1', 'nested.md', { type: 'markdown' })],
       },
     ];
-    const { rerender } = wrap(
-      <FileComponent nodes={grouped as any} />,
-    );
+    const { rerender } = wrap(<FileComponent nodes={grouped as any} />);
     fireEvent.click(await screen.findByText('nested.md'));
     await act(async () => {
       await Promise.resolve();

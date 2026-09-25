@@ -24,7 +24,9 @@ const installObserverMocks = () => {
     };
   }) as unknown as typeof ResizeObserver;
 
-  global.MutationObserver = vi.fn(function MockMutationObserver(cb: MoCallback) {
+  global.MutationObserver = vi.fn(function MockMutationObserver(
+    cb: MoCallback,
+  ) {
     const inst = {
       callback: cb,
       observe: vi.fn(),

@@ -42,7 +42,12 @@ vi.mock('react-chartjs-2', () => ({
     lastOptions = options;
     lastData = data;
     lastPlugins = plugins ?? [];
-    return <div data-testid="funnel-bar" data-labels={JSON.stringify(data?.labels)} />;
+    return (
+      <div
+        data-testid="funnel-bar"
+        data-labels={JSON.stringify(data?.labels)}
+      />
+    );
   },
 }));
 
@@ -90,8 +95,7 @@ vi.mock('../utils', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../utils')>();
   return {
     ...actual,
-    resolveCssVariable: (c: string) =>
-      c.startsWith('var(') ? '#1890ff' : c,
+    resolveCssVariable: (c: string) => (c.startsWith('var(') ? '#1890ff' : c),
   };
 });
 
@@ -102,7 +106,9 @@ const baseData = [
   { x: '访问', y: 800, ratio: '100%', category: 'B', filterLabel: 'F1' },
 ];
 
-const renderFunnel = (props: Partial<React.ComponentProps<typeof FunnelChart>> = {}) =>
+const renderFunnel = (
+  props: Partial<React.ComponentProps<typeof FunnelChart>> = {},
+) =>
   render(
     <ConfigProvider>
       <FunnelChart data={baseData} title="漏斗" {...props} />
@@ -207,17 +213,13 @@ describe('FunnelChart 分支覆盖', () => {
   it('legend onClick 切换转化率图例', () => {
     renderFunnel({ typeNames: { rate: '转化率', name: '步骤' } });
     const onClick = lastOptions?.plugins?.legend?.onClick;
-    expect(() =>
-      onClick?.({}, { text: '转化率' }, {}),
-    ).not.toThrow();
+    expect(() => onClick?.({}, { text: '转化率' }, {})).not.toThrow();
   });
 
   it('legend onClick 其他项走默认行为', () => {
     renderFunnel();
     const onClick = lastOptions?.plugins?.legend?.onClick;
-    expect(() =>
-      onClick?.({}, { text: '转化' }, { chart: {} }),
-    ).not.toThrow();
+    expect(() => onClick?.({}, { text: '转化' }, { chart: {} })).not.toThrow();
   });
 
   it('renderFilterInToolbar 为 true 时在工具栏渲染筛选', () => {
@@ -249,10 +251,12 @@ describe('FunnelChart 分支覆盖', () => {
       <ConfigProvider>
         <FunnelChart
           data={baseData}
-          statistic={[
-            { type: 'sum', target: 'y', label: 'A' },
-            { type: 'avg', target: 'y', label: 'B' },
-          ] as any}
+          statistic={
+            [
+              { type: 'sum', target: 'y', label: 'A' },
+              { type: 'avg', target: 'y', label: 'B' },
+            ] as any
+          }
         />
       </ConfigProvider>,
     );
@@ -351,7 +355,16 @@ describe('FunnelChart 分支覆盖', () => {
     };
     plugin.afterDatasetsDraw({
       ctx,
-      data: { datasets: [{ data: [[-50, 50], [-25, 25]] }] },
+      data: {
+        datasets: [
+          {
+            data: [
+              [-50, 50],
+              [-25, 25],
+            ],
+          },
+        ],
+      },
       scales: { x: { getPixelForValue: (v: number) => v * 10 } },
       getDatasetMeta: () => ({
         data: [
@@ -384,7 +397,14 @@ describe('FunnelChart 分支覆盖', () => {
       ctx,
       data: {
         labels: ['步骤1', '步骤2'],
-        datasets: [{ data: [[-50, 50], [-25, 25]] }],
+        datasets: [
+          {
+            data: [
+              [-50, 50],
+              [-25, 25],
+            ],
+          },
+        ],
       },
       scales: { x: { getPixelForValue: (v: number) => v * 10 + 100 } },
       getDatasetMeta: () => ({
@@ -466,11 +486,7 @@ describe('FunnelChart 分支覆盖', () => {
       ],
     });
     await act(async () => {
-      lastOptions?.plugins?.legend?.onClick?.(
-        {},
-        { text: '转化率' },
-        {},
-      );
+      lastOptions?.plugins?.legend?.onClick?.({}, { text: '转化率' }, {});
     });
     await waitFor(() => {
       const plugin = lastPlugins.find((p) => p.id === 'funnelTrapezoidLabels');
@@ -489,7 +505,16 @@ describe('FunnelChart 分支覆盖', () => {
     };
     plugin.afterDatasetsDraw({
       ctx,
-      data: { datasets: [{ data: [[-50, 50], [-25, 25]] }] },
+      data: {
+        datasets: [
+          {
+            data: [
+              [-50, 50],
+              [-25, 25],
+            ],
+          },
+        ],
+      },
       scales: { x: { getPixelForValue: (v: number) => v * 10 } },
       getDatasetMeta: () => ({
         data: [
@@ -521,7 +546,16 @@ describe('FunnelChart 分支覆盖', () => {
     };
     plugin.afterDatasetsDraw({
       ctx,
-      data: { datasets: [{ data: [[-50, 50], [-25, 25]] }] },
+      data: {
+        datasets: [
+          {
+            data: [
+              [-50, 50],
+              [-25, 25],
+            ],
+          },
+        ],
+      },
       scales: { x: { getPixelForValue: (v: number) => v * 10 } },
       getDatasetMeta: () => ({
         data: [
@@ -561,7 +595,16 @@ describe('FunnelChart 分支覆盖', () => {
     };
     plugin.afterDatasetsDraw({
       ctx,
-      data: { datasets: [{ data: [[-50, 50], [-25, 25]] }] },
+      data: {
+        datasets: [
+          {
+            data: [
+              [-50, 50],
+              [-25, 25],
+            ],
+          },
+        ],
+      },
       scales: { x: { getPixelForValue: (v: number) => v * 10 + 100 } },
       getDatasetMeta: () => ({
         data: [
@@ -703,7 +746,16 @@ describe('FunnelChart 分支覆盖', () => {
     };
     plugin.afterDatasetsDraw({
       ctx,
-      data: { datasets: [{ data: [[-50, 50], [-25, 25]] }] },
+      data: {
+        datasets: [
+          {
+            data: [
+              [-50, 50],
+              [-25, 25],
+            ],
+          },
+        ],
+      },
       scales: { x: {} },
       getDatasetMeta: () => ({
         data: [
@@ -794,10 +846,7 @@ describe('FunnelChart 分支覆盖', () => {
     const { rerender } = renderFunnel({ data: dataA });
     rerender(
       <ConfigProvider>
-        <FunnelChart
-          data={[{ x: 'C', y: 80, category: 'C' }]}
-          title="漏斗"
-        />
+        <FunnelChart data={[{ x: 'C', y: 80, category: 'C' }]} title="漏斗" />
       </ConfigProvider>,
     );
     await waitFor(() => {
@@ -818,7 +867,9 @@ describe('FunnelChart 分支覆盖', () => {
         { x: 'B', y: 50, ratio: '25%' },
       ],
     });
-    expect(lastPlugins.some((p) => p.id === 'funnelTrapezoidLabels')).toBe(true);
+    expect(lastPlugins.some((p) => p.id === 'funnelTrapezoidLabels')).toBe(
+      true,
+    );
   });
 
   it('legend 点击转化率切换 showTrapezoid', () => {
@@ -834,7 +885,12 @@ describe('FunnelChart 分支覆盖', () => {
         ctx: {},
         data: { datasets: [{ data: [100, 50] }] },
         scales: { x: { getPixelForValue: () => 0 } },
-        getDatasetMeta: () => ({ data: [{ x: 0, y: 0, base: 0 }, { x: 0, y: 0, base: 0 }] }),
+        getDatasetMeta: () => ({
+          data: [
+            { x: 0, y: 0, base: 0 },
+            { x: 0, y: 0, base: 0 },
+          ],
+        }),
       }),
     ).not.toThrow();
   });
@@ -871,7 +927,16 @@ describe('FunnelChart 分支覆盖', () => {
     };
     plugin.afterDatasetsDraw({
       ctx,
-      data: { datasets: [{ data: [[-50, 50], [-25, 25]] }] },
+      data: {
+        datasets: [
+          {
+            data: [
+              [-50, 50],
+              [-25, 25],
+            ],
+          },
+        ],
+      },
       scales: { x: { getPixelForValue: () => 100 } },
       getDatasetMeta: () => ({
         data: [{ x: 100, y: 10, height: 20, base: 0 }],
@@ -1014,7 +1079,16 @@ describe('FunnelChart 分支覆盖', () => {
       expect(() =>
         plugin?.afterDatasetsDraw?.({
           ctx: { save: vi.fn(), restore: vi.fn() },
-          data: { datasets: [{ data: [[-50, 50], [-25, 25]] }] },
+          data: {
+            datasets: [
+              {
+                data: [
+                  [-50, 50],
+                  [-25, 25],
+                ],
+              },
+            ],
+          },
           scales: { x: { getPixelForValue: () => 100 } },
           getDatasetMeta: () => null,
         }),
@@ -1066,7 +1140,16 @@ describe('FunnelChart 分支覆盖', () => {
       };
       plugin?.afterDatasetsDraw?.({
         ctx,
-        data: { datasets: [{ data: [[-50, 50], [-25, 25]] }] },
+        data: {
+          datasets: [
+            {
+              data: [
+                [-50, 50],
+                [-25, 25],
+              ],
+            },
+          ],
+        },
         scales: { x: { getPixelForValue: (v: number) => v * 10 + 100 } },
         getDatasetMeta: () => ({
           data: [
@@ -1194,7 +1277,17 @@ describe('FunnelChart 分支覆盖', () => {
       });
       const onClick = lastOptions?.plugins?.legend?.onClick;
       if (typeof onClick === 'function') {
-        onClick({}, {}, { chart: { data: lastData, toggleDataVisibility: vi.fn(), update: vi.fn() } });
+        onClick(
+          {},
+          {},
+          {
+            chart: {
+              data: lastData,
+              toggleDataVisibility: vi.fn(),
+              update: vi.fn(),
+            },
+          },
+        );
       }
 
       // plugin afterDatasetsDraw meta 缺失早退
@@ -1283,7 +1376,14 @@ describe('FunnelChart 分支覆盖', () => {
           lineWidth: 0,
         },
         data: {
-          datasets: [{ data: [[-50, 50], [-25, 25]] }],
+          datasets: [
+            {
+              data: [
+                [-50, 50],
+                [-25, 25],
+              ],
+            },
+          ],
           labels: ['A', 'B'],
         },
         scales: { x: { getPixelForValue: (v: number) => Number(v) || 0 } },
@@ -1307,8 +1407,8 @@ describe('FunnelChart 分支覆盖', () => {
           { x: 'B', y: 50, category: 'A', filterLabel: 'F2' },
         ],
       });
-      const filterBtn = screen.queryByTestId?.('custom-F1') ||
-        screen.queryByText('F1');
+      const filterBtn =
+        screen.queryByTestId?.('custom-F1') || screen.queryByText('F1');
       if (filterBtn) {
         fireEvent.click(filterBtn);
       }
@@ -1323,7 +1423,7 @@ describe('FunnelChart 分支覆盖', () => {
       });
       const click = lastOptions?.onClick;
       if (typeof click === 'function') {
-        click({}, [ { index: 0 } ]);
+        click({}, [{ index: 0 }]);
       }
     });
 
@@ -1365,7 +1465,14 @@ describe('FunnelChart 分支覆盖', () => {
           lineWidth: 0,
         },
         data: {
-          datasets: [{ data: [[0, 100], [0, 50]] }],
+          datasets: [
+            {
+              data: [
+                [0, 100],
+                [0, 50],
+              ],
+            },
+          ],
           labels: undefined,
         },
         scales: { x: { getPixelForValue: (v: number) => v } },

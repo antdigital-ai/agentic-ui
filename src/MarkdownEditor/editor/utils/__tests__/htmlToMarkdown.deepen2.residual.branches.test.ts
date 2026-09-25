@@ -47,9 +47,9 @@ describe('htmlToMarkdown deepen2 residual branches', () => {
   });
 
   it('img 带 title；无 title；isHtml 真值', () => {
-    expect(
-      htmlToMarkdown('<img src="/x.png" alt="n" title="t" />'),
-    ).toMatch(/"t"/);
+    expect(htmlToMarkdown('<img src="/x.png" alt="n" title="t" />')).toMatch(
+      /"t"/,
+    );
     expect(htmlToMarkdown('<img src="/y.png" alt="n" />')).toMatch(/!\[n\]/);
     expect(isHtml('<p>hi</p>')).toBe(true);
   });

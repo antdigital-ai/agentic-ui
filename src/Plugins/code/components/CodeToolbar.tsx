@@ -220,7 +220,9 @@ export const CodeToolbar = (props: CodeToolbarProps) => {
                       height: '1em',
                       width: '1em',
                     }}
-                    src={langIconMap.get((element.language || '').toLowerCase())}
+                    src={langIconMap.get(
+                      (element.language || '').toLowerCase(),
+                    )}
                   />
                 </div>
               )}

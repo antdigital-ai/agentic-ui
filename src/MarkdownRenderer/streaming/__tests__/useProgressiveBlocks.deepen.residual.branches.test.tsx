@@ -23,13 +23,10 @@ describe('useProgressiveBlocks deepen residual branches', () => {
 
   it('requestIdleCallback 存在时走 rIC bump', () => {
     const idleCbs: Array<() => void> = [];
-    vi.stubGlobal(
-      'requestIdleCallback',
-      (cb: () => void) => {
-        idleCbs.push(cb);
-        return 1;
-      },
-    );
+    vi.stubGlobal('requestIdleCallback', (cb: () => void) => {
+      idleCbs.push(cb);
+      return 1;
+    });
 
     const { result, unmount } = renderHook(() =>
       useProgressiveBlocks(40, false, 1),

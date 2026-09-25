@@ -7,7 +7,12 @@ import {
   Range,
   Transforms,
 } from 'slate';
-import type { CardAfterNode, CardBeforeNode, CardNode, ParagraphNode } from '../../el';
+import type {
+  CardAfterNode,
+  CardBeforeNode,
+  CardNode,
+  ParagraphNode,
+} from '../../el';
 import { clearCardAreaText, hasRange, isCardEmpty } from './utils';
 
 const EMPTY_PARAGRAPH: ParagraphNode = {
@@ -208,11 +213,7 @@ export const handleCardRemoveNodeOperation = (
   if (Element.isElement(node) && node.type === 'card-after') {
     const cardPath = safeParentPath(operation.path);
     const cardNode = safeGetNode(editor, cardPath);
-    if (
-      cardPath &&
-      Element.isElement(cardNode) &&
-      cardNode.type === 'card'
-    ) {
+    if (cardPath && Element.isElement(cardNode) && cardNode.type === 'card') {
       apply({
         type: 'remove_node',
         path: cardPath,
@@ -228,11 +229,7 @@ export const handleCardRemoveNodeOperation = (
   if (Element.isElement(node) && node.type === 'card-before') {
     const cardPath = safeParentPath(operation.path);
     const cardNode = safeGetNode(editor, cardPath);
-    if (
-      cardPath &&
-      Element.isElement(cardNode) &&
-      cardNode.type === 'card'
-    ) {
+    if (cardPath && Element.isElement(cardNode) && cardNode.type === 'card') {
       apply({
         type: 'remove_node',
         path: cardPath,
@@ -350,7 +347,11 @@ export const handleCardDeleteBackward = (
   deleteBackward: Editor['deleteBackward'],
 ): boolean => {
   const { selection } = editor;
-  if (!selection || !hasRange(editor, selection) || !Range.isCollapsed(selection)) {
+  if (
+    !selection ||
+    !hasRange(editor, selection) ||
+    !Range.isCollapsed(selection)
+  ) {
     return false;
   }
 

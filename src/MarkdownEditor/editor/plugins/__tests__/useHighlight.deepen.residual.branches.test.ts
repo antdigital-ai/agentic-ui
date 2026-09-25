@@ -3,11 +3,7 @@
  */
 import { Element, Path, createEditor } from 'slate';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  cacheTextNode,
-  clearInlineKatex,
-  useHighlight,
-} from '../useHighlight';
+import { cacheTextNode, clearInlineKatex, useHighlight } from '../useHighlight';
 
 vi.mock('../../utils/editorUtils', () => ({
   EditorUtils: {
@@ -29,7 +25,9 @@ describe('useHighlight deepen residual branches', () => {
   it('非元素节点 / 非 highlight 类型早退', () => {
     const decorate = useHighlight(undefined, false);
     expect(decorate([{ text: 'x' } as any, [0, 0]])).toEqual([]);
-    expect(decorate([{ type: 'blockquote', children: [{ text: 'q' }] } as any, [0]])).toEqual([]);
+    expect(
+      decorate([{ type: 'blockquote', children: [{ text: 'q' }] } as any, [0]]),
+    ).toEqual([]);
   });
 
   it('store.highlightCache 预填充 + cacheTextNode 复用', () => {
@@ -111,7 +109,9 @@ describe('useHighlight deepen residual branches', () => {
         if (k.startsWith('jinja')) props.add(k);
       });
     });
-    expect(props.has('jinjaFilter') || props.has('jinjaPlaceholder')).toBe(true);
+    expect(props.has('jinjaFilter') || props.has('jinjaPlaceholder')).toBe(
+      true,
+    );
     expect(props.has('jinjaKeyword') || props.has('jinjaDelimiter')).toBe(true);
   });
 
@@ -144,7 +144,12 @@ describe('useHighlight deepen residual branches', () => {
     ] as any;
     cacheTextNode.set(katexNode, {
       path: [0, 1],
-      range: [{ anchor: { path: [0, 1, 0], offset: 0 }, focus: { path: [0, 1, 0], offset: 0 } }],
+      range: [
+        {
+          anchor: { path: [0, 1, 0], offset: 0 },
+          focus: { path: [0, 1, 0], offset: 0 },
+        },
+      ],
     });
     clearInlineKatex(editor);
     expect(cacheTextNode.has(katexNode)).toBe(false);
@@ -157,7 +162,12 @@ describe('useHighlight deepen residual branches', () => {
     };
     cacheTextNode.set(node, {
       path: [0],
-      range: [{ anchor: { path: [0, 0], offset: 0 }, focus: { path: [0, 0], offset: 3 } }],
+      range: [
+        {
+          anchor: { path: [0, 0], offset: 0 },
+          focus: { path: [0, 0], offset: 3 },
+        },
+      ],
     });
     const decorate = useHighlight(undefined, false);
     const ranges = decorate([node, [1]]);

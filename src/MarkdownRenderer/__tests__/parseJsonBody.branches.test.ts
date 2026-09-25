@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { parseJsonBody, parseSchemaJson } from '../renderers/utils/parseJsonBody';
+import {
+  parseJsonBody,
+  parseSchemaJson,
+} from '../renderers/utils/parseJsonBody';
 
 describe('parseJsonBody 分支覆盖', () => {
   it('parseJsonBody：合法 / 空串 / 部分 JSON / 彻底失败', () => {

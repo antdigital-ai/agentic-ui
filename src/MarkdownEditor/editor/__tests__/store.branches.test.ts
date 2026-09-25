@@ -7,13 +7,9 @@ import { createEditor, Editor, Node, Transforms } from 'slate';
 import { withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { withMarkdown } from '../plugins/withMarkdown';
-import {
-  EditorStore,
-  EditorStoreContext,
-  useEditorStore,
-} from '../store';
 import * as parserMdToSchemaModule from '../parser/parserMdToSchema';
+import { withMarkdown } from '../plugins/withMarkdown';
+import { EditorStore, EditorStoreContext, useEditorStore } from '../store';
 
 vi.mock('slate-react', async (importOriginal) => {
   const actual = await importOriginal<typeof import('slate-react')>();
@@ -156,9 +152,7 @@ describe('EditorStore 分支覆盖', () => {
           children: [
             {
               type: 'table-row',
-              children: [
-                { type: 'table-cell', children: [{ text: '' }] },
-              ],
+              children: [{ type: 'table-cell', children: [{ text: '' }] }],
             },
           ],
         },
@@ -182,9 +176,7 @@ describe('EditorStore 分支覆盖', () => {
     });
 
     it('非 http filePath 使用 querystring name 作为链接 text', () => {
-      editor.children = [
-        { type: 'paragraph', children: [{ text: '' }] },
-      ];
+      editor.children = [{ type: 'paragraph', children: [{ text: '' }] }];
       editor.selection = {
         anchor: { path: [0, 0], offset: 0 },
         focus: { path: [0, 0], offset: 0 },
@@ -259,9 +251,7 @@ describe('EditorStore 分支覆盖', () => {
     });
 
     it('_setLongContentSync 全空 chunk 时不替换内容', () => {
-      editor.children = [
-        { type: 'paragraph', children: [{ text: 'keep' }] },
-      ];
+      editor.children = [{ type: 'paragraph', children: [{ text: 'keep' }] }];
       store.setMDContent('   \n\n   \n\n   ', undefined, {
         chunkSize: 1,
         useRAF: false,
@@ -349,8 +339,7 @@ describe('EditorStore 分支覆盖', () => {
       await (store as any)._parseAndSetContentWithRAF(chunks, [], 50);
 
       const appendCalls = insertSpy.mock.calls.filter(
-        ([, , opts]) =>
-          Array.isArray(opts?.at) && (opts.at[0] as number) > 0,
+        ([, , opts]) => Array.isArray(opts?.at) && (opts.at[0] as number) > 0,
       );
       expect(appendCalls.length).toBeGreaterThan(0);
     });
@@ -525,10 +514,7 @@ describe('EditorStore 分支覆盖', () => {
 
       store.focus();
 
-      expect(errSpy).toHaveBeenCalledWith(
-        '移动光标失败:',
-        expect.any(Error),
-      );
+      expect(errSpy).toHaveBeenCalledWith('移动光标失败:', expect.any(Error));
       errSpy.mockRestore();
     });
   });
@@ -584,9 +570,7 @@ describe('EditorStore 分支覆盖', () => {
     });
 
     it('内容与当前相同且 trim 相等时跳过', () => {
-      editor.children = [
-        { type: 'paragraph', children: [{ text: 'same' }] },
-      ];
+      editor.children = [{ type: 'paragraph', children: [{ text: 'same' }] }];
       const clearSpy = vi.spyOn(store, 'clearContent');
       store.setMDContent('same');
       expect(clearSpy).not.toHaveBeenCalled();
@@ -634,28 +618,23 @@ describe('EditorStore 分支覆盖', () => {
   describe('istanbul residual：setMDContent 分片与 insert 边界', () => {
     it('undefined md 早退；相同内容 skip；空串路径', () => {
       expect(() => store.setMDContent(undefined as any)).not.toThrow();
-      editor.children = [
-        { type: 'paragraph', children: [{ text: 'same' }] },
-      ];
+      editor.children = [{ type: 'paragraph', children: [{ text: 'same' }] }];
       store.setMDContent('same');
       store.setMDContent('');
     });
 
     it('长 md + useRAF + 小 chunkSize 走分片', async () => {
-      const long = Array.from({ length: 20 }, (_, i) => `## H${i}\n\npara ${i}\n`).join(
-        '\n',
-      );
+      const long = Array.from(
+        { length: 20 },
+        (_, i) => `## H${i}\n\npara ${i}\n`,
+      ).join('\n');
       // 签名为 (md, plugins?, options?)，options 不可当作 plugins
       await new Promise<void>((resolve) => {
-        store.setMDContent(
-          long,
-          [],
-          {
-            chunkSize: 40,
-            useRAF: true,
-            onProgress: () => {},
-          },
-        );
+        store.setMDContent(long, [], {
+          chunkSize: 40,
+          useRAF: true,
+          onProgress: () => {},
+        });
         setTimeout(resolve, 50);
       });
     });
@@ -702,8 +681,7 @@ describe('EditorStore 分支覆盖', () => {
       expect(
         editor.children.some(
           (n: any) =>
-            n.type === 'paragraph' &&
-            n.children?.[0]?.text === 'keep',
+            n.type === 'paragraph' && n.children?.[0]?.text === 'keep',
         ),
       ).toBe(true);
     });
@@ -760,14 +738,21 @@ describe('EditorStore 分支覆盖', () => {
 
     it('executeOperations：缺 properties/node/text 与缺路径跳过', () => {
       editor.children = [{ type: 'paragraph', children: [{ text: 'x' }] }];
-      editor.hasPath = vi.fn((path: number[]) => path.length === 1 && path[0] === 0);
+      editor.hasPath = vi.fn(
+        (path: number[]) => path.length === 1 && path[0] === 0,
+      );
       expect(() =>
         (store as any).executeOperations([
           { type: 'update', path: [0], priority: 1 },
           { type: 'replace', path: [0], priority: 1 },
           { type: 'text', path: [0], priority: 1 },
           { type: 'remove', path: [9], priority: 0 },
-          { type: 'insert', path: [1], node: { type: 'paragraph', children: [{ text: 'i' }] }, priority: 10 },
+          {
+            type: 'insert',
+            path: [1],
+            node: { type: 'paragraph', children: [{ text: 'i' }] },
+            priority: 10,
+          },
         ]),
       ).not.toThrow();
     });
@@ -801,10 +786,14 @@ describe('EditorStore 分支覆盖', () => {
     });
 
     it('istanbul buffer：plugins undefined；空白 chunk 跳过；fence 分片', () => {
-      store.setMDContent('# t\n\n```js\nconst a = 1\n```\n\nend\n', undefined as any, {
-        chunkSize: 8,
-        useRAF: false,
-      });
+      store.setMDContent(
+        '# t\n\n```js\nconst a = 1\n```\n\nend\n',
+        undefined as any,
+        {
+          chunkSize: 8,
+          useRAF: false,
+        },
+      );
       store.setMDContent('   \n\n   ', [], { chunkSize: 2, useRAF: false });
       expect(store).toBeTruthy();
     });
@@ -852,13 +841,10 @@ describe('EditorStore 分支覆盖', () => {
     it('setMDContent chunks>10 + useRAF 走 _parseAndSetContentWithRAF', async () => {
       vi.useFakeTimers({ shouldAdvanceTime: true });
       const rafCallbacks: FrameRequestCallback[] = [];
-      vi.stubGlobal(
-        'requestAnimationFrame',
-        ((cb: FrameRequestCallback) => {
-          rafCallbacks.push(cb);
-          return rafCallbacks.length;
-        }) as typeof requestAnimationFrame,
-      );
+      vi.stubGlobal('requestAnimationFrame', ((cb: FrameRequestCallback) => {
+        rafCallbacks.push(cb);
+        return rafCallbacks.length;
+      }) as typeof requestAnimationFrame);
       vi.stubGlobal(
         'cancelAnimationFrame',
         (() => {}) as typeof cancelAnimationFrame,
@@ -887,13 +873,10 @@ describe('EditorStore 分支覆盖', () => {
     it('cancelSetMDContent 在 RAF 进行中 abort 并清理', async () => {
       vi.useFakeTimers({ shouldAdvanceTime: true });
       let rafCb: FrameRequestCallback | null = null;
-      vi.stubGlobal(
-        'requestAnimationFrame',
-        ((cb: FrameRequestCallback) => {
-          rafCb = cb;
-          return 1;
-        }) as typeof requestAnimationFrame,
-      );
+      vi.stubGlobal('requestAnimationFrame', ((cb: FrameRequestCallback) => {
+        rafCb = cb;
+        return 1;
+      }) as typeof requestAnimationFrame);
       vi.stubGlobal(
         'cancelAnimationFrame',
         vi.fn() as typeof cancelAnimationFrame,

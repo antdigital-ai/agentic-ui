@@ -29,9 +29,7 @@ describe('markdownReactShared deepen3 residual', () => {
     );
     expect(nestedOpen.length).toBeGreaterThan(1);
 
-    const closePending = splitMarkdownBlocks(
-      '<think>\nkeep\n\n\n</think>\nok',
-    );
+    const closePending = splitMarkdownBlocks('<think>\nkeep\n\n\n</think>\nok');
     expect(closePending.some((b) => b.includes('ok'))).toBe(true);
 
     const closeInlinePending = splitMarkdownBlocks(
@@ -56,7 +54,11 @@ describe('markdownReactShared deepen3 residual', () => {
     expect(taskSingle).toBeTruthy();
 
     const preSingle = (comps.pre as any)({
-      children: React.createElement('code', { className: 'language-js' }, 'var a=1'),
+      children: React.createElement(
+        'code',
+        { className: 'language-js' },
+        'var a=1',
+      ),
       node: {
         children: [
           {

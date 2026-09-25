@@ -91,9 +91,9 @@ describe('BarChart residual prop/config branches', () => {
         yAxisLabel="Y"
       />,
     );
-    expect((globalThis as any).__barResidualData?.datasets?.length).toBeGreaterThan(
-      0,
-    );
+    expect(
+      (globalThis as any).__barResidualData?.datasets?.length,
+    ).toBeGreaterThan(0);
   });
 
   it('非数组 data', () => {
@@ -159,12 +159,7 @@ describe('BarChart residual prop/config branches', () => {
   });
 
   it('window resize 更新宽度', () => {
-    render(
-      <BarChart
-        data={[{ x: 'a', y: 1, type: 't' }]}
-        title="resize"
-      />,
-    );
+    render(<BarChart data={[{ x: 'a', y: 1, type: 't' }]} title="resize" />);
     Object.defineProperty(window, 'innerWidth', {
       writable: true,
       configurable: true,

@@ -57,7 +57,9 @@ describe('QuadrantChart 分支覆盖', () => {
       </ConfigProvider>,
     );
     expect(screen.getByTestId('quadrant-chart-toolbar')).toBeInTheDocument();
-    expect(screen.queryByTestId('quadrant-chart-title')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('quadrant-chart-title'),
+    ).not.toBeInTheDocument();
   });
 
   it('无 title/toolbar 时不渲染 header', () => {
@@ -68,7 +70,9 @@ describe('QuadrantChart 分支覆盖', () => {
         </I18nContext.Provider>
       </ConfigProvider>,
     );
-    expect(screen.queryByTestId('quadrant-chart-header')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('quadrant-chart-header'),
+    ).not.toBeInTheDocument();
   });
 
   it('有数据时渲染 4 象限网格', () => {

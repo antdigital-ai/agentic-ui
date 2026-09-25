@@ -1,5 +1,5 @@
-import { endsInsideGfmTable } from './gfmTableLine';
 import { endsInsideUnclosedFence } from './fenceTracker';
+import { endsInsideGfmTable } from './gfmTableLine';
 
 const LAST_BLOCK_THROTTLE_CHARS = 20;
 const BLOCK_BOUNDARY_TRIGGERS = /[\n`|#>*\-!~]/;

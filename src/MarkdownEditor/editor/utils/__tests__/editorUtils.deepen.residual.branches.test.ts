@@ -141,7 +141,10 @@ describe('EditorUtils deepen residual branches', () => {
       EditorUtils.listToParagraph(listEditor, listNode).length,
     ).toBeGreaterThan(0);
     expect(
-      EditorUtils.listToParagraph(listEditor, { type: 'list', children: [] } as any),
+      EditorUtils.listToParagraph(listEditor, {
+        type: 'list',
+        children: [],
+      } as any),
     ).toEqual([]);
     expect(() => EditorUtils.clearMarks(listEditor, true)).not.toThrow();
   });

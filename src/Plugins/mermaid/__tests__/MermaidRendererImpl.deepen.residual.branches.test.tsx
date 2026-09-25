@@ -22,9 +22,7 @@ describe('MermaidRendererImpl deepen residual branches', () => {
       (mod as any).MermaidRendererImpl ||
       (mod as any).default ||
       Object.values(mod)[0];
-    const { container } = render(
-      <Comp mermaidSource="" isRendered={false} />,
-    );
+    const { container } = render(<Comp mermaidSource="" isRendered={false} />);
     container.querySelectorAll('button').forEach((b) => fireEvent.click(b));
     expect(container.firstChild || true).toBeTruthy();
   });

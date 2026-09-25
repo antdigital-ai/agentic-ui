@@ -1,10 +1,10 @@
 import { renderHook } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { useAdaptiveTooltipProps } from '../useAdaptiveTooltipProps';
 import {
   EMPTY_TOOLTIP_TRIGGER_PROPS,
   INFORMATIONAL_TOOLTIP_TRIGGER_PROPS,
 } from '../../Utils/adaptiveTooltip';
+import { useAdaptiveTooltipProps } from '../useAdaptiveTooltipProps';
 
 describe('useAdaptiveTooltipProps', () => {
   afterEach(() => {

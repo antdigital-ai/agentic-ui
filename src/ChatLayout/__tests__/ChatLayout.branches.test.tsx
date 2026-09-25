@@ -24,7 +24,9 @@ describe('ChatLayout branches', () => {
     );
     const spacer = container.querySelector('[aria-hidden="true"]');
     expect(spacer).toHaveStyle({ height: '48px' });
-    const footer = container.querySelector('[class*="footer"]:not([class*="background"])');
+    const footer = container.querySelector(
+      '[class*="footer"]:not([class*="background"])',
+    );
     expect(footer).toHaveStyle({ minHeight: '48px' });
   });
 });

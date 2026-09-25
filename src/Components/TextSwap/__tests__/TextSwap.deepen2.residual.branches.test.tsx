@@ -22,9 +22,7 @@ describe('TextSwap deepen2 residual branches', () => {
     delete window.matchMedia;
     const mod = await import('../index');
     const Comp =
-      (mod as any).TextSwap ||
-      (mod as any).default ||
-      Object.values(mod)[0];
+      (mod as any).TextSwap || (mod as any).default || Object.values(mod)[0];
     try {
       render(<Comp texts={['a', 'b']} />);
     } catch {

@@ -8,9 +8,7 @@ import { BackspaceKey } from '../backspace';
 describe('BackspaceKey residual branches', () => {
   it('无 selection：range/run 早退', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: '' }] },
-    ] as any;
+    editor.children = [{ type: 'paragraph', children: [{ text: '' }] }] as any;
     editor.selection = null;
     const bs = new BackspaceKey(editor);
     expect(bs.range()).toBeUndefined();

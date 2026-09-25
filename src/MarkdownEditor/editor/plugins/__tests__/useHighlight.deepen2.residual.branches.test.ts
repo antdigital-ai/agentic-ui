@@ -50,11 +50,7 @@ describe('useHighlight deepen2 residual branches', () => {
     const decorate = useHighlight(undefined, true);
     const node: Element = {
       type: 'paragraph',
-      children: [
-        { text: '' },
-        { text: '' },
-        { text: '{% if ok %}' },
-      ],
+      children: [{ text: '' }, { text: '' }, { text: '{% if ok %}' }],
     };
     expect(() => decorate([node, [0]])).not.toThrow();
   });

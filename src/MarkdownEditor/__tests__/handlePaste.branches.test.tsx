@@ -407,7 +407,9 @@ describe('handlePaste 分支覆盖', () => {
     });
 
     it('Editor.node 返回 falsy 时返回 false', () => {
-      const nodeSpy = vi.spyOn(Editor, 'node').mockReturnValue(undefined as any);
+      const nodeSpy = vi
+        .spyOn(Editor, 'node')
+        .mockReturnValue(undefined as any);
       const result = shouldInsertTextDirectly(editor, {
         focus: { path: [0, 0], offset: 0 },
       });
@@ -483,13 +485,20 @@ describe('handlePaste 分支覆盖', () => {
         .fn()
         .mockResolvedValue(['https://cdn/a.mp4', 'https://cdn/b.mp3']);
       (EditorUtils.createMediaNode as any).mockImplementation(
-        (url: string, type: string) => ({ type, url, children: [{ text: '' }] }),
+        (url: string, type: string) => ({
+          type,
+          url,
+          children: [{ text: '' }],
+        }),
       );
       Transforms.select(editor, { path: [0, 0], offset: 0 });
 
       const result = await handleFilesPaste(
         editor,
-        { ...mockClipboard, files: [videoFile, audioFile] } as unknown as DataTransfer,
+        {
+          ...mockClipboard,
+          files: [videoFile, audioFile],
+        } as unknown as DataTransfer,
         { image: { upload } },
       );
 
@@ -626,11 +635,10 @@ describe('handlePaste 分支覆盖', () => {
     it('findMediaInsertPath 为空或 url 缺失时返回 false', () => {
       (EditorUtils.findMediaInsertPath as any).mockReturnValue(null);
       expect(
-        handleSpecialTextPaste(
-          editor,
-          'media://?url=https://img.com/a.jpg',
-          { path: [0], offset: 0 },
-        ),
+        handleSpecialTextPaste(editor, 'media://?url=https://img.com/a.jpg', {
+          path: [0],
+          offset: 0,
+        }),
       ).toBe(false);
 
       (EditorUtils.findMediaInsertPath as any).mockReturnValue([0]);
@@ -899,26 +907,20 @@ describe('handlePaste istanbul residual：files / http / fragment / tag 假值',
 
   it.skip('handleHttpLinkPaste / handleSpecialTextPaste 假值早退', () => {
     expect(
-      handleHttpLinkPaste(
-        editor,
-        '',
-        { path: [0, 0], offset: 0 } as any,
-      ),
+      handleHttpLinkPaste(editor, '', { path: [0, 0], offset: 0 } as any),
     ).toBe(false);
     expect(
-      handleHttpLinkPaste(
-        editor,
-        'https://example.com/path',
-        { path: [0, 0], offset: 0 } as any,
-      ),
+      handleHttpLinkPaste(editor, 'https://example.com/path', {
+        path: [0, 0],
+        offset: 0,
+      } as any),
     ).toBe(true);
 
     expect(
-      handleSpecialTextPaste(
-        editor,
-        'not-special',
-        { path: [0, 0], offset: 0 } as any,
-      ),
+      handleSpecialTextPaste(editor, 'not-special', {
+        path: [0, 0],
+        offset: 0,
+      } as any),
     ).toBe(false);
   });
 

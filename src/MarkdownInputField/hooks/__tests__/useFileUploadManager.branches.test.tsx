@@ -1,9 +1,9 @@
-import { renderHook, act } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { I18nContext } from '../../../I18n';
-import { useFileUploadManager } from '../useFileUploadManager';
 import * as deviceUtils from '../../AttachmentButton/utils';
+import { useFileUploadManager } from '../useFileUploadManager';
 
 vi.mock('../../utils/uploadFile', () => ({
   upLoadFileToServer: vi.fn(async () => undefined),
@@ -11,12 +11,11 @@ vi.mock('../../utils/uploadFile', () => ({
 
 const wrapper =
   (locale: Record<string, string> = {}) =>
-  ({ children }: { children: React.ReactNode }) =>
-    (
-      <I18nContext.Provider value={{ locale, language: 'zh-CN' } as any}>
-        {children}
-      </I18nContext.Provider>
-    );
+  ({ children }: { children: React.ReactNode }) => (
+    <I18nContext.Provider value={{ locale, language: 'zh-CN' } as any}>
+      {children}
+    </I18nContext.Provider>
+  );
 
 describe('useFileUploadManager 分支覆盖', () => {
   beforeEach(() => {
@@ -43,9 +42,12 @@ describe('useFileUploadManager 分支覆盖', () => {
       ['1', { uuid: '1', name: 'a', status: 'uploading' } as any],
       ['2', { uuid: '2', name: 'b', status: 'error' } as any],
     ]);
-    const { result } = renderHook(() => useFileUploadManager({ fileMap: map }), {
-      wrapper: wrapper(),
-    });
+    const { result } = renderHook(
+      () => useFileUploadManager({ fileMap: map }),
+      {
+        wrapper: wrapper(),
+      },
+    );
     expect(result.current.fileUploadStatus).toBe('error');
     expect(result.current.fileUploadSummary.errorCount).toBe(1);
     expect(result.current.fileUploadSummary.uploadingCount).toBe(1);
@@ -75,8 +77,9 @@ describe('useFileUploadManager 分支覆盖', () => {
 
   it('uploadImage：forGallery 使用 image/*；extensions 生成 accept', async () => {
     const click = vi.fn();
-    const create = vi.spyOn(document, 'createElement').mockImplementation(
-      (tag: string) => {
+    const create = vi
+      .spyOn(document, 'createElement')
+      .mockImplementation((tag: string) => {
         if (tag === 'input') {
           return {
             type: '',
@@ -90,15 +93,17 @@ describe('useFileUploadManager 分支覆盖', () => {
           } as any;
         }
         return document.createElementNS('http://www.w3.org/1999/xhtml', tag);
-      },
-    );
+      });
     vi.spyOn(document.body, 'appendChild').mockImplementation((n) => n);
 
     const { result } = renderHook(
       () =>
         useFileUploadManager({
           attachment: {
-            supportedFormat: { type: 'file', extensions: ['pdf', 'txt'] } as any,
+            supportedFormat: {
+              type: 'file',
+              extensions: ['pdf', 'txt'],
+            } as any,
           },
         }),
       { wrapper: wrapper() },
@@ -288,8 +293,13 @@ describe('useFileUploadManager 分支覆盖', () => {
     const { result } = renderHook(
       () =>
         useFileUploadManager({
-          fileMap: new Map([['unknown', { uuid: 'unknown', status: 'queued' } as any]]),
-          attachment: { allowMultiple: false, supportedFormat: { type: 'file', extensions: [] } as any },
+          fileMap: new Map([
+            ['unknown', { uuid: 'unknown', status: 'queued' } as any],
+          ]),
+          attachment: {
+            allowMultiple: false,
+            supportedFormat: { type: 'file', extensions: [] } as any,
+          },
         }),
       { wrapper: wrapper() },
     );

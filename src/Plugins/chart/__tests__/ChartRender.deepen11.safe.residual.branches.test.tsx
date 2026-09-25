@@ -105,7 +105,9 @@ describe('ChartRender deepen11 safe residual branches', () => {
     );
     await waitFor(() => {
       expect(
-        captured.funnel.length + captured.histogram.length + captured.boxplot.length,
+        captured.funnel.length +
+          captured.histogram.length +
+          captured.boxplot.length,
       ).toBeGreaterThan(0);
     });
     expect(captured.funnel[0]?.data).toEqual([]);

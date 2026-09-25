@@ -24,7 +24,9 @@ describe('isImeComposing residual branches', () => {
     expect(getEditorTextSnapshot(null)).toBe('');
     expect(getEditorTextSnapshot(undefined)).toBe('');
     const editor = createEditor();
-    editor.children = [{ type: 'paragraph', children: [{ text: 'hi' }] }] as any;
+    editor.children = [
+      { type: 'paragraph', children: [{ text: 'hi' }] },
+    ] as any;
     editor.selection = null;
     expect(getEditorTextSnapshot(editor)).toBe('');
     editor.selection = {
@@ -40,33 +42,25 @@ describe('isImeComposing residual branches', () => {
   });
 
   it('isImeComposing：composition / keyCode / Enter 守卫', () => {
-    expect(
-      isImeComposing({ key: 'a', nativeEvent: {} }, true),
-    ).toBe(true);
+    expect(isImeComposing({ key: 'a', nativeEvent: {} }, true)).toBe(true);
     expect(
       isImeComposing({
         key: 'a',
         nativeEvent: { isComposing: true },
       }),
     ).toBe(true);
-    expect(
-      isImeComposing({ key: 'a', keyCode: 229, nativeEvent: {} }),
-    ).toBe(true);
+    expect(isImeComposing({ key: 'a', keyCode: 229, nativeEvent: {} })).toBe(
+      true,
+    );
 
     markImeEnterCommitGuard();
-    expect(
-      isImeComposing({ key: 'Enter', nativeEvent: {} }),
-    ).toBe(true);
+    expect(isImeComposing({ key: 'Enter', nativeEvent: {} })).toBe(true);
     // 仅消费一次
-    expect(
-      isImeComposing({ key: 'Enter', nativeEvent: {} }),
-    ).toBe(false);
+    expect(isImeComposing({ key: 'Enter', nativeEvent: {} })).toBe(false);
 
     markImeEnterCommitGuard();
     clearImeEnterCommitGuard();
-    expect(
-      isImeComposing({ key: 'Enter', nativeEvent: {} }),
-    ).toBe(false);
+    expect(isImeComposing({ key: 'Enter', nativeEvent: {} })).toBe(false);
   });
 
   it('scheduleClearInputComposition：rAF 双帧与 cancel；无 rAF 走 setTimeout', () => {
@@ -101,7 +95,9 @@ describe('isImeComposing residual branches', () => {
     ).not.toThrow();
 
     const editor = createEditor();
-    editor.children = [{ type: 'paragraph', children: [{ text: 'ab' }] }] as any;
+    editor.children = [
+      { type: 'paragraph', children: [{ text: 'ab' }] },
+    ] as any;
     editor.selection = {
       anchor: { path: [0, 0], offset: 2 },
       focus: { path: [0, 0], offset: 2 },

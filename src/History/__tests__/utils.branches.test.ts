@@ -67,9 +67,9 @@ describe('History utils branches', () => {
   describe('getItemTimestamp', () => {
     it('缺失 gmtCreate 返回 0', () => {
       expect(getItemTimestamp({})).toBe(0);
-      expect(getItemTimestamp({ gmtCreate: null as unknown as undefined })).toBe(
-        0,
-      );
+      expect(
+        getItemTimestamp({ gmtCreate: null as unknown as undefined }),
+      ).toBe(0);
     });
 
     it('number 直接返回', () => {

@@ -24,9 +24,7 @@ describe('lists/keyboardBridge 分支覆盖', () => {
 
   it('isCollapsedInBlock：无 selection / 非 collapsed / 未命中', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: '' }] },
-    ] as any;
+    editor.children = [{ type: 'paragraph', children: [{ text: '' }] }] as any;
     expect(isCollapsedInBlock(editor, 'paragraph')).toBe(false);
 
     editor.selection = {
@@ -64,9 +62,7 @@ describe('lists/keyboardBridge 分支覆盖', () => {
 
     expect(handleTabWithLists(editor, event)).toBe(false);
 
-    editor.children = [
-      { type: 'paragraph', children: [{ text: '' }] },
-    ] as any;
+    editor.children = [{ type: 'paragraph', children: [{ text: '' }] }] as any;
     editor.selection = {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [0, 0], offset: 0 },
@@ -83,23 +79,17 @@ describe('lists/keyboardBridge 分支覆盖', () => {
   it('handleListsOnEnter / Backspace 早退与命中', async () => {
     const { ListsEditor } = await import('../ListsEditor');
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: '' }] },
-    ] as any;
+    editor.children = [{ type: 'paragraph', children: [{ text: '' }] }] as any;
     editor.selection = {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [0, 0], offset: 0 },
     };
 
     (ListsEditor.isListsEnabled as any).mockReturnValue(false);
-    expect(
-      handleListsOnEnter(editor, { key: 'Enter' } as any),
-    ).toBe(false);
+    expect(handleListsOnEnter(editor, { key: 'Enter' } as any)).toBe(false);
 
     (ListsEditor.isListsEnabled as any).mockReturnValue(true);
-    expect(
-      handleListsOnEnter(editor, { key: 'a' } as any),
-    ).toBe(false);
+    expect(handleListsOnEnter(editor, { key: 'a' } as any)).toBe(false);
     expect(
       handleListsOnEnter(editor, {
         key: 'Enter',
@@ -114,26 +104,26 @@ describe('lists/keyboardBridge 分支覆盖', () => {
     ).toBe(false);
     expect(handleListsOnEnter(editor, { key: 'Enter' } as any)).toBe(true);
 
-    expect(
-      handleListsOnBackspace(editor, { key: 'Delete' } as any),
-    ).toBe(false);
+    expect(handleListsOnBackspace(editor, { key: 'Delete' } as any)).toBe(
+      false,
+    );
     editor.selection = null;
-    expect(
-      handleListsOnBackspace(editor, { key: 'Backspace' } as any),
-    ).toBe(false);
+    expect(handleListsOnBackspace(editor, { key: 'Backspace' } as any)).toBe(
+      false,
+    );
     editor.selection = {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [0, 0], offset: 1 },
     };
-    expect(
-      handleListsOnBackspace(editor, { key: 'Backspace' } as any),
-    ).toBe(false);
+    expect(handleListsOnBackspace(editor, { key: 'Backspace' } as any)).toBe(
+      false,
+    );
     editor.selection = {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [0, 0], offset: 0 },
     };
-    expect(
-      handleListsOnBackspace(editor, { key: 'Backspace' } as any),
-    ).toBe(true);
+    expect(handleListsOnBackspace(editor, { key: 'Backspace' } as any)).toBe(
+      true,
+    );
   });
 });

@@ -39,9 +39,9 @@ describe('decreaseListItemDepth', () => {
       },
     ];
 
-    expect(decreaseListItemDepth(editor, agenticListsSchema, [0, 0, 1, 0])).toBe(
-      true,
-    );
+    expect(
+      decreaseListItemDepth(editor, agenticListsSchema, [0, 0, 1, 0]),
+    ).toBe(true);
     expect((editor.children[0] as any).children.length).toBeGreaterThan(1);
   });
 
@@ -59,7 +59,9 @@ describe('decreaseListItemDepth', () => {
       },
     ];
 
-    expect(decreaseListItemDepth(editor, agenticListsSchema, [0, 0])).toBe(true);
+    expect(decreaseListItemDepth(editor, agenticListsSchema, [0, 0])).toBe(
+      true,
+    );
     expect((editor.children[0] as { type: string }).type).toBe('paragraph');
   });
 
@@ -96,8 +98,8 @@ describe('decreaseListItemDepth', () => {
       },
     ];
 
-    expect(decreaseListItemDepth(editor, agenticListsSchema, [0, 0, 1, 0])).toBe(
-      true,
-    );
+    expect(
+      decreaseListItemDepth(editor, agenticListsSchema, [0, 0, 1, 0]),
+    ).toBe(true);
   });
 });

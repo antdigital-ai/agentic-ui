@@ -57,8 +57,12 @@ describe('EditorUtils deepen7 safe residual branches', () => {
   });
 
   it('createMediaNode / copy / hasPath / coalesceRoot', () => {
-    expect(EditorUtils.createMediaNode('https://x/a.png', 'image')).toBeTruthy();
-    expect(EditorUtils.createMediaNode('https://x/a.mp4', 'video')).toBeTruthy();
+    expect(
+      EditorUtils.createMediaNode('https://x/a.png', 'image'),
+    ).toBeTruthy();
+    expect(
+      EditorUtils.createMediaNode('https://x/a.mp4', 'video'),
+    ).toBeTruthy();
     expect(EditorUtils.copy({ a: 1 })).toEqual({ a: 1 });
 
     const editor = createEditor();
@@ -89,4 +93,3 @@ describe('EditorUtils deepen7 safe residual branches', () => {
     expect(EditorUtils.checkSelEnd(editor, [1])).toBeTypeOf('boolean');
   });
 });
-

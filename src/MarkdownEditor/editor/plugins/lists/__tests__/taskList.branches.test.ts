@@ -3,12 +3,12 @@
  */
 import { createEditor, Transforms } from 'slate';
 import { describe, expect, it } from 'vitest';
-import { ListType } from '../types';
 import {
   listMatchesToolbarMode,
   modeToListType,
   syncListMetadataForMode,
 } from '../taskList';
+import { ListType } from '../types';
 
 describe('taskList branches', () => {
   it('listMatchesToolbarMode / modeToListType', () => {

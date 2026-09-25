@@ -2,7 +2,13 @@
  * useEnlargeAndContainerHandler / useFileUploadManager / SendActions residual branches
  */
 import '@testing-library/jest-dom';
-import { act, fireEvent, render, renderHook, screen } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+} from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { I18nContext } from '../../I18n';
@@ -27,7 +33,12 @@ vi.mock('slate-react', () => ({
 
 vi.mock('../AttachmentButton', () => ({
   AttachmentButton: ({ title, disabled }: any) => (
-    <button type="button" data-testid="attachment-btn" title={title} disabled={disabled}>
+    <button
+      type="button"
+      data-testid="attachment-btn"
+      title={title}
+      disabled={disabled}
+    >
       attach
     </button>
   ),
@@ -35,7 +46,12 @@ vi.mock('../AttachmentButton', () => ({
 
 vi.mock('../VoiceInput', () => ({
   VoiceInputButton: ({ title, disabled }: any) => (
-    <button type="button" data-testid="voice-btn" title={title} disabled={disabled}>
+    <button
+      type="button"
+      data-testid="voice-btn"
+      title={title}
+      disabled={disabled}
+    >
       voice
     </button>
   ),
@@ -124,9 +140,8 @@ describe('useEnlargeAndContainerHandler istanbul residual', () => {
 
   it('interactive target / focus / activeInput null ref', async () => {
     const { ReactEditor } = await import('slate-react');
-    const { EditorUtils } = await import(
-      '../../MarkdownEditor/editor/utils/editorUtils'
-    );
+    const { EditorUtils } =
+      await import('../../MarkdownEditor/editor/utils/editorUtils');
     vi.mocked(ReactEditor.isFocused).mockReturnValue(false);
     const editor = { children: [] };
     const input = document.createElement('div');
@@ -171,9 +186,8 @@ describe('useEnlargeAndContainerHandler istanbul residual', () => {
   it('isFocused true / throws 早退', async () => {
     const { ReactEditor } = await import('slate-react');
     vi.mocked(ReactEditor.isFocused).mockReturnValue(true);
-    const { EditorUtils } = await import(
-      '../../MarkdownEditor/editor/utils/editorUtils'
-    );
+    const { EditorUtils } =
+      await import('../../MarkdownEditor/editor/utils/editorUtils');
     vi.mocked(EditorUtils.focus).mockClear();
     const { result } = renderHook(() =>
       useEnlargeAndContainerHandler({
@@ -257,9 +271,8 @@ describe('useFileUploadManager istanbul residual', () => {
   });
 
   it('getAcceptValue 扩展名列表与 gallery', async () => {
-    const { isMobileDevice, isWeChat, isVivoOrOppoDevice } = await import(
-      '../AttachmentButton/utils'
-    );
+    const { isMobileDevice, isWeChat, isVivoOrOppoDevice } =
+      await import('../AttachmentButton/utils');
     vi.mocked(isMobileDevice).mockReturnValue(false);
     vi.mocked(isWeChat).mockReturnValue(false);
     vi.mocked(isVivoOrOppoDevice).mockReturnValue(false);
@@ -313,13 +326,7 @@ describe('SendActions istanbul residual', () => {
     );
 
   it('fileUploadDone=false 默认 status uploading', () => {
-    wrap(
-      <SendActions
-        fileUploadDone={false}
-        value="hi"
-        onSend={vi.fn()}
-      />,
-    );
+    wrap(<SendActions fileUploadDone={false} value="hi" onSend={vi.fn()} />);
     expect(screen.getByTestId('send-btn')).toBeInTheDocument();
   });
 
@@ -329,9 +336,7 @@ describe('SendActions istanbul residual', () => {
     );
     expect(screen.getByTestId('attachment-btn')).toBeInTheDocument();
     unmount();
-    wrap(
-      <SendActions voiceRecognizer={vi.fn() as any} value="a" />,
-    );
+    wrap(<SendActions voiceRecognizer={vi.fn() as any} value="a" />);
     expect(screen.getByTestId('voice-btn')).toBeInTheDocument();
   });
 
@@ -365,10 +370,7 @@ describe('SendActions istanbul residual', () => {
   it('whitespace value 不可发送；fileMap 非空可发送', () => {
     const map = new Map([['f', { name: 'a.png' } as any]]);
     wrap(
-      <SendActions
-        value="   "
-        attachment={{ enable: true, fileMap: map }}
-      />,
+      <SendActions value="   " attachment={{ enable: true, fileMap: map }} />,
     );
     expect(screen.getByTestId('send-btn')).toHaveAttribute(
       'data-sendable',

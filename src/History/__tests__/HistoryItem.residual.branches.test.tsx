@@ -194,9 +194,7 @@ describe('HistoryItem residual branches', () => {
   });
 
   it('无 onDeleteItem 不渲染删除按钮', () => {
-    render(
-      <HistoryItem item={baseItem} {...baseProps} type="chat" />,
-    );
+    render(<HistoryItem item={baseItem} {...baseProps} type="chat" />);
     expect(screen.queryByTestId('delete-btn')).not.toBeInTheDocument();
   });
 
@@ -311,7 +309,9 @@ describe('HistoryItem residual branches', () => {
 
     rerender(
       <HistoryItem
-        item={{ ...baseItem, description: 'desc-line', status: 'success' } as any}
+        item={
+          { ...baseItem, description: 'desc-line', status: 'success' } as any
+        }
         {...baseProps}
         onSelectionChange={onSelectionChange}
         type="task"
@@ -512,7 +512,12 @@ describe('HistoryItem residual branches', () => {
               id: `id-${status ?? 'none'}`,
               status,
               description: status === 'error' ? '' : undefined,
-              icon: status === 'success' ? undefined : status === 'cancel' ? 0 : null,
+              icon:
+                status === 'success'
+                  ? undefined
+                  : status === 'cancel'
+                    ? 0
+                    : null,
             } as any
           }
           selectedIds={[]}
@@ -764,9 +769,7 @@ describe('HistoryItem residual branches', () => {
     expect(screen.getByTestId('extra-fn')).toBeInTheDocument();
     expect(extra).toHaveBeenCalled();
 
-    render(
-      <HistoryItem item={baseItem} {...baseProps} type="chat" />,
-    );
+    render(<HistoryItem item={baseItem} {...baseProps} type="chat" />);
     expect(screen.queryByTestId('running-icon')).not.toBeInTheDocument();
   });
 
@@ -851,7 +854,9 @@ describe('HistoryItem residual branches', () => {
 
     render(
       <HistoryItem
-        item={{ ...baseItem, icon: '📄', description: 'ignored-in-chat' } as any}
+        item={
+          { ...baseItem, icon: '📄', description: 'ignored-in-chat' } as any
+        }
         {...baseProps}
         type="chat"
       />,

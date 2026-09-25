@@ -7,11 +7,17 @@ import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
-import { PureBubble, PureAIBubble, PureUserBubble } from '../PureBubble';
+import { PureAIBubble, PureBubble, PureUserBubble } from '../PureBubble';
 import type { BubbleProps, MessageBubbleData } from '../type';
 
 vi.mock('../../MarkdownEditor/BaseMarkdownEditor', () => ({
-  BaseMarkdownEditor: ({ initValue, readonly }: { initValue?: string; readonly?: boolean }) => (
+  BaseMarkdownEditor: ({
+    initValue,
+    readonly,
+  }: {
+    initValue?: string;
+    readonly?: boolean;
+  }) => (
     <div data-testid="md-editor" data-readonly={String(readonly)}>
       {initValue}
     </div>
@@ -100,7 +106,9 @@ describe('PureBubble deepen residual branches', () => {
 
     fireEvent.click(screen.getByTestId('dislike-legacy-btn'));
     await Promise.resolve();
-    expect(setMessageItem).toHaveBeenCalledWith('m1', { feedback: 'thumbsDown' });
+    expect(setMessageItem).toHaveBeenCalledWith('m1', {
+      feedback: 'thumbsDown',
+    });
 
     render(
       <ConfigProvider>
@@ -123,7 +131,13 @@ describe('PureBubble deepen residual branches', () => {
     render(
       <ConfigProvider>
         <BubbleConfigContext.Provider
-          value={{ compact: true, thoughtChain: { enable: true }, agentId: 'a1' } as any}
+          value={
+            {
+              compact: true,
+              thoughtChain: { enable: true },
+              agentId: 'a1',
+            } as any
+          }
         >
           <PureBubble
             {...baseProps({
@@ -134,7 +148,10 @@ describe('PureBubble deepen residual branches', () => {
         </BubbleConfigContext.Provider>
       </ConfigProvider>,
     );
-    expect(screen.getByTestId('md-editor')).toHaveAttribute('data-readonly', 'true');
+    expect(screen.getByTestId('md-editor')).toHaveAttribute(
+      'data-readonly',
+      'true',
+    );
     expect(document.querySelector('[class*="bubble-compact"]')).toBeTruthy();
   });
 
@@ -187,7 +204,10 @@ describe('PureBubble deepen residual branches', () => {
         />
       </ConfigProvider>,
     );
-    expect(screen.getByTestId('md-editor')).toHaveAttribute('data-readonly', 'false');
+    expect(screen.getByTestId('md-editor')).toHaveAttribute(
+      'data-readonly',
+      'false',
+    );
   });
 
   it('MessagesContext setMessage 经 bubbleRef 转发', () => {

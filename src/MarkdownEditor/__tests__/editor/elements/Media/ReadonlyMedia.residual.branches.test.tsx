@@ -5,10 +5,10 @@ import '@testing-library/jest-dom';
 import { act, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { MediaNode } from '../../../../el';
 import { ReadonlyMedia } from '../../../../editor/elements/Media/ReadonlyMedia';
 import * as editorUtils from '../../../../editor/utils';
 import * as domUtils from '../../../../editor/utils/dom';
+import type { MediaNode } from '../../../../el';
 
 vi.mock('antd', () => ({
   Skeleton: { Image: () => <div data-testid="skeleton" /> },
@@ -19,7 +19,9 @@ vi.mock('@ant-design/icons', () => ({
 }));
 
 vi.mock('../../../../editor/elements/Image', () => ({
-  ReadonlyImage: (p: any) => <img data-testid="ro-img" src={p.src} alt={p.alt} />,
+  ReadonlyImage: (p: any) => (
+    <img data-testid="ro-img" src={p.src} alt={p.alt} />
+  ),
 }));
 
 vi.mock('../../../../editor/components/MediaErrorLink', () => ({

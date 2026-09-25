@@ -209,9 +209,7 @@ function renderEditor(props: any = {}) {
     <SlateMarkdownEditor
       prefixCls="ant-md"
       instance={
-        props.omitInstance
-          ? undefined
-          : (props.instance ?? { id: 'inst6' })
+        props.omitInstance ? undefined : (props.instance ?? { id: 'inst6' })
       }
       initSchemaValue={
         props.initSchemaValue ?? [

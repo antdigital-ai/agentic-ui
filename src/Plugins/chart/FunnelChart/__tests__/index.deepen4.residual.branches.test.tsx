@@ -143,7 +143,15 @@ describe('FunnelChart deepen4 residual branches', () => {
           scales: {},
           data: {
             labels: ['A', undefined, 'C'],
-            datasets: [{ data: [[-50, 50], [-25, 25], [-5, 5]] }],
+            datasets: [
+              {
+                data: [
+                  [-50, 50],
+                  [-25, 25],
+                  [-5, 5],
+                ],
+              },
+            ],
           },
           getDatasetMeta: () => ({
             data: [

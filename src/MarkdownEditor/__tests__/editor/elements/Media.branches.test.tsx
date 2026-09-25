@@ -1,5 +1,12 @@
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Media, ResizeImage } from '../../../editor/elements/Media';
@@ -431,7 +438,9 @@ describe('Media targeted coverage', () => {
         {null}
       </Media>,
     );
-    expect(screen.getByTestId('media-unsafe-url-plain-text')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('media-unsafe-url-plain-text'),
+    ).toBeInTheDocument();
     expect(screen.getByText('javascript:alert(1)')).toBeInTheDocument();
   });
 
@@ -560,7 +569,11 @@ describe('Media targeted coverage', () => {
     mocks.getMediaTypeMock.mockReturnValue('video');
     const { rerender } = render(
       <Media
-        element={{ ...baseElement, url: 'https://example.com/v.mp4', finished: false }}
+        element={{
+          ...baseElement,
+          url: 'https://example.com/v.mp4',
+          finished: false,
+        }}
         attributes={{} as any}
       >
         {null}
@@ -569,7 +582,11 @@ describe('Media targeted coverage', () => {
     expect(screen.getByTestId('skeleton-image')).toBeInTheDocument();
     rerender(
       <Media
-        element={{ ...baseElement, url: 'https://example.com/v.mp4', finished: true }}
+        element={{
+          ...baseElement,
+          url: 'https://example.com/v.mp4',
+          finished: true,
+        }}
         attributes={{} as any}
       >
         {null}
@@ -1110,18 +1127,22 @@ describe('Media targeted coverage', () => {
     mocks.getMediaTypeMock.mockReturnValue('attachment' as any);
     render(
       <Media
-        element={{
-          ...baseElement,
-          url: 'https://example.com/f.bin',
-          alt: undefined,
-          mediaType: 'attachment',
-          comment: [{ id: 'c1' }],
-        } as any}
+        element={
+          {
+            ...baseElement,
+            url: 'https://example.com/f.bin',
+            alt: undefined,
+            mediaType: 'attachment',
+            comment: [{ id: 'c1' }],
+          } as any
+        }
         attributes={{} as any}
       >
         {null}
       </Media>,
     );
-    expect(screen.getByText(/attachment|f\.bin|example\.com/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/attachment|f\.bin|example\.com/i),
+    ).toBeInTheDocument();
   });
 });

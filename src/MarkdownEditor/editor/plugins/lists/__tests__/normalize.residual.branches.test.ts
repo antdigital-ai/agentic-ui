@@ -133,8 +133,8 @@ describe('lists normalizations residual branches', () => {
     ] as Editor['children'];
     expect(ListsEditor.isListsEnabled(editor)).toBe(true);
     // 已规范化结构通常返回 false
-    expect(
-      typeof normalizeNode(editor, [editor.children[0], [0]]),
-    ).toBe('boolean');
+    expect(typeof normalizeNode(editor, [editor.children[0], [0]])).toBe(
+      'boolean',
+    );
   });
 });

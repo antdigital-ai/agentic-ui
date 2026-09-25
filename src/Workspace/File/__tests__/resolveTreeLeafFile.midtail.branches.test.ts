@@ -11,7 +11,11 @@ import {
 describe('resolveTreeLeafFile midtail branches', () => {
   it('hasTreeLeafFileBinding：file=null / 对象 / 顶层字段 / synthetic', () => {
     expect(
-      hasTreeLeafFileBinding({ key: 'a', name: 'a', file: null } as FileTreeNode),
+      hasTreeLeafFileBinding({
+        key: 'a',
+        name: 'a',
+        file: null,
+      } as FileTreeNode),
     ).toBe(false);
     expect(
       hasTreeLeafFileBinding({
@@ -28,10 +32,9 @@ describe('resolveTreeLeafFile midtail branches', () => {
       } as FileTreeNode),
     ).toBe(true);
     expect(
-      hasTreeLeafFileBinding(
-        { key: 'a', name: 'a' } as FileTreeNode,
-        { allowSyntheticLeaf: true },
-      ),
+      hasTreeLeafFileBinding({ key: 'a', name: 'a' } as FileTreeNode, {
+        allowSyntheticLeaf: true,
+      }),
     ).toBe(true);
     expect(
       hasTreeLeafFileBinding({ key: 'a', name: 'a' } as FileTreeNode),

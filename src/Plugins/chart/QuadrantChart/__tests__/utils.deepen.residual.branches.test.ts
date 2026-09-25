@@ -17,7 +17,10 @@ describe('QuadrantChart utils deepen residual branches', () => {
   it('labelKey 命中但 row 值为 null/undefined 时回退空串再补 Qn', () => {
     const columns = [{ dataIndex: 'label' }, { dataIndex: 'items' }];
     const groups = parseQuadrantsFromRows(
-      [{ label: null, items: 'a' }, { label: undefined, items: 'b' }],
+      [
+        { label: null, items: 'a' },
+        { label: undefined, items: 'b' },
+      ],
       columns,
     );
     expect(groups[0].label).toBe('Q1');

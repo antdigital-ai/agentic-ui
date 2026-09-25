@@ -99,7 +99,9 @@ describe('Workspace index deepen2 residual branches', () => {
       </Workspace>,
     );
     expect(screen.getByTestId('custom-panel')).toBeInTheDocument();
-    expect(screen.getByTestId('workspace-tab-count--custom-0')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('workspace-tab-count--custom-0'),
+    ).toBeInTheDocument();
     const segmented = screen.getByTestId('workspace-segmented');
     const options = segmented.querySelectorAll('label');
     if (options.length >= 2) {
@@ -210,7 +212,9 @@ describe('Workspace index deepen2 residual branches', () => {
       </Workspace>,
       { 'workspace.title': '我的工作区' },
     );
-    expect(screen.getByTestId('workspace-title')).toHaveTextContent('我的工作区');
+    expect(screen.getByTestId('workspace-title')).toHaveTextContent(
+      '我的工作区',
+    );
   });
 
   it('Fragment 嵌套 children 扁平化', () => {

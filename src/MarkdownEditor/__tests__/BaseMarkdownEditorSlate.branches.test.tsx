@@ -14,7 +14,9 @@ const mocks = vi.hoisted(() => ({
 }));
 
 let slateEditorProps: Record<string, any> = {};
-let mockEditorChildren: any[] = [{ type: 'paragraph', children: [{ text: 'hello' }] }];
+let mockEditorChildren: any[] = [
+  { type: 'paragraph', children: [{ text: 'hello' }] },
+];
 
 const mockEditor = {
   children: mockEditorChildren,
@@ -22,7 +24,10 @@ const mockEditor = {
 };
 
 vi.mock('../Hooks/useDebounceFn', () => ({
-  useDebounceFn: (fn: (...args: any[]) => void) => ({ run: fn, cancel: vi.fn() }),
+  useDebounceFn: (fn: (...args: any[]) => void) => ({
+    run: fn,
+    cancel: vi.fn(),
+  }),
 }));
 
 vi.mock('../Hooks/useRefFunction', () => ({
@@ -36,7 +41,9 @@ vi.mock('../Config', () => ({
 vi.mock('../editor/Editor', () => ({
   SlateMarkdownEditor: (props: Record<string, any>) => {
     slateEditorProps = props;
-    return <div data-testid="slate-editor">{props.initSchemaValue?.length}</div>;
+    return (
+      <div data-testid="slate-editor">{props.initSchemaValue?.length}</div>
+    );
   },
 }));
 
@@ -152,14 +159,16 @@ vi.mock('../editor/store', () => {
 });
 
 import BaseMarkdownEditorSlate from '../BaseMarkdownEditorSlate';
-import { EditorUtils } from '../editor/utils/editorUtils';
 import { parserMdToSchema } from '../editor/parser/parserMdToSchema';
+import { EditorUtils } from '../editor/utils/editorUtils';
 
 describe('BaseMarkdownEditorSlate 分支覆盖', () => {
   beforeEach(() => {
     slateEditorProps = {};
     vi.clearAllMocks();
-    mockEditor.children = [{ type: 'paragraph', children: [{ text: 'hello' }] }];
+    mockEditor.children = [
+      { type: 'paragraph', children: [{ text: 'hello' }] },
+    ];
   });
 
   afterEach(() => {
@@ -168,10 +177,7 @@ describe('BaseMarkdownEditorSlate 分支覆盖', () => {
 
   it('toolBar.enable=true 且非 readonly 时渲染 ToolBar', () => {
     render(
-      <BaseMarkdownEditorSlate
-        initValue="# hi"
-        toolBar={{ enable: true }}
-      />,
+      <BaseMarkdownEditorSlate initValue="# hi" toolBar={{ enable: true }} />,
     );
     expect(screen.getByTestId('toolbar')).toBeInTheDocument();
     expect(screen.getByTestId('markdown-editor')).toHaveClass(
@@ -181,7 +187,11 @@ describe('BaseMarkdownEditorSlate 分支覆盖', () => {
 
   it('readonly 时不渲染 ToolBar 与 InsertLink', () => {
     render(
-      <BaseMarkdownEditorSlate initValue="# hi" readonly toolBar={{ enable: true }} />,
+      <BaseMarkdownEditorSlate
+        initValue="# hi"
+        readonly
+        toolBar={{ enable: true }}
+      />,
     );
     expect(screen.queryByTestId('toolbar')).not.toBeInTheDocument();
     expect(screen.queryByTestId('insert-link')).not.toBeInTheDocument();
@@ -333,9 +343,7 @@ describe('BaseMarkdownEditorSlate 分支覆盖', () => {
       <BaseMarkdownEditorSlate initValue="keep" plugins={[p1]} />,
     );
     const firstKey = slateEditorProps.slateRemountKey;
-    rerender(
-      <BaseMarkdownEditorSlate initValue="keep" plugins={[p2]} />,
-    );
+    rerender(<BaseMarkdownEditorSlate initValue="keep" plugins={[p2]} />);
     await waitFor(() => {
       expect(slateEditorProps.slateRemountKey).not.toBe(firstKey);
     });
@@ -346,8 +354,14 @@ describe('BaseMarkdownEditorSlate 分支覆盖', () => {
     vi.mocked(EditorUtils.reset).mockImplementationOnce(() => {
       throw new Error('reset fail');
     });
-    const p1: MarkdownEditorPlugin = { withEditorKey: 'x', withEditor: (e) => e };
-    const p2: MarkdownEditorPlugin = { withEditorKey: 'y', withEditor: (e) => e };
+    const p1: MarkdownEditorPlugin = {
+      withEditorKey: 'x',
+      withEditor: (e) => e,
+    };
+    const p2: MarkdownEditorPlugin = {
+      withEditorKey: 'y',
+      withEditor: (e) => e,
+    };
     mockEditor.children = [{ type: 'paragraph', children: [{ text: 'keep' }] }];
     const { rerender } = render(
       <BaseMarkdownEditorSlate initValue="x" plugins={[p1]} />,
@@ -377,9 +391,7 @@ describe('BaseMarkdownEditorSlate 分支覆盖', () => {
 
   it('readonly 时不注册 onBlur 点击监听', () => {
     const onBlur = vi.fn();
-    render(
-      <BaseMarkdownEditorSlate initValue="r" readonly onBlur={onBlur} />,
-    );
+    render(<BaseMarkdownEditorSlate initValue="r" readonly onBlur={onBlur} />);
     const outside = document.createElement('div');
     document.body.appendChild(outside);
     fireEvent.mouseDown(outside);
@@ -402,7 +414,11 @@ describe('BaseMarkdownEditorSlate 分支覆盖', () => {
   it('toc=false 时 onChange 仍转发但不更新 schema state', () => {
     const onChange = vi.fn();
     render(
-      <BaseMarkdownEditorSlate initValue="# ch" toc={false} onChange={onChange} />,
+      <BaseMarkdownEditorSlate
+        initValue="# ch"
+        toc={false}
+        onChange={onChange}
+      />,
     );
     slateEditorProps.onChange?.('md', []);
     expect(onChange).toHaveBeenCalled();

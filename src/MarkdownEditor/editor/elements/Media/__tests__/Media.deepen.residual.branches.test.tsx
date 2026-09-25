@@ -2,7 +2,13 @@
  * Media deepen：finished 超时文本、video/audio 失败、attachment、ResizeImage resize。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -34,11 +40,7 @@ vi.mock('react-rnd', () => ({
       data-w={size?.width}
       onClick={() => {
         onResizeStart?.();
-        onResize?.(
-          null,
-          'right',
-          { clientWidth: 200 },
-        );
+        onResize?.(null, 'right', { clientWidth: 200 });
         onResizeStop?.();
       }}
     >
@@ -63,7 +65,9 @@ vi.mock('../../../../../Utils/htmlUrlSafety', () => ({
 }));
 
 vi.mock('../../Image', () => ({
-  ReadonlyImage: (p: any) => <img data-testid="ro-img" src={p.src} alt={p.alt} />,
+  ReadonlyImage: (p: any) => (
+    <img data-testid="ro-img" src={p.src} alt={p.alt} />
+  ),
 }));
 
 vi.mock('../../../components/MediaErrorLink', () => ({

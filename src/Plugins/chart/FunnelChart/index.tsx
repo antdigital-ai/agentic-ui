@@ -401,9 +401,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
     const anyNonTopProvided = stages.some((_, i) => {
       if (i === 0) return false;
       const prevStage = stages[i - 1];
-      const dp = filteredData.find((d) =>
-        isXValueEqual(d.x, prevStage),
-      );
+      const dp = filteredData.find((d) => isXValueEqual(d.x, prevStage));
       const v = dp?.ratio;
       // eslint-disable-next-line eqeqeq -- intentional nullish
       if (v == null) return false;
@@ -413,9 +411,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
     return stages.map((_, i) => {
       if (i === 0) return anyNonTopProvided ? '100%' : undefined;
       const prevStage = stages[i - 1];
-      const dp = filteredData.find((d) =>
-        isXValueEqual(d.x, prevStage),
-      );
+      const dp = filteredData.find((d) => isXValueEqual(d.x, prevStage));
       return formatRaw(dp?.ratio);
     });
   }, [filteredData, stages]);
@@ -424,9 +420,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
     return stages.map((_, i) => {
       if (i === 0) return false;
       const prevStage = stages[i - 1];
-      const dp = filteredData.find((d) =>
-        isXValueEqual(d.x, prevStage),
-      );
+      const dp = filteredData.find((d) => isXValueEqual(d.x, prevStage));
       const v = dp?.ratio;
       // eslint-disable-next-line eqeqeq -- intentional nullish
       if (v == null) return false;

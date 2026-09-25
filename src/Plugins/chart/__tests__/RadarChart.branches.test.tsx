@@ -133,7 +133,9 @@ const mockData = [
   { x: '沟通', y: 85, type: 'teamB', category: 'cat2' },
 ];
 
-const renderRadar = (props: Partial<React.ComponentProps<typeof RadarChart>> = {}) =>
+const renderRadar = (
+  props: Partial<React.ComponentProps<typeof RadarChart>> = {},
+) =>
   render(
     <ConfigProvider>
       <RadarChart data={mockData} {...props} />
@@ -258,9 +260,9 @@ describe('RadarChart 分支覆盖', () => {
         ],
       },
     });
-    expect(document.getElementById('custom-radar-tooltip')?.innerHTML).toContain(
-      'bad',
-    );
+    expect(
+      document.getElementById('custom-radar-tooltip')?.innerHTML,
+    ).toContain('bad');
   });
 
   it('tooltip external parsed 访问异常走 catch', () => {
@@ -282,9 +284,9 @@ describe('RadarChart 分支覆盖', () => {
         ],
       },
     });
-    expect(document.getElementById('custom-radar-tooltip')?.innerHTML).toContain(
-      '0',
-    );
+    expect(
+      document.getElementById('custom-radar-tooltip')?.innerHTML,
+    ).toContain('0');
   });
 
   it('color 数组按 index 循环取色', () => {
@@ -589,9 +591,9 @@ describe('RadarChart 分支覆盖', () => {
         ],
       },
     });
-    expect(document.getElementById('custom-radar-tooltip')?.innerHTML).toContain(
-      'rgba(0, 0, 0',
-    );
+    expect(
+      document.getElementById('custom-radar-tooltip')?.innerHTML,
+    ).toContain('rgba(0, 0, 0');
     document.getElementById('custom-radar-tooltip')?.remove();
   });
 
@@ -716,9 +718,7 @@ describe('RadarChart 分支覆盖', () => {
     });
     rerender(
       <ConfigProvider>
-        <RadarChart
-          data={[{ x: 'X', y: 9, type: 't1', category: 'C3' }]}
-        />
+        <RadarChart data={[{ x: 'X', y: 9, type: 't1', category: 'C3' }]} />
       </ConfigProvider>,
     );
     await waitFor(() => {
@@ -784,9 +784,9 @@ describe('RadarChart 分支覆盖', () => {
         dataPoints: [{ parsed: { r: Number.NaN } }],
       },
     });
-    expect(document.getElementById('custom-radar-tooltip')?.innerHTML).toContain(
-      '0',
-    );
+    expect(
+      document.getElementById('custom-radar-tooltip')?.innerHTML,
+    ).toContain('0');
   });
 
   it('download 失败时 console.warn 不抛错', () => {
@@ -826,7 +826,12 @@ describe('RadarChart 分支覆盖', () => {
     const external = capturedOptions?.plugins?.tooltip?.external;
     external({
       chart: mockChartInstance,
-      tooltip: { opacity: 0, caretX: 10, caretY: 20, dataPoints: [{ parsed: { r: 5 } }] },
+      tooltip: {
+        opacity: 0,
+        caretX: 10,
+        caretY: 20,
+        dataPoints: [{ parsed: { r: 5 } }],
+      },
     });
     expect(document.getElementById('custom-radar-tooltip')).toBeNull();
   });
@@ -837,7 +842,10 @@ describe('RadarChart 分支覆盖', () => {
   });
 
   it('height 字符串 auto 时使用默认高度', () => {
-    renderRadar({ data: [{ x: 'A', y: 1, type: 't1', category: 'c1' }], height: 'auto' });
+    renderRadar({
+      data: [{ x: 'A', y: 1, type: 't1', category: 'c1' }],
+      height: 'auto',
+    });
     expect(screen.getByTestId('radar-chart')).toBeInTheDocument();
   });
 

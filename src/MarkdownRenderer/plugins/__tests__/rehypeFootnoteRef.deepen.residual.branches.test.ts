@@ -23,6 +23,8 @@ describe('rehypeFootnoteRef deepen residual branches', () => {
   });
 
   it('无 parent / 无 index 时静默跳过', () => {
-    expect(() => rehypeFootnoteRef()({ type: 'root', children: [] })).not.toThrow();
+    expect(() =>
+      rehypeFootnoteRef()({ type: 'root', children: [] }),
+    ).not.toThrow();
   });
 });

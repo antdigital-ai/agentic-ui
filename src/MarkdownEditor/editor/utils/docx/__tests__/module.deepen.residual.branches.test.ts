@@ -57,7 +57,10 @@ describe('docx/module deepen residual branches', () => {
     op.appendChild(text);
     p.appendChild(op);
     // parent chain: text -> O:P -> P
-    Object.defineProperty(text, 'parentNode', { value: op, configurable: true });
+    Object.defineProperty(text, 'parentNode', {
+      value: op,
+      configurable: true,
+    });
     Object.defineProperty(op, 'parentNode', { value: p, configurable: true });
     expect(deserialize(text, {})).toBe('op-text');
 

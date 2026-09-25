@@ -29,9 +29,7 @@ describe('editorCommands deepen4 residual branches', () => {
 
   it('convertToParagraph：非 head 无操作', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: 'p' }] },
-    ] as any;
+    editor.children = [{ type: 'paragraph', children: [{ text: 'p' }] }] as any;
     Transforms.select(editor, Editor.range(editor, [0]));
     convertToParagraph(editor);
     expect((editor.children[0] as any).type).toBe('paragraph');
@@ -63,7 +61,7 @@ describe('editorCommands deepen4 residual branches', () => {
     expect(editor.children.some((n: any) => n.type === 'head')).toBe(true);
   });
 
-  it('中间选区：text ?? \'\' 与 splitPoint 缺失回退', () => {
+  it("中间选区：text ?? '' 与 splitPoint 缺失回退", () => {
     const editor = createEditor();
     editor.children = [
       {

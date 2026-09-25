@@ -6,9 +6,9 @@ import '@testing-library/jest-dom';
 import { cleanup, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { SchemaForm } from '..';
 import { I18nContext } from '../../../I18n';
 import type { LowCodeSchema } from '../../types';
-import { SchemaForm } from '..';
 
 const baseSchema = (properties: any): LowCodeSchema =>
   ({
@@ -55,7 +55,7 @@ describe('SchemaForm deepen4 residual branches', () => {
     expect(screen.getByTestId('schema-form')).toBeInTheDocument();
   });
 
-  it('array 仅 description：min/max 文案走 description||\'\'', () => {
+  it("array 仅 description：min/max 文案走 description||''", () => {
     render(
       <I18nContext.Provider
         value={
@@ -91,7 +91,9 @@ describe('SchemaForm deepen4 residual branches', () => {
   it('object 仅 description 无 properties；嵌套 object 含 array（baseName）', () => {
     render(
       <I18nContext.Provider
-        value={{ locale: { inputPlaceholder: '请输入' }, language: 'zh-CN' } as any}
+        value={
+          { locale: { inputPlaceholder: '请输入' }, language: 'zh-CN' } as any
+        }
       >
         <SchemaForm
           schema={baseSchema({

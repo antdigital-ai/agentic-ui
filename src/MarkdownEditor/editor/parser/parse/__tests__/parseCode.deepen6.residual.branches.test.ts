@@ -42,10 +42,7 @@ describe('parseCode deepen6 residual branches', () => {
   });
 
   it('仅 config 空对象 vs 有键；yaml value undefined', () => {
-    const emptyCfg = handleCode(
-      { value: 'print(1)\n', lang: 'python' },
-      {},
-    );
+    const emptyCfg = handleCode({ value: 'print(1)\n', lang: 'python' }, {});
     expect(emptyCfg.otherProps?.finished).toBe(false);
 
     const withCfg = handleCode(
@@ -61,6 +58,10 @@ describe('parseCode deepen6 residual branches', () => {
   it('无 otherProps 的 code：debug otherPropsKeys 空数组臂', () => {
     const r = handleCode({ value: 'x', lang: 'unknown-lang-xyz' });
     expect(r.type).toBe('code');
-    expect(r.otherProps === null || r.otherProps === undefined || typeof r.otherProps === 'object').toBe(true);
+    expect(
+      r.otherProps === null ||
+        r.otherProps === undefined ||
+        typeof r.otherProps === 'object',
+    ).toBe(true);
   });
 });

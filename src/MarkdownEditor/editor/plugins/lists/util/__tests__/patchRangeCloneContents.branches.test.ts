@@ -30,9 +30,7 @@ describe('patchRangeCloneContents.branches', () => {
     listRange.selectNodeContents(ul);
     const wrapped = listRange.cloneContents();
     expect(
-      [...wrapped.childNodes].some(
-        (n) => (n as HTMLElement).nodeName === 'UL',
-      ),
+      [...wrapped.childNodes].some((n) => (n as HTMLElement).nodeName === 'UL'),
     ).toBe(true);
     ul.remove();
   });

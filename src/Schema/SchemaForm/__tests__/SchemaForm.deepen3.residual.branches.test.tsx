@@ -6,9 +6,9 @@ import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { SchemaForm } from '..';
 import { I18nContext } from '../../../I18n';
 import type { LowCodeSchema } from '../../types';
-import { SchemaForm } from '..';
 
 const baseSchema = (properties: any): LowCodeSchema =>
   ({
@@ -88,7 +88,9 @@ describe('SchemaForm deepen3 residual branches', () => {
   it('object 无 title/description/properties；嵌套 object 含 array', () => {
     render(
       <I18nContext.Provider
-        value={{ locale: { inputPlaceholder: '请输入' }, language: 'zh-CN' } as any}
+        value={
+          { locale: { inputPlaceholder: '请输入' }, language: 'zh-CN' } as any
+        }
       >
         <SchemaForm
           schema={baseSchema({

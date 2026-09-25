@@ -186,7 +186,10 @@ function getDefaultStore() {
     setOpenInsertCompletion,
     keyTask$: { next: keyTaskNext },
     insertCompletionText$,
-    selChange$: { next: vi.fn(), subscribe: vi.fn(() => ({ unsubscribe: vi.fn() })) },
+    selChange$: {
+      next: vi.fn(),
+      subscribe: vi.fn(() => ({ unsubscribe: vi.fn() })),
+    },
   };
 }
 
@@ -196,9 +199,7 @@ function renderPanel(extra: Record<string, any> = {}) {
     captured = opts;
     return opts;
   });
-  render(
-    <InsertAutocomplete optionsRender={optionsRender} {...extra} />,
-  );
+  render(<InsertAutocomplete optionsRender={optionsRender} {...extra} />);
   act(() => insertCompletionText$.next(''));
   return () => captured;
 }
@@ -278,7 +279,10 @@ describe('InsertAutocomplete deepen3 safe residual branches', () => {
     await act(async () => {});
     const tabEmbed = Array.from(
       document.body.querySelectorAll('.ant-tabs-tab'),
-    ).find((t) => t.textContent?.includes('链接嵌入') || t.textContent?.includes('Embed'));
+    ).find(
+      (t) =>
+        t.textContent?.includes('链接嵌入') || t.textContent?.includes('Embed'),
+    );
     if (tabEmbed) {
       fireEvent.click(tabEmbed);
       await act(async () => {});

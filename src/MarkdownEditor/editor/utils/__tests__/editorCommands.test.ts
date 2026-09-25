@@ -1,8 +1,8 @@
 import { Editor, Element, Node, Path, Range, Transforms } from 'slate';
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import {
-  ListsEditor,
   listMatchesToolbarMode,
+  ListsEditor,
   syncListMetadataForMode,
 } from '../../plugins/lists';
 import {

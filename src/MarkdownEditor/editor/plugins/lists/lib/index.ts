@@ -1,4 +1,3 @@
-export { isDeleteBackwardAllowed } from './isDeleteBackwardAllowed';
 export { getCursorPosition } from './getCursorPosition';
 export { getCursorPositionInNode } from './getCursorPositionInNode';
 export { getListItems } from './getListItems';
@@ -9,9 +8,10 @@ export { getNextSibling } from './getNextSibling';
 export { getParentList } from './getParentList';
 export { getParentListItem } from './getParentListItem';
 export { getPrevSibling } from './getPrevSibling';
-export { isAtStartOfListItem } from './isAtStartOfListItem';
 export { isAtEmptyListItem } from './isAtEmptyListItem';
+export { isAtStartOfListItem } from './isAtStartOfListItem';
 export { isContainingTextNodes } from './isContainingTextNodes';
+export { isDeleteBackwardAllowed } from './isDeleteBackwardAllowed';
 export { isElementOrEditor } from './isElementOrEditor';
 export { isInList } from './isInList';
 export { isListItemContainingText } from './isListItemContainingText';

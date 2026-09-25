@@ -3,7 +3,13 @@
  * id 空串、props||{}、CommentList 双路径。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { MarkdownEditorPlugin } from '../plugin';
@@ -183,8 +189,8 @@ vi.mock('../../Constants/contentPaddingVars', () => ({
 }));
 
 import BaseMarkdownEditorSlate from '../BaseMarkdownEditorSlate';
-import { EditorUtils } from '../editor/utils/editorUtils';
 import { parserSlateNodeToMarkdown } from '../editor/parser/parserSlateNodeToMarkdown';
+import { EditorUtils } from '../editor/utils/editorUtils';
 
 describe('BaseMarkdownEditorSlate deepen4 residual branches', () => {
   beforeEach(() => {
@@ -192,9 +198,7 @@ describe('BaseMarkdownEditorSlate deepen4 residual branches', () => {
     mocks.copyReturnsNull = false;
     vi.clearAllMocks();
     vi.useFakeTimers({ shouldAdvanceTime: true });
-    mockEditorChildren = [
-      { type: 'paragraph', children: [{ text: 'hello' }] },
-    ];
+    mockEditorChildren = [{ type: 'paragraph', children: [{ text: 'hello' }] }];
   });
 
   afterEach(() => {
@@ -220,9 +224,7 @@ describe('BaseMarkdownEditorSlate deepen4 residual branches', () => {
 
   it('filtered：copy null → schema?.filter || []', async () => {
     mocks.copyReturnsNull = true;
-    render(
-      <BaseMarkdownEditorSlate initValue="" readonly toc={false} />,
-    );
+    render(<BaseMarkdownEditorSlate initValue="" readonly toc={false} />);
     await act(async () => {
       vi.advanceTimersByTime(30);
     });

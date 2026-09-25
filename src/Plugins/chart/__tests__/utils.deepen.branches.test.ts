@@ -151,8 +151,13 @@ describe('chart/utils deepen branches', () => {
   });
 
   it('hexToRgba 经 CSS 变量解析', () => {
-    document.documentElement.style.setProperty('--deepen-rgb', 'rgb(10, 20, 30)');
-    expect(hexToRgba('var(--deepen-rgb)', 0.25)).toMatch(/rgba\(10,\s*20,\s*30/);
+    document.documentElement.style.setProperty(
+      '--deepen-rgb',
+      'rgb(10, 20, 30)',
+    );
+    expect(hexToRgba('var(--deepen-rgb)', 0.25)).toMatch(
+      /rgba\(10,\s*20,\s*30/,
+    );
     document.documentElement.style.removeProperty('--deepen-rgb');
   });
 

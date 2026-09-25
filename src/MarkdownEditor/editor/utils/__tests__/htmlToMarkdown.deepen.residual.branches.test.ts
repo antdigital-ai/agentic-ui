@@ -2,11 +2,7 @@
  * htmlToMarkdown deepen：注释保留、link/image handler、pre 无 code、空 text。
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  extractTextFromHtml,
-  htmlToMarkdown,
-  isHtml,
-} from '../htmlToMarkdown';
+import { extractTextFromHtml, htmlToMarkdown, isHtml } from '../htmlToMarkdown';
 
 describe('htmlToMarkdown deepen residual branches', () => {
   beforeEach(() => {

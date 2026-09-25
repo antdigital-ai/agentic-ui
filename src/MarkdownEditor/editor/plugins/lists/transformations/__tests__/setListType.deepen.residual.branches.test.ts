@@ -20,9 +20,9 @@ describe('setListType deepen residual branches', () => {
   it('at=null 返回 false', () => {
     const editor = createEditor();
     editor.selection = null;
-    expect(setListType(editor, agenticListsSchema, ListType.ORDERED, null)).toBe(
-      false,
-    );
+    expect(
+      setListType(editor, agenticListsSchema, ListType.ORDERED, null),
+    ).toBe(false);
   });
 
   it('选区无 list 返回 false', () => {

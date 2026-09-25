@@ -131,7 +131,12 @@ const branchSchema: LowCodeSchema = {
         items: {
           type: 'object',
           properties: {
-            name: { type: 'string', title: '名称', required: true, default: '' },
+            name: {
+              type: 'string',
+              title: '名称',
+              required: true,
+              default: '',
+            },
           },
         },
       },
@@ -298,9 +303,7 @@ describe('SchemaForm 分支覆盖', () => {
         },
       },
     };
-    render(
-      <SchemaForm schema={schema} />,
-    );
+    render(<SchemaForm schema={schema} />);
     expect(screen.getByLabelText('手机')).toBeInTheDocument();
   });
 
@@ -357,7 +360,9 @@ describe('SchemaForm 分支覆盖', () => {
         <SchemaForm schema={schema} />
       </Wrapper>,
     );
-    expect(screen.getByRole('spinbutton', { name: '数量' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('spinbutton', { name: '数量' }),
+    ).toBeInTheDocument();
   });
 
   it('array 无 minItems/maxItems 时不附加长度规则', async () => {
@@ -508,7 +513,9 @@ describe('SchemaForm 分支覆盖', () => {
         <SchemaForm schema={schema} />
       </Wrapper>,
     );
-    expect(screen.getByRole('spinbutton', { name: '上限' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('spinbutton', { name: '上限' }),
+    ).toBeInTheDocument();
   });
 
   it('array 仅 maxItems 规则分支', async () => {
@@ -594,7 +601,9 @@ describe('SchemaForm 分支覆盖', () => {
         <SchemaForm schema={schema} />
       </Wrapper>,
     );
-    expect(screen.getByRole('spinbutton', { name: '下限' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('spinbutton', { name: '下限' }),
+    ).toBeInTheDocument();
   });
 
   it('array items 为 object 时渲染嵌套字段', () => {
@@ -673,7 +682,9 @@ describe('SchemaForm 分支覆盖', () => {
         <SchemaForm schema={schema} />
       </Wrapper>,
     );
-    expect(screen.getByRole('spinbutton', { name: '默认值' })).toHaveValue('42');
+    expect(screen.getByRole('spinbutton', { name: '默认值' })).toHaveValue(
+      '42',
+    );
   });
 
   it('array 无 items 定义时仍渲染添加按钮', () => {
@@ -715,7 +726,9 @@ describe('SchemaForm 分支覆盖', () => {
         <SchemaForm schema={schema} />
       </Wrapper>,
     );
-    expect(screen.getByRole('spinbutton', { name: '范围' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('spinbutton', { name: '范围' }),
+    ).toBeInTheDocument();
   });
 
   it('string enum 缺失 default 时使用首项', () => {
@@ -837,7 +850,11 @@ describe('SchemaForm 分支覆盖', () => {
   it('readonly 时 Select 与 InputNumber 禁用', () => {
     const { container } = render(
       <Wrapper>
-        <SchemaForm schema={branchSchema} readonly initialValues={{ enumField: 'a', price: 9 }} />
+        <SchemaForm
+          schema={branchSchema}
+          readonly
+          initialValues={{ enumField: 'a', price: 9 }}
+        />
       </Wrapper>,
     );
     expect(container.querySelector('.ant-select-disabled')).toBeTruthy();
@@ -877,7 +894,10 @@ describe('SchemaForm 分支覆盖', () => {
     const user = userEvent.setup();
     render(
       <Wrapper>
-        <SchemaForm schema={branchSchema} initialValues={{ fallbackTitle: 'x' }} />
+        <SchemaForm
+          schema={branchSchema}
+          initialValues={{ fallbackTitle: 'x' }}
+        />
       </Wrapper>,
     );
     await user.type(screen.getByLabelText('desc-only key'), '!');
@@ -1008,7 +1028,9 @@ describe('SchemaForm 分支覆盖', () => {
       </I18nContext.Provider>,
     );
     expect(screen.getByLabelText('仅描述')).toBeInTheDocument();
-    expect(screen.getByRole('spinbutton', { name: '数字描述' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('spinbutton', { name: '数字描述' }),
+    ).toBeInTheDocument();
   });
 
   it('array 项为 number 类型时渲染 InputNumber', async () => {
@@ -1130,7 +1152,9 @@ describe('SchemaForm 分支覆盖', () => {
         <SchemaForm schema={schema} />
       </Wrapper>,
     );
-    expect(screen.getByRole('spinbutton', { name: '金额字段' })).toHaveValue('20');
+    expect(screen.getByRole('spinbutton', { name: '金额字段' })).toHaveValue(
+      '20',
+    );
   });
 
   it('string pattern 无 patternMessage 且无 locale 时仍渲染', () => {
@@ -1154,7 +1178,10 @@ describe('SchemaForm 分支覆盖', () => {
   it('array 同时有 minItems 与 maxItems 规则字段渲染', () => {
     render(
       <Wrapper>
-        <SchemaForm schema={branchSchema} initialValues={{ limitedArray: ['a'] }} />
+        <SchemaForm
+          schema={branchSchema}
+          initialValues={{ limitedArray: ['a'] }}
+        />
       </Wrapper>,
     );
     expect(screen.getByText('限制数组')).toBeInTheDocument();
@@ -1185,10 +1212,7 @@ describe('SchemaForm 分支覆盖', () => {
     };
     render(
       <Wrapper>
-        <SchemaForm
-          schema={schema}
-          initialValues={{ group: { count: 2 } }}
-        />
+        <SchemaForm schema={schema} initialValues={{ group: { count: 2 } }} />
       </Wrapper>,
     );
     await waitFor(() => {
@@ -1415,7 +1439,10 @@ describe('SchemaForm 分支覆盖', () => {
     };
     render(
       <Wrapper>
-        <SchemaForm schema={schema} initialValues={{ meta: { note: 'override' } }} />
+        <SchemaForm
+          schema={schema}
+          initialValues={{ meta: { note: 'override' } }}
+        />
       </Wrapper>,
     );
     expect(screen.getByDisplayValue('override')).toBeInTheDocument();

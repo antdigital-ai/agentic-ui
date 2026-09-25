@@ -3,8 +3,8 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { PlaceholderContent } from '../components/PlaceholderContent';
 import type { FileNode } from '../../../types';
+import { PlaceholderContent } from '../components/PlaceholderContent';
 
 const file: FileNode = { id: 'f1', name: 'readme.txt', size: 2048 };
 

@@ -23,9 +23,9 @@ describe('list transforms midtail branches', () => {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [0, 0], offset: 1 },
     };
-    expect(
-      setListType(editor, agenticListsSchema, ListType.ORDERED),
-    ).toBe(false);
+    expect(setListType(editor, agenticListsSchema, ListType.ORDERED)).toBe(
+      false,
+    );
 
     editor.children = [
       {
@@ -117,9 +117,7 @@ describe('list transforms midtail branches', () => {
         children: [
           {
             type: 'list-item',
-            children: [
-              { type: 'paragraph', children: [{ text: 'only' }] },
-            ],
+            children: [{ type: 'paragraph', children: [{ text: 'only' }] }],
           },
         ],
       },
@@ -161,9 +159,9 @@ describe('list transforms midtail branches', () => {
         ],
       },
     ] as Editor['children'];
-    expect(decreaseListItemDepth(editor, agenticListsSchema, [0, 0, 1, 0])).toBe(
-      true,
-    );
+    expect(
+      decreaseListItemDepth(editor, agenticListsSchema, [0, 0, 1, 0]),
+    ).toBe(true);
   });
 
   it('setListType：目标 type 与当前相同时仍返回 boolean', () => {
@@ -183,8 +181,8 @@ describe('list transforms midtail branches', () => {
       anchor: { path: [0, 0, 0, 0], offset: 0 },
       focus: { path: [0, 0, 0, 0], offset: 0 },
     };
-    expect(typeof setListType(editor, agenticListsSchema, ListType.UNORDERED)).toBe(
-      'boolean',
-    );
+    expect(
+      typeof setListType(editor, agenticListsSchema, ListType.UNORDERED),
+    ).toBe('boolean');
   });
 });

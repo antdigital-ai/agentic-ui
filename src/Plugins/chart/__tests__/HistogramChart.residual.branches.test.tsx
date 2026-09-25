@@ -81,9 +81,7 @@ describe('HistogramChart residual prop/config branches', () => {
   ];
 
   it('statisticConfig 空数组 / 单对象 / 数组', () => {
-    const { unmount } = render(
-      <HistogramChart data={sample} statistic={[]} />,
-    );
+    const { unmount } = render(<HistogramChart data={sample} statistic={[]} />);
     expect(screen.queryByTestId('chart-statistic')).toBeNull();
     unmount();
 
@@ -97,9 +95,7 @@ describe('HistogramChart residual prop/config branches', () => {
   });
 
   it('非数组 data 安全为空；filter 切换；颜色假值', () => {
-    const { unmount } = render(
-      <HistogramChart data={null as any} title="H" />,
-    );
+    const { unmount } = render(<HistogramChart data={null as any} title="H" />);
     expect(screen.getByTestId('chart-toolbar')).toBeInTheDocument();
     unmount();
 

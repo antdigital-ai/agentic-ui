@@ -17,9 +17,7 @@ describe('withSanitizeInvalidChildren deepen residual branches', () => {
 
   it('非 normalizing 时 normalize 不跑 repair', () => {
     const editor = withSanitizeInvalidChildren(createEditor());
-    editor.children = [
-      { type: 'paragraph', children: [{ text: 'a' }] },
-    ] as any;
+    editor.children = [{ type: 'paragraph', children: [{ text: 'a' }] }] as any;
     expect(() => editor.normalize()).not.toThrow();
   });
 

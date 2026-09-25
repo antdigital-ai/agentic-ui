@@ -1307,13 +1307,7 @@ describe('BarChart 额外用例', () => {
           ytitle: '数值',
         },
       ];
-      render(
-        <BarChart
-          data={data}
-          xPosition="top"
-          yPosition="right"
-        />,
-      );
+      render(<BarChart data={data} xPosition="top" yPosition="right" />);
       const options = (globalThis as any).__barChartLastOptions as any;
       expect(options?.scales?.x?.position).toBe('top');
       expect(options?.scales?.y?.position).toBe('right');
@@ -1441,11 +1435,7 @@ describe('BarChart 额外用例', () => {
     it('legendPosition/legendAlign 配置生效', () => {
       const data = [{ category: 'A', type: 't1', x: 'X1', y: 10 }];
       render(
-        <BarChart
-          data={data}
-          legendPosition="top"
-          legendAlign="center"
-        />,
+        <BarChart data={data} legendPosition="top" legendAlign="center" />,
       );
       const options = (globalThis as any).__barChartLastOptions as any;
       expect(options?.plugins?.legend?.position).toBe('top');
@@ -1770,9 +1760,7 @@ describe('BarChart 额外用例', () => {
         { category: 'B', type: 't1', x: 'X2', y: 20 },
       ];
       const { rerender } = render(<BarChart data={data} />);
-      rerender(
-        <BarChart data={[{ type: 't1', x: 'X3', y: 30 }]} />,
-      );
+      rerender(<BarChart data={[{ type: 't1', x: 'X3', y: 30 }]} />);
       await waitFor(() => {
         const labels = JSON.parse(
           screen.getByTestId('bar-chart').getAttribute('data-labels') || '[]',
@@ -1789,7 +1777,9 @@ describe('BarChart 额外用例', () => {
       const { rerender } = render(<BarChart data={data} />);
       rerender(
         <BarChart
-          data={[{ category: 'A', type: 't1', x: 'X1', y: 10, filterLabel: 'F1' }]}
+          data={[
+            { category: 'A', type: 't1', x: 'X1', y: 10, filterLabel: 'F1' },
+          ]}
         />,
       );
       await waitFor(() => {

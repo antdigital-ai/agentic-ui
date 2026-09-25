@@ -5,7 +5,14 @@
  * 未在主测试中稳定覆盖的分支。
  */
 import '@testing-library/jest-dom';
-import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import message from 'antd/es/message';
 import React from 'react';
@@ -221,7 +228,19 @@ describe('ChartRender 分支覆盖', () => {
   it('renderDescriptionsFallback：单行多列时渲染 descriptions', async () => {
     renderChart({
       chartType: 'bar',
-      chartData: [{ name: 'Only', value: 1, c1: 1, c2: 2, c3: 3, c4: 4, c5: 5, c6: 6, c7: 7 }],
+      chartData: [
+        {
+          name: 'Only',
+          value: 1,
+          c1: 1,
+          c2: 2,
+          c3: 3,
+          c4: 4,
+          c5: 5,
+          c6: 6,
+          c7: 7,
+        },
+      ],
       config: wideConfig,
       title: 'Fallback',
     });
@@ -352,9 +371,7 @@ describe('ChartRender 分支覆盖', () => {
     await screen.findByTestId('scatter-chart');
     await waitFor(() => {
       expect(runtimeCalls.scatter.at(-1)).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ x: 0, y: 0 }),
-        ]),
+        expect.arrayContaining([expect.objectContaining({ x: 0, y: 0 })]),
       );
     });
   });
@@ -369,7 +386,9 @@ describe('ChartRender 分支覆盖', () => {
     });
 
     await waitFor(() => {
-      expect(document.querySelector('.ant-agentic-plugin-chart__table')).toBeInTheDocument();
+      expect(
+        document.querySelector('.ant-agentic-plugin-chart__table'),
+      ).toBeInTheDocument();
     });
 
     const copyIcon = document.querySelector('.anticon-copy');
@@ -390,7 +409,9 @@ describe('ChartRender 分支覆盖', () => {
     });
 
     await waitFor(() => {
-      expect(document.querySelector('.ant-agentic-plugin-chart__table')).toBeInTheDocument();
+      expect(
+        document.querySelector('.ant-agentic-plugin-chart__table'),
+      ).toBeInTheDocument();
     });
 
     const copyIcon = document.querySelector('.anticon-copy');
@@ -410,7 +431,9 @@ describe('ChartRender 分支覆盖', () => {
     });
 
     await waitFor(() => {
-      expect(document.querySelector('.ant-agentic-plugin-chart__table')).toBeInTheDocument();
+      expect(
+        document.querySelector('.ant-agentic-plugin-chart__table'),
+      ).toBeInTheDocument();
     });
     expect(screen.getByText('My Table')).toBeInTheDocument();
   });
@@ -502,10 +525,26 @@ describe('ChartRender 分支覆盖', () => {
 
   it('bar / line / column / area runtime 分支', async () => {
     const cases = [
-      { chartType: 'bar' as const, testId: 'bar-chart', bucket: runtimeCalls.bar },
-      { chartType: 'line' as const, testId: 'line-chart', bucket: runtimeCalls.line },
-      { chartType: 'column' as const, testId: 'bar-chart', bucket: runtimeCalls.bar },
-      { chartType: 'area' as const, testId: 'area-chart', bucket: runtimeCalls.area },
+      {
+        chartType: 'bar' as const,
+        testId: 'bar-chart',
+        bucket: runtimeCalls.bar,
+      },
+      {
+        chartType: 'line' as const,
+        testId: 'line-chart',
+        bucket: runtimeCalls.line,
+      },
+      {
+        chartType: 'column' as const,
+        testId: 'bar-chart',
+        bucket: runtimeCalls.bar,
+      },
+      {
+        chartType: 'area' as const,
+        testId: 'area-chart',
+        bucket: runtimeCalls.area,
+      },
     ];
 
     for (const { chartType, testId, bucket } of cases) {
@@ -611,7 +650,9 @@ describe('ChartRender 分支覆盖', () => {
     });
 
     await waitFor(() => {
-      expect(document.querySelector('.ant-agentic-plugin-chart__table')).toBeInTheDocument();
+      expect(
+        document.querySelector('.ant-agentic-plugin-chart__table'),
+      ).toBeInTheDocument();
     });
     expect(screen.getByText(/2.*列/)).toBeInTheDocument();
   });
@@ -685,10 +726,7 @@ describe('ChartRender 分支覆盖', () => {
   it('boxplot 缺省 label 与非有限值过滤', async () => {
     renderChart({
       chartType: 'boxplot',
-      chartData: [
-        { value: 5 },
-        { name: 'G2', value: 'x', series: 'S1' },
-      ],
+      chartData: [{ value: 5 }, { name: 'G2', value: 'x', series: 'S1' }],
       colorLegend: 'series',
       config: { ...runtimeConfig, x: 'name', y: 'value' },
       title: 'BoxDefault',
@@ -864,7 +902,9 @@ describe('ChartRender 分支覆盖', () => {
     });
 
     await waitFor(() => {
-      expect(document.querySelector('.ant-agentic-plugin-chart__table')).toBeInTheDocument();
+      expect(
+        document.querySelector('.ant-agentic-plugin-chart__table'),
+      ).toBeInTheDocument();
     });
   });
 
@@ -913,9 +953,7 @@ describe('ChartRender 分支覆盖', () => {
   it('boxplot 含 category 分组字段', async () => {
     renderChart({
       chartType: 'boxplot',
-      chartData: [
-        { name: 'G1', value: 10, series: 'S1', category: 'C1' },
-      ],
+      chartData: [{ name: 'G1', value: 10, series: 'S1', category: 'C1' }],
       groupBy: 'category',
       colorLegend: 'series',
       config: runtimeConfig,
@@ -1026,7 +1064,9 @@ describe('ChartRender 分支覆盖', () => {
     });
 
     await waitFor(() => {
-      expect(document.querySelector('.ant-agentic-plugin-chart__table')).toBeInTheDocument();
+      expect(
+        document.querySelector('.ant-agentic-plugin-chart__table'),
+      ).toBeInTheDocument();
     });
 
     const setting = document.querySelector('.anticon-setting');
@@ -1054,7 +1094,9 @@ describe('ChartRender 分支覆盖', () => {
     });
 
     await waitFor(() => {
-      expect(document.querySelector('.ant-agentic-plugin-chart__table')).toBeInTheDocument();
+      expect(
+        document.querySelector('.ant-agentic-plugin-chart__table'),
+      ).toBeInTheDocument();
     });
 
     const triggers = screen.getAllByText((_, el) =>
@@ -1159,9 +1201,7 @@ describe('ChartRender 分支覆盖', () => {
     await screen.findByTestId('area-chart');
     await waitFor(() => {
       expect(runtimeCalls.area.at(-1)).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ sortBy: 2 }),
-        ]),
+        expect.arrayContaining([expect.objectContaining({ sortBy: 2 })]),
       );
     });
   });
@@ -1374,7 +1414,9 @@ describe('ChartRender 分支覆盖', () => {
       config: runtimeConfig,
     });
     await waitFor(() => {
-      expect(document.querySelector('.ant-agentic-plugin-chart__table')).toBeInTheDocument();
+      expect(
+        document.querySelector('.ant-agentic-plugin-chart__table'),
+      ).toBeInTheDocument();
     });
     expect(screen.queryByText('My Table')).not.toBeInTheDocument();
   });
@@ -1415,8 +1457,28 @@ describe('ChartRender 分支覆盖', () => {
     renderChart({
       chartType: 'bar',
       chartData: [
-        { name: 'A', value: 1, c1: 1, c2: 2, c3: 3, c4: 4, c5: 5, c6: 6, c7: 7 },
-        { name: 'B', value: 2, c1: 1, c2: 2, c3: 3, c4: 4, c5: 5, c6: 6, c7: 7 },
+        {
+          name: 'A',
+          value: 1,
+          c1: 1,
+          c2: 2,
+          c3: 3,
+          c4: 4,
+          c5: 5,
+          c6: 6,
+          c7: 7,
+        },
+        {
+          name: 'B',
+          value: 2,
+          c1: 1,
+          c2: 2,
+          c3: 3,
+          c4: 4,
+          c5: 5,
+          c6: 6,
+          c7: 7,
+        },
       ],
       config: wideConfig,
       title: 'NoFallback',
@@ -1520,7 +1582,9 @@ describe('ChartRender 分支覆盖', () => {
       title: 'CopyFail',
     });
     await waitFor(() => {
-      expect(document.querySelector('.ant-agentic-plugin-chart__table')).toBeInTheDocument();
+      expect(
+        document.querySelector('.ant-agentic-plugin-chart__table'),
+      ).toBeInTheDocument();
     });
     const copyIcon = document.querySelector('.anticon-copy');
     if (copyIcon) fireEvent.click(copyIcon);
@@ -1661,9 +1725,7 @@ describe('ChartRender 分支覆盖', () => {
   it('boxplot filterBy 映射 filterLabel', async () => {
     renderChart({
       chartType: 'boxplot',
-      chartData: [
-        { name: 'G1', value: 10, series: 'S1', filter: 'F1' },
-      ],
+      chartData: [{ name: 'G1', value: 10, series: 'S1', filter: 'F1' }],
       filterBy: 'filter',
       colorLegend: 'series',
       config: runtimeConfig,
@@ -1753,7 +1815,9 @@ describe('ChartRender 分支覆盖', () => {
       title: 'SwitchType',
     });
     await waitFor(() => {
-      expect(document.querySelector('.ant-agentic-plugin-chart__table')).toBeInTheDocument();
+      expect(
+        document.querySelector('.ant-agentic-plugin-chart__table'),
+      ).toBeInTheDocument();
     });
     await openChartTypeDropdown('表格');
     await clickDropdownMenuItem('柱状图');
@@ -1768,7 +1832,9 @@ describe('ChartRender 分支覆盖', () => {
       title: 'ConfigSubmit',
     });
     await waitFor(() => {
-      expect(document.querySelector('.ant-agentic-plugin-chart__table')).toBeInTheDocument();
+      expect(
+        document.querySelector('.ant-agentic-plugin-chart__table'),
+      ).toBeInTheDocument();
     });
     const configTrigger = screen.getByRole('button', { name: '配置图表' });
     await act(async () => {
@@ -1783,7 +1849,9 @@ describe('ChartRender 分支覆盖', () => {
     await act(async () => {
       fireEvent.click(submitBtn!);
     });
-    expect(document.querySelector('.ant-agentic-plugin-chart__table')).toBeInTheDocument();
+    expect(
+      document.querySelector('.ant-agentic-plugin-chart__table'),
+    ).toBeInTheDocument();
   });
 
   it('descriptions 工具栏复制与配置图标均可交互', async () => {
@@ -1832,7 +1900,9 @@ describe('ChartRender 分支覆盖', () => {
     await openChartTypeDropdown('卡片列表');
     await clickDropdownMenuItem('表格');
     await waitFor(() => {
-      expect(document.querySelector('.ant-agentic-plugin-chart__table')).toBeInTheDocument();
+      expect(
+        document.querySelector('.ant-agentic-plugin-chart__table'),
+      ).toBeInTheDocument();
     });
   });
 
@@ -2094,9 +2164,7 @@ describe('ChartRender 分支覆盖', () => {
     it('histogram 带 type/category/filterLabel 走 cond 真分支', async () => {
       renderChart({
         chartType: 'histogram',
-        chartData: [
-          { name: 'A', value: 5, series: 'S1', cat: 'C1', fl: 'F1' },
-        ],
+        chartData: [{ name: 'A', value: 5, series: 'S1', cat: 'C1', fl: 'F1' }],
         colorLegend: 'series',
         groupBy: 'cat',
         filterBy: 'fl',
@@ -2255,10 +2323,7 @@ describe('ChartRender 分支覆盖', () => {
         chartType: 'bar',
         chartData: [{ name: 'A', value: 9 }],
         config: {
-          columns: [
-            { dataIndex: 'name' },
-            { dataIndex: 'value' },
-          ],
+          columns: [{ dataIndex: 'name' }, { dataIndex: 'value' }],
           x: 'name',
           y: 'value',
           height: 0,
@@ -2333,10 +2398,7 @@ describe('ChartRender 分支覆盖', () => {
         chartType: 'area',
         chartData: [{ name: 'A', value: 2 }],
         config: {
-          columns: [
-            { dataIndex: 'name' },
-            { dataIndex: 'value' },
-          ],
+          columns: [{ dataIndex: 'name' }, { dataIndex: 'value' }],
           x: 'name',
           y: 'value',
           height: 0,
@@ -2369,10 +2431,7 @@ describe('ChartRender 分支覆盖', () => {
         chartType: 'line',
         chartData: [{ name: 'B', value: 4 }],
         config: {
-          columns: [
-            { dataIndex: 'name' },
-            { dataIndex: 'value' },
-          ],
+          columns: [{ dataIndex: 'name' }, { dataIndex: 'value' }],
           rest: {},
           x: 'name',
           y: 'value',

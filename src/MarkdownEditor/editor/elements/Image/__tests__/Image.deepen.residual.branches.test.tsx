@@ -3,15 +3,17 @@
  * 事件 guard、Popover 选中、innerWidth 回退。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import React from 'react';
 import { Transforms } from 'slate';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  EditorImage,
-  ReadonlyImage,
-  ResizeImage,
-} from '../index';
+import { EditorImage, ReadonlyImage, ResizeImage } from '../index';
 
 const storeState: any = {
   markdownEditorRef: { current: {} },
@@ -27,7 +29,9 @@ vi.mock('antd', () => {
     Popover: ({ children, content, open }: any) => (
       <div data-testid="popover" data-open={String(open)}>
         {children}
-        {open !== false ? <div data-testid="popover-content">{content}</div> : null}
+        {open !== false ? (
+          <div data-testid="popover-content">{content}</div>
+        ) : null}
       </div>
     ),
     Space: ({ children }: any) => <div>{children}</div>,
@@ -44,13 +48,21 @@ vi.mock('@ant-design/icons', () => ({
 vi.mock('react-rnd', () => ({
   Rnd: ({ children, onResizeStart, onResizeStop, onResize }: any) => (
     <div data-testid="rnd">
-      <button type="button" data-testid="rnd-resize" onClick={() => onResize?.({}, 'right', { clientWidth: 300 })}>
+      <button
+        type="button"
+        data-testid="rnd-resize"
+        onClick={() => onResize?.({}, 'right', { clientWidth: 300 })}
+      >
         resize
       </button>
       <button type="button" data-testid="rnd-start" onClick={onResizeStart}>
         start
       </button>
-      <button type="button" data-testid="rnd-stop" onClick={() => onResizeStop?.({ width: 300, height: 150 })}>
+      <button
+        type="button"
+        data-testid="rnd-stop"
+        onClick={() => onResizeStop?.({ width: 300, height: 150 })}
+      >
         stop
       </button>
       {children}
@@ -116,7 +128,11 @@ vi.mock('../../../utils', async () => {
 
 vi.mock('../../../components/MediaErrorLink', () => ({
   MediaErrorLink: ({ displayText, url, fallbackUrl }: any) => (
-    <span data-testid="media-error-link" data-url={url} data-fallback={fallbackUrl}>
+    <span
+      data-testid="media-error-link"
+      data-url={url}
+      data-fallback={fallbackUrl}
+    >
       {displayText}
     </span>
   ),
@@ -207,7 +223,9 @@ describe('Image/index deepen residual branches', () => {
   it('EditorImage：load 失败 fallbackUrl 链；contextMenu/mouseDown/dragStart', () => {
     const createdImgs: HTMLImageElement[] = [];
     const originalCreate = Document.prototype.createElement.bind(document);
-    vi.spyOn(document, 'createElement').mockImplementation(((tagName: string) => {
+    vi.spyOn(document, 'createElement').mockImplementation(((
+      tagName: string,
+    ) => {
       const el = originalCreate(tagName) as any;
       if (tagName === 'img') createdImgs.push(el);
       return el;
@@ -263,8 +281,14 @@ describe('Image/index deepen residual branches', () => {
     );
 
     const img = screen.getByAltText('load') as HTMLImageElement;
-    Object.defineProperty(img, 'naturalWidth', { configurable: true, value: 600 });
-    Object.defineProperty(img, 'naturalHeight', { configurable: true, value: 300 });
+    Object.defineProperty(img, 'naturalWidth', {
+      configurable: true,
+      value: 600,
+    });
+    Object.defineProperty(img, 'naturalHeight', {
+      configurable: true,
+      value: 300,
+    });
     fireEvent.load(img);
     fireEvent.click(screen.getByTestId('rnd-resize'));
     expect(img.style.width).toContain('300');
@@ -294,7 +318,10 @@ describe('Image/index deepen residual branches', () => {
     act(() => {
       vi.advanceTimersByTime(16);
     });
-    expect(screen.getByTestId('popover')).toHaveAttribute('data-open', 'undefined');
+    expect(screen.getByTestId('popover')).toHaveAttribute(
+      'data-open',
+      'undefined',
+    );
     expect(screen.getByTestId('action-块级图片')).toBeInTheDocument();
   });
 });

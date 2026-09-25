@@ -71,7 +71,9 @@ describe('MarkdownRenderer 额外分支', () => {
       />,
     );
     await waitFor(() => {
-      expect(screen.getByTestId('markdown-renderer').textContent).toContain('x');
+      expect(screen.getByTestId('markdown-renderer').textContent).toContain(
+        'x',
+      );
     });
   });
 

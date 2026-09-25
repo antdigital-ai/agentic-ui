@@ -3,10 +3,7 @@
  * className 非 language、file value ??、非 object file。
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  markdownToHtml,
-  markdownToHtmlSync,
-} from '../markdownToHtml';
+import { markdownToHtml, markdownToHtmlSync } from '../markdownToHtml';
 
 describe('markdownToHtml deepen2 residual branches', () => {
   beforeEach(() => {

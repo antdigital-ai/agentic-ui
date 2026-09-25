@@ -1,5 +1,4 @@
-import type { Editor } from 'slate';
-import type { Location, Span } from 'slate';
+import type { Editor, Location, Span } from 'slate';
 
 import type { ListsSchema } from '../types';
 
@@ -11,23 +10,23 @@ import { isListItemContainingText } from './isListItemContainingText';
  * Returns true when editor has collapsed selection and the cursor is in an empty "list-item".
  */
 export function isAtEmptyListItem(
-    editor: Editor,
-    schema: ListsSchema,
-    at: Location | Span | null = editor.selection,
+  editor: Editor,
+  schema: ListsSchema,
+  at: Location | Span | null = editor.selection,
 ): boolean {
-    const point = getCursorPosition(editor, at);
+  const point = getCursorPosition(editor, at);
 
-    if (!point) {
-        return false;
-    }
+  if (!point) {
+    return false;
+  }
 
-    const listItemsInSelection = getListItems(editor, schema, point);
+  const listItemsInSelection = getListItems(editor, schema, point);
 
-    if (listItemsInSelection.length !== 1) {
-        return false;
-    }
+  if (listItemsInSelection.length !== 1) {
+    return false;
+  }
 
-    const [[listItemNode]] = listItemsInSelection;
+  const [[listItemNode]] = listItemsInSelection;
 
-    return !isListItemContainingText(editor, schema, listItemNode);
+  return !isListItemContainingText(editor, schema, listItemNode);
 }

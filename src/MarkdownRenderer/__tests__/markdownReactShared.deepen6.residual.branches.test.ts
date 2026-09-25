@@ -24,9 +24,7 @@ describe('markdownReactShared deepen6 residual', () => {
     );
     expect(midThink.length).toBeGreaterThan(0);
 
-    const beforeClose = splitMarkdownBlocks(
-      '<think>\nbody\n\n\n</think>\nok',
-    );
+    const beforeClose = splitMarkdownBlocks('<think>\nbody\n\n\n</think>\nok');
     expect(beforeClose.some((b) => b.includes('ok'))).toBe(true);
 
     const nestedOpen = splitMarkdownBlocks(
@@ -55,7 +53,7 @@ describe('markdownReactShared deepen6 residual', () => {
     // 直接走 code：无 props
     if (comps.code) {
       const c = (comps.code as any)({});
-      expect(c !== null && c !== undefined || c === null).toBe(true);
+      expect((c !== null && c !== undefined) || c === null).toBe(true);
     }
   });
 
@@ -68,7 +66,7 @@ describe('markdownReactShared deepen6 residual', () => {
           throw { weird: true };
         },
       });
-      expect(out !== null && out !== undefined || out === null).toBe(true);
+      expect((out !== null && out !== undefined) || out === null).toBe(true);
     } catch {
       // ok
     }
@@ -78,7 +76,7 @@ describe('markdownReactShared deepen6 residual', () => {
           throw 'boom-string';
         },
       });
-      expect(out2 !== null && out2 !== undefined || out2 === null).toBe(true);
+      expect((out2 !== null && out2 !== undefined) || out2 === null).toBe(true);
     } catch {
       // ok
     }

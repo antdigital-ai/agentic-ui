@@ -29,7 +29,9 @@ describe('InsertAutocomplete deepen residual branches', () => {
       quote: null,
       code: '',
     } as any);
-    const labels = opts.flatMap((g) => g.children || []).map((c) => c.label?.[0]);
+    const labels = opts
+      .flatMap((g) => g.children || [])
+      .map((c) => c.label?.[0]);
     expect(labels.some((l) => typeof l === 'string' && l.length > 0)).toBe(
       true,
     );

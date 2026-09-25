@@ -5,11 +5,7 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import {
-  AIBubble,
-  runRender,
-  shouldRenderBeforeContent,
-} from '../AIBubble';
+import { AIBubble, runRender, shouldRenderBeforeContent } from '../AIBubble';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
 import type { MessageBubbleData } from '../type';
 
@@ -45,9 +41,15 @@ describe('AIBubble residual branches', () => {
   it('runRender：false / 函数 / 默认', () => {
     expect(runRender(false, {} as any, <span>d</span>)).toBeNull();
     expect(
-      runRender(() => <span data-testid="r">r</span>, {} as any, <span>d</span>),
+      runRender(
+        () => <span data-testid="r">r</span>,
+        {} as any,
+        <span>d</span>,
+      ),
     ).toBeTruthy();
-    expect(runRender(undefined, {} as any, <span data-testid="d">d</span>)).toBeTruthy();
+    expect(
+      runRender(undefined, {} as any, <span data-testid="d">d</span>),
+    ).toBeTruthy();
   });
 
   it('shouldRenderBeforeContent 矩阵', () => {

@@ -19,9 +19,7 @@ describe('DocInfo deepen2 residual branches', () => {
   it('无 reference_url_info_list', async () => {
     const mod = await import('../DocInfo');
     const Comp =
-      (mod as any).DocInfo ||
-      (mod as any).default ||
-      Object.values(mod)[0];
+      (mod as any).DocInfo || (mod as any).default || Object.values(mod)[0];
     try {
       render(
         <Comp

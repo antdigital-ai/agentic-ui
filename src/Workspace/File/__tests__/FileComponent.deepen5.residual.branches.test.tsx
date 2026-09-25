@@ -27,7 +27,11 @@ vi.mock('antd', async () => {
   };
 });
 
-const file = (id: string, name: string, extra?: Partial<FileNode>): FileNode => ({
+const file = (
+  id: string,
+  name: string,
+  extra?: Partial<FileNode>,
+): FileNode => ({
   id,
   name,
   content: 'body',
@@ -114,7 +118,7 @@ describe('FileComponent deepen5 residual branches', () => {
     wrap(
       <FileComponent
         nodes={[file('f4', 'obj.md')]}
-        onPreview={async () => ({ foo: 1 } as any)}
+        onPreview={async () => ({ foo: 1 }) as any}
       />,
     );
     fireEvent.click(await screen.findByText('obj.md'));

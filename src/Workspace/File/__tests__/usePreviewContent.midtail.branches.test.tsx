@@ -94,12 +94,10 @@ describe('usePreviewContent midtail branches', () => {
       () => {},
     );
 
-    const fetchMock = vi
-      .spyOn(globalThis, 'fetch')
-      .mockResolvedValueOnce({
-        ok: true,
-        text: async () => 'remote',
-      } as Response);
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      text: async () => 'remote',
+    } as Response);
 
     const { result, rerender } = renderHook(
       ({ file }) => usePreviewContent(file, undefined),

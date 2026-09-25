@@ -94,10 +94,7 @@ describe('chart/index deepen2 residual branches', () => {
 
   it('rootWidth 0 → minWidth 256；subgraph 渲染', async () => {
     render(
-      <ChartElement
-        element={baseElement()}
-        attributes={{} as any}
-      >
+      <ChartElement element={baseElement()} attributes={{} as any}>
         {[]}
       </ChartElement>,
     );

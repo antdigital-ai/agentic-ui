@@ -3,7 +3,13 @@
  * setTimeout 早退、placeholder 回退、dirtLeaf selectFormat。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { EditorUtils } from '../../utils/editorUtils';
@@ -108,7 +114,9 @@ vi.mock('../TagPopup', () => ({
 }));
 
 vi.mock('../FncLeaf', () => ({
-  FncLeaf: ({ children }: any) => <span data-testid="fnc-leaf">{children}</span>,
+  FncLeaf: ({ children }: any) => (
+    <span data-testid="fnc-leaf">{children}</span>
+  ),
 }));
 
 vi.mock('antd', async (importOriginal) => {

@@ -18,9 +18,9 @@ describe('markdownReactShared deepen4 residual', () => {
     expect(leadInline.length).toBeGreaterThan(0);
 
     const leadOpen = splitMarkdownBlocks('\n\n\n<think>\nbody\n</think>');
-    expect(leadOpen.some((b) => b.includes('body') || b.includes('think'))).toBe(
-      true,
-    );
+    expect(
+      leadOpen.some((b) => b.includes('body') || b.includes('think')),
+    ).toBe(true);
 
     const leadInlineOpen = splitMarkdownBlocks(
       '\n\n\n<think>start\nmore\n</think>',
@@ -33,9 +33,7 @@ describe('markdownReactShared deepen4 residual', () => {
     );
     expect(nested.length).toBeGreaterThan(1);
 
-    const closePending = splitMarkdownBlocks(
-      '<think>\nx\n\n\n</think>\nok',
-    );
+    const closePending = splitMarkdownBlocks('<think>\nx\n\n\n</think>\nok');
     expect(closePending.some((b) => b.includes('ok'))).toBe(true);
 
     const closeInlinePending = splitMarkdownBlocks(

@@ -18,9 +18,9 @@ describe('collectMarkdownRendererPlugin deepen residual branches', () => {
     expect(collectRendererComponents()).toEqual({});
     expect(collectRendererRemarkPlugins()).toEqual([]);
     expect(collectRendererRehypePlugins()).toEqual([]);
-    expect(collectRendererComponents([{ renderer: {} } as MarkdownEditorPlugin])).toEqual(
-      {},
-    );
+    expect(
+      collectRendererComponents([{ renderer: {} } as MarkdownEditorPlugin]),
+    ).toEqual({});
   });
 
   it('merge：跳过无 renderer；空 remark/rehype 不写入；仅 components', () => {

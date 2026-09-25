@@ -10,12 +10,12 @@ import {
   compareChartXValues,
   compareSortByValues,
   compareXValues,
-  DEFAULT_CHART_DATASET_TYPE,
   debounce,
+  DEFAULT_CHART_DATASET_TYPE,
   extractAndSortXValues,
   findDataPointByXValue,
-  getSortByForX,
   getDataHash,
+  getSortByForX,
   hasChartSortBy,
   hexToRgba,
   isChartXDateOrRange,
@@ -25,8 +25,8 @@ import {
   normalizeRadarChartData,
   normalizeXValue,
   parseChartDataYValue,
-  parseChineseCurrencyToNumber,
   parseChartXDateSortKey,
+  parseChineseCurrencyToNumber,
   parseSortByValue,
   resolveChartSortByField,
   resolveCssVariable,
@@ -79,7 +79,11 @@ describe('normalizeRadarChartData 分支', () => {
         { label: 'B', score: 2 },
       ]),
     ).toEqual([
-      expect.objectContaining({ x: 'B', y: 2, type: DEFAULT_CHART_DATASET_TYPE }),
+      expect.objectContaining({
+        x: 'B',
+        y: 2,
+        type: DEFAULT_CHART_DATASET_TYPE,
+      }),
     ]);
   });
 
@@ -437,9 +441,7 @@ describe('normalizeRadarChartData 扩展', () => {
     const [item] = normalizeRadarChartData([
       { x: 'A', y: 1, type: 't', xtitle: 'X', ytitle: 'Y' },
     ]);
-    expect(item).toEqual(
-      expect.objectContaining({ xtitle: 'X', ytitle: 'Y' }),
-    );
+    expect(item).toEqual(expect.objectContaining({ xtitle: 'X', ytitle: 'Y' }));
   });
 });
 
@@ -524,10 +526,7 @@ describe('istanbul residual：getDataHash / isConfigEqual / resolveCssVariable',
       ),
     ).toBe(false);
     expect(
-      isConfigEqual(
-        { x: 'a', rest: { a: 1 } },
-        { x: 'a', rest: { a: 2 } },
-      ),
+      isConfigEqual({ x: 'a', rest: { a: 1 } }, { x: 'a', rest: { a: 2 } }),
     ).toBe(false);
   });
 
@@ -565,9 +564,7 @@ describe('istanbul residual：getDataHash / isConfigEqual / resolveCssVariable',
       { x: 'A', y: 2 },
     ];
     expect(findDataPointByXValue(data, 'A', '')).toEqual(data[1]);
-    expect(findDataPointByXValue(data, 'A', undefined as any)).toEqual(
-      data[0],
-    );
+    expect(findDataPointByXValue(data, 'A', undefined as any)).toEqual(data[0]);
   });
 
   it('normalizeRadarChartData 跳过无 type 且无 label 的无效项已覆盖；再打空数组', () => {
@@ -634,9 +631,10 @@ describe('chart/utils istanbul residual：纯函数边界矩阵', () => {
 
   it.skip('sort/hash/equal/empty 假值臂', () => {
     expect(uniqueChartXValuesPreservingOrder([])).toEqual([]);
-    expect(
-      uniqueChartXValuesPreservingOrder(['a', 'a', 'b']),
-    ).toEqual(['a', 'b']);
+    expect(uniqueChartXValuesPreservingOrder(['a', 'a', 'b'])).toEqual([
+      'a',
+      'b',
+    ]);
     expect(
       sortChartDataRowsByXField(
         [

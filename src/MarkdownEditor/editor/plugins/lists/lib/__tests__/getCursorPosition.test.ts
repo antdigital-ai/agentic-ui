@@ -32,7 +32,12 @@ describe('getCursorPosition', () => {
       { type: 'paragraph', children: [{ text: 'a' }] },
       { type: 'paragraph', children: [{ text: 'b' }] },
     ];
-    expect(getCursorPosition(editor, [[0, 0], [1, 0]])).toBeNull();
+    expect(
+      getCursorPosition(editor, [
+        [0, 0],
+        [1, 0],
+      ]),
+    ).toBeNull();
   });
 
   it('resolves a path to the start point', () => {

@@ -36,7 +36,9 @@ describe('FootnoteDefinition branches', () => {
         <span />
       </FootnoteDefinition>,
     );
-    expect(container.querySelector('[data-be="footnoteDefinition"]')).toBeTruthy();
+    expect(
+      container.querySelector('[data-be="footnoteDefinition"]'),
+    ).toBeTruthy();
     expect(container.querySelector('.empty')).toBeTruthy();
   });
 

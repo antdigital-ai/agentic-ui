@@ -4,7 +4,8 @@ import { remarkContainer } from '../remarkContainer';
 function mkParagraph(firstChild: unknown) {
   return {
     type: 'paragraph',
-    children: firstChild === null || firstChild === undefined ? [] : [firstChild],
+    children:
+      firstChild === null || firstChild === undefined ? [] : [firstChild],
   };
 }
 

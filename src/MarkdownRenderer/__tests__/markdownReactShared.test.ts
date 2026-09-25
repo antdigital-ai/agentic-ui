@@ -32,8 +32,7 @@ describe('splitMarkdownBlocks', () => {
   });
 
   it('does not treat think-like tags inside code fences as think blocks', () => {
-    const md =
-      '```html\n<think>\nexample\n\n</think>\n```\n\nResponse text.';
+    const md = '```html\n<think>\nexample\n\n</think>\n```\n\nResponse text.';
     const result = splitMarkdownBlocks(md);
     expect(result).toEqual([
       '```html\n<think>\nexample\n\n</think>\n```',

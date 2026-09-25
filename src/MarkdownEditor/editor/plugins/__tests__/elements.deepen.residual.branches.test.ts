@@ -112,9 +112,7 @@ describe('plugins/elements deepen residual branches', () => {
 
   it('list.run：选区非末尾 cutText；match 异常时 removeLength 0', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: '1. rest' }] },
-    ];
+    editor.children = [{ type: 'paragraph', children: [{ text: '1. rest' }] }];
     Transforms.select(editor, {
       anchor: { path: [0, 0], offset: 3 },
       focus: { path: [0, 0], offset: 3 },

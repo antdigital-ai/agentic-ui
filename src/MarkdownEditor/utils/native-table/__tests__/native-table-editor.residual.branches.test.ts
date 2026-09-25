@@ -8,9 +8,7 @@ import { NativeTableEditor } from '../native-table-editor';
 describe('NativeTableEditor residual branches', () => {
   it('insertTable：rows/cols 小于 1 时钳制为 1', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: '' }] },
-    ] as any;
+    editor.children = [{ type: 'paragraph', children: [{ text: '' }] }] as any;
     editor.selection = {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [0, 0], offset: 0 },
@@ -24,9 +22,7 @@ describe('NativeTableEditor residual branches', () => {
 
   it('findTable / removeTable；无表时 remove 安全', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: 'x' }] },
-    ] as any;
+    editor.children = [{ type: 'paragraph', children: [{ text: 'x' }] }] as any;
     editor.selection = {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [0, 0], offset: 0 },

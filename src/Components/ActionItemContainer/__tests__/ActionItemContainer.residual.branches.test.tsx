@@ -136,7 +136,9 @@ describe('ActionItemContainer residual branches', () => {
         B
       </button>,
     ] as KeyedElement[];
-    const { container } = wrap(<ActionItemContainer>{items}</ActionItemContainer>);
+    const { container } = wrap(
+      <ActionItemContainer>{items}</ActionItemContainer>,
+    );
     const menu = container.querySelector(
       '[class*="overflow-container-menu"]',
     ) as HTMLElement;
@@ -145,7 +147,8 @@ describe('ActionItemContainer residual branches', () => {
 
     await waitFor(() => {
       expect(
-        document.querySelectorAll('[class*="overflow-container-popup-item"]').length,
+        document.querySelectorAll('[class*="overflow-container-popup-item"]')
+          .length,
       ).toBe(2);
     });
 

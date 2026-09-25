@@ -79,7 +79,9 @@ describe('CodeToolbar residual branches', () => {
       <CodeToolbar
         theme="light"
         isExpanded={false}
-        element={{ type: 'code', language: 'js', value: 'console.log(1)' } as any}
+        element={
+          { type: 'code', language: 'js', value: 'console.log(1)' } as any
+        }
         readonly
         onCloseClick={vi.fn()}
         languageSelectorProps={langProps}

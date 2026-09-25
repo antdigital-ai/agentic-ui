@@ -1,5 +1,4 @@
-import type { Editor } from 'slate';
-import type { Location } from 'slate';
+import type { Editor, Location } from 'slate';
 
 import type { ListsSchema } from '../types';
 
@@ -12,18 +11,21 @@ import { isAtStartOfListItem } from './isAtStartOfListItem';
  * Check if `editor.deleteBackward()` is safe to call (it won't break the structure).
  */
 export function isDeleteBackwardAllowed(
-    editor: Editor,
-    schema: ListsSchema,
-    at: Location | null = editor.selection,
+  editor: Editor,
+  schema: ListsSchema,
+  at: Location | null = editor.selection,
 ): boolean {
-    const listItemsInSelection = getListItems(editor, schema, at);
+  const listItemsInSelection = getListItems(editor, schema, at);
 
-    if (listItemsInSelection.length === 0) {
-        return true;
-    }
+  if (listItemsInSelection.length === 0) {
+    return true;
+  }
 
-    const [[, listItemPath]] = listItemsInSelection;
-    const isInNestedList = getParentListItem(editor, schema, listItemPath) !== null;
-    const isFirstListItem = getPrevSibling(editor, listItemPath) === null;
-    return isInNestedList || !isFirstListItem || !isAtStartOfListItem(editor, schema);
+  const [[, listItemPath]] = listItemsInSelection;
+  const isInNestedList =
+    getParentListItem(editor, schema, listItemPath) !== null;
+  const isFirstListItem = getPrevSibling(editor, listItemPath) === null;
+  return (
+    isInNestedList || !isFirstListItem || !isAtStartOfListItem(editor, schema)
+  );
 }

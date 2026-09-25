@@ -59,10 +59,10 @@ vi.mock('react-dom', async () => {
   };
 });
 
-import { useEditorStore } from '../../../store';
-import { FloatBar } from '../FloatBar';
-import { getSelRect } from '../../../utils/dom';
 import { MARKDOWN_EDITOR_EVENTS } from '../../../../BaseMarkdownEditor';
+import { useEditorStore } from '../../../store';
+import { getSelRect } from '../../../utils/dom';
+import { FloatBar } from '../FloatBar';
 
 describe('FloatBar deepen residual branches', () => {
   beforeEach(() => {
@@ -105,7 +105,9 @@ describe('FloatBar deepen residual branches', () => {
 
   it('left 被 clamp 到容器宽度内', () => {
     render(<FloatBar readonly={false} />);
-    const bar = document.querySelector('[class*="float-bar"]') as HTMLDivElement;
+    const bar = document.querySelector(
+      '[class*="float-bar"]',
+    ) as HTMLDivElement;
     expect(bar).toBeTruthy();
     const left = parseFloat(bar.style.left);
     expect(left).toBeLessThanOrEqual(mockContainer.clientWidth);
@@ -114,12 +116,16 @@ describe('FloatBar deepen residual branches', () => {
 
   it('readonly 模式使用较窄 barWidth 定位', () => {
     render(<FloatBar readonly />);
-    const bar = document.querySelector('[class*="float-bar"]') as HTMLDivElement;
+    const bar = document.querySelector(
+      '[class*="float-bar"]',
+    ) as HTMLDivElement;
     expect(parseFloat(bar.style.left)).toBeGreaterThanOrEqual(4);
   });
 
   it('Escape 关闭并移动选区到末尾', () => {
-    const selectSpy = vi.spyOn(Transforms, 'select').mockImplementation(() => {});
+    const selectSpy = vi
+      .spyOn(Transforms, 'select')
+      .mockImplementation(() => {});
     const hasPathSpy = vi.spyOn(Editor, 'hasPath').mockReturnValue(true);
     const endSpy = vi
       .spyOn(Editor, 'end')
@@ -136,7 +142,9 @@ describe('FloatBar deepen residual branches', () => {
 
   it('Escape 无 sel 时不 select', () => {
     selection = null;
-    const selectSpy = vi.spyOn(Transforms, 'select').mockImplementation(() => {});
+    const selectSpy = vi
+      .spyOn(Transforms, 'select')
+      .mockImplementation(() => {});
     render(<FloatBar readonly={false} />);
     fireEvent.keyDown(mockContainer, { key: 'Escape' });
     expect(selectSpy).not.toHaveBeenCalled();
@@ -145,7 +153,9 @@ describe('FloatBar deepen residual branches', () => {
 
   it('SELECTIONCHANGE 事件更新位置', () => {
     render(<FloatBar readonly={false} />);
-    const bar = document.querySelector('[class*="float-bar"]') as HTMLDivElement;
+    const bar = document.querySelector(
+      '[class*="float-bar"]',
+    ) as HTMLDivElement;
     fireEvent(
       mockContainer,
       new MouseEvent(MARKDOWN_EDITOR_EVENTS.SELECTIONCHANGE, {
@@ -169,7 +179,9 @@ describe('FloatBar deepen residual branches', () => {
 
   it('domRect 变化为 null 时关闭（opacity 0）', () => {
     const { rerender } = render(<FloatBar readonly={false} />);
-    const bar = document.querySelector('[class*="float-bar"]') as HTMLDivElement;
+    const bar = document.querySelector(
+      '[class*="float-bar"]',
+    ) as HTMLDivElement;
     expect(bar.style.opacity).toBe('1');
     vi.mocked(useEditorStore).mockReturnValue({
       domRect: null,
@@ -183,7 +195,9 @@ describe('FloatBar deepen residual branches', () => {
 
   it('mousedown 阻止冒泡', () => {
     render(<FloatBar readonly={false} />);
-    const bar = document.querySelector('[class*="float-bar"]') as HTMLDivElement;
+    const bar = document.querySelector(
+      '[class*="float-bar"]',
+    ) as HTMLDivElement;
     const stop = vi.fn();
     fireEvent.mouseDown(bar, { preventDefault: stop, stopPropagation: stop });
     expect(bar).toBeInTheDocument();

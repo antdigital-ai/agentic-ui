@@ -97,9 +97,9 @@ describe('ReadonlyMarkdownEditorView deepen3 residual branches', () => {
     const root = container.querySelector('[data-testid="markdown-editor"]');
     expect(root?.className).toMatch(/report/);
     expect(root?.className).toMatch(/slide/);
-    expect(screen.getByTestId('md-renderer3').getAttribute('data-streaming')).toBe(
-      'true',
-    );
+    expect(
+      screen.getByTestId('md-renderer3').getAttribute('data-streaming'),
+    ).toBe('true');
 
     rerender(
       <ReadonlyMarkdownEditorView
@@ -109,9 +109,9 @@ describe('ReadonlyMarkdownEditorView deepen3 residual branches', () => {
         toc={false}
       />,
     );
-    expect(screen.getByTestId('md-renderer3').getAttribute('data-streaming')).toBe(
-      'true',
-    );
+    expect(
+      screen.getByTestId('md-renderer3').getAttribute('data-streaming'),
+    ).toBe('true');
   });
 
   it('空 commentList 走 clearHighlights；点击后展示 CommentList', async () => {

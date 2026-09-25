@@ -2,9 +2,9 @@
  * editableTableWidth / getTableColWidths residual：% 解析、readonly、列数不足。
  */
 import { describe, expect, it } from 'vitest';
+import type { TableNode } from '../../../../types/Table';
 import { getEditableTableColWidths } from '../editableTableWidth';
 import { getReadonlyTableColWidths } from '../getTableColWidths';
-import type { TableNode } from '../../../../types/Table';
 
 const row = (n: number, text = 'c') => ({
   type: 'table-row' as const,

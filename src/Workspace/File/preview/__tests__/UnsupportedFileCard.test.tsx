@@ -3,8 +3,8 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { UnsupportedFileCard } from '../components/UnsupportedFileCard';
 import type { FileNode } from '../../../types';
+import { UnsupportedFileCard } from '../components/UnsupportedFileCard';
 
 const file: FileNode = {
   id: 'f1',
@@ -47,7 +47,9 @@ describe('UnsupportedFileCard', () => {
     );
 
     expect(screen.getByText('此文件无法预览。')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: '下载' })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: '下载' }),
+    ).not.toBeInTheDocument();
   });
 
   it('uses custom locale strings', () => {

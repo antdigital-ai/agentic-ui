@@ -175,7 +175,8 @@ export const DeepThink = (
                 minHeight: 18,
                 wordWrap: 'break-word',
                 zIndex: 2,
-                border: '1px solid var(--color-red-border-default, rgba(244, 244, 247, 0.7473))',
+                border:
+                  '1px solid var(--color-red-border-default, rgba(244, 244, 247, 0.7473))',
                 gap: 8,
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -215,5 +216,12 @@ export const DeepThink = (
         </div>
       </>
     );
-  }, [props.category, props.output?.type, props.output?.data, props.output?.errorMsg, props.output?.response, props.costMillis]);
+  }, [
+    props.category,
+    props.output?.type,
+    props.output?.data,
+    props.output?.errorMsg,
+    props.output?.response,
+    props.costMillis,
+  ]);
 };

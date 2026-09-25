@@ -10,9 +10,7 @@ describe('applyTableMinSizeToSchema', () => {
         children: [
           {
             type: 'table-row',
-            children: [
-              { type: 'table-cell', children: [{ text: 'A' }] },
-            ],
+            children: [{ type: 'table-cell', children: [{ text: 'A' }] }],
           } as Elements,
         ],
       } as Elements,
@@ -60,9 +58,7 @@ describe('applyTableMinSizeToSchema', () => {
             children: [
               {
                 type: 'table-row',
-                children: [
-                  { type: 'table-cell', children: [{ text: 'H' }] },
-                ],
+                children: [{ type: 'table-cell', children: [{ text: 'H' }] }],
               } as Elements,
             ],
           } as Elements,
@@ -71,9 +67,7 @@ describe('applyTableMinSizeToSchema', () => {
             children: [
               {
                 type: 'table-row',
-                children: [
-                  { type: 'table-cell', children: [{ text: 'F' }] },
-                ],
+                children: [{ type: 'table-cell', children: [{ text: 'F' }] }],
               } as Elements,
             ],
           } as Elements,

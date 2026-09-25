@@ -55,10 +55,9 @@ describe('midtail batch F pure branches', () => {
   });
 
   it('useShallowMemo：同引用 / 浅相等 / 浅不等', () => {
-    const { result, rerender } = renderHook(
-      ({ v }) => useShallowMemo(v),
-      { initialProps: { v: { a: 1 } as any } },
-    );
+    const { result, rerender } = renderHook(({ v }) => useShallowMemo(v), {
+      initialProps: { v: { a: 1 } as any },
+    });
     const first = result.current;
     rerender({ v: { a: 1 } });
     expect(result.current).toBe(first);

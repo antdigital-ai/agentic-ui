@@ -11,9 +11,7 @@ import {
 } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import HistogramChart, {
-  type HistogramChartDataItem,
-} from '../HistogramChart';
+import HistogramChart, { type HistogramChartDataItem } from '../HistogramChart';
 
 const mockDownloadChart = vi.fn();
 
@@ -123,17 +121,16 @@ describe('HistogramChart 分支覆盖', () => {
   });
 
   it('非数组 data 按空数据处理', () => {
-    render(<HistogramChart data={null as unknown as HistogramChartDataItem[]} />);
+    render(
+      <HistogramChart data={null as unknown as HistogramChartDataItem[]} />,
+    );
     expect(screen.getByText('暂无有效数据')).toBeInTheDocument();
   });
 
   it('过滤掉非有限 value 后为空则显示暂无有效数据', () => {
     render(
       <HistogramChart
-        data={[
-          { value: Number.NaN },
-          { value: Number.POSITIVE_INFINITY },
-        ]}
+        data={[{ value: Number.NaN }, { value: Number.POSITIVE_INFINITY }]}
       />,
     );
     expect(screen.getByText('暂无有效数据')).toBeInTheDocument();
@@ -152,13 +149,7 @@ describe('HistogramChart 分支覆盖', () => {
 
   it('所有值相同时 calculateBinEdges 走 min===max 分支', () => {
     render(
-      <HistogramChart
-        data={[
-          { value: 42 },
-          { value: 42 },
-          { value: 42 },
-        ]}
-      />,
+      <HistogramChart data={[{ value: 42 }, { value: 42 }, { value: 42 }]} />,
     );
     expect(screen.getByTestId('histogram-chart')).toBeInTheDocument();
   });
@@ -174,7 +165,9 @@ describe('HistogramChart 分支覆盖', () => {
       />,
     );
     const data = (globalThis as any).__histogramBranchData;
-    expect(data.datasets[0].data.some((v: number) => v > 0 && v <= 1)).toBe(true);
+    expect(data.datasets[0].data.some((v: number) => v > 0 && v <= 1)).toBe(
+      true,
+    );
   });
 
   it('stacked=false 时 dataset stack 为 undefined', () => {
@@ -253,9 +246,7 @@ describe('HistogramChart 分支覆盖', () => {
       { value: 20, category: 'B' },
     ];
     const { rerender } = render(<HistogramChart data={dataA} />);
-    rerender(
-      <HistogramChart data={[{ value: 30, category: 'C' }]} />,
-    );
+    rerender(<HistogramChart data={[{ value: 30, category: 'C' }]} />);
     await waitFor(() => {
       expect(screen.getByTestId('histogram-chart')).toBeInTheDocument();
     });
@@ -276,10 +267,7 @@ describe('HistogramChart 分支覆盖', () => {
 
   it('tooltip label 回调格式化 showFrequency 小数', () => {
     render(
-      <HistogramChart
-        data={[{ value: 10 }, { value: 20 }]}
-        showFrequency
-      />,
+      <HistogramChart data={[{ value: 10 }, { value: 20 }]} showFrequency />,
     );
     const options = (globalThis as any).__histogramBranchOptions;
     const label = options.plugins.tooltip.callbacks.label({
@@ -310,9 +298,7 @@ describe('HistogramChart 分支覆盖', () => {
   });
 
   it('statistic 空数组时不渲染统计区块', () => {
-    render(
-      <HistogramChart data={[{ value: 10 }]} statistic={[]} />,
-    );
+    render(<HistogramChart data={[{ value: 10 }]} statistic={[]} />);
     expect(screen.queryByTestId('chart-statistic')).not.toBeInTheDocument();
   });
 
@@ -446,13 +432,7 @@ describe('HistogramChart 分支覆盖', () => {
 
   it('min===max 分箱边界', () => {
     render(
-      <HistogramChart
-        data={[
-          { value: 5 },
-          { value: 5 },
-          { value: 5 },
-        ]}
-      />,
+      <HistogramChart data={[{ value: 5 }, { value: 5 }, { value: 5 }]} />,
     );
     expect(screen.getByTestId('histogram-chart')).toBeInTheDocument();
   });
@@ -507,13 +487,7 @@ describe('HistogramChart 分支覆盖', () => {
       value: 500,
     });
     render(
-      <HistogramChart
-        data={[
-          { value: 1 },
-          { value: 2 },
-          { value: 8 },
-        ]}
-      />,
+      <HistogramChart data={[{ value: 1 }, { value: 2 }, { value: 8 }]} />,
     );
     await act(async () => {
       window.dispatchEvent(new Event('resize'));

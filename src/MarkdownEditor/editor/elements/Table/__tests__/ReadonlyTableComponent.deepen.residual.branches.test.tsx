@@ -7,8 +7,8 @@ import { ConfigProvider } from 'antd';
 import copy from 'copy-to-clipboard';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ReadonlyTableComponent } from '../ReadonlyTableComponent';
 import * as editorStore from '../../../store';
+import { ReadonlyTableComponent } from '../ReadonlyTableComponent';
 
 vi.mock('../../../store');
 vi.mock('copy-to-clipboard', () => ({ default: vi.fn(() => true) }));
@@ -63,10 +63,7 @@ describe('ReadonlyTableComponent deepen residual', () => {
   const renderTable = (element: any = tableElement) =>
     render(
       <ConfigProvider>
-        <ReadonlyTableComponent
-          element={element as any}
-          baseCls="md-table"
-        >
+        <ReadonlyTableComponent element={element as any} baseCls="md-table">
           <tr>
             <td>A</td>
           </tr>

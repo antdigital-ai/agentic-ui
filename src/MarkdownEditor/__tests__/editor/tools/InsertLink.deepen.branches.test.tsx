@@ -29,8 +29,7 @@ vi.mock('../../../editor/utils/path', () => ({
     };
   }),
   isLink: vi.fn(
-    (path: string) =>
-      path.startsWith('http://') || path.startsWith('https://'),
+    (path: string) => path.startsWith('http://') || path.startsWith('https://'),
   ),
 }));
 
@@ -264,9 +263,9 @@ describe('InsertLink deepen branches', () => {
       passive: false,
     });
 
-    const wheelHandler = addSpy.mock.calls.find((c) => c[0] === 'wheel')?.[1] as (
-      e: WheelEvent,
-    ) => void;
+    const wheelHandler = addSpy.mock.calls.find(
+      (c) => c[0] === 'wheel',
+    )?.[1] as (e: WheelEvent) => void;
     const preventSpy = vi.spyOn(WheelEvent.prototype, 'preventDefault');
     wheelHandler?.(new WheelEvent('wheel'));
     expect(preventSpy).toHaveBeenCalled();
@@ -309,7 +308,10 @@ describe('InsertLink deepen branches', () => {
       index: 0,
     };
     vi.mocked(pathUtils.isLink).mockReturnValue(false);
-    vi.mocked(pathUtils.parsePath).mockReturnValue({ path: '', hash: 'only-hash' });
+    vi.mocked(pathUtils.parsePath).mockReturnValue({
+      path: '',
+      hash: 'only-hash',
+    });
     render(<InsertLink />);
     fireEvent.click(document.querySelector('.ant-modal .ant-btn-primary')!);
     expect(EditorUtils.focus).toHaveBeenCalled();

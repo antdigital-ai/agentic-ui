@@ -28,9 +28,7 @@ vi.mock('../../Plugins/chart/ChartRender', () => ({
     return React.createElement('div', {
       'data-testid': 'chart-render',
       'data-chart-type': String(props.chartType),
-      'data-data-len': String(
-        (props.chartData as unknown[])?.length ?? 0,
-      ),
+      'data-data-len': String((props.chartData as unknown[])?.length ?? 0),
     });
   },
 }));
@@ -333,9 +331,9 @@ describe('ChartBlockRenderer 分支覆盖', () => {
       dataSource: [{ x: 'A', y: 1 }],
     });
     const { container } = renderChartBlock(chartData, 'my-chart-class');
-    expect(
-      container.querySelector('[data-be="chart"]')?.className,
-    ).toContain('my-chart-class');
+    expect(container.querySelector('[data-be="chart"]')?.className).toContain(
+      'my-chart-class',
+    );
   });
 
   it('数组 payload；非法 JSON 返回 null；对象无 type', async () => {

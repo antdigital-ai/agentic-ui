@@ -22,8 +22,6 @@ describe('inlineLeafNormalizeUtils deepen residual branches', () => {
   });
 
   it('tag+code 叶无 text 字段视为 orphan', () => {
-    expect(
-      hasOrphanTagDecoration({ tag: true, code: true } as any),
-    ).toBe(true);
+    expect(hasOrphanTagDecoration({ tag: true, code: true } as any)).toBe(true);
   });
 });

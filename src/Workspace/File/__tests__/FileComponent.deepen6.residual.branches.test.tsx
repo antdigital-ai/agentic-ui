@@ -26,7 +26,11 @@ vi.mock('antd', async () => {
   };
 });
 
-const file = (id: string, name: string, extra?: Partial<FileNode>): FileNode => ({
+const file = (
+  id: string,
+  name: string,
+  extra?: Partial<FileNode>,
+): FileNode => ({
   id,
   name,
   content: 'body',
@@ -143,9 +147,7 @@ describe('FileComponent deepen6 residual branches', () => {
 
   it('默认预览有 onShare；tree defaultView + keyword null', async () => {
     const onShare = vi.fn();
-    wrap(
-      <FileComponent nodes={[file('p1', 'prev.md')]} onShare={onShare} />,
-    );
+    wrap(<FileComponent nodes={[file('p1', 'prev.md')]} onShare={onShare} />);
     fireEvent.click(await screen.findByText('prev.md'));
     await waitFor(() => {
       expect(

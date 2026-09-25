@@ -2,7 +2,13 @@
  * HistogramChart index 补洞：formatBinLabel、末箱 inclusive、预分箱、toolbar filter。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import HistogramChart from '../index';
@@ -106,9 +112,9 @@ describe('HistogramChart index deepen branches', () => {
       />,
     );
     const labels = (globalThis as any).__histDeepenData?.labels ?? [];
-    expect(labels.some((l: string) => l.includes('1,000') || l.includes('1000'))).toBe(
-      true,
-    );
+    expect(
+      labels.some((l: string) => l.includes('1,000') || l.includes('1000')),
+    ).toBe(true);
     expect(labels.some((l: string) => l.includes('0.0001'))).toBe(true);
     expect(labels.some((l: string) => l.includes('1.5'))).toBe(true);
   });

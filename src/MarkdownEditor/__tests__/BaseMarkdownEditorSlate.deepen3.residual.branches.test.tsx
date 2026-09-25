@@ -160,9 +160,7 @@ describe('BaseMarkdownEditorSlate deepen3 residual branches', () => {
     _slateEditorProps = {};
     vi.clearAllMocks();
     vi.useFakeTimers({ shouldAdvanceTime: true });
-    mockEditorChildren = [
-      { type: 'paragraph', children: [{ text: 'hello' }] },
-    ];
+    mockEditorChildren = [{ type: 'paragraph', children: [{ text: 'hello' }] }];
   });
 
   afterEach(() => {

@@ -2,14 +2,11 @@
  * tableCellMemo：element / children 引用相等矩阵。
  */
 import React from 'react';
-import { describe, expect, it } from 'vitest';
 import type { RenderElementProps } from 'slate-react';
+import { describe, expect, it } from 'vitest';
 import { isSameTableCellRenderProps } from '../tableCellMemo';
 
-const stub = (
-  element: object,
-  children: React.ReactNode,
-): RenderElementProps =>
+const stub = (element: object, children: React.ReactNode): RenderElementProps =>
   ({
     element,
     children,
@@ -45,10 +42,7 @@ describe('tableCellMemo branches', () => {
     expect(
       isSameTableCellRenderProps(
         stub(el, kids),
-        stub(
-          { type: 'header-cell' },
-          React.createElement('span', null, 'x'),
-        ),
+        stub({ type: 'header-cell' }, React.createElement('span', null, 'x')),
       ),
     ).toBe(false);
   });

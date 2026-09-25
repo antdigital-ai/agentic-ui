@@ -20,9 +20,7 @@ const mockCreateSandbox = vi.hoisted(() =>
     destroy: mockSandboxDestroy,
   })),
 );
-const mockTemplateRender = vi.hoisted(() =>
-  vi.fn((tpl: string) => tpl),
-);
+const mockTemplateRender = vi.hoisted(() => vi.fn((tpl: string) => tpl));
 const mockMustacheRender = vi.hoisted(() =>
   vi.fn((tpl: string, data: any) =>
     tpl.replace(/\{\{\s*name\s*\}\}/g, String(data?.name ?? '')),
@@ -155,7 +153,9 @@ describe('SchemaRenderer deepen10 safe residual branches', () => {
       throw 'tpl-string';
     });
     const tplErr = vi.spyOn(console, 'error').mockImplementation(() => {});
-    render(<SchemaRenderer schema={baseSchema()} values={{ name: 't' }} debug />);
+    render(
+      <SchemaRenderer schema={baseSchema()} values={{ name: 't' }} debug />,
+    );
     await flush();
     expect(
       document.body.textContent?.includes('Template rendering error') ||

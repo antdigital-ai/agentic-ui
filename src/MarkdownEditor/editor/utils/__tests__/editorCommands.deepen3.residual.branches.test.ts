@@ -47,9 +47,7 @@ describe('editorCommands deepen3 residual branches', () => {
 
   it('originalNode 非 Element：continue', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: 'ABCDEF' }] },
-    ];
+    editor.children = [{ type: 'paragraph', children: [{ text: 'ABCDEF' }] }];
     editor.selection = {
       anchor: { path: [0, 0], offset: 1 },
       focus: { path: [0, 0], offset: 4 },

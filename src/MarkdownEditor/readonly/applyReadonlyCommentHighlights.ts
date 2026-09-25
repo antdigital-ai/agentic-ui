@@ -32,8 +32,9 @@ const shouldSkipTextNode = (node: globalThis.Node): boolean => {
     return true;
   }
   return (
-    parent.closest(`[${READONLY_COMMENT_ATTR}="true"],pre,code,script,style`) !==
-    null
+    parent.closest(
+      `[${READONLY_COMMENT_ATTR}="true"],pre,code,script,style`,
+    ) !== null
   );
 };
 

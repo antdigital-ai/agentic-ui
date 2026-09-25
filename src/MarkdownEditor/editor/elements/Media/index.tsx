@@ -579,17 +579,14 @@ export function Media({
                 {element.otherProps?.collaborators ? (
                   <div>
                     <AvatarList
-                      displayList={
-                        element.otherProps?.collaborators
-                          ?.map((item: { [key: string]: number }) => {
-                            return {
-                              name: Object.keys(item).at(0) as string,
-                              collaboratorNumber:
-                                Object.values(item).at(0) || 0,
-                            };
-                          })
-                          .slice(0, 5)
-                      }
+                      displayList={element.otherProps?.collaborators
+                        ?.map((item: { [key: string]: number }) => {
+                          return {
+                            name: Object.keys(item).at(0) as string,
+                            collaboratorNumber: Object.values(item).at(0) || 0,
+                          };
+                        })
+                        .slice(0, 5)}
                     />
                   </div>
                 ) : (

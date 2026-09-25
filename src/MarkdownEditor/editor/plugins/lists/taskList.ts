@@ -47,16 +47,13 @@ export function syncListMetadataForMode(
         Editor.nodes(editor, {
           at: listPath,
           match: (n) =>
-            Element.isElement(n) && (n as { type?: string }).type === 'list-item',
+            Element.isElement(n) &&
+            (n as { type?: string }).type === 'list-item',
         }),
       );
       for (const [item, itemPath] of listItems) {
         if (typeof (item as { checked?: boolean }).checked !== 'boolean') {
-          Transforms.setNodes(
-            editor,
-            { checked: false },
-            { at: itemPath },
-          );
+          Transforms.setNodes(editor, { checked: false }, { at: itemPath });
         }
       }
     } else {

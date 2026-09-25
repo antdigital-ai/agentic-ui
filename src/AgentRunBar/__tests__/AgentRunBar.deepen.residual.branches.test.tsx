@@ -6,11 +6,7 @@ import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cnLabels, I18nContext } from '../../I18n';
-import {
-  AgentRunBar,
-  TASK_RUNNING_STATUS,
-  TASK_STATUS,
-} from '../index';
+import { AgentRunBar, TASK_RUNNING_STATUS, TASK_STATUS } from '../index';
 
 vi.mock('framer-motion', () => ({
   motion: {

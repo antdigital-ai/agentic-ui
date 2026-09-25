@@ -25,16 +25,13 @@ vi.mock('is-hotkey', () => {
     const map: Record<string, (e: any) => boolean> = {
       up: (e) => e.key === 'ArrowUp',
       down: (e) => e.key === 'ArrowDown',
-      'mod+ArrowDown': (e) =>
-        e.key === 'ArrowDown' && (e.metaKey || e.ctrlKey),
+      'mod+ArrowDown': (e) => e.key === 'ArrowDown' && (e.metaKey || e.ctrlKey),
       'mod+ArrowUp': (e) => e.key === 'ArrowUp' && (e.metaKey || e.ctrlKey),
       backspace: (e) => e.key === 'Backspace',
       'mod+shift+v': (e) =>
         e.key === 'v' && (e.metaKey || e.ctrlKey) && e.shiftKey,
-      'mod+alt+v': (e) =>
-        e.key === 'v' && (e.metaKey || e.ctrlKey) && e.altKey,
-      'mod+opt+v': (e) =>
-        e.key === 'v' && (e.metaKey || e.ctrlKey) && e.altKey,
+      'mod+alt+v': (e) => e.key === 'v' && (e.metaKey || e.ctrlKey) && e.altKey,
+      'mod+opt+v': (e) => e.key === 'v' && (e.metaKey || e.ctrlKey) && e.altKey,
       'mod+shift+s': (e) =>
         e.key === 's' && (e.metaKey || e.ctrlKey) && e.shiftKey,
     };
@@ -320,10 +317,7 @@ describe('useKeyboard 分支覆盖', () => {
     const editor = makeEditor([
       {
         type: 'paragraph',
-        children: [
-          { text: 'before' },
-          { text: 'tag', tag: true },
-        ],
+        children: [{ text: 'before' }, { text: 'tag', tag: true }],
       },
     ]);
     // 光标落在 tag 文本起点

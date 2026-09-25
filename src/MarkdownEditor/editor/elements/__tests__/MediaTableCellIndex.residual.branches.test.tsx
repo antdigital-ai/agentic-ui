@@ -21,7 +21,10 @@ vi.mock('slate-react', () => ({
   useSelected: () => false,
   useFocused: () => false,
   useSlate: () => ({
-    selection: { anchor: { path: [0, 0], offset: 0 }, focus: { path: [0, 0], offset: 0 } },
+    selection: {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    },
     children: [{ type: 'paragraph', children: [{ text: '' }] }],
   }),
   ReactEditor: {
@@ -42,7 +45,12 @@ describe('Media / TableCellIndex residual branches', () => {
     expect(() =>
       render(
         <Media
-          element={{ type: 'media', url: '', mediaType: 'image', children: [{ text: '' }] }}
+          element={{
+            type: 'media',
+            url: '',
+            mediaType: 'image',
+            children: [{ text: '' }],
+          }}
           attributes={{ 'data-slate-node': 'element' }}
         >
           <span />
@@ -74,7 +82,12 @@ describe('Media / TableCellIndex residual branches', () => {
     const mediaMod = await import('../Media');
     const { Media, ResizeImage } = mediaMod as any;
 
-    for (const mediaType of ['video', 'audio', 'image', 'attachment'] as const) {
+    for (const mediaType of [
+      'video',
+      'audio',
+      'image',
+      'attachment',
+    ] as const) {
       expect(() =>
         render(
           <Media
@@ -82,7 +95,8 @@ describe('Media / TableCellIndex residual branches', () => {
               type: 'media',
               url: `https://cdn.example/a.${mediaType === 'image' ? 'png' : mediaType === 'video' ? 'mp4' : mediaType === 'audio' ? 'mp3' : 'bin'}`,
               mediaType,
-              alt: mediaType === 'attachment' ? 'attachment:file.bin' : mediaType,
+              alt:
+                mediaType === 'attachment' ? 'attachment:file.bin' : mediaType,
               width: 120,
               height: 80,
               children: [{ text: '' }],
@@ -126,14 +140,7 @@ describe('Media / TableCellIndex residual branches', () => {
         ),
       ).not.toThrow();
       expect(() =>
-        render(
-          <ResizeImage
-            src=""
-            alt=""
-            selected={false}
-            defaultSize={{}}
-          />,
-        ),
+        render(<ResizeImage src="" alt="" selected={false} defaultSize={{}} />),
       ).not.toThrow();
     }
     expect(document.body).toBeTruthy();

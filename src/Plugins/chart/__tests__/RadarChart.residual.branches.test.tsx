@@ -69,9 +69,9 @@ describe('RadarChart residual prop/config branches', () => {
         height={280}
       />,
     );
-    expect((globalThis as any).__radarResidualData?.datasets?.length).toBeGreaterThan(
-      0,
-    );
+    expect(
+      (globalThis as any).__radarResidualData?.datasets?.length,
+    ).toBeGreaterThan(0);
   });
 
   it('非数组 data', () => {

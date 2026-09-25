@@ -20,9 +20,11 @@ describe('wrapInList deepen residual branches', () => {
   it('at=null / selection=null 返回 false', () => {
     const editor = createEditor();
     editor.selection = null;
-    expect(wrapInList(editor, agenticListsSchema, ListType.UNORDERED, null)).toBe(
+    expect(
+      wrapInList(editor, agenticListsSchema, ListType.UNORDERED, null),
+    ).toBe(false);
+    expect(wrapInList(editor, agenticListsSchema, ListType.ORDERED)).toBe(
       false,
     );
-    expect(wrapInList(editor, agenticListsSchema, ListType.ORDERED)).toBe(false);
   });
 });

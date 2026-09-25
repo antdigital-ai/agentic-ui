@@ -146,8 +146,7 @@ export function LinkCard({
                         .map((item: { [key: string]: number }) => {
                           return {
                             name: Object.keys(item).at(0) as string,
-                            collaboratorNumber:
-                              Object.values(item).at(0) || 0,
+                            collaboratorNumber: Object.values(item).at(0) || 0,
                           };
                         })
                         .slice(0, 5)}

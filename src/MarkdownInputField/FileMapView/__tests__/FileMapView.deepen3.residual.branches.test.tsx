@@ -64,9 +64,7 @@ describe('FileMapView deepen3 residual branches', () => {
   });
 
   it('image：itemRender 包装 placeholder', () => {
-    const itemRender = vi.fn((f, dom) => (
-      <div data-testid="img-ph">{dom}</div>
-    ));
+    const itemRender = vi.fn((f, dom) => <div data-testid="img-ph">{dom}</div>);
     const map = new Map<string, AttachmentFile>([
       [
         'a',

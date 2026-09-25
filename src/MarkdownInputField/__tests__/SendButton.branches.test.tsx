@@ -26,7 +26,9 @@ describe('SendButton branches', () => {
     render(
       <ConfigProvider>
         <I18nContext.Provider
-          value={{ locale: { send: '发送', stop: '停止' }, language: 'zh-CN' } as any}
+          value={
+            { locale: { send: '发送', stop: '停止' }, language: 'zh-CN' } as any
+          }
         >
           {ui}
         </I18nContext.Provider>
@@ -48,23 +50,14 @@ describe('SendButton branches', () => {
 
   it('可发送态点击触发 onClick', () => {
     const onClick = vi.fn();
-    wrap(
-      <SendButton isSendable typing={false} onClick={onClick} />,
-    );
+    wrap(<SendButton isSendable typing={false} onClick={onClick} />);
     fireEvent.click(screen.getByRole('button'));
     expect(onClick).toHaveBeenCalled();
   });
 
   it('disabled 时不触发 onClick', () => {
     const onClick = vi.fn();
-    wrap(
-      <SendButton
-        isSendable
-        disabled
-        typing={false}
-        onClick={onClick}
-      />,
-    );
+    wrap(<SendButton isSendable disabled typing={false} onClick={onClick} />);
     fireEvent.click(screen.getByRole('button'));
     expect(onClick).not.toHaveBeenCalled();
   });
@@ -77,9 +70,7 @@ describe('SendButton branches', () => {
   });
 
   it('不可发送弱态', () => {
-    wrap(
-      <SendButton isSendable={false} typing={false} onClick={vi.fn()} />,
-    );
+    wrap(<SendButton isSendable={false} typing={false} onClick={vi.fn()} />);
     expect(screen.getByRole('button')).toBeInTheDocument();
   });
 

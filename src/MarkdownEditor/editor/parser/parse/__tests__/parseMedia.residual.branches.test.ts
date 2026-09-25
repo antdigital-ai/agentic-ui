@@ -50,9 +50,7 @@ describe('parseMedia residual branches', () => {
   });
 
   it.skip('handleAttachmentLink：无附件 null；有附件 name 回退 url', () => {
-    expect(
-      handleAttachmentLink({ children: [{ value: 'plain' }] }),
-    ).toBeNull();
+    expect(handleAttachmentLink({ children: [{ value: 'plain' }] })).toBeNull();
     const withName = handleAttachmentLink({
       children: [{ value: 'attach:x >Doc</a>' }],
     });
@@ -65,10 +63,7 @@ describe('parseMedia residual branches', () => {
 
   it.skip('handleLinkCard 不抛', () => {
     expect(() =>
-      handleLinkCard(
-        { url: 'https://x', title: 'T', children: [] },
-        {},
-      ),
+      handleLinkCard({ url: 'https://x', title: 'T', children: [] }, {}),
     ).not.toThrow();
   });
 });

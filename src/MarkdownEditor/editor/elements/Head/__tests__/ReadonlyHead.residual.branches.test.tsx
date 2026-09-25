@@ -8,14 +8,27 @@ describe('ReadonlyHead residual branches', () => {
     const { rerender } = render(
       <ReadonlyHead
         attributes={{}}
-        element={{ type: 'head', level: 2, align: 'center', children: [{ text: 'Hello World' }] } as any}
+        element={
+          {
+            type: 'head',
+            level: 2,
+            align: 'center',
+            children: [{ text: 'Hello World' }],
+          } as any
+        }
       >
         Hello World
       </ReadonlyHead>,
     );
-    expect(screen.getByRole('heading', { level: 2 })).toHaveAttribute('data-align', 'center');
+    expect(screen.getByRole('heading', { level: 2 })).toHaveAttribute(
+      'data-align',
+      'center',
+    );
     rerender(
-      <ReadonlyHead attributes={{}} element={{ type: 'head', level: 3, children: [{ text: '' }] } as any}>
+      <ReadonlyHead
+        attributes={{}}
+        element={{ type: 'head', level: 3, children: [{ text: '' }] } as any}
+      >
         {''}
       </ReadonlyHead>,
     );

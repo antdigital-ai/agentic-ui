@@ -103,11 +103,7 @@ describe('FileMapView deepen residual branches', () => {
     }
     render(
       <ConfigProvider>
-        <FileMapView
-          fileMap={map}
-          maxDisplayCount={2}
-          onViewAll={onViewAll}
-        />
+        <FileMapView fileMap={map} maxDisplayCount={2} onViewAll={onViewAll} />
       </ConfigProvider>,
     );
     const more = screen.getByTestId('file-view-view-all');

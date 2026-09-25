@@ -64,7 +64,9 @@ describe('ActionItemContainer deepen12 safe residual branches', () => {
         W3
       </button>,
     ] as KeyedElement[];
-    const { container } = wrap(<ActionItemContainer>{items}</ActionItemContainer>);
+    const { container } = wrap(
+      <ActionItemContainer>{items}</ActionItemContainer>,
+    );
     const root = container.firstElementChild as HTMLElement;
     const scroll = (container.querySelector('[class*="scroll"]') ||
       root) as HTMLElement;

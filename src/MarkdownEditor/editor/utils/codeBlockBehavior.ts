@@ -76,7 +76,9 @@ export const handleCodeBlockAceKeyDown = (
   }
 
   const isModEnter =
-    event.key === 'Enter' && (event.metaKey || event.ctrlKey) && !event.shiftKey;
+    event.key === 'Enter' &&
+    (event.metaKey || event.ctrlKey) &&
+    !event.shiftKey;
   if (isModEnter) {
     insertParagraphAfterCodeBlock(editor, path);
     event.preventDefault();
@@ -128,7 +130,9 @@ export const handleCodeBlockTextInputKeyDown = (
 };
 
 /** 焦点在 Ace 输入区时，外层 Slate onKeyDown 应让路。 */
-export const isCodeBlockAceInputTarget = (target: EventTarget | null): boolean => {
+export const isCodeBlockAceInputTarget = (
+  target: EventTarget | null,
+): boolean => {
   if (!(target instanceof HTMLElement)) {
     return false;
   }

@@ -73,7 +73,6 @@ describe('KeyboardTask', () => {
       },
     };
 
-
     // Reset mocks
     vi.clearAllMocks();
   });

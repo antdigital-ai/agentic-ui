@@ -24,12 +24,7 @@ vi.mock('../RagRetrievalInfo', () => ({
   RagRetrievalInfo: () => <div data-testid="rag">Rag</div>,
 }));
 vi.mock('../TitleInfo', () => ({
-  TitleInfo: ({
-    title,
-    setCollapse,
-    collapse,
-    titleExtraRender,
-  }: any) => (
+  TitleInfo: ({ title, setCollapse, collapse, titleExtraRender }: any) => (
     <div data-testid="title-info">
       <span>{title}</span>
       <button

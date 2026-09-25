@@ -18,9 +18,7 @@ describe('tab deepen residual branches', () => {
 
   it('无 selection 早退', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: 'x' }] },
-    ] as any;
+    editor.children = [{ type: 'paragraph', children: [{ text: 'x' }] }] as any;
     editor.selection = null;
     const tab = new TabKey(editor);
     const preventDefault = vi.fn();

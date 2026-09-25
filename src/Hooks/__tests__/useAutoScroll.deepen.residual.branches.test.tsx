@@ -34,7 +34,9 @@ const installObserverMocks = () => {
     return inst;
   }) as unknown as typeof ResizeObserver;
 
-  global.MutationObserver = vi.fn(function MockMutationObserver(cb: MoCallback) {
+  global.MutationObserver = vi.fn(function MockMutationObserver(
+    cb: MoCallback,
+  ) {
     const inst = {
       callback: cb,
       observe: vi.fn(),
@@ -149,7 +151,9 @@ describe('useAutoScroll deepen residual branches', () => {
     };
     const { rerender, unmount } = render(<Wrapper deps={[1]} />);
     rerender(<Wrapper deps={[2]} />);
-    const el = document.querySelector('[data-testid="as-deepen"]') as HTMLElement;
+    const el = document.querySelector(
+      '[data-testid="as-deepen"]',
+    ) as HTMLElement;
 
     act(() => {
       el.dispatchEvent(
@@ -268,12 +272,12 @@ describe('useAutoScroll deepen residual branches', () => {
     };
     const { rerender, unmount } = render(<Wrapper deps={[1]} />);
     rerender(<Wrapper deps={[2]} />);
-    const el = document.querySelector('[data-testid="as-wheel"]') as HTMLElement;
+    const el = document.querySelector(
+      '[data-testid="as-wheel"]',
+    ) as HTMLElement;
 
     act(() => {
-      el.dispatchEvent(
-        new WheelEvent('wheel', { deltaY: -20, bubbles: true }),
-      );
+      el.dispatchEvent(new WheelEvent('wheel', { deltaY: -20, bubbles: true }));
     });
     expect(onScrollStateChange.mock.calls.length).toBeGreaterThan(0);
 
@@ -284,9 +288,7 @@ describe('useAutoScroll deepen residual branches', () => {
     }
     onScrollStateChange.mockClear();
     act(() => {
-      el.dispatchEvent(
-        new WheelEvent('wheel', { deltaY: -20, bubbles: true }),
-      );
+      el.dispatchEvent(new WheelEvent('wheel', { deltaY: -20, bubbles: true }));
     });
     unmount();
   });
@@ -333,9 +335,7 @@ describe('useAutoScroll deepen residual branches', () => {
 
     // 先 unpin
     act(() => {
-      el.dispatchEvent(
-        new WheelEvent('wheel', { deltaY: -40, bubbles: true }),
-      );
+      el.dispatchEvent(new WheelEvent('wheel', { deltaY: -40, bubbles: true }));
     });
 
     // 收缩内容
@@ -797,7 +797,10 @@ describe('useAutoScroll deepen residual branches', () => {
       if (metrics) metrics.scrollHeight = 900;
       const ro = roInstances[roInstances.length - 1];
       ro?.callback([
-        { target: document.querySelector('[data-testid="as-grow-smooth"]'), contentRect: { height: 900 } as any } as any,
+        {
+          target: document.querySelector('[data-testid="as-grow-smooth"]'),
+          contentRect: { height: 900 } as any,
+        } as any,
       ]);
       flushRaf(8);
     });
@@ -957,8 +960,12 @@ describe('useAutoScroll deepen residual branches', () => {
       );
     };
     const { rerender, unmount } = render(<Wrapper deps={[1]} />);
-    const el = document.querySelector('[data-testid="as-remount"]') as HTMLElement;
-    const child = document.querySelector('[data-testid="child"]') as HTMLElement;
+    const el = document.querySelector(
+      '[data-testid="as-remount"]',
+    ) as HTMLElement;
+    const child = document.querySelector(
+      '[data-testid="child"]',
+    ) as HTMLElement;
 
     act(() => {
       const mo = moInstances[moInstances.length - 1];
@@ -1082,7 +1089,14 @@ describe('useAutoScroll deepen residual branches', () => {
         metrics.scrollTop = 50;
       }
       moInstances[moInstances.length - 1]?.callback(
-        [{ type: 'characterData', target: el, addedNodes: [], removedNodes: [] } as any],
+        [
+          {
+            type: 'characterData',
+            target: el,
+            addedNodes: [],
+            removedNodes: [],
+          } as any,
+        ],
         moInstances[moInstances.length - 1] as any,
       );
       flushRaf(4);

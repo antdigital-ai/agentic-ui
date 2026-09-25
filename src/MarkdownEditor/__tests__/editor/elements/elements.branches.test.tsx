@@ -85,15 +85,21 @@ vi.mock('../../../editor/elements/AgenticUiBlocks/AgenticUiTaskBlock', () => ({
   ReadonlyAgenticUiTaskBlock: elementStubs.box('agentic-task-readonly'),
 }));
 
-vi.mock('../../../editor/elements/AgenticUiBlocks/AgenticUiToolUseBarBlock', () => ({
-  AgenticUiToolUseBarBlock: elementStubs.box('agentic-tool-edit'),
-  ReadonlyAgenticUiToolUseBarBlock: elementStubs.box('agentic-tool-readonly'),
-}));
+vi.mock(
+  '../../../editor/elements/AgenticUiBlocks/AgenticUiToolUseBarBlock',
+  () => ({
+    AgenticUiToolUseBarBlock: elementStubs.box('agentic-tool-edit'),
+    ReadonlyAgenticUiToolUseBarBlock: elementStubs.box('agentic-tool-readonly'),
+  }),
+);
 
-vi.mock('../../../editor/elements/AgenticUiBlocks/AgenticUiFileMapBlock', () => ({
-  AgenticUiFileMapBlock: elementStubs.box('agentic-filemap-edit'),
-  ReadonlyAgenticUiFileMapBlock: elementStubs.box('agentic-filemap-readonly'),
-}));
+vi.mock(
+  '../../../editor/elements/AgenticUiBlocks/AgenticUiFileMapBlock',
+  () => ({
+    AgenticUiFileMapBlock: elementStubs.box('agentic-filemap-edit'),
+    ReadonlyAgenticUiFileMapBlock: elementStubs.box('agentic-filemap-readonly'),
+  }),
+);
 
 vi.mock('../../../editor/elements/Blockquote', () => ({
   Blockquote: elementStubs.box('blockquote-edit'),
@@ -189,9 +195,12 @@ vi.mock('../../../editor/elements/FootnoteDefinition', () => ({
   FootnoteDefinition: elementStubs.box('footnote-edit'),
 }));
 
-vi.mock('../../../editor/elements/FootnoteDefinition/ReadonlyFootnoteDefinition', () => ({
-  ReadonlyFootnoteDefinition: elementStubs.box('footnote-readonly'),
-}));
+vi.mock(
+  '../../../editor/elements/FootnoteDefinition/ReadonlyFootnoteDefinition',
+  () => ({
+    ReadonlyFootnoteDefinition: elementStubs.box('footnote-readonly'),
+  }),
+);
 
 vi.mock('../../../editor/elements/LinkCard', () => ({
   LinkCard: elementStubs.box('link-card-edit'),
@@ -273,7 +282,9 @@ vi.mock('../../../editor/elements/TagPopup', () => ({
 }));
 
 vi.mock('../../../editor/elements/FncLeaf', () => ({
-  FncLeaf: ({ children }: any) => <span data-testid="fnc-leaf">{children}</span>,
+  FncLeaf: ({ children }: any) => (
+    <span data-testid="fnc-leaf">{children}</span>
+  ),
 }));
 
 vi.mock('../../../editor/elements/CommentLeaf', () => ({
@@ -412,10 +423,7 @@ describe('elements/index branches', () => {
 
   it('MLeaf restores jinja dollar placeholder in children', () => {
     const { container } = render(
-      <MLeaf
-        {...baseLeafProps}
-        leaf={{ text: 'x', jinjaVariable: true }}
-      >
+      <MLeaf {...baseLeafProps} leaf={{ text: 'x', jinjaVariable: true }}>
         {`${JINJA_DOLLAR_PLACEHOLDER}{ foo }`}
       </MLeaf>,
     );
@@ -478,7 +486,9 @@ describe('elements/index branches', () => {
       />,
     );
 
-    fireEvent.click(screen.getByText('leaf-child').closest('[data-be="text"]')!);
+    fireEvent.click(
+      screen.getByText('leaf-child').closest('[data-be="text"]')!,
+    );
     expect(openSpy).not.toHaveBeenCalled();
     openSpy.mockRestore();
   });
@@ -493,7 +503,9 @@ describe('elements/index branches', () => {
       />,
     );
 
-    fireEvent.click(screen.getByText('leaf-child').closest('[data-be="text"]')!);
+    fireEvent.click(
+      screen.getByText('leaf-child').closest('[data-be="text"]')!,
+    );
     expect(onClick).toHaveBeenCalledWith('https://example.com');
   });
 
@@ -531,10 +543,7 @@ describe('elements/index branches', () => {
 
   it('MLeaf identifier-only leaf uses FncLeaf path', () => {
     render(
-      <MLeaf
-        {...baseLeafProps}
-        leaf={{ text: 'fn', identifier: 'id-1' }}
-      />,
+      <MLeaf {...baseLeafProps} leaf={{ text: 'fn', identifier: 'id-1' }} />,
     );
     expect(screen.getByTestId('fnc-leaf')).toBeInTheDocument();
   });
@@ -593,7 +602,9 @@ describe('elements/index branches', () => {
         element={{ type: 'card-before', children: [] }}
       />,
     );
-    const el = container.querySelector('[data-be="card-before"]') as HTMLElement;
+    const el = container.querySelector(
+      '[data-be="card-before"]',
+    ) as HTMLElement;
     expect(el.style.display).toBe('none');
   });
 
@@ -659,12 +670,7 @@ describe('elements/index branches', () => {
   });
 
   it('MLeaf fnd leaf uses FncLeaf path', () => {
-    render(
-      <MLeaf
-        {...baseLeafProps}
-        leaf={{ text: 'fn', fnd: true }}
-      />,
-    );
+    render(<MLeaf {...baseLeafProps} leaf={{ text: 'fn', fnd: true }} />);
     expect(screen.getByTestId('fnc-leaf')).toBeInTheDocument();
   });
 
@@ -682,11 +688,7 @@ describe('elements/index branches', () => {
   it('MLeaf readonly double-click does not select format', () => {
     vi.mocked(EditorUtils.isDirtLeaf).mockReturnValue(true);
     render(
-      <MLeaf
-        {...baseLeafProps}
-        readonly
-        leaf={{ text: 'fmt', bold: true }}
-      />,
+      <MLeaf {...baseLeafProps} readonly leaf={{ text: 'fmt', bold: true }} />,
     );
     const textEl = screen.getByText('leaf-child').closest('[data-be="text"]')!;
     fireEvent.click(textEl, { detail: 2 });
@@ -735,7 +737,9 @@ describe('elements/index branches', () => {
         linkConfig={{ openInNewTab: false }}
       />,
     );
-    fireEvent.click(screen.getByText('leaf-child').closest('[data-be="text"]')!);
+    fireEvent.click(
+      screen.getByText('leaf-child').closest('[data-be="text"]')!,
+    );
     expect(window.location.href).toBe('https://example.com/page');
     Object.defineProperty(window, 'location', {
       configurable: true,
@@ -745,10 +749,7 @@ describe('elements/index branches', () => {
 
   it('MLeaf restores jinja dollar in nested React element children', () => {
     render(
-      <MLeaf
-        {...baseLeafProps}
-        leaf={{ text: 'x', jinjaVariable: true }}
-      >
+      <MLeaf {...baseLeafProps} leaf={{ text: 'x', jinjaVariable: true }}>
         <span>{`${JINJA_DOLLAR_PLACEHOLDER}{ bar }`}</span>
       </MLeaf>,
     );
@@ -756,12 +757,7 @@ describe('elements/index branches', () => {
   });
 
   it('MLeaf leaf.color 写入 style', () => {
-    render(
-      <MLeaf
-        {...baseLeafProps}
-        leaf={{ text: 'c', color: '#00ff00' }}
-      />,
-    );
+    render(<MLeaf {...baseLeafProps} leaf={{ text: 'c', color: '#00ff00' }} />);
     const textEl = screen.getByText('leaf-child').closest('[data-be="text"]')!;
     expect(textEl).toHaveStyle({ color: '#00ff00' });
   });
@@ -856,7 +852,12 @@ describe('elements/index istanbul residual', () => {
   it('MElement deps 一侧 undefined 触发 rerender', () => {
     const element = { type: 'paragraph', children: [], hash: 'h1' };
     const { rerender } = render(
-      <MElement {...baseElementProps} readonly element={element} deps={['a']} />,
+      <MElement
+        {...baseElementProps}
+        readonly
+        element={element}
+        deps={['a']}
+      />,
     );
     rerender(
       <MElement
@@ -872,7 +873,12 @@ describe('elements/index istanbul residual', () => {
   it('MElement deps 长度不同触发 rerender', () => {
     const element = { type: 'paragraph', children: [], hash: 'h2' };
     const { rerender } = render(
-      <MElement {...baseElementProps} readonly element={element} deps={['a']} />,
+      <MElement
+        {...baseElementProps}
+        readonly
+        element={element}
+        deps={['a']}
+      />,
     );
     rerender(
       <MElement
@@ -890,12 +896,7 @@ describe('elements/index istanbul residual', () => {
     const { rerender } = render(
       <MElement {...baseElementProps} element={element} />,
     );
-    rerender(
-      <MElement
-        {...baseElementProps}
-        element={{ ...element }}
-      />,
-    );
+    rerender(<MElement {...baseElementProps} element={{ ...element }} />);
     expect(screen.getByTestId('paragraph-edit')).toBeInTheDocument();
   });
 
@@ -942,12 +943,7 @@ describe('elements/index istanbul residual', () => {
   });
 
   it('MLeaf mark=true 但 text 为空不渲染 mark', () => {
-    render(
-      <MLeaf
-        {...baseLeafProps}
-        leaf={{ text: '', mark: true }}
-      />,
-    );
+    render(<MLeaf {...baseLeafProps} leaf={{ text: '', mark: true }} />);
     expect(screen.queryByRole('mark')).not.toBeInTheDocument();
   });
 
@@ -959,7 +955,9 @@ describe('elements/index istanbul residual', () => {
         linkConfig={{ openInNewTab: false }}
       />,
     );
-    fireEvent.click(screen.getByText('leaf-child').closest('[data-be="text"]')!);
+    fireEvent.click(
+      screen.getByText('leaf-child').closest('[data-be="text"]')!,
+    );
   });
 
   it('MLeaf placeholder 空且无 locale 时仍渲染 TagPopup', () => {
@@ -1096,10 +1094,7 @@ describe('elements/index istanbul residual', () => {
 
   it('istanbul after：MLeaf 仅 italic / 仅 strikethrough / url 叶子', () => {
     const { unmount: u1 } = render(
-      <MLeaf
-        {...baseLeafProps}
-        leaf={{ text: 'i-only', italic: true }}
-      />,
+      <MLeaf {...baseLeafProps} leaf={{ text: 'i-only', italic: true }} />,
     );
     expect(screen.getByText('leaf-child')).toBeInTheDocument();
     u1();

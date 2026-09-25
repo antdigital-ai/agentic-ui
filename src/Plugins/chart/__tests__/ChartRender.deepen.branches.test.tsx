@@ -2,7 +2,14 @@
  * ChartRender 补洞：runtime 真值 height/title、空 chartData、i18n、toolbar、防抖。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -226,9 +233,7 @@ describe('ChartRender deepen branches', () => {
     wrap(
       <ChartRender
         chartType="histogram"
-        chartData={[
-          { name: 'a', value: 3, type: 'T', category: 'C', fl: 'F' },
-        ]}
+        chartData={[{ name: 'a', value: 3, type: 'T', category: 'C', fl: 'F' }]}
         config={titledConfig as any}
         title="HistTitle"
         groupBy="category"
@@ -302,14 +307,16 @@ describe('ChartRender deepen branches', () => {
     });
     const copyIcon = document.querySelector('.anticon-copy');
     if (copyIcon) fireEvent.click(copyIcon);
-    await waitFor(() => expect(screen.getByText('Copied OK')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText('Copied OK')).toBeInTheDocument(),
+    );
 
     const colsTrigger = screen.getByText(/Cols/);
     await user.click(colsTrigger.closest('span') ?? colsTrigger);
     await waitFor(() =>
-      expect(document.querySelectorAll('.ant-dropdown-menu-item').length).toBeGreaterThan(
-        0,
-      ),
+      expect(
+        document.querySelectorAll('.ant-dropdown-menu-item').length,
+      ).toBeGreaterThan(0),
     );
   });
 
@@ -317,7 +324,9 @@ describe('ChartRender deepen branches', () => {
     wrap(
       <ChartRender
         chartType="bar"
-        chartData={[{ c0: 1, c1: 2, c2: 3, c3: 4, c4: 5, c5: 6, c6: 7, c7: 8, c8: 9 }]}
+        chartData={[
+          { c0: 1, c1: 2, c2: 3, c3: 4, c4: 5, c5: 6, c6: 7, c7: 8, c8: 9 },
+        ]}
         config={
           {
             columns: Array.from({ length: 9 }, (_, i) => ({

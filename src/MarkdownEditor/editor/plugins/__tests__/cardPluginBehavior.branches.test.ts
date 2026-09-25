@@ -129,9 +129,7 @@ describe('cardPluginBehavior 分支覆盖', () => {
       editor.children = [
         {
           type: 'paragraph',
-          children: [
-            { type: 'card-after', children: [{ text: '' }] },
-          ],
+          children: [{ type: 'card-after', children: [{ text: '' }] }],
         },
       ];
       expect(findCardForCardAfterInner(editor, [0, 0, 0])).toBeNull();
@@ -141,9 +139,11 @@ describe('cardPluginBehavior 分支覆盖', () => {
       const editor = createEditor();
       editor.children = [cardWithContent()];
       expect(
-        redirectCardAfterFragment(editor, [0, 2, 0], [
-          { type: 'paragraph', children: [{ text: 'frag' }] },
-        ]),
+        redirectCardAfterFragment(
+          editor,
+          [0, 2, 0],
+          [{ type: 'paragraph', children: [{ text: 'frag' }] }],
+        ),
       ).toBe(true);
       expect(editor.children.length).toBe(2);
     });
@@ -165,7 +165,9 @@ describe('cardPluginBehavior 分支覆盖', () => {
     it('收集 card 祖先 path', () => {
       const editor = createEditor();
       editor.children = [cardWithContent('x')];
-      expect(collectCardPathsForTextOperation(editor, [0, 1, 0])).toEqual([[0]]);
+      expect(collectCardPathsForTextOperation(editor, [0, 1, 0])).toEqual([
+        [0],
+      ]);
     });
 
     it('collectCardPathsForTextOperation 在 Node.get 抛错时停止遍历', () => {
@@ -197,7 +199,9 @@ describe('cardPluginBehavior 分支覆盖', () => {
         path: [0],
         node: editor.children[0],
       };
-      expect(handleCardRemoveNodeOperation(editor, op as any, apply)).toBe(true);
+      expect(handleCardRemoveNodeOperation(editor, op as any, apply)).toBe(
+        true,
+      );
       expect(apply).toHaveBeenCalledWith(op);
     });
 
@@ -205,13 +209,16 @@ describe('cardPluginBehavior 分支覆盖', () => {
       const editor = createEditor();
       editor.children = [cardWithContent()];
       const apply = vi.fn();
-      const cardAfter = (editor.children[0] as { children: Node[] }).children[2];
+      const cardAfter = (editor.children[0] as { children: Node[] })
+        .children[2];
       const op: Operation = {
         type: 'remove_node',
         path: [0, 2],
         node: cardAfter,
       };
-      expect(handleCardRemoveNodeOperation(editor, op as any, apply)).toBe(true);
+      expect(handleCardRemoveNodeOperation(editor, op as any, apply)).toBe(
+        true,
+      );
       expect(apply).toHaveBeenCalledWith(
         expect.objectContaining({ path: [0] }),
       );
@@ -221,13 +228,16 @@ describe('cardPluginBehavior 分支覆盖', () => {
       const editor = createEditor();
       editor.children = [cardWithContent()];
       const apply = vi.fn();
-      const cardBefore = (editor.children[0] as { children: Node[] }).children[0];
+      const cardBefore = (editor.children[0] as { children: Node[] })
+        .children[0];
       const op: Operation = {
         type: 'remove_node',
         path: [0, 0],
         node: cardBefore,
       };
-      expect(handleCardRemoveNodeOperation(editor, op as any, apply)).toBe(true);
+      expect(handleCardRemoveNodeOperation(editor, op as any, apply)).toBe(
+        true,
+      );
     });
 
     it('删除 card-after 但父级非 card 时仅 apply 原操作', () => {
@@ -239,13 +249,16 @@ describe('cardPluginBehavior 分支覆盖', () => {
         },
       ];
       const apply = vi.fn();
-      const cardAfter = (editor.children[0] as { children: Node[] }).children[0];
+      const cardAfter = (editor.children[0] as { children: Node[] })
+        .children[0];
       const op: Operation = {
         type: 'remove_node',
         path: [0, 0],
         node: cardAfter,
       };
-      expect(handleCardRemoveNodeOperation(editor, op as any, apply)).toBe(true);
+      expect(handleCardRemoveNodeOperation(editor, op as any, apply)).toBe(
+        true,
+      );
       expect(apply).toHaveBeenCalledWith(op);
     });
 
@@ -258,7 +271,9 @@ describe('cardPluginBehavior 分支覆盖', () => {
         path: [0, 1],
         node: (editor.children[0] as { children: Node[] }).children[1],
       };
-      expect(handleCardRemoveNodeOperation(editor, op as any, apply)).toBe(true);
+      expect(handleCardRemoveNodeOperation(editor, op as any, apply)).toBe(
+        true,
+      );
     });
 
     it('非 card 相关 remove 返回 false', () => {
@@ -270,7 +285,9 @@ describe('cardPluginBehavior 分支覆盖', () => {
         path: [0],
         node: editor.children[0],
       };
-      expect(handleCardRemoveNodeOperation(editor, op as any, apply)).toBe(false);
+      expect(handleCardRemoveNodeOperation(editor, op as any, apply)).toBe(
+        false,
+      );
     });
   });
 
@@ -428,9 +445,9 @@ describe('cardPluginBehavior 分支覆盖', () => {
       const editor = createEditor();
       editor.children = [emptyCard()];
       editor.selection = null;
-      expect(
-        handleCardDeleteBackward(editor, 'character', vi.fn()),
-      ).toBe(false);
+      expect(handleCardDeleteBackward(editor, 'character', vi.fn())).toBe(
+        false,
+      );
     });
 
     it('card-after 无有效 contentPath 时移除 card', () => {
@@ -446,9 +463,9 @@ describe('cardPluginBehavior 分支覆盖', () => {
       ];
       Transforms.select(editor, { path: [0, 0, 0], offset: 0 });
       const deleteBackward = vi.fn();
-      expect(handleCardDeleteBackward(editor, 'character', deleteBackward)).toBe(
-        true,
-      );
+      expect(
+        handleCardDeleteBackward(editor, 'character', deleteBackward),
+      ).toBe(true);
       expect(editor.children.length).toBe(1);
       expect((editor.children[0] as { type: string }).type).toBe('paragraph');
       expect(deleteBackward).not.toHaveBeenCalled();
@@ -459,9 +476,9 @@ describe('cardPluginBehavior 分支覆盖', () => {
       editor.children = [emptyCard()];
       Transforms.select(editor, { path: [0, 0, 0], offset: 0 });
       const deleteBackward = vi.fn();
-      expect(handleCardDeleteBackward(editor, 'character', deleteBackward)).toBe(
-        true,
-      );
+      expect(
+        handleCardDeleteBackward(editor, 'character', deleteBackward),
+      ).toBe(true);
       expect(deleteBackward).not.toHaveBeenCalled();
     });
 
@@ -470,9 +487,9 @@ describe('cardPluginBehavior 分支覆盖', () => {
       editor.children = [cardWithContent('content')];
       Transforms.select(editor, { path: [0, 2, 0], offset: 0 });
       const deleteBackward = vi.fn();
-      expect(handleCardDeleteBackward(editor, 'character', deleteBackward)).toBe(
-        true,
-      );
+      expect(
+        handleCardDeleteBackward(editor, 'character', deleteBackward),
+      ).toBe(true);
       expect(editor.selection?.anchor.path).toEqual([0, 1, 0]);
     });
 
@@ -481,9 +498,9 @@ describe('cardPluginBehavior 分支覆盖', () => {
       editor.children = [emptyCard()];
       Transforms.select(editor, { path: [0, 2, 0], offset: 0 });
       const deleteBackward = vi.fn();
-      expect(handleCardDeleteBackward(editor, 'character', deleteBackward)).toBe(
-        true,
-      );
+      expect(
+        handleCardDeleteBackward(editor, 'character', deleteBackward),
+      ).toBe(true);
       expect(editor.selection?.anchor.path).toEqual([0, 1, 0]);
       expect(deleteBackward).not.toHaveBeenCalled();
     });
@@ -493,9 +510,9 @@ describe('cardPluginBehavior 分支覆盖', () => {
       editor.children = [{ type: 'paragraph', children: [{ text: 'ab' }] }];
       Transforms.select(editor, { path: [0, 0], offset: 1 });
       const deleteBackward = vi.fn();
-      expect(handleCardDeleteBackward(editor, 'character', deleteBackward)).toBe(
-        true,
-      );
+      expect(
+        handleCardDeleteBackward(editor, 'character', deleteBackward),
+      ).toBe(true);
       expect(deleteBackward).toHaveBeenCalledWith('character');
     });
   });

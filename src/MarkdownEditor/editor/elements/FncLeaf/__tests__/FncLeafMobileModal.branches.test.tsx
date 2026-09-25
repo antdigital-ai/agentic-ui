@@ -6,13 +6,7 @@ import { FncLeafMobileModal } from '../FncLeafMobileModal';
 
 describe('FncLeafMobileModal 分支覆盖', () => {
   it('无 definition 且无 identifier 显示暂无说明', () => {
-    render(
-      <FncLeafMobileModal
-        open
-        onClose={vi.fn()}
-        displayLabel=""
-      />,
-    );
+    render(<FncLeafMobileModal open onClose={vi.fn()} displayLabel="" />);
     expect(screen.getByText('暂无脚注说明')).toBeInTheDocument();
     expect(screen.getByText('脚注')).toBeInTheDocument();
   });

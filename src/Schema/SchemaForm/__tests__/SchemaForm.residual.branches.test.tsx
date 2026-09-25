@@ -6,9 +6,9 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { SchemaForm } from '..';
 import { I18nContext } from '../../../I18n';
 import type { LowCodeSchema } from '../../types';
-import { SchemaForm } from '..';
 
 const locale = {
   inputPlaceholder: '请输入',
@@ -62,10 +62,7 @@ describe('SchemaForm residual branches', () => {
     expect(() =>
       render(
         <Wrapper>
-          <SchemaForm
-            schema={baseSchema(undefined)}
-            initialValues={{}}
-          />
+          <SchemaForm schema={baseSchema(undefined)} initialValues={{}} />
         </Wrapper>,
       ),
     ).not.toThrow();

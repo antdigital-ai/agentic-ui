@@ -2,7 +2,13 @@
  * TaskList deepen residual：scrollIntoView object、无 locale 完成/进行中文案、折叠箭头。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -44,7 +50,9 @@ describe('TaskList deepen residual branches', () => {
   it('无 locale 全部成功 → 任务完成；collapse 默认', () => {
     render(
       <ConfigProvider>
-        <I18nContext.Provider value={{ locale: null, language: 'zh-CN' } as any}>
+        <I18nContext.Provider
+          value={{ locale: null, language: 'zh-CN' } as any}
+        >
           <TaskList
             variant="simple"
             open
@@ -67,7 +75,9 @@ describe('TaskList deepen residual branches', () => {
   it('无 locale 进行中 → 默认模板；expand 默认', () => {
     render(
       <ConfigProvider>
-        <I18nContext.Provider value={{ locale: null, language: 'zh-CN' } as any}>
+        <I18nContext.Provider
+          value={{ locale: null, language: 'zh-CN' } as any}
+        >
           <TaskList
             variant="simple"
             open={false}

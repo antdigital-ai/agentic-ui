@@ -210,9 +210,7 @@ function renderEditor(props: any = {}) {
     <SlateMarkdownEditor
       prefixCls="ant-md"
       instance={
-        props.omitInstance
-          ? undefined
-          : (props.instance ?? { id: 'inst5' })
+        props.omitInstance ? undefined : (props.instance ?? { id: 'inst5' })
       }
       initSchemaValue={
         props.initSchemaValue ?? [
@@ -274,9 +272,7 @@ describe('Editor deepen5 residual branches', () => {
           children: [
             {
               type: 'table-row',
-              children: [
-                { type: 'table-cell', children: [{ text: 'a' }] },
-              ],
+              children: [{ type: 'table-cell', children: [{ text: 'a' }] }],
             },
           ],
         },

@@ -111,12 +111,10 @@ describe('BarChart deepen4 residual branches', () => {
       },
     };
     // dataset 0 raw 经 ??0 → 非顶段返回 0（覆盖 Number(ds?.data?.[d] ?? 0)）
-    expect(
-      br({ raw: undefined, datasetIndex: 0, dataIndex: 0, chart }),
-    ).toBe(0);
-    expect(
-      br({ raw: 3, datasetIndex: 1, dataIndex: 0, chart }),
-    ).toBeTruthy();
+    expect(br({ raw: undefined, datasetIndex: 0, dataIndex: 0, chart })).toBe(
+      0,
+    );
+    expect(br({ raw: 3, datasetIndex: 1, dataIndex: 0, chart })).toBeTruthy();
   });
 
   it('showDataLabels：无 type 用默认数据集名；chartOptions 非对象 deepMerge', () => {

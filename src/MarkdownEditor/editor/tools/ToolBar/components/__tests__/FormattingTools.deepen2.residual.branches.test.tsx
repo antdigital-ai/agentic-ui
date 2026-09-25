@@ -22,13 +22,7 @@ describe('FormattingTools deepen2 residual branches', () => {
       (mod as any).default ||
       Object.values(mod)[0];
     try {
-      render(
-        <Comp
-          editor={{} as any}
-          isActive={() => false}
-          run={vi.fn()}
-        />,
-      );
+      render(<Comp editor={{} as any} isActive={() => false} run={vi.fn()} />);
     } catch {
       /* props 差异可接受 */
     }

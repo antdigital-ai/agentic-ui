@@ -69,8 +69,14 @@ describe('getScroll 分支覆盖', () => {
 
   it('getScrollRailHeight HTMLElement', () => {
     const el = document.createElement('div');
-    Object.defineProperty(el, 'scrollHeight', { configurable: true, value: 300 });
-    Object.defineProperty(el, 'offsetHeight', { configurable: true, value: 200 });
+    Object.defineProperty(el, 'scrollHeight', {
+      configurable: true,
+      value: 300,
+    });
+    Object.defineProperty(el, 'offsetHeight', {
+      configurable: true,
+      value: 200,
+    });
     expect(getScrollRailHeight(el)).toBe(100);
   });
 

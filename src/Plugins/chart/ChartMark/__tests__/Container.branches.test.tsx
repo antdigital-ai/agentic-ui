@@ -5,14 +5,22 @@ import { Container } from '../Container';
 
 vi.mock('../../utils', () => ({ debounce: (fn: any) => fn }));
 vi.mock('rc-resize-observer', () => ({
-  default: ({ children, onResize }: any) => <div data-testid="observer" onClick={onResize}>{children}</div>,
+  default: ({ children, onResize }: any) => (
+    <div data-testid="observer" onClick={onResize}>
+      {children}
+    </div>
+  ),
 }));
 
 describe('ChartMark Container residual branches', () => {
   it.skip('ignores resize callbacks before the chart enters view', () => {
     const resize = vi.fn();
     const { getByTestId } = render(
-      <Container chartRef={{ current: { resize } } as any} htmlRef={{ current: null }} index={0}>
+      <Container
+        chartRef={{ current: { resize } } as any}
+        htmlRef={{ current: null }}
+        index={0}
+      >
         chart
       </Container>,
     );
@@ -22,7 +30,11 @@ describe('ChartMark Container residual branches', () => {
 
   it.skip('handles absent chart refs after entering view', () => {
     const { getByTestId } = render(
-      <Container chartRef={{ current: undefined } as any} htmlRef={{ current: null }} index={1}>
+      <Container
+        chartRef={{ current: undefined } as any}
+        htmlRef={{ current: null }}
+        index={1}
+      >
         chart
       </Container>,
     );

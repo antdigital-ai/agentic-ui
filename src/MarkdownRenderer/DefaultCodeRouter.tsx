@@ -87,9 +87,7 @@ interface RouteConfig {
   /** 需要从 pluginComponents 中查找的插件 key（默认等于 language） */
   pluginKey?: string;
   /** 额外透传给组件的 props 选择器 */
-  extraProps?: (
-    ctx: DefaultCodeRouterProps,
-  ) => Record<string, any> | undefined;
+  extraProps?: (ctx: DefaultCodeRouterProps) => Record<string, any> | undefined;
 }
 
 const ROUTE_TABLE: RouteConfig[] = [

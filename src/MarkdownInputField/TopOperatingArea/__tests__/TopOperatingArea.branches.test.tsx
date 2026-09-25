@@ -47,9 +47,7 @@ describe('TopOperatingArea branches', () => {
         <TopOperatingArea />
       </ConfigProvider>,
     );
-    expect(
-      container.querySelector('[class*="-buttons"]'),
-    ).toBeNull();
+    expect(container.querySelector('[class*="-buttons"]')).toBeNull();
   });
 
   it('targetRef 空 current 时回退 window', () => {

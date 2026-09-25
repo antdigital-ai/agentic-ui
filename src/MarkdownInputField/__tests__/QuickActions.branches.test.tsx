@@ -2,7 +2,13 @@
  * QuickActions 分支覆盖：refine、enlarge、resize、quickActionRender。
  */
 import '@testing-library/jest-dom';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { QuickActions } from '../QuickActions';
@@ -71,17 +77,15 @@ vi.mock('rc-resize-observer', () => {
 describe('QuickActions branches', () => {
   it('无 refine/enlarge/render 时渲染空容器', () => {
     render(<QuickActions />);
-    expect(screen.getByTestId('markdown-input-field-quick-actions')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('markdown-input-field-quick-actions'),
+    ).toBeInTheDocument();
   });
 
   it('enlargeable 渲染放大按钮', () => {
     const onEnlargeClick = vi.fn();
     render(
-      <QuickActions
-        enlargeable
-        isEnlarged
-        onEnlargeClick={onEnlargeClick}
-      />,
+      <QuickActions enlargeable isEnlarged onEnlargeClick={onEnlargeClick} />,
     );
     fireEvent.click(screen.getByTestId('enlargement-toggle'));
     expect(onEnlargeClick).toHaveBeenCalled();
@@ -103,10 +107,7 @@ describe('QuickActions branches', () => {
   it('refinePrompt enable=false 时点击不调用 onRefine', async () => {
     const onRefine = vi.fn();
     render(
-      <QuickActions
-        refinePrompt={{ enable: false, onRefine }}
-        value="hi"
-      />,
+      <QuickActions refinePrompt={{ enable: false, onRefine }} value="hi" />,
     );
     fireEvent.click(screen.getByTestId('refine-prompt-button'));
     expect(onRefine).not.toHaveBeenCalled();
@@ -120,7 +121,9 @@ describe('QuickActions branches', () => {
     render(
       <QuickActions
         refinePrompt={{ enable: true, onRefine }}
-        editorRef={{ current: { store: { setMDContent, getMDContent } } } as any}
+        editorRef={
+          { current: { store: { setMDContent, getMDContent } } } as any
+        }
         onValueChange={onValueChange}
         value="fallback"
       />,
@@ -150,9 +153,7 @@ describe('QuickActions branches', () => {
   });
 
   it('refine 无 onRefine 早退', async () => {
-    render(
-      <QuickActions refinePrompt={{ enable: true } as any} value="x" />,
-    );
+    render(<QuickActions refinePrompt={{ enable: true } as any} value="x" />);
     fireEvent.click(screen.getByTestId('refine-prompt-button'));
     expect(screen.getByTestId('refine-prompt-button')).toHaveAttribute(
       'data-status',

@@ -80,7 +80,8 @@ export const FncLeaf = ({
   );
 
   const dataFndName = useMemo(
-    () => (leaf.fnd ? extractFootnoteDefinitionIdentifier(leaf.text) : undefined),
+    () =>
+      leaf.fnd ? extractFootnoteDefinitionIdentifier(leaf.text) : undefined,
     [leaf.fnd, leaf.text],
   );
 
@@ -123,10 +124,7 @@ export const FncLeaf = ({
     }
   });
 
-  const customRenderChildren = useMemo(
-    () => displayLabel,
-    [displayLabel],
-  );
+  const customRenderChildren = useMemo(() => displayLabel, [displayLabel]);
 
   let dom = (
     <span

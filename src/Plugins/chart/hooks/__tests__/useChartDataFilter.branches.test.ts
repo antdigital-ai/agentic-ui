@@ -7,9 +7,7 @@ import { useChartDataFilter } from '../useChartDataFilter';
 
 describe('useChartDataFilter branches', () => {
   it('非数组 data 回退 EMPTY；过滤空 x；默认分类 label', () => {
-    const { result } = renderHook(() =>
-      useChartDataFilter(null as any),
-    );
+    const { result } = renderHook(() => useChartDataFilter(null as any));
     expect(result.current.safeData).toEqual([]);
     expect(result.current.filteredData).toEqual([]);
   });
@@ -22,10 +20,9 @@ describe('useChartDataFilter branches', () => {
       { category: '', x: 4, y: 4 },
     ] as any;
 
-    const { result, rerender } = renderHook(
-      ({ d }) => useChartDataFilter(d),
-      { initialProps: { d: data } },
-    );
+    const { result, rerender } = renderHook(({ d }) => useChartDataFilter(d), {
+      initialProps: { d: data },
+    });
 
     expect(result.current.categories).toEqual(['A', 'B']);
     expect(result.current.filterLabels).toEqual(['L1', 'L2']);
@@ -37,10 +34,14 @@ describe('useChartDataFilter branches', () => {
       result.current.setSelectedFilter('A');
       result.current.setSelectedFilterLabel('L1');
     });
+    expect(result.current.filteredData.every((i) => i.category === 'A')).toBe(
+      true,
+    );
     expect(
-      result.current.filteredData.every((i) => i.category === 'A'),
+      result.current.filteredData.every(
+        (i) => i.x !== null && i.x !== undefined,
+      ),
     ).toBe(true);
-    expect(result.current.filteredData.every((i) => i.x !== null && i.x !== undefined)).toBe(true);
 
     act(() => {
       result.current.setSelectedFilter('gone');
@@ -48,9 +49,10 @@ describe('useChartDataFilter branches', () => {
     rerender({
       d: [{ category: 'C', x: 1, y: 1 }] as any,
     });
-    expect(result.current.selectedFilter === '' || result.current.selectedFilter === 'C').toBe(
-      true,
-    );
+    expect(
+      result.current.selectedFilter === '' ||
+        result.current.selectedFilter === 'C',
+    ).toBe(true);
 
     act(() => {
       result.current.setSelectedFilterLabel('L1');
@@ -76,10 +78,9 @@ describe('useChartDataFilter branches', () => {
       { category: 'A', filterLabel: 'L1', x: 1, y: 1 },
       { category: 'A', filterLabel: 'L2', x: 2, y: 2 },
     ] as any;
-    const { result, rerender } = renderHook(
-      ({ d }) => useChartDataFilter(d),
-      { initialProps: { d: data } },
-    );
+    const { result, rerender } = renderHook(({ d }) => useChartDataFilter(d), {
+      initialProps: { d: data },
+    });
     act(() => {
       result.current.setSelectedFilterLabel('L1');
     });

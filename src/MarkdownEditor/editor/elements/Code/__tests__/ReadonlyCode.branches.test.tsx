@@ -69,9 +69,9 @@ describe('ReadonlyCode branches', () => {
       </ReadonlyCode>,
     );
     expect(
-      document.querySelector('[data-is-unclosed]')?.getAttribute(
-        'data-is-unclosed',
-      ),
+      document
+        .querySelector('[data-is-unclosed]')
+        ?.getAttribute('data-is-unclosed'),
     ).toBe('true');
   });
 

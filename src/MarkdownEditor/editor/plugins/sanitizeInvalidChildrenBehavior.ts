@@ -1,4 +1,12 @@
-import { Editor, Element, Node, NodeEntry, Path, Text, Transforms } from 'slate';
+import {
+  Editor,
+  Element,
+  Node,
+  NodeEntry,
+  Path,
+  Text,
+  Transforms,
+} from 'slate';
 import { HistoryEditor } from 'slate-history';
 
 import { EditorUtils } from '../utils/editorUtils';
@@ -12,7 +20,9 @@ export const isValidChild = (child: unknown): child is Node =>
  * `Array.prototype.some` skips sparse holes; Slate still sees missing indices and
  * can pass `undefined` as `leaf` into `renderLeaf`, which then throws in `Text.isText`.
  */
-export const childArrayHasInvalidEntries = (rawChildren: unknown[]): boolean => {
+export const childArrayHasInvalidEntries = (
+  rawChildren: unknown[],
+): boolean => {
   for (let i = 0; i < rawChildren.length; i += 1) {
     if (!(i in rawChildren) || !isValidChild(rawChildren[i])) {
       return true;
@@ -156,7 +166,10 @@ const rootChildrenNeedDirectAssignment = (raw: unknown): boolean =>
  * 替换编辑器根节点：结构完好时走 Transforms；稀疏洞/undefined 等损坏根只能直接赋值，
  * 否则 removeNodes 会因无效 path 抛错（见 withSanitizeInvalidChildren 稀疏根用例）。
  */
-export const setEditorChildrenSafely = (editor: Editor, nodes: Node[]): void => {
+export const setEditorChildrenSafely = (
+  editor: Editor,
+  nodes: Node[],
+): void => {
   const normalized = EditorUtils.coalesceRootAllEmptyParagraphs(nodes);
 
   if (rootChildrenNeedDirectAssignment(editor.children)) {
@@ -221,8 +234,7 @@ export const normalizeEditorRootEntry = (
   const hasInvalid = childArrayHasInvalidEntries(childList);
   if (hasInvalid || childList.length === 0) {
     const fixedTop = compactEditorRootChildren(childList);
-    const nextNodes =
-      fixedTop.length === 0 ? [createDefaultBlock()] : fixedTop;
+    const nextNodes = fixedTop.length === 0 ? [createDefaultBlock()] : fixedTop;
     setEditorChildrenSafely(editor, nextNodes);
     normalizeNode([editor, []]);
     return true;

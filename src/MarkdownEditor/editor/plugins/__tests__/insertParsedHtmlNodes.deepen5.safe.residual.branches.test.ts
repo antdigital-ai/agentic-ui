@@ -29,15 +29,14 @@ describe('insertParsedHtmlNodes deepen5 safe residual branches', () => {
     node.parentNode = el;
     node.parentElement = el;
     const result = deserialize(node, 'BLOCKQUOTE');
-    expect(result === null || result === undefined || typeof result === 'object').toBe(
-      true,
-    );
+    expect(
+      result === null || result === undefined || typeof result === 'object',
+    ).toBe(true);
   });
 
   it('blob / http upload：editorProps.image?.upload 双 if 臂', async () => {
-    const { docxDeserializer } = await import(
-      '../../utils/docx/docxDeserializer'
-    );
+    const { docxDeserializer } =
+      await import('../../utils/docx/docxDeserializer');
     global.fetch = vi.fn().mockResolvedValue({
       blob: async () => new Blob(['x'], { type: 'image/png' }),
     }) as any;
@@ -82,9 +81,8 @@ describe('insertParsedHtmlNodes deepen5 safe residual branches', () => {
   });
 
   it('无选区大批量：insertAt undefined 分段插入', async () => {
-    const { docxDeserializer } = await import(
-      '../../utils/docx/docxDeserializer'
-    );
+    const { docxDeserializer } =
+      await import('../../utils/docx/docxDeserializer');
     const many = Array.from({ length: 25 }, (_, i) => ({
       type: 'paragraph',
       children: [{ text: `chunk${i}` }],
@@ -100,9 +98,8 @@ describe('insertParsedHtmlNodes deepen5 safe residual branches', () => {
   });
 
   it('list-item + specialNode 首段：children||[] 与非折叠 selection', async () => {
-    const { docxDeserializer } = await import(
-      '../../utils/docx/docxDeserializer'
-    );
+    const { docxDeserializer } =
+      await import('../../utils/docx/docxDeserializer');
     vi.mocked(docxDeserializer).mockReturnValueOnce([
       {
         type: 'list',
@@ -145,7 +142,12 @@ describe('insertParsedHtmlNodes deepen5 safe residual branches', () => {
       return [][Symbol.iterator]();
     }) as any);
 
-    const result = await insertParsedHtmlNodes(editor, '<ul><li>a</li></ul>', {}, '');
+    const result = await insertParsedHtmlNodes(
+      editor,
+      '<ul><li>a</li></ul>',
+      {},
+      '',
+    );
     nodesSpy.mockRestore();
     expect(result === true || result === false).toBe(true);
   });

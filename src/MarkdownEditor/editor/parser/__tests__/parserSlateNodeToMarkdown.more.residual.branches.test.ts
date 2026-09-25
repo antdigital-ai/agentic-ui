@@ -150,19 +150,18 @@ describe('parserSlateNodeToMarkdown istanbul easy/medium matrix', () => {
       }),
       assert: (s: string) => expect(s).toMatch(/^#\s/),
     },
-  ])('convertPluginNode container fallbacks: $label', ({
-    type,
-    convert,
-    assert,
-  }) => {
-    const md = parserSlateNodeToMarkdown(
-      [{ type, children: [{ text: '' }] }] as any,
-      'IND',
-      [{ root: true }],
-      [pluginMatch(type, convert)] as any,
-    );
-    assert(md);
-  });
+  ])(
+    'convertPluginNode container fallbacks: $label',
+    ({ type, convert, assert }) => {
+      const md = parserSlateNodeToMarkdown(
+        [{ type, children: [{ text: '' }] }] as any,
+        'IND',
+        [{ root: true }],
+        [pluginMatch(type, convert)] as any,
+      );
+      assert(md);
+    },
+  );
 
   it('parserNode !node 早退（list-item 内 null 子节点）', () => {
     const md = parserSlateNodeToMarkdown([
@@ -405,10 +404,7 @@ describe('parserSlateNodeToMarkdown istanbul easy/medium matrix', () => {
     const md = parserSlateNodeToMarkdown([
       {
         type: 'paragraph',
-        children: [
-          { text: 'mix', bold: true, italic: true },
-          { text: 'next' },
-        ],
+        children: [{ text: 'mix', bold: true, italic: true }, { text: 'next' }],
       },
     ] as any);
     expect(md).toContain('mix');
@@ -712,7 +708,11 @@ describe('parserSlateNodeToMarkdown istanbul easy/medium matrix', () => {
         toMarkdown: [
           {
             match: (n: any) => n.type === 'custom-code',
-            convert: () => ({ type: 'code', lang: undefined, value: undefined }),
+            convert: () => ({
+              type: 'code',
+              lang: undefined,
+              value: undefined,
+            }),
           },
         ],
       },
@@ -1225,7 +1225,9 @@ describe('parserSlateNodeToMarkdown istanbul easy/medium matrix', () => {
                   children: [
                     {
                       type: 'paragraph',
-                      children: [{ text: 'c', code: true, strikethrough: true }],
+                      children: [
+                        { text: 'c', code: true, strikethrough: true },
+                      ],
                     },
                   ],
                 },

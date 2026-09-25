@@ -2,13 +2,13 @@ import '@testing-library/jest-dom';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { TocHeading } from '../../../editor/tools/Leading';
+import type { Elements } from '../../../el';
 
 function resetFakeTimers() {
   cleanup();
   vi.clearAllTimers();
 }
-import { TocHeading } from '../../../editor/tools/Leading';
-import type { Elements } from '../../../el';
 
 const mockContainerRef: { current: HTMLDivElement | null } = { current: null };
 const configTargets: HTMLElement[] = [];

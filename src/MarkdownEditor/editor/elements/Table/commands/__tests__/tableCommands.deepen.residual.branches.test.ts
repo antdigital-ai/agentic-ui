@@ -65,9 +65,7 @@ describe('tableCommands deepen residual branches', () => {
 
   it('非 table 路径早退', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: '' }] },
-    ] as any;
+    editor.children = [{ type: 'paragraph', children: [{ text: '' }] }] as any;
     expect(() => clearTableSelection(editor as any, [0])).not.toThrow();
   });
 });

@@ -2,7 +2,13 @@
  * AgenticLayout deepen：mousemove 未拖拽早退、RTL 拖拽、视口 resize clamp。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -30,9 +36,7 @@ describe('AgenticLayout deepen residual branches', () => {
       </ConfigProvider>,
     );
     expect(screen.getByTestId(AGENTIC_LAYOUT_TEST_ID)).toBeInTheDocument();
-    expect(() =>
-      fireEvent.mouseMove(document, { clientX: 100 }),
-    ).not.toThrow();
+    expect(() => fireEvent.mouseMove(document, { clientX: 100 })).not.toThrow();
   });
 
   it('拖拽 mouseup 后再 mousemove 早退；RTL 拖拽可调宽', async () => {
@@ -56,9 +60,7 @@ describe('AgenticLayout deepen residual branches', () => {
       vi.advanceTimersByTime(32);
     });
     fireEvent.mouseUp(document);
-    expect(() =>
-      fireEvent.mouseMove(document, { clientX: 900 }),
-    ).not.toThrow();
+    expect(() => fireEvent.mouseMove(document, { clientX: 900 })).not.toThrow();
   });
 
   it('视口缩小后 clamp 超宽右栏', async () => {

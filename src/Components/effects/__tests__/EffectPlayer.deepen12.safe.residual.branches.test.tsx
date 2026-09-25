@@ -43,7 +43,9 @@ describe('EffectPlayer deepen12 safe residual branches', () => {
     );
     expect(player.loadScene).toHaveBeenCalledWith('scene', { autoplay: false });
     expect(player.pause).toHaveBeenCalled();
-    rerender(<EffectPlayer sceneUrl={'scene' as any} autoplay={false} size={30} />);
+    rerender(
+      <EffectPlayer sceneUrl={'scene' as any} autoplay={false} size={30} />,
+    );
     expect(player.resize).toHaveBeenCalled();
     unmount();
     expect(player.dispose).toHaveBeenCalled();

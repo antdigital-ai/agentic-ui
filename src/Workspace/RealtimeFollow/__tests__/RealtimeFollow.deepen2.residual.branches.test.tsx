@@ -43,7 +43,9 @@ describe('RealtimeFollow deepen2 residual branches', () => {
         data={{ type: 'markdown', content: 'x', status: 'done' }}
       />,
     );
-    expect(container.querySelector('[class*="workspace-realtime"]')).toBeTruthy();
+    expect(
+      container.querySelector('[class*="workspace-realtime"]'),
+    ).toBeTruthy();
   });
 
   it('html 受控 viewMode：点击不改 controlled，仍回调 onViewModeChange', () => {

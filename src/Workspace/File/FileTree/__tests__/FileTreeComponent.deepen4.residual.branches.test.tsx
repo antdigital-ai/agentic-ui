@@ -3,7 +3,13 @@
  * loadData source 缺失、deselected、visibleRoots locale、onFileClick。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -95,9 +101,7 @@ describe('FileTreeComponent deepen4 residual branches', () => {
         }}
       >
         <FileTree
-          treeData={
-            [{ key: 'a', name: 'alpha.txt', isLeaf: true }] as any
-          }
+          treeData={[{ key: 'a', name: 'alpha.txt', isLeaf: true }] as any}
           filterKeyword="zzz"
           onLoadChildren={vi.fn()}
         />

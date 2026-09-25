@@ -2,10 +2,7 @@
  * parserSlateNodeToMarkdown deepen residual：isMix、plugin convert 全分支、mark/chart/list 边角。
  */
 import { describe, expect, it } from 'vitest';
-import {
-  isMix,
-  parserSlateNodeToMarkdown,
-} from '../parserSlateNodeToMarkdown';
+import { isMix, parserSlateNodeToMarkdown } from '../parserSlateNodeToMarkdown';
 
 const pluginMatch = (type: string, convert: () => any) => ({
   toMarkdown: [{ match: (n: any) => n?.type === type, convert }],

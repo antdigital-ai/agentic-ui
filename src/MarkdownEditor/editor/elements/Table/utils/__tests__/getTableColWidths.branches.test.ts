@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { getReadonlyTableColWidths } from '../getTableColWidths';
 import type { TableNode } from '../../../../types/Table';
+import { getReadonlyTableColWidths } from '../getTableColWidths';
 
 const tableWithCells = (): TableNode =>
   ({

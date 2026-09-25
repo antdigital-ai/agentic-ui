@@ -21,7 +21,9 @@ describe('remarkContainer deepen2 residual branches', () => {
         {
           type: 'containerDirective',
           name: 'note',
-          children: [{ type: 'paragraph', children: [{ type: 'text', value: 'a' }] }],
+          children: [
+            { type: 'paragraph', children: [{ type: 'text', value: 'a' }] },
+          ],
         },
       ],
     };

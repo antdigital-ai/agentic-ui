@@ -99,8 +99,6 @@ describe('ChartRender deepen9 residual branches', () => {
     }
   });
 
-
-
   it('radar：空数组；table 视图空 title 列过滤', async () => {
     wrap(
       <ChartRender

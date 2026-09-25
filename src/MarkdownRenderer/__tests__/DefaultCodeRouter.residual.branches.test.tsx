@@ -7,16 +7,24 @@ import { describe, expect, it, vi } from 'vitest';
 import { DefaultCodeRouter } from '../DefaultCodeRouter';
 
 vi.mock('../renderers/MermaidRenderer', () => ({
-  MermaidBlockRenderer: (p: any) => <div data-testid="lazy-mermaid">{p.language}</div>,
+  MermaidBlockRenderer: (p: any) => (
+    <div data-testid="lazy-mermaid">{p.language}</div>
+  ),
 }));
 vi.mock('../renderers/ChartRenderer', () => ({
-  ChartBlockRenderer: (p: any) => <div data-testid="lazy-chart">{p.language}</div>,
+  ChartBlockRenderer: (p: any) => (
+    <div data-testid="lazy-chart">{p.language}</div>
+  ),
 }));
 vi.mock('../renderers/CodeRenderer', () => ({
-  CodeBlockRenderer: (p: any) => <div data-testid="lazy-code">{p.language}</div>,
+  CodeBlockRenderer: (p: any) => (
+    <div data-testid="lazy-code">{p.language}</div>
+  ),
 }));
 vi.mock('../renderers/SchemaRenderer', () => ({
-  SchemaBlockRenderer: (p: any) => <div data-testid="lazy-schema">{p.language}</div>,
+  SchemaBlockRenderer: (p: any) => (
+    <div data-testid="lazy-schema">{p.language}</div>
+  ),
 }));
 vi.mock('../renderers/AgenticUiTaskBlockRenderer', () => ({
   AgenticUiTaskBlockRenderer: () => <div data-testid="lazy-task" />,
@@ -59,9 +67,7 @@ describe('DefaultCodeRouter residual branches', () => {
       <DefaultCodeRouter {...base} language="json-chart" />,
     );
     expect(await findByTestId('lazy-chart')).toBeTruthy();
-    rerender(
-      <DefaultCodeRouter {...base} language="agentic-ui-usertoolbar" />,
-    );
+    rerender(<DefaultCodeRouter {...base} language="agentic-ui-usertoolbar" />);
     expect(await findByTestId('lazy-tool')).toBeTruthy();
   });
 
@@ -75,9 +81,7 @@ describe('DefaultCodeRouter residual branches', () => {
     );
     expect(await findByTestId('lazy-filemap')).toHaveTextContent('cfg');
 
-    rerender(
-      <DefaultCodeRouter {...base} language="agentar-card" />,
-    );
+    rerender(<DefaultCodeRouter {...base} language="agentar-card" />);
     expect(await findByTestId('lazy-schema')).toBeTruthy();
 
     rerender(

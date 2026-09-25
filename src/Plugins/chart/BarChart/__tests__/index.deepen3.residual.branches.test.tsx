@@ -183,12 +183,7 @@ describe('BarChart deepen3 residual branches', () => {
     ).toMatchObject({ topLeft: 6 });
 
     cleanup();
-    render(
-      <BarChart
-        data={[{ x: 'a', y: -4, type: 't' }]}
-        title="radius-v"
-      />,
-    );
+    render(<BarChart data={[{ x: 'a', y: -4, type: 't' }]} title="radius-v" />);
     const brV = (globalThis as any).__bar3Data?.datasets?.[0]?.borderRadius;
     expect(
       brV({

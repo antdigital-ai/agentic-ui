@@ -7,7 +7,9 @@ import { useHistoryData } from '../useHistoryData';
 
 describe('useHistoryData residual branches', () => {
   it('无 request 时 loadHistory 直接返回', async () => {
-    const { result } = renderHook(() => useHistoryData({ agentId: 'a' } as any));
+    const { result } = renderHook(() =>
+      useHistoryData({ agentId: 'a' } as any),
+    );
     await act(async () => {
       await result.current.loadHistory();
     });

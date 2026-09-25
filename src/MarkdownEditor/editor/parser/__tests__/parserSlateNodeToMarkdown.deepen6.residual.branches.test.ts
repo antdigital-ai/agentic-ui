@@ -63,9 +63,7 @@ describe('parserSlateNodeToMarkdown deepen6 residual', () => {
     const urlEmpty = parserSlateNodeToMarkdown([
       {
         type: 'paragraph',
-        children: [
-          { text: '', tag: true, url: 'https://ex.com/x' } as any,
-        ],
+        children: [{ text: '', tag: true, url: 'https://ex.com/x' } as any],
       },
     ] as any);
     expect(urlEmpty).toContain('https://ex.com/x');

@@ -1,5 +1,4 @@
-import type { Editor } from 'slate';
-import type { Node, NodeEntry } from 'slate';
+import type { Editor, Node, NodeEntry } from 'slate';
 import { Element } from 'slate';
 
 import { isContainingTextNodes, isElementOrEditor } from '../lib';
@@ -14,28 +13,28 @@ import type { ListsSchema } from '../types';
  * pasting, so we have a separate rule for that in `deserializeHtml`.
  */
 export function normalizeOrphanListItemText(
-    editor: Editor,
-    schema: ListsSchema,
-    [node, path]: NodeEntry<Node>,
+  editor: Editor,
+  schema: ListsSchema,
+  [node, path]: NodeEntry<Node>,
 ): boolean {
-    if (isElementOrEditor(node) && !schema.isListItemNode(node)) {
-        // We look for "list-item-text" nodes that are NOT under a "list-item" node
-        for (const [index, child] of node.children.entries()) {
-            if (Element.isElement(child) && schema.isListItemTextNode(child)) {
-                if (isContainingTextNodes(child)) {
-                    editor.setNodes(schema.createDefaultTextNode(), {
-                        at: [...path, index],
-                    });
-                } else {
-                    editor.unwrapNodes({
-                        at: [...path, index],
-                        mode: 'highest',
-                    });
-                }
-                return true;
-            }
+  if (isElementOrEditor(node) && !schema.isListItemNode(node)) {
+    // We look for "list-item-text" nodes that are NOT under a "list-item" node
+    for (const [index, child] of node.children.entries()) {
+      if (Element.isElement(child) && schema.isListItemTextNode(child)) {
+        if (isContainingTextNodes(child)) {
+          editor.setNodes(schema.createDefaultTextNode(), {
+            at: [...path, index],
+          });
+        } else {
+          editor.unwrapNodes({
+            at: [...path, index],
+            mode: 'highest',
+          });
         }
+        return true;
+      }
     }
+  }
 
-    return false;
+  return false;
 }

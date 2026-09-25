@@ -6,8 +6,8 @@ import { fireEvent, render } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { createEditor } from 'slate';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Slate, withReact } from 'slate-react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { TableCellIndex } from '../../../../editor/elements/Table/TableCellIndex';
 import { TableContextTestProvider } from '../../../../editor/elements/Table/TableContext';
 

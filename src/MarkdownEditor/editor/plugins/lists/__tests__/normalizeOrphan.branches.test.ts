@@ -1,8 +1,8 @@
 import { createEditor, Editor } from 'slate';
 import { describe, expect, it } from 'vitest';
-import { agenticListsSchema } from '../schema';
 import { normalizeOrphanListItem } from '../normalizations/normalizeOrphanListItem';
 import { normalizeOrphanListItemText } from '../normalizations/normalizeOrphanListItemText';
+import { agenticListsSchema } from '../schema';
 
 describe('normalizeOrphan 分支覆盖', () => {
   it('istanbul one-miss: 根级 orphan list-item 含直接 text 时转为 default block', () => {

@@ -38,9 +38,9 @@ describe('findTextInReadonlyMarkdownDom residual branches', () => {
     expect(hits.some((h) => h.lineContent.includes('outer'))).toBe(true);
 
     expect(getReadonlyMarkdownBlocks(root, -1)).toEqual([]);
-    expect(
-      findTextInReadonlyMarkdownDom(root, [NaN as any], 'Hello'),
-    ).toEqual([]);
+    expect(findTextInReadonlyMarkdownDom(root, [NaN as any], 'Hello')).toEqual(
+      [],
+    );
   });
 
   it('dataset.be 缺失时用 tagName；多 pattern 截断 maxResults', () => {

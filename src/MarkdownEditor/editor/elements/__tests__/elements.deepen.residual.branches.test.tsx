@@ -89,17 +89,16 @@ vi.mock('../List/ReadonlyListItem', () => ({
 
 vi.mock('../TagPopup', () => ({
   TagPopup: ({ children, onSelect }: any) => (
-    <div
-      data-testid="tag-popup"
-      onClick={() => onSelect?.('', [], {})}
-    >
+    <div data-testid="tag-popup" onClick={() => onSelect?.('', [], {})}>
       {children}
     </div>
   ),
 }));
 
 vi.mock('../FncLeaf', () => ({
-  FncLeaf: ({ children }: any) => <span data-testid="fnc-leaf">{children}</span>,
+  FncLeaf: ({ children }: any) => (
+    <span data-testid="fnc-leaf">{children}</span>
+  ),
 }));
 
 vi.mock('../CommentLeaf', () => ({
@@ -147,19 +146,16 @@ describe('elements/index deepen residual branches', () => {
     ['agentic-ui-filemap', 'agentic-filemap', 'readonly-agentic-filemap'],
     ['numbered-list', 'list', 'readonly-list'],
     ['bulleted-list', 'list', 'readonly-list'],
-  ] as const)(
-    'MElement %s 编辑/只读路由',
-    (type, editId, roId) => {
-      const el = { type, children: [] };
-      const { unmount } = render(
-        <MElement {...baseElementProps} element={el} readonly={false} />,
-      );
-      expect(screen.getByTestId(editId)).toBeInTheDocument();
-      unmount();
-      render(<MElement {...baseElementProps} element={el} readonly />);
-      expect(screen.getByTestId(roId)).toBeInTheDocument();
-    },
-  );
+  ] as const)('MElement %s 编辑/只读路由', (type, editId, roId) => {
+    const el = { type, children: [] };
+    const { unmount } = render(
+      <MElement {...baseElementProps} element={el} readonly={false} />,
+    );
+    expect(screen.getByTestId(editId)).toBeInTheDocument();
+    unmount();
+    render(<MElement {...baseElementProps} element={el} readonly />);
+    expect(screen.getByTestId(roId)).toBeInTheDocument();
+  });
 
   it('MElement hash+readonly memo：同 hash 不强制重渲染', () => {
     const el = { type: 'paragraph', hash: 'h1', children: [] };

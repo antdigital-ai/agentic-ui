@@ -9,14 +9,6 @@ import {
   Text,
   Transforms,
 } from 'slate';
-import {
-  escapeRegExp,
-  normalizeMarkdownSearchText,
-} from './markdownSearchText';
-import {
-  findTextInReadonlyMarkdownDom,
-  isReadonlyMarkdownSearchEditor,
-} from '../../readonly/findTextInReadonlyMarkdownDom';
 import { DOMNode } from 'slate-dom';
 import { History, HistoryEditor } from 'slate-history';
 import { ReactEditor } from 'slate-react';
@@ -27,7 +19,15 @@ import {
   ListNode,
   ParagraphNode,
 } from '../../el';
+import {
+  findTextInReadonlyMarkdownDom,
+  isReadonlyMarkdownSearchEditor,
+} from '../../readonly/findTextInReadonlyMarkdownDom';
 import { getMediaType } from './dom';
+import {
+  escapeRegExp,
+  normalizeMarkdownSearchText,
+} from './markdownSearchText';
 
 export class EditorUtils {
   static get p() {

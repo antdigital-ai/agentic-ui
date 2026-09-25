@@ -25,9 +25,7 @@ describe('AnswerAlert 分支补充', () => {
   });
 
   it('showIcon 无 type 时 IconNode 返回 null', () => {
-    const { container } = render(
-      <AnswerAlert message="m" showIcon />,
-    );
+    const { container } = render(<AnswerAlert message="m" showIcon />);
     expect(container.querySelector('.ant-answer-alert-icon')).toBeNull();
   });
 
@@ -37,7 +35,11 @@ describe('AnswerAlert 分支补充', () => {
         message="m"
         showIcon
         type="info"
-        icon={<span className="my-icon" data-testid="ico">i</span>}
+        icon={
+          <span className="my-icon" data-testid="ico">
+            i
+          </span>
+        }
       />,
     );
     expect(screen.getByTestId('ico')).toHaveClass('my-icon');
@@ -46,9 +48,7 @@ describe('AnswerAlert 分支补充', () => {
 
   it('closing 中再次点击不重复 onClose', () => {
     const onClose = vi.fn();
-    render(
-      <AnswerAlert message="m" closable motion onClose={onClose} />,
-    );
+    render(<AnswerAlert message="m" closable motion onClose={onClose} />);
     const btn = screen.getByLabelText('Close');
     fireEvent.click(btn);
     fireEvent.click(btn);

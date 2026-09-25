@@ -116,8 +116,8 @@ describe('HistoryItem deepen9 residual branches', () => {
       />,
     );
     const tips = screen.getAllByTestId('tooltip');
-    expect(tips.some((t) => (t.getAttribute('data-title') || '').length > 20)).toBe(
-      true,
-    );
+    expect(
+      tips.some((t) => (t.getAttribute('data-title') || '').length > 20),
+    ).toBe(true);
   });
 });

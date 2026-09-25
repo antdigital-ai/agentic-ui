@@ -177,7 +177,9 @@ describe('Head Component', () => {
       const { container } = render(<Head {...emptyProps} />);
       const heading = container.querySelector('h1');
       expect(heading).not.toHaveAttribute('data-slate-placeholder');
-      expect(container.querySelector('[data-slate-placeholder="true"]')).toBeNull();
+      expect(
+        container.querySelector('[data-slate-placeholder="true"]'),
+      ).toBeNull();
     });
 
     it('应该为打字机模式添加 typewriter 类', () => {

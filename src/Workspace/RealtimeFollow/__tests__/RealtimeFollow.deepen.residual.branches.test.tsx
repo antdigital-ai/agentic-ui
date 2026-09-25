@@ -21,9 +21,7 @@ vi.mock('../style', () => ({
 const wrap = (ui: React.ReactElement, locale: Record<string, string> = {}) =>
   render(
     <ConfigProvider>
-      <I18nContext.Provider
-        value={{ locale, language: 'zh-CN' } as any}
-      >
+      <I18nContext.Provider value={{ locale, language: 'zh-CN' } as any}>
         {ui}
       </I18nContext.Provider>
     </ConfigProvider>,

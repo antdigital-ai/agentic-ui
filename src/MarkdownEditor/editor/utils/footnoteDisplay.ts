@@ -7,7 +7,9 @@ export const FOOTNOTE_REF_IDENTIFIER_REG = /\[\^([^\]]+)\]/;
 /** 脚注定义行前缀 `[^id]:` */
 const FOOTNOTE_DEF_PREFIX_REG = /^\[\^([^\]]+)\]:?/;
 
-export function extractFootnoteRefIdentifier(text?: string): string | undefined {
+export function extractFootnoteRefIdentifier(
+  text?: string,
+): string | undefined {
   if (!text) {
     return undefined;
   }

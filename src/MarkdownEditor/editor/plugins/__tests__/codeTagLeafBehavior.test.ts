@@ -148,10 +148,7 @@ describe('codeTagLeafBehavior', () => {
     editor.children = [
       {
         type: 'paragraph',
-        children: [
-          { text: '', mark: true, markLabel: '@' },
-          { text: 'next' },
-        ],
+        children: [{ text: '', mark: true, markLabel: '@' }, { text: 'next' }],
       },
     ];
     editor.selection = {

@@ -9,18 +9,21 @@ import { I18nContext } from '../../I18n';
 import { AttachmentFileList } from '../AttachmentButton/AttachmentFileList';
 import { FileMapView } from '../FileMapView';
 
-vi.mock('../AttachmentButton/AttachmentFileList/AttachmentFileListItem', () => ({
-  AttachmentFileListItem: ({ file, onDelete, onPreview }: any) => (
-    <div data-testid={`item-${file.uuid || file.name}`}>
-      <button type="button" onClick={() => onPreview?.(file)}>
-        preview
-      </button>
-      <button type="button" onClick={() => onDelete?.(file)}>
-        delete
-      </button>
-    </div>
-  ),
-}));
+vi.mock(
+  '../AttachmentButton/AttachmentFileList/AttachmentFileListItem',
+  () => ({
+    AttachmentFileListItem: ({ file, onDelete, onPreview }: any) => (
+      <div data-testid={`item-${file.uuid || file.name}`}>
+        <button type="button" onClick={() => onPreview?.(file)}>
+          preview
+        </button>
+        <button type="button" onClick={() => onDelete?.(file)}>
+          delete
+        </button>
+      </div>
+    ),
+  }),
+);
 
 vi.mock('../FileMapView/FileMapViewItem', () => ({
   FileMapViewItem: ({ file }: any) => (
@@ -71,11 +74,7 @@ describe('FileMapView istanbul residual', () => {
     );
     const onViewAll = vi.fn().mockResolvedValue(false);
     wrap(
-      <FileMapView
-        fileMap={files}
-        maxDisplayCount={2}
-        onViewAll={onViewAll}
-      />,
+      <FileMapView fileMap={files} maxDisplayCount={2} onViewAll={onViewAll} />,
     );
     const more = screen.queryByText(/查看|所有|更多|View/i);
     if (more) {
@@ -95,10 +94,7 @@ describe('FileMapView istanbul residual', () => {
           previewUrl: 'https://x/a.png',
         },
       ],
-      [
-        'ph',
-        { uuid: 'ph', name: 'b.png', status: 'placeholder' },
-      ],
+      ['ph', { uuid: 'ph', name: 'b.png', status: 'placeholder' }],
       [
         'vid',
         {
@@ -153,7 +149,12 @@ describe('AttachmentFileList istanbul residual', () => {
     const map = new Map([
       [
         'a',
-        { uuid: 'a', name: 'a.png', status: 'weird', url: 'https://x/a.png' } as any,
+        {
+          uuid: 'a',
+          name: 'a.png',
+          status: 'weird',
+          url: 'https://x/a.png',
+        } as any,
       ],
     ]);
     rerender(
@@ -170,7 +171,12 @@ describe('AttachmentFileList istanbul residual', () => {
     const map = new Map([
       [
         'a',
-        { uuid: 'a', name: 'a.png', status: 'done', url: 'https://x/a.png' } as any,
+        {
+          uuid: 'a',
+          name: 'a.png',
+          status: 'done',
+          url: 'https://x/a.png',
+        } as any,
       ],
     ]);
     wrap(
@@ -188,9 +194,7 @@ describe('AttachmentFileList istanbul residual', () => {
 
   it('无 uuid 用 name 作 key；无 url 预览不抛错', () => {
     const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
-    const map = new Map([
-      ['0', { name: 'plain.txt', status: 'done' } as any],
-    ]);
+    const map = new Map([['0', { name: 'plain.txt', status: 'done' } as any]]);
     wrap(<AttachmentFileList fileMap={map} onDelete={vi.fn()} />);
     fireEvent.click(screen.getByText('preview'));
     expect(openSpy).not.toHaveBeenCalled();

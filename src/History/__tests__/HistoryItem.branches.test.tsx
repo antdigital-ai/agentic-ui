@@ -42,7 +42,9 @@ vi.mock('antd', () => ({
 
 vi.mock('../style', () => ({ useStyle: () => ({ hashId: 'h' }) }));
 vi.mock('../utils', () => ({ formatTime: (v: any) => `time:${v}` }));
-vi.mock('../../Hooks/useRefFunction', () => ({ useRefFunction: (fn: any) => fn }));
+vi.mock('../../Hooks/useRefFunction', () => ({
+  useRefFunction: (fn: any) => fn,
+}));
 vi.mock('../../Hooks/useAdaptiveTooltipProps', () => ({
   useAdaptiveTooltipProps: () => ({}),
 }));
@@ -77,9 +79,9 @@ vi.mock('../hooks/useTextOverflow', () => ({
   })),
 }));
 
+import { I18nContext } from '../../I18n';
 import { HistoryItem } from '../components/HistoryItem';
 import { useTextOverflow } from '../hooks/useTextOverflow';
-import { I18nContext } from '../../I18n';
 
 const baseItem = {
   sessionId: 's1',
@@ -120,7 +122,13 @@ describe('HistoryItem 分支覆盖', () => {
       <HistoryItem
         item={baseItem}
         {...baseProps}
-        customOperationExtra={[[<span key="x" data-testid="nested-op">op</span>]]}
+        customOperationExtra={[
+          [
+            <span key="x" data-testid="nested-op">
+              op
+            </span>,
+          ],
+        ]}
       />,
     );
     expect(screen.getByTestId('nested-op')).toBeInTheDocument();
@@ -130,7 +138,9 @@ describe('HistoryItem 分支覆盖', () => {
     const { container } = render(
       <HistoryItem item={baseItem} {...baseProps} customOperationExtra="   " />,
     );
-    expect(container.querySelector('[class*="extra-actions"]')).not.toBeInTheDocument();
+    expect(
+      container.querySelector('[class*="extra-actions"]'),
+    ).not.toBeInTheDocument();
   });
 
   it('isValidCustomOperation：嵌套数组全无效时不渲染', () => {
@@ -141,7 +151,9 @@ describe('HistoryItem 分支覆盖', () => {
         customOperationExtra={[null, false, '']}
       />,
     );
-    expect(container.querySelector('[class*="extra-actions"]')).not.toBeInTheDocument();
+    expect(
+      container.querySelector('[class*="extra-actions"]'),
+    ).not.toBeInTheDocument();
   });
 
   it('renderTaskStatusIcon：未知 status 返回 null（多行 task 无 icon）', () => {
@@ -150,7 +162,14 @@ describe('HistoryItem 分支覆盖', () => {
       status: 'running' as any,
       description: '运行中',
     };
-    render(<HistoryItem item={item} {...baseProps} type="task" runningId={['id1']} />);
+    render(
+      <HistoryItem
+        item={item}
+        {...baseProps}
+        type="task"
+        runningId={['id1']}
+      />,
+    );
     expect(screen.getByTestId('running-icon')).toBeInTheDocument();
   });
 
@@ -296,9 +315,7 @@ describe('HistoryItem 分支覆盖', () => {
       <HistoryItem
         item={baseItem}
         {...baseProps}
-        extra={(item) => (
-          <span data-testid="extra-slot">{item.sessionId}</span>
-        )}
+        extra={(item) => <span data-testid="extra-slot">{item.sessionId}</span>}
       />,
     );
     expect(screen.getByTestId('extra-slot')).toHaveTextContent('s1');
@@ -381,8 +398,7 @@ describe('HistoryItem 分支覆盖', () => {
   });
 
   it('多行：长 description 字符串 Tooltip open 为 undefined', () => {
-    const longDesc =
-      '这是一段超过二十个字符的任务描述文本内容补充到足够长度';
+    const longDesc = '这是一段超过二十个字符的任务描述文本内容补充到足够长度';
     render(
       <HistoryItem
         item={{
@@ -403,16 +419,18 @@ describe('HistoryItem 分支覆盖', () => {
   });
 
   it('单行 runningId 命中时展示 running 图标', () => {
-    render(
-      <HistoryItem item={baseItem} {...baseProps} runningId={['id1']} />,
-    );
+    render(<HistoryItem item={baseItem} {...baseProps} runningId={['id1']} />);
     expect(screen.getByTestId('running-icon')).toBeInTheDocument();
   });
 
   it('onDeleteItem 存在时点击 delete 触发回调', async () => {
     const onDeleteItem = vi.fn().mockResolvedValue(undefined);
     render(
-      <HistoryItem item={baseItem} {...baseProps} onDeleteItem={onDeleteItem} />,
+      <HistoryItem
+        item={baseItem}
+        {...baseProps}
+        onDeleteItem={onDeleteItem}
+      />,
     );
     fireEvent.click(screen.getByTestId('delete-btn'));
     await Promise.resolve();
@@ -438,7 +456,10 @@ describe('HistoryItem 分支覆盖', () => {
     const onClick = vi.fn();
     render(<HistoryItem item={baseItem} {...baseProps} onClick={onClick} />);
     fireEvent.click(screen.getByText('Session Title'));
-    expect(onClick).toHaveBeenCalledWith('s1', expect.objectContaining(baseItem));
+    expect(onClick).toHaveBeenCalledWith(
+      's1',
+      expect.objectContaining(baseItem),
+    );
   });
 
   it('isValidCustomOperation：单元素有效时渲染', () => {
@@ -476,21 +497,38 @@ describe('HistoryItem 分支覆盖', () => {
 
   it('isValidCustomOperation：数字节点视为无效', () => {
     const { container } = render(
-      <HistoryItem item={baseItem} {...baseProps} customOperationExtra={42 as any} />,
+      <HistoryItem
+        item={baseItem}
+        {...baseProps}
+        customOperationExtra={42 as any}
+      />,
     );
-    expect(container.querySelector('[class*="extra-actions"]')).not.toBeInTheDocument();
+    expect(
+      container.querySelector('[class*="extra-actions"]'),
+    ).not.toBeInTheDocument();
   });
 
   it('isValidCustomOperation：false 节点视为无效', () => {
     const { container } = render(
-      <HistoryItem item={baseItem} {...baseProps} customOperationExtra={false} />,
+      <HistoryItem
+        item={baseItem}
+        {...baseProps}
+        customOperationExtra={false}
+      />,
     );
-    expect(container.querySelector('[class*="extra-actions"]')).not.toBeInTheDocument();
+    expect(
+      container.querySelector('[class*="extra-actions"]'),
+    ).not.toBeInTheDocument();
   });
 
   it('单行 chat：runningId 未命中时不展示 running 图标', () => {
     render(
-      <HistoryItem item={baseItem} {...baseProps} type="chat" runningId={['other']} />,
+      <HistoryItem
+        item={baseItem}
+        {...baseProps}
+        type="chat"
+        runningId={['other']}
+      />,
     );
     expect(screen.queryByTestId('running-icon')).not.toBeInTheDocument();
   });
@@ -548,9 +586,15 @@ describe('HistoryItem 分支覆盖', () => {
 
   it('customOperationExtra 为 null 时不渲染 extra-actions', () => {
     const { container } = render(
-      <HistoryItem item={baseItem} {...baseProps} customOperationExtra={null} />,
+      <HistoryItem
+        item={baseItem}
+        {...baseProps}
+        customOperationExtra={null}
+      />,
     );
-    expect(container.querySelector('[class*="extra-actions"]')).not.toBeInTheDocument();
+    expect(
+      container.querySelector('[class*="extra-actions"]'),
+    ).not.toBeInTheDocument();
   });
 
   it('多行 task 仅有 description 无 status/icon 仍展示描述', () => {
@@ -637,15 +681,19 @@ describe('HistoryItem 分支覆盖', () => {
       />,
     );
     const tooltips = screen.getAllByTestId('tooltip');
-    expect(tooltips.some((t) => t.getAttribute('data-open') === 'undefined')).toBe(
-      true,
-    );
+    expect(
+      tooltips.some((t) => t.getAttribute('data-open') === 'undefined'),
+    ).toBe(true);
   });
 
   it('多行 task 无 icon 有 status 时渲染状态图标', () => {
     render(
       <HistoryItem
-        item={{ ...baseItem, status: 'error' as const, description: '失败任务' }}
+        item={{
+          ...baseItem,
+          status: 'error' as const,
+          description: '失败任务',
+        }}
         {...baseProps}
         type="task"
       />,
@@ -715,9 +763,7 @@ describe('HistoryItem 分支覆盖', () => {
   });
 
   it('runningId 匹配时渲染 running 图标', () => {
-    render(
-      <HistoryItem item={baseItem} {...baseProps} runningId={['id1']} />,
-    );
+    render(<HistoryItem item={baseItem} {...baseProps} runningId={['id1']} />);
     expect(screen.getByTestId('running-icon')).toBeInTheDocument();
   });
 
@@ -768,9 +814,9 @@ describe('HistoryItem 分支覆盖', () => {
     });
     render(<HistoryItem item={baseItem} {...baseProps} />);
     const tooltips = screen.getAllByTestId('tooltip');
-    expect(tooltips.some((t) => t.getAttribute('data-open') === 'undefined')).toBe(
-      true,
-    );
+    expect(
+      tooltips.some((t) => t.getAttribute('data-open') === 'undefined'),
+    ).toBe(true);
   });
 
   it('多行：description 恰好 20 字符时 Tooltip open=false', () => {
@@ -874,9 +920,9 @@ describe('HistoryItem 分支覆盖', () => {
       />,
     );
     const tooltips = screen.getAllByTestId('tooltip');
-    expect(tooltips.some((t) => t.getAttribute('data-open') === 'undefined')).toBe(
-      true,
-    );
+    expect(
+      tooltips.some((t) => t.getAttribute('data-open') === 'undefined'),
+    ).toBe(true);
   });
 
   it('多行 task 无 onDeleteItem 时 handleDelete 不抛错', async () => {
@@ -939,7 +985,11 @@ describe('HistoryItem 分支覆盖', () => {
 
   it('单行 isRunning 且 runningId 为字符串 id 匹配', () => {
     render(
-      <HistoryItem item={{ ...baseItem, id: 99 }} {...baseProps} runningId={['99']} />,
+      <HistoryItem
+        item={{ ...baseItem, id: 99 }}
+        {...baseProps}
+        runningId={['99']}
+      />,
     );
     expect(screen.getByTestId('running-icon')).toBeInTheDocument();
   });
@@ -974,9 +1024,15 @@ describe('HistoryItem 分支覆盖', () => {
 
   it('isValidCustomOperation 空白字符串数组不渲染', () => {
     const { container } = render(
-      <HistoryItem item={baseItem} {...baseProps} customOperationExtra={['  ', '']} />,
+      <HistoryItem
+        item={baseItem}
+        {...baseProps}
+        customOperationExtra={['  ', '']}
+      />,
     );
-    expect(container.querySelector('[class*="extra-actions"]')).not.toBeInTheDocument();
+    expect(
+      container.querySelector('[class*="extra-actions"]'),
+    ).not.toBeInTheDocument();
   });
 
   it('多行 description 21 字符 Tooltip open 为 undefined', () => {

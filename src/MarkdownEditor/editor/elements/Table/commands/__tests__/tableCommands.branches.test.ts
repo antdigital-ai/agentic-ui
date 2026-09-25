@@ -75,9 +75,8 @@ describe('tableCommands 分支覆盖', () => {
   });
 
   it('removeTableRow：仅一行时 removeTable；多行删除', async () => {
-    const { NativeTableEditor } = await import(
-      '../../../../../utils/native-table'
-    );
+    const { NativeTableEditor } =
+      await import('../../../../../utils/native-table');
     const one = buildEditor(1, 2);
     removeTableRow(one, [0], 0);
     expect(NativeTableEditor.removeTable).toHaveBeenCalled();
@@ -104,9 +103,8 @@ describe('tableCommands 分支覆盖', () => {
   });
 
   it('removeTableColumn：仅一列 removeTable；多列删除', async () => {
-    const { NativeTableEditor } = await import(
-      '../../../../../utils/native-table'
-    );
+    const { NativeTableEditor } =
+      await import('../../../../../utils/native-table');
     const one = buildEditor(2, 1);
     removeTableColumn(one, [0], 0);
     expect(NativeTableEditor.removeTable).toHaveBeenCalled();
@@ -120,8 +118,8 @@ describe('tableCommands 分支覆盖', () => {
     const editor = buildEditor(2, 1);
     insertTableColumn(editor, [0], 0, 'before');
     insertTableColumn(editor, [0], 0, 'after');
-    expect((editor.children[0] as any).children[0].children.length).toBeGreaterThanOrEqual(
-      2,
-    );
+    expect(
+      (editor.children[0] as any).children[0].children.length,
+    ).toBeGreaterThanOrEqual(2);
   });
 });

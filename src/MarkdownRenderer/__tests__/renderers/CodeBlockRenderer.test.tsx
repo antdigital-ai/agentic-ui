@@ -34,7 +34,11 @@ vi.mock('../../renderers/CodeBlockToolbar', () => ({
       <button type="button" onClick={onCopy}>
         copy
       </button>
-      <button type="button" data-expanded={String(expanded)} onClick={onToggleExpanded}>
+      <button
+        type="button"
+        data-expanded={String(expanded)}
+        onClick={onToggleExpanded}
+      >
         toggle
       </button>
     </div>
@@ -62,7 +66,9 @@ describe('CodeBlockRenderer', () => {
   it('toggles expanded state when collapse button is clicked', () => {
     render(<CodeBlockRenderer language="json">{'{}'}</CodeBlockRenderer>);
 
-    const content = document.querySelector('.code-editor-content') as HTMLElement;
+    const content = document.querySelector(
+      '.code-editor-content',
+    ) as HTMLElement;
     expect(content.style.display).toBe('block');
 
     fireEvent.click(screen.getByRole('button', { name: 'toggle' }));

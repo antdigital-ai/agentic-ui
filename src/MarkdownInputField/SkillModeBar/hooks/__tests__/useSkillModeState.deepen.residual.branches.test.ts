@@ -18,8 +18,7 @@ describe('useSkillModeState deepen residual branches', () => {
   it('open 不变时不触发 onSkillModeOpenChange', () => {
     const onChange = vi.fn();
     const { rerender } = renderHook(
-      ({ open }) =>
-        useSkillModeState({ open } as any, onChange),
+      ({ open }) => useSkillModeState({ open } as any, onChange),
       { initialProps: { open: true } },
     );
     onChange.mockClear();

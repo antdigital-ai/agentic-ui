@@ -10,7 +10,9 @@ describe('CodeContainer residual branches', () => {
         code
       </CodeContainer>,
     );
-    expect(screen.getByTestId('code-container')).not.toHaveAttribute('data-lang');
+    expect(screen.getByTestId('code-container')).not.toHaveAttribute(
+      'data-lang',
+    );
   });
 
   it('stops clicks and reports editor clicks with visual flags', () => {

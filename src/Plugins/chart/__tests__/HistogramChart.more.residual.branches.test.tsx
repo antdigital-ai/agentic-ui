@@ -152,10 +152,13 @@ describe('HistogramChart more residual branches', () => {
     const opts = (globalThis as any).__histMoreOptions;
     const label = opts?.plugins?.tooltip?.callbacks?.label;
     if (typeof label === 'function') {
-      expect(label({ parsed: { x: 1, y: 2 }, dataset: { label: 't' } })).toBeTruthy();
+      expect(
+        label({ parsed: { x: 1, y: 2 }, dataset: { label: 't' } }),
+      ).toBeTruthy();
       expect(label({ parsed: {}, dataset: {} })).toBeTruthy();
     }
-    const bg = (globalThis as any).__histMoreData?.datasets?.[0]?.backgroundColor;
+    const bg = (globalThis as any).__histMoreData?.datasets?.[0]
+      ?.backgroundColor;
     if (typeof bg === 'function') {
       expect(
         bg({
@@ -190,7 +193,8 @@ describe('HistogramChart more residual branches', () => {
         showLegend
       />,
     );
-    const bg = (globalThis as any).__histMoreData?.datasets?.[0]?.backgroundColor;
+    const bg = (globalThis as any).__histMoreData?.datasets?.[0]
+      ?.backgroundColor;
     if (typeof bg === 'function') {
       expect(
         bg({
@@ -209,13 +213,20 @@ describe('HistogramChart more residual branches', () => {
       ).toBeTruthy();
       expect(
         bg({
-          chart: { chartArea: null, ctx: {}, scales: {}, isDatasetVisible: () => true },
+          chart: {
+            chartArea: null,
+            ctx: {},
+            scales: {},
+            isDatasetVisible: () => true,
+          },
           parsed: { y: 2 },
           dataIndex: 1,
         }),
       ).toBeTruthy();
     }
-    expect((globalThis as any).__histMoreData?.datasets?.[0]?.label || '默认').toBeTruthy();
+    expect(
+      (globalThis as any).__histMoreData?.datasets?.[0]?.label || '默认',
+    ).toBeTruthy();
   });
 
   it('istanbul deepen：category/filter；频率；预分箱；轴标题；resize', () => {
@@ -345,7 +356,9 @@ describe('HistogramChart more residual branches', () => {
     const opts = (globalThis as any).__histMoreOptions;
     const tip = opts?.plugins?.tooltip?.callbacks?.label;
     if (typeof tip === 'function') {
-      expect(tip({ dataset: { label: 'tiny' }, parsed: { y: 0.5 } })).toBeTruthy();
+      expect(
+        tip({ dataset: { label: 'tiny' }, parsed: { y: 0.5 } }),
+      ).toBeTruthy();
       expect(tip({ dataset: {}, parsed: { y: Number.NaN } })).toBeDefined();
     }
 
@@ -377,9 +390,9 @@ describe('HistogramChart more residual branches', () => {
         toolbarExtra={<span>ex</span>}
       />,
     );
-    expect((globalThis as any).__histMoreData?.datasets?.length).toBeGreaterThan(
-      0,
-    );
+    expect(
+      (globalThis as any).__histMoreData?.datasets?.length,
+    ).toBeGreaterThan(0);
   });
 
   it('exclusive deepen：空数据；负数；binCount；stacked；filter', () => {

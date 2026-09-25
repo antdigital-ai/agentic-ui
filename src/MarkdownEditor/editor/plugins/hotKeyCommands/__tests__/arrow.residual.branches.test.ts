@@ -74,9 +74,7 @@ describe('keyArrow residual branches', () => {
             children: [
               {
                 type: 'table-cell',
-                children: [
-                  { type: 'paragraph', children: [{ text: 'c' }] },
-                ],
+                children: [{ type: 'paragraph', children: [{ text: 'c' }] }],
               },
             ],
           },

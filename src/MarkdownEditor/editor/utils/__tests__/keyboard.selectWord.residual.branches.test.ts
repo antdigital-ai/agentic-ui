@@ -32,9 +32,7 @@ describe('KeyboardTask selectWord / format residual', () => {
 
   it('selectWord：中文边界；单字符扩展', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: '你好世界' }] },
-    ];
+    editor.children = [{ type: 'paragraph', children: [{ text: '你好世界' }] }];
     editor.selection = {
       anchor: { path: [0, 0], offset: 2 },
       focus: { path: [0, 0], offset: 2 },

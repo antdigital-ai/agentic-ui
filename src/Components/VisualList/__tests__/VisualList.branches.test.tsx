@@ -31,20 +31,14 @@ describe('VisualList branches', () => {
 
   it('loading / isLoading 渲染 loadingRender', () => {
     wrap(
-      <VisualList
-        data={[]}
-        isLoading
-        loadingRender={() => <span>ld</span>}
-      />,
+      <VisualList data={[]} isLoading loadingRender={() => <span>ld</span>} />,
     );
     expect(screen.getByText('ld')).toBeTruthy();
   });
 
   it('img onError 切到默认图标', () => {
     const { container } = wrap(
-      <VisualList
-        data={[{ id: '1', src: 'https://x/bad.png', title: 't' }]}
-      />,
+      <VisualList data={[{ id: '1', src: 'https://x/bad.png', title: 't' }]} />,
     );
     const img = container.querySelector('img');
     expect(img).toBeTruthy();
@@ -65,7 +59,11 @@ describe('VisualList branches', () => {
 
   it('空 data 且无 loading；自定义 className', () => {
     const { container } = wrap(
-      <VisualList data={[]} className="vl-x" emptyRender={() => <span>empty</span>} />,
+      <VisualList
+        data={[]}
+        className="vl-x"
+        emptyRender={() => <span>empty</span>}
+      />,
     );
     expect(screen.getByText('empty')).toBeTruthy();
     expect(container.querySelector('.vl-x')).toBeTruthy();

@@ -31,10 +31,12 @@ vi.mock('slate-react', () => ({
   },
 }));
 
-const makeEvent = (overrides: Partial<{
-  defaultPrevented: boolean;
-  propagationStopped: boolean;
-}> = {}) => ({
+const makeEvent = (
+  overrides: Partial<{
+    defaultPrevented: boolean;
+    propagationStopped: boolean;
+  }> = {},
+) => ({
   preventDefault: vi.fn(),
   stopPropagation: vi.fn(),
   isDefaultPrevented: () => overrides.defaultPrevented ?? false,
@@ -102,9 +104,7 @@ describe('editorUtils residual helper branches', () => {
 
   it('getPointStrOffset / findLeafPath', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: 'abc' }] },
-    ];
+    editor.children = [{ type: 'paragraph', children: [{ text: 'abc' }] }];
     expect(
       getPointStrOffset(editor, { path: [0, 0], offset: 2 }),
     ).toBeGreaterThanOrEqual(0);

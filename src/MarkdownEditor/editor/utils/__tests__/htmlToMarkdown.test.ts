@@ -211,7 +211,8 @@ describe('isWordHtml', () => {
   });
 
   it('Microsoft Word generator meta 命中', () => {
-    const html = '<html><head><meta name="Generator" content="Microsoft Word 16"></head><body>x</body></html>';
+    const html =
+      '<html><head><meta name="Generator" content="Microsoft Word 16"></head><body>x</body></html>';
     expect(isWordHtml(html)).toBe(true);
   });
 
@@ -221,7 +222,8 @@ describe('isWordHtml', () => {
   });
 
   it('Office xmlns 命名空间命中', () => {
-    const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office"><body>x</body></html>';
+    const html =
+      '<html xmlns:o="urn:schemas-microsoft-com:office:office"><body>x</body></html>';
     expect(isWordHtml(html)).toBe(true);
   });
 

@@ -345,6 +345,10 @@ export const cnLabels = {
   'suggestion.searchMore': '搜索更多',
   'suggestion.select': '选择建议',
   'suggestion.followUp': '追问',
+  // VoiceButton related
+  'voice.unsupported': '当前环境不支持语音播报',
+  'voice.stop': '停止播报',
+  'voice.play': '语音播报',
   // MarkdownInputField related
   'input.fileUpload': '文件上传',
   'input.attachmentListTitle': '上传附件',
@@ -844,6 +848,10 @@ export const enLabels: typeof cnLabels = {
   'suggestion.searchMore': 'Search more',
   'suggestion.select': 'Select suggestion',
   'suggestion.followUp': 'Follow-up',
+  // VoiceButton related
+  'voice.unsupported': 'Speech playback is not supported in this environment',
+  'voice.stop': 'Stop playback',
+  'voice.play': 'Play with voice',
   // MarkdownInputField related
   'input.fileUpload': 'Upload attachments',
   'input.attachmentListTitle': 'Uploaded attachments',

@@ -3,7 +3,13 @@
  * NewChat/Search、getPopupContainer、locale 缺省标题。
  */
 import '@testing-library/jest-dom';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -28,23 +34,25 @@ vi.mock('../components', () => ({
     />
   ),
   HistoryEmpty: () => <div data-testid="history-empty">找不到相关结果</div>,
-  generateHistoryItems: vi.fn(({ filteredList }: { filteredList?: unknown[] }) => {
-    if (!filteredList?.length) return [];
-    return [
-      {
-        key: 'g1',
-        label: '今日',
-        type: 'group',
-        children: [
-          {
-            key: 's1',
-            label: '会话1',
-            onClick: () => {},
-          },
-        ],
-      },
-    ];
-  }),
+  generateHistoryItems: vi.fn(
+    ({ filteredList }: { filteredList?: unknown[] }) => {
+      if (!filteredList?.length) return [];
+      return [
+        {
+          key: 'g1',
+          label: '今日',
+          type: 'group',
+          children: [
+            {
+              key: 's1',
+              label: '会话1',
+              onClick: () => {},
+            },
+          ],
+        },
+      ];
+    },
+  ),
 }));
 
 vi.mock('../menu', () => ({

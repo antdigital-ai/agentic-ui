@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
 import type React from 'react';
+import { describe, expect, it } from 'vitest';
 import {
   bubblePropsAreEqual,
   shallowEqualRecord,
@@ -239,9 +239,9 @@ describe('bubblePropsAreEqual', () => {
 
   it('returns false when scalar Bubble props change', () => {
     const base: BubbleProps = { id: 'm1', originData: baseOrigin() };
-    expect(
-      bubblePropsAreEqual(base, { ...base, placement: 'right' }),
-    ).toBe(false);
+    expect(bubblePropsAreEqual(base, { ...base, placement: 'right' })).toBe(
+      false,
+    );
     expect(bubblePropsAreEqual(base, { ...base, pure: true })).toBe(false);
     expect(bubblePropsAreEqual(base, { ...base, readonly: true })).toBe(false);
     expect(bubblePropsAreEqual(base, { ...base, shouldShowCopy: true })).toBe(

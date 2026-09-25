@@ -28,13 +28,14 @@ vi.mock('../../../Components/ActionIconBox', () => ({
   ),
 }));
 
-const wrap = (ui: React.ReactNode, opts?: { locale?: any; compact?: boolean }) =>
+const wrap = (
+  ui: React.ReactNode,
+  opts?: { locale?: any; compact?: boolean },
+) =>
   render(
     <ConfigProvider>
       <I18nContext.Provider value={{ locale: opts?.locale ?? {} } as any}>
-        <BubbleConfigContext.Provider
-          value={{ compact: opts?.compact } as any}
-        >
+        <BubbleConfigContext.Provider value={{ compact: opts?.compact } as any}>
           {ui}
         </BubbleConfigContext.Provider>
       </I18nContext.Provider>
@@ -96,9 +97,7 @@ describe('DocInfoList deepen residual branches', () => {
     const long = 'L'.repeat(30);
     wrap(
       <DocInfoList
-        reference_url_info_list={[
-          { placeholder: 'ph', doc_id: 'd9', url: '' },
-        ]}
+        reference_url_info_list={[{ placeholder: 'ph', doc_id: 'd9', url: '' }]}
         options={[
           {
             content: long,

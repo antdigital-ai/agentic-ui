@@ -51,7 +51,9 @@ describe('FileComponent residual branches', () => {
         ]}
       />,
     );
-    const input = screen.queryByRole('textbox') || screen.queryByPlaceholderText(/搜索|Search/i);
+    const input =
+      screen.queryByRole('textbox') ||
+      screen.queryByPlaceholderText(/搜索|Search/i);
     if (input) {
       act(() => {
         fireEvent.change(input, { target: { value: 'alpha' } });
@@ -103,7 +105,12 @@ describe('FileComponent residual branches', () => {
             name: 'Group',
             type: 'plainText',
             children: [
-              { id: 'f1', name: 'readme.md', content: '# hi', url: 'https://x/r' },
+              {
+                id: 'f1',
+                name: 'readme.md',
+                content: '# hi',
+                url: 'https://x/r',
+              },
               { id: 'f2', name: 'skip.bin', content: 'x' },
             ],
           } as any,
@@ -128,7 +135,11 @@ describe('FileComponent residual branches', () => {
     const onPreview = vi.fn();
     const onDownload = vi.fn();
     const { rerender, unmount } = wrap(
-      <FileComponent nodes={[]} onPreview={onPreview} onDownload={onDownload} />,
+      <FileComponent
+        nodes={[]}
+        onPreview={onPreview}
+        onDownload={onDownload}
+      />,
     );
     expect(document.body).toBeTruthy();
     rerender(
@@ -289,7 +300,12 @@ describe('FileComponent residual branches', () => {
                 name: 'G2',
                 type: 'code',
                 children: [
-                  { id: 'keep', name: 'keep.md', content: 'k2', type: 'markdown' },
+                  {
+                    id: 'keep',
+                    name: 'keep.md',
+                    content: 'k2',
+                    type: 'markdown',
+                  },
                 ],
               } as any,
             ]}
@@ -408,7 +424,7 @@ describe('FileComponent residual branches', () => {
     wrap(
       <FileComponent
         nodes={[{ id: 'x', name: 'x.txt', content: 'x' }]}
-        onPreview={async () => ({ foo: 1 } as any)}
+        onPreview={async () => ({ foo: 1 }) as any}
         bindDomId
         fileTreeSwitch={{
           defaultView: 'tree',

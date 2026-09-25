@@ -52,7 +52,9 @@ describe('MermaidRendererImpl midtail branches', () => {
         />
       </ConfigProvider>,
     );
-    expect(container.querySelector('[class*="mermaid"]') || container.firstChild).toBeTruthy();
+    expect(
+      container.querySelector('[class*="mermaid"]') || container.firstChild,
+    ).toBeTruthy();
 
     const buttons = screen.getAllByRole('button');
     expect(buttons.length).toBeGreaterThanOrEqual(1);

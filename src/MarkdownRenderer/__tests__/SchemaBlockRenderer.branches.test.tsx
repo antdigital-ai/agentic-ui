@@ -40,7 +40,9 @@ describe('SchemaBlockRenderer 分支覆盖', () => {
   it('apaasifyRender 返回 undefined 时回退 SchemaRenderer', () => {
     render(
       <SchemaBlockRenderer language="schema" apaasifyRender={() => undefined}>
-        {'{"version":"1","name":"n","description":"d","component":{"type":"html","schema":"<div/>","properties":{}}}'}
+        {
+          '{"version":"1","name":"n","description":"d","component":{"type":"html","schema":"<div/>","properties":{}}}'
+        }
       </SchemaBlockRenderer>,
     );
     expect(screen.getByTestId('schema-renderer')).toBeTruthy();
@@ -49,7 +51,9 @@ describe('SchemaBlockRenderer 分支覆盖', () => {
   it('agentar-card 语言走 card 容器', () => {
     render(
       <SchemaBlockRenderer language="agentar-card">
-        {'{"version":"1","name":"n","description":"d","component":{"type":"html","schema":"<div/>","properties":{}},"initialValues":{"a":1}}'}
+        {
+          '{"version":"1","name":"n","description":"d","component":{"type":"html","schema":"<div/>","properties":{}},"initialValues":{"a":1}}'
+        }
       </SchemaBlockRenderer>,
     );
     expect(screen.getByTestId('agentar-card-container')).toBeTruthy();
@@ -62,7 +66,9 @@ describe('SchemaBlockRenderer 分支覆盖', () => {
         language="schema"
         editorCodeProps={{ render: renderOk } as any}
       >
-        {'{"version":"1","name":"n","description":"d","component":{"type":"html","schema":"<div/>","properties":{}}}'}
+        {
+          '{"version":"1","name":"n","description":"d","component":{"type":"html","schema":"<div/>","properties":{}}}'
+        }
       </SchemaBlockRenderer>,
     );
     expect(screen.getByTestId('custom-render')).toBeTruthy();
@@ -73,7 +79,9 @@ describe('SchemaBlockRenderer 分支覆盖', () => {
         language="schema"
         editorCodeProps={{ render: renderUndef } as any}
       >
-        {'{"version":"1","name":"n","description":"d","component":{"type":"html","schema":"<div/>","properties":{}}}'}
+        {
+          '{"version":"1","name":"n","description":"d","component":{"type":"html","schema":"<div/>","properties":{}}}'
+        }
       </SchemaBlockRenderer>,
     );
     expect(screen.getByTestId('schema-renderer')).toBeTruthy();
@@ -86,7 +94,9 @@ describe('SchemaBlockRenderer 分支覆盖', () => {
         language="schema"
         editorCodeProps={{ render: renderThrow } as any}
       >
-        {'{"version":"1","name":"n","description":"d","component":{"type":"html","schema":"<div/>","properties":{}}}'}
+        {
+          '{"version":"1","name":"n","description":"d","component":{"type":"html","schema":"<div/>","properties":{}}}'
+        }
       </SchemaBlockRenderer>,
     );
     expect(screen.getByTestId('schema-renderer')).toBeTruthy();

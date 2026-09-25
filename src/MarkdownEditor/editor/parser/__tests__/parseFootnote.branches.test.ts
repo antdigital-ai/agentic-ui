@@ -7,9 +7,7 @@ import {
 
 describe('parseFootnote 分支覆盖', () => {
   it('footnoteReferenceToTextLeaf 有 identifier', () => {
-    expect(
-      footnoteReferenceToTextLeaf({ identifier: 'note1' }),
-    ).toMatchObject({
+    expect(footnoteReferenceToTextLeaf({ identifier: 'note1' })).toMatchObject({
       text: '[^note1]',
       identifier: 'note1',
       fnc: true,
@@ -41,7 +39,10 @@ describe('parseFootnote 分支覆盖', () => {
 
   it('footnoteReferenceToTextLeaf identifier 与 label 均缺失', () => {
     expect(
-      footnoteReferenceToTextLeaf({ identifier: null as any, label: null as any }),
+      footnoteReferenceToTextLeaf({
+        identifier: null as any,
+        label: null as any,
+      }),
     ).toMatchObject({
       text: '',
       identifier: undefined,

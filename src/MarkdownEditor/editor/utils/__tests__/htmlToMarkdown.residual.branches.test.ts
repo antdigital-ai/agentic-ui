@@ -28,9 +28,9 @@ describe('htmlToMarkdown residual branches', () => {
     expect(isWordHtml('<p class="MsoNormal">x</p>')).toBe(true);
     expect(isWordHtml('<o:p></o:p>')).toBe(true);
     expect(cleanWordHtml('')).toBe('');
-    expect(cleanWordHtml('<o:p>x</o:p>&nbsp;<span class="MsoX">y</span>')).toMatch(
-      /x|y/,
-    );
+    expect(
+      cleanWordHtml('<o:p>x</o:p>&nbsp;<span class="MsoX">y</span>'),
+    ).toMatch(/x|y/);
   });
 
   it('cleanHtml / isHtml / extractText / batch', () => {

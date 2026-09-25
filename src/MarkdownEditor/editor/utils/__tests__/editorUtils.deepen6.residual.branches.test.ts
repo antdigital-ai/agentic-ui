@@ -93,9 +93,7 @@ describe('EditorUtils deepen6 residual branches', () => {
 
   it('getSelectionFromDomSelection：anchorNode 非 DOM', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: 'hi' }] },
-    ];
+    editor.children = [{ type: 'paragraph', children: [{ text: 'hi' }] }];
     const fakeSel = {
       anchorNode: 123 as any,
       focusNode: 456 as any,
@@ -116,9 +114,7 @@ describe('EditorUtils deepen6 residual branches', () => {
 
   it('createSelectionFromNodes：window undefined 早退', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: 'a' }] },
-    ];
+    editor.children = [{ type: 'paragraph', children: [{ text: 'a' }] }];
     const orig = globalThis.window;
     vi.stubGlobal('window', undefined);
     try {

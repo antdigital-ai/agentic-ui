@@ -49,9 +49,7 @@ describe('DocInfoList branches', () => {
         />
       </BubbleConfigContext.Provider>,
     );
-    expect(
-      container.querySelector('[class*="doc-info-compact"]'),
-    ).toBeTruthy();
+    expect(container.querySelector('[class*="doc-info-compact"]')).toBeTruthy();
   });
 
   it('filter 掉 falsy options', () => {
@@ -83,7 +81,9 @@ describe('DocInfoList branches', () => {
         reference_url_info_list={[]}
       />,
     );
-    const listItem = screen.getByText(longContent).closest('[class*="list-item"]');
+    const listItem = screen
+      .getByText(longContent)
+      .closest('[class*="list-item"]');
     await user.hover(listItem as HTMLElement);
     const metaBlock = document.body.querySelector('[class*="FBFCFD"]');
     if (metaBlock) {
@@ -178,7 +178,9 @@ describe('DocInfoList branches', () => {
       />,
     );
     await user.hover(
-      screen.getByText(longContent).closest('[class*="list-item"]') as HTMLElement,
+      screen
+        .getByText(longContent)
+        .closest('[class*="list-item"]') as HTMLElement,
     );
     expect(screen.queryByTestId('md-preview')).toBeNull();
   });

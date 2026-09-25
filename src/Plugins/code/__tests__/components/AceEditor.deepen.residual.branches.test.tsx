@@ -103,7 +103,9 @@ vi.mock('../../../../Hooks/useRefFunction', () => ({
   useRefFunction: (fn: any) => fn,
 }));
 
-vi.mock('is-hotkey', () => ({ default: (...args: any[]) => isHotkey(...args) }));
+vi.mock('is-hotkey', () => ({
+  default: (...args: any[]) => isHotkey(...args),
+}));
 
 import { EditorUtils } from '../../../../MarkdownEditor/editor/utils/editorUtils';
 import { AceEditor } from '../../components/AceEditor';

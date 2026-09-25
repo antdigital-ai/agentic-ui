@@ -64,7 +64,9 @@ describe('UserBubble deepen residual branches', () => {
         />
       </BubbleConfigContext.Provider>,
     );
-    expect(container.querySelector('[class*="bubble"]') || container).toBeTruthy();
+    expect(
+      container.querySelector('[class*="bubble"]') || container,
+    ).toBeTruthy();
     expect(screen.getByTestId('msg-display')).toBeTruthy();
   });
 

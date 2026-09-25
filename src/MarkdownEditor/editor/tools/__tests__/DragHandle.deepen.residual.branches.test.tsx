@@ -30,8 +30,6 @@ describe('DragHandle deepen residual branches', () => {
   });
 
   it('自定义 style', () => {
-    expect(() =>
-      render(<DragHandle style={{ opacity: 0.5 }} />),
-    ).not.toThrow();
+    expect(() => render(<DragHandle style={{ opacity: 0.5 }} />)).not.toThrow();
   });
 });

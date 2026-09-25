@@ -70,14 +70,18 @@ describe('DocCards deepen residual branches', () => {
       'aria-label',
       '标签列表',
     );
-    expect(screen.getByTestId('doc-cards-item-1-title')).toHaveTextContent('Ok');
+    expect(screen.getByTestId('doc-cards-item-1-title')).toHaveTextContent(
+      'Ok',
+    );
   });
 
   it('locale.docCards / docCardsTags 覆盖默认', () => {
-    wrap(
-      <DocCards columns={[{ dataIndex: 'x' }]} data={[]} />,
-      { docCards: 'EmptyCards', docCardsTags: 'TagList' },
+    wrap(<DocCards columns={[{ dataIndex: 'x' }]} data={[]} />, {
+      docCards: 'EmptyCards',
+      docCardsTags: 'TagList',
+    });
+    expect(screen.getByTestId('doc-cards-empty')).toHaveTextContent(
+      'EmptyCards',
     );
-    expect(screen.getByTestId('doc-cards-empty')).toHaveTextContent('EmptyCards');
   });
 });

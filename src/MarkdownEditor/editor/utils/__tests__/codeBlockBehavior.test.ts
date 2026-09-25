@@ -81,9 +81,7 @@ describe('codeBlockBehavior', () => {
     const event = new KeyboardEvent('keydown', { key: 'Backspace' });
     const preventSpy = vi.spyOn(event, 'preventDefault');
 
-    expect(
-      handleCodeBlockAceKeyDown(editor, [0], event, ''),
-    ).toBe('handled');
+    expect(handleCodeBlockAceKeyDown(editor, [0], event, '')).toBe('handled');
     expect(preventSpy).toHaveBeenCalled();
     expect(editor.children[0]).toEqual(
       expect.objectContaining({ type: 'paragraph' }),

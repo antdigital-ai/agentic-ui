@@ -123,7 +123,9 @@ describe('TableCellIndex deepen residual branches', () => {
       { deleteIconPosition: { rowIndex: 0 } },
     );
     fireEvent.click(
-      document.querySelector('.ant-agentic-md-editor-table-cell-index-delete-icon')!,
+      document.querySelector(
+        '.ant-agentic-md-editor-table-cell-index-delete-icon',
+      )!,
     );
     expect(removeTableRow).not.toHaveBeenCalled();
   });
@@ -131,7 +133,9 @@ describe('TableCellIndex deepen residual branches', () => {
   it('正常删除行并 clearSelect', () => {
     renderCell({}, { deleteIconPosition: { rowIndex: 0 } });
     fireEvent.click(
-      document.querySelector('.ant-agentic-md-editor-table-cell-index-delete-icon')!,
+      document.querySelector(
+        '.ant-agentic-md-editor-table-cell-index-delete-icon',
+      )!,
     );
     expect(removeTableRow).toHaveBeenCalledWith(currentTestEditor, [0], 0);
     expect(mockSetDeleteIconPosition).toHaveBeenCalledWith(null);
@@ -141,7 +145,9 @@ describe('TableCellIndex deepen residual branches', () => {
     renderCell({ rowIndex: 0 }, { deleteIconPosition: { rowIndex: 0 } });
     fireEvent.click(document.querySelector('td')!);
     fireEvent.click(
-      document.querySelector('.ant-agentic-md-editor-table-cell-index-insert-row-before')!,
+      document.querySelector(
+        '.ant-agentic-md-editor-table-cell-index-insert-row-before',
+      )!,
     );
     expect(insertTableRow).toHaveBeenCalledWith(
       currentTestEditor,
@@ -155,7 +161,9 @@ describe('TableCellIndex deepen residual branches', () => {
     renderCell({ rowIndex: 0 }, { deleteIconPosition: { rowIndex: 0 } });
     fireEvent.click(document.querySelector('td')!);
     fireEvent.click(
-      document.querySelector('.ant-agentic-md-editor-table-cell-index-insert-row-after')!,
+      document.querySelector(
+        '.ant-agentic-md-editor-table-cell-index-insert-row-after',
+      )!,
     );
     expect(insertTableRow).toHaveBeenCalledWith(
       currentTestEditor,
@@ -190,11 +198,7 @@ describe('TableCellIndex deepen residual branches', () => {
             <table>
               <tbody>
                 <tr>
-                  <TableCellIndex
-                    targetRow={{}}
-                    rowIndex={0}
-                    tablePath={[0]}
-                  />
+                  <TableCellIndex targetRow={{}} rowIndex={0} tablePath={[0]} />
                 </tr>
               </tbody>
             </table>

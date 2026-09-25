@@ -1,7 +1,7 @@
 /**
  * useThrottleFn deepen：窗口期内二次调用挂起 timeout。
  */
-import { renderHook, act } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useThrottleFn } from '../useThrottleFn';
 

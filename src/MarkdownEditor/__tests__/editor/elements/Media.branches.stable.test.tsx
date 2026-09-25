@@ -42,7 +42,11 @@ vi.mock('antd', () => ({
 vi.mock('react-rnd', () => ({
   Rnd: ({ children, onResizeStop, onResize }: any) => (
     <div data-testid="rnd-wrap">
-      <button type="button" data-testid="rnd-stop" onClick={() => onResizeStop?.()}>
+      <button
+        type="button"
+        data-testid="rnd-stop"
+        onClick={() => onResizeStop?.()}
+      >
         stop
       </button>
       <button
@@ -166,11 +170,16 @@ describe('Media stable branches', () => {
   it('unsafe url renders plain text fallback', () => {
     mocks.shouldRenderUrlAsPlainTextMock.mockReturnValue(true);
     render(
-      <Media element={{ ...baseElement, url: 'javascript:alert(1)' }} attributes={{} as any}>
+      <Media
+        element={{ ...baseElement, url: 'javascript:alert(1)' }}
+        attributes={{} as any}
+      >
         {null}
       </Media>,
     );
-    expect(screen.getByTestId('media-unsafe-url-plain-text')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('media-unsafe-url-plain-text'),
+    ).toBeInTheDocument();
   });
 
   it('readonly image uses ReadonlyImage', () => {
@@ -191,7 +200,11 @@ describe('Media stable branches', () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     render(
       <Media
-        element={{ ...baseElement, url: 'https://example.com/v.mp4', finished: true }}
+        element={{
+          ...baseElement,
+          url: 'https://example.com/v.mp4',
+          finished: true,
+        }}
         attributes={{} as any}
       >
         {null}
@@ -231,7 +244,10 @@ describe('Media stable branches', () => {
   it('other media type falls back to image pipeline', () => {
     mocks.getMediaTypeMock.mockReturnValue('other');
     render(
-      <Media element={{ ...baseElement, mediaType: 'other' }} attributes={{} as any}>
+      <Media
+        element={{ ...baseElement, mediaType: 'other' }}
+        attributes={{} as any}
+      >
         {null}
       </Media>,
     );
@@ -263,7 +279,10 @@ describe('Media stable branches', () => {
   it('ResizeImage onResizeStop forwards size callback', () => {
     const onResizeStop = vi.fn();
     render(
-      <ResizeImage src="https://example.com/a.png" onResizeStop={onResizeStop} />,
+      <ResizeImage
+        src="https://example.com/a.png"
+        onResizeStop={onResizeStop}
+      />,
     );
     fireEvent.click(screen.getByTestId('rnd-stop'));
     expect(onResizeStop).toHaveBeenCalled();
@@ -271,7 +290,10 @@ describe('Media stable branches', () => {
 
   it('delete confirm removes node', () => {
     render(
-      <Media element={{ ...baseElement, mediaType: 'image' }} attributes={{} as any}>
+      <Media
+        element={{ ...baseElement, mediaType: 'image' }}
+        attributes={{} as any}
+      >
         {null}
       </Media>,
     );
@@ -379,7 +401,10 @@ describe('Media stable branches', () => {
   it('edit mode image ResizeImage onResizeStop updates node', () => {
     mocks.getMediaTypeMock.mockReturnValue('image');
     render(
-      <Media element={{ ...baseElement, finished: true }} attributes={{} as any}>
+      <Media
+        element={{ ...baseElement, finished: true }}
+        attributes={{} as any}
+      >
         {null}
       </Media>,
     );
@@ -391,7 +416,10 @@ describe('Media stable branches', () => {
     currentStore.readonly = true;
     mocks.getMediaTypeMock.mockReturnValue('image');
     render(
-      <Media element={{ ...baseElement, finished: true }} attributes={{} as any}>
+      <Media
+        element={{ ...baseElement, finished: true }}
+        attributes={{} as any}
+      >
         {null}
       </Media>,
     );

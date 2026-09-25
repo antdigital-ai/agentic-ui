@@ -9,6 +9,7 @@ import { MarkdownEditorProps } from '../../BaseMarkdownEditor';
 import { AttachNode, MediaNode } from '../../el';
 import { useSubject } from '../../hooks/subscribe';
 import type { EditorStore } from '../store';
+import { isCodeBlockAceInputTarget } from './codeBlockBehavior';
 import {
   convertToParagraph,
   createList,
@@ -21,7 +22,6 @@ import {
   toggleQuote,
 } from './editorCommands';
 import { EditorUtils } from './editorUtils';
-import { isCodeBlockAceInputTarget } from './codeBlockBehavior';
 
 export type Methods<T> = {
   // eslint-disable-next-line @typescript-eslint/ban-types

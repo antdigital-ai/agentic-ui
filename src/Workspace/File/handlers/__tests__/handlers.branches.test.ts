@@ -81,7 +81,9 @@ describe('Workspace File handlers branches', () => {
     expect(writeText).toHaveBeenCalledWith(window.location.href);
 
     writeText.mockRejectedValue(new Error('denied'));
-    await expect(handleDefaultShare({ url: 'u' } as any)).resolves.toBeUndefined();
+    await expect(
+      handleDefaultShare({ url: 'u' } as any),
+    ).resolves.toBeUndefined();
     vi.unstubAllGlobals();
   });
 

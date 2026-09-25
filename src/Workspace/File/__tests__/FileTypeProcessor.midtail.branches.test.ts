@@ -3,6 +3,7 @@
  */
 import { describe, expect, it, vi } from 'vitest';
 import { FileCategory } from '../../types';
+import { PreviewCapability } from '../DataSourceStrategy';
 import {
   FileTypeProcessor,
   getMimeType,
@@ -13,7 +14,6 @@ import {
   isTextFile,
   isVideoFile,
 } from '../FileTypeProcessor';
-import { PreviewCapability } from '../DataSourceStrategy';
 
 const mockDs = (previewCapability: PreviewCapability, mimeType?: string) => ({
   processFile: vi.fn(() => ({
@@ -28,9 +28,9 @@ describe('FileTypeProcessor midtail branches', () => {
   it('infer：显式 type / MIME / 扩展名 / URL / 默认', () => {
     const proc = new FileTypeProcessor(mockDs(PreviewCapability.FULL) as any);
 
-    expect(proc.inferFileType({ id: '1', name: 'a', type: 'pdf' } as any).fileType).toBe(
-      'pdf',
-    );
+    expect(
+      proc.inferFileType({ id: '1', name: 'a', type: 'pdf' } as any).fileType,
+    ).toBe('pdf');
 
     expect(
       proc.inferFileType({
@@ -58,9 +58,7 @@ describe('FileTypeProcessor midtail branches', () => {
   });
 
   it('processFile：BASIC 仅图片可预览；NONE 不可；FULL 多类型模式', () => {
-    const basic = new FileTypeProcessor(
-      mockDs(PreviewCapability.BASIC) as any,
-    );
+    const basic = new FileTypeProcessor(mockDs(PreviewCapability.BASIC) as any);
     const img = basic.processFile({
       id: 'i',
       name: 'a.png',
@@ -106,9 +104,9 @@ describe('FileTypeProcessor midtail branches', () => {
       name: 'z.zip',
       type: 'archive',
     } as any);
-    expect(result.previewMode === 'external' || result.previewMode === 'none').toBe(
-      true,
-    );
+    expect(
+      result.previewMode === 'external' || result.previewMode === 'none',
+    ).toBe(true);
     full.cleanupResult(result);
   });
 

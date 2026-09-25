@@ -57,9 +57,9 @@ describe('ButtonTab residual branches', () => {
     const iconBtn = screen.getByTestId('ico').parentElement!;
     fireEvent.keyDown(iconBtn, { key: 'Enter' });
     expect(onIconClick).not.toHaveBeenCalled();
-    expect(screen.getByTestId('agentic-chatboot-button-tab').className).toContain(
-      'extra',
-    );
+    expect(
+      screen.getByTestId('agentic-chatboot-button-tab').className,
+    ).toContain('extra');
   });
 
   it('无 icon 时仅渲染 children', () => {

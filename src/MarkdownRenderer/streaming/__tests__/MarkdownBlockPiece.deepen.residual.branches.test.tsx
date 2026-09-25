@@ -3,9 +3,9 @@
  */
 import { cleanup, render } from '@testing-library/react';
 import React from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { unified } from 'unified';
 import remarkParse from 'remark-parse';
+import { unified } from 'unified';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MarkdownBlockPiece } from '../MarkdownBlockPiece';
 
 describe('MarkdownBlockPiece deepen residual branches', () => {

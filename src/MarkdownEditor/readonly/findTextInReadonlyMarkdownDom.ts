@@ -80,7 +80,8 @@ const collectBlockElements = (
 export const getReadonlyMarkdownBlocks = (
   root: HTMLElement,
   blockIndex?: number,
-): HTMLElement[] => collectBlockElements(root, blockIndex === undefined ? [] : [blockIndex]);
+): HTMLElement[] =>
+  collectBlockElements(root, blockIndex === undefined ? [] : [blockIndex]);
 
 const getBlockPlainText = (block: HTMLElement): string => block.innerText || '';
 
@@ -110,7 +111,8 @@ const findMatchesInText = (
         matchedText,
         offset: { start, end },
         lineContent: text,
-        nodeType: options.block.dataset.be || options.block.tagName.toLowerCase(),
+        nodeType:
+          options.block.dataset.be || options.block.tagName.toLowerCase(),
         searchVariant: variant,
       });
       match = pattern.exec(text);

@@ -2,7 +2,13 @@
  * ScatterChart deepen2：SSR window 分支、分类回退、mobile、type 缺省配色。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import ScatterChart from '../ScatterChart';

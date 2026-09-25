@@ -69,9 +69,12 @@ describe('easyWins safe residual branches', () => {
     applyTableMinSizeToSchema([table], { minColumn: 2, minRows: 2 });
     expect(table.children.length).toBeGreaterThanOrEqual(2);
 
-    await convertRemoteImages({} as any, {
-      editor: { children: null },
-    } as any);
+    await convertRemoteImages(
+      {} as any,
+      {
+        editor: { children: null },
+      } as any,
+    );
     expect(true).toBe(true);
   });
 });

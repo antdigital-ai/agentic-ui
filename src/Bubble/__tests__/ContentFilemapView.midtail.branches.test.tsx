@@ -25,7 +25,9 @@ describe('ContentFilemapView midtail branches', () => {
     const { container } = render(
       <ContentFilemapView blocks={[]} placement="left" />,
     );
-    expect(container.querySelector('[data-testid="content-filemap-view"]')).toBeNull();
+    expect(
+      container.querySelector('[data-testid="content-filemap-view"]'),
+    ).toBeNull();
   });
 
   it('无 uuid 用 name 作 key；onDownload 回退 previewUrl', () => {

@@ -24,11 +24,11 @@ vi.mock('../../MarkdownInputField/FileMapView', () => ({
       <button
         type="button"
         data-testid="fv-viewall"
-        onClick={() => props.onViewAll?.(Array.from(props.fileMap?.values() || []))}
+        onClick={() =>
+          props.onViewAll?.(Array.from(props.fileMap?.values() || []))
+        }
       />
-      <div data-testid="fv-more">
-        {props.renderMoreAction?.({ name: 'f' })}
-      </div>
+      <div data-testid="fv-more">{props.renderMoreAction?.({ name: 'f' })}</div>
       <span data-testid="fv-slot">
         {typeof props.customSlot === 'function'
           ? props.customSlot({ name: 'slot' })

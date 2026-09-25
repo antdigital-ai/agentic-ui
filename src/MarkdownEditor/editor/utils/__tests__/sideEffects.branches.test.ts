@@ -12,7 +12,11 @@ describe('sideEffects download 分支覆盖', () => {
       download: 'file',
       href: '',
       style: { visibility: '' },
-      setAttribute: vi.fn(function (this: HTMLAnchorElement, key: string, val: string) {
+      setAttribute: vi.fn(function (
+        this: HTMLAnchorElement,
+        key: string,
+        val: string,
+      ) {
         if (key === 'href') this.href = val;
         if (key === 'download') this.download = val;
       }),

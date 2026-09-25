@@ -98,7 +98,11 @@ export function commitImeCompositionTextIfMissing(
   composedText: string,
   getTextSnapshot: (editor: Editor) => string,
 ): void {
-  if (!editor?.selection || !composedText || !Range.isCollapsed(editor.selection)) {
+  if (
+    !editor?.selection ||
+    !composedText ||
+    !Range.isCollapsed(editor.selection)
+  ) {
     return;
   }
 
@@ -110,7 +114,10 @@ export function commitImeCompositionTextIfMissing(
     }
 
     const textAfter = getTextSnapshot(editor);
-    if (textAfter.endsWith(composedText) && textAfter.length >= textBefore.length) {
+    if (
+      textAfter.endsWith(composedText) &&
+      textAfter.length >= textBefore.length
+    ) {
       return;
     }
 

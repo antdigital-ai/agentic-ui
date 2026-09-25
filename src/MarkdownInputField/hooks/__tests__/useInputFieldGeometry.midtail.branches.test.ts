@@ -77,14 +77,15 @@ describe('useInputFieldGeometry midtail branches', () => {
         attachment: { enable: true },
       }),
     );
-    expect(att.current.collapsedHeightPx).toBe(100 + ATTACHMENT_EXTRA_HEIGHT_PX);
+    expect(att.current.collapsedHeightPx).toBe(
+      100 + ATTACHMENT_EXTRA_HEIGHT_PX,
+    );
   });
 
   it('computedMinHeight：enlarged / style / enlarge+refine / 单按钮 / 多行', () => {
     expect(
-      renderHook(() =>
-        useInputFieldGeometry({ ...base, isEnlarged: true }),
-      ).result.current.computedMinHeight,
+      renderHook(() => useInputFieldGeometry({ ...base, isEnlarged: true }))
+        .result.current.computedMinHeight,
     ).toBe('auto');
 
     expect(
@@ -107,9 +108,8 @@ describe('useInputFieldGeometry midtail branches', () => {
     ).toBe(MIN_HEIGHT_WITH_ENLARGE_AND_REFINE_PX);
 
     expect(
-      renderHook(() =>
-        useInputFieldGeometry({ ...base, totalActionCount: 1 }),
-      ).result.current.computedMinHeight,
+      renderHook(() => useInputFieldGeometry({ ...base, totalActionCount: 1 }))
+        .result.current.computedMinHeight,
     ).toBe(MIN_HEIGHT_SINGLE_ACTION_PX);
 
     expect(
@@ -125,7 +125,8 @@ describe('useInputFieldGeometry midtail branches', () => {
     );
     expect(result.current.enlargedStyle.maxHeight).toBeTruthy();
     expect(
-      renderHook(() => useInputFieldGeometry(base)).result.current.enlargedStyle,
+      renderHook(() => useInputFieldGeometry(base)).result.current
+        .enlargedStyle,
     ).toEqual({});
   });
 });

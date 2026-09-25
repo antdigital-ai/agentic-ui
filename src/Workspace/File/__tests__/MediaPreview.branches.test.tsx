@@ -75,9 +75,7 @@ describe('MediaPreview 分支覆盖', () => {
 
   it('video 无 locale 时使用默认不支持文案', () => {
     renderMedia('video', 'https://example.com/a.mp4');
-    expect(
-      screen.getByText('您的浏览器不支持视频播放'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('您的浏览器不支持视频播放')).toBeInTheDocument();
   });
 
   it('video 有 locale 时使用自定义不支持文案', () => {

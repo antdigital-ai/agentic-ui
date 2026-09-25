@@ -90,7 +90,15 @@ describe('FunnelChart deepen7 safe residual branches', () => {
       ctx,
       data: {
         labels: ['A', 'B'],
-        datasets: [{ data: [[-40, 40], [-20, 20], [-5, 5]] }],
+        datasets: [
+          {
+            data: [
+              [-40, 40],
+              [-20, 20],
+              [-5, 5],
+            ],
+          },
+        ],
       },
       scales: { x: { getPixelForValue: (v: number) => 100 + v } },
       getDatasetMeta: () => ({
@@ -123,4 +131,3 @@ describe('FunnelChart deepen7 safe residual branches', () => {
     ).toBe(true);
   });
 });
-

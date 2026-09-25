@@ -28,9 +28,9 @@ describe('SchemaBlockRenderer initialValues 分支', () => {
         }
       </SchemaBlockRenderer>,
     );
-    expect(screen.getAllByTestId('mock-schema-values').at(-1)!.textContent).toBe(
-      '{}',
-    );
+    expect(
+      screen.getAllByTestId('mock-schema-values').at(-1)!.textContent,
+    ).toBe('{}');
   });
 
   it('无 initialValues 字段回退 {}', () => {
@@ -46,7 +46,9 @@ describe('SchemaBlockRenderer initialValues 分支', () => {
 
   it('schema 值为数组时走 SchemaRenderer 默认分支', () => {
     render(
-      <SchemaBlockRenderer language="schema">{'[{"a":1}]'}</SchemaBlockRenderer>,
+      <SchemaBlockRenderer language="schema">
+        {'[{"a":1}]'}
+      </SchemaBlockRenderer>,
     );
     expect(screen.getByTestId('schema-renderer')).toBeTruthy();
   });

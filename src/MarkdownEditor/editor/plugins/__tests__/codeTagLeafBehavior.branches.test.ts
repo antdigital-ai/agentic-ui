@@ -245,15 +245,15 @@ describe('istanbul residual：codeTagLeafBehavior 假值 / 早退', () => {
     expect(
       shouldExitMarkOnInsertBreak({ text: undefined as any, mark: true }, 0),
     ).toBe(true);
-    expect(
-      shouldExitMarkOnInsertBreak({ text: 'ab', mark: true }, 1),
-    ).toBe(false);
-    expect(
-      shouldExitMarkOnInsertBreak({ text: 'ab\n', mark: true }, 3),
-    ).toBe(true);
-    expect(
-      shouldExitMarkOnInsertBreak({ text: '\n', mark: true }, 1),
-    ).toBe(true);
+    expect(shouldExitMarkOnInsertBreak({ text: 'ab', mark: true }, 1)).toBe(
+      false,
+    );
+    expect(shouldExitMarkOnInsertBreak({ text: 'ab\n', mark: true }, 3)).toBe(
+      true,
+    );
+    expect(shouldExitMarkOnInsertBreak({ text: '\n', mark: true }, 1)).toBe(
+      true,
+    );
   });
 
   it('handleMarkRemoveTextOperation：text/removed ?? 与删后非空返回 false', () => {
@@ -356,9 +356,7 @@ describe('istanbul residual：codeTagLeafBehavior 假值 / 早退', () => {
 
   it('handleTagRemoveTextOperation：空 trim 文本清 tag；全文删除占位', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [tagNode('  ')] },
-    ];
+    editor.children = [{ type: 'paragraph', children: [tagNode('  ')] }];
     expect(
       handleTagRemoveTextOperation(
         editor,
@@ -367,9 +365,7 @@ describe('istanbul residual：codeTagLeafBehavior 假值 / 早退', () => {
       ),
     ).toBe(true);
 
-    editor.children = [
-      { type: 'paragraph', children: [tagNode('xy')] },
-    ];
+    editor.children = [{ type: 'paragraph', children: [tagNode('xy')] }];
     expect(
       handleTagRemoveTextOperation(
         editor,
@@ -383,9 +379,7 @@ describe('istanbul residual：codeTagLeafBehavior 假值 / 早退', () => {
 describe('codeTagLeafBehavior istanbul residual：非 tag / apply / mark 假值', () => {
   it('非 code/tag 叶返回 false；部分删除走 apply', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: 'plain' }] },
-    ];
+    editor.children = [{ type: 'paragraph', children: [{ text: 'plain' }] }];
     const apply = vi.fn();
     expect(
       handleTagRemoveTextOperation(
@@ -395,9 +389,7 @@ describe('codeTagLeafBehavior istanbul residual：非 tag / apply / mark 假值'
       ),
     ).toBe(false);
 
-    editor.children = [
-      { type: 'paragraph', children: [tagNode('hello')] },
-    ];
+    editor.children = [{ type: 'paragraph', children: [tagNode('hello')] }];
     expect(
       handleTagRemoveTextOperation(
         editor,

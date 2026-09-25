@@ -161,11 +161,7 @@ export class FileTypeProcessor {
    */
   private getTypeFromUrl(url: string): FileType | null {
     // 与 UrlDataSourceStrategy 一致：忽略 query / hash，避免签名 URL 误判扩展名
-    const urlExtension = url
-      .split(/[?#]/)[0]
-      .split('.')
-      .pop()
-      ?.toLowerCase();
+    const urlExtension = url.split(/[?#]/)[0].split('.').pop()?.toLowerCase();
     if (!urlExtension) return null;
 
     for (const [type, definition] of Object.entries(FILE_TYPES)) {

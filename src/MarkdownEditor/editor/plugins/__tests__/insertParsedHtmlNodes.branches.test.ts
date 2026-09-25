@@ -1,12 +1,12 @@
 import { createEditor, Node } from 'slate';
 import { describe, expect, it, vi } from 'vitest';
+import { docxDeserializer } from '../../utils/docx/docxDeserializer';
 import {
   deserialize,
   ELEMENT_TAGS,
   insertParsedHtmlNodes,
   TEXT_TAGS,
 } from '../insertParsedHtmlNodes';
-import { docxDeserializer } from '../../utils/docx/docxDeserializer';
 
 vi.mock('../../utils/docx/docxDeserializer', () => ({
   docxDeserializer: vi.fn(),
@@ -76,9 +76,9 @@ describe('insertParsedHtmlNodes residual branches', () => {
       { text: 'raw leaf' },
     ] as any);
 
-    await expect(insertParsedHtmlNodes(editor, '<p>x</p>', {}, '')).resolves.toBe(
-      true,
-    );
+    await expect(
+      insertParsedHtmlNodes(editor, '<p>x</p>', {}, ''),
+    ).resolves.toBe(true);
     expect(Node.string(editor.children.at(-1) as any)).toBe('raw leaf');
   });
 
@@ -125,9 +125,9 @@ describe('insertParsedHtmlNodes residual branches', () => {
     vi.mocked(docxDeserializer).mockReturnValueOnce([
       { type: 'list', children: [] },
     ] as any);
-    await expect(insertParsedHtmlNodes(listEditor, '<ul></ul>', {}, '')).resolves.toBe(
-      false,
-    );
+    await expect(
+      insertParsedHtmlNodes(listEditor, '<ul></ul>', {}, ''),
+    ).resolves.toBe(false);
   });
 });
 
@@ -139,9 +139,9 @@ describe('insertParsedHtmlNodes istanbul residual：空 html / 无 selection', (
     await expect(insertParsedHtmlNodes(editor, '', {}, '')).resolves.toBe(
       false,
     );
-    await expect(
-      insertParsedHtmlNodes(editor, '   ', {}, ''),
-    ).resolves.toBe(false);
+    await expect(insertParsedHtmlNodes(editor, '   ', {}, '')).resolves.toBe(
+      false,
+    );
 
     editor.selection = {
       anchor: { path: [0, 0], offset: 0 },

@@ -25,7 +25,10 @@ describe('EditorUtils deepen3 residual branches', () => {
   });
 
   it('createMediaNode：相对路径；origin 空串', () => {
-    const originDesc = Object.getOwnPropertyDescriptor(window.location, 'origin');
+    const originDesc = Object.getOwnPropertyDescriptor(
+      window.location,
+      'origin',
+    );
     try {
       Object.defineProperty(window.location, 'origin', {
         configurable: true,
@@ -55,16 +58,18 @@ describe('EditorUtils deepen3 residual branches', () => {
         children: [{ text: 'ab' }, { text: undefined as any }, { text: 'cd' }],
       },
     ];
-    const spy = vi.spyOn(Editor, 'next').mockImplementation((ed: any, opts: any) => {
-      const at = opts?.at;
-      if (Path.equals(at, [0, 0])) {
-        return [{ text: undefined as any }, [0, 1]] as any;
-      }
-      if (Path.equals(at, [0, 1])) {
-        return [{ text: 'cd' }, [0, 2]] as any;
-      }
-      return undefined as any;
-    });
+    const spy = vi
+      .spyOn(Editor, 'next')
+      .mockImplementation((ed: any, opts: any) => {
+        const at = opts?.at;
+        if (Path.equals(at, [0, 0])) {
+          return [{ text: undefined as any }, [0, 1]] as any;
+        }
+        if (Path.equals(at, [0, 1])) {
+          return [{ text: 'cd' }, [0, 2]] as any;
+        }
+        return undefined as any;
+      });
     const text = EditorUtils.copyText(editor, { path: [0, 0], offset: 0 });
     expect(typeof text).toBe('string');
     const cut = EditorUtils.cutText(editor, { path: [0, 0], offset: 0 });

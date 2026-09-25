@@ -102,9 +102,10 @@ describe('EditorStore core deepen branches', () => {
 
   it('长内容 !useRAF 同步分片；全空白 chunk 不替换', () => {
     editor.children = [{ type: 'paragraph', children: [{ text: 'keep' }] }];
-    const long = Array.from({ length: 12 }, (_, i) => `## S${i}\n\nbody ${i}`).join(
-      '\n\n',
-    );
+    const long = Array.from(
+      { length: 12 },
+      (_, i) => `## S${i}\n\nbody ${i}`,
+    ).join('\n\n');
     store.setMDContent(long, [], { chunkSize: 20, useRAF: false });
     expect(editor.children.length).toBeGreaterThan(0);
 
@@ -117,13 +118,10 @@ describe('EditorStore core deepen branches', () => {
 
   it('chunks>10 + useRAF：空白 chunk、空 schema、后续 append、进度回调异常', async () => {
     const rafQueue: FrameRequestCallback[] = [];
-    vi.stubGlobal(
-      'requestAnimationFrame',
-      ((cb: FrameRequestCallback) => {
-        rafQueue.push(cb);
-        return rafQueue.length;
-      }) as typeof requestAnimationFrame,
-    );
+    vi.stubGlobal('requestAnimationFrame', ((cb: FrameRequestCallback) => {
+      rafQueue.push(cb);
+      return rafQueue.length;
+    }) as typeof requestAnimationFrame);
     vi.stubGlobal('cancelAnimationFrame', vi.fn());
 
     const parserSpy = vi
@@ -136,7 +134,9 @@ describe('EditorStore core deepen branches', () => {
           return { schema: [] };
         }
         return {
-          schema: [{ type: 'paragraph', children: [{ text: chunk.slice(0, 12) }] }],
+          schema: [
+            { type: 'paragraph', children: [{ text: chunk.slice(0, 12) }] },
+          ],
         };
       });
 
@@ -175,13 +175,10 @@ describe('EditorStore core deepen branches', () => {
   it('cancelSetMDContent abort 后 reject；signal.aborted 清理 rafId', async () => {
     const rafQueue: FrameRequestCallback[] = [];
     const cancelSpy = vi.fn();
-    vi.stubGlobal(
-      'requestAnimationFrame',
-      ((cb: FrameRequestCallback) => {
-        rafQueue.push(cb);
-        return rafQueue.length;
-      }) as typeof requestAnimationFrame,
-    );
+    vi.stubGlobal('requestAnimationFrame', ((cb: FrameRequestCallback) => {
+      rafQueue.push(cb);
+      return rafQueue.length;
+    }) as typeof requestAnimationFrame);
     vi.stubGlobal('cancelAnimationFrame', cancelSpy);
 
     const many = Array.from({ length: 14 }, (_, i) => `Z${i}\n\n`).join('');
@@ -204,13 +201,10 @@ describe('EditorStore core deepen branches', () => {
   it('RAF 中 editor 失效时 reject 并 cancelAnimationFrame', async () => {
     const rafQueue: FrameRequestCallback[] = [];
     const cancelSpy = vi.fn();
-    vi.stubGlobal(
-      'requestAnimationFrame',
-      ((cb: FrameRequestCallback) => {
-        rafQueue.push(cb);
-        return 1;
-      }) as typeof requestAnimationFrame,
-    );
+    vi.stubGlobal('requestAnimationFrame', ((cb: FrameRequestCallback) => {
+      rafQueue.push(cb);
+      return 1;
+    }) as typeof requestAnimationFrame);
     vi.stubGlobal('cancelAnimationFrame', cancelSpy);
 
     const many = Array.from({ length: 12 }, (_, i) => `E${i}\n\n`).join('');
@@ -243,13 +237,10 @@ describe('EditorStore core deepen branches', () => {
       });
 
     const rafQueue: FrameRequestCallback[] = [];
-    vi.stubGlobal(
-      'requestAnimationFrame',
-      ((cb: FrameRequestCallback) => {
-        rafQueue.push(cb);
-        return rafQueue.length;
-      }) as typeof requestAnimationFrame,
-    );
+    vi.stubGlobal('requestAnimationFrame', ((cb: FrameRequestCallback) => {
+      rafQueue.push(cb);
+      return rafQueue.length;
+    }) as typeof requestAnimationFrame);
     vi.stubGlobal('cancelAnimationFrame', vi.fn());
 
     const promise = (store as any)._parseAndSetContentWithRAF(

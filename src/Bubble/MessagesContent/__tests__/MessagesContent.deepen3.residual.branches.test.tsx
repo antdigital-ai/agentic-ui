@@ -3,7 +3,13 @@
  * EXCEPTION isExtraNull、finished+EXCEPTION 文案三元链。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { BubbleConfigContext } from '../../BubbleConfigProvide';
@@ -37,7 +43,9 @@ vi.mock('../EXCEPTION', () => ({
   EXCEPTION: ({ content, extra }: any) => (
     <div data-testid="exception3">
       <span data-testid="ex-body">{content}</span>
-      <span data-testid="ex-extra">{extra === null || extra === undefined ? 'null' : 'set'}</span>
+      <span data-testid="ex-extra">
+        {extra === null || extra === undefined ? 'null' : 'set'}
+      </span>
       {extra}
     </div>
   ),

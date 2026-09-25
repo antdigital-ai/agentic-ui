@@ -271,9 +271,7 @@ describe('Editor deepen4 residual branches', () => {
           children: [
             {
               type: 'table-row',
-              children: [
-                { type: 'table-cell', children: [{ text: 'a' }] },
-              ],
+              children: [{ type: 'table-cell', children: [{ text: 'a' }] }],
             },
           ],
         },

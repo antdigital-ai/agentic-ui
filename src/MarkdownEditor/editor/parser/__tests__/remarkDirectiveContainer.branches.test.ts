@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import remarkDirectiveContainer from '../remarkDirectiveContainer';
 
-function runPlugin(tree: any, options?: Parameters<typeof remarkDirectiveContainer>[0]) {
+function runPlugin(
+  tree: any,
+  options?: Parameters<typeof remarkDirectiveContainer>[0],
+) {
   const plugin = remarkDirectiveContainer(options);
   plugin(tree);
   return tree;
@@ -15,7 +18,9 @@ describe('remarkDirectiveContainer 分支覆盖', () => {
         {
           type: 'containerDirective',
           name: 'info',
-          children: [{ type: 'paragraph', children: [{ type: 'text', value: 'b' }] }],
+          children: [
+            { type: 'paragraph', children: [{ type: 'text', value: 'b' }] },
+          ],
         },
       ],
     };
@@ -35,14 +40,19 @@ describe('remarkDirectiveContainer 分支覆盖', () => {
         {
           type: 'containerDirective',
           name: 'info',
-          children: [{ type: 'paragraph', children: [{ type: 'text', value: 'body' }] }],
+          children: [
+            { type: 'paragraph', children: [{ type: 'text', value: 'body' }] },
+          ],
         },
       ],
     };
     runPlugin(tree);
     const node = tree.children[0];
     expect(node.data.hName).toBe('div');
-    expect(node.data.hProperties.className).toEqual(['markdown-container', 'info']);
+    expect(node.data.hProperties.className).toEqual([
+      'markdown-container',
+      'info',
+    ]);
   });
 
   it('带 title 属性时在 children 前插入标题段落', () => {

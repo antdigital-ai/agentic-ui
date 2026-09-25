@@ -135,7 +135,6 @@ export class EnterKey {
         e.preventDefault();
       }
     }
-
   }
 
   private table(

@@ -76,9 +76,7 @@ describe('PureBubble residual branches', () => {
   it('无 originData.content 空串', () => {
     render(
       <ConfigProvider>
-        <PureBubble
-          originData={{ ...origin, content: undefined as any }}
-        />
+        <PureBubble originData={{ ...origin, content: undefined as any }} />
       </ConfigProvider>,
     );
     expect(screen.getByTestId('md')).toBeInTheDocument();
@@ -87,9 +85,7 @@ describe('PureBubble residual branches', () => {
   it('placement 默认 left；非 string content → 空 initValue', () => {
     render(
       <ConfigProvider>
-        <PureBubble
-          originData={{ ...origin, content: { obj: true } as any }}
-        />
+        <PureBubble originData={{ ...origin, content: { obj: true } as any }} />
       </ConfigProvider>,
     );
     expect(screen.getByTestId('md')).toHaveTextContent('');
@@ -115,7 +111,11 @@ describe('PureBubble residual branches', () => {
         <PureBubble
           time={42}
           avatar={{ title: 'A', name: 'N' }}
-          originData={{ ...origin, meta: undefined, createAt: undefined as any }}
+          originData={{
+            ...origin,
+            meta: undefined,
+            createAt: undefined as any,
+          }}
         />
       </ConfigProvider>,
     );

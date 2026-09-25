@@ -31,11 +31,13 @@ function renderEditorEditable(options: {
   return render(
     <ConfigProvider>
       <EditorStoreContext.Provider
-        value={{
-          editorProps: options.editorProps ?? {},
-          readonly: options.readonly ?? false,
-          markdownContainerRef: containerRef,
-        } as any}
+        value={
+          {
+            editorProps: options.editorProps ?? {},
+            readonly: options.readonly ?? false,
+            markdownContainerRef: containerRef,
+          } as any
+        }
       >
         <Slate editor={editor} initialValue={editor.children}>
           <I18nContext.Provider value={{ locale, language: 'zh-CN' }}>

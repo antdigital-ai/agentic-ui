@@ -1,8 +1,12 @@
-import type { Editor } from 'slate';
 import { isHotkey } from 'is-hotkey';
 import type { KeyboardEvent } from 'react';
+import type { Editor } from 'slate';
 
-import { getListItems, isAtEmptyListItem, isDeleteBackwardAllowed } from '../lib';
+import {
+  getListItems,
+  isAtEmptyListItem,
+  isDeleteBackwardAllowed,
+} from '../lib';
 import { ListsEditor } from '../ListsEditor';
 import {
   decreaseDepth,
@@ -19,7 +23,10 @@ export function onTabIncreaseListDepth(editor: Editor, event: KeyboardEvent) {
   return false;
 }
 
-export function onShiftTabDecreaseListDepth(editor: Editor, event: KeyboardEvent) {
+export function onShiftTabDecreaseListDepth(
+  editor: Editor,
+  event: KeyboardEvent,
+) {
   const schema = ListsEditor.getListsSchema(editor);
   if (schema && isHotkey('shift+tab', event.nativeEvent)) {
     event.preventDefault();
@@ -28,7 +35,10 @@ export function onShiftTabDecreaseListDepth(editor: Editor, event: KeyboardEvent
   return false;
 }
 
-export function onBackspaceDecreaseListDepth(editor: Editor, event: KeyboardEvent) {
+export function onBackspaceDecreaseListDepth(
+  editor: Editor,
+  event: KeyboardEvent,
+) {
   const schema = ListsEditor.getListsSchema(editor);
   if (
     schema &&
@@ -41,7 +51,10 @@ export function onBackspaceDecreaseListDepth(editor: Editor, event: KeyboardEven
   return false;
 }
 
-export function onEnterEscapeFromEmptyList(editor: Editor, event: KeyboardEvent) {
+export function onEnterEscapeFromEmptyList(
+  editor: Editor,
+  event: KeyboardEvent,
+) {
   const schema = ListsEditor.getListsSchema(editor);
   if (schema && isHotkey('enter', event.nativeEvent)) {
     if (isAtEmptyListItem(editor, schema)) {

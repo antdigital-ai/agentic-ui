@@ -1,4 +1,4 @@
-import { Element, type Element as SlateElement, type Node } from 'slate';
+import { Element, type Node, type Element as SlateElement } from 'slate';
 import type { BulletedListNode, NumberedListNode } from '../../../el';
 import { ListType, type ListsSchema } from './types';
 
@@ -22,13 +22,15 @@ export const getListType = (
 export const agenticListsSchema: ListsSchema = {
   isConvertibleToListTextNode(node: Node) {
     return (
-      Element.isElement(node) && (node as { type?: string }).type === 'paragraph'
+      Element.isElement(node) &&
+      (node as { type?: string }).type === 'paragraph'
     );
   },
 
   isDefaultTextNode(node: Node) {
     return (
-      Element.isElement(node) && (node as { type?: string }).type === 'paragraph'
+      Element.isElement(node) &&
+      (node as { type?: string }).type === 'paragraph'
     );
   },
 
@@ -48,18 +50,24 @@ export const agenticListsSchema: ListsSchema = {
 
   isListItemNode(node: Node) {
     return (
-      Element.isElement(node) && (node as { type?: string }).type === 'list-item'
+      Element.isElement(node) &&
+      (node as { type?: string }).type === 'list-item'
     );
   },
 
   isListItemTextNode(node: Node) {
     return (
-      Element.isElement(node) && (node as { type?: string }).type === 'paragraph'
+      Element.isElement(node) &&
+      (node as { type?: string }).type === 'paragraph'
     );
   },
 
   createDefaultTextNode(props = {}) {
-    return { children: [{ text: '' }], ...props, type: 'paragraph' } as SlateElement;
+    return {
+      children: [{ text: '' }],
+      ...props,
+      type: 'paragraph',
+    } as SlateElement;
   },
 
   createListNode(type: ListType = ListType.UNORDERED, props = {}) {
@@ -80,6 +88,10 @@ export const agenticListsSchema: ListsSchema = {
   },
 
   createListItemTextNode(props = {}) {
-    return { children: [{ text: '' }], ...props, type: 'paragraph' } as SlateElement;
+    return {
+      children: [{ text: '' }],
+      ...props,
+      type: 'paragraph',
+    } as SlateElement;
   },
 };

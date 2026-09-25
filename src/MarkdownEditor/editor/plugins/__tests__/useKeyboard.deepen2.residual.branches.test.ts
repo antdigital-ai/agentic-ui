@@ -28,8 +28,7 @@ vi.mock('is-hotkey', () => {
     const map: Record<string, (e: any) => boolean> = {
       up: (e) => e.key === 'ArrowUp',
       down: (e) => e.key === 'ArrowDown',
-      'mod+ArrowDown': (e) =>
-        e.key === 'ArrowDown' && (e.metaKey || e.ctrlKey),
+      'mod+ArrowDown': (e) => e.key === 'ArrowDown' && (e.metaKey || e.ctrlKey),
       'mod+ArrowUp': (e) => e.key === 'ArrowUp' && (e.metaKey || e.ctrlKey),
       backspace: (e) => e.key === 'Backspace',
       'mod+shift+v': () => false,
@@ -208,11 +207,7 @@ describe('useKeyboard deepen2 residual branches', () => {
       [
         {
           type: 'paragraph',
-          children: [
-            { text: 'a' },
-            { text: 'chip', tag: true },
-            { text: 'b' },
-          ],
+          children: [{ text: 'a' }, { text: 'chip', tag: true }, { text: 'b' }],
         },
       ],
       {

@@ -58,7 +58,9 @@ describe('editorUtils deepen12 safe residual branches', () => {
 
   it('findByPathAndText：空 trim 早退', () => {
     const editor = createEditor();
-    editor.children = [{ type: 'paragraph', children: [{ text: 'word test' }] }];
+    editor.children = [
+      { type: 'paragraph', children: [{ text: 'word test' }] },
+    ];
     expect(findByPathAndText(editor as any, [0], '   ')).toEqual([]);
   });
 

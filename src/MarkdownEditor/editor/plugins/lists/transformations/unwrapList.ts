@@ -1,5 +1,4 @@
-import type { Editor } from 'slate';
-import type { Location, Span } from 'slate';
+import type { Editor, Location, Span } from 'slate';
 import { Point, Range } from 'slate';
 
 import { getListItems } from '../lib';
@@ -8,16 +7,16 @@ import type { ListsSchema } from '../types';
 import { decreaseDepth } from './decreaseDepth';
 
 function toSpan(at: Location): Span {
-    if (Range.isRange(at)) {
-        const [start, end] = Range.edges(at);
-        return [start.path, end.path];
-    }
+  if (Range.isRange(at)) {
+    const [start, end] = Range.edges(at);
+    return [start.path, end.path];
+  }
 
-    if (Point.isPoint(at)) {
-        return [at.path, at.path];
-    }
+  if (Point.isPoint(at)) {
+    return [at.path, at.path];
+  }
 
-    return [at, at];
+  return [at, at];
 }
 
 /**
@@ -25,48 +24,48 @@ function toSpan(at: Location): Span {
  * No lists will be left in the current selection.
  */
 export function unwrapList(
-    editor: Editor,
-    schema: ListsSchema,
-    at: Location | null = editor.selection,
+  editor: Editor,
+  schema: ListsSchema,
+  at: Location | null = editor.selection,
 ): boolean {
-    if (!at) {
-        return false;
+  if (!at) {
+    return false;
+  }
+
+  let iterations = 0;
+
+  const span = toSpan(at);
+  const start = editor.pathRef(span[0]);
+  const end = editor.pathRef(span[1]);
+
+  editor.withoutNormalizing(() => {
+    do {
+      if (!start.current || !end.current) {
+        break;
+      }
+
+      const location: Span = [start.current, end.current];
+
+      const items = getListItems(editor, schema, location);
+
+      if (items.length === 0) {
+        break;
+      }
+
+      iterations++;
+
+      decreaseDepth(editor, schema, location);
+    } while (iterations < 1000);
+
+    if (iterations >= 1000) {
+      throw new Error(
+        'Too many iterations. Most likely there is a bug causing an infinite loop.',
+      );
     }
+  });
 
-    let iterations = 0;
+  start.unref();
+  end.unref();
 
-    const span = toSpan(at);
-    const start = editor.pathRef(span[0]);
-    const end = editor.pathRef(span[1]);
-
-    editor.withoutNormalizing(() => {
-        do {
-            if (!start.current || !end.current) {
-                break;
-            }
-
-            const location: Span = [start.current, end.current];
-
-            const items = getListItems(editor, schema, location);
-
-            if (items.length === 0) {
-                break;
-            }
-
-            iterations++;
-
-            decreaseDepth(editor, schema, location);
-        } while (iterations < 1000);
-
-        if (iterations >= 1000) {
-            throw new Error(
-                'Too many iterations. Most likely there is a bug causing an infinite loop.',
-            );
-        }
-    });
-
-    start.unref();
-    end.unref();
-
-    return iterations > 0;
+  return iterations > 0;
 }

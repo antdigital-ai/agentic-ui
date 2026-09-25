@@ -50,8 +50,7 @@ describe('HistoryList residual branches', () => {
       selectedIds: ['a'],
       onSelectionChange: vi.fn(),
       onClick: vi.fn(),
-      sessionSort: (x: any, y: any) =>
-        (x.gmtCreate || 0) - (y.gmtCreate || 0),
+      sessionSort: (x: any, y: any) => (x.gmtCreate || 0) - (y.gmtCreate || 0),
     } as any);
     expect(custom.length).toBeGreaterThan(0);
   });

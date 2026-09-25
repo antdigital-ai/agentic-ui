@@ -10,9 +10,7 @@ vi.mock('../../../Schema', () => ({
 describe('SchemaBlockRenderer', () => {
   it('renders fallback pre for invalid JSON', () => {
     render(
-      <SchemaBlockRenderer language="schema">
-        {'not-json'}
-      </SchemaBlockRenderer>,
+      <SchemaBlockRenderer language="schema">{'not-json'}</SchemaBlockRenderer>,
     );
 
     expect(screen.getByTestId('schema-fallback')).toHaveTextContent('not-json');
@@ -22,10 +20,7 @@ describe('SchemaBlockRenderer', () => {
     const apaasifyRender = vi.fn(() => <span>Custom apaasify</span>);
 
     render(
-      <SchemaBlockRenderer
-        language="apaasify"
-        apaasifyRender={apaasifyRender}
-      >
+      <SchemaBlockRenderer language="apaasify" apaasifyRender={apaasifyRender}>
         {JSON.stringify({ title: 'Card' })}
       </SchemaBlockRenderer>,
     );

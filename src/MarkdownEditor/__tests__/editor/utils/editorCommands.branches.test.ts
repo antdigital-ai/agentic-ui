@@ -3,8 +3,8 @@
  * 不 mock Slate，仅 mock NativeTableEditor 等外部依赖。
  */
 import { createEditor, Editor } from 'slate';
-import { withAgenticLists } from '../../../editor/plugins/lists';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { withAgenticLists } from '../../../editor/plugins/lists';
 import {
   convertToParagraph,
   createList,
@@ -879,9 +879,7 @@ describe('editorCommands 集成覆盖', () => {
       editor.children = [
         {
           type: 'blockquote',
-          children: [
-            { type: 'head', level: 2, children: [{ text: 'h2' }] },
-          ],
+          children: [{ type: 'head', level: 2, children: [{ text: 'h2' }] }],
         },
       ];
       editor.selection = {
@@ -930,9 +928,7 @@ describe('editorCommands 集成覆盖', () => {
       editor.children = [
         {
           type: 'blockquote',
-          children: [
-            { type: 'head', level: 2, children: [{ text: 'h2' }] },
-          ],
+          children: [{ type: 'head', level: 2, children: [{ text: 'h2' }] }],
         },
       ];
       editor.selection = {
@@ -1232,10 +1228,7 @@ describe('editorCommands istanbul residual', () => {
 
   it('preferred 非 paragraph/head 时 early return 不插入', () => {
     insertTableMock.mockClear();
-    insertTable(editor, [
-      { type: 'code', children: [{ text: 'x' }] },
-      [0],
-    ]);
+    insertTable(editor, [{ type: 'code', children: [{ text: 'x' }] }, [0]]);
     expect(insertTableMock).not.toHaveBeenCalled();
   });
 
@@ -1254,9 +1247,11 @@ describe('editorCommands istanbul residual', () => {
   });
 
   it('Editor.nodes 返回数组时走 Array.isArray 分支', () => {
-    const spy = vi.spyOn(Editor, 'nodes').mockReturnValue([
-      [{ type: 'paragraph', children: [{ text: '' }] }, [1]],
-    ] as any);
+    const spy = vi
+      .spyOn(Editor, 'nodes')
+      .mockReturnValue([
+        [{ type: 'paragraph', children: [{ text: '' }] }, [1]],
+      ] as any);
     editor.selection = null;
     insertTable(editor);
     expect(insertTableMock).toHaveBeenCalled();
@@ -1264,9 +1259,11 @@ describe('editorCommands istanbul residual', () => {
   });
 
   it('Editor.nodes 数组首项非 paragraph/head 时返回 undefined', () => {
-    const spy = vi.spyOn(Editor, 'nodes').mockReturnValue([
-      [{ type: 'code', children: [{ text: 'x' }] }, [0]],
-    ] as any);
+    const spy = vi
+      .spyOn(Editor, 'nodes')
+      .mockReturnValue([
+        [{ type: 'code', children: [{ text: 'x' }] }, [0]],
+      ] as any);
     editor.selection = null;
     insertTableMock.mockClear();
     insertTable(editor);

@@ -41,11 +41,7 @@ const baseFile = {
 describe('FileMapViewItem branches', () => {
   it('正常文件渲染名称与扩展名', () => {
     render(
-      <FileMapViewItem
-        file={baseFile}
-        prefixCls="file-item"
-        hashId="h"
-      />,
+      <FileMapViewItem file={baseFile} prefixCls="file-item" hashId="h" />,
     );
     expect(screen.getByTestId('file-item-name')).toHaveTextContent('report');
     expect(screen.getByTestId('file-item-extension')).toHaveTextContent('pdf');
@@ -64,10 +60,7 @@ describe('FileMapViewItem branches', () => {
 
   it('size<=0 不展示大小', () => {
     render(
-      <FileMapViewItem
-        file={{ ...baseFile, size: 0 }}
-        prefixCls="file-item"
-      />,
+      <FileMapViewItem file={{ ...baseFile, size: 0 }} prefixCls="file-item" />,
     );
     expect(screen.queryByTestId('file-item-size')).not.toBeInTheDocument();
   });
@@ -164,10 +157,7 @@ describe('FileMapViewItem branches', () => {
       />,
     );
     fireEvent.click(screen.getByTestId('file-item'));
-    expect(openSpy).toHaveBeenCalledWith(
-      'https://preview.example/a',
-      '_blank',
-    );
+    expect(openSpy).toHaveBeenCalledWith('https://preview.example/a', '_blank');
     openSpy.mockRestore();
   });
 
@@ -247,7 +237,9 @@ describe('FileMapViewItem branches', () => {
         prefixCls="file-item"
       />,
     );
-    expect(screen.getByTestId('file-item').getAttribute('aria-label')).toBeNull();
+    expect(
+      screen.getByTestId('file-item').getAttribute('aria-label'),
+    ).toBeNull();
   });
 
   it('仅扩展名/大小/时间全无时 extension container 为 null', () => {

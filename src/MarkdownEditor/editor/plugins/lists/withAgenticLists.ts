@@ -1,7 +1,7 @@
 import { Editor, Element, Transforms, type NodeEntry } from 'slate';
 
-import { agenticListsSchema, getListType } from './schema';
 import { normalizeNode as listsNormalizeNode } from './normalizeNode';
+import { agenticListsSchema, getListType } from './schema';
 import { withAgenticListsReact } from './withAgenticListsReact';
 import { withListsSchema } from './withListsSchema';
 
@@ -17,7 +17,10 @@ export function withAgenticLists<T extends Editor>(editor: T): T {
   enhanced.normalizeNode = (entry: NodeEntry, options?) => {
     const [node, path] = entry;
 
-    if (Element.isElement(node) && (node as { type?: string }).type === 'list') {
+    if (
+      Element.isElement(node) &&
+      (node as { type?: string }).type === 'list'
+    ) {
       const listType = getListType((node as { order?: boolean }).order);
       Transforms.setNodes(enhanced, { type: listType }, { at: path });
       if ((node as { order?: boolean }).order !== undefined) {

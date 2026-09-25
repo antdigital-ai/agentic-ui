@@ -98,7 +98,10 @@ describe('remarkChartFromComment midtail branches', () => {
           {
             type: 'tableRow',
             children: [
-              { type: 'tableCell', children: [{ type: 'text', value: '2024' }] },
+              {
+                type: 'tableCell',
+                children: [{ type: 'text', value: '2024' }],
+              },
               { type: 'tableCell', children: [{ type: 'text', value: '100' }] },
             ],
           },

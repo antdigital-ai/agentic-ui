@@ -21,7 +21,9 @@ describe('CaseReply residual branches', () => {
       </TestWrapper>,
     );
     expect(screen.getByText('Title')).toBeInTheDocument();
-    expect(screen.getByTestId('agentic-chatboot-case-reply')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('agentic-chatboot-case-reply'),
+    ).toBeInTheDocument();
   });
 
   it('onClick 触发', () => {

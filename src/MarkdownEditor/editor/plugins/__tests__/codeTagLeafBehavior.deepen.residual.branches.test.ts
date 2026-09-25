@@ -65,9 +65,7 @@ describe('codeTagLeafBehavior deepen residual branches', () => {
 
   it('tryInsertTextOutsideTagOnDoubleSpace：末尾双空格成功插入', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [tagNode('a ')] },
-    ];
+    editor.children = [{ type: 'paragraph', children: [tagNode('a ')] }];
     editor.selection = {
       anchor: { path: [0, 0], offset: 2 },
       focus: { path: [0, 0], offset: 2 },
@@ -156,10 +154,7 @@ describe('codeTagLeafBehavior deepen residual branches', () => {
     editor.children = [
       {
         type: 'paragraph',
-        children: [
-          { text: '', mark: true, markLabel: '@' },
-          { text: 'next' },
-        ],
+        children: [{ text: '', mark: true, markLabel: '@' }, { text: 'next' }],
       },
     ];
     editor.selection = {

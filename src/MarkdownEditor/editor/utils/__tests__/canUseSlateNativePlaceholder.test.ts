@@ -56,16 +56,12 @@ describe('canUseSlateNativePlaceholder', () => {
   });
 
   it('段落有文本时返回 false', () => {
-    editor.children = [
-      { type: 'paragraph', children: [{ text: 'hello' }] },
-    ];
+    editor.children = [{ type: 'paragraph', children: [{ text: 'hello' }] }];
     expect(canUseSlateNativePlaceholder(editor)).toBe(false);
   });
 
   it('仅空白字符时 trim 后视为空，返回 true', () => {
-    editor.children = [
-      { type: 'paragraph', children: [{ text: '   ' }] },
-    ];
+    editor.children = [{ type: 'paragraph', children: [{ text: '   ' }] }];
     expect(canUseSlateNativePlaceholder(editor)).toBe(true);
   });
 

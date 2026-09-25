@@ -94,10 +94,7 @@ describe('chart/index deepen6 residual branches', () => {
 
   it('空字符串 value：numberString 早退；subgraph 渲染', async () => {
     render(
-      <ChartElement
-        element={baseElement()}
-        attributes={{} as any}
-      >
+      <ChartElement element={baseElement()} attributes={{} as any}>
         {[]}
       </ChartElement>,
     );

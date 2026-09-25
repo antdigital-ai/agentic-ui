@@ -71,9 +71,7 @@ describe('BackspaceKey deepen residual branches', () => {
         children: [
           {
             type: 'table-row',
-            children: [
-              { type: 'table-cell', children: [{ text: '' }] },
-            ],
+            children: [{ type: 'table-cell', children: [{ text: '' }] }],
           },
         ],
       },

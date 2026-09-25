@@ -47,7 +47,9 @@ export class ReadonlyMarkdownEditorStore {
       return null;
     }
     return (
-      container.querySelector<HTMLElement>('[class*="-content-markdown-readonly"]') ||
+      container.querySelector<HTMLElement>(
+        '[class*="-content-markdown-readonly"]',
+      ) ||
       container.querySelector<HTMLElement>('[class*="-content"]') ||
       container
     );
@@ -115,7 +117,9 @@ export const createReadonlyMarkdownEditorInstance = (options: {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = filename.endsWith('.html') ? filename : `${filename}.html`;
+      link.download = filename.endsWith('.html')
+        ? filename
+        : `${filename}.html`;
       link.click();
       URL.revokeObjectURL(url);
     },

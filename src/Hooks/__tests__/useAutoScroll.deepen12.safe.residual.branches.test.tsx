@@ -65,8 +65,9 @@ describe('useAutoScroll deepen12 safe residual branches', () => {
     const Probe = () => {
       const { containerRef } = useAutoScroll({ deps: [2], scrollTolerance: 8 });
       React.useEffect(() => {
-        (containerRef as React.MutableRefObject<HTMLDivElement | null>).current =
-          el;
+        (
+          containerRef as React.MutableRefObject<HTMLDivElement | null>
+        ).current = el;
       }, [containerRef]);
       return <div ref={containerRef} data-testid="as12" />;
     };

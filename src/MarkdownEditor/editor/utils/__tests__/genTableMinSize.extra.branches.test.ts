@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { applyTableMinSizeToSchema } from '../genTableMinSize';
 import type { Elements } from '../../../el';
+import { applyTableMinSizeToSchema } from '../genTableMinSize';
 
 describe('genTableMinSize 额外分支', () => {
   it('非 table 节点跳过', () => {

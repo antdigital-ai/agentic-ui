@@ -50,10 +50,7 @@ describe('parseCode deepen3 residual branches', () => {
     expect(plain.type).toBe('code');
     expect(plain.otherProps?.finished).toBeUndefined();
 
-    const onlyEmptyCfg = handleCode(
-      { value: 'print(1)', lang: 'python' },
-      {},
-    );
+    const onlyEmptyCfg = handleCode({ value: 'print(1)', lang: 'python' }, {});
     expect(onlyEmptyCfg.otherProps?.finished).toBe(false);
 
     const yaml = handleYaml({ value: 'a: 1' });

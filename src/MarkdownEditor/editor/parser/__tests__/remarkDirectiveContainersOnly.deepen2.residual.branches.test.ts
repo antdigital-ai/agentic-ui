@@ -1,9 +1,9 @@
 /**
  * remarkDirectiveContainersOnly deepen2：unified 插件挂载。
  */
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { unified } from 'unified';
 import remarkParse from 'remark-parse';
+import { unified } from 'unified';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import remarkDirectiveContainersOnly from '../remarkDirectiveContainersOnly';
 
 describe('remarkDirectiveContainersOnly deepen2 residual branches', () => {

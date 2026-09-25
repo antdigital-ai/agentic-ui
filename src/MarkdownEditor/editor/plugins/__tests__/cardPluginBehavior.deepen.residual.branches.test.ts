@@ -34,18 +34,14 @@ describe('cardPluginBehavior deepen residual branches', () => {
       anchor: { path: [0, 2, 0], offset: 0 },
       focus: { path: [0, 1, 0], offset: 1 },
     };
-    expect(
-      handleCardDeleteBackward(editor, 'character', vi.fn()),
-    ).toBe(false);
+    expect(handleCardDeleteBackward(editor, 'character', vi.fn())).toBe(false);
 
     editor.selection = {
       anchor: { path: [0, 2, 0], offset: 0 },
       focus: { path: [0, 2, 0], offset: 0 },
     };
     vi.spyOn(Range, 'isCollapsed').mockReturnValue(false);
-    expect(
-      handleCardDeleteBackward(editor, 'character', vi.fn()),
-    ).toBe(false);
+    expect(handleCardDeleteBackward(editor, 'character', vi.fn())).toBe(false);
     vi.restoreAllMocks();
   });
 

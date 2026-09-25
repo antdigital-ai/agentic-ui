@@ -5,9 +5,9 @@ import '@testing-library/jest-dom';
 import { cleanup, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { SchemaForm } from '..';
 import { I18nContext } from '../../../I18n';
 import type { LowCodeSchema } from '../../types';
-import { SchemaForm } from '..';
 
 const baseSchema = (properties: any): LowCodeSchema =>
   ({
@@ -296,11 +296,10 @@ describe('SchemaForm deepen residual branches', () => {
     expect(screen.getByText('K')).toBeInTheDocument();
 
     rerender(
-      <I18nContext.Provider value={{ locale: undefined, language: 'zh-CN' } as any}>
-        <SchemaForm
-          schema={{ component: undefined } as any}
-          readonly={false}
-        />
+      <I18nContext.Provider
+        value={{ locale: undefined, language: 'zh-CN' } as any}
+      >
+        <SchemaForm schema={{ component: undefined } as any} readonly={false} />
       </I18nContext.Provider>,
     );
     expect(document.body).toBeTruthy();

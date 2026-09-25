@@ -6,10 +6,7 @@ import { render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import {
-  AttachmentFileIcon,
-  FileMetaPlaceholder,
-} from '../AttachmentFileIcon';
+import { AttachmentFileIcon, FileMetaPlaceholder } from '../AttachmentFileIcon';
 
 vi.mock('../../../../Workspace/File/utils', () => ({
   getFileTypeIcon: (type: string, _s: string, name: string) => (
@@ -18,9 +15,8 @@ vi.mock('../../../../Workspace/File/utils', () => ({
 }));
 
 vi.mock('../../utils', async () => {
-  const actual = await vi.importActual<typeof import('../../utils')>(
-    '../../utils',
-  );
+  const actual =
+    await vi.importActual<typeof import('../../utils')>('../../utils');
   return {
     ...actual,
     isImageFile: (file: any) =>

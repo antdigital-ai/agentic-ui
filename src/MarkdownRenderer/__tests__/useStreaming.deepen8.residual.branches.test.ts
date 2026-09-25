@@ -21,9 +21,7 @@ describe('useStreaming deepen8 residual branches', () => {
   });
 
   it('fence 未闭合 → ...', () => {
-    const { result } = renderHook(() =>
-      useStreaming('```js\nconst x=1', true),
-    );
+    const { result } = renderHook(() => useStreaming('```js\nconst x=1', true));
     expect(result.current === '...' || typeof result.current === 'string').toBe(
       true,
     );

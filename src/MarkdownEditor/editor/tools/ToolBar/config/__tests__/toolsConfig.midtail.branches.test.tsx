@@ -40,7 +40,10 @@ describe('toolsConfig midtail branches', () => {
 
     const localeWrapper = ({ children }: { children: React.ReactNode }) => (
       <I18nContext.Provider
-        value={{ locale: { 'toolbar.bold': 'Bold!' } as any, language: 'en-US' }}
+        value={{
+          locale: { 'toolbar.bold': 'Bold!' } as any,
+          language: 'en-US',
+        }}
       >
         {children}
       </I18nContext.Provider>

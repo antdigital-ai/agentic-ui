@@ -24,9 +24,9 @@ describe('EditorUtils deepen8 safe residual branches', () => {
     expect(EditorUtils.copyText(editor, start, end)).toContain('hello');
     expect(() => EditorUtils.cutText(editor, start, end)).not.toThrow();
     editor.selection = { anchor: start, focus: end };
-    expect(
-      EditorUtils.includeAll(editor, editor.selection!, [0]),
-    ).toBeTypeOf('boolean');
+    expect(EditorUtils.includeAll(editor, editor.selection!, [0])).toBeTypeOf(
+      'boolean',
+    );
   });
 
   it('setAlignment / isAlignmentActive / highColor / getUrl', () => {
@@ -57,5 +57,3 @@ describe('EditorUtils deepen8 safe residual branches', () => {
     expect(editor.children.length).toBeGreaterThan(0);
   });
 });
-
-

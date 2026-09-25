@@ -62,7 +62,7 @@ describe('insertParsedHtmlNodes residual branches', () => {
     expect(TEXT_TAGS.DEL()).toEqual({ strikethrough: true });
     const mark = TEXT_TAGS.MARK({
       getAttribute: (k: string) =>
-        ({ color: 'red', bg: 'yellow', label: '@' } as any)[k],
+        (({ color: 'red', bg: 'yellow', label: '@' }) as any)[k],
     } as any);
     expect(mark.mark).toBe(true);
     expect(mark.markColor).toBe('red');

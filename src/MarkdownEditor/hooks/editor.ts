@@ -70,9 +70,7 @@ export const useSelStatus = (element: any) => {
     selChange$,
     (ctx) => {
       const path = EditorUtils.findPath(markdownEditorRef.current, element);
-      const selected = ctx
-        ? Path.equals(path, ctx.node?.[1] || [])
-        : false;
+      const selected = ctx ? Path.equals(path, ctx.node?.[1] || []) : false;
       const prev = state();
       if (
         prev.selected === selected &&

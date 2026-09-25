@@ -15,10 +15,9 @@ describe('htmlToMarkdown 分支覆盖', () => {
   });
 
   it('preserveComments 保留 HTML 注释', () => {
-    const result = htmlToMarkdown(
-      '<div><!-- note --><p>x</p></div>',
-      { preserveComments: true },
-    );
+    const result = htmlToMarkdown('<div><!-- note --><p>x</p></div>', {
+      preserveComments: true,
+    });
     expect(result).toContain('<!-- note -->');
   });
 
@@ -41,9 +40,9 @@ describe('htmlToMarkdown 分支覆盖', () => {
   });
 
   it('图片带 title 属性', () => {
-    expect(
-      htmlToMarkdown('<img src="/x.png" alt="a" title="t" />'),
-    ).toContain('"t"');
+    expect(htmlToMarkdown('<img src="/x.png" alt="a" title="t" />')).toContain(
+      '"t"',
+    );
   });
 
   it('有序列表转换', () => {
@@ -75,16 +74,14 @@ describe('htmlToMarkdown 分支覆盖', () => {
   });
 
   it('isWordHtml 检测 Word 标记', () => {
-    expect(isWordHtml('xmlns:o="urn:schemas-microsoft-com:office:office"')).toBe(
-      true,
-    );
+    expect(
+      isWordHtml('xmlns:o="urn:schemas-microsoft-com:office:office"'),
+    ).toBe(true);
     expect(isWordHtml('<p>plain</p>')).toBe(false);
   });
 
   it('cleanWordHtml 清理 Word 冗余', () => {
-    const result = cleanWordHtml(
-      '<p class="MsoNormal"><span>text</span></p>',
-    );
+    const result = cleanWordHtml('<p class="MsoNormal"><span>text</span></p>');
     expect(result).toContain('text');
   });
 

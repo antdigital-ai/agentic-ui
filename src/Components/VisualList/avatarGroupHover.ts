@@ -45,8 +45,7 @@ export function applyAvatarGroupHover(
     readAvatarGroupHoverConfig(group);
 
   items.forEach((el, index) => {
-    el.style.transitionTimingFunction =
-      activeIndex === null ? easeOut : easeIn;
+    el.style.transitionTimingFunction = activeIndex === null ? easeOut : easeIn;
 
     if (activeIndex === null) {
       el.style.setProperty('--visual-list-shift', '0px');

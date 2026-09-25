@@ -43,10 +43,7 @@ describe('MessagesContent residual branches', () => {
   it('typing：未完成且非 aborted/非 history', () => {
     render(
       <BubbleConfigContext.Provider value={{} as any}>
-        <BubbleMessageDisplay
-          content="hello"
-          originData={baseOrigin as any}
-        />
+        <BubbleMessageDisplay content="hello" originData={baseOrigin as any} />
       </BubbleConfigContext.Provider>,
     );
     expect(screen.getByTestId('md-preview')).toHaveAttribute(

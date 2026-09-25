@@ -100,12 +100,8 @@ describe('FunnelChart more residual branches', () => {
 
     const tooltip = opts?.plugins?.tooltip;
     if (tooltip?.callbacks?.label) {
-      expect(
-        tooltip.callbacks.label({ dataIndex: 0 }),
-      ).toBeTruthy();
-      expect(
-        tooltip.callbacks.label({ dataIndex: 99 }),
-      ).toBeDefined();
+      expect(tooltip.callbacks.label({ dataIndex: 0 })).toBeTruthy();
+      expect(tooltip.callbacks.label({ dataIndex: 99 })).toBeDefined();
     }
 
     expect(screen.getByTestId('tb')).toBeInTheDocument();
@@ -132,9 +128,16 @@ describe('FunnelChart more residual branches', () => {
       { x: 'B', y: 50, category: 'C1', filterLabel: 'F1', ratio: 20 },
     ];
     const { rerender } = render(
-      <FunnelChart data={dataA} height={'0px' as any} theme="light" showLegend />,
+      <FunnelChart
+        data={dataA}
+        height={'0px' as any}
+        theme="light"
+        showLegend
+      />,
     );
-    expect((globalThis as any).__funnelMoreData?.datasets?.[0]?.data).toBeTruthy();
+    expect(
+      (globalThis as any).__funnelMoreData?.datasets?.[0]?.data,
+    ).toBeTruthy();
 
     rerender(
       <FunnelChart
@@ -193,11 +196,7 @@ describe('FunnelChart more residual branches', () => {
     });
     expect(labels.some((l: any) => l.text === '转化率')).toBe(true);
     expect(() =>
-      opts?.plugins?.legend?.onClick?.(
-        {},
-        { text: '步骤' },
-        { chart: {} },
-      ),
+      opts?.plugins?.legend?.onClick?.({}, { text: '步骤' }, { chart: {} }),
     ).not.toThrow();
   });
 
@@ -231,7 +230,15 @@ describe('FunnelChart more residual branches', () => {
       ctx,
       data: {
         labels: ['A', 'B', 'C'],
-        datasets: [{ data: [[-50, 50], [-30, 30], [-15, 15]] }],
+        datasets: [
+          {
+            data: [
+              [-50, 50],
+              [-30, 30],
+              [-15, 15],
+            ],
+          },
+        ],
       },
       scales: {
         x: { getPixelForValue: (v: number) => 100 + v },
@@ -268,9 +275,9 @@ describe('FunnelChart more residual branches', () => {
     act(() => {
       fireEvent.click(screen.getByTestId('ff'));
     });
-    expect((globalThis as any).__funnelMoreData?.labels?.length).toBeGreaterThan(
-      0,
-    );
+    expect(
+      (globalThis as any).__funnelMoreData?.labels?.length,
+    ).toBeGreaterThan(0);
   });
 
   it('height 字符串 px 解析失败回退；ratio 空串/数字/空白', () => {
@@ -310,9 +317,9 @@ describe('FunnelChart more residual branches', () => {
         ]}
       />,
     );
-    expect((globalThis as any).__funnelMoreData?.labels?.length).toBeGreaterThan(
-      0,
-    );
+    expect(
+      (globalThis as any).__funnelMoreData?.labels?.length,
+    ).toBeGreaterThan(0);
   });
 
   it('legend onClick 走 defaultClick；tooltip 缺 dataIndex', () => {
@@ -361,7 +368,14 @@ describe('FunnelChart more residual branches', () => {
       ctx,
       data: {
         labels: ['A', 'B'],
-        datasets: [{ data: [[-40, 40], [-20, 20]] }],
+        datasets: [
+          {
+            data: [
+              [-40, 40],
+              [-20, 20],
+            ],
+          },
+        ],
       },
       scales: {},
       getDatasetMeta: () => ({
@@ -416,9 +430,9 @@ describe('FunnelChart more residual branches', () => {
         title="multi"
       />,
     );
-    expect((globalThis as any).__funnelMoreData?.labels?.length).toBeGreaterThan(
-      0,
-    );
+    expect(
+      (globalThis as any).__funnelMoreData?.labels?.length,
+    ).toBeGreaterThan(0);
     rerender(
       <FunnelChart
         data={[
@@ -505,9 +519,9 @@ describe('FunnelChart more residual branches', () => {
         showLegend={false}
       />,
     );
-    expect((globalThis as any).__funnelMoreData?.labels?.length).toBeGreaterThan(
-      0,
-    );
+    expect(
+      (globalThis as any).__funnelMoreData?.labels?.length,
+    ).toBeGreaterThan(0);
 
     rerender(
       <FunnelChart

@@ -174,7 +174,12 @@ describe('agenticUiEmbedUtils', () => {
       const r = normalizeToolUseBarPropsFromJson({
         tools: [
           { toolName: 'no-id', toolTarget: '', status: 'idle' },
-          { key: 'from-key', toolName: 'has-key', toolTarget: '', status: 'idle' },
+          {
+            key: 'from-key',
+            toolName: 'has-key',
+            toolTarget: '',
+            status: 'idle',
+          },
         ],
       });
       // 没有 id 也没有 key 的条目 id 为空字符串 → toolFromRecord 返回 null → 被过滤
@@ -241,9 +246,27 @@ describe('agenticUiEmbedUtils', () => {
     it('type 字段：summary/normal/任意字符串均可', () => {
       const r = normalizeToolUseBarPropsFromJson({
         tools: [
-          { id: 'a', toolName: 'n', toolTarget: '', status: 'idle', type: 'summary' },
-          { id: 'b', toolName: 'n', toolTarget: '', status: 'idle', type: 'normal' },
-          { id: 'c', toolName: 'n', toolTarget: '', status: 'idle', type: 'custom-type' },
+          {
+            id: 'a',
+            toolName: 'n',
+            toolTarget: '',
+            status: 'idle',
+            type: 'summary',
+          },
+          {
+            id: 'b',
+            toolName: 'n',
+            toolTarget: '',
+            status: 'idle',
+            type: 'normal',
+          },
+          {
+            id: 'c',
+            toolName: 'n',
+            toolTarget: '',
+            status: 'idle',
+            type: 'custom-type',
+          },
         ],
       });
       expect(r.tools[0].type).toBe('summary');
@@ -253,21 +276,39 @@ describe('agenticUiEmbedUtils', () => {
 
     it('type 非字符串时为 undefined', () => {
       const r = normalizeToolUseBarPropsFromJson({
-        tools: [{ id: 't', toolName: 'n', toolTarget: '', status: 'idle', type: 42 }],
+        tools: [
+          { id: 't', toolName: 'n', toolTarget: '', status: 'idle', type: 42 },
+        ],
       });
       expect(r.tools[0].type).toBeUndefined();
     });
 
     it('testId 字段传递', () => {
       const r = normalizeToolUseBarPropsFromJson({
-        tools: [{ id: 't', toolName: 'n', toolTarget: '', status: 'idle', testId: 'my-test' }],
+        tools: [
+          {
+            id: 't',
+            toolName: 'n',
+            toolTarget: '',
+            status: 'idle',
+            testId: 'my-test',
+          },
+        ],
       });
       expect(r.tools[0].testId).toBe('my-test');
     });
 
     it('testId 非字符串时为 undefined', () => {
       const r = normalizeToolUseBarPropsFromJson({
-        tools: [{ id: 't', toolName: 'n', toolTarget: '', status: 'idle', testId: 123 }],
+        tools: [
+          {
+            id: 't',
+            toolName: 'n',
+            toolTarget: '',
+            status: 'idle',
+            testId: 123,
+          },
+        ],
       });
       expect(r.tools[0].testId).toBeUndefined();
     });
@@ -300,7 +341,11 @@ describe('agenticUiEmbedUtils', () => {
 
     it('null/undefined 条目在 tools 数组中被过滤', () => {
       const r = normalizeToolUseBarPropsFromJson({
-        tools: [null, { id: 't', toolName: 'n', toolTarget: '', status: 'idle' }, undefined],
+        tools: [
+          null,
+          { id: 't', toolName: 'n', toolTarget: '', status: 'idle' },
+          undefined,
+        ],
       });
       expect(r.tools).toHaveLength(1);
     });

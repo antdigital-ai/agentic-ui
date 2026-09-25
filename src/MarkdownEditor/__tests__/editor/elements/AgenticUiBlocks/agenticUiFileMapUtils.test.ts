@@ -152,8 +152,21 @@ describe('normalizeFileMapPropsFromJson', () => {
 
   it('normalizeFile 返回 null 时过滤该条目', () => {
     const r = normalizeFileMapPropsFromJson(
-      { fileList: [{ name: 'a', uuid: 'u1' }, { name: 'b', uuid: 'u2' }] },
-      (raw) => (raw.name === 'a' ? null : { ...raw, name: raw.name as string, type: 'application/octet-stream', uuid: raw.uuid as string }),
+      {
+        fileList: [
+          { name: 'a', uuid: 'u1' },
+          { name: 'b', uuid: 'u2' },
+        ],
+      },
+      (raw) =>
+        raw.name === 'a'
+          ? null
+          : {
+              ...raw,
+              name: raw.name as string,
+              type: 'application/octet-stream',
+              uuid: raw.uuid as string,
+            },
     );
     expect(r.fileList).toHaveLength(1);
     expect(r.fileList[0].name).toBe('b');
@@ -161,7 +174,12 @@ describe('normalizeFileMapPropsFromJson', () => {
 
   it('null/undefined 条目被过滤', () => {
     const r = normalizeFileMapPropsFromJson({
-      fileList: [null, { name: 'a', uuid: 'u1' }, undefined, { name: 'b', uuid: 'u2' }],
+      fileList: [
+        null,
+        { name: 'a', uuid: 'u1' },
+        undefined,
+        { name: 'b', uuid: 'u2' },
+      ],
     });
     expect(r.fileList).toHaveLength(2);
   });

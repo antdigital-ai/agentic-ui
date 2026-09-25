@@ -12,9 +12,7 @@ const mockValidate = vi.hoisted(() =>
 const mockSandboxExecute = vi.hoisted(() =>
   vi.fn().mockResolvedValue({ success: true }),
 );
-const mockTemplateRender = vi.hoisted(() =>
-  vi.fn((tpl: string) => tpl),
-);
+const mockTemplateRender = vi.hoisted(() => vi.fn((tpl: string) => tpl));
 
 vi.mock('../../validator', () => ({
   mdDataSchemaValidator: {
@@ -98,11 +96,7 @@ describe('SchemaRenderer deepen2 residual branches', () => {
       ],
     });
     render(
-      <SchemaRenderer
-        schema={baseSchema()}
-        values={{ name: 'x' }}
-        debug
-      />,
+      <SchemaRenderer schema={baseSchema()} values={{ name: 'x' }} debug />,
     );
     await waitFor(() => {
       expect(document.body.textContent).toMatch(/验证失败|bad|plain/);
@@ -113,13 +107,7 @@ describe('SchemaRenderer deepen2 residual branches', () => {
       valid: false,
       errors: { msg: 'obj-errors' } as any,
     });
-    render(
-      <SchemaRenderer
-        schema={baseSchema()}
-        values={{}}
-        debug
-      />,
-    );
+    render(<SchemaRenderer schema={baseSchema()} values={{}} debug />);
     await waitFor(() => {
       expect(document.body.textContent).toMatch(/obj-errors|验证失败/);
     });
@@ -188,9 +176,9 @@ describe('SchemaRenderer deepen2 residual branches', () => {
       />,
     );
     await actWait();
-    expect(warn.mock.calls.length + err.mock.calls.length).toBeGreaterThanOrEqual(
-      0,
-    );
+    expect(
+      warn.mock.calls.length + err.mock.calls.length,
+    ).toBeGreaterThanOrEqual(0);
   });
 
   it('attachShadow 失败走 innerHTML fallback', async () => {

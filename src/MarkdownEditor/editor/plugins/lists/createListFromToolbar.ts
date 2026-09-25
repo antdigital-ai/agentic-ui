@@ -33,10 +33,7 @@ function demoteHeadingToParagraph(editor: Editor, path: Path) {
 /**
  * 工具栏：创建/切换/取消列表（Prezly ListsEditor + Agentic 任务列表元数据）
  */
-export function createListFromToolbar(
-  editor: Editor,
-  mode: ListToolbarMode,
-) {
+export function createListFromToolbar(editor: Editor, mode: ListToolbarMode) {
   const selection = editor.selection;
   if (!selection || !ListsEditor.isListsEnabled(editor)) {
     return;

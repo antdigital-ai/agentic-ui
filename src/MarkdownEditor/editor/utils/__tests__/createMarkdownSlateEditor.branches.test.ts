@@ -7,13 +7,22 @@ import {
 
 describe('createMarkdownSlateEditor residual options', () => {
   it('assigns stable slots for absent, keyed, named, and anonymous plugins', () => {
-    const namedPlugin = { withEditor: function decorate(editor: any) { return editor; } };
+    const namedPlugin = {
+      withEditor: function decorate(editor: any) {
+        return editor;
+      },
+    };
     expect(getWithEditorSlotKey({} as any)).toBe('_');
-    expect(getWithEditorSlotKey({ withEditor: vi.fn(), withEditorKey: 'custom' } as any)).toBe(
-      'custom',
-    );
+    expect(
+      getWithEditorSlotKey({
+        withEditor: vi.fn(),
+        withEditorKey: 'custom',
+      } as any),
+    ).toBe('custom');
     expect(getWithEditorSlotKey(namedPlugin as any)).toBe('decorate');
-    expect(getWithEditorSlotKey({ withEditor: (editor: any) => editor } as any)).toBe('w');
+    expect(
+      getWithEditorSlotKey({ withEditor: (editor: any) => editor } as any),
+    ).toBe('w');
   });
 
   it('includes ordering in composition keys and accepts omitted plugins', () => {
@@ -28,7 +37,9 @@ describe('createMarkdownSlateEditor residual options', () => {
 
   it('creates an editor and composes supplied editor plugins', () => {
     const plugin = vi.fn((editor: any) => ({ ...editor, customPlugin: true }));
-    const editor = createMarkdownSlateEditor([{ withEditor: plugin } as any]) as any;
+    const editor = createMarkdownSlateEditor([
+      { withEditor: plugin } as any,
+    ]) as any;
     expect(plugin).toHaveBeenCalled();
     expect(editor.customPlugin).toBe(true);
   });

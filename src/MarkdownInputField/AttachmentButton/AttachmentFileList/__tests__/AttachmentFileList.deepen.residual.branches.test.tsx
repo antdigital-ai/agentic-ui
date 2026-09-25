@@ -3,7 +3,13 @@
  * 退出动画重入、locale 标题、uploading 隐藏清空。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -152,10 +158,7 @@ describe('AttachmentFileList deepen residual branches', () => {
 
   it('fileMap undefined 隐藏容器；dataTestId', () => {
     wrap(
-      <AttachmentFileList
-        onDelete={vi.fn()}
-        dataTestId="att-list-deepen"
-      />,
+      <AttachmentFileList onDelete={vi.fn()} dataTestId="att-list-deepen" />,
     );
     expect(screen.getByTestId('att-list-deepen')).toBeInTheDocument();
   });

@@ -13,7 +13,9 @@ describe('HistoryLoadMore residual branches', () => {
 
   it('prevents duplicate task requests and recovers after errors', async () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const onLoadMore = vi.fn(async () => { throw new Error('failed'); });
+    const onLoadMore = vi.fn(async () => {
+      throw new Error('failed');
+    });
     render(<HistoryLoadMore type="task" onLoadMore={onLoadMore} />);
     fireEvent.click(screen.getByRole('button'));
     fireEvent.click(screen.getByRole('button'));

@@ -62,7 +62,9 @@ describe('MessagesContent deepen5 residual branches', () => {
         <BubbleMessageDisplay
           placement="left"
           content={LOADING_FLAT}
-          originData={{ ...base, isFinished: false, content: LOADING_FLAT } as any}
+          originData={
+            { ...base, isFinished: false, content: LOADING_FLAT } as any
+          }
         />
       </BubbleConfigContext.Provider>,
     );
@@ -95,7 +97,7 @@ describe('MessagesContent deepen5 residual branches', () => {
     render(
       <BubbleMessageDisplay
         placement="left"
-        content={<span data-testid="react-content">R</span> as any}
+        content={(<span data-testid="react-content">R</span>) as any}
         originData={{ ...base, content: 'x' } as any}
       />,
     );

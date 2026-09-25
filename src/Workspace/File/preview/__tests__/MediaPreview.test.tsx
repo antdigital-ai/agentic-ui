@@ -3,8 +3,8 @@ import { render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
-import { MediaPreview } from '../components/MediaPreview';
 import type { FileNode } from '../../../types';
+import { MediaPreview } from '../components/MediaPreview';
 
 const file: FileNode = { id: 'f1', name: 'demo.png' };
 const baseProps = {
@@ -64,7 +64,9 @@ describe('MediaPreview', () => {
     );
     const video = container.querySelector('video');
     expect(video).toHaveAttribute('src', 'https://example.com/a.mp4');
-    expect(container.querySelector('track[kind="captions"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('track[kind="captions"]'),
+    ).toBeInTheDocument();
   });
 
   it('renders audio element', () => {

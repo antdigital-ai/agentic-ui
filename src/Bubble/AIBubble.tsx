@@ -386,10 +386,7 @@ export const AIBubble: React.FC<
         hidePadding,
         setHidePadding,
         setMessage: (message) => {
-          props.bubbleRef?.current?.setMessageItem?.(
-            props.id!,
-            message as any,
-          );
+          props.bubbleRef?.current?.setMessageItem?.(props.id!, message as any);
         },
       }}
     >

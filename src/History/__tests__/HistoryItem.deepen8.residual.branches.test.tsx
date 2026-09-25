@@ -133,13 +133,7 @@ describe('HistoryItem deepen8 residual branches', () => {
   });
 
   it('type=chat：isMultiMode RHS 求值 false', () => {
-    render(
-      <HistoryItem
-        {...baseProps}
-        item={baseItem as any}
-        type="chat"
-      />,
-    );
+    render(<HistoryItem {...baseProps} item={baseItem as any} type="chat" />);
     expect(screen.getByText('Title A')).toBeInTheDocument();
   });
 });

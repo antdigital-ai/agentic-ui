@@ -39,9 +39,9 @@ describe('DonutChart hooks deepen residual branches', () => {
   });
 
   it('useResponsiveDimensions 移动/桌面两臂', () => {
-    expect(useResponsiveDimensions(true, 400, 600, 400).width).toBeLessThanOrEqual(
-      360,
-    );
+    expect(
+      useResponsiveDimensions(true, 400, 600, 400).width,
+    ).toBeLessThanOrEqual(360);
     expect(useResponsiveDimensions(false, 900, 600, 400).chartWidth).toBe(600);
   });
 

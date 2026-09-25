@@ -11,9 +11,12 @@ describe('src/Workspace/RealtimeFollow/style.ts branches', () => {
   );
 
   it('自定义 prefixCls', () => {
-    const { result } = renderHook(() => useRealtimeFollowStyle('custom-style-prefix'), {
-      wrapper,
-    });
+    const { result } = renderHook(
+      () => useRealtimeFollowStyle('custom-style-prefix'),
+      {
+        wrapper,
+      },
+    );
     expect(result.current).toBeDefined();
     expect(result.current.hashId).toBeDefined();
   });

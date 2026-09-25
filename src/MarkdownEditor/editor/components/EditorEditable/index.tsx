@@ -27,9 +27,7 @@ export function EditorEditable(props: EditorEditableProps) {
   );
 
   const placeholder =
-    !readonly &&
-    !suppressPlaceholder &&
-    canUseSlateNativePlaceholder(editor)
+    !readonly && !suppressPlaceholder && canUseSlateNativePlaceholder(editor)
       ? placeholderText
       : undefined;
 

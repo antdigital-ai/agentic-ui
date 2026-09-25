@@ -154,9 +154,9 @@ describe('HistoryItem deepen5 residual branches', () => {
       />,
     );
     const tips = screen.getAllByTestId('tooltip');
-    expect(
-      tips.some((t) => t.getAttribute('data-open') === 'false'),
-    ).toBe(true);
+    expect(tips.some((t) => t.getAttribute('data-open') === 'false')).toBe(
+      true,
+    );
     expect(screen.getByText('short')).toBeInTheDocument();
   });
 

@@ -23,9 +23,15 @@ describe('BubbleExtra residual branches', () => {
     const onLikeCancel = vi.fn();
     render(
       <BubbleExtra
-        bubble={{
-          originData: { content: 'answer', feedback: 'thumbsUp', isFinished: true },
-        } as any}
+        bubble={
+          {
+            originData: {
+              content: 'answer',
+              feedback: 'thumbsUp',
+              isFinished: true,
+            },
+          } as any
+        }
         readonly={false}
         onLikeCancel={onLikeCancel}
       />,

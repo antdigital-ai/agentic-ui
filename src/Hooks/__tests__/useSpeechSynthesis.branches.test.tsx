@@ -61,17 +61,19 @@ describe('useSpeechSynthesis branches', () => {
       value: synthesis,
     });
 
-    global.SpeechSynthesisUtterance = vi.fn(function SpeechSynthesisUtteranceMock(
-      this: SpeechSynthesisUtterance,
-      text: string,
-    ) {
-      this.text = text;
-      this.rate = 1;
-      this.voice = null;
-      this.lang = '';
-      this.onend = null;
-      this.onerror = null;
-    }) as unknown as typeof SpeechSynthesisUtterance;
+    global.SpeechSynthesisUtterance = vi.fn(
+      function SpeechSynthesisUtteranceMock(
+        this: SpeechSynthesisUtterance,
+        text: string,
+      ) {
+        this.text = text;
+        this.rate = 1;
+        this.voice = null;
+        this.lang = '';
+        this.onend = null;
+        this.onerror = null;
+      },
+    ) as unknown as typeof SpeechSynthesisUtterance;
   };
 
   const fireVoicesChanged = () => {
@@ -104,13 +106,17 @@ describe('useSpeechSynthesis branches', () => {
       result.current.start();
     });
 
-    const utterance = (SpeechSynthesisUtterance as unknown as ReturnType<typeof vi.fn>)
-      .mock.results[0].value;
+    const utterance = (
+      SpeechSynthesisUtterance as unknown as ReturnType<typeof vi.fn>
+    ).mock.results[0].value;
     expect(utterance.voice).toBeNull();
   });
 
   it('findVoice：匹配 voiceURI 时设置 voice', () => {
-    const matched = { voiceURI: 'target-voice', name: 'Target' } as SpeechSynthesisVoice;
+    const matched = {
+      voiceURI: 'target-voice',
+      name: 'Target',
+    } as SpeechSynthesisVoice;
     mockGetVoices.mockReturnValue([matched]);
 
     const { result } = renderHook(() =>
@@ -125,8 +131,9 @@ describe('useSpeechSynthesis branches', () => {
       result.current.start();
     });
 
-    const utterance = (SpeechSynthesisUtterance as unknown as ReturnType<typeof vi.fn>)
-      .mock.results[0].value;
+    const utterance = (
+      SpeechSynthesisUtterance as unknown as ReturnType<typeof vi.fn>
+    ).mock.results[0].value;
     expect(utterance.voice).toBe(matched);
   });
 
@@ -147,8 +154,9 @@ describe('useSpeechSynthesis branches', () => {
       result.current.start();
     });
 
-    const utterance = (SpeechSynthesisUtterance as unknown as ReturnType<typeof vi.fn>)
-      .mock.results[0].value;
+    const utterance = (
+      SpeechSynthesisUtterance as unknown as ReturnType<typeof vi.fn>
+    ).mock.results[0].value;
     expect(utterance.voice).toBeNull();
   });
 
@@ -161,8 +169,9 @@ describe('useSpeechSynthesis branches', () => {
       result.current.start();
     });
 
-    const utterance = (SpeechSynthesisUtterance as unknown as ReturnType<typeof vi.fn>)
-      .mock.results[0].value;
+    const utterance = (
+      SpeechSynthesisUtterance as unknown as ReturnType<typeof vi.fn>
+    ).mock.results[0].value;
     expect(utterance.lang).toBe('zh-CN');
   });
 
@@ -334,7 +343,10 @@ describe('useSpeechSynthesis branches', () => {
   });
 
   it('无 addEventListener 能力时跳过 pending', () => {
-    installSpeechSynthesis({ omitAddEventListener: true, omitRemoveEventListener: true });
+    installSpeechSynthesis({
+      omitAddEventListener: true,
+      omitRemoveEventListener: true,
+    });
 
     const { result } = renderHook(() =>
       useSpeechSynthesis({
@@ -484,8 +496,9 @@ describe('useSpeechSynthesis branches', () => {
     act(() => {
       result.current.start();
     });
-    const first = (SpeechSynthesisUtterance as unknown as ReturnType<typeof vi.fn>)
-      .mock.results[0].value;
+    const first = (
+      SpeechSynthesisUtterance as unknown as ReturnType<typeof vi.fn>
+    ).mock.results[0].value;
     expect(first.onend).toBeDefined();
 
     act(() => {

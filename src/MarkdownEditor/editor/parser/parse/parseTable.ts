@@ -377,8 +377,7 @@ export const parseTableOrChart = (
   }
 
   // config 恒为对象；mergeCells 缺省为空数组
-  const mergeCells =
-    (config as CodeNode['otherProps'])?.mergeCells || [];
+  const mergeCells = (config as CodeNode['otherProps'])?.mergeCells || [];
 
   // 创建合并单元格映射，用于快速查找
   const mergeMap = new Map<

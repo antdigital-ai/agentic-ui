@@ -60,7 +60,10 @@ describe('MarkdownPreview deepen residual branches', () => {
         <MarkdownPreview {...baseProps} />
       </BubbleConfigContext.Provider>,
     );
-    expect(screen.getByTestId('md-editor')).toHaveAttribute('data-min-width', '');
+    expect(screen.getByTestId('md-editor')).toHaveAttribute(
+      'data-min-width',
+      '',
+    );
   });
 
   it('chartType + standalone 走 max(clientWidth||600)-23', () => {
@@ -78,25 +81,25 @@ describe('MarkdownPreview deepen residual branches', () => {
         </MessagesContext.Provider>
       </BubbleConfigContext.Provider>,
     );
-    expect(screen.getByTestId('md-editor').getAttribute('data-min-width')).toContain(
-      'min(',
+    expect(
+      screen.getByTestId('md-editor').getAttribute('data-min-width'),
+    ).toContain('min(');
+    expect(screen.getByTestId('md-editor')).toHaveAttribute(
+      'data-max-width',
+      '100%',
     );
-    expect(screen.getByTestId('md-editor')).toHaveAttribute('data-max-width', '100%');
   });
 
   it('chartType 非 standalone 走 min(clientWidth||600)-128；无 htmlRef', () => {
     render(
       <BubbleConfigContext.Provider value={{ standalone: false } as any}>
         <MessagesContext.Provider value={null as any}>
-          <MarkdownPreview
-            {...baseProps}
-            content={'chartType: pie'}
-          />
+          <MarkdownPreview {...baseProps} content={'chartType: pie'} />
         </MessagesContext.Provider>
       </BubbleConfigContext.Provider>,
     );
-    expect(screen.getByTestId('md-editor').getAttribute('data-min-width')).toContain(
-      'min(',
-    );
+    expect(
+      screen.getByTestId('md-editor').getAttribute('data-min-width'),
+    ).toContain('min(');
   });
 });

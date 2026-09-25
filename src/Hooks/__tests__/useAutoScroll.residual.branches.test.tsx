@@ -103,9 +103,7 @@ describe('useAutoScroll residual branches', () => {
     });
     metrics.scrollTop = 0;
     act(() => {
-      el.dispatchEvent(
-        new WheelEvent('wheel', { deltaY: -40, bubbles: true }),
-      );
+      el.dispatchEvent(new WheelEvent('wheel', { deltaY: -40, bubbles: true }));
     });
     document.body.removeChild(el);
     expect(onScrollStateChange.mock.calls.length >= 0).toBe(true);

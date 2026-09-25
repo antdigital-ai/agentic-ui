@@ -28,14 +28,14 @@ const createMockItems = (count: number = 3): KeyedElement[] =>
   )) as KeyedElement[];
 
 const queryContainer = (container: HTMLElement) =>
-  container.querySelector('[class*="agentic-chat-action-item-box"][class*="container"]') as
-    | HTMLElement
-    | null;
+  container.querySelector(
+    '[class*="agentic-chat-action-item-box"][class*="container"]',
+  ) as HTMLElement | null;
 
 const queryScroll = (container: HTMLElement) =>
-  container.querySelector('[class*="agentic-chat-action-item-box"][class*="scroll"]') as
-    | HTMLElement
-    | null;
+  container.querySelector(
+    '[class*="agentic-chat-action-item-box"][class*="scroll"]',
+  ) as HTMLElement | null;
 
 const queryMenuButton = (container: HTMLElement) =>
   container.querySelector(
@@ -95,7 +95,11 @@ describe('ActionItemContainer branches', () => {
     );
     const containerEl = queryContainer(container)!;
 
-    fireEvent.pointerDown(containerEl, { button: 0, clientX: 100, pointerId: 1 });
+    fireEvent.pointerDown(containerEl, {
+      button: 0,
+      clientX: 100,
+      pointerId: 1,
+    });
     fireEvent.pointerMove(containerEl, { clientX: 102, pointerId: 1 });
 
     expect(HTMLElement.prototype.setPointerCapture).not.toHaveBeenCalled();
@@ -116,8 +120,16 @@ describe('ActionItemContainer branches', () => {
       value: 50,
     });
 
-    fireEvent.pointerDown(containerEl, { button: 0, clientX: 100, pointerId: 1 });
-    fireEvent.pointerMove(containerEl, { clientX: 120, pointerId: 1, cancelable: true });
+    fireEvent.pointerDown(containerEl, {
+      button: 0,
+      clientX: 100,
+      pointerId: 1,
+    });
+    fireEvent.pointerMove(containerEl, {
+      clientX: 120,
+      pointerId: 1,
+      cancelable: true,
+    });
     fireEvent.pointerUp(containerEl, { pointerId: 1 });
 
     expect(HTMLElement.prototype.setPointerCapture).toHaveBeenCalled();
@@ -387,7 +399,9 @@ describe('ActionItemContainer branches', () => {
     );
     const source = popupItems[0] as HTMLElement;
     const target = popupItems[2] as HTMLElement;
-    const dragHandle = source.querySelector('[class*="drag-handle"]') as HTMLElement;
+    const dragHandle = source.querySelector(
+      '[class*="drag-handle"]',
+    ) as HTMLElement;
 
     fireEvent.mouseDown(dragHandle);
     fireEvent.dragStart(source, { dataTransfer: { effectAllowed: 'move' } });
@@ -415,7 +429,9 @@ describe('ActionItemContainer branches', () => {
     const popupItem = document.querySelector(
       '[class*="overflow-container-popup-item"]',
     ) as HTMLElement;
-    const dragHandle = popupItem.querySelector('[class*="drag-handle"]') as HTMLElement;
+    const dragHandle = popupItem.querySelector(
+      '[class*="drag-handle"]',
+    ) as HTMLElement;
 
     fireEvent.mouseDown(dragHandle);
     fireEvent.dragStart(popupItem, {
@@ -447,7 +463,9 @@ describe('ActionItemContainer branches', () => {
     const popupItem = document.querySelector(
       '[class*="overflow-container-popup-item"]',
     ) as HTMLElement;
-    const content = popupItem.querySelector('div[draggable="false"]') as HTMLElement;
+    const content = popupItem.querySelector(
+      'div[draggable="false"]',
+    ) as HTMLElement;
 
     fireEvent.mouseDown(content);
     fireEvent.mouseUp(content);
@@ -474,7 +492,9 @@ describe('ActionItemContainer branches', () => {
     const popupItem = document.querySelector(
       '[class*="overflow-container-popup-item"]',
     ) as HTMLElement;
-    const dragHandle = popupItem.querySelector('[class*="drag-handle"]') as HTMLElement;
+    const dragHandle = popupItem.querySelector(
+      '[class*="drag-handle"]',
+    ) as HTMLElement;
 
     fireEvent.mouseDown(dragHandle);
     fireEvent.dragStart(popupItem, {
@@ -508,7 +528,10 @@ describe('ActionItemContainer branches', () => {
     const popup = document.querySelector(
       '[class*="overflow-container-popup"]',
     ) as HTMLElement;
-    const wheelEvent = new WheelEvent('wheel', { bubbles: true, cancelable: true });
+    const wheelEvent = new WheelEvent('wheel', {
+      bubbles: true,
+      cancelable: true,
+    });
     const stopSpy = vi.spyOn(wheelEvent, 'stopPropagation');
     popup.dispatchEvent(wheelEvent);
 
@@ -553,7 +576,11 @@ describe('ActionItemContainer branches', () => {
       </TestWrapper>,
     );
     const containerEl = queryContainer(container)!;
-    fireEvent.pointerDown(containerEl, { button: 0, clientX: 100, pointerId: 1 });
+    fireEvent.pointerDown(containerEl, {
+      button: 0,
+      clientX: 100,
+      pointerId: 1,
+    });
     fireEvent.pointerUp(containerEl, { pointerId: 1 });
 
     const clickEvent = new MouseEvent('click', {
@@ -568,13 +595,17 @@ describe('ActionItemContainer branches', () => {
   it('size small / large 应用尺寸类名', () => {
     const { container, rerender } = render(
       <TestWrapper>
-        <ActionItemContainer size="small">{createMockItems()}</ActionItemContainer>
+        <ActionItemContainer size="small">
+          {createMockItems()}
+        </ActionItemContainer>
       </TestWrapper>,
     );
     expect(queryContainer(container)?.className).toMatch(/small|container/);
     rerender(
       <TestWrapper>
-        <ActionItemContainer size="large">{createMockItems()}</ActionItemContainer>
+        <ActionItemContainer size="large">
+          {createMockItems()}
+        </ActionItemContainer>
       </TestWrapper>,
     );
     expect(queryContainer(container)?.className).toMatch(/large|container/);
@@ -583,7 +614,9 @@ describe('ActionItemContainer branches', () => {
   it.skip('menuDisabled 时不渲染溢出菜单按钮', () => {
     const { container } = render(
       <TestWrapper>
-        <ActionItemContainer menuDisabled>{createMockItems(4)}</ActionItemContainer>
+        <ActionItemContainer menuDisabled>
+          {createMockItems(4)}
+        </ActionItemContainer>
       </TestWrapper>,
     );
     expect(queryMenuButton(container)).toBeFalsy();

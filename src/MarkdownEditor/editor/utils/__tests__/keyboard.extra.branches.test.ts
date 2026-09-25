@@ -39,9 +39,7 @@ describe('KeyboardTask 额外分支', () => {
 
   it('selectWord：中文前后界；仅向前匹配', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: '甲乙丙丁' }] },
-    ];
+    editor.children = [{ type: 'paragraph', children: [{ text: '甲乙丙丁' }] }];
     editor.selection = {
       anchor: { path: [0, 0], offset: 2 },
       focus: { path: [0, 0], offset: 2 },

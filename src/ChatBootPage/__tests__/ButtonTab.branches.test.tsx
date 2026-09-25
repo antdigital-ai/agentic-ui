@@ -54,7 +54,10 @@ describe('ButtonTab branches', () => {
     const onIconClick = vi.fn();
     render(
       <TestWrapper>
-        <ButtonTab onIconClick={onIconClick} icon={<span data-testid="ico">I</span>}>
+        <ButtonTab
+          onIconClick={onIconClick}
+          icon={<span data-testid="ico">I</span>}
+        >
           Tab
         </ButtonTab>
       </TestWrapper>,
@@ -72,14 +75,20 @@ describe('ButtonTab branches', () => {
         </ButtonTab>
       </TestWrapper>,
     );
-    expect(screen.getByText('I').parentElement?.getAttribute('role')).toBeNull();
+    expect(
+      screen.getByText('I').parentElement?.getAttribute('role'),
+    ).toBeNull();
   });
 
   it('disabled icon 点击不触发 onIconClick', () => {
     const onIconClick = vi.fn();
     render(
       <TestWrapper>
-        <ButtonTab disabled onIconClick={onIconClick} icon={<span data-testid="ico">I</span>}>
+        <ButtonTab
+          disabled
+          onIconClick={onIconClick}
+          icon={<span data-testid="ico">I</span>}
+        >
           Tab
         </ButtonTab>
       </TestWrapper>,

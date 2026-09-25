@@ -99,7 +99,9 @@ describe('FunnelChart deepen6 safe residual branches', () => {
         bottomLayerMinWidth={0.2}
       />,
     );
-    expect((globalThis as any).__funnelSafe6Data?.datasets?.[0]?.data).toBeTruthy();
+    expect(
+      (globalThis as any).__funnelSafe6Data?.datasets?.[0]?.data,
+    ).toBeTruthy();
   });
 
   it('mobile：innerWidth 窄；rightLabel / trapezoid 插件', () => {
@@ -125,7 +127,14 @@ describe('FunnelChart deepen6 safe residual branches', () => {
       ctx,
       data: {
         labels: ['A', 'B', 'extra'],
-        datasets: [{ data: [[-50, 50], [-20, 20]] }],
+        datasets: [
+          {
+            data: [
+              [-50, 50],
+              [-20, 20],
+            ],
+          },
+        ],
       },
       scales: { x: { getPixelForValue: (v: number) => 100 + v } },
       getDatasetMeta: () => ({
@@ -143,7 +152,14 @@ describe('FunnelChart deepen6 safe residual branches', () => {
       ctx,
       data: {
         labels: ['A', 'B'],
-        datasets: [{ data: [[-50, 50], [-20, 20]] }],
+        datasets: [
+          {
+            data: [
+              [-50, 50],
+              [-20, 20],
+            ],
+          },
+        ],
       },
       scales: { x: { getPixelForValue: (v: number) => 100 + v } },
       getDatasetMeta: () => ({
@@ -201,7 +217,14 @@ describe('FunnelChart deepen6 safe residual branches', () => {
       ctx,
       data: {
         labels: ['A', 'B'],
-        datasets: [{ data: [[-50, 50], [-25, 25]] }],
+        datasets: [
+          {
+            data: [
+              [-50, 50],
+              [-25, 25],
+            ],
+          },
+        ],
       },
       scales: { x: { getPixelForValue: (v: number) => 100 + v } },
       getDatasetMeta: () => ({

@@ -151,13 +151,16 @@ describe('Suggestion 分支覆盖', () => {
     expect(screen.getByTestId('dropdown')).toHaveAttribute('data-open', 'true');
 
     await userEvent.click(screen.getByTestId('dropdown-close'));
-    expect(screen.getByTestId('dropdown')).toHaveAttribute('data-open', 'false');
+    expect(screen.getByTestId('dropdown')).toHaveAttribute(
+      'data-open',
+      'false',
+    );
   });
 
   it('异步 items 在 open 变化时加载并渲染菜单项', async () => {
-    const loadItems = vi.fn().mockResolvedValue([
-      { key: 'async-1', label: 'Async One' },
-    ]);
+    const loadItems = vi
+      .fn()
+      .mockResolvedValue([{ key: 'async-1', label: 'Async One' }]);
 
     render(
       <Suggestion
@@ -293,7 +296,10 @@ describe('Suggestion 分支覆盖', () => {
 
     await userEvent.click(screen.getByTestId('custom-select'));
     expect(onSelect).toHaveBeenCalledWith('picked', [1, 2]);
-    expect(screen.getByTestId('dropdown')).toHaveAttribute('data-open', 'false');
+    expect(screen.getByTestId('dropdown')).toHaveAttribute(
+      'data-open',
+      'false',
+    );
   });
 
   it('dropdownRender 容器 keyDown 阻止冒泡', () => {
@@ -305,9 +311,7 @@ describe('Suggestion 分支覆盖', () => {
         tagInputProps={{
           items: [],
           open: true,
-          dropdownRender: () => (
-            <div data-testid="custom-body">body</div>
-          ),
+          dropdownRender: () => <div data-testid="custom-body">body</div>,
         }}
       >
         <button type="button">child</button>

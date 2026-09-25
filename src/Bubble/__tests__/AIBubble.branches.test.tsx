@@ -5,11 +5,7 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import {
-  AIBubble,
-  runRender,
-  shouldRenderBeforeContent,
-} from '../AIBubble';
+import { AIBubble, runRender, shouldRenderBeforeContent } from '../AIBubble';
 import type { BubbleProps, MessageBubbleData } from '../type';
 
 vi.mock('../../MarkdownEditor/BaseMarkdownEditor', () => ({
@@ -99,9 +95,7 @@ describe('AIBubble branches', () => {
   describe('AIBubble component', () => {
     it('render=false 返回 null', () => {
       const { container } = render(
-        <AIBubble
-          {...baseProps({ bubbleRenderConfig: { render: false } })}
-        />,
+        <AIBubble {...baseProps({ bubbleRenderConfig: { render: false } })} />,
       );
       expect(container.firstChild).toBeNull();
     });
@@ -114,7 +108,9 @@ describe('AIBubble branches', () => {
           })}
         />,
       );
-      expect(screen.queryByTestId('bubble-avatar-title')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('bubble-avatar-title'),
+      ).not.toBeInTheDocument();
     });
 
     it('filemap 块剥离后展示 stripped 内容', () => {
@@ -122,8 +118,7 @@ describe('AIBubble branches', () => {
         <AIBubble
           {...baseProps({
             originData: origin({
-              content:
-                'text\n```agentic-ui-filemap\n{"files":[]}\n```\n',
+              content: 'text\n```agentic-ui-filemap\n{"files":[]}\n```\n',
             }),
           })}
         />,

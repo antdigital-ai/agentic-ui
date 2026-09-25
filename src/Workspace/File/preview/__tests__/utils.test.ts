@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  buildMarkdownContent,
-  getContentStatus,
-  isHtmlFile,
-} from '../utils';
+import { buildMarkdownContent, getContentStatus, isHtmlFile } from '../utils';
 
 describe('isHtmlFile', () => {
   it('detects html by extension', () => {
@@ -27,9 +23,9 @@ describe('getContentStatus', () => {
   });
 
   it('returns loading for loading state', () => {
-    expect(
-      getContentStatus({ status: 'loading', mdContent: '' }),
-    ).toBe('loading');
+    expect(getContentStatus({ status: 'loading', mdContent: '' })).toBe(
+      'loading',
+    );
   });
 
   it('returns done for idle and ready states', () => {

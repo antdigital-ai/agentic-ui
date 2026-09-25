@@ -6,11 +6,17 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
-import { LOADING_FLAT } from '../MessagesContent';
 import BubbleList from '../List';
+import { LOADING_FLAT } from '../MessagesContent';
 
 vi.mock('../Bubble', () => ({
-  Bubble: ({ originData, placement }: { originData: { content?: string }; placement?: string }) => (
+  Bubble: ({
+    originData,
+    placement,
+  }: {
+    originData: { content?: string };
+    placement?: string;
+  }) => (
     <div data-testid="bubble-item" data-placement={placement}>
       {originData?.content}
     </div>
@@ -27,7 +33,11 @@ vi.mock('../../MarkdownEditor/editor/components/LazyElement', () => ({
   ),
 }));
 
-const msg = (id: string, content: string, role: 'user' | 'assistant' = 'assistant') => ({
+const msg = (
+  id: string,
+  content: string,
+  role: 'user' | 'assistant' = 'assistant',
+) => ({
   id,
   role,
   content,
@@ -54,9 +64,7 @@ describe('BubbleList branches', () => {
   });
 
   it('有消息时渲染 Bubble 项', () => {
-    render(
-      <BubbleList bubbleList={[msg('1', 'hello'), msg('2', 'world')]} />,
-    );
+    render(<BubbleList bubbleList={[msg('1', 'hello'), msg('2', 'world')]} />);
     expect(screen.getAllByTestId('bubble-item')).toHaveLength(2);
   });
 
@@ -66,16 +74,12 @@ describe('BubbleList branches', () => {
   });
 
   it('extraShowOnHover 传入 BubbleConfigContext', () => {
-    render(
-      <BubbleList bubbleList={[msg('1', 'x')]} extraShowOnHover />,
-    );
+    render(<BubbleList bubbleList={[msg('1', 'x')]} extraShowOnHover />);
     expect(screen.getByTestId('bubble-item')).toBeInTheDocument();
   });
 
   it('readonly 透传给子 Bubble', () => {
-    render(
-      <BubbleList bubbleList={[msg('1', 'x')]} readonly />,
-    );
+    render(<BubbleList bubbleList={[msg('1', 'x')]} readonly />);
     expect(screen.getByText('x')).toBeInTheDocument();
   });
 
@@ -93,19 +97,12 @@ describe('BubbleList branches', () => {
   });
 
   it('renderMode 合并进 markdownRenderConfig', () => {
-    render(
-      <BubbleList
-        bubbleList={[msg('1', 'md')]}
-        renderMode="markdown"
-      />,
-    );
+    render(<BubbleList bubbleList={[msg('1', 'md')]} renderMode="markdown" />);
     expect(screen.getByTestId('bubble-item')).toBeInTheDocument();
   });
 
   it('renderType 兼容协议字段', () => {
-    render(
-      <BubbleList bubbleList={[msg('1', 't')]} renderType="markdown" />,
-    );
+    render(<BubbleList bubbleList={[msg('1', 't')]} renderType="markdown" />);
     expect(screen.getByText('t')).toBeInTheDocument();
   });
 
@@ -139,10 +136,7 @@ describe('BubbleList branches', () => {
 
   it('lazy.enable 包裹 LazyElement', () => {
     render(
-      <BubbleList
-        bubbleList={[msg('1', 'lazy')]}
-        lazy={{ enable: true }}
-      />,
+      <BubbleList bubbleList={[msg('1', 'lazy')]} lazy={{ enable: true }} />,
     );
     expect(screen.getByTestId('lazy-element')).toBeInTheDocument();
   });
@@ -159,11 +153,7 @@ describe('BubbleList branches', () => {
 
   it('LOADING_FLAT 过渡到真实 id 保持 key', () => {
     const { rerender } = render(
-      <BubbleList
-        bubbleList={[
-          { ...msg(LOADING_FLAT, ''), createAt: 42 },
-        ]}
-      />,
+      <BubbleList bubbleList={[{ ...msg(LOADING_FLAT, ''), createAt: 42 }]} />,
     );
     rerender(
       <BubbleList
@@ -292,9 +282,7 @@ describe('BubbleList branches', () => {
 
   it('列表收缩时仍可渲染剩余项', () => {
     const { rerender } = render(
-      <BubbleList
-        bubbleList={[msg('1', 'a'), msg('2', 'b'), msg('3', 'c')]}
-      />,
+      <BubbleList bubbleList={[msg('1', 'a'), msg('2', 'b'), msg('3', 'c')]} />,
     );
     expect(screen.getAllByTestId('bubble-item')).toHaveLength(3);
     rerender(<BubbleList bubbleList={[msg('1', 'a')]} />);

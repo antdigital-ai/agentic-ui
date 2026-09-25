@@ -36,9 +36,9 @@ describe('parserMarkdownToSlateNode deepen residual branches', () => {
   it('代码块内空行不切块', () => {
     const md = '```js\nconst a=1\n\nconst b=2\n```\n\n# after';
     const r = parserMarkdownToSlateNode(md);
-    expect(r.schema?.some((n: any) => n.type === 'head' || n.type === 'code')).toBe(
-      true,
-    );
+    expect(
+      r.schema?.some((n: any) => n.type === 'head' || n.type === 'code'),
+    ).toBe(true);
   });
 
   it('根级仅 ::: 段落被跳过', () => {

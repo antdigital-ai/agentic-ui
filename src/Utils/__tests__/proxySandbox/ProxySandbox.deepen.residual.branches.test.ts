@@ -44,9 +44,9 @@ describe('ProxySandbox deepen residual branches', () => {
       timeout: 500,
       strictMode: true,
     });
-    expect(() =>
-      (sandbox as any).executeCode('return evilVar'),
-    ).toThrow(/not allowed|is not defined/);
+    expect(() => (sandbox as any).executeCode('return evilVar')).toThrow(
+      /not allowed|is not defined/,
+    );
   });
 
   it('trySerializeParams：不可序列化参数走同步回退', async () => {

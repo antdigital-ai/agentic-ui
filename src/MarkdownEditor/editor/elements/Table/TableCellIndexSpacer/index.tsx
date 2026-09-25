@@ -73,214 +73,211 @@ export interface TableCellIndexSpacerProps {
  * - 用于占位和布局
  * - 支持点击选中整列功能
  */
-export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = memo(({
-  style,
-  className,
-  columnIndex,
-  tablePath,
-}) => {
-  const { locale } = useContext(I18nContext);
-  const context = useContext(ConfigProvider.ConfigContext);
-  const baseClassName = context?.getPrefixCls(
-    'agentic-md-editor-table-cell-index-spacer',
-  );
-  const { markdownEditorRef } = useEditorStore();
-  const setDeleteIconPosition = useSetTableChromePosition();
-  const shouldShowDeleteIcon = useTableColumnChromeActive(columnIndex);
-  const isSelectWholeTable = columnIndex === -1;
-  const actionColumnIndex = isSelectWholeTable ? 0 : columnIndex;
+export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = memo(
+  ({ style, className, columnIndex, tablePath }) => {
+    const { locale } = useContext(I18nContext);
+    const context = useContext(ConfigProvider.ConfigContext);
+    const baseClassName = context?.getPrefixCls(
+      'agentic-md-editor-table-cell-index-spacer',
+    );
+    const { markdownEditorRef } = useEditorStore();
+    const setDeleteIconPosition = useSetTableChromePosition();
+    const shouldShowDeleteIcon = useTableColumnChromeActive(columnIndex);
+    const isSelectWholeTable = columnIndex === -1;
+    const actionColumnIndex = isSelectWholeTable ? 0 : columnIndex;
 
-  const clearSelect = useRefFunction((clearIcon = true) => {
-    if (clearIcon) {
-      setDeleteIconPosition(null);
-    }
-    if (!tablePath) return;
-    const editor = markdownEditorRef.current;
-    if (!editor) return;
-    clearTableSelection(editor, tablePath);
-  });
-
-  /**
-   * 处理点击事件，选中整列或显示删除图标
-   */
-  const handleClick = useRefFunction((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    // 如果提供了列索引，显示删除图标
-    if (columnIndex !== undefined) {
-      setDeleteIconPosition({
-        columnIndex,
-      });
-    }
-
-    if (columnIndex === undefined || !tablePath) {
-      return;
-    }
-
-    try {
-      clearSelect(false);
+    const clearSelect = useRefFunction((clearIcon = true) => {
+      if (clearIcon) {
+        setDeleteIconPosition(null);
+      }
+      if (!tablePath) return;
       const editor = markdownEditorRef.current;
       if (!editor) return;
-      if (isSelectWholeTable) {
-        selectWholeTable(editor, tablePath);
+      clearTableSelection(editor, tablePath);
+    });
+
+    /**
+     * 处理点击事件，选中整列或显示删除图标
+     */
+    const handleClick = useRefFunction((e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // 如果提供了列索引，显示删除图标
+      if (columnIndex !== undefined) {
+        setDeleteIconPosition({
+          columnIndex,
+        });
+      }
+
+      if (columnIndex === undefined || !tablePath) {
         return;
       }
 
-      selectTableColumn(editor, tablePath, columnIndex);
-    } catch (error) {
-      console.warn('Failed to select table column:', error);
-    }
-  });
+      try {
+        clearSelect(false);
+        const editor = markdownEditorRef.current;
+        if (!editor) return;
+        if (isSelectWholeTable) {
+          selectWholeTable(editor, tablePath);
+          return;
+        }
 
-  /**
-   * 处理删除图标点击事件
-   */
-  const handleDeleteClick = useRefFunction((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    try {
-      if (!tablePath || actionColumnIndex === undefined) {
-        return;
+        selectTableColumn(editor, tablePath, columnIndex);
+      } catch (error) {
+        console.warn('Failed to select table column:', error);
       }
-      const editor = markdownEditorRef.current;
-      if (!editor) return;
-      removeTableColumn(editor, tablePath, actionColumnIndex);
-      clearSelect();
-    } catch (error) {
-      console.warn('Failed to delete table column:', error);
-    }
-  });
+    });
 
-  /**
-   * 处理在前面增加一列点击事件
-   */
-  const handleInsertColumnBefore = useRefFunction((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+    /**
+     * 处理删除图标点击事件
+     */
+    const handleDeleteClick = useRefFunction((e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-    try {
-      if (!tablePath || actionColumnIndex === undefined) {
-        return;
+      try {
+        if (!tablePath || actionColumnIndex === undefined) {
+          return;
+        }
+        const editor = markdownEditorRef.current;
+        if (!editor) return;
+        removeTableColumn(editor, tablePath, actionColumnIndex);
+        clearSelect();
+      } catch (error) {
+        console.warn('Failed to delete table column:', error);
       }
-      const editor = markdownEditorRef.current;
-      if (!editor) return;
-      insertTableColumn(editor, tablePath, actionColumnIndex, 'before');
-      clearSelect();
-    } catch (error) {
-      console.warn('Failed to insert column before:', error);
-    }
-  });
+    });
 
-  /**
-   * 处理在后面增加一列点击事件
-   */
-  const handleInsertColumnAfter = useRefFunction((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+    /**
+     * 处理在前面增加一列点击事件
+     */
+    const handleInsertColumnBefore = useRefFunction((e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-    try {
-      if (!tablePath || actionColumnIndex === undefined) {
-        return;
+      try {
+        if (!tablePath || actionColumnIndex === undefined) {
+          return;
+        }
+        const editor = markdownEditorRef.current;
+        if (!editor) return;
+        insertTableColumn(editor, tablePath, actionColumnIndex, 'before');
+        clearSelect();
+      } catch (error) {
+        console.warn('Failed to insert column before:', error);
       }
-      const editor = markdownEditorRef.current;
-      if (!editor) return;
-      insertTableColumn(editor, tablePath, actionColumnIndex, 'after');
-      clearSelect();
-    } catch (error) {
-      console.warn('Failed to insert column after:', error);
-    }
-  });
+    });
 
-  const ref = useRef<HTMLTableDataCellElement>(null);
+    /**
+     * 处理在后面增加一列点击事件
+     */
+    const handleInsertColumnAfter = useRefFunction((e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-  useClickAway(() => {
-    if (shouldShowDeleteIcon) {
-      clearSelect();
-    }
-  }, ref);
-
-  const shouldShowInsertButtons = shouldShowDeleteIcon;
-
-  const stopEditorMouseDown = useRefFunction((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  });
-
-  return (
-    <td
-      ref={ref}
-      className={classNames(baseClassName, className, 'config-td')}
-      contentEditable={false}
-      style={{
-        cursor: columnIndex !== undefined ? 'pointer' : 'default',
-        padding: 0,
-        position: 'relative',
-        backgroundColor: shouldShowDeleteIcon
-          ? 'var(--color-primary-control-fill-primary-active)'
-          : undefined,
-        ...style,
-      }}
-      onClick={handleClick}
-      onMouseDown={stopEditorMouseDown}
-      title={
-        columnIndex !== undefined
-          ? columnIndex === -1
-            ? locale?.['table.clickToSelectTable'] || '点击选中整个表格'
-            : locale?.['table.clickToSelectColumn'] ||
-              '点击选中整列，显示操作按钮'
-          : undefined
+      try {
+        if (!tablePath || actionColumnIndex === undefined) {
+          return;
+        }
+        const editor = markdownEditorRef.current;
+        if (!editor) return;
+        insertTableColumn(editor, tablePath, actionColumnIndex, 'after');
+        clearSelect();
+      } catch (error) {
+        console.warn('Failed to insert column after:', error);
       }
-    >
-      <div
-        className={classNames(
-          `${baseClassName}-action-buttons`,
-          shouldShowDeleteIcon && `${baseClassName}-action-buttons-visible`,
-        )}
+    });
+
+    const ref = useRef<HTMLTableDataCellElement>(null);
+
+    useClickAway(() => {
+      if (shouldShowDeleteIcon) {
+        clearSelect();
+      }
+    }, ref);
+
+    const shouldShowInsertButtons = shouldShowDeleteIcon;
+
+    const stopEditorMouseDown = useRefFunction((e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    return (
+      <td
+        ref={ref}
+        className={classNames(baseClassName, className, 'config-td')}
+        contentEditable={false}
+        style={{
+          cursor: columnIndex !== undefined ? 'pointer' : 'default',
+          padding: 0,
+          position: 'relative',
+          backgroundColor: shouldShowDeleteIcon
+            ? 'var(--color-primary-control-fill-primary-active)'
+            : undefined,
+          ...style,
+        }}
+        onClick={handleClick}
+        onMouseDown={stopEditorMouseDown}
+        title={
+          columnIndex !== undefined
+            ? columnIndex === -1
+              ? locale?.['table.clickToSelectTable'] || '点击选中整个表格'
+              : locale?.['table.clickToSelectColumn'] ||
+                '点击选中整列，显示操作按钮'
+            : undefined
+        }
       >
-        {/* 总是显示增加列的按钮 */}
-        {shouldShowInsertButtons && (
-          <div
-            className={classNames(
-              `${baseClassName}-action-button`,
-              `${baseClassName}-insert-column-before`,
-            )}
-            onClick={handleInsertColumnBefore}
-            onMouseDown={stopEditorMouseDown}
-            title={locale?.['table.insertColumnBefore'] || '在前面增加一列'}
-          >
-            <InsertRowLeftOutlined />
-          </div>
-        )}
         <div
           className={classNames(
-            `${baseClassName}-action-button`,
-            `${baseClassName}-delete-icon`,
+            `${baseClassName}-action-buttons`,
+            shouldShowDeleteIcon && `${baseClassName}-action-buttons-visible`,
           )}
-          onClick={handleDeleteClick}
-          onMouseDown={stopEditorMouseDown}
-          title={locale?.['table.deleteColumn'] || '删除整列'}
         >
-          <DeleteOutlined />
-        </div>
-        {/* 总是显示增加列的按钮 */}
-        {shouldShowInsertButtons && (
+          {/* 总是显示增加列的按钮 */}
+          {shouldShowInsertButtons && (
+            <div
+              className={classNames(
+                `${baseClassName}-action-button`,
+                `${baseClassName}-insert-column-before`,
+              )}
+              onClick={handleInsertColumnBefore}
+              onMouseDown={stopEditorMouseDown}
+              title={locale?.['table.insertColumnBefore'] || '在前面增加一列'}
+            >
+              <InsertRowLeftOutlined />
+            </div>
+          )}
           <div
             className={classNames(
               `${baseClassName}-action-button`,
-              `${baseClassName}-insert-column-after`,
+              `${baseClassName}-delete-icon`,
             )}
-            onClick={handleInsertColumnAfter}
+            onClick={handleDeleteClick}
             onMouseDown={stopEditorMouseDown}
-            title={locale?.['table.insertColumnAfter'] || '在后面增加一列'}
+            title={locale?.['table.deleteColumn'] || '删除整列'}
           >
-            <InsertRowRightOutlined />
+            <DeleteOutlined />
           </div>
-        )}
-      </div>
-    </td>
-  );
-});
+          {/* 总是显示增加列的按钮 */}
+          {shouldShowInsertButtons && (
+            <div
+              className={classNames(
+                `${baseClassName}-action-button`,
+                `${baseClassName}-insert-column-after`,
+              )}
+              onClick={handleInsertColumnAfter}
+              onMouseDown={stopEditorMouseDown}
+              title={locale?.['table.insertColumnAfter'] || '在后面增加一列'}
+            >
+              <InsertRowRightOutlined />
+            </div>
+          )}
+        </div>
+      </td>
+    );
+  },
+);
 
 TableCellIndexSpacer.displayName = 'TableCellIndexSpacer';

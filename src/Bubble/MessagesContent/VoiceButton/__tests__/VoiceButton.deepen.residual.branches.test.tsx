@@ -173,5 +173,4 @@ describe('VoiceButton deepen residual branches', () => {
     fireEvent.click(screen.getByLabelText('停止播报'));
     expect(stop).toHaveBeenCalled();
   });
-
 });

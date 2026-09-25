@@ -19,9 +19,7 @@ describe('CodeToolbar deepen residual branches', () => {
   it('空 language 不炸', async () => {
     const mod = await import('../CodeToolbar');
     const Comp =
-      (mod as any).CodeToolbar ||
-      (mod as any).default ||
-      Object.values(mod)[0];
+      (mod as any).CodeToolbar || (mod as any).default || Object.values(mod)[0];
     try {
       render(
         <Comp

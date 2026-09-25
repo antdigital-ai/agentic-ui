@@ -210,11 +210,7 @@ export const TaskList = memo(
       ? locale?.['taskList.collapse'] || '收起'
       : locale?.['taskList.expand'] || '展开';
 
-    const visibleItems = simpleExpanded
-      ? items
-      : lastItem
-        ? [lastItem]
-        : [];
+    const visibleItems = simpleExpanded ? items : lastItem ? [lastItem] : [];
 
     return (
       <div

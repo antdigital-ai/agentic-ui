@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { unwrapList } from '../unwrapList';
 import { decreaseListItemDepth } from '../decreaseListItemDepth';
+import { unwrapList } from '../unwrapList';
 
 vi.mock('../../lib', () => ({
   getListItems: vi.fn(() => []),

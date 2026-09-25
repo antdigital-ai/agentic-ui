@@ -1,6 +1,6 @@
 import { cleanup, renderHook } from '@testing-library/react';
-import { Editor } from 'slate';
 import { Subject } from 'rxjs';
+import { Editor } from 'slate';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useOnchange } from '../../../editor/plugins/useOnchange';
 
@@ -14,11 +14,13 @@ const mockRun = vi.fn();
 const mockSetDomRect = vi.fn();
 const mockParser = vi.fn(() => 'mock-md');
 const mockBumpFloatBarRevision = vi.fn();
-const mockSetRefreshFloatBar = vi.fn((updater?: boolean | ((prev: boolean) => boolean)) => {
-  if (typeof updater === 'function') {
-    updater(false);
-  }
-});
+const mockSetRefreshFloatBar = vi.fn(
+  (updater?: boolean | ((prev: boolean) => boolean)) => {
+    if (typeof updater === 'function') {
+      updater(false);
+    }
+  },
+);
 
 const selChange$ = new Subject<any>();
 

@@ -3,9 +3,9 @@
  */
 import '@testing-library/jest-dom';
 import { act, render, screen } from '@testing-library/react';
+import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ConfigProvider } from 'antd';
 import { TextSwap } from '../index';
 
 const renderSwap = (ui: React.ReactElement) =>
@@ -53,9 +53,7 @@ describe('TextSwap branches', () => {
     const original = window.matchMedia;
     // @ts-expect-error test stub
     window.matchMedia = undefined;
-    expect(() =>
-      renderSwap(<TextSwap swapKey="k">Z</TextSwap>),
-    ).not.toThrow();
+    expect(() => renderSwap(<TextSwap swapKey="k">Z</TextSwap>)).not.toThrow();
     window.matchMedia = original;
   });
 
@@ -73,15 +71,11 @@ describe('TextSwap branches', () => {
     vi.spyOn(window, 'matchMedia').mockImplementation(() => {
       throw new Error('unsupported');
     });
-    expect(() =>
-      renderSwap(<TextSwap swapKey="1">A</TextSwap>),
-    ).not.toThrow();
+    expect(() => renderSwap(<TextSwap swapKey="1">A</TextSwap>)).not.toThrow();
   });
 
   it('swapKey 变化触发交换动画 class', () => {
-    const { rerender } = renderSwap(
-      <TextSwap swapKey="a">One</TextSwap>,
-    );
+    const { rerender } = renderSwap(<TextSwap swapKey="a">One</TextSwap>);
     rerender(
       <TextSwap swapKey="b" durationMs={120}>
         Two

@@ -73,8 +73,8 @@ describe('getTableColWidths 额外分支', () => {
         },
       ],
     } as TableNode;
-    expect(
-      getReadonlyTableColWidths({ columnCount: 2, element }),
-    ).toHaveLength(2);
+    expect(getReadonlyTableColWidths({ columnCount: 2, element })).toHaveLength(
+      2,
+    );
   });
 });

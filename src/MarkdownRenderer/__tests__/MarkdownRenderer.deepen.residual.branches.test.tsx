@@ -19,9 +19,7 @@ describe('MarkdownRenderer deepen residual branches', () => {
   });
 
   it('省略 streaming：默认 false 仍渲染', () => {
-    const { container } = render(
-      <MarkdownRenderer content="hello world" />,
-    );
+    const { container } = render(<MarkdownRenderer content="hello world" />);
     expect(container.textContent).toContain('hello');
   });
 });

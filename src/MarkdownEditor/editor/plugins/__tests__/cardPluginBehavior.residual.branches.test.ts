@@ -64,5 +64,4 @@ describe('cardPluginBehavior residual branches', () => {
     expect(safeParentPath(null as any)).toBeNull();
     expect(safeGetNode(editor, null)).toBeNull();
   });
-
 });

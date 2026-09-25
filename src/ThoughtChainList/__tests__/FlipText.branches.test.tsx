@@ -21,9 +21,7 @@ describe('FlipText 分支覆盖', () => {
     const { unmount } = render(<FlipText word="A" />);
     unmount();
     render(<FlipText word="B" />);
-    const styles = document.querySelectorAll(
-      '#agentic-ui-flip-text-keyframes',
-    );
+    const styles = document.querySelectorAll('#agentic-ui-flip-text-keyframes');
     // useEffect 在 test 环境仍会注入；幂等保证最多 1 个
     expect(styles.length).toBeLessThanOrEqual(1);
   });

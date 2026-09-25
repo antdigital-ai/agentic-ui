@@ -43,9 +43,7 @@ describe('useStreaming deepen2 residual branches', () => {
   });
 
   it('表格双空行提前结束 incomplete', () => {
-    const { result } = renderHook(() =>
-      useStreaming('| H |\n\n| --- |', true),
-    );
+    const { result } = renderHook(() => useStreaming('| H |\n\n| --- |', true));
     expect(result.current).toContain('| H |');
   });
 

@@ -43,7 +43,9 @@ describe('AceEditorWrapper deepen safe residual branches', () => {
     mockState.editor.getValue.mockReturnValue('same');
     mockState.ace.edit.mockClear();
     mockState.ace.edit.mockReturnValue(mockState.editor);
-    Object.keys(mockState.handlers).forEach((k) => delete mockState.handlers[k]);
+    Object.keys(mockState.handlers).forEach(
+      (k) => delete mockState.handlers[k],
+    );
     vi.useFakeTimers({ shouldAdvanceTime: true });
   });
 

@@ -93,10 +93,9 @@ describe('useOnchange deepen2 residual branches', () => {
     const { result } = renderHook(() =>
       useOnchange(onChange, { wait: 0, selectionTrackingEnabled: false }),
     );
-    result.current(
-      [{ type: 'paragraph', children: [{ text: 'AB' }] }] as any,
-      [{ type: 'insert_text', text: 'B' } as any],
-    );
+    result.current([{ type: 'paragraph', children: [{ text: 'AB' }] }] as any, [
+      { type: 'insert_text', text: 'B' } as any,
+    ]);
     expect(onChange).toHaveBeenCalled();
   });
 

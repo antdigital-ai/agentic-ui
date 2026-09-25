@@ -23,10 +23,7 @@ describe('LanguageSelector deepen residual branches', () => {
       Object.values(mod)[0];
     try {
       render(
-        <Comp
-          element={{ language: undefined } as any}
-          setNode={vi.fn()}
-        />,
+        <Comp element={{ language: undefined } as any} setNode={vi.fn()} />,
       );
     } catch {
       /* ok */

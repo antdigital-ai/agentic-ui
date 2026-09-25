@@ -203,10 +203,7 @@ describe('AreaChart 额外覆盖用例', () => {
 
   it('theme dark', () => {
     render(
-      <AreaChart
-        data={[{ x: '2024-01', y: 1, type: 'A' }]}
-        theme="dark"
-      />,
+      <AreaChart data={[{ x: '2024-01', y: 1, type: 'A' }]} theme="dark" />,
     );
     expect(screen.getByTestId('line-chart')).toBeInTheDocument();
   });

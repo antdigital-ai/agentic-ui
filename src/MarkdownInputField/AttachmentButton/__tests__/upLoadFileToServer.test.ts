@@ -340,8 +340,7 @@ describe('upLoadFileToServer - Map identity and count guards', () => {
       maxFileCount: 0,
       onExceedMaxCount,
       locale: {
-        'markdownInput.maxFileCountExceeded':
-          'limit is ${maxFileCount} files',
+        'markdownInput.maxFileCountExceeded': 'limit is ${maxFileCount} files',
       } as any,
     });
 

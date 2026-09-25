@@ -33,37 +33,54 @@ describe('ContentFilemapView 分支覆盖', () => {
   });
 
   it('json5 解析失败时 partialParse 成功仍渲染', () => {
-    const body = "{fileList: [{name: 'a.png', uuid: 'u1', url: 'https://x.com/a.png'}]}";
+    const body =
+      "{fileList: [{name: 'a.png', uuid: 'u1', url: 'https://x.com/a.png'}]}";
     render(<ContentFilemapView blocks={[makeBlock(body)]} placement="left" />);
     expect(screen.getByTestId('file-view-list')).toBeInTheDocument();
   });
 
   it('json5 与 partialParse 均失败时不渲染', () => {
     const { container } = render(
-      <ContentFilemapView blocks={[makeBlock('<<<not-json>>>')]} placement="left" />,
+      <ContentFilemapView
+        blocks={[makeBlock('<<<not-json>>>')]}
+        placement="left"
+      />,
     );
-    expect(container.querySelector('[data-testid="file-view-list"]')).toBeNull();
+    expect(
+      container.querySelector('[data-testid="file-view-list"]'),
+    ).toBeNull();
   });
 
   it('defaultHandlers.onPreview 有 previewUrl 时 window.open', () => {
     const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
-    render(<ContentFilemapView blocks={[makeBlock(validBody)]} placement="left" />);
+    render(
+      <ContentFilemapView blocks={[makeBlock(validBody)]} placement="left" />,
+    );
     (lastFileMapViewProps.onPreview as (f: { previewUrl: string }) => void)({
       previewUrl: 'https://example.com/preview',
     });
-    expect(openSpy).toHaveBeenCalledWith('https://example.com/preview', '_blank');
+    expect(openSpy).toHaveBeenCalledWith(
+      'https://example.com/preview',
+      '_blank',
+    );
   });
 
   it('defaultHandlers.onPreview 无 url 时不调用 window.open', () => {
     const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
-    render(<ContentFilemapView blocks={[makeBlock(validBody)]} placement="left" />);
+    render(
+      <ContentFilemapView blocks={[makeBlock(validBody)]} placement="left" />,
+    );
     openSpy.mockClear();
-    (lastFileMapViewProps.onPreview as (f: Record<string, unknown>) => void)({});
+    (lastFileMapViewProps.onPreview as (f: Record<string, unknown>) => void)(
+      {},
+    );
     expect(openSpy).not.toHaveBeenCalled();
   });
 
   it('defaultHandlers.onDownload 有 url 时创建 a 标签下载', () => {
-    render(<ContentFilemapView blocks={[makeBlock(validBody)]} placement="left" />);
+    render(
+      <ContentFilemapView blocks={[makeBlock(validBody)]} placement="left" />,
+    );
     const click = vi.fn();
     const link = { href: '', download: '', click } as HTMLAnchorElement;
     const createSpy = vi
@@ -76,7 +93,12 @@ describe('ContentFilemapView 分支覆盖', () => {
       .spyOn(document.body, 'removeChild')
       .mockImplementation(() => link);
 
-    (lastFileMapViewProps.onDownload as (f: { url: string; name: string }) => void)({
+    (
+      lastFileMapViewProps.onDownload as (f: {
+        url: string;
+        name: string;
+      }) => void
+    )({
       url: 'https://example.com/file.pdf',
       name: 'file.pdf',
     });
@@ -91,10 +113,14 @@ describe('ContentFilemapView 分支覆盖', () => {
   });
 
   it('defaultHandlers.onDownload 无 url 时不创建链接', () => {
-    render(<ContentFilemapView blocks={[makeBlock(validBody)]} placement="left" />);
+    render(
+      <ContentFilemapView blocks={[makeBlock(validBody)]} placement="left" />,
+    );
     const createSpy = vi.spyOn(document, 'createElement');
     createSpy.mockClear();
-    (lastFileMapViewProps.onDownload as (f: Record<string, unknown>) => void)({});
+    (lastFileMapViewProps.onDownload as (f: Record<string, unknown>) => void)(
+      {},
+    );
     expect(createSpy).not.toHaveBeenCalled();
     createSpy.mockRestore();
   });
@@ -133,9 +159,9 @@ describe('ContentFilemapView 分支覆盖', () => {
     });
     render(<ContentFilemapView blocks={[makeBlock(body)]} placement="left" />);
     expect(lastFileMapViewProps.fileMap).toBeInstanceOf(Map);
-    expect((lastFileMapViewProps.fileMap as Map<string, unknown>).has('file-0')).toBe(
-      true,
-    );
+    expect(
+      (lastFileMapViewProps.fileMap as Map<string, unknown>).has('file-0'),
+    ).toBe(true);
   });
 
   it('parsed className 优先于 fileViewConfig.className', () => {
@@ -198,10 +224,7 @@ describe('ContentFilemapView 分支覆盖', () => {
     );
     expect(container).toBeEmptyDOMElement();
     rerender(
-      <ContentFilemapView
-        blocks={[makeBlock(validBody)]}
-        placement="right"
-      />,
+      <ContentFilemapView blocks={[makeBlock(validBody)]} placement="right" />,
     );
     expect(screen.getByTestId('file-view-list')).toBeInTheDocument();
   });

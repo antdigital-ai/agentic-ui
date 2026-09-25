@@ -54,7 +54,9 @@ describe('env 分支覆盖', () => {
   });
 
   it('getDeviceBrand iPhone UA', () => {
-    expect(getDeviceBrand('Mozilla/5.0 (iPhone; CPU iPhone OS)')).toBe('iphone');
+    expect(getDeviceBrand('Mozilla/5.0 (iPhone; CPU iPhone OS)')).toBe(
+      'iphone',
+    );
   });
 
   it('getDeviceBrand 华为 UA', () => {

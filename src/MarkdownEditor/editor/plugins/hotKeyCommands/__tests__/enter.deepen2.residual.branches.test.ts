@@ -70,9 +70,7 @@ describe('EnterKey deepen2 residual branches', () => {
 
   it('IME composing / 无 selection 早退', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: 'a' }] },
-    ] as any;
+    editor.children = [{ type: 'paragraph', children: [{ text: 'a' }] }] as any;
     editor.selection = null;
     expect(() => make(editor).run(evt())).not.toThrow();
 

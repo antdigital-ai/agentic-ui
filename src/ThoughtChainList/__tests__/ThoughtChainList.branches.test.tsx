@@ -37,12 +37,7 @@ vi.mock('../DotAni', () => ({
 }));
 
 vi.mock('../../Components/ActionIconBox', () => ({
-  ActionIconBox: ({
-    children,
-    onClick,
-    title,
-    'data-testid': testId,
-  }: any) => (
+  ActionIconBox: ({ children, onClick, title, 'data-testid': testId }: any) => (
     <button
       type="button"
       data-testid={testId || 'action-icon-box'}
@@ -246,7 +241,15 @@ describe('ThoughtChainList 分支覆盖', () => {
             category: 'RagRetrieval',
             meta: {
               data: {
-                kb: [{ name: '知识库A', icon: '', uuid: '1', type: 'doc', description: 'd' }],
+                kb: [
+                  {
+                    name: '知识库A',
+                    icon: '',
+                    uuid: '1',
+                    type: 'doc',
+                    description: 'd',
+                  },
+                ],
               },
             },
           }),

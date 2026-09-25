@@ -3,7 +3,13 @@
  * type 缺省 label、tooltip q1 空、SSR window、resize。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import BoxPlotChart from '../index';
@@ -141,7 +147,9 @@ describe('BoxPlotChart deepen2 residual branches', () => {
     const lines = labelFn({
       raw: { min: 1, median: 3, q3: 4, max: 5 },
     });
-    expect(Array.isArray(lines) ? lines.join(' ') : String(lines)).toMatch(/Q1/);
+    expect(Array.isArray(lines) ? lines.join(' ') : String(lines)).toMatch(
+      /Q1/,
+    );
     expect(labelFn({ raw: null })).toBe('');
   });
 

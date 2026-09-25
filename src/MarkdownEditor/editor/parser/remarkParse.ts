@@ -1,9 +1,9 @@
+import type { Root } from 'mdast';
 import remarkFrontmatter from 'remark-frontmatter';
 import remarkGfm from 'remark-gfm';
 import remarkHtml from 'remark-html';
 import remarkMath from 'remark-math';
 import remarkParse from 'remark-parse';
-import type { Root } from 'mdast';
 import type { Processor } from 'unified';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';

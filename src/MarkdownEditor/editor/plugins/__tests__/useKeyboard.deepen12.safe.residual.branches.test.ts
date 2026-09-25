@@ -135,9 +135,15 @@ describe('useKeyboard deepen12 safe residual branches', () => {
 
   it('Ace 输入目标早退', () => {
     aceTarget.isCodeBlockAceInputTarget.mockReturnValue(true);
-    const editor = makeEditor([{ type: 'paragraph', children: [{ text: 'x' }] }]);
+    const editor = makeEditor([
+      { type: 'paragraph', children: [{ text: 'x' }] },
+    ]);
     const { result } = renderHook(() =>
-      useKeyboard({ inputComposition: false } as any, { current: editor }, {} as any),
+      useKeyboard(
+        { inputComposition: false } as any,
+        { current: editor },
+        {} as any,
+      ),
     );
     const e = keyEvent({ key: 'a' });
     result.current(e);
@@ -147,10 +153,17 @@ describe('useKeyboard deepen12 safe residual branches', () => {
   it('lists backspace 消费后 return', () => {
     lists.handleListsOnBackspace.mockReturnValue(true);
     const editor = makeEditor([
-      { type: 'list', children: [{ type: 'list-item', children: [{ text: 'x' }] }] },
+      {
+        type: 'list',
+        children: [{ type: 'list-item', children: [{ text: 'x' }] }],
+      },
     ]);
     const { result } = renderHook(() =>
-      useKeyboard({ inputComposition: false } as any, { current: editor }, {} as any),
+      useKeyboard(
+        { inputComposition: false } as any,
+        { current: editor },
+        {} as any,
+      ),
     );
     const e = keyEvent({ key: 'Backspace' });
     result.current(e);

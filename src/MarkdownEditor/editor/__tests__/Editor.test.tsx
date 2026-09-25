@@ -13,7 +13,6 @@ import { HistoryEditor, withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { I18nContext } from '../../../I18n';
-import { DEFAULT_EDITOR_PLACEHOLDER } from '../utils/resolveEditorPlaceholder';
 import {
   CodeNode,
   ElementProps,
@@ -26,10 +25,11 @@ import type { MarkdownEditorProps } from '../../types';
 import { SlateMarkdownEditor } from '../Editor';
 import * as handlePasteModule from '../plugins/handlePaste';
 import { EditorStore, EditorStoreContext } from '../store';
-import { createEditorSelChangeSubject } from '../utils/editorSelChange';
 import type { KeyboardTask, Methods } from '../utils';
+import { createEditorSelChangeSubject } from '../utils/editorSelChange';
 import * as editorUtilsModule from '../utils/editorUtils';
 import { EditorUtils } from '../utils/editorUtils';
+import { DEFAULT_EDITOR_PLACEHOLDER } from '../utils/resolveEditorPlaceholder';
 
 describe('SlateMarkdownEditor', () => {
   let mockInstance: MarkdownEditorInstance;
@@ -210,39 +210,39 @@ describe('SlateMarkdownEditor', () => {
               language: 'zh-CN',
             }}
           >
-          <div ref={containerRef} data-testid="editor-wrapper">
-            <EditorStoreContext.Provider value={contextValue}>
-              <PluginContext.Provider value={props.plugins || []}>
-                <SlateMarkdownEditor
-                  prefixCls="ant-agentic-md-editor"
-                  instance={mockInstance}
-                  initSchemaValue={props.initSchemaValue}
-                  plugins={props.plugins}
-                  eleItemRender={props.eleItemRender}
-                  placeholder={props.placeholder}
-                  reportMode={props.reportMode}
-                  readonly={props.readonly}
-                  onSelectionChange={props.onSelectionChange}
-                  comment={props.comment}
-                  tableConfig={props.tableConfig}
-                  fncProps={props.fncProps}
-                  pasteConfig={props.pasteConfig}
-                  onPaste={props.onPaste}
-                  lazy={props.lazy}
-                  leafRender={props.leafRender}
-                  typewriter={props.typewriter}
-                  onFocus={props.onFocus}
-                  onBlur={props.onBlur}
-                  tagInputProps={props.tagInputProps}
-                  floatBar={props.floatBar}
-                  textAreaProps={props.textAreaProps}
-                  className={props.className}
-                  style={props.style}
-                  compact={props.compact}
-                />
-              </PluginContext.Provider>
-            </EditorStoreContext.Provider>
-          </div>
+            <div ref={containerRef} data-testid="editor-wrapper">
+              <EditorStoreContext.Provider value={contextValue}>
+                <PluginContext.Provider value={props.plugins || []}>
+                  <SlateMarkdownEditor
+                    prefixCls="ant-agentic-md-editor"
+                    instance={mockInstance}
+                    initSchemaValue={props.initSchemaValue}
+                    plugins={props.plugins}
+                    eleItemRender={props.eleItemRender}
+                    placeholder={props.placeholder}
+                    reportMode={props.reportMode}
+                    readonly={props.readonly}
+                    onSelectionChange={props.onSelectionChange}
+                    comment={props.comment}
+                    tableConfig={props.tableConfig}
+                    fncProps={props.fncProps}
+                    pasteConfig={props.pasteConfig}
+                    onPaste={props.onPaste}
+                    lazy={props.lazy}
+                    leafRender={props.leafRender}
+                    typewriter={props.typewriter}
+                    onFocus={props.onFocus}
+                    onBlur={props.onBlur}
+                    tagInputProps={props.tagInputProps}
+                    floatBar={props.floatBar}
+                    textAreaProps={props.textAreaProps}
+                    className={props.className}
+                    style={props.style}
+                    compact={props.compact}
+                  />
+                </PluginContext.Provider>
+              </EditorStoreContext.Provider>
+            </div>
           </I18nContext.Provider>
         </ConfigProvider>,
       ),
@@ -641,7 +641,9 @@ describe('SlateMarkdownEditor', () => {
         initSchemaValue: [
           {
             type: 'paragraph',
-            children: [{ text: '', tag: true } as { text: string; tag: boolean }],
+            children: [
+              { text: '', tag: true } as { text: string; tag: boolean },
+            ],
           } as ParagraphNode,
         ],
       });

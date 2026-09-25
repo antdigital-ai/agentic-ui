@@ -41,9 +41,9 @@ describe('LanguageSelector residual branches', () => {
       />,
     );
     // Popover open — search input appears
-    const input = await screen.findByPlaceholderText(/Search|搜索|lang/i).catch(
-      () => screen.queryByRole('textbox'),
-    );
+    const input = await screen
+      .findByPlaceholderText(/Search|搜索|lang/i)
+      .catch(() => screen.queryByRole('textbox'));
     if (input) {
       fireEvent.change(input, { target: { value: 'py' } });
     }

@@ -34,7 +34,11 @@ vi.mock('antd', () => ({
   ),
   Divider: () => <span data-testid="divider">|</span>,
   Tooltip: ({ children, title, open }: any) => (
-    <div data-testid="tooltip" data-title={String(title ?? '')} data-open={open}>
+    <div
+      data-testid="tooltip"
+      data-title={String(title ?? '')}
+      data-open={open}
+    >
       {children}
     </div>
   ),
@@ -72,8 +76,8 @@ vi.mock('../hooks/useTextOverflow', () => ({
   })),
 }));
 
-import { useTextOverflow } from '../hooks/useTextOverflow';
 import { HistoryItem } from '../components/HistoryItem';
+import { useTextOverflow } from '../hooks/useTextOverflow';
 
 const baseItem = {
   sessionId: 's12',

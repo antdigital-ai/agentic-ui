@@ -10,7 +10,9 @@ vi.mock('../../Bubble', () => ({
   Bubble: ({ originData, placement }: any) => (
     <div
       data-testid={
-        placement === 'right' ? `user-${originData?.id}` : `ai-${originData?.id}`
+        placement === 'right'
+          ? `user-${originData?.id}`
+          : `ai-${originData?.id}`
       }
     >
       {originData?.content}

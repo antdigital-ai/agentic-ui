@@ -381,7 +381,10 @@ describe('PureBubble', () => {
       extra: {},
     },
     bubbleRenderConfig: {
-      render: (_props: unknown, slots: { extra?: React.ReactNode; messageContent?: React.ReactNode }) => (
+      render: (
+        _props: unknown,
+        slots: { extra?: React.ReactNode; messageContent?: React.ReactNode },
+      ) => (
         <div data-testid="pure-bubble-render">
           {slots.messageContent}
           {slots.extra}

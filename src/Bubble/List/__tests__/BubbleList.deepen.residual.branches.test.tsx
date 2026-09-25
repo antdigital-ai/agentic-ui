@@ -9,15 +9,12 @@ import { BubbleConfigContext } from '../../BubbleConfigProvide';
 import { LOADING_FLAT } from '../../MessagesContent';
 
 vi.mock('../../Bubble', () => ({
-  Bubble: ({
-    originData,
-    placement,
-    markdownRenderConfig,
-    deps,
-  }: any) => (
+  Bubble: ({ originData, placement, markdownRenderConfig, deps }: any) => (
     <div
       data-testid={
-        placement === 'right' ? `user-${originData?.id}` : `ai-${originData?.id}`
+        placement === 'right'
+          ? `user-${originData?.id}`
+          : `ai-${originData?.id}`
       }
       data-render-mode={markdownRenderConfig?.renderMode}
       data-deps-len={deps?.length ?? 0}
@@ -27,17 +24,19 @@ vi.mock('../../Bubble', () => ({
   ),
 }));
 
-const lazyElementSpy = vi.fn(({ children, renderPlaceholder, elementInfo }: any) => {
-  if (renderPlaceholder) {
-    renderPlaceholder({
-      height: 100,
-      style: {},
-      isIntersecting: false,
-      elementInfo,
-    });
-  }
-  return <div data-testid="lazy-wrap">{children}</div>;
-});
+const lazyElementSpy = vi.fn(
+  ({ children, renderPlaceholder, elementInfo }: any) => {
+    if (renderPlaceholder) {
+      renderPlaceholder({
+        height: 100,
+        style: {},
+        isIntersecting: false,
+        elementInfo,
+      });
+    }
+    return <div data-testid="lazy-wrap">{children}</div>;
+  },
+);
 
 vi.mock('../../../MarkdownEditor/editor/components/LazyElement', () => ({
   LazyElement: (props: any) => lazyElementSpy(props),
@@ -70,16 +69,22 @@ describe('BubbleList deepen residual branches', () => {
 
   it('isLoading 渲染 SkeletonList；legacy loading 兼容', () => {
     const { rerender } = render(<BubbleList bubbleList={[]} isLoading />);
-    expect(document.querySelector('.ant-agentic-bubble-list-loading')).toBeTruthy();
+    expect(
+      document.querySelector('.ant-agentic-bubble-list-loading'),
+    ).toBeTruthy();
 
     rerender(<BubbleList bubbleList={[]} loading />);
-    expect(document.querySelector('.ant-agentic-bubble-list-loading')).toBeTruthy();
+    expect(
+      document.querySelector('.ant-agentic-bubble-list-loading'),
+    ).toBeTruthy();
   });
 
   it('BubbleConfigContext 合并 extraShowOnHover；compact readonly 类名', () => {
     render(
       <BubbleConfigContext.Provider
-        value={{ standalone: true, compact: true, extraShowOnHover: true } as any}
+        value={
+          { standalone: true, compact: true, extraShowOnHover: true } as any
+        }
       >
         <BubbleList
           bubbleList={[{ id: '1', role: 'user', content: 'u' } as any]}
@@ -134,7 +139,12 @@ describe('BubbleList deepen residual branches', () => {
     const { rerender } = render(
       <BubbleList
         bubbleList={[
-          { id: LOADING_FLAT, role: 'assistant', content: '', createAt: 99 } as any,
+          {
+            id: LOADING_FLAT,
+            role: 'assistant',
+            content: '',
+            createAt: 99,
+          } as any,
         ]}
       />,
     );
@@ -143,7 +153,12 @@ describe('BubbleList deepen residual branches', () => {
     rerender(
       <BubbleList
         bubbleList={[
-          { id: 'real-1', role: 'assistant', content: 'done', createAt: 99 } as any,
+          {
+            id: 'real-1',
+            role: 'assistant',
+            content: 'done',
+            createAt: 99,
+          } as any,
         ]}
       />,
     );
@@ -154,21 +169,36 @@ describe('BubbleList deepen residual branches', () => {
     const { rerender } = render(
       <BubbleList
         bubbleList={[
-          { id: LOADING_FLAT, role: 'assistant', content: '', createAt: 1 } as any,
+          {
+            id: LOADING_FLAT,
+            role: 'assistant',
+            content: '',
+            createAt: 1,
+          } as any,
         ]}
       />,
     );
     rerender(
       <BubbleList
         bubbleList={[
-          { id: 'stable-id', role: 'assistant', content: 'x', createAt: 1 } as any,
+          {
+            id: 'stable-id',
+            role: 'assistant',
+            content: 'x',
+            createAt: 1,
+          } as any,
         ]}
       />,
     );
     rerender(
       <BubbleList
         bubbleList={[
-          { id: 'stable-id', role: 'assistant', content: 'y', createAt: 1 } as any,
+          {
+            id: 'stable-id',
+            role: 'assistant',
+            content: 'y',
+            createAt: 1,
+          } as any,
         ]}
       />,
     );

@@ -20,9 +20,7 @@ const mockCreateSandbox = vi.hoisted(() =>
     destroy: mockSandboxDestroy,
   })),
 );
-const mockTemplateRender = vi.hoisted(() =>
-  vi.fn((tpl: string) => tpl),
-);
+const mockTemplateRender = vi.hoisted(() => vi.fn((tpl: string) => tpl));
 
 vi.mock('../../validator', () => ({
   mdDataSchemaValidator: {
@@ -146,11 +144,7 @@ describe('SchemaRenderer deepen9 safe residual branches', () => {
       error: 'boom',
     });
     render(
-      <SchemaRenderer
-        schema={baseSchema()}
-        values={{ name: 'a' }}
-        debug
-      />,
+      <SchemaRenderer schema={baseSchema()} values={{ name: 'a' }} debug />,
     );
     await flush();
     expect(document.body).toBeTruthy();

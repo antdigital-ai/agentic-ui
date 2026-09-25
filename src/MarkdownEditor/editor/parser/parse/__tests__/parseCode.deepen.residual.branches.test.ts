@@ -22,7 +22,9 @@ describe('parseCode deepen residual branches', () => {
       'agentic-ui-task',
     );
     expect(handleCode({ value: '{', lang: 'schema' }).type).toBe('apaasify');
-    expect(handleCode({ value: '{', lang: 'agentic-ui-filemap' }).value).toBeTruthy();
+    expect(
+      handleCode({ value: '{', lang: 'agentic-ui-filemap' }).value,
+    ).toBeTruthy();
     spy.mockRestore();
   });
 

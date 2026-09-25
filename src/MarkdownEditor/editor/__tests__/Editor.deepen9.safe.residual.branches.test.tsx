@@ -159,6 +159,7 @@ vi.mock('../utils/htmlToMarkdown', async (importOriginal) => {
 });
 
 import { Editor } from 'slate';
+import { isWeChat } from '../../../Utils/env';
 import { SlateMarkdownEditor } from '../Editor';
 import {
   EditorUtils,
@@ -166,7 +167,6 @@ import {
   getSelectionFromDomSelection,
   isPath,
 } from '../utils/editorUtils';
-import { isWeChat } from '../../../Utils/env';
 
 function setupStore(overrides: Record<string, any> = {}) {
   const editor = {
@@ -191,7 +191,9 @@ function setupStore(overrides: Record<string, any> = {}) {
       },
     ],
     operations: [],
-    getFragment: vi.fn(() => [{ type: 'paragraph', children: [{ text: 'ab' }] }]),
+    getFragment: vi.fn(() => [
+      { type: 'paragraph', children: [{ text: 'ab' }] },
+    ]),
   };
   const container = document.createElement('div');
   const editable = document.createElement('div');

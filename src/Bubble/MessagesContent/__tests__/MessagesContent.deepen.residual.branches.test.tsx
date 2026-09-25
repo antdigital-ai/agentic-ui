@@ -42,9 +42,7 @@ vi.mock('../DocInfo', () => ({
 }));
 
 vi.mock('../EXCEPTION', () => ({
-  EXCEPTION: ({ content }: any) => (
-    <div data-testid="exception">{content}</div>
-  ),
+  EXCEPTION: ({ content }: any) => <div data-testid="exception">{content}</div>,
 }));
 
 const base = {
@@ -86,7 +84,9 @@ describe('MessagesContent deepen residual branches', () => {
         />
       </BubbleConfigContext.Provider>,
     );
-    expect(container.querySelector('[data-testid="message-content"]')).toBeNull();
+    expect(
+      container.querySelector('[data-testid="message-content"]'),
+    ).toBeNull();
   });
 
   it('EXCEPTION answerStatus；placement=left 才走 EXCEPTION', () => {

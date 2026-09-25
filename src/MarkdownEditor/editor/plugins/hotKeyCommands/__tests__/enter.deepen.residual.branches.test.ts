@@ -258,10 +258,7 @@ describe('EnterKey deepen residual branches', () => {
   it('paragraph：IME / 空串 / 非末尾', () => {
     const editor = createEditor();
     const key = make(editor);
-    const node = [
-      { type: 'paragraph', children: [{ text: 'x' }] },
-      [0],
-    ] as any;
+    const node = [{ type: 'paragraph', children: [{ text: 'x' }] }, [0]] as any;
     const sel = {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [0, 0], offset: 0 },
@@ -283,7 +280,9 @@ describe('EnterKey deepen residual branches', () => {
   it('普通 paragraph 走 insertBreak；store.editor 缺失安全', () => {
     const editor = createEditor();
     editor.insertBreak = vi.fn();
-    editor.children = [{ type: 'paragraph', children: [{ text: 'ab' }] }] as any;
+    editor.children = [
+      { type: 'paragraph', children: [{ text: 'ab' }] },
+    ] as any;
     editor.selection = {
       anchor: { path: [0, 0], offset: 1 },
       focus: { path: [0, 0], offset: 1 },
@@ -291,9 +290,12 @@ describe('EnterKey deepen residual branches', () => {
     make(editor).run(evt());
     expect(editor.insertBreak).toHaveBeenCalled();
 
-    const key = new EnterKey({ editor: undefined } as any, {
-      range: vi.fn(),
-    } as any);
+    const key = new EnterKey(
+      { editor: undefined } as any,
+      {
+        range: vi.fn(),
+      } as any,
+    );
     expect(key.editor).toBeUndefined();
   });
 

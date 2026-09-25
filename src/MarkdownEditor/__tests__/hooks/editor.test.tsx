@@ -9,8 +9,8 @@ import {
   withReact,
 } from 'slate-react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createEditorSelChangeSubject } from '../../editor/utils/editorSelChange';
 import { EditorStore, EditorStoreContext } from '../../editor/store';
+import { createEditorSelChangeSubject } from '../../editor/utils/editorSelChange';
 import { useMEditor, useSelStatus } from '../../hooks/editor';
 
 describe('MarkdownEditor hooks/editor', () => {

@@ -66,10 +66,7 @@ describe('useHighlight deepen5 residual branches', () => {
     expect(
       ranges.some(
         (r: any) =>
-          r.jinjaFilter ||
-          r.jinjaString ||
-          r.jinjaDelimiter ||
-          r.jinjaKeyword,
+          r.jinjaFilter || r.jinjaString || r.jinjaDelimiter || r.jinjaKeyword,
       ),
     ).toBe(true);
   });
@@ -113,11 +110,16 @@ describe('useHighlight deepen5 residual branches', () => {
     expect(first.length).toBeGreaterThan(0);
     cacheTextNode.set(node, {
       path: [1],
-      range: [{ anchor: { path: [1, 0], offset: 0 }, focus: { path: [1, 0], offset: 1 } }],
+      range: [
+        {
+          anchor: { path: [1, 0], offset: 0 },
+          focus: { path: [1, 0], offset: 1 },
+        },
+      ],
     });
     const second = decorate([node, [0]]);
-    expect(second.some((r: any) => r.jinjaDelimiter || r.jinjaVariableName)).toBe(
-      true,
-    );
+    expect(
+      second.some((r: any) => r.jinjaDelimiter || r.jinjaVariableName),
+    ).toBe(true);
   });
 });

@@ -33,7 +33,9 @@ describe('FileTreeComponent deepen12 safe residual branches', () => {
   });
 
   it('load 早退：未知 key / isLeaf / 已有 children', async () => {
-    const onLoad = vi.fn(async () => [{ key: 'c', name: 'c.txt', isLeaf: true }]);
+    const onLoad = vi.fn(async () => [
+      { key: 'c', name: 'c.txt', isLeaf: true },
+    ]);
     const { container, rerender } = render(
       <Wrapper>
         <FileTree
@@ -61,7 +63,11 @@ describe('FileTreeComponent deepen12 safe residual branches', () => {
 
     rerender(
       <Wrapper>
-        <FileTree treeData={[]} onLoadChildren={onLoad} filterKeyword={undefined} />
+        <FileTree
+          treeData={[]}
+          onLoadChildren={onLoad}
+          filterKeyword={undefined}
+        />
       </Wrapper>,
     );
     expect(container).toBeTruthy();
@@ -110,7 +116,9 @@ describe('FileTreeComponent deepen12 safe residual branches', () => {
           onPreview={onPreview}
           onDownload={vi.fn()}
           resolveTreeLeafFileOptions={{
-            fileNodeByRelativePath: new Map([['syn.md', { id: '1', name: 'syn.md' } as any]]),
+            fileNodeByRelativePath: new Map([
+              ['syn.md', { id: '1', name: 'syn.md' } as any],
+            ]),
           }}
         />
       </Wrapper>,

@@ -114,9 +114,7 @@ describe('MarkdownPreview branches', () => {
   it('extraShowOnHover + extra + 非 typing 时 Popover', async () => {
     const user = userEvent.setup();
     render(
-      <BubbleConfigContext.Provider
-        value={{ extraShowOnHover: true } as any}
-      >
+      <BubbleConfigContext.Provider value={{ extraShowOnHover: true } as any}>
         <MarkdownPreview
           {...baseProps({
             extra: <span data-testid="hover-extra">Hover</span>,
@@ -131,9 +129,7 @@ describe('MarkdownPreview branches', () => {
 
   it('extraShowOnHover 但 typing 时不包 Popover', () => {
     render(
-      <BubbleConfigContext.Provider
-        value={{ extraShowOnHover: true } as any}
-      >
+      <BubbleConfigContext.Provider value={{ extraShowOnHover: true } as any}>
         <MarkdownPreview
           {...baseProps({
             extra: <span>E</span>,

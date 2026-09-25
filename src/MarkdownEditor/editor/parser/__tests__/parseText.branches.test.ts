@@ -37,10 +37,9 @@ describe('parseText 分支覆盖', () => {
   });
 
   it('applyHtmlTagsToElement mark 带 markColor/markBg/markLabel', () => {
-    const result = applyHtmlTagsToElement(
-      { text: 'hi' },
-      [{ tag: 'mark', markColor: 'red', markBg: 'yellow', markLabel: '@' }],
-    );
+    const result = applyHtmlTagsToElement({ text: 'hi' }, [
+      { tag: 'mark', markColor: 'red', markBg: 'yellow', markLabel: '@' },
+    ]);
     expect(result).toMatchObject({
       text: 'hi',
       mark: true,
@@ -56,13 +55,10 @@ describe('parseText 分支覆盖', () => {
   });
 
   it('applyHtmlTagsToElement font 带 color 与 span color 叠加 highColor', () => {
-    const result = applyHtmlTagsToElement(
-      { text: 'x' },
-      [
-        { tag: 'font', color: '#111' },
-        { tag: 'span', color: '#222' },
-      ],
-    );
+    const result = applyHtmlTagsToElement({ text: 'x' }, [
+      { tag: 'font', color: '#111' },
+      { tag: 'span', color: '#222' },
+    ]);
     expect(result.color).toBe('#111');
     expect(result.highColor).toBe('#222');
   });
@@ -181,7 +177,9 @@ describe('parseText 分支覆盖', () => {
 
   it('strong/emphasis/delete 空 children 保留格式空文本', () => {
     expect(
-      parseText([{ type: 'strong', children: [] } as any], { bold: true } as any),
+      parseText([{ type: 'strong', children: [] } as any], {
+        bold: true,
+      } as any),
     ).toEqual([expect.objectContaining({ bold: true, text: '' })]);
     expect(
       parseText([{ type: 'emphasis', children: [] } as any], {
@@ -239,12 +237,7 @@ describe('parseText 分支覆盖', () => {
       ),
     ).toMatchObject({ text: 'hi' });
     expect(
-      handleTextAndInlineElementsPure(
-        { type: 'break' },
-        [],
-        (l) => l,
-        vi.fn(),
-      ),
+      handleTextAndInlineElementsPure({ type: 'break' }, [], (l) => l, vi.fn()),
     ).toMatchObject({ text: '\n' });
     expect(
       handleTextAndInlineElementsPure(

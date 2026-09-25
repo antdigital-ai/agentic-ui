@@ -117,15 +117,15 @@ describe('ProxySandbox deepen2 residual branches', () => {
   it('validateCode：危险模式与 critical forbidden', () => {
     sandbox = new ProxySandbox({ timeout: 300 });
     expect(() => (sandbox as any).validateCode('eval(1)')).toThrow(/dangerous/);
-    expect(() =>
-      (sandbox as any).validateCode('globalThis.foo'),
-    ).toThrow(/globalThis/);
-    expect(() =>
-      (sandbox as any).validateCode('return fetch'),
-    ).toThrow(/not allowed/);
-    expect(() =>
-      (sandbox as any).validateCode('x.constructor'),
-    ).toThrow(/dangerous/);
+    expect(() => (sandbox as any).validateCode('globalThis.foo')).toThrow(
+      /globalThis/,
+    );
+    expect(() => (sandbox as any).validateCode('return fetch')).toThrow(
+      /not allowed/,
+    );
+    expect(() => (sandbox as any).validateCode('x.constructor')).toThrow(
+      /dangerous/,
+    );
   });
 
   it('isObviousInfiniteLoop + instrumentCode + instruction limit', async () => {

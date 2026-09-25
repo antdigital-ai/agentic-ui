@@ -156,10 +156,7 @@ describe('Editor residual clipboard/selection branches', () => {
     const { SlateMarkdownEditor } = await import('../Editor');
     const onSelectionChange = vi.fn();
     render(
-      <SlateMarkdownEditor
-        note={0}
-        onSelectionChange={onSelectionChange}
-      />,
+      <SlateMarkdownEditor note={0} onSelectionChange={onSelectionChange} />,
     );
     expect(editableProps).toBeTruthy();
     if (typeof editableProps.onCopy === 'function') {
@@ -261,9 +258,7 @@ describe('Editor residual clipboard/selection branches', () => {
 
   it('readonly 跳过选区同步路径仍可挂载', async () => {
     const { SlateMarkdownEditor } = await import('../Editor');
-    render(
-      <SlateMarkdownEditor note={3} readonly reportMode />,
-    );
+    render(<SlateMarkdownEditor note={3} readonly reportMode />);
     expect(editableProps).toBeTruthy();
   });
 
@@ -271,9 +266,7 @@ describe('Editor residual clipboard/selection branches', () => {
     const { Editor, Range } = await import('slate');
     const { ReactEditor } = await import('slate-react');
     (Range.isCollapsed as any).mockReturnValueOnce(false);
-    (Editor.hasPath as any)
-      .mockReturnValueOnce(true)
-      .mockReturnValueOnce(true);
+    (Editor.hasPath as any).mockReturnValueOnce(true).mockReturnValueOnce(true);
     (ReactEditor.setFragmentData as any) = vi.fn();
 
     const { SlateMarkdownEditor } = await import('../Editor');
@@ -389,9 +382,7 @@ describe('Editor residual clipboard/selection branches', () => {
     }
     if (typeof slateOnChange === 'function') {
       act(() => {
-        slateOnChange([
-          { type: 'paragraph', children: [{ text: 'changed' }] },
-        ]);
+        slateOnChange([{ type: 'paragraph', children: [{ text: 'changed' }] }]);
       });
     }
     expect(onPaste).toHaveBeenCalled();
@@ -465,7 +456,8 @@ describe('Editor residual clipboard/selection branches', () => {
     const mimeMap: Record<string, string> = {
       'text/html': '<p>hi</p>',
       'text/rtf': '{\\rtf1}',
-      'application/x-slate-md-fragment': '[{"type":"paragraph","children":[{"text":"x"}]}]',
+      'application/x-slate-md-fragment':
+        '[{"type":"paragraph","children":[{"text":"x"}]}]',
       'text/markdown': '**bold**',
       'text/plain': 'plain text body',
     };

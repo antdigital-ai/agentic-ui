@@ -3,7 +3,13 @@
  * title/name 回退、collaborators 空值、点击 open。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -108,9 +114,9 @@ describe('ReadonlyLinkCard 分支覆盖', () => {
       finished: true,
       children: [{ text: '' }],
     });
-    expect(screen.getByText('no title').closest('a')!.getAttribute('download')).toBe(
-      'no title',
-    );
+    expect(
+      screen.getByText('no title').closest('a')!.getAttribute('download'),
+    ).toBe('no title');
     unmount();
 
     renderWithProvider({
@@ -173,9 +179,9 @@ describe('ReadonlyLinkCard 分支覆盖', () => {
     // `{}` → name 空，collaboratorNumber 走 || 0
     expect(screen.getByTestId('avatar-empty')).toHaveTextContent('undefined:0');
     expect(screen.queryByTestId('avatar-F')).toBeNull();
-    expect(screen.getByTestId('avatar-list').querySelectorAll('span')).toHaveLength(
-      5,
-    );
+    expect(
+      screen.getByTestId('avatar-list').querySelectorAll('span'),
+    ).toHaveLength(5);
   });
 
   it('点击容器与标题均触发 window.open', () => {

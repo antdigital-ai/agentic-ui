@@ -2,7 +2,13 @@
  * Workspace index deepen3：Realtime null、非法 panelType、tab 守卫、ResizeObserver 0→正。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -137,14 +143,8 @@ describe('Workspace index deepen3 residual branches', () => {
     );
     expect(resizeCallback).toBeTruthy();
     act(() => {
-      resizeCallback?.(
-        [{ contentRect: { width: 0 } } as any],
-        {} as any,
-      );
-      resizeCallback?.(
-        [{ contentRect: { width: 320 } } as any],
-        {} as any,
-      );
+      resizeCallback?.([{ contentRect: { width: 0 } } as any], {} as any);
+      resizeCallback?.([{ contentRect: { width: 320 } } as any], {} as any);
     });
     expect(screen.getByTestId('workspace')).toBeInTheDocument();
   });

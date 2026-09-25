@@ -37,13 +37,16 @@ vi.mock('../Hooks/useRefFunction', () => ({
 }));
 
 const mockIsMobileDevice = vi.fn(() => false);
-vi.mock('../MarkdownInputField/AttachmentButton/utils', async (importOriginal) => {
-  const actual = await importOriginal<any>();
-  return {
-    ...actual,
-    isMobileDevice: () => mockIsMobileDevice(),
-  };
-});
+vi.mock(
+  '../MarkdownInputField/AttachmentButton/utils',
+  async (importOriginal) => {
+    const actual = await importOriginal<any>();
+    return {
+      ...actual,
+      isMobileDevice: () => mockIsMobileDevice(),
+    };
+  },
+);
 
 const origin = (o?: Partial<MessageBubbleData>): MessageBubbleData => ({
   id: 'm1',
@@ -83,9 +86,13 @@ describe('midtail batch K pure / light hooks', () => {
         React.createElement('span', null, 'C'),
       ),
     ).toBeTruthy();
-    expect(getFileTypeIcon('plainText' as any, undefined, 'a.pdf')).toBeTruthy();
+    expect(
+      getFileTypeIcon('plainText' as any, undefined, 'a.pdf'),
+    ).toBeTruthy();
     expect(getFileTypeIcon('plainText' as any, undefined, 'a.md')).toBeTruthy();
-    expect(getFileTypeIcon('plainText' as any, undefined, 'noext')).toBeTruthy();
+    expect(
+      getFileTypeIcon('plainText' as any, undefined, 'noext'),
+    ).toBeTruthy();
     expect(getFileTypeIcon('image' as any)).toBeTruthy();
     expect(getFileTypeIcon('not-a-real-type' as any)).toBeTruthy();
 
@@ -139,26 +146,30 @@ describe('midtail batch K pure / light hooks', () => {
       ),
     ).toBeTruthy();
 
-    expect(generateUniqueId({ id: 'fixed', name: 'n', type: 'plainText' } as any)).toBe(
-      'fixed',
-    );
     expect(
-      generateUniqueId({ name: 'n', type: 'plainText' } as any),
-    ).toMatch(/plainText_n_/);
+      generateUniqueId({ id: 'fixed', name: 'n', type: 'plainText' } as any),
+    ).toBe('fixed');
+    expect(generateUniqueId({ name: 'n', type: 'plainText' } as any)).toMatch(
+      /plainText_n_/,
+    );
   });
 
   it('createHastProcessor：formula / rehype / remark / markedConfig', () => {
     const p0 = createHastProcessor();
     expect(p0).toBeTruthy();
 
-    const p1 = createHastProcessor(undefined, undefined, { enable: true } as any);
+    const p1 = createHastProcessor(undefined, undefined, {
+      enable: true,
+    } as any);
     expect(p1).toBeTruthy();
 
     const rehype = [() => (tree: any) => tree];
     const remarkFn = () => (tree: any) => tree;
     const p2 = createHastProcessor(
       [remarkFn as any, [remarkFn as any, { x: 1 }] as any],
-      { markedConfig: [remarkFn as any, [remarkFn as any, { y: 2 }] as any] } as any,
+      {
+        markedConfig: [remarkFn as any, [remarkFn as any, { y: 2 }] as any],
+      } as any,
       { enable: false } as any,
       rehype as any,
     );
@@ -346,7 +357,11 @@ describe('midtail batch K pure / light hooks', () => {
         sendMessage,
       }),
     );
-    r2.current.handleKeyDown({ ...e, preventDefault: vi.fn(), stopPropagation: vi.fn() });
+    r2.current.handleKeyDown({
+      ...e,
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+    });
     expect(sendMessage).not.toHaveBeenCalled();
 
     const { result: r3 } = renderHook(() =>

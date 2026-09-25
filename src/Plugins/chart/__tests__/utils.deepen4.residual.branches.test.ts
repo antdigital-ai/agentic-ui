@@ -25,9 +25,9 @@ describe('chart/utils deepen4 residual branches', () => {
     const b = parseChartXDateSortKey('2024/2');
     const c = parseChartXDateSortKey('2024-1-2');
     const d = parseChartXDateSortKey('1999/12/1');
-    expect(
-      [a, b, c, d].some((v) => v === null || typeof v === 'number'),
-    ).toBe(true);
+    expect([a, b, c, d].some((v) => v === null || typeof v === 'number')).toBe(
+      true,
+    );
     expect(typeof parseChartXDateSortKey('2020') === 'number' || true).toBe(
       true,
     );

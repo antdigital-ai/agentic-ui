@@ -169,7 +169,9 @@ function setupStore() {
     },
     children: [{ type: 'card', children: [{ text: 'card-body' }] }],
     operations: [],
-    getFragment: vi.fn(() => [{ type: 'paragraph', children: [{ text: 'ab' }] }]),
+    getFragment: vi.fn(() => [
+      { type: 'paragraph', children: [{ text: 'ab' }] },
+    ]),
   };
   const container = document.createElement('div');
   const editable = document.createElement('div');

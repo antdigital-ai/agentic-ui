@@ -34,7 +34,11 @@ vi.mock('../PreviewComponent', () => ({
   ),
 }));
 
-const file = (id: string, name: string, extra?: Partial<FileNode>): FileNode => ({
+const file = (
+  id: string,
+  name: string,
+  extra?: Partial<FileNode>,
+): FileNode => ({
   id,
   name,
   content: 'body',
@@ -79,9 +83,7 @@ describe('FileComponent deepen8 safe residual branches', () => {
       await Promise.resolve();
       vi.advanceTimersByTime(30);
     });
-    expect(
-      screen.queryByTestId('preview-d8') || document.body,
-    ).toBeTruthy();
+    expect(screen.queryByTestId('preview-d8') || document.body).toBeTruthy();
 
     cleanup();
     wrap(
@@ -101,7 +103,7 @@ describe('FileComponent deepen8 safe residual branches', () => {
     wrap(
       <FileComponent
         nodes={[file('c', 'c.md')]}
-        onPreview={async () => ({ foo: 1 } as any)}
+        onPreview={async () => ({ foo: 1 }) as any}
       />,
     );
     fireEvent.click(await screen.findByText('c.md'));
@@ -118,9 +120,7 @@ describe('FileComponent deepen8 safe residual branches', () => {
     );
     fireEvent.click(await screen.findByText('d.md'));
     await waitFor(() => {
-      expect(
-        screen.queryByTestId('custom-prev') || document.body,
-      ).toBeTruthy();
+      expect(screen.queryByTestId('custom-prev') || document.body).toBeTruthy();
     });
   });
 

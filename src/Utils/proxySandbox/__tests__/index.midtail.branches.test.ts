@@ -39,9 +39,7 @@ describe('proxySandbox index midtail branches', () => {
 
   it('quickExecute 成功与失败', async () => {
     await expect(quickExecute('return 10')).resolves.toBe(10);
-    await expect(
-      quickExecute('throw new Error("x")'),
-    ).rejects.toBeTruthy();
+    await expect(quickExecute('throw new Error("x")')).rejects.toBeTruthy();
   });
 
   it('health checker support + basicExecution', async () => {

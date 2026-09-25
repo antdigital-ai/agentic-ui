@@ -25,9 +25,9 @@ describe('useStreaming deepen12 safe residual branches', () => {
     const partial = renderHook(() =>
       useStreaming('| A | B |\n| --- | --- |\n| 1 |', true),
     );
-    expect(partial.result.current === '...' || partial.result.current.length > 0).toBe(
-      true,
-    );
+    expect(
+      partial.result.current === '...' || partial.result.current.length > 0,
+    ).toBe(true);
     const mismatch = renderHook(() =>
       useStreaming('| A | B |\n| --- | --- |\n| 1 | 2 | 3 |', true),
     );
@@ -38,9 +38,9 @@ describe('useStreaming deepen12 safe residual branches', () => {
     const list = renderHook(() => useStreaming('1. item', true));
     expect(typeof list.result.current).toBe('string');
     const link = renderHook(() => useStreaming('[text', true));
-    expect(link.result.current === '...' || link.result.current.length >= 0).toBe(
-      true,
-    );
+    expect(
+      link.result.current === '...' || link.result.current.length >= 0,
+    ).toBe(true);
   });
 
   it('同文 rerender 空 chunk；前缀变化重置', () => {
@@ -57,9 +57,9 @@ describe('useStreaming deepen12 safe residual branches', () => {
 
   it('围栏流式重置；非 Text emphasis 早退', () => {
     const fence = renderHook(() => useStreaming('```\ncode', true));
-    expect(fence.result.current === '...' || fence.result.current.includes('```')).toBe(
-      true,
-    );
+    expect(
+      fence.result.current === '...' || fence.result.current.includes('```'),
+    ).toBe(true);
     const emph = renderHook(() => useStreaming('**bold', true));
     expect(typeof emph.result.current).toBe('string');
   });

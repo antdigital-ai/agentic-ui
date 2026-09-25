@@ -13,8 +13,7 @@ export interface FootnoteReferenceMdast {
 export function footnoteReferenceToTextLeaf(
   currentElement: FootnoteReferenceMdast,
 ): CustomLeaf {
-  const identifier =
-    currentElement.identifier ?? currentElement.label ?? '';
+  const identifier = currentElement.identifier ?? currentElement.label ?? '';
   const text = identifier ? `[^${identifier}]` : '';
   return {
     text,
@@ -49,9 +48,7 @@ export function legacyFootnoteReferenceElementToTextLeaf(node: {
   const fromIdentifier = node.identifier ?? '';
   const fromString =
     extractFootnoteRefIdentifier(
-      node.text ??
-        node.children?.map((c) => c.text ?? '').join('') ??
-        '',
+      node.text ?? node.children?.map((c) => c.text ?? '').join('') ?? '',
     ) ?? '';
   const identifier = fromIdentifier || fromString;
   return footnoteReferenceToTextLeaf({ identifier });

@@ -88,9 +88,9 @@ describe('BoxPlotChart more residual branches', () => {
         title="bp"
       />,
     );
-    expect(
-      (globalThis as any).__boxMoreData?.datasets?.length,
-    ).toBeGreaterThan(0);
+    expect((globalThis as any).__boxMoreData?.datasets?.length).toBeGreaterThan(
+      0,
+    );
   });
 
   it('单色 + 图例/网格开启 + tooltip 回调', () => {
@@ -260,7 +260,11 @@ describe('BoxPlotChart more residual branches', () => {
     render(
       <BoxPlotChart
         data={[
-          { label: 'Z', values: [Number.NaN, Number.POSITIVE_INFINITY], type: 'z' },
+          {
+            label: 'Z',
+            values: [Number.NaN, Number.POSITIVE_INFINITY],
+            type: 'z',
+          },
           { label: 'Z2', values: [1], type: 'z' },
         ]}
         color="#ff0000"
@@ -420,7 +424,8 @@ describe('BoxPlotChart more residual branches', () => {
         }),
       ).toBeDefined();
     }
-    const bg = (globalThis as any).__boxMoreData?.datasets?.[0]?.backgroundColor;
+    const bg = (globalThis as any).__boxMoreData?.datasets?.[0]
+      ?.backgroundColor;
     if (typeof bg === 'function') {
       expect(
         bg({
@@ -516,8 +521,8 @@ describe('BoxPlotChart more residual branches', () => {
         theme="light"
       />,
     );
-    expect(
-      (globalThis as any).__boxMoreData?.datasets?.length,
-    ).toBeGreaterThan(0);
+    expect((globalThis as any).__boxMoreData?.datasets?.length).toBeGreaterThan(
+      0,
+    );
   });
 });

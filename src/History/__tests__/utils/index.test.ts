@@ -15,9 +15,9 @@ describe('History utils', () => {
     it('缺失或 null gmtCreate 应返回 0', () => {
       expect(getItemTimestamp({})).toBe(0);
       expect(getItemTimestamp({ gmtCreate: undefined })).toBe(0);
-      expect(
-        getItemTimestamp({ gmtCreate: null as unknown as number }),
-      ).toBe(0);
+      expect(getItemTimestamp({ gmtCreate: null as unknown as number })).toBe(
+        0,
+      );
     });
 
     it('number 应原样返回', () => {

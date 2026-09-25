@@ -5,11 +5,11 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { Transforms } from 'slate';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ReactEditor } from 'slate-react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { I18nProvide } from '../../../../../I18n';
-import { EditorUtils } from '../../../utils/editorUtils';
 import { useEditorStore } from '../../../store';
+import { EditorUtils } from '../../../utils/editorUtils';
 import { JinjaTemplatePanel } from '../index';
 
 vi.mock('../../../store', () => ({

@@ -102,11 +102,13 @@ describe('chart/utils deepen6 safe residual branches', () => {
         'name',
       )[0].name,
     ).toBe('2024-01');
-    expect(uniqueChartXValuesPreservingOrder([
-      { x: 'b', y: 1 },
-      { x: 'a', y: 2 },
-      { x: 'b', y: 3 },
-    ])).toEqual(['b', 'a']);
+    expect(
+      uniqueChartXValuesPreservingOrder([
+        { x: 'b', y: 1 },
+        { x: 'a', y: 2 },
+        { x: 'b', y: 3 },
+      ]),
+    ).toEqual(['b', 'a']);
     expect(isNotEmpty(0)).toBe(true);
     expect(getDataHash([{ a: 1 }])).toBeTruthy();
     expect(isConfigEqual({ a: 1 }, { a: 1 })).toBe(true);

@@ -3,7 +3,13 @@
  * floating 切换、无 thinkContent。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -126,7 +132,9 @@ describe('ToolUseBarThink deepen2 residual branches', () => {
     await act(async () => {
       vi.advanceTimersByTime(20);
     });
-    const floating = screen.getAllByTestId('tool-use-bar-think-floating-expand');
+    const floating = screen.getAllByTestId(
+      'tool-use-bar-think-floating-expand',
+    );
     fireEvent.click(floating[0]);
     expect(onFloating).toHaveBeenCalled();
   });

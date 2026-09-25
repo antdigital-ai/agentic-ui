@@ -4,9 +4,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   createMarkdownParser,
+  fixStrongWithSpecialChars,
   getMarkdownParser,
   protectJinjaDollarInText,
-  fixStrongWithSpecialChars,
 } from '../remarkParse';
 
 describe('remarkParse more residual branches', () => {

@@ -12,9 +12,9 @@
  * @see {@link https://ace.c9.io/} Ace Editor 官方文档
  */
 
+import type { Ace } from 'ace-builds';
 import isHotkey from 'is-hotkey';
 import { startTransition, useEffect, useRef, useState } from 'react';
-import type { Ace } from 'ace-builds';
 import type { Path } from 'slate';
 import { useRefFunction } from '../../../Hooks/useRefFunction';
 import partialParse from '../../../MarkdownEditor/editor/parser/json-parse';

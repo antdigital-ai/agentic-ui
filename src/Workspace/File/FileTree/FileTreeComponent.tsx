@@ -56,8 +56,8 @@ const canBindSyntheticTreeLeaf = (options: {
 }) =>
   Boolean(
     options.onDownload ||
-      (options.onPreview &&
-        options.resolveTreeLeafFileOptions?.fileNodeByRelativePath?.size),
+    (options.onPreview &&
+      options.resolveTreeLeafFileOptions?.fileNodeByRelativePath?.size),
   );
 
 const mapTreeToDataNodes = (

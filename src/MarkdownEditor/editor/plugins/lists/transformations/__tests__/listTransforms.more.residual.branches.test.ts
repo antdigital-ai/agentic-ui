@@ -50,9 +50,9 @@ describe('lists transformations / getListItems residual', () => {
         offset: 0,
       }).length,
     ).toBeGreaterThan(0);
-    expect(getListItems(editor, agenticListsSchema, [0, 0]).length).toBeGreaterThan(
-      0,
-    );
+    expect(
+      getListItems(editor, agenticListsSchema, [0, 0]).length,
+    ).toBeGreaterThan(0);
     expect(
       getListItems(editor, agenticListsSchema, [
         [0, 0, 0, 0],

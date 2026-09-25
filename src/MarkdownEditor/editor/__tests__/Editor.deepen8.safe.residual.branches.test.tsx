@@ -139,10 +139,8 @@ vi.mock('../../plugin', () => ({
   PluginContext: React.createContext([]),
 }));
 vi.mock('../elements', () => ({
-  MElement: ({ children }: any) =>
-    React.createElement('div', null, children),
-  MLeaf: ({ children }: any) =>
-    React.createElement('span', null, children),
+  MElement: ({ children }: any) => React.createElement('div', null, children),
+  MLeaf: ({ children }: any) => React.createElement('span', null, children),
 }));
 vi.mock('../../../Utils/env', () => ({
   isWeChat: vi.fn(() => false),

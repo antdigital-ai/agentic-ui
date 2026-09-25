@@ -9,7 +9,9 @@ vi.mock('slate-react', () => ({
   useSlateStatic: () => ({}),
   ReactEditor: { findPath: () => [0] },
 }));
-vi.mock('../../../store', () => ({ useEditorStore: () => ({ readonly: false }) }));
+vi.mock('../../../store', () => ({
+  useEditorStore: () => ({ readonly: false }),
+}));
 vi.mock('../../../utils/codeBlockBehavior', () => ({
   handleCodeBlockTextInputKeyDown: () => keyDownResult.current,
   setCodeBlockNodes: commit,
@@ -22,12 +24,20 @@ describe('SimpleCodeBlockEditor without Ace', () => {
   });
 
   it('commits edited text and consumes handled key events', () => {
-    render(<SimpleCodeBlockEditor element={{ type: 'code', language: 'ts', value: 'const x = 1' } as any} />);
+    render(
+      <SimpleCodeBlockEditor
+        element={{ type: 'code', language: 'ts', value: 'const x = 1' } as any}
+      />,
+    );
     const editor = screen.getByTestId('simple-code-block-editor');
     fireEvent.change(editor, { target: { value: 'next' } });
     fireEvent.keyDown(editor, { key: 'Tab' });
     fireEvent.compositionEnd(editor, { currentTarget: { value: 'final' } });
-    expect(commit).toHaveBeenCalledWith(expect.anything(), [0], expect.objectContaining({ value: 'next' }));
+    expect(commit).toHaveBeenCalledWith(
+      expect.anything(),
+      [0],
+      expect.objectContaining({ value: 'next' }),
+    );
     expect(editor).toHaveAttribute('aria-label', 'Code: ts');
   });
 
@@ -35,9 +45,7 @@ describe('SimpleCodeBlockEditor without Ace', () => {
     keyDownResult.current = 'not-handled';
     const stopPropagation = vi.fn();
     render(
-      <SimpleCodeBlockEditor
-        element={{ type: 'code', value: 'x' } as any}
-      />,
+      <SimpleCodeBlockEditor element={{ type: 'code', value: 'x' } as any} />,
     );
     const editor = screen.getByTestId('simple-code-block-editor');
     expect(editor).toHaveAttribute('aria-label', 'Code block');

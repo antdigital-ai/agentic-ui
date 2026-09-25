@@ -5,9 +5,9 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { UserBubble } from '../UserBubble';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
 import type { BubbleProps, MessageBubbleData } from '../type';
+import { UserBubble } from '../UserBubble';
 
 vi.mock('../../MarkdownEditor/BaseMarkdownEditor', () => ({
   BaseMarkdownEditor: ({ initValue }: { initValue?: string }) => (
@@ -45,9 +45,7 @@ const baseProps = (over: Partial<BubbleProps> = {}): BubbleProps => ({
 describe('UserBubble branches', () => {
   it('render=false 返回 null', () => {
     const { container } = render(
-      <UserBubble
-        {...baseProps({ bubbleRenderConfig: { render: false } })}
-      />,
+      <UserBubble {...baseProps({ bubbleRenderConfig: { render: false } })} />,
     );
     expect(container.firstChild).toBeNull();
   });
@@ -71,14 +69,9 @@ describe('UserBubble branches', () => {
   });
 
   it('extraShowOnHover 透传 false', () => {
-    render(
-      <UserBubble {...baseProps()} />,
-      {
-        wrapper: ({ children }) => (
-          <div>{children}</div>
-        ),
-      },
-    );
+    render(<UserBubble {...baseProps()} />, {
+      wrapper: ({ children }) => <div>{children}</div>,
+    });
     expect(screen.getByTestId('message-content')).toBeInTheDocument();
   });
 
@@ -112,9 +105,7 @@ describe('UserBubble branches', () => {
       <UserBubble
         {...baseProps({
           bubbleRenderConfig: {
-            contentBeforeRender: () => (
-              <div data-testid="before">B</div>
-            ),
+            contentBeforeRender: () => <div data-testid="before">B</div>,
           },
         })}
       />,
@@ -127,9 +118,7 @@ describe('UserBubble branches', () => {
       <UserBubble
         {...baseProps({
           bubbleRenderConfig: {
-            contentAfterRender: () => (
-              <div data-testid="after">A</div>
-            ),
+            contentAfterRender: () => <div data-testid="after">A</div>,
           },
         })}
       />,

@@ -198,9 +198,7 @@ describe('CodeToolbar deepen residual branches', () => {
       <CodeToolbar
         theme="chaos"
         isExpanded
-        element={
-          { type: 'code', language: 'markdown', value: '# hi' } as any
-        }
+        element={{ type: 'code', language: 'markdown', value: '# hi' } as any}
         readonly={false}
         onCloseClick={vi.fn()}
         languageSelectorProps={langProps}

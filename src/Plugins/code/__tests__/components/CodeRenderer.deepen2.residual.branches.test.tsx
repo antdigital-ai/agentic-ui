@@ -121,11 +121,11 @@ vi.mock('../../../../MarkdownEditor', () => ({
   ),
 }));
 
+import { CodeRenderer } from '../../components/CodeRenderer';
 import {
   openHtmlLocalPreview,
   openMarkdownLocalPreview,
 } from '../../utils/localPreview';
-import { CodeRenderer } from '../../components/CodeRenderer';
 
 const baseElement = (overrides: Record<string, unknown> = {}) => ({
   type: 'code' as const,

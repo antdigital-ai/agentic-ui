@@ -21,9 +21,7 @@ const mockCreateSandbox = vi.hoisted(() =>
     destroy: mockSandboxDestroy,
   })),
 );
-const mockTemplateRender = vi.hoisted(() =>
-  vi.fn((tpl: string) => tpl),
-);
+const mockTemplateRender = vi.hoisted(() => vi.fn((tpl: string) => tpl));
 const mockMustacheRender = vi.hoisted(() =>
   vi.fn((tpl: string, data: any) =>
     tpl.replace(/\{\{\s*name\s*\}\}/g, String(data?.name ?? '')),
@@ -165,22 +163,14 @@ describe('SchemaRenderer deepen8 safe residual branches', () => {
 
   it('shadowRoot 已存在时走复用臂（二次渲染）', async () => {
     const { rerender, container } = render(
-      <SchemaRenderer
-        schema={baseSchema()}
-        values={{ name: 'a' }}
-      />,
+      <SchemaRenderer schema={baseSchema()} values={{ name: 'a' }} />,
     );
     await flush();
     const host = container.querySelector('[data-testid="schema-renderer"]');
     expect(host?.shadowRoot || host).toBeTruthy();
 
     mockTemplateRender.mockImplementation(() => '<div class="ok2">b</div>');
-    rerender(
-      <SchemaRenderer
-        schema={baseSchema()}
-        values={{ name: 'b' }}
-      />,
-    );
+    rerender(<SchemaRenderer schema={baseSchema()} values={{ name: 'b' }} />);
     await flush();
     expect(
       host?.shadowRoot?.innerHTML?.includes('ok2') ||
@@ -201,11 +191,7 @@ describe('SchemaRenderer deepen8 safe residual branches', () => {
     };
 
     const { rerender, container } = render(
-      <SchemaRenderer
-        schema={baseSchema()}
-        values={{ name: 'a' }}
-        debug
-      />,
+      <SchemaRenderer schema={baseSchema()} values={{ name: 'a' }} debug />,
     );
     await flush();
     expect(

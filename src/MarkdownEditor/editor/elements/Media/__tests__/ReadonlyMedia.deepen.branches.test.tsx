@@ -6,9 +6,9 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { MediaNode } from '../../../../el';
-import { ReadonlyMedia } from '../ReadonlyMedia';
 import * as editorUtils from '../../../utils';
 import * as domUtils from '../../../utils/dom';
+import { ReadonlyMedia } from '../ReadonlyMedia';
 
 vi.mock('antd', () => ({
   Skeleton: { Image: () => <div data-testid="skeleton" /> },
@@ -19,7 +19,9 @@ vi.mock('@ant-design/icons', () => ({
 }));
 
 vi.mock('../../Image', () => ({
-  ReadonlyImage: (p: any) => <img data-testid="ro-img" src={p.src} alt={p.alt} />,
+  ReadonlyImage: (p: any) => (
+    <img data-testid="ro-img" src={p.src} alt={p.alt} />
+  ),
 }));
 
 vi.mock('../../../components/MediaErrorLink', () => ({

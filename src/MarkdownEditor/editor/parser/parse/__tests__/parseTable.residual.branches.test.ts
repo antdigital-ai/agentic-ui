@@ -48,10 +48,7 @@ describe('parseTable residual branches', () => {
     const withCode = '```\n| a |\n```\n';
     expect(preprocessMarkdownTableNewlines(withCode)).toContain('```');
 
-    const longCell =
-      '| ' +
-      'x'.repeat(40) +
-      '\nmore |\n| - |\n| 1 |';
+    const longCell = '| ' + 'x'.repeat(40) + '\nmore |\n| - |\n| 1 |';
     const processed = preprocessMarkdownTableNewlines(longCell);
     expect(typeof processed).toBe('string');
   });

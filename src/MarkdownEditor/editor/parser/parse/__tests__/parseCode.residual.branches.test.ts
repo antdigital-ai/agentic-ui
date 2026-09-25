@@ -67,12 +67,12 @@ describe('parseCode handleYaml / residual matrix', () => {
     expect(handleCode({ value: '[]', lang: 'schema' }).value).toEqual([]);
     expect(handleCode({ value: '[]', lang: 'apassify' }).type).toBe('apaasify');
     expect(handleCode({ value: '[]', lang: 'apaasify' }).type).toBe('apaasify');
-    expect(
-      handleCode({ value: '', lang: 'agentic-ui-toolusebar' }).type,
-    ).toBe('agentic-ui-toolusebar');
-    expect(
-      handleCode({ value: '', lang: 'agentic-ui-usertoolbar' }).type,
-    ).toBe('agentic-ui-toolusebar');
+    expect(handleCode({ value: '', lang: 'agentic-ui-toolusebar' }).type).toBe(
+      'agentic-ui-toolusebar',
+    );
+    expect(handleCode({ value: '', lang: 'agentic-ui-usertoolbar' }).type).toBe(
+      'agentic-ui-toolusebar',
+    );
     expect(
       handleCode({ value: '{"a":1}', lang: 'agentic-ui-filemap' }).type,
     ).toBe('agentic-ui-filemap');
@@ -120,9 +120,7 @@ describe('parseCode handleYaml / residual matrix', () => {
     expect(doneish.type).toBe('code');
 
     expect(handleCode({ lang: 'txt' } as any).value).toBeUndefined();
-    expect(
-      handleCode({ value: '', lang: 'js' }).language || '',
-    ).toBeDefined();
+    expect(handleCode({ value: '', lang: 'js' }).language || '').toBeDefined();
     expect(
       handleCode(
         { value: 'print(1)\n', lang: 'js' },

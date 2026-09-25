@@ -104,8 +104,7 @@ export class BackspaceKey {
                 if (text) {
                   if (pre[0].type === 'code') {
                     setCodeBlockNodes(this.editor, pre[1], {
-                      value:
-                        getCodeBlockPlainText(pre[0] as CodeNode) + text,
+                      value: getCodeBlockPlainText(pre[0] as CodeNode) + text,
                     });
                   } else {
                     Transforms.insertNodes(this.editor, el.children, {

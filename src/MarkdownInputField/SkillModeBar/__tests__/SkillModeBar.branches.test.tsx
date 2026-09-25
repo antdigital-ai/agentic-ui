@@ -61,9 +61,7 @@ describe('SkillModeBar branches', () => {
   });
 
   it('无 rightContent 但 closable 时有关闭无 divider', () => {
-    wrap(
-      <SkillModeBar skillMode={{ open: true, title: 'OnlyClose' }} />,
-    );
+    wrap(<SkillModeBar skillMode={{ open: true, title: 'OnlyClose' }} />);
     expect(screen.getByTestId('skill-mode-close')).toBeTruthy();
   });
 

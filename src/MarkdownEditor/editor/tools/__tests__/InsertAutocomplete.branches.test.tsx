@@ -218,6 +218,7 @@ vi.mock('react-dom', async () => {
 });
 
 import { Editor, Element, Node, Transforms } from 'slate';
+import { I18nContext } from '../../../../I18n';
 import { useEditorStore } from '../../store';
 import { EditorUtils } from '../../utils/editorUtils';
 import { getRemoteMediaType } from '../../utils/media';
@@ -226,7 +227,6 @@ import {
   InsertAutocomplete,
   InsertAutocompleteItem,
 } from '../InsertAutocomplete';
-import { I18nContext } from '../../../../I18n';
 
 const useEditorStoreMock = vi.mocked(useEditorStore);
 
@@ -1861,17 +1861,14 @@ describe('InsertAutocomplete istanbul residual：locale 真值覆盖 fallback', 
     // label: [locale?.table || '表格']
     // label: [locale?.quote || '引用']
     // label: [locale?.head1 || '主标题']
-    const options = getInsertOptions(
-      { isTop: true },
-      {
-        table: 'TableEN',
-        quote: 'QuoteEN',
-        localeImage: 'ImgEN',
-        head1: 'H1EN',
-        head2: 'H2EN',
-        head3: 'H3EN',
-      } as any,
-    );
+    const options = getInsertOptions({ isTop: true }, {
+      table: 'TableEN',
+      quote: 'QuoteEN',
+      localeImage: 'ImgEN',
+      head1: 'H1EN',
+      head2: 'H2EN',
+      head3: 'H3EN',
+    } as any);
     const labels = options.flatMap((g) =>
       (g.children || []).flatMap((i) => i.label || []),
     );

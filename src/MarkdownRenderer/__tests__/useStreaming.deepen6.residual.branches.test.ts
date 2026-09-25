@@ -21,14 +21,12 @@ describe('useStreaming deepen6 residual branches', () => {
       renderHook(() => useStreaming('|', true)).result.current,
     ).toBeTruthy();
     expect(
-      renderHook(() =>
-        useStreaming('| A | B |\n| --- | --- |\n| only', true),
-      ).result.current,
+      renderHook(() => useStreaming('| A | B |\n| --- | --- |\n| only', true))
+        .result.current,
     ).toBe('...');
     expect(
-      renderHook(() =>
-        useStreaming('| A | B |\n| --- | --- |\n| x |', true),
-      ).result.current,
+      renderHook(() => useStreaming('| A | B |\n| --- | --- |\n| x |', true))
+        .result.current,
     ).toBe('...');
   });
 

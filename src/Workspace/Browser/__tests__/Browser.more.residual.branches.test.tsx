@@ -7,10 +7,7 @@ import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { I18nContext } from '../../../I18n';
-import Browser, {
-  BrowserItemComponent,
-  BrowserList,
-} from '../index';
+import Browser, { BrowserItemComponent, BrowserList } from '../index';
 
 const locale = {
   'browser.noResults': 'No results',
@@ -92,7 +89,10 @@ describe('Browser more residual branches', () => {
 
   it.skip('Browser 无 suggestions 时安全渲染', () => {
     const { container } = wrap(
-      <Browser suggestions={[]} request={() => ({ items: [], loading: false })} />,
+      <Browser
+        suggestions={[]}
+        request={() => ({ items: [], loading: false })}
+      />,
     );
     expect(container.firstChild).toBeTruthy();
   });

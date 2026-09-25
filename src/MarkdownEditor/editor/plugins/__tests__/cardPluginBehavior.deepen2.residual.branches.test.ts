@@ -74,7 +74,10 @@ describe('cardPluginBehavior deepen2 residual branches', () => {
 
   it('handleCardInsertNodeOperation：card-after 真实 redirect 成功', () => {
     const editor = createEditor();
-    editor.children = [cardWithContent(), { type: 'paragraph', children: [{ text: '' }] }];
+    editor.children = [
+      cardWithContent(),
+      { type: 'paragraph', children: [{ text: '' }] },
+    ];
     const op = {
       type: 'insert_node' as const,
       path: [0, 2, 0],

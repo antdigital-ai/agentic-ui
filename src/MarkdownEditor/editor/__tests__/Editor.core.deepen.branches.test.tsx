@@ -177,7 +177,9 @@ function createMockEditor(overrides: any = {}) {
     },
     children: [{ type: 'paragraph', children: [{ text: 'ab' }] }],
     operations: [{ type: 'insert_text' }],
-    getFragment: vi.fn(() => [{ type: 'paragraph', children: [{ text: 'ab' }] }]),
+    getFragment: vi.fn(() => [
+      { type: 'paragraph', children: [{ text: 'ab' }] },
+    ]),
     ...overrides,
   };
 }
@@ -202,7 +204,9 @@ function renderEditor(props: any = {}) {
       prefixCls="ant-md"
       instance={props.instance ?? { id: 'inst' }}
       initSchemaValue={
-        props.initSchemaValue ?? [{ type: 'paragraph', children: [{ text: '' }] }]
+        props.initSchemaValue ?? [
+          { type: 'paragraph', children: [{ text: '' }] },
+        ]
       }
       {...props}
     />,
@@ -283,7 +287,11 @@ describe('Editor core deepen branches', () => {
     const preventDefault = vi.fn();
     editableProps.onCopy({
       preventDefault,
-      clipboardData: { clearData: vi.fn(), setData: vi.fn(), getData: () => '' },
+      clipboardData: {
+        clearData: vi.fn(),
+        setData: vi.fn(),
+        getData: () => '',
+      },
       target: document.createElement('div'),
     });
 

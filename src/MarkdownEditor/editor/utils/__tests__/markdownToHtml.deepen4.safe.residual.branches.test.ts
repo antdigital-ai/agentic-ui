@@ -3,10 +3,7 @@
  * file.value ?? 链（async/sync）、code properties 臂。
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  markdownToHtml,
-  markdownToHtmlSync,
-} from '../markdownToHtml';
+import { markdownToHtml, markdownToHtmlSync } from '../markdownToHtml';
 
 describe('markdownToHtml deepen4 safe residual branches', () => {
   beforeEach(() => {
@@ -53,7 +50,9 @@ describe('markdownToHtml deepen4 safe residual branches', () => {
     expect(typeof short).toBe('string');
 
     const long = await markdownToHtml(
-      '```js\n' + Array.from({ length: 6 }, (_, i) => `line${i}`).join('\n') + '\n```',
+      '```js\n' +
+        Array.from({ length: 6 }, (_, i) => `line${i}`).join('\n') +
+        '\n```',
     );
     expect(long).toMatch(/data-block|pre/i);
   });

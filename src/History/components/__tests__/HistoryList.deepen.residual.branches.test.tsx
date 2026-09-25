@@ -40,8 +40,9 @@ describe('HistoryList deepen residual branches', () => {
         sessionTitle: `T${i}`,
       }),
     );
-    const groupLabelRender = vi.fn((key: string, rows: any[], label: string) =>
-      `G:${key}:${rows.length}:${label}`,
+    const groupLabelRender = vi.fn(
+      (key: string, rows: any[], label: string) =>
+        `G:${key}:${rows.length}:${label}`,
     );
     const customDateFormatter = vi.fn(() => 'FMT');
     const items = generateHistoryItems({

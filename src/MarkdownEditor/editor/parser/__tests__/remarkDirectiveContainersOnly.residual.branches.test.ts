@@ -16,8 +16,9 @@ describe('remarkDirectiveContainersOnly residual branches', () => {
     expect(data.micromarkExtensions?.length).toBeGreaterThan(0);
     expect(data.fromMarkdownExtensions?.length).toBeGreaterThan(0);
     expect(data.toMarkdownExtensions?.length).toBeGreaterThan(0);
-    const flow = (data.micromarkExtensions![0] as { flow?: Record<number, unknown> })
-      .flow;
+    const flow = (
+      data.micromarkExtensions![0] as { flow?: Record<number, unknown> }
+    ).flow;
     expect(flow?.[58]).toBeTruthy();
   });
 

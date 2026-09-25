@@ -52,11 +52,7 @@ describe('useHighlight deepen4 residual branches', () => {
     const decorate = useHighlight(undefined, true);
     const node: Element = {
       type: 'paragraph',
-      children: [
-        { text: '{{ ' },
-        { text: 'user' },
-        { text: '.name }}' },
-      ],
+      children: [{ text: '{{ ' }, { text: 'user' }, { text: '.name }}' }],
     };
     const ranges = decorate([node, [0]]);
     expect(ranges.length).toBeGreaterThan(0);

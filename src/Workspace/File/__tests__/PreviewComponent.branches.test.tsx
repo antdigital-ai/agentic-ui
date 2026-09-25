@@ -7,8 +7,8 @@ import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { I18nContext } from '../../../I18n';
-import { PreviewComponent } from '../PreviewComponent';
 import type { FileNode } from '../../types';
+import { PreviewComponent } from '../PreviewComponent';
 
 vi.mock('../../../MarkdownEditor', () => ({
   MarkdownEditor: React.forwardRef(({ initValue }: any, ref: any) => {
@@ -63,7 +63,9 @@ const file: FileNode = {
   path: '/readme.md',
 };
 
-const renderPreview = (props: Partial<React.ComponentProps<typeof PreviewComponent>> = {}) => {
+const renderPreview = (
+  props: Partial<React.ComponentProps<typeof PreviewComponent>> = {},
+) => {
   const mockUse = vi.mocked(usePreviewContent);
   if (!mockUse.getMockImplementation()) {
     mockUse.mockReturnValue({
@@ -194,7 +196,9 @@ describe('PreviewComponent branches', () => {
       onDownload: vi.fn(),
       file: { ...file, canDownload: false },
     });
-    expect(screen.queryByRole('button', { name: 'Download' })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Download' }),
+    ).not.toBeInTheDocument();
   });
 
   it('onShare canShare 时触发分享', () => {

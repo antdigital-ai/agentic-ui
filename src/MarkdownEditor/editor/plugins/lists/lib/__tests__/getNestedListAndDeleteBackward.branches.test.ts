@@ -3,12 +3,12 @@
  */
 import { createEditor, Editor, Transforms } from 'slate';
 import { describe, expect, it } from 'vitest';
-import { agenticListsSchema } from '../../schema';
-import { withAgenticLists } from '../../withAgenticLists';
 import { ListsEditor } from '../../ListsEditor';
+import { agenticListsSchema } from '../../schema';
+import { ListType } from '../../types';
+import { withAgenticLists } from '../../withAgenticLists';
 import { getNestedList } from '../getNestedList';
 import { isDeleteBackwardAllowed } from '../isDeleteBackwardAllowed';
-import { ListType } from '../../types';
 
 const listItem = (text: string, nested?: object) => ({
   type: 'list-item' as const,
@@ -26,9 +26,7 @@ const bulletedList = (...items: ReturnType<typeof listItem>[]) => ({
   children: items,
 });
 
-function createListEditor(
-  structure: ReturnType<typeof bulletedList>,
-) {
+function createListEditor(structure: ReturnType<typeof bulletedList>) {
   const editor = withAgenticLists(createEditor());
   editor.children = [structure] as Editor['children'];
   return editor;
@@ -42,9 +40,7 @@ describe('getNestedList branches', () => {
 
   it('有嵌套 list 返回 entry', () => {
     const nested = bulletedList(listItem('child'));
-    const editor = createListEditor(
-      bulletedList(listItem('parent', nested)),
-    );
+    const editor = createListEditor(bulletedList(listItem('parent', nested)));
     const entry = getNestedList(editor, agenticListsSchema, [0, 0]);
     expect(entry).not.toBeNull();
     expect(entry![1]).toEqual([0, 0, 1]);
@@ -73,17 +69,15 @@ describe('isDeleteBackwardAllowed branches', () => {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [0, 0], offset: 0 },
     };
-    expect(
-      isDeleteBackwardAllowed(editor, agenticListsSchema),
-    ).toBe(true);
+    expect(isDeleteBackwardAllowed(editor, agenticListsSchema)).toBe(true);
   });
 
   it('at 为 null 且无选区返回 true', () => {
     const editor = createListEditor(bulletedList(listItem('a')));
     editor.selection = null;
-    expect(
-      isDeleteBackwardAllowed(editor, agenticListsSchema, null),
-    ).toBe(true);
+    expect(isDeleteBackwardAllowed(editor, agenticListsSchema, null)).toBe(
+      true,
+    );
   });
 
   it('首个顶层 list-item 且在开头不允许', () => {
@@ -94,9 +88,7 @@ describe('isDeleteBackwardAllowed branches', () => {
       anchor: { path: [0, 0, 0, 0], offset: 0 },
       focus: { path: [0, 0, 0, 0], offset: 0 },
     };
-    expect(
-      isDeleteBackwardAllowed(editor, agenticListsSchema),
-    ).toBe(false);
+    expect(isDeleteBackwardAllowed(editor, agenticListsSchema)).toBe(false);
   });
 
   it('第二个 sibling 允许', () => {
@@ -107,23 +99,17 @@ describe('isDeleteBackwardAllowed branches', () => {
       anchor: { path: [0, 1, 0, 0], offset: 0 },
       focus: { path: [0, 1, 0, 0], offset: 0 },
     };
-    expect(
-      isDeleteBackwardAllowed(editor, agenticListsSchema),
-    ).toBe(true);
+    expect(isDeleteBackwardAllowed(editor, agenticListsSchema)).toBe(true);
   });
 
   it('嵌套 list-item 允许', () => {
     const nested = bulletedList(listItem('child'));
-    const editor = createListEditor(
-      bulletedList(listItem('parent', nested)),
-    );
+    const editor = createListEditor(bulletedList(listItem('parent', nested)));
     editor.selection = {
       anchor: { path: [0, 0, 1, 0, 0, 0], offset: 0 },
       focus: { path: [0, 0, 1, 0, 0, 0], offset: 0 },
     };
-    expect(
-      isDeleteBackwardAllowed(editor, agenticListsSchema),
-    ).toBe(true);
+    expect(isDeleteBackwardAllowed(editor, agenticListsSchema)).toBe(true);
   });
 
   it('首项但不在开头允许', () => {
@@ -132,9 +118,7 @@ describe('isDeleteBackwardAllowed branches', () => {
       anchor: { path: [0, 0, 0, 0], offset: 2 },
       focus: { path: [0, 0, 0, 0], offset: 2 },
     };
-    expect(
-      isDeleteBackwardAllowed(editor, agenticListsSchema),
-    ).toBe(true);
+    expect(isDeleteBackwardAllowed(editor, agenticListsSchema)).toBe(true);
   });
 });
 

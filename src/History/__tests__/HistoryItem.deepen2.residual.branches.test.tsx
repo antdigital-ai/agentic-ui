@@ -130,9 +130,9 @@ describe('HistoryItem deepen2 residual branches', () => {
     expect(screen.getByText('⭐')).toBeInTheDocument();
     expect(fmt).toHaveBeenCalled();
     const tips = screen.getAllByTestId('tooltip');
-    expect(
-      tips.some((t) => t.getAttribute('data-open') === 'undefined'),
-    ).toBe(true);
+    expect(tips.some((t) => t.getAttribute('data-open') === 'undefined')).toBe(
+      true,
+    );
   });
 
   it('短 description：tooltip open=false；无 icon 有 status', () => {

@@ -18,9 +18,7 @@ describe('AgentRunBar deepen2 residual branches', () => {
   it('无 variant 用 default', async () => {
     const mod = await import('../index');
     const Comp =
-      (mod as any).AgentRunBar ||
-      (mod as any).default ||
-      Object.values(mod)[0];
+      (mod as any).AgentRunBar || (mod as any).default || Object.values(mod)[0];
     render(<Comp status="running" />);
     expect(document.body).toBeTruthy();
   });

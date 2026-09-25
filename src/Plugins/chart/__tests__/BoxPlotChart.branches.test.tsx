@@ -128,11 +128,7 @@ describe('BoxPlotChart 分支覆盖', () => {
   });
 
   it('label 为空字符串时被过滤导致空态', () => {
-    render(
-      <BoxPlotChart
-        data={[{ label: '', values: [1, 2, 3] }]}
-      />,
-    );
+    render(<BoxPlotChart data={[{ label: '', values: [1, 2, 3] }]} />);
     expect(screen.getByText('暂无有效数据')).toBeInTheDocument();
   });
 
@@ -248,9 +244,7 @@ describe('BoxPlotChart 分支覆盖', () => {
   });
 
   it('tooltip label 在 raw 缺失时返回空字符串', () => {
-    render(
-      <BoxPlotChart data={[{ label: 'X', values: [1, 2, 3] }]} />,
-    );
+    render(<BoxPlotChart data={[{ label: 'X', values: [1, 2, 3] }]} />);
     const options = (globalThis as any).__boxplotBranchOptions;
     expect(options.plugins.tooltip.callbacks.label({ raw: null })).toBe('');
   });
@@ -306,9 +300,7 @@ describe('BoxPlotChart 分支覆盖', () => {
     ];
     const { rerender } = render(<BoxPlotChart data={initial} />);
     rerender(
-      <BoxPlotChart
-        data={[{ label: 'Z', values: [5, 6], category: 'Z' }]}
-      />,
+      <BoxPlotChart data={[{ label: 'Z', values: [5, 6], category: 'Z' }]} />,
     );
     await waitFor(() => {
       expect(screen.getByTestId('boxplot-chart')).toBeInTheDocument();
@@ -316,9 +308,7 @@ describe('BoxPlotChart 分支覆盖', () => {
   });
 
   it('window resize 触发 isMobile 分支', async () => {
-    render(
-      <BoxPlotChart data={[{ label: 'A', values: [1, 2, 3] }]} />,
-    );
+    render(<BoxPlotChart data={[{ label: 'A', values: [1, 2, 3] }]} />);
     Object.defineProperty(window, 'innerWidth', {
       writable: true,
       configurable: true,
@@ -364,10 +354,7 @@ describe('BoxPlotChart 分支覆盖', () => {
 
   it('点击下载调用 downloadChart', () => {
     render(
-      <BoxPlotChart
-        data={[{ label: 'A', values: [1, 2, 3] }]}
-        title="下载"
-      />,
+      <BoxPlotChart data={[{ label: 'A', values: [1, 2, 3] }]} title="下载" />,
     );
     fireEvent.click(screen.getByTestId('download-btn'));
     expect(mockDownloadChart).toHaveBeenCalledTimes(1);
@@ -397,9 +384,7 @@ describe('BoxPlotChart 分支覆盖', () => {
   });
 
   it('tooltip raw 无 mean 时不输出均值行', () => {
-    render(
-      <BoxPlotChart data={[{ label: 'A', values: [1, 2, 3] }]} />,
-    );
+    render(<BoxPlotChart data={[{ label: 'A', values: [1, 2, 3] }]} />);
     const options = (globalThis as any).__boxplotBranchOptions;
     const lines = options.plugins.tooltip.callbacks.label({
       raw: { min: 1, q1: 1.5, median: 2, q3: 2.5, max: 3 },
@@ -425,9 +410,7 @@ describe('BoxPlotChart 分支覆盖', () => {
   });
 
   it('tooltip raw 含 mean 时输出均值行', () => {
-    render(
-      <BoxPlotChart data={[{ label: 'A', values: [1, 2, 3, 4, 5] }]} />,
-    );
+    render(<BoxPlotChart data={[{ label: 'A', values: [1, 2, 3, 4, 5] }]} />);
     const options = (globalThis as any).__boxplotBranchOptions;
     const lines = options.plugins.tooltip.callbacks.label({
       raw: { min: 1, q1: 2, median: 3, q3: 4, max: 5, mean: 3 },
@@ -437,10 +420,7 @@ describe('BoxPlotChart 分支覆盖', () => {
 
   it('width 字符串 px 写入 style', () => {
     render(
-      <BoxPlotChart
-        data={[{ label: 'A', values: [1, 2, 3] }]}
-        width="520px"
-      />,
+      <BoxPlotChart data={[{ label: 'A', values: [1, 2, 3] }]} width="520px" />,
     );
     expect(screen.getByTestId('chart-container')).toBeInTheDocument();
   });
@@ -523,17 +503,11 @@ describe('BoxPlotChart 分支覆盖', () => {
 
   it('width 百分比与数字', () => {
     const { rerender } = render(
-      <BoxPlotChart
-        data={[{ label: 'A', values: [1, 2, 3] }]}
-        width="80%"
-      />,
+      <BoxPlotChart data={[{ label: 'A', values: [1, 2, 3] }]} width="80%" />,
     );
     expect(screen.getByTestId('chart-container')).toBeInTheDocument();
     rerender(
-      <BoxPlotChart
-        data={[{ label: 'A', values: [1, 2, 3] }]}
-        width={400}
-      />,
+      <BoxPlotChart data={[{ label: 'A', values: [1, 2, 3] }]} width={400} />,
     );
     expect(screen.getByTestId('boxplot-chart')).toBeInTheDocument();
   });
@@ -605,11 +579,7 @@ describe('BoxPlotChart 分支覆盖', () => {
     expect(screen.queryByTestId('chart-statistic')).not.toBeInTheDocument();
     unmountStat();
 
-    render(
-      <BoxPlotChart
-        data={[{ label: 'A', values: [1, 2, 3, 4, 5] }]}
-      />,
-    );
+    render(<BoxPlotChart data={[{ label: 'A', values: [1, 2, 3, 4, 5] }]} />);
     const options = (globalThis as any).__boxplotBranchOptions;
     const labelCb = options?.plugins?.tooltip?.callbacks?.label;
     expect(labelCb?.({ raw: undefined })).toBe('');

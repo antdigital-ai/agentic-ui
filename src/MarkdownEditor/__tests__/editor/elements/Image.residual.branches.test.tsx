@@ -88,7 +88,11 @@ vi.mock('slate', async () => {
   const actual = await vi.importActual<any>('slate');
   return {
     ...actual,
-    Transforms: { ...actual.Transforms, setNodes: vi.fn(), removeNodes: vi.fn() },
+    Transforms: {
+      ...actual.Transforms,
+      setNodes: vi.fn(),
+      removeNodes: vi.fn(),
+    },
     Path: actual.Path,
   };
 });
@@ -112,9 +116,7 @@ describe('Image residual branches', () => {
 
     storeState.editorProps = {
       image: {
-        render: (p: any, el: any) => (
-          <div data-testid="custom-img">{el}</div>
-        ),
+        render: (p: any, el: any) => <div data-testid="custom-img">{el}</div>,
       },
     };
     rerender(<ReadonlyImage src="https://a.png" width={100} />);
@@ -182,7 +184,9 @@ describe('Image residual branches', () => {
         defaultSize={{ width: 50, height: 50 }}
       />,
     );
-    expect(document.querySelector('[data-testid="rnd"]') || document.body).toBeTruthy();
+    expect(
+      document.querySelector('[data-testid="rnd"]') || document.body,
+    ).toBeTruthy();
   });
 
   it('exclusive deepen：EditorImage 空 url；align left/right；未选中 Resize', () => {

@@ -4,8 +4,8 @@
 import { createEditor } from 'slate';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { agenticListsSchema } from '../../schema';
-import { setListType } from '../setListType';
 import { ListType } from '../../types';
+import { setListType } from '../setListType';
 
 describe('setListType deepen2 residual branches', () => {
   beforeEach(() => {

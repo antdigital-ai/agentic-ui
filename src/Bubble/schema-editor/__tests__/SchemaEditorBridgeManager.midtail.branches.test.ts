@@ -21,9 +21,8 @@ describe('SchemaEditorBridgeManager midtail branches', () => {
   beforeEach(async () => {
     vi.resetModules();
     createBridge.mockClear();
-    ({ SchemaEditorBridgeManager: Manager } = await import(
-      '../SchemaEditorBridgeManager'
-    ));
+    ({ SchemaEditorBridgeManager: Manager } =
+      await import('../SchemaEditorBridgeManager'));
   });
 
   afterEach(() => {

@@ -3,7 +3,13 @@
  * collaborators 假值、clientWidth 链、locale 删除文案缺省。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { I18nContext } from '../../../../../I18n';
@@ -81,7 +87,12 @@ vi.mock('../../../components/ContributorAvatar', () => ({
 
 vi.mock('../../../../../Components/ActionIconBox', () => ({
   ActionIconBox: ({ title, onClick, children }: any) => (
-    <button type="button" data-testid="media-delete-btn" title={String(title)} onClick={onClick}>
+    <button
+      type="button"
+      data-testid="media-delete-btn"
+      title={String(title)}
+      onClick={onClick}
+    >
       {children}
     </button>
   ),

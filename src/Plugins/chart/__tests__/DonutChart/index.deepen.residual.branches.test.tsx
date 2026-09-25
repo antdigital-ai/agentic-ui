@@ -11,79 +11,77 @@ const mockChartInstances: any[] = [];
 const downloadChart = vi.fn();
 
 vi.mock('react-chartjs-2', () => ({
-  Doughnut: React.forwardRef(
-    ({ data, options, plugins }: any, ref: any) => {
-      React.useEffect(() => {
-        if (ref) {
-          const canvas = (globalThis as any).__donutChartMockNoCanvas
-            ? null
-            : document.createElement('canvas');
-          const mockInstance = {
-            canvas,
-            toBase64Image: vi.fn(() => 'data:image/png;base64,test'),
-            getDatasetMeta: vi.fn(() => ({ data: [] })),
-            width: 200,
-            height: 200,
-            data,
-          };
-          mockChartInstances.push(mockInstance);
-          if (typeof ref === 'function') ref(mockInstance);
-          else if (ref && typeof ref === 'object') ref.current = mockInstance;
-        }
-      }, [ref]);
-
-      try {
-        options?.plugins?.tooltip?.callbacks?.label?.({
-          label: 'T',
-          raw: NaN,
-        });
-        options?.plugins?.tooltip?.callbacks?.label?.({
-          label: 'T',
-          raw: Infinity,
-        });
-        const dl = options?.plugins?.datalabels;
-        if (dl?.display) {
-          dl.display({
-            dataset: { data: ['10'] },
-            dataIndex: 0,
-          });
-          dl.display({
-            dataset: { data: [0] },
-            dataIndex: 0,
-          });
-        }
-        if (dl?.formatter) {
-          dl.formatter(10, {
-            chart: { data: { labels: ['A'] } },
-            dataIndex: 0,
-          });
-          dl.formatter(10, {
-            chart: { data: { labels: [null] } },
-            dataIndex: 0,
-          });
-        }
-        plugins?.forEach((p: any) => {
-          p?.beforeDraw?.({
-            chartArea: { width: 100, height: 100, left: 0, top: 0 },
-            ctx: {
-              save: vi.fn(),
-              restore: vi.fn(),
-              beginPath: vi.fn(),
-              arc: vi.fn(),
-              fill: vi.fn(),
-              fillText: vi.fn(),
-              measureText: () => ({ width: 10 }),
-            },
-            data: { datasets: [{ data: [1] }] },
-          } as any);
-        });
-      } catch {
-        /* ignore callback probe errors */
+  Doughnut: React.forwardRef(({ data, options, plugins }: any, ref: any) => {
+    React.useEffect(() => {
+      if (ref) {
+        const canvas = (globalThis as any).__donutChartMockNoCanvas
+          ? null
+          : document.createElement('canvas');
+        const mockInstance = {
+          canvas,
+          toBase64Image: vi.fn(() => 'data:image/png;base64,test'),
+          getDatasetMeta: vi.fn(() => ({ data: [] })),
+          width: 200,
+          height: 200,
+          data,
+        };
+        mockChartInstances.push(mockInstance);
+        if (typeof ref === 'function') ref(mockInstance);
+        else if (ref && typeof ref === 'object') ref.current = mockInstance;
       }
+    }, [ref]);
 
-      return <div data-testid="doughnut-chart">Chart</div>;
-    },
-  ),
+    try {
+      options?.plugins?.tooltip?.callbacks?.label?.({
+        label: 'T',
+        raw: NaN,
+      });
+      options?.plugins?.tooltip?.callbacks?.label?.({
+        label: 'T',
+        raw: Infinity,
+      });
+      const dl = options?.plugins?.datalabels;
+      if (dl?.display) {
+        dl.display({
+          dataset: { data: ['10'] },
+          dataIndex: 0,
+        });
+        dl.display({
+          dataset: { data: [0] },
+          dataIndex: 0,
+        });
+      }
+      if (dl?.formatter) {
+        dl.formatter(10, {
+          chart: { data: { labels: ['A'] } },
+          dataIndex: 0,
+        });
+        dl.formatter(10, {
+          chart: { data: { labels: [null] } },
+          dataIndex: 0,
+        });
+      }
+      plugins?.forEach((p: any) => {
+        p?.beforeDraw?.({
+          chartArea: { width: 100, height: 100, left: 0, top: 0 },
+          ctx: {
+            save: vi.fn(),
+            restore: vi.fn(),
+            beginPath: vi.fn(),
+            arc: vi.fn(),
+            fill: vi.fn(),
+            fillText: vi.fn(),
+            measureText: () => ({ width: 10 }),
+          },
+          data: { datasets: [{ data: [1] }] },
+        } as any);
+      });
+    } catch {
+      /* ignore callback probe errors */
+    }
+
+    return <div data-testid="doughnut-chart">Chart</div>;
+  }),
 }));
 
 vi.mock('../../utils', () => ({
@@ -230,4 +228,3 @@ describe('DonutChart deepen residual branches', () => {
     expect(screen.getByTestId('doughnut-chart')).toBeInTheDocument();
   });
 });
-

@@ -55,9 +55,9 @@ describe('bubblePropsAreEqual deep residual branches', () => {
   it('config / deps / avatar / shouldShowCopy 矩阵', () => {
     const base = props();
     expect(bubblePropsAreEqual(base, base)).toBe(true);
-    expect(
-      bubblePropsAreEqual(base, props({ shouldShowCopy: true })),
-    ).toBe(false);
+    expect(bubblePropsAreEqual(base, props({ shouldShowCopy: true }))).toBe(
+      false,
+    );
     expect(
       bubblePropsAreEqual(
         props({ markdownRenderConfig: { a: { x: 1 } } as any }),

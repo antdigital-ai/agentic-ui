@@ -32,7 +32,9 @@ describe('DonutChart Legend 分支覆盖', () => {
 
   it('超过 12 项时渲染分页并可翻页', () => {
     const data = makeData(15);
-    const colors = data.map((_, i) => `#${(i + 1).toString(16).padStart(6, '0')}`);
+    const colors = data.map(
+      (_, i) => `#${(i + 1).toString(16).padStart(6, '0')}`,
+    );
     render(
       <Legend {...baseProps} chartData={data} backgroundColors={colors} />,
     );
@@ -80,7 +82,9 @@ describe('DonutChart Legend 分支覆盖', () => {
     );
     const pagination = container.querySelector('.donut-legend-pagination');
     expect(pagination).toBeInTheDocument();
-    expect(pagination).toHaveStyle({ borderTopColor: 'rgba(255,255,255,0.12)' });
+    expect(pagination).toHaveStyle({
+      borderTopColor: 'rgba(255,255,255,0.12)',
+    });
   });
 
   it('移动端 + 分页时 flexShrink 分支', () => {
@@ -105,7 +109,9 @@ describe('DonutChart Legend 分支覆盖', () => {
         backgroundColors={[]}
       />,
     );
-    const colorSpan = document.querySelector('.donut-legend-color') as HTMLElement;
+    const colorSpan = document.querySelector(
+      '.donut-legend-color',
+    ) as HTMLElement;
     expect(colorSpan?.style.getPropertyValue('--donut-legend-color')).toBe(
       '#ccc',
     );

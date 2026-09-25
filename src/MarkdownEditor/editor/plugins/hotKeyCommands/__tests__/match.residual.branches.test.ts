@@ -1,8 +1,8 @@
 /**
  * MatchKey residual：无 editor / 非折叠 / code 节点 / 门控 match。
  */
-import { createEditor } from 'slate';
 import React from 'react';
+import { createEditor } from 'slate';
 import { describe, expect, it, vi } from 'vitest';
 import { MatchKey } from '../match';
 
@@ -45,9 +45,7 @@ describe('MatchKey residual branches', () => {
 
   it('gatedByMatchInputToNode 关闭时跳过对应规则', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: '' }] },
-    ] as any;
+    editor.children = [{ type: 'paragraph', children: [{ text: '' }] }] as any;
     editor.selection = {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [0, 0], offset: 0 },

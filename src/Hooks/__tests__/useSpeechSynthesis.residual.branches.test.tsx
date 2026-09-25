@@ -46,7 +46,10 @@ describe('useSpeechSynthesis residual branches', () => {
         removeEventListener,
       },
     });
-    (global as any).SpeechSynthesisUtterance = function (this: any, text: string) {
+    (global as any).SpeechSynthesisUtterance = function (
+      this: any,
+      text: string,
+    ) {
       this.text = text;
       this.rate = 1;
       this.lang = '';
@@ -83,7 +86,13 @@ describe('useSpeechSynthesis residual branches', () => {
       result.current.start();
     });
     getVoices.mockReturnValue([
-      { voiceURI: 'uri-x', name: 'X', lang: 'en', localService: true, default: false },
+      {
+        voiceURI: 'uri-x',
+        name: 'X',
+        lang: 'en',
+        localService: true,
+        default: false,
+      },
     ]);
     act(() => {
       voicesHandlers.forEach((h) => h());

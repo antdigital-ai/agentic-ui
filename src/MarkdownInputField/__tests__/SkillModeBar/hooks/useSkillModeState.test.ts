@@ -26,9 +26,7 @@ describe('useSkillModeState', () => {
   });
 
   it('无回调时内部变更不抛错', () => {
-    const { result } = renderHook(() =>
-      useSkillModeState({ open: false }),
-    );
+    const { result } = renderHook(() => useSkillModeState({ open: false }));
     expect(() => {
       act(() => {
         result.current(true);
@@ -62,9 +60,7 @@ describe('useSkillModeState', () => {
 
   it('skillMode 缺省时仍可调用内部 handler', () => {
     const onChange = vi.fn();
-    const { result } = renderHook(() =>
-      useSkillModeState(undefined, onChange),
-    );
+    const { result } = renderHook(() => useSkillModeState(undefined, onChange));
     act(() => {
       result.current(false);
     });

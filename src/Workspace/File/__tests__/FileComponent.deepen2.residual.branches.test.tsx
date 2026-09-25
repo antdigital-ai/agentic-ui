@@ -17,9 +17,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { I18nProvide } from '../../../I18n';
 import type { FileNode } from '../../types';
 import { FileComponent } from '../FileComponent';
-import {
-  GROUP_INITIAL_PAGE_SIZE,
-} from '../components/FileGroup';
+import { GROUP_INITIAL_PAGE_SIZE } from '../components/FileGroup';
 
 vi.mock('antd', async () => {
   const actual = await vi.importActual('antd');
@@ -36,7 +34,11 @@ const wrap = (ui: React.ReactNode) =>
     </ConfigProvider>,
   );
 
-const file = (id: string, name: string, extra?: Partial<FileNode>): FileNode => ({
+const file = (
+  id: string,
+  name: string,
+  extra?: Partial<FileNode>,
+): FileNode => ({
   id,
   name,
   content: 'x',
@@ -129,11 +131,7 @@ describe('FileComponent deepen2 residual branches', () => {
         onPreview={async () =>
           (
             <div data-testid="custom-prev">
-              <button
-                type="button"
-                data-testid="share-btn"
-                onClick={() => {}}
-              >
+              <button type="button" data-testid="share-btn" onClick={() => {}}>
                 share-slot
               </button>
             </div>

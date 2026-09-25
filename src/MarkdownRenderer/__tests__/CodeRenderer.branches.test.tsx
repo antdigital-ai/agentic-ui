@@ -47,7 +47,9 @@ describe('CodeBlockRenderer 分支覆盖', () => {
     render(<CodeBlockRenderer language="js">{'code'}</CodeBlockRenderer>);
     const collapseBtn = screen.getByLabelText('展开/收起');
     fireEvent.click(collapseBtn);
-    const content = document.querySelector('.code-editor-content') as HTMLElement;
+    const content = document.querySelector(
+      '.code-editor-content',
+    ) as HTMLElement;
     expect(content?.style.display).toBe('none');
   });
 
@@ -79,10 +81,7 @@ describe('CodeBlockRenderer 分支覆盖', () => {
 
   it('editorCodeProps.theme 优先于 detectedTheme', () => {
     render(
-      <CodeBlockRenderer
-        language="js"
-        editorCodeProps={{ theme: 'chaos' }}
-      >
+      <CodeBlockRenderer language="js" editorCodeProps={{ theme: 'chaos' }}>
         {'dark theme'}
       </CodeBlockRenderer>,
     );

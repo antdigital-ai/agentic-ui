@@ -21,7 +21,9 @@ describe('loadCSS deepen2 residual branches', () => {
     delete globalThis.window;
     try {
       const mod = await import('../loadCSS');
-      await expect(mod.loadCSS('https://x.test/a.css')).resolves.toBeUndefined();
+      await expect(
+        mod.loadCSS('https://x.test/a.css'),
+      ).resolves.toBeUndefined();
       expect(mod.preloadCSS('https://x.test/b.css')).toBeUndefined();
     } finally {
       globalThis.window = orig;

@@ -88,9 +88,7 @@ describe('TableContext midtail branches', () => {
 
   it('仅 rowIndex 时行激活为 true', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <TableContextTestProvider
-        value={{ deleteIconPosition: { rowIndex: 1 } }}
-      >
+      <TableContextTestProvider value={{ deleteIconPosition: { rowIndex: 1 } }}>
         {children}
       </TableContextTestProvider>
     );

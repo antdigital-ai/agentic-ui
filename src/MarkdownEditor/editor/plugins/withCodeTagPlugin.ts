@@ -5,8 +5,8 @@ import {
   handleTagDeleteBackward,
   handleTagRemoveTextOperation,
   moveSelectionOutOfCodeTagLeaf,
-  tryInsertTextOutsideTagOnDoubleSpace,
   tryInsertTextOutsideMarkOnDoubleSpace,
+  tryInsertTextOutsideTagOnDoubleSpace,
 } from './codeTagLeafBehavior';
 
 /**

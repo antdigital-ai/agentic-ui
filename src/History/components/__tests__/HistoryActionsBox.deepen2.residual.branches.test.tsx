@@ -3,7 +3,13 @@
  * 避免 midtail/Popconfirm 挂起模式（无长 waitFor、无真实 portal 动画）。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { I18nContext } from '../../../I18n';
@@ -34,7 +40,9 @@ vi.mock('antd', async () => {
           <button
             type="button"
             data-testid="pc-ok"
-            onClick={() => onConfirm?.({ stopPropagation() {}, preventDefault() {} })}
+            onClick={() =>
+              onConfirm?.({ stopPropagation() {}, preventDefault() {} })
+            }
           >
             ok
           </button>

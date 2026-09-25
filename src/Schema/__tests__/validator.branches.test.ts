@@ -508,9 +508,12 @@ describe('SchemaValidator validate 分支补洞', () => {
   });
 
   it('error.message 为空时使用未知错误', () => {
-    const mockValidate = Object.assign(vi.fn(() => false), {
-      errors: [{ instancePath: '/field', message: undefined }],
-    });
+    const mockValidate = Object.assign(
+      vi.fn(() => false),
+      {
+        errors: [{ instancePath: '/field', message: undefined }],
+      },
+    );
     vi.spyOn((validator as any).ajv, 'compile').mockReturnValue(
       mockValidate as any,
     );
@@ -523,9 +526,12 @@ describe('SchemaValidator validate 分支补洞', () => {
 describe('validator istanbul residual：errors 空数组', () => {
   it.skip('compile 返回 false 且 errors 为空时仍 invalid', () => {
     const validator = new SchemaValidator();
-    const mockValidate = Object.assign(vi.fn(() => false), {
-      errors: null,
-    });
+    const mockValidate = Object.assign(
+      vi.fn(() => false),
+      {
+        errors: null,
+      },
+    );
     vi.spyOn((validator as any).ajv, 'compile').mockReturnValue(
       mockValidate as any,
     );

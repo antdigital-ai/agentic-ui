@@ -120,9 +120,9 @@ describe('handlePaste deepen branches', () => {
           ? JSON.stringify([{ type: 'paragraph', children: [] }])
           : '',
     } as DataTransfer;
-    expect(
-      handleSlateMarkdownFragment(editor, clip, editor.selection),
-    ).toBe(true);
+    expect(handleSlateMarkdownFragment(editor, clip, editor.selection)).toBe(
+      true,
+    );
   });
 
   it('handleSlateMarkdownFragment：多节点走 replaceSelectedNode', () => {

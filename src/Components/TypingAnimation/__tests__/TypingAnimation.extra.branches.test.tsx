@@ -39,7 +39,12 @@ describe('TypingAnimation 分支覆盖补洞', () => {
   it.skip('children 字符串；as=div；underscore cursor', () => {
     render(
       <ConfigProvider>
-        <TypingAnimation as="div" showCursor cursorStyle="underscore" startOnView={false}>
+        <TypingAnimation
+          as="div"
+          showCursor
+          cursorStyle="underscore"
+          startOnView={false}
+        >
           Hello
         </TypingAnimation>
       </ConfigProvider>,

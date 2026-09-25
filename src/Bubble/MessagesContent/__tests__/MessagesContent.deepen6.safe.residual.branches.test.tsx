@@ -127,4 +127,3 @@ describe('MessagesContent deepen6 safe residual branches', () => {
     expect(['true', 'false']).toContain(el.getAttribute('data-typing'));
   });
 });
-

@@ -45,9 +45,7 @@ describe('codeBlockBehavior branches', () => {
     expect((editor.children[0] as any).children[0].text).toBe('');
 
     const empty = createEditor();
-    empty.children = [
-      { type: 'code', value: 'x', children: [] },
-    ] as any;
+    empty.children = [{ type: 'code', value: 'x', children: [] }] as any;
     setCodeBlockNodes(empty, [0], { value: 'y' });
     expect((empty.children[0] as any).value).toBe('y');
   });
@@ -170,9 +168,7 @@ describe('codeBlockBehavior branches', () => {
 
   it('isCodeBlockAceInputTarget', () => {
     expect(isCodeBlockAceInputTarget(null)).toBe(false);
-    expect(isCodeBlockAceInputTarget(document.createTextNode('x'))).toBe(
-      false,
-    );
+    expect(isCodeBlockAceInputTarget(document.createTextNode('x'))).toBe(false);
     const wrap = document.createElement('div');
     wrap.setAttribute('data-be', 'code');
     const ta = document.createElement('textarea');

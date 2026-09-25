@@ -18,9 +18,7 @@ describe('native-table-editor deepen residual branches', () => {
 
   it('无表格时 insert/remove 早退', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: '' }] },
-    ] as any;
+    editor.children = [{ type: 'paragraph', children: [{ text: '' }] }] as any;
     editor.selection = {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [0, 0], offset: 0 },
@@ -43,9 +41,7 @@ describe('native-table-editor deepen residual branches', () => {
             children: [
               {
                 type: 'table-cell',
-                children: [
-                  { type: 'paragraph', children: [{ text: '' }] },
-                ],
+                children: [{ type: 'paragraph', children: [{ text: '' }] }],
               },
             ],
           },

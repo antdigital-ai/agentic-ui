@@ -45,7 +45,10 @@ vi.mock('react-chartjs-2', () => ({
       const canvas = document.createElement('canvas');
       canvas.width = 200;
       canvas.height = 200;
-      const inst = { canvas, toBase64Image: vi.fn(() => 'data:image/png;base64,x') };
+      const inst = {
+        canvas,
+        toBase64Image: vi.fn(() => 'data:image/png;base64,x'),
+      };
       if (typeof ref === 'function') ref(inst);
       else if (ref) ref.current = inst;
     }, [ref]);
@@ -248,7 +251,9 @@ describe('DonutChart 分支覆盖', () => {
       rerender(
         <Wrapper>
           <DonutChart
-            data={[{ label: 'C', value: 10, filterLabel: 'F3', category: 'cat1' }]}
+            data={[
+              { label: 'C', value: 10, filterLabel: 'F3', category: 'cat1' },
+            ]}
             title="筛选"
             showToolbar
             filterList={['cat1']}
@@ -368,9 +373,7 @@ describe('DonutChart 分支覆盖', () => {
       const opts = (globalThis as any).__donutBranchLast.options;
       const display = opts.plugins.datalabels.display;
       expect(display({ dataset: { data: [99, 1] }, dataIndex: 0 })).toBe(true);
-      expect(display({ dataset: { data: [99, 1] }, dataIndex: 1 })).toBe(
-        false,
-      );
+      expect(display({ dataset: { data: [99, 1] }, dataIndex: 1 })).toBe(false);
     });
 
     it('datalabels formatter 有/无 label 分支', () => {
@@ -385,9 +388,8 @@ describe('DonutChart 分支覆盖', () => {
           />
         </Wrapper>,
       );
-      const formatter =
-        (globalThis as any).__donutBranchLast.options.plugins.datalabels
-          .formatter;
+      const formatter = (globalThis as any).__donutBranchLast.options.plugins
+        .datalabels.formatter;
       const ctx = {
         chart: { data: { labels: ['A', 'B'] } },
         dataIndex: 0,
@@ -409,9 +411,8 @@ describe('DonutChart 分支覆盖', () => {
           />
         </Wrapper>,
       );
-      const labelCb =
-        (globalThis as any).__donutBranchLast.options.plugins.tooltip.callbacks
-          .label;
+      const labelCb = (globalThis as any).__donutBranchLast.options.plugins
+        .tooltip.callbacks.label;
       expect(labelCb({ label: 'A', raw: 30 })).toContain('30');
     });
 
@@ -542,9 +543,8 @@ describe('DonutChart 分支覆盖', () => {
           />
         </Wrapper>,
       );
-      const labelCb =
-        (globalThis as any).__donutBranchLast.options.plugins.tooltip.callbacks
-          .label;
+      const labelCb = (globalThis as any).__donutBranchLast.options.plugins
+        .tooltip.callbacks.label;
       const result = labelCb({ label: 'A', raw: 30 });
       expect(result).not.toContain('30');
     });
@@ -650,7 +650,9 @@ describe('DonutChart 分支覆盖', () => {
           />
         </Wrapper>,
       );
-      expect(() => fireEvent.click(screen.getByTestId('download-btn'))).not.toThrow();
+      expect(() =>
+        fireEvent.click(screen.getByTestId('download-btn')),
+      ).not.toThrow();
       vi.restoreAllMocks();
     });
 

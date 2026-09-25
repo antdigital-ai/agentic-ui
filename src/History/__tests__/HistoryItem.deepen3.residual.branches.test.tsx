@@ -149,9 +149,7 @@ describe('HistoryItem deepen3 residual branches', () => {
   });
 
   it('chat 无 onDeleteItem；task 无 description 但有 status icon', () => {
-    render(
-      <HistoryItem item={baseItem as any} {...baseProps} type="chat" />,
-    );
+    render(<HistoryItem item={baseItem as any} {...baseProps} type="chat" />);
     fireEvent.click(screen.getByTestId('delete-btn'));
 
     cleanup();

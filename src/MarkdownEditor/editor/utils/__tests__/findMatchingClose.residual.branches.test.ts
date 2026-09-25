@@ -25,12 +25,12 @@ describe('findMatchingClose residual branches', () => {
     expect(isCodeBlockLikelyComplete('  ')).toBe(false);
     expect(isCodeBlockLikelyComplete('ab', 'js')).toBe(false);
     expect(isCodeBlockLikelyComplete('graph', 'mermaid')).toBe(false);
-    expect(
-      isCodeBlockLikelyComplete('flowchart TD\nA-->B', 'mermaid'),
-    ).toBe(true);
-    expect(
-      isCodeBlockLikelyComplete('flowchart TD\nA-->', 'mermaid'),
-    ).toBe(false);
+    expect(isCodeBlockLikelyComplete('flowchart TD\nA-->B', 'mermaid')).toBe(
+      true,
+    );
+    expect(isCodeBlockLikelyComplete('flowchart TD\nA-->', 'mermaid')).toBe(
+      false,
+    );
     expect(isCodeBlockLikelyComplete('const x = (', 'js')).toBe(false);
     // 完整语句是否判定 complete 取决于括号/引号启发式，只断言可调用
     expect(typeof isCodeBlockLikelyComplete("const x = 'ok';", 'js')).toBe(

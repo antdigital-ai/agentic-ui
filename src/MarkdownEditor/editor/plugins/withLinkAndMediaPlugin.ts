@@ -56,10 +56,7 @@ const handleLinkAndMediaOperation = (
   ) {
     const node = Node.get(editor, operation.path);
     if (['link-card', 'media'].includes(node?.type)) {
-      insertEmptyParagraphAfter(
-        editor,
-        Path.next([operation.path.at(0)!]),
-      );
+      insertEmptyParagraphAfter(editor, Path.next([operation.path.at(0)!]));
     }
     return true;
   }

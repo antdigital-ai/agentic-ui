@@ -61,7 +61,9 @@ describe('LazyElement deepen residual branches', () => {
       );
     });
     expect(screen.getByTestId('lazy-child')).toBeInTheDocument();
-    expect(MockIntersectionObserver.instances[0]?.disconnect).toHaveBeenCalled();
+    expect(
+      MockIntersectionObserver.instances[0]?.disconnect,
+    ).toHaveBeenCalled();
   });
 
   it('100ms 视口 fallback：有尺寸时强制可见', () => {

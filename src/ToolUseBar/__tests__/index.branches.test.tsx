@@ -66,9 +66,7 @@ describe('ToolUseBar branches', () => {
   });
 
   it('disableAnimation 应用 no-animation 类名', () => {
-    const { container } = render(
-      <ToolUseBar tools={tools} disableAnimation />,
-    );
+    const { container } = render(<ToolUseBar tools={tools} disableAnimation />);
     expect(container.firstChild?.className).toContain('no-animation');
   });
 

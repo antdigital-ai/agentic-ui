@@ -7,8 +7,8 @@ import stringWidth from 'string-width';
 import { debugInfo } from '../../../Utils/debugUtils';
 import type { ChartNode, CustomLeaf } from '../../el';
 import type { MarkdownEditorPlugin } from '../../plugin';
-import { getMediaType } from '../utils/dom';
 import { getCodeBlockPlainText } from '../utils/codeBlockPlainText';
+import { getMediaType } from '../utils/dom';
 import { extractFootnoteRefIdentifier } from '../utils/footnoteDisplay';
 import { JINJA_DOLLAR_PLACEHOLDER } from './constants';
 

@@ -31,7 +31,11 @@ vi.mock('../menu', () => ({
 
 vi.mock('../components/LoadMoreComponent', () => ({
   HistoryLoadMore: ({ onLoadMore }: any) => (
-    <button type="button" data-testid="load-more" onClick={() => onLoadMore?.()}>
+    <button
+      type="button"
+      data-testid="load-more"
+      onClick={() => onLoadMore?.()}
+    >
       more
     </button>
   ),
@@ -39,10 +43,7 @@ vi.mock('../components/LoadMoreComponent', () => ({
 
 vi.mock('../components/HistorySearch', () => ({
   HistorySearch: ({ onSearch }: any) => (
-    <input
-      data-testid="search"
-      onChange={(e) => onSearch?.(e.target.value)}
-    />
+    <input data-testid="search" onChange={(e) => onSearch?.(e.target.value)} />
   ),
 }));
 
@@ -116,7 +117,9 @@ describe('History residual branches', () => {
         />
       </ConfigProvider>,
     );
-    await waitFor(() => expect(screen.getByTestId('custom-more')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByTestId('custom-more')).toBeInTheDocument(),
+    );
   });
 
   it('agent loadMore 默认组件；mergedLoading 时不渲染', async () => {

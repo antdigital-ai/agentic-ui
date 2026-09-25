@@ -62,12 +62,7 @@ describe('BubbleExtra deepen2 residual branches', () => {
 
   it('click 前清空 content：copy 走空串', () => {
     const originData = { content: 'body', isFinished: true };
-    render(
-      <BubbleExtra
-        bubble={{ originData } as any}
-        shouldShowCopy
-      />,
-    );
+    render(<BubbleExtra bubble={{ originData } as any} shouldShowCopy />);
     originData.content = undefined as any;
     fireEvent.click(screen.getByTestId('chat-item-copy-button'));
     expect(copyMock).toHaveBeenCalledWith('');
@@ -96,19 +91,11 @@ describe('BubbleExtra deepen2 residual branches', () => {
       isFinished: true,
     };
     const { rerender } = render(
-      <BubbleExtra
-        bubble={{ originData } as any}
-        shouldShowVoice
-      />,
+      <BubbleExtra bubble={{ originData } as any} shouldShowVoice />,
     );
     expect(screen.getByTestId('voice-btn')).toHaveTextContent('speak');
     originData.content = '';
-    rerender(
-      <BubbleExtra
-        bubble={{ originData } as any}
-        shouldShowVoice
-      />,
-    );
+    rerender(<BubbleExtra bubble={{ originData } as any} shouldShowVoice />);
   });
 
   it('isAborted finished 且无 copy/reSend → null', () => {

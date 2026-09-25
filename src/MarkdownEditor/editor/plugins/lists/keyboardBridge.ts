@@ -4,10 +4,7 @@ import { Editor, Element, Range } from 'slate';
 import { ListsEditor } from './ListsEditor';
 import { onKeyDown as listsOnKeyDown } from './onKeyDown';
 
-export function isCollapsedInBlock(
-  editor: Editor,
-  blockType: string,
-): boolean {
+export function isCollapsedInBlock(editor: Editor, blockType: string): boolean {
   const sel = editor.selection;
   if (!sel || !Range.isCollapsed(sel)) {
     return false;
@@ -21,7 +18,10 @@ export function isCollapsedInBlock(
 }
 
 /** Tab：Prezly 列表优先；仅表格单元格走 TabKey */
-export function handleTabWithLists(editor: Editor, event: KeyboardEvent): boolean {
+export function handleTabWithLists(
+  editor: Editor,
+  event: KeyboardEvent,
+): boolean {
   if (
     isCollapsedInBlock(editor, 'table-cell') ||
     !ListsEditor.isListsEnabled(editor)

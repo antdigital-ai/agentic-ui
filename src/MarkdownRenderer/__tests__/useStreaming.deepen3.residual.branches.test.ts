@@ -24,9 +24,7 @@ describe('useStreaming deepen3 residual branches', () => {
   });
 
   it('空 cells 行 || 与 separator 不匹配提前完成', () => {
-    const { result } = renderHook(() =>
-      useStreaming('||\n| - |\n| x |', true),
-    );
+    const { result } = renderHook(() => useStreaming('||\n| - |\n| x |', true));
     expect(result.current).not.toBe('...');
   });
 

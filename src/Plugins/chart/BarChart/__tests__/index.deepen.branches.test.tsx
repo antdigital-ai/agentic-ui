@@ -2,7 +2,13 @@
  * BarChart index 补洞：SSR、发散色、filter、datalabels、stacked 半径、deepMerge。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import BarChart from '../index';
@@ -73,7 +79,11 @@ vi.mock('../../components', () => ({
   downloadChart: vi.fn(),
 }));
 
-const chartCtx = (parsed: any, indexAxis: 'x' | 'y' = 'x', extraChart?: any) => ({
+const chartCtx = (
+  parsed: any,
+  indexAxis: 'x' | 'y' = 'x',
+  extraChart?: any,
+) => ({
   chart: {
     chartArea: { left: 0, right: 200, top: 0, bottom: 200 },
     ctx: {
@@ -338,7 +348,9 @@ describe('BarChart index deepen branches', () => {
     act(() => {
       fireEvent.click(screen.getByTestId('dl'));
     });
-    expect((globalThis as any).__barDeepenOptions?.layout?.padding).toBeTruthy();
+    expect(
+      (globalThis as any).__barDeepenOptions?.layout?.padding,
+    ).toBeTruthy();
     expect(screen.getByTestId('stat')).toBeInTheDocument();
   });
 });

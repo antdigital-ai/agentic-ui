@@ -11,15 +11,20 @@ describe('src/MarkdownEditor/editor/tools/JinjaTemplatePanel/style.ts branches',
   );
 
   it('自定义 prefixCls', () => {
-    const { result } = renderHook(() => useJinjaTemplatePanelStyle('custom-style-prefix'), {
-      wrapper,
-    });
+    const { result } = renderHook(
+      () => useJinjaTemplatePanelStyle('custom-style-prefix'),
+      {
+        wrapper,
+      },
+    );
     expect(result.current).toBeDefined();
     expect(result.current.hashId).toBeDefined();
   });
 
   it('无参数调用走默认 prefixCls', () => {
-    const { result } = renderHook(() => useJinjaTemplatePanelStyle(), { wrapper });
+    const { result } = renderHook(() => useJinjaTemplatePanelStyle(), {
+      wrapper,
+    });
     expect(result.current).toBeDefined();
   });
 });

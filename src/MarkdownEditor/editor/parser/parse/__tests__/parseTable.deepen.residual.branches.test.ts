@@ -3,10 +3,7 @@
  * chartType table 降级、config 数字键对象、finished 透传。
  */
 import { describe, expect, it, vi } from 'vitest';
-import {
-  getColumnAlignment,
-  parseTableOrChart,
-} from '../parseTable';
+import { getColumnAlignment, parseTableOrChart } from '../parseTable';
 
 const parseNodes = vi.fn(() => [{ type: 'paragraph', children: [] }]);
 
@@ -82,12 +79,19 @@ describe('parseTable deepen residual branches', () => {
         },
       ],
     } as any;
-    const node = parseTableOrChart(table, { type: 'paragraph' } as any, [], parseNodes);
+    const node = parseTableOrChart(
+      table,
+      { type: 'paragraph' } as any,
+      [],
+      parseNodes,
+    );
     // wrapperCardNode 外包 card
     expect(node.type === 'card' || node.type === 'table').toBe(true);
     const inner =
       node.type === 'card'
-        ? (node as any).children?.find((c: any) => c.type === 'table' || c.type === 'chart')
+        ? (node as any).children?.find(
+            (c: any) => c.type === 'table' || c.type === 'chart',
+          )
         : node;
     expect(inner?.finished).toBe(false);
     const cols = inner?.otherProps?.columns ?? [];
@@ -134,7 +138,9 @@ describe('parseTable deepen residual branches', () => {
         { config: { 0: { chartType: 'line', x: 'x', y: 'y' } } as any },
       ),
     );
-    expect(numericCfg.type === 'chart' || numericCfg.type === 'table').toBe(true);
+    expect(numericCfg.type === 'chart' || numericCfg.type === 'table').toBe(
+      true,
+    );
   });
 
   it('mergeCells 使用 rowspan/colspan 别名并标记 hidden', () => {

@@ -3,13 +3,19 @@
  * pending→uploading、error 文案回退、无 onPreview 图片/外链。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { AttachmentButton } from '../index';
 import { AttachmentFileList } from '../AttachmentFileList';
 import { AttachmentFileListItem } from '../AttachmentFileList/AttachmentFileListItem';
+import { AttachmentButton } from '../index';
 
 vi.mock('../AttachmentFileList/AttachmentFileIcon', () => ({
   AttachmentFileIcon: () => <div data-testid="att-icon" />,
@@ -44,11 +50,7 @@ describe('Attachment deepen residual branches', () => {
 
   it('AttachmentButton：title=null 不渲染标题 span', () => {
     wrap(
-      <AttachmentButton
-        uploadImage={vi.fn()}
-        title={null}
-        disabled={false}
-      />,
+      <AttachmentButton uploadImage={vi.fn()} title={null} disabled={false} />,
     );
     expect(document.querySelector('[class*="-title"]')).toBeNull();
   });

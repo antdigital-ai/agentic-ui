@@ -3,10 +3,7 @@
  */
 import { createEditor, Transforms } from 'slate';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  convertToParagraph,
-  setHeading,
-} from '../editorCommands';
+import { convertToParagraph, setHeading } from '../editorCommands';
 
 describe('editorCommands deepen residual branches', () => {
   beforeEach(() => {

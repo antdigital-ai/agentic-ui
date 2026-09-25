@@ -51,26 +51,26 @@ describe('loadCSS deepen residual branches', () => {
     await loadCSS(href);
 
     const href2 = `https://cdn.example/deepen-b-${Date.now()}.css`;
-    const createSpy = vi
-      .spyOn(document, 'createElement')
-      .mockImplementation(((tag: string) => {
-        if (tag === 'link') {
-          const el = {
-            rel: '',
-            type: '',
-            href: '',
-            onload: null as any,
-            onerror: null as any,
-            setAttribute(k: string, v: string) {
-              (this as any)[k] = v;
-            },
-          };
-          return el as any;
-        }
-        return document.createElementNS
-          ? (document.createElementNS('http://www.w3.org/1999/xhtml', tag) as any)
-          : ({} as any);
-      }) as any);
+    const createSpy = vi.spyOn(document, 'createElement').mockImplementation(((
+      tag: string,
+    ) => {
+      if (tag === 'link') {
+        const el = {
+          rel: '',
+          type: '',
+          href: '',
+          onload: null as any,
+          onerror: null as any,
+          setAttribute(k: string, v: string) {
+            (this as any)[k] = v;
+          },
+        };
+        return el as any;
+      }
+      return document.createElementNS
+        ? (document.createElementNS('http://www.w3.org/1999/xhtml', tag) as any)
+        : ({} as any);
+    }) as any);
     const appendSpy = vi
       .spyOn(document.head, 'appendChild')
       .mockImplementation((node: any) => {

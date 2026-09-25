@@ -215,9 +215,9 @@ describe('BubbleExtra deepen residual branches', () => {
         shouldShowCopy
       />,
     );
-    expect(screen.getAllByTestId('chat-item-copy-button').length).toBeGreaterThan(
-      0,
-    );
+    expect(
+      screen.getAllByTestId('chat-item-copy-button').length,
+    ).toBeGreaterThan(0);
   });
 
   it('无内容且无动作返回 null', () => {

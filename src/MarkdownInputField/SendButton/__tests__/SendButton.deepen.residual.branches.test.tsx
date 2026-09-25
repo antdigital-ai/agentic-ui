@@ -19,9 +19,7 @@ describe('SendButton deepen residual branches', () => {
   it('disabled 不触发发送', async () => {
     const mod = await import('../index');
     const Comp =
-      (mod as any).SendButton ||
-      (mod as any).default ||
-      Object.values(mod)[0];
+      (mod as any).SendButton || (mod as any).default || Object.values(mod)[0];
     const onSend = vi.fn();
     const { container } = render(
       <Comp disabled onSend={onSend} typing={false} />,

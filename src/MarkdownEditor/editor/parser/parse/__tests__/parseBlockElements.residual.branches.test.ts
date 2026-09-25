@@ -15,7 +15,9 @@ const parseNodes = (nodes: any[], _top?: boolean, _parent?: any) =>
 
 describe('parseBlockElements residual branches', () => {
   it('handleHeading：有/无 children；depth', () => {
-    expect(handleHeading({ depth: 2, children: [] }, parseNodes as any)).toMatchObject({
+    expect(
+      handleHeading({ depth: 2, children: [] }, parseNodes as any),
+    ).toMatchObject({
       type: 'head',
       level: 2,
       children: [{ text: '' }],

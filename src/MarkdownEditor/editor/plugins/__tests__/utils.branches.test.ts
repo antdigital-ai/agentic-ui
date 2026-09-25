@@ -63,27 +63,21 @@ describe('plugins/utils branches', () => {
     expect(
       isCardEmpty({
         type: 'card',
-        children: [
-          { type: 'paragraph', children: [{ text: '' }] },
-        ],
+        children: [{ type: 'paragraph', children: [{ text: '' }] }],
       }),
     ).toBe(true);
 
     expect(
       isCardEmpty({
         type: 'card',
-        children: [
-          { type: 'paragraph', children: [{ text: '  ' }] },
-        ],
+        children: [{ type: 'paragraph', children: [{ text: '  ' }] }],
       }),
     ).toBe(true);
 
     expect(
       isCardEmpty({
         type: 'card',
-        children: [
-          { type: 'paragraph', children: [{ text: 'x' }] },
-        ],
+        children: [{ type: 'paragraph', children: [{ text: 'x' }] }],
       }),
     ).toBe(false);
 

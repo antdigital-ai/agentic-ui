@@ -45,9 +45,7 @@ describe('schedule prompt with placeholders and code fence', () => {
   });
 
   it('placeholder tags survive orphan inline leaf normalize after parse', () => {
-    const { schema } = parserMdToSchema(
-      '描述 `${placeholder:任务名称}` 结束',
-    );
+    const { schema } = parserMdToSchema('描述 `${placeholder:任务名称}` 结束');
     const editor = withOrphanInlineLeafNormalize(createEditor());
     editor.children = schema as Descendant[];
     Editor.normalize(editor, { force: true });

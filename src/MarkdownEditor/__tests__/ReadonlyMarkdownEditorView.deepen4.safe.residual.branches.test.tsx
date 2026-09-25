@@ -96,7 +96,9 @@ describe('ReadonlyMarkdownEditorView deepen4 safe residual branches', () => {
       contentContainer = document.createElement('div');
       vi.advanceTimersByTime(20);
     });
-    expect(applyHighlights.mock.calls.length + clearHighlights.mock.calls.length).toBeGreaterThan(0);
+    expect(
+      applyHighlights.mock.calls.length + clearHighlights.mock.calls.length,
+    ).toBeGreaterThan(0);
   });
 
   it('comment enable 且空列表走 clearHighlights', () => {

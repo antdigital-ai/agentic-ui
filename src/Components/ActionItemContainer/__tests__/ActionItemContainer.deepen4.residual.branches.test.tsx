@@ -37,9 +37,7 @@ describe('ActionItemContainer deepen4 residual branches', () => {
         B
       </button>,
     ] as KeyedElement[];
-    const { rerender } = wrap(
-      <ActionItemContainer>{a}</ActionItemContainer>,
-    );
+    const { rerender } = wrap(<ActionItemContainer>{a}</ActionItemContainer>);
     const b = [
       <button key="c" type="button">
         C

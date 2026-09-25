@@ -26,9 +26,7 @@ describe('CopyButton deepen residual branches', () => {
     Object.assign(navigator, {
       clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
     });
-    const { container } = render(
-      <CopyButton data-testid="copy" />,
-    );
+    const { container } = render(<CopyButton data-testid="copy" />);
     const btn = container.querySelector('button, [role="button"], span, div');
     if (btn) fireEvent.click(btn);
     expect(container.firstChild).toBeTruthy();

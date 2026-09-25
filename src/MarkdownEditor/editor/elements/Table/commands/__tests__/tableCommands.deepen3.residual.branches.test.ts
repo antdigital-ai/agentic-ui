@@ -17,9 +17,7 @@ describe('tableCommands deepen3 residual branches', () => {
 
   it('无效路径不炸', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: 'x' }] },
-    ];
+    editor.children = [{ type: 'paragraph', children: [{ text: 'x' }] }];
     for (const v of Object.values(cmds)) {
       if (typeof v === 'function') {
         try {

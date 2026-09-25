@@ -34,7 +34,9 @@ describe('Katex midtail branches', () => {
         }
       />,
     );
-    expect(document.querySelector('.katex-container') || document.body).toBeTruthy();
+    expect(
+      document.querySelector('.katex-container') || document.body,
+    ).toBeTruthy();
   });
 
   it('code/CodeUI/Katex：缺 el 回退；有 value', () => {

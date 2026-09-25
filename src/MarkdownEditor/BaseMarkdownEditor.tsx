@@ -13,11 +13,11 @@ export * from './editor/utils';
 export * from './el';
 export * from './types';
 
-export type { EditorSelChangePayload } from './editor/utils/editorSelChange';
 export { createEditorSelChangeSubject } from './editor/utils/editorSelChange';
-export { ReadonlyMarkdownEditorView };
+export type { EditorSelChangePayload } from './editor/utils/editorSelChange';
 export { ReadonlyMarkdownEditorStore } from './readonly/ReadonlyMarkdownEditorStore';
 export { findTextInReadonlyMarkdownDom } from './readonly/findTextInReadonlyMarkdownDom';
+export { ReadonlyMarkdownEditorView };
 
 /**
  * 按只读模式与 renderMode 分流：

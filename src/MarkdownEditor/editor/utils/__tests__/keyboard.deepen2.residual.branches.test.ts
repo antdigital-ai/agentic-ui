@@ -1,8 +1,8 @@
 /**
  * useSystemKeyboard deepen2 residual：mod+b、readonly、无 selection、attach。
  */
-import copy from 'copy-to-clipboard';
 import { renderHook } from '@testing-library/react';
+import copy from 'copy-to-clipboard';
 import { Subject } from 'rxjs';
 import { createEditor, Transforms } from 'slate';
 import { ReactEditor, withReact } from 'slate-react';

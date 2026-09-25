@@ -5,7 +5,7 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { PureBubble, PureAIBubble, PureUserBubble } from '../PureBubble';
+import { PureAIBubble, PureBubble, PureUserBubble } from '../PureBubble';
 import type { BubbleProps, MessageBubbleData } from '../type';
 
 vi.mock('../../MarkdownEditor/BaseMarkdownEditor', () => ({

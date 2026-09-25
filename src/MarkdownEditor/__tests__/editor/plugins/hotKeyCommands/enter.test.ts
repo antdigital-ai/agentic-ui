@@ -510,7 +510,6 @@ describe('enter.ts', () => {
       // 由于我们没有完全模拟 BlockMathNodes，这里只是确保方法被调用
       expect(e.preventDefault).not.toHaveBeenCalled();
     });
-
   });
 
   describe('empty 方法', () => {

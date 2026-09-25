@@ -1,8 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import {
-  isMix,
-  parserSlateNodeToMarkdown,
-} from '../parserSlateNodeToMarkdown';
+import { isMix, parserSlateNodeToMarkdown } from '../parserSlateNodeToMarkdown';
 
 describe('parserSlateNodeToMarkdown targeted coverage', () => {
   it('覆盖 numeric key 排序与数组 config 序列化分支（408,475,491,492）', () => {
@@ -926,7 +923,12 @@ describe('parserSlateNodeToMarkdown targeted coverage', () => {
     circular.self = circular;
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const result = parserSlateNodeToMarkdown([
-      { type: 'code', language: 'json', value: circular, children: [{ text: '' }] },
+      {
+        type: 'code',
+        language: 'json',
+        value: circular,
+        children: [{ text: '' }],
+      },
     ] as any);
     expect(result).toContain('```json');
     warnSpy.mockRestore();
@@ -1078,10 +1080,7 @@ describe('parserSlateNodeToMarkdown targeted coverage', () => {
     const result = parserSlateNodeToMarkdown([
       {
         type: 'paragraph',
-        children: [
-          { text: 'ab', bold: true, italic: true },
-          { text: ' cd' },
-        ],
+        children: [{ text: 'ab', bold: true, italic: true }, { text: ' cd' }],
       },
     ] as any);
     expect(result).toContain('***ab***');
@@ -1400,14 +1399,22 @@ describe('parserSlateNodeToMarkdown 深度边界', () => {
 
   it('mediaType 缺省时走 getMediaType；无 height 的 video / align 图 / iframe', () => {
     const result = parserSlateNodeToMarkdown([
-      { type: 'media', url: 'https://cdn.example/v.mp4', children: [{ text: '' }] },
+      {
+        type: 'media',
+        url: 'https://cdn.example/v.mp4',
+        children: [{ text: '' }],
+      },
       {
         type: 'media',
         url: 'https://cdn.example/p.png',
         align: 'right',
         children: [{ text: '' }],
       },
-      { type: 'media', url: 'https://embed.example/frame', children: [{ text: '' }] },
+      {
+        type: 'media',
+        url: 'https://embed.example/frame',
+        children: [{ text: '' }],
+      },
     ] as any);
     expect(result).toContain('<video src="https://cdn.example/v.mp4"/>');
     expect(result).toContain('data-align="right"');
@@ -2546,9 +2553,7 @@ describe('parserSlate istanbul residual：convertPlugin / composeText / containe
         [{ type: 'p-text2', children: [{ text: '' }] }] as any,
         '',
         [{ root: true }],
-        [
-          pluginMatch('p-text2', () => ({ type: 'text', value: 'ok' })),
-        ] as any,
+        [pluginMatch('p-text2', () => ({ type: 'text', value: 'ok' }))] as any,
       ),
     ).toBe('ok');
 

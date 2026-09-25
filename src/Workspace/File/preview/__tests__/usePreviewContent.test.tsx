@@ -1,9 +1,9 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { FileNode } from '../../../types';
 import { fileTypeProcessor } from '../../FileTypeProcessor';
 import { usePreviewContent } from '../usePreviewContent';
-import type { FileNode } from '../../../types';
 
 vi.mock('../../FileTypeProcessor', () => ({
   fileTypeProcessor: {
@@ -12,7 +12,11 @@ vi.mock('../../FileTypeProcessor', () => ({
   },
 }));
 
-const textFile: FileNode = { id: 'f1', name: 'app.ts', content: 'const x = 1;' };
+const textFile: FileNode = {
+  id: 'f1',
+  name: 'app.ts',
+  content: 'const x = 1;',
+};
 
 describe('usePreviewContent', () => {
   beforeEach(() => {

@@ -3,11 +3,7 @@
  * mark 非 Text children、chartType 对象、attachment size。
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  findAttachment,
-  findImageElement,
-  handleHtml,
-} from '../parseHtml';
+import { findAttachment, findImageElement, handleHtml } from '../parseHtml';
 
 describe('parseHtml deepen3 residual branches', () => {
   beforeEach(() => {
@@ -60,22 +56,17 @@ describe('parseHtml deepen3 residual branches', () => {
   });
 
   it('mark applyMarkRecursive：无 text 有 children 递归', () => {
-    const out = handleHtml(
-      { value: '<mark>**x**</mark>' },
-      null,
-      [],
-      () => ({
-        schema: [
-          {
-            type: 'paragraph',
-            children: [
-              { type: 'strong', children: [{ text: 'x' }] },
-              { type: 'empty' },
-            ],
-          },
-        ],
-      }),
-    );
+    const out = handleHtml({ value: '<mark>**x**</mark>' }, null, [], () => ({
+      schema: [
+        {
+          type: 'paragraph',
+          children: [
+            { type: 'strong', children: [{ text: 'x' }] },
+            { type: 'empty' },
+          ],
+        },
+      ],
+    }));
     expect(out.el).toBeTruthy();
   });
 
@@ -91,9 +82,7 @@ describe('parseHtml deepen3 residual branches', () => {
 
   it('findAttachment：有 data-size', () => {
     expect(
-      findAttachment(
-        '<a href="https://f.bin" download data-size="12">f</a>',
-      ),
+      findAttachment('<a href="https://f.bin" download data-size="12">f</a>'),
     ).toMatchObject({ url: 'https://f.bin', size: 12 });
   });
 });

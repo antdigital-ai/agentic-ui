@@ -6,7 +6,15 @@
 import '@testing-library/jest-dom';
 import { act, render } from '@testing-library/react';
 import React from 'react';
-import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from 'vitest';
 import { AceEditor } from '../../components/AceEditor';
 
 const eventHandlers: Record<string, ((...args: any[]) => void)[]> = {};
@@ -122,7 +130,10 @@ const editOptionsCaptor = vi.hoisted(() => ({
   calls: [] as Record<string, unknown>[],
 }));
 
-const appendTextareaAndReturnEditor = (el: HTMLElement, options?: Record<string, unknown>) => {
+const appendTextareaAndReturnEditor = (
+  el: HTMLElement,
+  options?: Record<string, unknown>,
+) => {
   if (options) {
     editOptionsCaptor.calls.push(options);
   }

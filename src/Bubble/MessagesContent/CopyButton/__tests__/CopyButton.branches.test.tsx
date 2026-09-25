@@ -5,12 +5,19 @@ import { CopyButton, CopyIcon } from '../index';
 
 vi.mock('../../../../Components/ActionIconBox', () => ({
   ActionIconBox: ({ children, onClick, title, ...props }: any) => (
-    <button type="button" {...props} onClick={onClick} data-title={typeof title === 'string' ? title : 'copied'}>
+    <button
+      type="button"
+      {...props}
+      onClick={onClick}
+      data-title={typeof title === 'string' ? title : 'copied'}
+    >
       {children(false)}
     </button>
   ),
 }));
-vi.mock('../../../../Hooks/useCopied', () => ({ useCopied: () => ({ copied: true, setCopied: vi.fn() }) }));
+vi.mock('../../../../Hooks/useCopied', () => ({
+  useCopied: () => ({ copied: true, setCopied: vi.fn() }),
+}));
 
 describe('CopyButton residual branches', () => {
   it('renders default icon and awaits optional click handlers', async () => {
@@ -22,10 +29,18 @@ describe('CopyButton residual branches', () => {
   });
 
   it('renders function and node children', () => {
-    const { rerender } = render(<CopyButton>{(hovered) => <span>{String(hovered)}</span>}</CopyButton>);
+    const { rerender } = render(
+      <CopyButton>{(hovered) => <span>{String(hovered)}</span>}</CopyButton>,
+    );
     expect(screen.getByText('false')).toBeInTheDocument();
-    rerender(<CopyButton><span>custom</span></CopyButton>);
+    rerender(
+      <CopyButton>
+        <span>custom</span>
+      </CopyButton>,
+    );
     expect(screen.getByText('custom')).toBeInTheDocument();
-    expect(render(<CopyIcon aria-label="copy" />).getByLabelText('copy')).toBeInTheDocument();
+    expect(
+      render(<CopyIcon aria-label="copy" />).getByLabelText('copy'),
+    ).toBeInTheDocument();
   });
 });

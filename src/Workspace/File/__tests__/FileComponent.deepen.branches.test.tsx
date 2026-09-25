@@ -97,11 +97,15 @@ const openPreviewFor = async (fileName: string) => {
 };
 
 const expectPreviewOpen = () => {
-  expect(document.querySelector('.ant-workspace-file-preview-back-button')).toBeTruthy();
+  expect(
+    document.querySelector('.ant-workspace-file-preview-back-button'),
+  ).toBeTruthy();
 };
 
 const expectPreviewClosed = () => {
-  expect(document.querySelector('.ant-workspace-file-preview-back-button')).toBeNull();
+  expect(
+    document.querySelector('.ant-workspace-file-preview-back-button'),
+  ).toBeNull();
 };
 
 const clickBackToList = () => {
@@ -114,7 +118,6 @@ const clickBackToList = () => {
 
 const previewActionButtons = () =>
   document.querySelectorAll('.ant-workspace-file-preview-item-action-btn');
-
 
 describe('FileComponent deepen branches', () => {
   afterEach(() => {
@@ -245,9 +248,17 @@ describe('FileComponent deepen branches', () => {
 
   it('onPreview 返回 string/number/boolean 自定义内容', async () => {
     for (const [name, value, matcher] of [
-      ['plain-preview.txt', 'plain-preview', (t: string) => screen.getByText(t)],
+      [
+        'plain-preview.txt',
+        'plain-preview',
+        (t: string) => screen.getByText(t),
+      ],
       ['num.txt', 42, (t: string) => screen.getByText(t)],
-      ['bool.txt', true, () => document.querySelector('.ant-workspace-file-preview-back-button')],
+      [
+        'bool.txt',
+        true,
+        () => document.querySelector('.ant-workspace-file-preview-back-button'),
+      ],
     ] as const) {
       const onPreview = vi.fn().mockResolvedValue(value);
       const { unmount } = render(
@@ -567,7 +578,9 @@ describe('FileComponent deepen branches', () => {
     await waitFor(() => {
       expect(previewActionButtons().length).toBeGreaterThan(0);
     });
-    fireEvent.click(previewActionButtons().item(previewActionButtons().length - 1)!);
+    fireEvent.click(
+      previewActionButtons().item(previewActionButtons().length - 1)!,
+    );
     expect(onDownload).toHaveBeenCalled();
   });
 
@@ -811,7 +824,9 @@ describe('FileComponent deepen branches', () => {
     });
     fireEvent.click(screen.getByTestId('close-image-preview'));
     await waitFor(() => {
-      expect(screen.queryByTestId('close-image-preview')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('close-image-preview'),
+      ).not.toBeInTheDocument();
     });
   });
 

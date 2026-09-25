@@ -2,7 +2,13 @@
  * BoxPlotChart deepen residual：空 values、无效数、statistic 空、分类回退、tooltip。
  */
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import BoxPlotChart from '../index';
@@ -25,7 +31,8 @@ vi.mock('react-chartjs-2', () => ({
     (globalThis as any).__boxResData = data;
     (globalThis as any).__boxResOptions = options;
     if (ref) {
-      if (typeof ref === 'function') ref({ canvas: document.createElement('canvas') });
+      if (typeof ref === 'function')
+        ref({ canvas: document.createElement('canvas') });
       else ref.current = { canvas: document.createElement('canvas') };
     }
     return <div data-testid="box-res" />;

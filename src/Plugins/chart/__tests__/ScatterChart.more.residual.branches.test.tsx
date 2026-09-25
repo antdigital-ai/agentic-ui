@@ -116,10 +116,7 @@ describe('ScatterChart more residual branches', () => {
 
   it('statistic 空数组不渲染；单对象转数组', () => {
     const { rerender } = render(
-      <ScatterChart
-        data={[{ x: 1, y: 2, type: 'a' }]}
-        statistic={[] as any}
-      />,
+      <ScatterChart data={[{ x: 1, y: 2, type: 'a' }]} statistic={[] as any} />,
     );
     expect(screen.queryByTestId('stat')).not.toBeInTheDocument();
     rerender(
@@ -167,11 +164,7 @@ describe('ScatterChart more residual branches', () => {
 
   it('external tooltip：opacity 0 / 空 dataPoints / 创建 DOM', () => {
     render(
-      <ScatterChart
-        data={[{ x: 1, y: 2, type: 'a' }]}
-        xUnit="kg"
-        yUnit="%"
-      />,
+      <ScatterChart data={[{ x: 1, y: 2, type: 'a' }]} xUnit="kg" yUnit="%" />,
     );
     const external = (globalThis as any).__scatterMoreOptions?.plugins?.tooltip
       ?.external;
@@ -210,9 +203,7 @@ describe('ScatterChart more residual branches', () => {
       />,
     );
     rerender(
-      <ScatterChart
-        data={[{ x: 3, y: 4, type: 'a', category: 'C2' }]}
-      />,
+      <ScatterChart data={[{ x: 3, y: 4, type: 'a', category: 'C2' }]} />,
     );
     expect((globalThis as any).__scatterMoreData?.datasets?.[0]?.data).toEqual([
       { x: 3, y: 4 },
@@ -225,9 +216,7 @@ describe('ScatterChart more residual branches', () => {
   });
 
   it('window resize 触发', () => {
-    render(
-      <ScatterChart data={[{ x: 1, y: 2, type: 'a' }]} title="r" />,
-    );
+    render(<ScatterChart data={[{ x: 1, y: 2, type: 'a' }]} title="r" />);
     Object.defineProperty(window, 'innerWidth', {
       writable: true,
       configurable: true,
@@ -256,9 +245,9 @@ describe('ScatterChart more residual branches', () => {
     );
     const pts = (globalThis as any).__scatterMoreData?.datasets?.[0]?.data;
     expect(Array.isArray(pts)).toBe(true);
-    expect(pts.every((p: any) => Number.isFinite(p.x) && Number.isFinite(p.y))).toBe(
-      true,
-    );
+    expect(
+      pts.every((p: any) => Number.isFinite(p.x) && Number.isFinite(p.y)),
+    ).toBe(true);
   });
 
   it('defaultColorList 回退；filter 切换；tooltip external 无单位', () => {
@@ -287,7 +276,9 @@ describe('ScatterChart more residual branches', () => {
       ?.external;
     if (typeof external === 'function') {
       external({
-        chart: { canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) } },
+        chart: {
+          canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) },
+        },
         tooltip: {
           opacity: 1,
           caretX: 8,
@@ -301,7 +292,9 @@ describe('ScatterChart more residual branches', () => {
           ],
         },
       });
-      expect(document.getElementById('custom-scatter-tooltip') || true).toBeTruthy();
+      expect(
+        document.getElementById('custom-scatter-tooltip') || true,
+      ).toBeTruthy();
     }
   });
 
@@ -326,8 +319,8 @@ describe('ScatterChart more residual branches', () => {
     act(() => {
       window.dispatchEvent(new Event('resize'));
     });
-    const gen = (globalThis as any).__scatterMoreOptions?.plugins?.legend?.labels
-      ?.generateLabels;
+    const gen = (globalThis as any).__scatterMoreOptions?.plugins?.legend
+      ?.labels?.generateLabels;
     if (typeof gen === 'function') {
       const labels = gen({
         data: {
@@ -347,11 +340,7 @@ describe('ScatterChart more residual branches', () => {
 
   it('istanbul deepen：空数据；单点；color 回调；bounds 轴；tooltip opacity0', () => {
     const { rerender } = render(
-      <ScatterChart
-        data={[]}
-        title="sc-empty"
-        theme="light"
-      />,
+      <ScatterChart data={[]} title="sc-empty" theme="light" />,
     );
     expect(screen.getByTestId('tb')).toHaveTextContent('sc-empty');
 
@@ -393,11 +382,15 @@ describe('ScatterChart more residual branches', () => {
       ?.external;
     if (typeof external === 'function') {
       external({
-        chart: { canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) } },
+        chart: {
+          canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) },
+        },
         tooltip: { opacity: 0, caretX: 0, caretY: 0, dataPoints: [] },
       });
       external({
-        chart: { canvas: { getBoundingClientRect: () => ({ left: 2, top: 3 }) } },
+        chart: {
+          canvas: { getBoundingClientRect: () => ({ left: 2, top: 3 }) },
+        },
         tooltip: {
           opacity: 1,
           caretX: 9,
@@ -461,7 +454,10 @@ describe('ScatterChart more residual branches', () => {
         xUnit=""
         yUnit=""
         showLegend
-        statistic={[{ title: 'n', value: 3 }, { title: 'm', value: 1 }]}
+        statistic={[
+          { title: 'n', value: 3 },
+          { title: 'm', value: 1 },
+        ]}
         title="sc-arr-color"
       />,
     );

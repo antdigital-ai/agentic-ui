@@ -91,7 +91,11 @@ vi.mock('../../components/index', () => ({
   ),
   CodeToolbar: ({ onExpandToggle, onViewModeToggle }: any) => (
     <div data-testid="code-toolbar">
-      <button type="button" data-testid="expand-toggle" onClick={onExpandToggle}>
+      <button
+        type="button"
+        data-testid="expand-toggle"
+        onClick={onExpandToggle}
+      >
         expand
       </button>
       {onViewModeToggle && (
@@ -118,8 +122,11 @@ vi.mock('../../../../MarkdownEditor', () => ({
 }));
 
 import { useDetectTheme } from '../../../chart/hooks';
-import { openHtmlLocalPreview, openMarkdownLocalPreview } from '../../utils/localPreview';
 import { CodeRenderer } from '../../components/CodeRenderer';
+import {
+  openHtmlLocalPreview,
+  openMarkdownLocalPreview,
+} from '../../utils/localPreview';
 
 const baseElement = (overrides: Record<string, unknown> = {}) => ({
   type: 'code' as const,
@@ -146,7 +153,11 @@ describe('CodeRenderer deepen residual branches', () => {
     const { unmount: unmountEmpty } = render(
       <CodeRenderer
         element={
-          baseElement({ language: 'html', value: '', children: [{ text: '' }] }) as any
+          baseElement({
+            language: 'html',
+            value: '',
+            children: [{ text: '' }],
+          }) as any
         }
         attributes={{} as any}
       >
@@ -176,7 +187,10 @@ describe('CodeRenderer deepen residual branches', () => {
   it('dark theme 使用 chaos 算法', () => {
     vi.mocked(useDetectTheme).mockReturnValue('dark');
     render(
-      <CodeRenderer element={baseElement({ language: 'javascript' }) as any} attributes={{} as any}>
+      <CodeRenderer
+        element={baseElement({ language: 'javascript' }) as any}
+        attributes={{} as any}
+      >
         <span />
       </CodeRenderer>,
     );
@@ -194,7 +208,13 @@ describe('CodeRenderer deepen residual branches', () => {
 
     rerender(
       <CodeRenderer
-        element={baseElement({ language: 'markdown', value: '# t', children: [{ text: '# t' }] }) as any}
+        element={
+          baseElement({
+            language: 'markdown',
+            value: '# t',
+            children: [{ text: '# t' }],
+          }) as any
+        }
         attributes={{} as any}
       >
         <span />
@@ -205,7 +225,10 @@ describe('CodeRenderer deepen residual branches', () => {
 
   it('expand toggle 折叠隐藏 ace 区域', () => {
     render(
-      <CodeRenderer element={baseElement({ language: 'javascript' }) as any} attributes={{} as any}>
+      <CodeRenderer
+        element={baseElement({ language: 'javascript' }) as any}
+        attributes={{} as any}
+      >
         <span />
       </CodeRenderer>,
     );
@@ -241,7 +264,9 @@ describe('CodeRenderer deepen residual branches', () => {
         <span />
       </CodeRenderer>,
     );
-    expect(container.querySelector('[data-testid="code-container"]')).toBeNull();
+    expect(
+      container.querySelector('[data-testid="code-container"]'),
+    ).toBeNull();
   });
 
   it('viewMode toggle 在 preview/code 间切换', () => {
@@ -302,6 +327,8 @@ describe('CodeRenderer deepen residual branches', () => {
         <span />
       </CodeRenderer>,
     );
-    expect(container.querySelector('[data-testid="code-container"]')).toBeNull();
+    expect(
+      container.querySelector('[data-testid="code-container"]'),
+    ).toBeNull();
   });
 });

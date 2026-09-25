@@ -54,6 +54,8 @@ describe('FileTreeComponent deepen6 residual branches', () => {
         />
       </Wrapper>,
     );
-    expect(container.textContent || container.querySelector('.ant-tree')).toBeTruthy();
+    expect(
+      container.textContent || container.querySelector('.ant-tree'),
+    ).toBeTruthy();
   });
 });

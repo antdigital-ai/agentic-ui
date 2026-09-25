@@ -37,8 +37,7 @@ describe('useMermaidRender midtail branches', () => {
     const divRef = { current: div } as React.RefObject<HTMLDivElement>;
 
     const { rerender } = renderHook(
-      ({ code, visible }) =>
-        useMermaidRender(code, divRef, 'm1', visible, {}),
+      ({ code, visible }) => useMermaidRender(code, divRef, 'm1', visible, {}),
       { initialProps: { code: '', visible: true } },
     );
     expect(div.innerHTML).toBe('');

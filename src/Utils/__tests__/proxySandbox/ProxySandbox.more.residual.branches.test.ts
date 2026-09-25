@@ -43,8 +43,8 @@ describe('ProxySandbox extra residual branches', () => {
       });
     `);
     await vi.advanceTimersByTimeAsync(50);
-    expect(result.success === true || result.result === 7 || !result.success).toBe(
-      true,
-    );
+    expect(
+      result.success === true || result.result === 7 || !result.success,
+    ).toBe(true);
   });
 });

@@ -25,9 +25,7 @@ describe('ReadonlyMarkdownEditorView 分支覆盖', () => {
   });
 
   it.skip('typewriter 作为 streaming 别名', () => {
-    render(
-      <ReadonlyMarkdownEditorView initValue="# Hi" typewriter />,
-    );
+    render(<ReadonlyMarkdownEditorView initValue="# Hi" typewriter />);
     expect(screen.getByTestId('md-renderer')).toHaveTextContent('# Hi');
   });
 

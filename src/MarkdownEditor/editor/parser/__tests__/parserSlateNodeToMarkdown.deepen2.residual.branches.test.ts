@@ -7,9 +7,7 @@ import { parserSlateNodeToMarkdown } from '../parserSlateNodeToMarkdown';
 describe('parserSlateNodeToMarkdown deepen2 residual', () => {
   it('空 paragraph / 空 text 不抛', () => {
     expect(() =>
-      parserSlateNodeToMarkdown([
-        { type: 'paragraph', children: [] },
-      ] as any),
+      parserSlateNodeToMarkdown([{ type: 'paragraph', children: [] }] as any),
     ).not.toThrow();
     expect(
       parserSlateNodeToMarkdown([
@@ -59,21 +57,15 @@ describe('parserSlateNodeToMarkdown deepen2 residual', () => {
     const md = parserSlateNodeToMarkdown([
       {
         type: 'list',
-        children: [
-          { type: 'list-item', children: [{ text: 'a' }] },
-        ],
+        children: [{ type: 'list-item', children: [{ text: 'a' }] }],
       },
       {
         type: 'bulleted-list',
-        children: [
-          { type: 'list-item', children: [{ text: 'b' }] },
-        ],
+        children: [{ type: 'list-item', children: [{ text: 'b' }] }],
       },
       {
         type: 'numbered-list',
-        children: [
-          { type: 'list-item', children: [{ text: 'c' }] },
-        ],
+        children: [{ type: 'list-item', children: [{ text: 'c' }] }],
       },
       { type: 'paragraph', children: [{ text: 'tail' }] },
     ] as any);
@@ -124,10 +116,7 @@ describe('parserSlateNodeToMarkdown deepen2 residual', () => {
     const mix = parserSlateNodeToMarkdown([
       {
         type: 'paragraph',
-        children: [
-          { text: 'ab', bold: true, italic: true },
-          { text: 'cd' },
-        ],
+        children: [{ text: 'ab', bold: true, italic: true }, { text: 'cd' }],
       },
     ] as any);
     expect(mix).toMatch(/ab/);
@@ -206,9 +195,7 @@ describe('parserSlateNodeToMarkdown deepen2 residual', () => {
           {
             type: 'numbered-list',
             start: 3,
-            children: [
-              { type: 'list-item', children: [{ text: 'nested' }] },
-            ],
+            children: [{ type: 'list-item', children: [{ text: 'nested' }] }],
           },
         ],
       },

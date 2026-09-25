@@ -59,9 +59,7 @@ export function getCodeBlockPlainText(
   let fromSlate = '';
   if (hasElementChildren(element)) {
     try {
-      fromSlate = Node.string(
-        element as Parameters<typeof Node.string>[0],
-      );
+      fromSlate = Node.string(element as Parameters<typeof Node.string>[0]);
     } catch {
       // 测试中可能对 slate / 节点结构部分 mock，退回到 value
     }

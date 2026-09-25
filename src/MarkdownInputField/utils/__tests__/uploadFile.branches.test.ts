@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { upLoadFileToServer } from '../uploadFile';
 import type { AttachmentFile } from '../../types/attachment';
+import { upLoadFileToServer } from '../uploadFile';
 
 const createFile = (
   name: string,

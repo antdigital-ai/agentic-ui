@@ -1,5 +1,11 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
+import {
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import React from 'react';
 import { createEditor, Descendant, type Operation } from 'slate';
 import { withHistory } from 'slate-history';
@@ -22,7 +28,9 @@ const editorStoreMock = {
   setRefreshFloatBar: vi.fn(),
   setDomRect: vi.fn(),
   refreshFloatBar: false,
-  markdownEditorRef: { current: null as ReturnType<typeof createEditor> | null },
+  markdownEditorRef: {
+    current: null as ReturnType<typeof createEditor> | null,
+  },
   selChange$: { next: vi.fn() },
 };
 

@@ -19,9 +19,7 @@ describe('GroupHeader deepen2 residual branches', () => {
   it('空内容子项 Boolean 链', async () => {
     const mod = await import('../GroupHeader');
     const Comp =
-      (mod as any).GroupHeader ||
-      (mod as any).default ||
-      Object.values(mod)[0];
+      (mod as any).GroupHeader || (mod as any).default || Object.values(mod)[0];
     try {
       render(
         <Comp

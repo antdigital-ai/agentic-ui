@@ -44,7 +44,9 @@ describe('ReadonlyMarkdownEditorView deepen residual branches', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.useFakeTimers({ shouldAdvanceTime: true });
-    bindClick.mockImplementation((_root, _setShow: (v: any[]) => void) => vi.fn());
+    bindClick.mockImplementation((_root, _setShow: (v: any[]) => void) =>
+      vi.fn(),
+    );
   });
 
   afterEach(() => {

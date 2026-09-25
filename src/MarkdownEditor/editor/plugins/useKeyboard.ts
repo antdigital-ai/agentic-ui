@@ -222,7 +222,10 @@ export const useKeyboard = (
                     Editor.previous(markdownEditorRef.current, {
                       at: tagPath,
                     }) || [];
-                  if (!prevNode || !(prevNode as any).text?.endsWith('\uFEFF')) {
+                  if (
+                    !prevNode ||
+                    !(prevNode as any).text?.endsWith('\uFEFF')
+                  ) {
                     e.preventDefault();
                     Transforms.insertNodes(
                       markdownEditorRef.current,
@@ -358,7 +361,11 @@ export const useKeyboard = (
         return;
       }
 
-      if (e.key === 'Enter' && !imeActive && handleListsOnEnter(markdownEditorRef.current, e)) {
+      if (
+        e.key === 'Enter' &&
+        !imeActive &&
+        handleListsOnEnter(markdownEditorRef.current, e)
+      ) {
         e.stopPropagation();
         e.preventDefault();
         return;

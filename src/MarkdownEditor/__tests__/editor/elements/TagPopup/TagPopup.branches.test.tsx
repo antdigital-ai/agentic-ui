@@ -10,7 +10,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SuggestionContext } from '../../../../../MarkdownInputField/Suggestion/SuggestionContext';
 import { TagPopup } from '../../../../editor/elements/TagPopup';
 
-const createContext = (overrides: Partial<React.ContextType<typeof SuggestionContext>> = {}) => ({
+const createContext = (
+  overrides: Partial<React.ContextType<typeof SuggestionContext>> = {},
+) => ({
   open: false,
   setOpen: vi.fn(),
   triggerNodeContext: { current: undefined as any },
@@ -67,7 +69,9 @@ describe('TagPopup 分支覆盖', () => {
       children: <span>child</span>,
     });
     await waitFor(() => expect(items).toHaveBeenCalled());
-    expect(document.querySelector('[data-tag-popup-input]')).toBeInTheDocument();
+    expect(
+      document.querySelector('[data-tag-popup-input]'),
+    ).toBeInTheDocument();
   });
 
   it('dropdown 类型容器点击不打开 panel（handleClick 提前 return）', () => {
@@ -361,7 +365,11 @@ describe('TagPopup 分支覆盖', () => {
     await waitFor(() => expect(tagRender).toHaveBeenCalled());
     const callProps = tagRender.mock.calls[0][0];
     callProps.onSelect('  spaced  ');
-    expect(onSelect).toHaveBeenCalledWith('spaced', expect.any(Array), undefined);
+    expect(onSelect).toHaveBeenCalledWith(
+      'spaced',
+      expect.any(Array),
+      undefined,
+    );
   });
 
   it('异步 items 加载时显示 loading 类名', async () => {
@@ -380,9 +388,7 @@ describe('TagPopup 分支覆盖', () => {
       children: <span>c</span>,
     });
     await waitFor(() => expect(items).toHaveBeenCalled());
-    expect(
-      container.querySelector('[class*="loading"]'),
-    ).toBeInTheDocument();
+    expect(container.querySelector('[class*="loading"]')).toBeInTheDocument();
     resolveItems!([{ label: 'Done', key: 'd' }]);
     await waitFor(() => screen.getByText('Done'));
   });
@@ -393,9 +399,7 @@ describe('TagPopup 分支覆盖', () => {
       items: [{ label: 'A', key: 'a' }],
       children: <span>c</span>,
     });
-    expect(
-      container.querySelector('[class*="empty"]'),
-    ).toBeInTheDocument();
+    expect(container.querySelector('[class*="empty"]')).toBeInTheDocument();
   });
 
   it('beforeOpenChange 返回 true 时 panel 可打开', () => {
@@ -452,9 +456,7 @@ describe('TagPopup 分支覆盖', () => {
       children: <span>c</span>,
     });
     await waitFor(() =>
-      expect(
-        document.querySelector('[data-tag-popup-input]'),
-      ).toBeTruthy(),
+      expect(document.querySelector('[data-tag-popup-input]')).toBeTruthy(),
     );
   });
 

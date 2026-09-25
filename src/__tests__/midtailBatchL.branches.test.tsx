@@ -60,9 +60,12 @@ vi.mock('../TaskList/style', () => ({
   useStyle: () => ({ hashId: 'h' }),
 }));
 
-vi.mock('../MarkdownInputField/AttachmentButton/AttachmentFileList/style', () => ({
-  useStyle: () => ({ hashId: 'h' }),
-}));
+vi.mock(
+  '../MarkdownInputField/AttachmentButton/AttachmentFileList/style',
+  () => ({
+    useStyle: () => ({ hashId: 'h' }),
+  }),
+);
 
 vi.mock('../MarkdownRenderer/markdownReactShared', async (importOriginal) => {
   const actual = await importOriginal<any>();
@@ -254,8 +257,9 @@ describe('midtail batch L UI branches', () => {
       <AttachmentFileList fileMap={new Map()} onDelete={onDelete} />,
     );
     expect(
-      container.querySelector('.ant-agentic-md-editor-attachment-list-container-empty') ||
-        container.querySelector('[class*="container-empty"]'),
+      container.querySelector(
+        '.ant-agentic-md-editor-attachment-list-container-empty',
+      ) || container.querySelector('[class*="container-empty"]'),
     ).toBeTruthy();
 
     wrap(
@@ -271,10 +275,7 @@ describe('midtail batch L UI branches', () => {
                 type: 'image/png',
               } as any,
             ],
-            [
-              '2',
-              { name: 'b.txt', status: 'done', type: 'text/plain' } as any,
-            ],
+            ['2', { name: 'b.txt', status: 'done', type: 'text/plain' } as any],
           ])
         }
         onDelete={onDelete}
@@ -466,7 +467,11 @@ describe('midtail batch L UI branches', () => {
     });
     vi.stubGlobal('cancelAnimationFrame', vi.fn());
 
-    const { result: r2, rerender: rr2, unmount } = renderHook(
+    const {
+      result: r2,
+      rerender: rr2,
+      unmount,
+    } = renderHook(
       ({ total, streaming, gen }) =>
         useProgressiveBlocks(total, streaming, gen),
       { initialProps: { total: 40, streaming: false, gen: 1 } },

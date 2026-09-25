@@ -31,7 +31,10 @@ describe('docx/module deepen2 residual branches', () => {
     const text = document.createTextNode('   ');
     op.appendChild(text);
     div.appendChild(op);
-    Object.defineProperty(text, 'parentNode', { value: op, configurable: true });
+    Object.defineProperty(text, 'parentNode', {
+      value: op,
+      configurable: true,
+    });
     Object.defineProperty(op, 'parentNode', {
       value: div,
       configurable: true,

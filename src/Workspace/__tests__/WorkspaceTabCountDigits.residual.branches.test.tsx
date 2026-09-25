@@ -74,9 +74,7 @@ describe('WorkspaceTabCountDigits residual branches', () => {
   });
 
   it('无 hashId 仍渲染；三位数字 stagger 递增', () => {
-    render(
-      <WorkspaceTabCountDigits tabKey="t" value={105} prefixCls="pfx" />,
-    );
+    render(<WorkspaceTabCountDigits tabKey="t" value={105} prefixCls="pfx" />);
     expect(
       screen.getByTestId('workspace-tab-count-digit--t--2').style
         .animationDelay,
@@ -84,9 +82,7 @@ describe('WorkspaceTabCountDigits residual branches', () => {
   });
 
   it('value=0 渲染单 digit', () => {
-    render(
-      <WorkspaceTabCountDigits tabKey="z" value={0} prefixCls="ws" />,
-    );
+    render(<WorkspaceTabCountDigits tabKey="z" value={0} prefixCls="ws" />);
     expect(screen.getByLabelText('0')).toBeInTheDocument();
   });
 });

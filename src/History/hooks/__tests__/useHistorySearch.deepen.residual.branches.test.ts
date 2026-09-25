@@ -1,7 +1,7 @@
 /**
  * useHistorySearch deepen：sessionTitle 为 null/undefined 时 `?? ''`。
  */
-import { renderHook, act } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useHistorySearch } from '../useHistorySearch';
 
@@ -21,9 +21,7 @@ describe('useHistorySearch deepen residual branches', () => {
       { id: '2', sessionTitle: undefined },
       { id: '3', sessionTitle: 'hello' },
     ] as any[];
-    const { result } = renderHook(() =>
-      useHistorySearch({} as any, list),
-    );
+    const { result } = renderHook(() => useHistorySearch({} as any, list));
     act(() => {
       result.current.handleSearch('hello');
     });

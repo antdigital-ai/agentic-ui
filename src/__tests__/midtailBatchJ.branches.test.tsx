@@ -6,14 +6,14 @@ import { render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { BubbleExtra } from '../Bubble/MessagesContent/BubbleExtra';
 import { ContentFilemapView } from '../Bubble/ContentFilemapView';
-import { Suggestion } from '../MarkdownInputField/Suggestion';
+import { BubbleExtra } from '../Bubble/MessagesContent/BubbleExtra';
 import { resolveSendDisabled } from '../MarkdownInputField/SendButton';
 import {
   getSendButtonPalette,
   resolveSendButtonDisplayColors,
 } from '../MarkdownInputField/SendButton/sendButtonPalette';
+import { Suggestion } from '../MarkdownInputField/Suggestion';
 import { ToolUseBar } from '../ToolUseBar';
 import {
   ToolContent,
@@ -245,9 +245,7 @@ describe('midtail batch J component branches', () => {
     expect(warn).toHaveBeenCalled();
     warn.mockRestore();
 
-    const itemsFn = vi.fn(async () => [
-      { key: 'k1', label: 'Item1' },
-    ]);
+    const itemsFn = vi.fn(async () => [{ key: 'k1', label: 'Item1' }]);
     wrap(
       <Suggestion tagInputProps={{ items: itemsFn, onSelect: vi.fn() } as any}>
         <button type="button">trigger</button>

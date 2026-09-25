@@ -13,7 +13,12 @@ vi.mock('../../../../MarkdownEditor/editor/store', () => ({
 vi.mock('copy-to-clipboard', () => ({ default: vi.fn(() => true) }));
 
 const langProps = {
-  element: { type: 'code', language: 'js', value: 'x', children: [{ text: '' }] },
+  element: {
+    type: 'code',
+    language: 'js',
+    value: 'x',
+    children: [{ text: '' }],
+  },
   setLanguage: vi.fn(),
   containerRef: { current: null },
 } as any;
@@ -24,7 +29,14 @@ describe('CodeToolbar 分支覆盖', () => {
       <CodeToolbar
         theme="light"
         isExpanded
-        element={{ type: 'code', language: 'typescript', value: 'a', children: [{ text: '' }] } as any}
+        element={
+          {
+            type: 'code',
+            language: 'typescript',
+            value: 'a',
+            children: [{ text: '' }],
+          } as any
+        }
         readonly
         onCloseClick={vi.fn()}
         languageSelectorProps={langProps}
@@ -39,12 +51,14 @@ describe('CodeToolbar 分支覆盖', () => {
       <CodeToolbar
         theme="light"
         isExpanded={false}
-        element={{
-          type: 'code',
-          language: 'html',
-          value: '<script>alert(1)</script>',
-          children: [{ text: '' }],
-        } as any}
+        element={
+          {
+            type: 'code',
+            language: 'html',
+            value: '<script>alert(1)</script>',
+            children: [{ text: '' }],
+          } as any
+        }
         readonly={false}
         onCloseClick={vi.fn()}
         languageSelectorProps={langProps}
@@ -68,7 +82,14 @@ describe('CodeToolbar 分支覆盖', () => {
         <CodeToolbar
           theme="dark"
           isExpanded={false}
-          element={{ type: 'code', language: 'HTML', value, children: [{ text: '' }] } as any}
+          element={
+            {
+              type: 'code',
+              language: 'HTML',
+              value,
+              children: [{ text: '' }],
+            } as any
+          }
           readonly
           onCloseClick={vi.fn()}
           languageSelectorProps={langProps}
@@ -84,7 +105,14 @@ describe('CodeToolbar 分支覆盖', () => {
       <CodeToolbar
         theme="light"
         isExpanded={false}
-        element={{ type: 'code', language: 'js', value: '', children: [{ text: '' }] } as any}
+        element={
+          {
+            type: 'code',
+            language: 'js',
+            value: '',
+            children: [{ text: '' }],
+          } as any
+        }
         readonly
         onCloseClick={vi.fn()}
         languageSelectorProps={langProps}
@@ -98,12 +126,14 @@ describe('CodeToolbar 分支覆盖', () => {
       <CodeToolbar
         theme="light"
         isExpanded={false}
-        element={{
-          type: 'code',
-          language: 'mermaid',
-          value: 'graph TD\nA-->B',
-          children: [{ text: '' }],
-        } as any}
+        element={
+          {
+            type: 'code',
+            language: 'mermaid',
+            value: 'graph TD\nA-->B',
+            children: [{ text: '' }],
+          } as any
+        }
         readonly={false}
         onCloseClick={vi.fn()}
         languageSelectorProps={langProps}

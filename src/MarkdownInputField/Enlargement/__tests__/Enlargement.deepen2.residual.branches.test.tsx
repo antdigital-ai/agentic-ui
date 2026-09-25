@@ -22,9 +22,7 @@ describe('Enlargement deepen2 residual branches', () => {
   });
 
   it('locale 字段 undefined 仍走默认', () => {
-    const { container, rerender } = render(
-      <Enlargement isEnlarged={false} />,
-    );
+    const { container, rerender } = render(<Enlargement isEnlarged={false} />);
     expect(container.firstChild).toBeTruthy();
     rerender(<Enlargement isEnlarged />);
     expect(container.firstChild).toBeTruthy();

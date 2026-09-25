@@ -62,9 +62,7 @@ describe('GroupHeader 分支覆盖', () => {
   });
 
   it('未传 onGroupDownload 时不显示下载按钮', () => {
-    render(
-      <GroupHeader group={group()} prefixCls={PREFIX} hashId={HASH} />,
-    );
+    render(<GroupHeader group={group()} prefixCls={PREFIX} hashId={HASH} />);
     expect(screen.queryByLabelText('下载')).toBeNull();
   });
 

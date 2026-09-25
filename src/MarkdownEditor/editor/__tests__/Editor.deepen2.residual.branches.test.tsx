@@ -294,7 +294,10 @@ describe('Editor deepen2 residual branches', () => {
     Object.defineProperty(child, 'offsetTop', { value: 10 });
     target.appendChild(child);
     const scrollEl = mockStoreConfig.markdownContainerRef.current;
-    Object.defineProperty(scrollEl, 'scrollTop', { value: 100, writable: true });
+    Object.defineProperty(scrollEl, 'scrollTop', {
+      value: 100,
+      writable: true,
+    });
     const preventDefault = vi.fn();
     editableProps.onMouseDown?.({
       target,

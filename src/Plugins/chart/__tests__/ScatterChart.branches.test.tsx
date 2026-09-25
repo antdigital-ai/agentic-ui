@@ -337,10 +337,7 @@ describe('ScatterChart 分支覆盖', () => {
         capturedScatterProps.options.plugins.legend.labels.generateLabels;
       const result = generateLabels({
         data: {
-          datasets: [
-            { borderColor: '#1677ff' },
-            { borderColor: '#52c41a' },
-          ],
+          datasets: [{ borderColor: '#1677ff' }, { borderColor: '#52c41a' }],
         },
       });
       expect(result[0].text).toBe('Short');
@@ -566,9 +563,7 @@ describe('ScatterChart 分支覆盖', () => {
     });
 
     it('字符串 color 与 CSS 变量解析', () => {
-      render(
-        <ScatterChart data={validData} color="var(--scatter-primary)" />,
-      );
+      render(<ScatterChart data={validData} color="var(--scatter-primary)" />);
       expect(capturedScatterProps.data.datasets[0].borderColor).toBeDefined();
     });
 
@@ -616,12 +611,7 @@ describe('ScatterChart 分支覆盖', () => {
     });
 
     it('renderFilterInToolbar 多分类时渲染工具栏筛选', () => {
-      render(
-        <ScatterChart
-          data={validData}
-          renderFilterInToolbar
-        />,
-      );
+      render(<ScatterChart data={validData} renderFilterInToolbar />);
       expect(screen.getByTestId('chart-filter')).toBeInTheDocument();
     });
 
@@ -643,9 +633,9 @@ describe('ScatterChart 分支覆盖', () => {
           ],
         },
       });
-      expect(document.getElementById('custom-scatter-tooltip')?.innerHTML).toContain(
-        'bad',
-      );
+      expect(
+        document.getElementById('custom-scatter-tooltip')?.innerHTML,
+      ).toContain('bad');
       document.getElementById('custom-scatter-tooltip')?.remove();
     });
 
@@ -722,12 +712,7 @@ describe('ScatterChart 分支覆盖', () => {
     });
 
     it('color 数组按 index 循环', () => {
-      render(
-        <ScatterChart
-          data={validData}
-          color={['#111111', '#222222']}
-        />,
-      );
+      render(<ScatterChart data={validData} color={['#111111', '#222222']} />);
       expect(capturedScatterProps.data.datasets).toHaveLength(2);
     });
 
@@ -816,9 +801,7 @@ describe('ScatterChart 分支覆盖', () => {
       ];
       const { rerender } = render(<ScatterChart data={data} />);
       rerender(
-        <ScatterChart
-          data={[{ category: 'C', type: 'T1', x: 3, y: 30 }]}
-        />,
+        <ScatterChart data={[{ category: 'C', type: 'T1', x: 3, y: 30 }]} />,
       );
       await waitFor(() => {
         expect(screen.getByTestId('scatter-chart')).toBeInTheDocument();
@@ -893,9 +876,7 @@ describe('ScatterChart 分支覆盖', () => {
       const { rerender } = render(<ScatterChart data={data} />);
       rerender(
         <ScatterChart
-          data={[
-            { category: 'A', type: 'T1', x: 3, y: 30, filterLabel: 'F1' },
-          ]}
+          data={[{ category: 'A', type: 'T1', x: 3, y: 30, filterLabel: 'F1' }]}
         />,
       );
       await waitFor(() => {
@@ -911,9 +892,7 @@ describe('ScatterChart 分支覆盖', () => {
         { category: 'B', type: 'T1', x: 2, y: 20 },
       ];
       const { rerender } = render(<ScatterChart data={data} />);
-      rerender(
-        <ScatterChart data={[{ type: 'T1', x: 3, y: 30 }]} />,
-      );
+      rerender(<ScatterChart data={[{ type: 'T1', x: 3, y: 30 }]} />);
       await waitFor(() => {
         expect(capturedScatterProps.data.datasets[0].data).toEqual([
           { x: 3, y: 30 },
@@ -958,12 +937,7 @@ describe('ScatterChart 分支覆盖', () => {
     });
 
     it('color 空数组时使用 defaultColorList 回退色', () => {
-      render(
-        <ScatterChart
-          data={validData}
-          color={[]}
-        />,
-      );
+      render(<ScatterChart data={validData} color={[]} />);
       expect(capturedScatterProps.data.datasets[0].borderColor).toBe('#111111');
     });
 
@@ -1032,9 +1006,7 @@ describe('ScatterChart 分支覆盖', () => {
       expect(screen.getByText('暂无有效数据')).toBeInTheDocument();
 
       render(
-        <ScatterChart
-          data={[{ category: 'A', type: 'T1', x: 1, y: 2 }]}
-        />,
+        <ScatterChart data={[{ category: 'A', type: 'T1', x: 1, y: 2 }]} />,
       );
       const ext = capturedScatterProps?.options?.plugins?.tooltip?.external;
       if (typeof ext === 'function') {
@@ -1092,9 +1064,7 @@ describe('ScatterChart 分支覆盖', () => {
     it('istanbul buffer：custom-scatter-tooltip 创建与空 dataPoints', () => {
       document.getElementById('custom-scatter-tooltip')?.remove();
       render(
-        <ScatterChart
-          data={[{ category: 'A', type: 'T1', x: 1, y: 2 }]}
-        />,
+        <ScatterChart data={[{ category: 'A', type: 'T1', x: 1, y: 2 }]} />,
       );
       const ext = capturedScatterProps?.options?.plugins?.tooltip?.external;
       expect(typeof ext).toBe('function');
@@ -1151,8 +1121,7 @@ describe('ScatterChart 分支覆盖', () => {
         />,
       );
       expect(capturedScatterProps?.options?.scales?.x?.min).toBeDefined();
-      const tickCb =
-        capturedScatterProps?.options?.scales?.y?.ticks?.callback;
+      const tickCb = capturedScatterProps?.options?.scales?.y?.ticks?.callback;
       if (typeof tickCb === 'function') {
         expect(tickCb(3)).toBe('3');
       }

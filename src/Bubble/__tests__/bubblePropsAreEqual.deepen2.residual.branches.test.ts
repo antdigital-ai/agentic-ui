@@ -140,10 +140,7 @@ describe('bubblePropsAreEqual deepen2 residual branches', () => {
     ).toBe(false);
     // null vs {}：进入 style !== 后走 || {} 两侧
     expect(
-      bubblePropsAreEqual(
-        props({ style: null as any }),
-        props({ style: {} }),
-      ),
+      bubblePropsAreEqual(props({ style: null as any }), props({ style: {} })),
     ).toBe(true);
     expect(
       bubblePropsAreEqual(

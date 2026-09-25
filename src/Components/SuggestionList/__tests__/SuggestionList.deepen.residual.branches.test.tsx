@@ -2,7 +2,13 @@
  * SuggestionList deepen：showMore 默认文案、键盘、onItemClick、overflow 无 node。
  */
 import '@testing-library/jest-dom';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -70,7 +76,9 @@ describe('SuggestionList deepen residual branches', () => {
       fireEvent.keyDown(go, { key: 'Enter' });
       fireEvent.keyDown(go, { key: ' ' });
     }
-    await waitFor(() => expect(onItemClick.mock.calls.length).toBeGreaterThan(1));
+    await waitFor(() =>
+      expect(onItemClick.mock.calls.length).toBeGreaterThan(1),
+    );
   });
 
   it('forceShow tooltip；MutationObserver 缺失仍可渲染', () => {

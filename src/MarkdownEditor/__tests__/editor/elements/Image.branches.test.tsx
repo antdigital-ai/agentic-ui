@@ -1,5 +1,11 @@
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import { Modal } from 'antd';
 import React from 'react';
 import { Transforms } from 'slate';
@@ -369,7 +375,10 @@ describe('Image targeted coverage', () => {
   it('缺少 mediaType 时仍可渲染', () => {
     const { mediaType: _m, ...rest } = baseElement as any;
     render(
-      <EditorImage element={{ ...rest, url: 'https://x.png' }} attributes={attrs}>
+      <EditorImage
+        element={{ ...rest, url: 'https://x.png' }}
+        attributes={attrs}
+      >
         {null}
       </EditorImage>,
     );
@@ -426,7 +435,9 @@ describe('Image istanbul residual：alt/src/defaultSize 假值臂', () => {
 
     rerender(<ReadonlyImage src="" alt="" />);
     fireEvent.error(screen.getByRole('img'));
-    expect(screen.getByTestId('media-error-link')).toHaveTextContent('图片链接');
+    expect(screen.getByTestId('media-error-link')).toHaveTextContent(
+      '图片链接',
+    );
   });
 
   it('ReadonlyImage onError 有 src 无 alt 显示 src', () => {
@@ -463,9 +474,7 @@ describe('Image istanbul residual：alt/src/defaultSize 假值臂', () => {
   });
 
   it('ResizeImage 加载失败无 alt 用 src 或图片链接', () => {
-    const { rerender } = render(
-      <ResizeImage src="https://fail.png" alt="" />,
-    );
+    const { rerender } = render(<ResizeImage src="https://fail.png" alt="" />);
     const img = document.querySelector('img');
     expect(img).toBeTruthy();
     fireEvent.error(img!);

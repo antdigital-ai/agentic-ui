@@ -22,11 +22,15 @@ describe('Enlargement deepen residual branches', () => {
   });
 
   it('放大/缩小 title 走默认文案', () => {
-    const { container, rerender } = render(
-      <Enlargement isEnlarged={false} />,
-    );
-    expect(container.querySelector('[title="放大"], [aria-label="放大"]') || container.firstChild).toBeTruthy();
+    const { container, rerender } = render(<Enlargement isEnlarged={false} />);
+    expect(
+      container.querySelector('[title="放大"], [aria-label="放大"]') ||
+        container.firstChild,
+    ).toBeTruthy();
     rerender(<Enlargement isEnlarged />);
-    expect(container.querySelector('[title="缩小"], [aria-label="缩小"]') || container.firstChild).toBeTruthy();
+    expect(
+      container.querySelector('[title="缩小"], [aria-label="缩小"]') ||
+        container.firstChild,
+    ).toBeTruthy();
   });
 });

@@ -1,6 +1,10 @@
 import { Editor } from 'slate';
 
-const SLATE_EDITOR_METHOD_BLOCKLIST = new Set(['children', 'selection', 'marks']);
+const SLATE_EDITOR_METHOD_BLOCKLIST = new Set([
+  'children',
+  'selection',
+  'marks',
+]);
 
 const ERROR_REPORTING_WRAPPED = Symbol('markdownEditorErrorReportingWrapped');
 
@@ -31,9 +35,7 @@ export const withErrorReporting = (editor: Editor): Editor => {
     ) {
       return;
     }
-    const wrapped = tryCatchCallback(
-      value as (...args: unknown[]) => unknown,
-    );
+    const wrapped = tryCatchCallback(value as (...args: unknown[]) => unknown);
     (wrapped as { [ERROR_REPORTING_WRAPPED]?: boolean })[
       ERROR_REPORTING_WRAPPED
     ] = true;

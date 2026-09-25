@@ -38,11 +38,7 @@ describe('ButtonTab deepen residual branches', () => {
   it('disabled 时 icon Enter 不触发', () => {
     const onIconClick = vi.fn();
     const { container } = render(
-      <ButtonTab
-        disabled
-        onIconClick={onIconClick}
-        icon={<span>i</span>}
-      >
+      <ButtonTab disabled onIconClick={onIconClick} icon={<span>i</span>}>
         tab
       </ButtonTab>,
     );

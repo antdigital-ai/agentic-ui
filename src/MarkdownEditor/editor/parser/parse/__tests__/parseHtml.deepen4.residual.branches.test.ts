@@ -17,9 +17,9 @@ describe('parseHtml deepen4 residual branches', () => {
   });
 
   it('img / iframe / video 识别', () => {
-    expect(findImageElement('<img src="https://i/a.png" alt="a">')?.url).toMatch(
-      /a\.png/,
-    );
+    expect(
+      findImageElement('<img src="https://i/a.png" alt="a">')?.url,
+    ).toMatch(/a\.png/);
     const iframe = findImageElement(
       '<iframe src="https://v/embed" width="100"></iframe>',
     );

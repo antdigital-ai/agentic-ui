@@ -67,19 +67,12 @@ describe('SchemaBlockRenderer branches', () => {
       component: { type: 'form' },
       initialValues: { a: 1 },
     });
-    render(
-      <SchemaBlockRenderer language="schema">{json}</SchemaBlockRenderer>,
-    );
+    render(<SchemaBlockRenderer language="schema">{json}</SchemaBlockRenderer>);
     expect(screen.getByTestId('schema-renderer')).toBeTruthy();
 
-    const apaasifyRender = vi.fn(() => (
-      <div data-testid="apaasify">ok</div>
-    ));
+    const apaasifyRender = vi.fn(() => <div data-testid="apaasify">ok</div>);
     render(
-      <SchemaBlockRenderer
-        language="apaasify"
-        apaasifyRender={apaasifyRender}
-      >
+      <SchemaBlockRenderer language="apaasify" apaasifyRender={apaasifyRender}>
         {json}
       </SchemaBlockRenderer>,
     );
@@ -87,10 +80,7 @@ describe('SchemaBlockRenderer branches', () => {
 
     apaasifyRender.mockReturnValue(undefined as any);
     render(
-      <SchemaBlockRenderer
-        language="apassify"
-        apaasifyRender={apaasifyRender}
-      >
+      <SchemaBlockRenderer language="apassify" apaasifyRender={apaasifyRender}>
         {json}
       </SchemaBlockRenderer>,
     );
@@ -102,9 +92,7 @@ describe('SchemaBlockRenderer branches', () => {
       component: { type: 'form' },
       initialValues: null,
     });
-    render(
-      <SchemaBlockRenderer language="schema">{json}</SchemaBlockRenderer>,
-    );
+    render(<SchemaBlockRenderer language="schema">{json}</SchemaBlockRenderer>);
     expect(screen.getByTestId('schema-renderer')).toBeTruthy();
   });
 });
