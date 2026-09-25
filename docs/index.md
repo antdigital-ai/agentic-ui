@@ -19,15 +19,11 @@ export default () => {
   return (
     <div
       style={{
-        position: 'absolute',
-        width: '100%',
-        height: '100%',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
+        // 保持正常文档流：内容撑开页面高度，dumi 底部 footer 不再被遮挡（#397）
+        width: '100vw',
+        marginLeft: 'calc(50% - 50vw)',
         paddingTop: 142,
-        overflowX: 'hidden',
+        overflow: 'hidden',
       }}
     >
       <HomePage />
