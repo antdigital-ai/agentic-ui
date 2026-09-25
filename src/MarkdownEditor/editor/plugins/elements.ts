@@ -114,10 +114,11 @@ export const MdElements: Record<string, MdNode> = {
   head: {
     matchKey: ' ',
     checkAllow: (ctx) => {
+      // 标题语法只可能出现在独立段落（reg 锚定整段为 # 前缀），
+      // 不再限制首段：任何位置的空段/纯语法段都允许即时转换（对标语雀体验，#59）
       return (
         EditorUtils.isTop(ctx.editor, ctx.node[1]) &&
-        ['paragraph', 'head'].includes(ctx.node?.[0]?.type) &&
-        !Path.hasPrevious(ctx.sel.anchor.path)
+        ['paragraph', 'head'].includes(ctx.node?.[0]?.type)
       );
     },
     reg: /^\s*(#{1,5})(\s+)([^\n]*)$/,
@@ -196,8 +197,7 @@ export const MdElements: Record<string, MdNode> = {
         return !(list && !Path.hasPrevious(ctx.node[1]));
       }
       return false;
-    },
-    run: (ctx) => {
+    },    run: (ctx) => {
       Transforms.delete(ctx.editor, {
         at: ctx.path,
       });
@@ -228,10 +228,8 @@ export const MdElements: Record<string, MdNode> = {
       if (Editor.parent(ctx.editor, ctx.node[1])[0].type === 'list-item') {
         return Path.hasPrevious(ctx.node[1]);
       }
-      return (
-        ['paragraph'].includes(ctx.node?.[0]?.type) &&
-        !Path.hasPrevious(ctx.sel.anchor.path)
-      );
+      // 不再限制首段：正文任意位置的空段/纯语法段都允许转为列表（#59）
+      return ['paragraph'].includes(ctx.node?.[0]?.type);
     },
     run: ({ editor, match, sel, path }) => {
       const removeLength =

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Editor, Element, Node, NodeEntry, Range } from 'slate';
+import { Editor, Element, Node, NodeEntry, Path, Range } from 'slate';
 import { TextMatchNodes } from '../elements';
 
 export class MatchKey {
@@ -47,11 +47,17 @@ export class MatchKey {
       }
     }
     if (!node || ['code'].includes(node?.[0]?.type)) return false;
+    // 段落级路径（去掉叶子索引）：用于判断当前是否处于文档首段
+    const isFirstParagraph = !Path.hasPrevious(node[1]);
     for (let n of TextMatchNodes) {
       if (
-        (n as { gatedByMatchInputToNode?: boolean }).gatedByMatchInputToNode &&
-        !this.isMatchInputToNodeEnabled()
+        (n as { gatedByMatchInputToNode?: boolean })
+          .gatedByMatchInputToNode &&
+        !this.isMatchInputToNodeEnabled() &&
+        isFirstParagraph
       ) {
+        // matchInputToNode 默认关闭仅用于避免首段 `- ` 误转列表（聊天输入框场景）；
+        // 正文段落保持所见即所得的即时转换（#59）
         continue;
       }
       if (

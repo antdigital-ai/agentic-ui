@@ -294,6 +294,34 @@ describe('elements.ts', () => {
       expect(typeof result).toBe('boolean');
     });
 
+    it('head.checkAllow 非首段 paragraph 也应允许转换（#59）', () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'first' }] },
+        { type: 'paragraph', children: [{ text: '# ' }] },
+      ];
+      const node: [any, number[]] = [editor.children[1] as any, [1]];
+      const sel = {
+        anchor: { path: [1, 0], offset: 2 },
+        focus: { path: [1, 0], offset: 2 },
+      };
+      const result = MdElements.head.checkAllow!({ editor, node, sel });
+      expect(result).toBe(true);
+    });
+
+    it('list.checkAllow 非首段 paragraph 也应允许转换（#59）', () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'first' }] },
+        { type: 'paragraph', children: [{ text: '- ' }] },
+      ];
+      const node: [any, number[]] = [editor.children[1] as any, [1]];
+      const sel = {
+        anchor: { path: [1, 0], offset: 2 },
+        focus: { path: [1, 0], offset: 2 },
+      };
+      const result = MdElements.list.checkAllow!({ editor, node, sel });
+      expect(result).toBe(true);
+    });
+
     it('link.run 应插入链接节点', () => {
       const match = ['[text](url)', 'text', 'url'] as RegExpMatchArray;
       match.index = 0;
