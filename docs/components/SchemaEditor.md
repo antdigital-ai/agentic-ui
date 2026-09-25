@@ -9,11 +9,11 @@ group:
   order: 4
 ---
 
-# SchemaEditor - schema 编辑工具
+# SchemaEditor - schema 编辑工具 {#schemaeditor-schema}
 
 SchemaEditor 是一个强大的 schema 编辑和预览工具，提供 HTML 模板和 JSON schema 的实时编辑功能，底层使用 AceEditor 来编辑 schema 中的 HTML 内容。
 
-## 功能特性
+## 功能特性 {#features}
 
 - 🎨 **实时编辑**: 支持 HTML 模板和 JSON schema 的实时编辑
 - 👀 **实时预览**: 实时显示编辑结果，支持模板变量替换
@@ -24,11 +24,11 @@ SchemaEditor 是一个强大的 schema 编辑和预览工具，提供 HTML 模�
 - 🔧 **类型安全**: 完整的 TypeScript 类型支持
 - 🎯 **模板引擎**: 支持 Mustache 模板语法
 
-## 基本用法
+## 基本用法 {#basic-usage}
 
 <code src="../demos/SchemaEditorBasicDemo.tsx">Schema 编辑器基础用法</code>
 
-## API 参考
+## API 参考 {#api}
 
 ### Props
 
@@ -51,9 +51,9 @@ SchemaEditor 是一个强大的 schema 编辑和预览工具，提供 HTML 模�
 | `ALLOWED_TAGS` | 允许的 HTML 标签 | `string[]` | -      | -    |
 | `ALLOWED_ATTR` | 允许的 HTML 属性 | `string[]` | -      | -    |
 
-## 高级用法
+## 高级用法 {#advanced-usage}
 
-### 自定义预览配置
+### 自定义预览配置 {#custom-config}
 
 ```tsx | pure
 <SchemaEditor
@@ -66,7 +66,7 @@ SchemaEditor 是一个强大的 schema 编辑和预览工具，提供 HTML 模�
 />
 ```
 
-### 隐藏预览
+### 隐藏预览 {#hide-preview}
 
 ```tsx | pure
 <SchemaEditor
@@ -89,7 +89,7 @@ SchemaEditor 是一个强大的 schema 编辑和预览工具，提供 HTML 模�
 />
 ```
 
-### 复杂 Schema 示例
+### 复杂 Schema 示例 {#example-schema}
 
 ```tsx | pure
 const complexSchema = {
@@ -159,7 +159,7 @@ const complexSchema = {
 };
 ```
 
-## Schema 格式
+## Schema 格式 {#schema}
 
 SchemaEditor 使用 `LowCodeSchema` 类型定义，主要包含以下字段：
 
@@ -186,7 +186,7 @@ interface ComponentConfig {
 }
 ```
 
-### 组件属性类型
+### 组件属性类型 {#types-props}
 
 ```tsx | pure
 interface StringProperty extends BaseProperty {
@@ -223,7 +223,7 @@ interface ObjectProperty extends BaseProperty {
 }
 ```
 
-### 示例 Schema
+### 示例 Schema {#example-schema-2}
 
 ```json
 {
@@ -253,11 +253,11 @@ interface ObjectProperty extends BaseProperty {
 }
 ```
 
-## 模板语法
+## 模板语法 {#template-syntax}
 
 SchemaEditor 支持 Mustache 模板语法，可以在 HTML 中使用 `{{变量名}}` 来插入动态内容。
 
-### 基本变量
+### 基本变量 {#basic}
 
 ```html
 <div>
@@ -266,7 +266,7 @@ SchemaEditor 支持 Mustache 模板语法，可以在 HTML 中使用 `{{变量�
 </div>
 ```
 
-### 条件渲染
+### 条件渲染 {#conditional-rendering}
 
 ```html
 <div>
@@ -277,7 +277,7 @@ SchemaEditor 支持 Mustache 模板语法，可以在 HTML 中使用 `{{变量�
 </div>
 ```
 
-### 循环渲染
+### 循环渲染 {#loop-rendering}
 
 ```html
 <ul>
@@ -287,7 +287,7 @@ SchemaEditor 支持 Mustache 模板语法，可以在 HTML 中使用 `{{变量�
 </ul>
 ```
 
-### 嵌套对象
+### 嵌套对象 {#nested-objects}
 
 ```html
 <div>
@@ -297,27 +297,27 @@ SchemaEditor 支持 Mustache 模板语法，可以在 HTML 中使用 `{{变量�
 </div>
 ```
 
-## 错误处理
+## 错误处理 {#error-handling}
 
 SchemaEditor 提供了完善的错误处理机制：
 
-### 验证错误
+### 验证错误 {#validation-errors}
 
 - **Schema 格式验证**: 自动检测 JSON 格式错误
 - **类型验证**: 验证组件属性类型
 - **必填字段验证**: 检查必填字段是否提供
 
-### 渲染错误
+### 渲染错误 {#render-errors}
 
 - **模板语法错误**: 检测 Mustache 模板语法错误
 - **变量未定义**: 提示模板中使用的未定义变量
 - **HTML 安全**: 过滤不安全的 HTML 标签和属性
 
-### 错误边界
+### 错误边界 {#error-boundaries}
 
 SchemaEditor 使用 React Error Boundary 来捕获渲染过程中的错误，并提供友好的错误提示。
 
-## 注意事项
+## 注意事项 {#notes}
 
 1. **安全性**: 在生产环境中，建议配置 `previewConfig` 来限制允许的 HTML 标签和属性
 2. **性能**: 大型 schema 可能会影响编辑性能，建议适当分页或懒加载
@@ -326,7 +326,7 @@ SchemaEditor 使用 React Error Boundary 来捕获渲染过程中的错误，并
 5. **浏览器支持**: 需要支持 ES6+ 的现代浏览器
 6. **依赖要求**: 需要安装 `ace-builds` 依赖包
 
-## 示例文件
+## 示例文件 {#example}
 
 本文档提供了以下示例文件，您可以直接导入使用：
 
@@ -335,13 +335,13 @@ SchemaEditor 使用 React Error Boundary 来捕获渲染过程中的错误，并
 - [`SchemaEditorReadonlyDemo.tsx`](./demos/SchemaEditorReadonlyDemo.tsx) - 只读模式示例
 - [`SchemaEditorErrorDemo.tsx`](./demos/SchemaEditorErrorDemo.tsx) - 错误处理示例
 
-## 相关组件
+## 相关组件 {#related-components}
 
 - [SchemaRenderer](./SchemaRenderer.md) - Schema 渲染器
 - [SchemaForm](./SchemaForm.md) - Schema 表单生成器
 - [AceEditor](../../plugins/code/components/AceEditor.md) - 代码编辑器
 
-## 更新日志
+## 更新日志 {#changelog}
 
 ### v1.2.0
 

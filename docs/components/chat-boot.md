@@ -6,17 +6,17 @@ group:
   order: 1
 ---
 
-# 对话启动组件
+# 对话启动组件 {#chat-boot-components}
 
 对话启动相关组件，包含标题、推荐卡片、按钮标签组等，用于构建对话界面的初始状态。
 
-## 基础用法
+## 基础用法 {#basic-usage}
 
 <code src="../demos/ChatBootPage/index.tsx" iframe=800>完整对话启动页 - 侧边栏 + 欢迎页 + 推荐卡片</code>
 
-## 组件概览
+## 组件概览 {#component-overview}
 
-### Title - 标题组件
+### Title - 标题组件 {#title-title}
 
 用于展示对话界面的欢迎标题和副标题。
 
@@ -28,7 +28,7 @@ export default () => {
 };
 ```
 
-### CaseReply - 推荐卡片
+### CaseReply - 推荐卡片 {#casereply}
 
 展示推荐的对话案例，支持点击快速开始对话。
 
@@ -49,7 +49,7 @@ export default () => {
 };
 ```
 
-### ButtonTabGroup - 按钮标签组
+### ButtonTabGroup - 按钮标签组 {#buttontabgroup}
 
 可切换的按钮标签组，支持选中状态和图标点击。
 
@@ -79,7 +79,7 @@ export default () => {
 };
 ```
 
-## API 参考
+## API 参考 {#api}
 
 ### TitleProps
 
@@ -139,27 +139,27 @@ export default () => {
 | onIconClick | 图标点击回调（独立于 Tab 点击，支持如刷新等操作） | `() => void` | -       | -    |
 | disabled    | 是否禁用该选项                                    | `boolean`    | `false` | -    |
 
-## 使用场景
+## 使用场景 {#use-cases}
 
-### Title 使用场景
+### Title 使用场景 {#title}
 
 - 对话界面的欢迎标题
 - 突出显示 AI 助手名称
 - 提供简短的功能说明
 
-### CaseReply 使用场景
+### CaseReply 使用场景 {#casereply-2}
 
 - 展示推荐对话话题
 - 快速开始常见对话
 - 引导用户使用功能
 
-### ButtonTabGroup 使用场景
+### ButtonTabGroup 使用场景 {#buttontabgroup-2}
 
 - 内容分类筛选（如"全部"、"最近"）
 - 助手类型切换（如不同功能的助手）
 - 视图模式切换
 
-## 设计特点
+## 设计特点 {#design-highlights}
 
 ### Title
 

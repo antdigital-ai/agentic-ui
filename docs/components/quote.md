@@ -6,11 +6,11 @@ group:
   order: 6
 ---
 
-# Quote 引用组件
+# Quote 引用组件 {#quote}
 
 Quote 组件是一个现代化的文件引用卡片组件，为代码引用和文档引用场景提供完整的展示解决方案。
 
-## ✨ 核心特性
+## ✨ 核心特性 {#core-features}
 
 - 📝 **内容展示**：主视图显示引用内容描述，简洁明了
 - 📁 **文件信息**：在详情弹出层中显示文件名和行号范围
@@ -21,25 +21,25 @@ Quote 组件是一个现代化的文件引用卡片组件，为代码引用和�
 - 🌈 **主题友好**：支持自定义样式和 CSS-in-JS 样式系统
 - 📱 **智能布局**：动态高度计算，响应式位置调整
 
-## 快速开始
+## 快速开始 {#quick-start}
 
-### 基础功能展示
+### 基础功能展示 {#basic}
 
 展示 Quote 组件的基础功能，包括文件信息显示、内容预览和关闭操作。
 
 <code src="../demos/quote-demo.tsx">基础用法 - 文件引用与弹出详情</code>
 
-### 在 MarkdownInputField 中使用
+### 在 MarkdownInputField 中使用 {#markdowninputfield}
 
 在输入框中使用 Quote 组件展示代码引用上下文，通过 `skillMode` 配合 `beforeTools` 属性实现。
 
 <code src="../demos/quote-with-input-demo.tsx" iframe="600">输入框集成 - 代码上下文引用</code>
 
-## 📖 API 参考
+## 📖 API 参考 {#api}
 
-### Quote 引用组件
+### Quote 引用组件 {#quote-2}
 
-#### 核心属性
+#### 核心属性 {#core-props}
 
 | 属性             | 说明                     | 类型                                             | 默认值   | 版本 |
 | ---------------- | ------------------------ | ------------------------------------------------ | -------- | ---- |
@@ -52,14 +52,14 @@ Quote 组件是一个现代化的文件引用卡片组件，为代码引用和�
 | onClose          | 关闭回调                 | `() => void`                                     | -        | -    |
 | onFileClick      | 文件名点击回调           | `(fileName: string, lineRange?: string) => void` | -        | -    |
 
-#### 样式配置
+#### 样式配置 {#style-props}
 
 | 属性      | 说明       | 类型                  | 默认值 | 版本 |
 | --------- | ---------- | --------------------- | ------ | ---- |
 | className | 自定义类名 | `string`              | -      | -    |
 | style     | 自定义样式 | `React.CSSProperties` | -      | -    |
 
-### 核心数据类型
+### 核心数据类型 {#core-data-types}
 
 #### QuoteProps
 
@@ -88,7 +88,7 @@ interface QuoteProps {
 }
 ```
 
-#### 属性详解
+#### 属性详解 {#props}
 
 - `fileName` - 文件名称，仅在弹出层中显示，不传时弹出层不显示文件信息
 - `lineRange` - 可选的行号范围，如 `'1-10'`，会自动附加到文件名后，仅在弹出层中显示
@@ -99,11 +99,11 @@ interface QuoteProps {
 - `onClose` - 关闭按钮的回调函数
 - `onFileClick` - 文件名点击回调，当用户点击弹出层中的文件名区域时触发
 
-### 弹出详情系统
+### 弹出详情系统 {#popover-detail-system}
 
 当提供 `popupDetail` 属性时，内容区域会变为可点击状态：
 
-#### 功能特点
+#### 功能特点 {#features}
 
 - **🖱️ 鼠标交互**：鼠标悬停内容区域弹出详情，移出时自动隐藏
 - **📐 方向控制**：通过 `popupDirection` 属性控制弹出层的水平位置（左侧或右侧）
@@ -111,7 +111,7 @@ interface QuoteProps {
 - **📱 响应式**：窗口大小变化时自动重新定位
 - **🎨 优雅样式**：内置阴影、边框和圆角，符合设计系统
 
-#### 使用示例
+#### 使用示例 {#examples}
 
 ```tsx | pure
 // 默认左侧弹出
@@ -140,18 +140,18 @@ interface QuoteProps {
 />
 ```
 
-### 文件名点击功能
+### 文件名点击功能 {#filename-click}
 
 当同时提供 `popupDetail` 和 `onFileClick` 属性时，用户可以点击弹出层header中的文件名区域来触发文件跳转：
 
-#### 功能特点
+#### 功能特点 {#features-2}
 
 - **📂 文件导航**：点击弹出层中的文件名区域快速跳转到对应文件
 - **📍 精确定位**：支持传递行号范围进行精确定位
 - **🎯 智能处理**：自动传递文件名和行号信息给回调函数
 - **💡 仅弹出层可点击**：文件名点击功能仅在有详情弹出层时可用
 
-#### 使用示例
+#### 使用示例 {#examples-2}
 
 ```tsx | pure
 const handleFileClick = (fileName: string, lineRange?: string) => {
@@ -178,16 +178,16 @@ const handleFileClick = (fileName: string, lineRange?: string) => {
 />;
 ```
 
-### 弹出方向控制
+### 弹出方向控制 {#popover-placement}
 
 通过 `popupDirection` 属性可以控制弹出层的水平位置，支持 `'left'`（默认）和 `'right'` 两个方向：
 
-#### 使用场景
+#### 使用场景 {#use-cases}
 
 - **左侧弹出**：适合页面右侧的引用组件，弹出层向左展开不会超出视口
 - **右侧弹出**：适合页面左侧的引用组件，弹出层向右展开避免遮挡内容
 
-#### 示例代码
+#### 示例代码 {#example}
 
 ```tsx | pure
 // 左侧弹出（默认行为）
@@ -207,7 +207,7 @@ const handleFileClick = (fileName: string, lineRange?: string) => {
 />
 ```
 
-### 关闭功能
+### 关闭功能 {#close-behavior}
 
 设置 `closable={true}` 并提供 `onClose` 回调时，会在右上角显示关闭按钮：
 
@@ -237,13 +237,13 @@ const handleFileClick = (fileName: string, lineRange?: string) => {
 />;
 ```
 
-## 🎯 使用场景
+## 🎯 使用场景 {#use-cases-2}
 
-### 在 MarkdownInputField 中展示代码上下文
+### 在 MarkdownInputField 中展示代码上下文 {#markdowninputfield-2}
 
 Quote 组件可以与 `MarkdownInputField` 完美配合，在用户输入时展示相关的代码引用和上下文信息。
 
-#### 实现步骤
+#### 实现步骤 {#implementation-steps}
 
 **1. 配置技能模式**
 

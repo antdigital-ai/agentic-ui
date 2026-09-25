@@ -7,11 +7,11 @@ group:
   order: 4
 ---
 
-# ScatterChart 散点图
+# ScatterChart 散点图 {#scatterchart}
 
 用于展示二维坐标的离散点分布，支持分类与二级筛选，含响应式优化。
 
-## 代码演示
+## 代码演示 {#demo}
 
 <code src="../demos/charts/scatter.tsx" background="var(--main-bg-color)" iframe=540></code>
 <code src="../demos/charts/scatter-toolbar-filter.tsx" background="var(--main-bg-color)" title="工具栏过滤器" iframe=540></code>
@@ -50,7 +50,7 @@ group:
 | yMin                  | Y 轴最小值；不传时从数据自动推算（含 10% 边距）                                     | `number`                                         | -          | -    |
 | yMax                  | Y 轴最大值；不传时从数据自动推算（含 10% 边距）                                     | `number`                                         | -          | -    |
 
-### ChartContainerProps（继承）
+### ChartContainerProps（继承） {#chartcontainerprops}
 
 | 属性       | 说明                                                                            | 类型                        | 默认值  | 版本 |
 | ---------- | ------------------------------------------------------------------------------- | --------------------------- | ------- | ---- |
@@ -89,7 +89,7 @@ group:
 | block          | 是否使用块级布局（弹性占用空间，多个时平分父容器宽度） | `boolean`                                                           | `false`     | -    |
 | extra          | 右上角自定义内容（图标、按钮等）                       | `React.ReactNode`                                                   | -           | -    |
 
-## 说明
+## 说明 {#notes}
 
 - 移动端会减小点的半径与 hover 半径以提升观感。
 - `hiddenX` 和 `hiddenY` 可以控制坐标轴的显示/隐藏，适用于只展示图表本身而不需要坐标轴的场景。

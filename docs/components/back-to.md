@@ -6,11 +6,11 @@ group:
   order: 1
 ---
 
-# BackTo 回到顶部/底部
+# BackTo 回到顶部/底部 {#backto}
 
 BackTo 是一个用于快速滚动到页面顶部或底部的浮动按钮组件，适用于长内容页面的导航场景。
 
-## 代码演示
+## 代码演示 {#demo}
 
 <code src="../demos/back-to.tsx" background="var(--main-bg-color)" iframe=540></code>
 
@@ -28,14 +28,14 @@ BackTo 是一个用于快速滚动到页面顶部或底部的浮动按钮组件�
 | tooltip       | 气泡卡片的内容                    | `ReactNode` \| [TooltipProps](https://ant.design/components/tooltip-cn#api)          | -              | -    |
 | onClick       | 点击按钮时的回调函数              | `(e: React.MouseEvent<HTMLButtonElement>, container: HTMLElement \| Window) => void` | -              | -    |
 
-## 类型说明
+## 类型说明 {#type-reference}
 
-### shouldVisible 参数
+### shouldVisible 参数 {#params-shouldvisible}
 
 - **数字类型**：当滚动距离大于等于该数值时显示按钮
 - **函数类型**：自定义显示逻辑，接收当前滚动位置和容器元素，返回是否显示按钮
 
-### target 参数
+### target 参数 {#params-target}
 
 指定滚动的目标容器，可以是：
 
@@ -44,9 +44,9 @@ BackTo 是一个用于快速滚动到页面顶部或底部的浮动按钮组件�
 
 **注意**：target 参数是一个函数，返回实际的滚动容器元素。这样可以确保在组件渲染时动态获取最新的容器引用。
 
-## 使用示例
+## 使用示例 {#examples}
 
-### 基础用法
+### 基础用法 {#basic-usage}
 
 ```tsx
 import { BackTo } from '@ant-design/agentic-ui';
@@ -75,7 +75,7 @@ export default () => {
 };
 ```
 
-### 自定义显示条件
+### 自定义显示条件 {#custom}
 
 ```tsx
 import { BackTo } from '@ant-design/agentic-ui';

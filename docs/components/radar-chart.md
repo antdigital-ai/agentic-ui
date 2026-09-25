@@ -7,11 +7,11 @@ group:
   order: 4
 ---
 
-# RadarChart 雷达图
+# RadarChart 雷达图 {#radarchart}
 
 用于展示多指标对比的雷达图，支持分类与二级筛选，移动端自适应。
 
-## 代码演示
+## 代码演示 {#demo}
 
 <code src="../demos/charts/radar.tsx" background="var(--main-bg-color)" iframe=540></code>
 <code src="../demos/charts/radar-toolbar-filter.tsx" background="var(--main-bg-color)" title="工具栏过滤器" iframe=540></code>
@@ -37,7 +37,7 @@ group:
 | textMaxWidth          | 图例文字最大宽度（px），超出截断并加省略号                                  | `number`                                         | `80`      | -    |
 | statistic             | 指标卡配置，单个对象或数组                                                  | `ChartStatisticConfig \| ChartStatisticConfig[]` | -         | -    |
 
-### ChartContainerProps（继承）
+### ChartContainerProps（继承） {#chartcontainerprops}
 
 | 属性       | 说明                                                                            | 类型                        | 默认值  | 版本 |
 | ---------- | ------------------------------------------------------------------------------- | --------------------------- | ------- | ---- |
@@ -82,7 +82,7 @@ group:
 | block          | 是否使用块级布局（弹性占用空间，多个时平分父容器宽度） | `boolean`                                                           | `false`     | -    |
 | extra          | 右上角自定义内容（图标、按钮等）                       | `React.ReactNode`                                                   | -           | -    |
 
-## 说明
+## 说明 {#notes}
 
 - 内置色板自动为不同 `type` 分配颜色并填充区域。
 - 图例在移动端自动放置到底部、字体缩放优化。

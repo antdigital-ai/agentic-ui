@@ -6,11 +6,11 @@ group:
   order: 3
 ---
 
-# Workspace - 工作空间
+# Workspace - 工作空间 {#workspace}
 
 Workspace 是一个功能强大的工作空间组件，提供了标签页式的内容管理界面。支持多种内容类型的展示，包括实时跟随、任务管理、文件预览、浏览器内容等，为用户提供统一的工作环境。
 
-## ✨ 功能特点
+## ✨ 功能特点 {#features}
 
 - 🔄 **实时跟随**: 支持 shell、markdown、html 等内容的实时更新显示，也支持完全自定义渲染
 - 📋 **任务管理**: 内置任务列表和任务状态管理功能
@@ -19,15 +19,15 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 - 🎛️ **自定义内容**: 支持自定义组件和内容渲染（通过 customContent 或 Workspace.Custom）
 - 📱 **响应式设计**: 适配不同屏幕尺寸，提供良好的用户体验
 
-## 代码演示
+## 代码演示 {#demo}
 
 > 已废弃事件保留向下兼容：`onToggleGroup` → `onGroupToggle`、`loading` → `isLoading`，详见各 API 表里带删除线 + version 标记的行。
 
-### 基础用法
+### 基础用法 {#basic-usage}
 
 <code src="../demos/workspace-demo.tsx" description="展示工作空间的基本功能和标签页切换">基础用法 - 多标签工作台</code>
 
-### 文件管理
+### 文件管理 {#file-management}
 
 <code src="../demos/workspace-file-demo.tsx" description="演示文件上传、预览、下载等文件管理功能">文件管理 - 预览与下载</code>
 <code src="../demos/workspace-file-large-demo.tsx" description="演示约 120 个文件的分页展示效果，支持分组与扁平两种视图，每组默认展示 50 条，点击查看更多每次追加 100 条">文件管理 - 大数据量</code>
@@ -42,31 +42,31 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 
 <!-- <code src="../demos/workspace-file-previewComponent.tsx">导出文件预览组件</code> -->
 
-### 实时跟随
+### 实时跟随 {#realtime-follow}
 
 <code src="../demos/workspace-realtime-demo.tsx" description="展示实时内容更新和跟随功能">实时跟随 - Markdown / Shell / HTML</code>
 
-### 浏览器
+### 浏览器 {#browser}
 
 <code src="../demos/workspace-browser-demo.tsx" description="展示浏览器搜索结果">浏览器 - 联网搜索结果展示</code>
 
-### 任务管理
+### 任务管理 {#task-management}
 
 <code src="../demos/workspace-task-demo.tsx" description="演示任务创建、编辑、状态管理等功能">任务管理 - 状态跟踪</code>
 
-### 空状态
+### 空状态 {#status}
 
 <code src="../demos/workspace-empty-demo.tsx" description="演示空状态功能">空状态处理</code>
 
-### 自定义内容
+### 自定义内容 {#custom-content}
 
 <code src="../demos/workspace-custom-demo.tsx" description="展示如何添加自定义组件和内容">自定义标签页内容</code>
 
-### 高级用法
+### 高级用法 {#advanced-usage}
 
 <code src="../demos/workspace-advanced-demo.tsx" description="展示复杂场景下的工作空间配置和使用">高级用法 - 复杂场景配置</code>
 
-### Header 右侧自定义
+### Header 右侧自定义 {#custom-header}
 
 <code src="../demos/workspace-header-extra-demo.tsx" description="展示如何自定义 header 右侧区域，添加自定义按钮或操作">Header 右侧自定义操作</code>
 
@@ -203,7 +203,7 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 | bindDomId             | 是否在每个文件项的根元素上绑定 `id` 属性                                                                         | `boolean`                                                                                                       | `false` | -      |
 | tab                   | 标签页配置                                                                                                       | `TabConfiguration`                                                                                              | -       | -      |
 
-#### DOM id 绑定策略
+#### DOM id 绑定策略 {#dom-id}
 
 - 当 `bindDomId` 为 `false`（默认）：不会在文件项根元素写入 `id` 属性，更推荐通过选择器如 `[data-testid]` 或 className 进行自动化选择。
 - 当 `bindDomId` 为 `true`：组件会在文件项根元素绑定 `id`。来源遵循：
@@ -396,7 +396,7 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 | children | 自定义内容 | `ReactNode`        | -      | -    |
 | tab      | 标签页配置 | `TabConfiguration` | -      | -    |
 
-### TabItem（内部结构）
+### TabItem（内部结构） {#tabitem}
 
 `Workspace` 解析子组件后得到的标签项，供内部分栏与内容渲染使用；其中 `componentType` 为内置子面板类型（`realtime` | `browser` | `task` | `file` | `fileTree` | `custom`），用于在首个「实时跟随」后插入视觉分割线。
 
@@ -413,29 +413,29 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 
 所有 `Workspace.*` 子组件另支持 `BaseChildProps.panelType`（`WorkspacePanelType`），用于 HOC 无法自动识别时显式声明面板类型。
 
-## 使用场景
+## 使用场景 {#use-cases}
 
-### 1. 开发工作空间
+### 1. 开发工作空间 {#dev-workspace}
 
 适用于开发环境中的多标签页工作空间，可以同时查看代码、日志、文档等。
 
-### 2. 数据分析工作台
+### 2. 数据分析工作台 {#data-analysis-workbench}
 
 用于数据分析场景，可以同时展示数据文件、分析结果、可视化图表等。
 
-### 3. 文档管理系统
+### 3. 文档管理系统 {#document-management}
 
 用于文档的预览、编辑、版本对比等功能。
 
-### 4. 实时监控面板
+### 4. 实时监控面板 {#realtime-monitor}
 
 用于展示实时数据、日志流、系统状态等信息。
 
-### 5. 任务管理界面
+### 5. 任务管理界面 {#task-management-ui}
 
 用于展示任务进度、执行状态、结果输出等。
 
-## 最佳实践
+## 最佳实践 {#best-practices}
 
 1. **合理使用标签页数量**：建议单个工作空间内的标签页数量不超过 8 个，避免界面过于拥挤。
 
@@ -464,7 +464,7 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 
 12. **文件预览**：需要跨 Tab 保留预览时设置 `preserveFilePreviewOnTabChange`。
 
-## 扩展 API
+## 扩展 API {#api}
 
 ### HtmlPreviewProps
 
@@ -505,7 +505,7 @@ HTML 预览组件的属性接口，用于 HTML 内容的预览和代码查看。
 | markdownEditorProps | Markdown 编辑器配置                  | `Partial<Omit<MarkdownEditorProps, 'editorRef' \| 'initValue' \| 'readonly'>>`    | -      | -    |
 | headerFileOverride  | 仅用于覆盖默认头部区域展示的文件信息 | `Partial<FileNode>`                                                               | -      | -    |
 
-## 工具函数
+## 工具函数 {#utils}
 
 ### getFileType
 

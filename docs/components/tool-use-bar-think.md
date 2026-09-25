@@ -6,7 +6,7 @@ group:
   order: 3
 ---
 
-# ToolUseBarThink 深度思考
+# ToolUseBarThink 深度思考 {#thinking-toolusebarthink}
 
 `ToolUseBarThink` 是一个独立的「深度思考」展示组件，用于在 Agent 对话流中呈现长链路思考过程（thinking）。它与 [ToolUseBar](./tool-use-bar) 同属工具调用展示族，但拥有独立的样式与交互：
 
@@ -14,13 +14,13 @@ group:
 - 内容超长（默认 200px 高度）时支持二级展开 / 收起
 - 提供 `light` 轻量模式，与文本流内嵌呈现
 
-## 何时使用
+## 何时使用 {#when-to-use}
 
 - 智能体执行较长推理 / 思考过程，需要对外呈现思考摘要或流式 `thinkContent`
 - 思考过程为「展示用」，与具体工具调用解耦时（不需要 `ToolUseBar` 的工具列表概念）
 - 希望在对话流中以一个独立卡片单独展示「正在思考 / 思考完成」状态
 
-## 代码演示
+## 代码演示 {#demo}
 
 <code src="../demos/tool-use-bar-think-playground.tsx">API Playground - 状态 / 受控 / 流式 / 自定义样式</code>
 
@@ -32,25 +32,25 @@ group:
 
 ### ToolUseBarThinkProps
 
-| 属性                     | 说明                               | 类型                                  | 默认值              | 版本 |
-| ------------------------ | ---------------------------------- | ------------------------------------- | ------------------- | ---- |
-| toolName                 | 工具/思考名称                      | `React.ReactNode`                     | -                   | -    |
-| toolTarget               | 工具目标 / 思考主题                | `React.ReactNode`                     | -                   | -    |
-| time                     | 时间信息（如耗时）                 | `React.ReactNode`                     | -                   | -    |
-| icon                     | 自定义图标（默认 Brain 图标）      | `React.ReactNode`                     | -                   | -    |
-| thinkContent             | 思考内容（支持流式追加）           | `React.ReactNode`                     | -                   | -    |
-| status                   | 组件状态                           | `'loading' \| 'success' \| 'error'`   | -                   | -    |
-| light                    | 轻量 / 行内模式                    | `boolean`                             | `false`             | -    |
-| expanded                 | 受控的展开状态                     | `boolean`                             | -                   | -    |
-| defaultExpanded          | 默认展开状态                       | `boolean`                             | `false`             | -    |
-| onExpandedChange         | 展开状态变化回调                   | `(expanded: boolean) => void`         | -                   | -    |
-| floatingExpanded         | Loading 状态下浮动展开按钮的受控值 | `boolean`                             | -                   | -    |
-| defaultFloatingExpanded  | 浮动展开按钮的默认值               | `boolean`                             | `false`             | -    |
-| onFloatingExpandedChange | 浮动展开状态变化回调               | `(floatingExpanded: boolean) => void` | -                   | -    |
+| 属性                     | 说明                                                                                                                                           | 类型                                  | 默认值              | 版本    |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- | ------------------- | ------- |
+| toolName                 | 工具/思考名称                                                                                                                                  | `React.ReactNode`                     | -                   | -       |
+| toolTarget               | 工具目标 / 思考主题                                                                                                                            | `React.ReactNode`                     | -                   | -       |
+| time                     | 时间信息（如耗时）                                                                                                                             | `React.ReactNode`                     | -                   | -       |
+| icon                     | 自定义图标（默认 Brain 图标）                                                                                                                  | `React.ReactNode`                     | -                   | -       |
+| thinkContent             | 思考内容（支持流式追加）                                                                                                                       | `React.ReactNode`                     | -                   | -       |
+| status                   | 组件状态                                                                                                                                       | `'loading' \| 'success' \| 'error'`   | -                   | -       |
+| light                    | 轻量 / 行内模式                                                                                                                                | `boolean`                             | `false`             | -       |
+| expanded                 | 受控的展开状态                                                                                                                                 | `boolean`                             | -                   | -       |
+| defaultExpanded          | 默认展开状态                                                                                                                                   | `boolean`                             | `false`             | -       |
+| onExpandedChange         | 展开状态变化回调                                                                                                                               | `(expanded: boolean) => void`         | -                   | -       |
+| floatingExpanded         | Loading 状态下浮动展开按钮的受控值                                                                                                             | `boolean`                             | -                   | -       |
+| defaultFloatingExpanded  | 浮动展开按钮的默认值                                                                                                                           | `boolean`                             | `false`             | -       |
+| onFloatingExpandedChange | 浮动展开状态变化回调                                                                                                                           | `(floatingExpanded: boolean) => void` | -                   | -       |
 | scrollIntoViewOnExpand   | 展开时是否将组件滚动到视窗内；传 `true` 默认 `{ behavior: 'smooth', block: 'nearest' }`，也可传 `ScrollIntoViewOptions` 自定义；初次挂载不触发 | `boolean \| ScrollIntoViewOptions`    | `false`             | 2.32.33 |
-| testId                   | 测试 ID                            | `string`                              | `'ToolUseBarThink'` | -    |
-| classNames               | Semantic 类名（按区域控制）        | `ToolUseBarThinkClassNames`           | -                   | -    |
-| styles                   | Semantic 样式（按区域控制）        | `ToolUseBarThinkStyles`               | -                   | -    |
+| testId                   | 测试 ID                                                                                                                                        | `string`                              | `'ToolUseBarThink'` | -       |
+| classNames               | Semantic 类名（按区域控制）                                                                                                                    | `ToolUseBarThinkClassNames`           | -                   | -       |
+| styles                   | Semantic 样式（按区域控制）                                                                                                                    | `ToolUseBarThinkStyles`               | -                   | -       |
 
 ### ToolUseBarThinkClassNames
 
@@ -74,7 +74,7 @@ group:
 
 `styles` 与 `classNames` 字段一一对应，类型为 `React.CSSProperties`，用法相同。
 
-## 行为说明
+## 行为说明 {#notes}
 
 1. **Loading 自动展开**：当 `status === 'loading'` 时，组件会自动将 `expanded` 置为 `true`，便于用户实时看到流式输出的思考内容。
 2. **二级展开**：当 `thinkContent` 高度超过 200px 时，会在底部显示「展开 / 收起」按钮，避免长思考占据过多版面。
@@ -82,7 +82,7 @@ group:
 4. **Light 模式**：`light={true}` 时使用更紧凑的样式（无独立图标容器、悬浮时切换 chevron），适合行内嵌入。
 5. **可控 / 非可控**：`expanded` / `floatingExpanded` 同时支持受控与非受控，未传值时使用 `defaultExpanded` / `defaultFloatingExpanded` 作为初始值。
 
-## 与 ToolUseBar 的关系
+## 与 ToolUseBar 的关系 {#toolusebar}
 
 | 维度     | ToolUseBar                   | ToolUseBarThink              |
 | -------- | ---------------------------- | ---------------------------- |

@@ -6,11 +6,11 @@ group:
   order: 3
 ---
 
-# AnswerAlert 应答中断提示
+# AnswerAlert 应答中断提示 {#answeralert}
 
 AnswerAlert 是一个用于展示系统状态和用户提示的组件，特别适用于 AI 对话场景中的应答中断、错误提示、成功反馈等场景。
 
-## 代码演示
+## 代码演示 {#demo}
 
 <code src="../demos/answer-alert.tsx" background="var(--main-bg-color)" iframe=540></code>
 
@@ -31,9 +31,9 @@ AnswerAlert 是一个用于展示系统状态和用户提示的组件，特别�
 | closable    | 可关闭配置                            | `boolean`                                               | `false` | -    |
 | onClose     | 关闭时触发的回调函数                  | `(e: React.MouseEvent<HTMLButtonElement>) => void`      | -       | -    |
 
-## 类型说明
+## 类型说明 {#type-reference}
 
-### type 类型
+### type 类型 {#types-type}
 
 - `success`: 成功提示，绿色主题，用于表示操作成功或完成状态
 - `error`: 错误提示，红色主题，用于表示错误或失败状态
@@ -41,9 +41,9 @@ AnswerAlert 是一个用于展示系统状态和用户提示的组件，特别�
 - `info`: 信息提示，蓝色主题，用于表示一般信息或提示
 - `gray`: 中性提示，灰色主题，用于表示加载中或中性状态
 
-## 使用示例
+## 使用示例 {#examples}
 
-### 基础用法
+### 基础用法 {#basic-usage}
 
 ```tsx
 import { AnswerAlert } from '@ant-design/agentic-ui';
@@ -63,7 +63,7 @@ export default () => {
 };
 ```
 
-### 带描述的提示
+### 带描述的提示 {#with-description}
 
 ```tsx
 import { AnswerAlert } from '@ant-design/agentic-ui';
@@ -89,7 +89,7 @@ export default () => {
 };
 ```
 
-### 可关闭的提示
+### 可关闭的提示 {#closable}
 
 ```tsx
 import React from 'react';
@@ -112,7 +112,7 @@ export default () => {
 };
 ```
 
-### 自定义操作按钮
+### 自定义操作按钮 {#custom}
 
 ```tsx
 import { AnswerAlert } from '@ant-design/agentic-ui';
@@ -139,7 +139,7 @@ export default () => {
 };
 ```
 
-### 自定义图标
+### 自定义图标 {#custom-icon}
 
 ```tsx
 import { AnswerAlert } from '@ant-design/agentic-ui';
@@ -158,7 +158,7 @@ export default () => {
 };
 ```
 
-### 复杂内容描述
+### 复杂内容描述 {#content}
 
 ```tsx
 import { AnswerAlert } from '@ant-design/agentic-ui';
@@ -188,12 +188,12 @@ export default () => {
 };
 ```
 
-## 常见问题
+## 常见问题 {#faq}
 
-### Q: 可以自定义提示的样式吗？
+### Q: 可以自定义提示的样式吗？ {#custom-q}
 
 A: 可以通过 `className` 和 `style` 属性来自定义样式，也可以通过 CSS 变量来调整主题色彩。
 
-### Q: 如何在提示中添加链接或按钮？
+### Q: 如何在提示中添加链接或按钮？ {#q}
 
 A: 可以在 `message`、`description` 或 `action` 属性中使用 JSX 元素，包括链接、按钮等交互组件。

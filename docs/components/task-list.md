@@ -6,11 +6,11 @@ group:
   order: 3
 ---
 
-# TaskList 任务列表
+# TaskList 任务列表 {#list-tasklist}
 
 用于展示任务列表的组件，支持折叠/展开、加载状态和不同的任务状态。
 
-## 代码演示
+## 代码演示 {#demo}
 
 <code src="../demos/task-list.tsx">基础用法 - 多状态任务流</code>
 
@@ -24,18 +24,18 @@ group:
 
 > **类型名变更**：Props 类型已从 `ThoughtChainProps` 重命名为 `TaskListProps`。旧类型名仍可使用但已标记 deprecated。
 
-| 属性                 | 说明                                                                                     | 类型                                                                            | 默认值      | 版本   |
-| -------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ----------- | ------ |
-| items                | 任务列表数据                                                                             | `TaskItem[]`                                                                    | `[]`        | -      |
-| loading              | 外部加载状态；全部 item 为 `success` 时摘要显示完成态；流式结束后请置 `false`            | `boolean`                                                                       | `false`     | -      |
-| className            | 自定义类名                                                                               | `string`                                                                        | -           | -      |
-| expandedKeys         | 受控模式：当前展开的任务项 key 数组                                                      | `string[]`                                                                      | -           | -      |
-| onExpandedKeysChange | 受控模式：展开状态变化时的回调函数                                                       | `(expandedKeys: string[]) => void`                                              | -           | -      |
-| variant              | 组件变体，`simple` 模式将任务列表收起为紧凑的单行摘要条                                  | `'default' \| 'simple'`                                                         | `'default'` | 2.31.0 |
-| open                 | `simple` 模式下摘要条是否展开（受控）                                                    | `boolean`                                                                       | -           | 2.31.0 |
-| onOpenChange         | `simple` 模式下摘要条展开状态变化回调                                                    | `(open: boolean) => void`                                                       | -           | 2.31.0 |
-| taskCompleteText     | 任务全部完成时摘要条的文案，未配置时回退到 i18n 默认值（仅在 `variant="simple"` 时渲染） | `` `React.ReactNode \| ((params: { items: TaskItem[] }) => React.ReactNode)` `` | -           | 2.31.0 |
-| showProgress         | `simple` 模式下摘要条内是否展示「已完成/总数」进度计数                                   | `boolean`                                                                       | `false`     | 2.32.33 |
+| 属性                   | 说明                                                                                                                                                                | 类型                                                                            | 默认值      | 版本    |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ----------- | ------- |
+| items                  | 任务列表数据                                                                                                                                                        | `TaskItem[]`                                                                    | `[]`        | -       |
+| loading                | 外部加载状态；全部 item 为 `success` 时摘要显示完成态；流式结束后请置 `false`                                                                                       | `boolean`                                                                       | `false`     | -       |
+| className              | 自定义类名                                                                                                                                                          | `string`                                                                        | -           | -       |
+| expandedKeys           | 受控模式：当前展开的任务项 key 数组                                                                                                                                 | `string[]`                                                                      | -           | -       |
+| onExpandedKeysChange   | 受控模式：展开状态变化时的回调函数                                                                                                                                  | `(expandedKeys: string[]) => void`                                              | -           | -       |
+| variant                | 组件变体，`simple` 模式将任务列表收起为紧凑的单行摘要条                                                                                                             | `'default' \| 'simple'`                                                         | `'default'` | 2.31.0  |
+| open                   | `simple` 模式下摘要条是否展开（受控）                                                                                                                               | `boolean`                                                                       | -           | 2.31.0  |
+| onOpenChange           | `simple` 模式下摘要条展开状态变化回调                                                                                                                               | `(open: boolean) => void`                                                       | -           | 2.31.0  |
+| taskCompleteText       | 任务全部完成时摘要条的文案，未配置时回退到 i18n 默认值（仅在 `variant="simple"` 时渲染）                                                                            | `` `React.ReactNode \| ((params: { items: TaskItem[] }) => React.ReactNode)` `` | -           | 2.31.0  |
+| showProgress           | `simple` 模式下摘要条内是否展示「已完成/总数」进度计数                                                                                                              | `boolean`                                                                       | `false`     | 2.32.33 |
 | scrollIntoViewOnExpand | `simple` 模式下展开摘要条时是否将组件滚动到视窗内；传 `true` 默认 `{ behavior: 'smooth', block: 'nearest' }`，也可传 `ScrollIntoViewOptions` 自定义；初次挂载不触发 | `boolean \| ScrollIntoViewOptions`                                              | `false`     | 2.32.33 |
 
 ### TaskItem
@@ -62,7 +62,7 @@ group:
 
 工具调用时间线若需逐步 API 展示，可优先考虑 [ToolUseBar](/components/tool-use-bar)；继续用 TaskList simple 时请接受收起时仅显示最后一步，并保证流式结束后 `loading={false}`、item `status` 与内容字段正确。
 
-### 自定义任务完成文案示例
+### 自定义任务完成文案示例 {#custom-example}
 
 `taskCompleteText` 仅在 `variant="simple"` 摘要条上生效，未配置时回退到 i18n 默认值（如「任务完成」）。
 支持直接传入 `React.ReactNode`（字符串 / JSX），也支持传入函数 `({ items }) => ReactNode` 基于当前任务列表动态生成。
@@ -92,7 +92,7 @@ export default () => {
 };
 ```
 
-### 受控模式示例
+### 受控模式示例 {#controlled-example}
 
 ```tsx
 import { useState } from 'react';
@@ -126,7 +126,7 @@ export default () => {
 };
 ```
 
-### 样式定制
+### 样式定制 {#style}
 
 组件使用了以下的样式变量，可以通过 CSS-in-JS 进行样式定制：
 

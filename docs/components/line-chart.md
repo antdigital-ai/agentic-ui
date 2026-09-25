@@ -7,11 +7,11 @@ group:
   order: 4
 ---
 
-# LineChart 折线图
+# LineChart 折线图 {#linechart}
 
 支持多序列、筛选、图例与网格线配置，含移动端响应式优化。
 
-## 代码演示
+## 代码演示 {#demo}
 
 <code src="../demos/charts/line.tsx" background="var(--main-bg-color)" iframe=540></code>
 <code src="../demos/charts/line-toolbar-filter.tsx" background="var(--main-bg-color)" title="工具栏过滤器" iframe=540></code>
@@ -44,7 +44,7 @@ group:
 | renderFilterInToolbar | 是否将过滤器渲染到工具栏（当为 true 时，ChartFilter 会显示在工具栏右侧）                                           | `boolean`                                        | `false`    | -    |
 | statistic             | ChartStatistic组件配置：object表示单个配置，array表示多个配置                                                      | `ChartStatisticConfig \| ChartStatisticConfig[]` | -          | -    |
 
-### ChartContainerProps（继承）
+### ChartContainerProps（继承） {#chartcontainerprops}
 
 | 属性       | 说明                                                                            | 类型                        | 默认值  | 版本 |
 | ---------- | ------------------------------------------------------------------------------- | --------------------------- | ------- | ---- |
@@ -85,7 +85,7 @@ group:
 | block          | 是否使用块级布局（弹性占用空间，多个时平分父容器宽度） | `boolean`                                                           | `false`     | -    |
 | extra          | 右上角自定义内容（图标、按钮等）                       | `React.ReactNode`                                                   | -           | -    |
 
-## 说明
+## 说明 {#notes}
 
 - 自动按 `x` 升序生成横轴，按 `type` 组装数据集并分配调色板。
 - `hiddenX` 和 `hiddenY` 可以控制坐标轴的显示/隐藏，适用于只展示图表本身而不需要坐标轴的场景。

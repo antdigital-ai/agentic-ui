@@ -6,11 +6,11 @@ group:
   order: 3
 ---
 
-# Loading 加载
+# Loading 加载 {#loading}
 
 一套优雅的加载动画组件集合，提供多种加载动画效果，适用于各种加载场景。
 
-## 代码演示
+## 代码演示 {#demo}
 
 <code src="../demos/loading/index.tsx">基础用法</code>
 
@@ -33,7 +33,7 @@ Loading 组件是主要的加载组件，支持多种使用模式。
 | `styles`           | 语义化样式配置，可分别设置 root、wrapper、indicator、tip 的样式                                                                   | `Partial<Record<'root' \| 'wrapper' \| 'indicator' \| 'tip', React.CSSProperties>>` | -      | -    |
 | `spinning`         | 是否显示加载状态，仅在嵌套模式下生效，控制是否显示加载指示器和背景动画效果                                                        | `boolean`                                                                           | `true` | -    |
 
-## 组件概览
+## 组件概览 {#component-overview}
 
 Loading 组件库提供了三种不同风格的加载动画组件：
 
@@ -56,7 +56,7 @@ Loading 组件库提供了三种不同风格的加载动画组件：
 | `style`     | 动画容器样式                                                           | `React.CSSProperties` | -       | -    |
 | `size`      | 动画尺寸（宽度和高度），支持数字（px）或字符串（如 `'1em'`, `'2rem'`） | `number \| string`    | `'1em'` | -    |
 
-## 特性
+## 特性 {#features}
 
 - 🎨 **多种类型**: 提供三种不同风格的动画组件，适应不同的使用场景
 - ⚡ **高性能**: 基于 Lottie 和 Effect 动画实现，确保动画流畅且性能优异
@@ -66,39 +66,39 @@ Loading 组件库提供了三种不同风格的加载动画组件：
 - 🎭 **嵌套模式**: 支持覆盖在内容上方显示加载状态，带有优雅的渐变背景和闪光动画效果，可通过 `spinning` 属性控制显示/隐藏
 - 🎨 **自定义指示器**: 支持使用任何 React 组件作为加载指示器
 
-## 使用说明
+## 使用说明 {#usage}
 
-### 尺寸控制
+### 尺寸控制 {#size-control}
 
 - **默认尺寸**: 当未设置 `size` 时，组件会根据模式自动选择默认尺寸
   - 非嵌套模式：默认尺寸为 `'1em'`，可以很好地与文本内容对齐
   - 嵌套模式：默认尺寸为 `32px`
 - **尺寸设置**: 可以通过 `size` 属性直接设置动画的宽度和高度，支持数字（px）或字符串（如 `'1em'`, `'2rem'`），也可以通过 `style` 属性传递 `fontSize` 来控制大小
 
-### 提示文本
+### 提示文本 {#tip-text}
 
 - **显示提示**: 通过 `tip` 属性设置提示文本，支持字符串或 ReactNode
 - **隐藏提示**: 设置 `tip={false}` 或 `tip={null}` 可以隐藏提示文本
 - **自动百分比**: 当设置了 `percent` 但未设置 `tip` 时，会自动显示百分比文本
 
-### 进度显示
+### 进度显示 {#progress-display}
 
 - **进度条**: 当设置了 `percent` 属性时，会自动显示圆形进度条，带有渐变色效果
 - **优先级**: 当同时设置了 `percent` 和 `indicator` 时，`indicator` 优先，`percent` 会被忽略
 - **提示优先级**: 当同时设置了 `percent` 和 `tip` 时，优先显示 `tip` 的内容
 
-### 自定义指示器
+### 自定义指示器 {#custom}
 
 - **使用方式**: 通过 `indicator` 属性传入任何 React 组件作为加载指示器
 - **优先级**: `indicator` 的优先级高于 `percent`，当同时设置时，会使用 `indicator` 而不是进度条
 
-### 加载状态控制
+### 加载状态控制 {#status}
 
 - **spinning 属性**: 控制是否显示加载状态，默认值为 `true`
 - **作用范围**: 仅在嵌套模式下生效，在非嵌套模式下此属性无效
 - **嵌套模式**: 当 `spinning={false}` 时，会隐藏加载指示器和背景动画效果，但子内容仍然可见
 
-### 样式定制
+### 样式定制 {#style}
 
 - **语义化样式**: 使用 `styles` 属性可以分别定制 `root`、`wrapper`、`indicator`、`tip` 的样式
 - **样式合并**: `styles.root` 会与 `style` 属性合并，`style` 的优先级高于 `styles.root`

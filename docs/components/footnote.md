@@ -7,13 +7,13 @@ group:
   order: 4
 ---
 
-# 脚注
+# 脚注 {#footnote}
 
 脚注是 Bubble 组件的内置功能，用于在 Markdown 内容中添加引用标记和补充说明，支持弹框预览和来源汇总展示。
 
 > 💡 脚注功能通过 `Bubble` 组件的 `markdownRenderConfig.fncProps` 配置使用，无需单独引入。
 
-## ✨ 功能特点
+## ✨ 功能特点 {#features}
 
 - 📝 **标准语法**：支持 Markdown 脚注语法 `[^标识]`
 - 💬 **弹框预览**：鼠标悬停显示脚注详情弹框
@@ -21,15 +21,15 @@ group:
 - 📋 **来源汇总**：在消息底部统一展示脚注来源列表
 - 🎨 **自定义渲染**：支持自定义脚注弹框的渲染方式
 
-## 代码演示
+## 代码演示 {#demo}
 
-### 基础用法
+### 基础用法 {#basic-usage}
 
 展示如何实现脚注弹框及消息底部的脚注汇总功能。
 
 <code src="../demos/bubble/footnote-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-## API 参考
+## API 参考 {#api}
 
 ### FootnoteProps
 
@@ -52,9 +52,9 @@ group:
 | url         | 链接地址       | `string` | -      | -    |
 | origin_url  | 原始链接地址   | `string` | -      | -    |
 
-## 使用说明
+## 使用说明 {#usage}
 
-### Markdown 脚注语法
+### Markdown 脚注语法 {#markdown}
 
 在正文中使用 `[^标识]` 引用脚注，在文末使用 `[^标识]: 说明内容` 定义脚注：
 
@@ -68,13 +68,13 @@ group:
 [^3]: [](https://developer.mozilla.org/zh-CN/)
 ```
 
-### 脚注类型
+### 脚注类型 {#types}
 
 1. **纯文本脚注**：`[^1]: 脚注说明文字`
 2. **带标题链接**：`[^2]: [标题文字](https://example.com)`
 3. **纯链接**：`[^3]: [](https://example.com)` - 标题自动从 URL 提取
 
-### 自定义脚注渲染
+### 自定义脚注渲染 {#custom}
 
 通过 `render` 函数自定义脚注引用的显示方式，实现自定义的 Popover 弹框效果：
 
@@ -186,7 +186,7 @@ export default () => {
 };
 ```
 
-### 脚注来源汇总
+### 脚注来源汇总 {#footnote-sources}
 
 使用 `bubbleRenderConfig.afterMessageRender` 在消息底部展示脚注来源：
 
@@ -211,21 +211,21 @@ const afterMessageRender = (props) => {
 <Bubble originData={message} bubbleRenderConfig={{ afterMessageRender }} />;
 ```
 
-## 使用场景
+## 使用场景 {#use-cases}
 
 - **知识问答**：为 AI 回答添加来源引用
 - **文档生成**：补充术语解释和参考资料
 - **学术内容**：标注数据来源和引文
 - **新闻资讯**：提供原始报道链接
 
-## 最佳实践
+## 最佳实践 {#best-practices}
 
 1. **保持简洁**：脚注内容应简明扼要，避免过长
 2. **有效链接**：确保脚注中的链接可访问
 3. **合理数量**：单条消息的脚注数量建议不超过 10 个
 4. **清晰标识**：使用有意义的脚注标识符
 
-## 相关组件
+## 相关组件 {#related-components}
 
 - [Bubble 气泡组件](./bubble.md) - 消息气泡容器
 - [VisualList 视觉列表](./VisualList.md) - 来源列表展示

@@ -7,23 +7,23 @@ group:
   order: 4
 ---
 
-# FunnelChart 漏斗图
+# FunnelChart 漏斗图 {#funnelchart}
 
 支持阶段排序、居中对称显示、内置筛选与主题配置，风格与其他图表一致。
 
-## 代码演示
+## 代码演示 {#demo}
 
-### 基础用法
+### 基础用法 {#basic-usage}
 
 <code src="../demos/charts/funnel.tsx" background="var(--main-bg-color)" iframe=540></code>
 <code src="../demos/charts/funnel-toolbar-filter.tsx" background="var(--main-bg-color)" title="工具栏过滤器" iframe=540></code>
 <code src="../demos/charts/funnel-statistic.tsx" background="var(--main-bg-color)" title="统计指标" iframe=540></code>
 
-### 最小宽度控制
+### 最小宽度控制 {#min-width-control}
 
 <code src="../demos/charts/funnelWithMinWidthBottom.tsx" background="var(--main-bg-color)" iframe=800></code>
 
-### 暗黑主题
+### 暗黑主题 {#dark-theme}
 
 <code src="../demos/charts/funnel-dark.tsx" background="#141414" title="暗黑主题" iframe=480></code>
 
@@ -51,7 +51,7 @@ group:
 | statistic             | 统计数据组件配置                                                                                                      | `StatisticConfigType`                    | -          | -    |
 | renderFilterInToolbar | 是否将过滤器渲染到工具栏（当为 true 时，ChartFilter 会显示在工具栏右侧）                                              | `boolean`                                | `false`    | -    |
 
-### ChartContainerProps（继承）
+### ChartContainerProps（继承） {#chartcontainerprops}
 
 | 属性       | 说明                                                                            | 类型                        | 默认值  | 版本 |
 | ---------- | ------------------------------------------------------------------------------- | --------------------------- | ------- | ---- |
@@ -91,7 +91,7 @@ group:
 | block          | 是否使用块级布局（弹性占用空间，多个时平分父容器宽度） | `boolean`                                                           | `false`     | -    |
 | extra          | 右上角自定义内容（图标、按钮等）                       | `React.ReactNode`                                                   | -           | -    |
 
-## 说明
+## 说明 {#notes}
 
 - 漏斗采用对称浮动条（Floating Bar）实现，自动按数值降序排列阶段。
 - Tooltip 默认显示相对第一层的百分比，可通过 `showPercent` 关闭。

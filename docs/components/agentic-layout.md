@@ -6,11 +6,11 @@ group:
   order: 1
 ---
 
-# AgenticLayout 智能体布局组件
+# AgenticLayout 智能体布局组件 {#layout-agenticlayout}
 
 `AgenticLayout` 是一个专为智能体应用设计的三栏布局组件，支持左中右三个区域的灵活配置，内置左右侧栏折叠、右侧栏拖拽调整宽度等能力。
 
-## 代码演示
+## 代码演示 {#demo}
 
 ### API Playground
 
@@ -18,43 +18,43 @@ group:
 
 <code src="../demos/agentic-layout-playground.tsx" iframe=720>API Playground - 全部核心 props</code>
 
-### 基础用法
+### 基础用法 {#basic-usage}
 
 最简用法：只传 `center`，即可获得一个带圆角阴影的内容容器。
 
 <code src="../demos/agentic-layout-basic.tsx" iframe=520>基础用法</code>
 
-### 三栏布局与侧边栏宽度
+### 三栏布局与侧边栏宽度 {#layout}
 
 通过 `left`、`center`、`right` 填充三栏内容，`leftWidth` 和 `rightWidth` 控制侧边栏宽度。
 
 <code src="../demos/agentic-layout-sidebar.tsx" iframe=580>三栏布局 + leftWidth / rightWidth</code>
 
-### 受控折叠
+### 受控折叠 {#controlled-collapse}
 
 通过 `header.leftCollapsed` / `header.rightCollapsed` 与对应回调受控管理折叠状态，可在外部完全控制折叠逻辑（例如根据窗口宽度自动折叠）。
 
 <code src="../demos/agentic-layout-collapse.tsx" iframe=560>受控折叠</code>
 
-### 非受控折叠
+### 非受控折叠 {#controlled-uncontrolled}
 
 使用 `header.leftDefaultCollapsed` / `header.rightDefaultCollapsed` 设置初始值，折叠状态由组件内部自动管理，无需外部 state。
 
 <code src="../demos/agentic-layout-uncontrolled.tsx" iframe=540>非受控折叠</code>
 
-### header 扩展内容
+### header 扩展内容 {#content-header}
 
 `header.title` 支持 ReactNode，`header.showShare` 开启分享按钮，`header.leftExtra` / `header.rightExtra` 在头部左右区域插入自定义内容。
 
 <code src="../demos/agentic-layout-header-extra.tsx" iframe=1020>header 扩展内容</code>
 
-### style 与右侧栏拖拽
+### style 与右侧栏拖拽 {#drag-style}
 
 `className` / `style` 自定义根容器样式，右侧栏内置拖拽手柄可动态调整宽度。组件默认 `minHeight: 600px`，可通过 `style={{ minHeight: 0 }}` 覆盖。
 
 <code src="../demos/agentic-layout-style.tsx" iframe=1100>style 与拖拽调整宽度</code>
 
-### 完整示例
+### 完整示例 {#full-example}
 
 结合 `History`、`ChatLayout`、`BubbleList`、`Workspace` 等组件，构成完整的智能体对话工作台界面。
 
@@ -75,7 +75,7 @@ group:
 | className  | 根容器自定义类名                                                           | `string`              | -      | -    |
 | style      | 根容器自定义样式                                                           | `React.CSSProperties` | -      | -    |
 
-### header 配置（LayoutHeaderConfig）
+### header 配置（LayoutHeaderConfig） {#config-layoutheaderconfig}
 
 | 属性                  | 说明                                                 | 类型                           | 默认值  | 版本 |
 | --------------------- | ---------------------------------------------------- | ------------------------------ | ------- | ---- |
@@ -94,7 +94,7 @@ group:
 | rightExtra            | 右侧操作区自定义内容（折叠按钮之后）                 | `ReactNode`                    | -       | -    |
 | className             | 头部自定义类名                                       | `string`                       | -       | -    |
 
-## 折叠状态说明
+## 折叠状态说明 {#collapse-notes}
 
 `AgenticLayout` 的折叠状态通过 `header` 属性统一管理，支持受控和非受控两种模式：
 
@@ -103,11 +103,11 @@ group:
 
 > 当同时传入受控值（`leftCollapsed`）和默认值（`leftDefaultCollapsed`）时，受控值优先。
 
-## 右侧栏拖拽调整宽度
+## 右侧栏拖拽调整宽度 {#drag}
 
 当传入 `right` 内容时，右侧栏左边缘会出现拖拽手柄（鼠标悬停高亮）。拖动手柄可调整右侧栏宽度，范围限制在 **400px ~ 窗口宽度的 70%** 之间。`rightWidth` prop 变更时会重置当前宽度。
 
-## 注意事项
+## 注意事项 {#notes}
 
 - `center` 属性是必填的，左右侧栏为可选
 - 传入 `left` / `right` 内容时，对应折叠按钮会自动显示（无需手动设置 `leftCollapsible` / `rightCollapsible`）

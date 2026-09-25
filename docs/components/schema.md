@@ -9,11 +9,11 @@ group:
   order: 4
 ---
 
-# Schema - 低代码渲染
+# Schema - 低代码渲染 {#schema}
 
 本文档介绍如何使用 Schema 系统来创建和配置组件。
 
-## 基本结构
+## 基本结构 {#basic}
 
 Schema 由以下几个主要部分组成：
 
@@ -33,11 +33,11 @@ Schema 由以下几个主要部分组成：
 }
 ```
 
-## 组件属性定义
+## 组件属性定义 {#props}
 
 组件属性在 `component.properties` 中定义，支持两种类型：
 
-### 字符串属性
+### 字符串属性 {#props-2}
 
 ```typescript | pure
 {
@@ -52,7 +52,7 @@ Schema 由以下几个主要部分组成：
 }
 ```
 
-### 数字属性
+### 数字属性 {#props-3}
 
 ```typescript | pure
 {
@@ -66,7 +66,7 @@ Schema 由以下几个主要部分组成：
 }
 ```
 
-## 使用示例
+## 使用示例 {#examples}
 
 以下是一个天气组件的配置示例：
 
@@ -91,7 +91,7 @@ Schema 由以下几个主要部分组成：
 }
 ```
 
-## 模板引擎
+## 模板引擎 {#template-engine}
 
 组件支持使用模板语法渲染内容：
 
@@ -99,7 +99,7 @@ Schema 由以下几个主要部分组成：
 - 模板引擎内置 XSS 防护
 - 支持属性值的动态更新
 
-## 主题配置
+## 主题配置 {#config}
 
 主题系统支持以下配置：
 
@@ -108,7 +108,7 @@ Schema 由以下几个主要部分组成：
 - 排版系统（字体、字号、行高）
 - 响应式断点（xs、sm、md、lg、xl）
 
-## 最佳实践
+## 最佳实践 {#best-practices}
 
 1. 属性命名使用驼峰式命名
 2. 为每个属性提供合理的默认值
@@ -116,16 +116,16 @@ Schema 由以下几个主要部分组成：
 4. 需要枚举值的属性优先使用 enum 定义
 5. 合理使用正则表达式进行输入验证
 
-## 注意事项
+## 注意事项 {#notes}
 
 1. type 属性必须使用字面量类型（使用 `as const`）
 2. 属性的默认值类型必须与声明的类型匹配
 3. 模板中的变量名必须与属性名完全匹配
 4. 所有必需的配置项都要填写
 
-## 核心组件使用指南
+## 核心组件使用指南 {#core-component-guide}
 
-### SchemaForm 使用
+### SchemaForm 使用 {#schemaform}
 
 SchemaForm 组件用于根据 schema 定义自动生成表单：
 
@@ -179,7 +179,7 @@ const MyFormComponent: React.FC = () => {
 };
 ```
 
-### SchemaRenderer 使用
+### SchemaRenderer 使用 {#schemarenderer}
 
 SchemaRenderer 组件用于根据 schema 和模板渲染内容：
 
@@ -215,7 +215,7 @@ const MyRendererComponent: React.FC = () => {
 };
 ```
 
-### validator 使用
+### validator 使用 {#validator}
 
 validator 用于验证 schema 数据的合法性：
 
@@ -277,7 +277,7 @@ const validateValue = () => {
 };
 ```
 
-## 完整示例
+## 完整示例 {#full-example}
 
 下面是一个完整的使用示例，展示了如何组合使用这些组件：
 
@@ -464,7 +464,7 @@ const CompleteExample: React.FC = () => {
 export default CompleteExample;
 ```
 
-## mustache 示例
+## mustache 示例 {#example-mustache}
 
 ```tsx
 import React, { useState } from 'react';
@@ -651,7 +651,7 @@ const CompleteExample: React.FC = () => {
 export default CompleteExample;
 ```
 
-## 输入 json 直接渲染
+## 输入 json 直接渲染 {#json}
 
 ```tsx
 import React, { useState, useEffect } from 'react';
@@ -995,7 +995,7 @@ const AdvancedSchemaEditor: React.FC = () => {
 export default SchemaEditor;
 ```
 
-### 嵌套对象
+### 嵌套对象 {#nested-objects}
 
 ```tsx
 import React, { useState } from 'react';
@@ -1092,7 +1092,7 @@ export default CompleteExample;
 4. 如何将输入值渲染到预览界面
 5. 如何处理特殊格式的输入（如标签字符串转换为数组）
 
-## 调试技巧
+## 调试技巧 {#debugging-tips}
 
 1. 使用浏览器开发者工具查看生成的 DOM 结构
 2. 在 validator 验证失败时查看详细的错误信息

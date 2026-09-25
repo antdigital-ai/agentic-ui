@@ -6,11 +6,11 @@ group:
   order: 2
 ---
 
-# ActionIconBox 操作图标盒子
+# ActionIconBox 操作图标盒子 {#icon-actioniconbox}
 
 该组件提供可点击的图标操作按钮，支持加载状态、工具提示、键盘导航等功能。主要用于编辑器工具栏中的各种操作按钮。
 
-## 代码演示
+## 代码演示 {#demo}
 
 ```tsx
 import { ActionIconBox } from '@ant-design/agentic-ui';

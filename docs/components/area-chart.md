@@ -7,11 +7,11 @@ group:
   order: 4
 ---
 
-# AreaChart 面积图
+# AreaChart 面积图 {#areachart}
 
 用于渲染分类型、多序列的面积图，支持筛选、图例、主题与响应式。
 
-## 代码演示
+## 代码演示 {#demo}
 
 <code src="../demos/charts/area.tsx" background="var(--main-bg-color)" iframe=540></code>
 <code src="../demos/charts/area-toolbar-filter.tsx" background="var(--main-bg-color)" title="工具栏过滤器" iframe=540></code>
@@ -44,7 +44,7 @@ group:
 | renderFilterInToolbar | 是否将过滤器渲染到工具栏（当为 true 时，ChartFilter 会显示在工具栏右侧）                                           | `boolean`                                        | `false`    | -    |
 | statistic             | ChartStatistic组件配置：object表示单个配置，array表示多个配置                                                      | `ChartStatisticConfig \| ChartStatisticConfig[]` | -          | -    |
 
-### ChartContainerProps（继承）
+### ChartContainerProps（继承） {#chartcontainerprops}
 
 | 属性       | 说明                                                                            | 类型                        | 默认值  | 版本 |
 | ---------- | ------------------------------------------------------------------------------- | --------------------------- | ------- | ---- |
@@ -85,7 +85,7 @@ group:
 | block          | 是否使用块级布局（弹性占用空间，多个时平分父容器宽度） | `boolean`                                                           | `false`     | -    |
 | extra          | 右上角自定义内容（图标、按钮等）                       | `React.ReactNode`                                                   | -           | -    |
 
-## 说明
+## 说明 {#notes}
 
 - 移动端自动启用响应式：宽度 100%，高度不超过 400px。
 - 当 `filterLabel` 存在时，组件会在分类基础上增加二级筛选。

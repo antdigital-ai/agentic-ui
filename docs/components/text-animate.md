@@ -6,11 +6,11 @@ group:
   order: 5
 ---
 
-# TextAnimate 文本入场动画
+# TextAnimate 文本入场动画 {#textanimate}
 
 `TextAnimate` 用于为文本提供按词 / 按字符 / 按行的入场动画，常用于 AI 回答的「优雅出现」效果。底层为纯 CSS 动画 + IntersectionObserver，不依赖 framer-motion。
 
-## 何时使用
+## 何时使用 {#when-to-use}
 
 - 智能体回答出现时希望有「优雅入场」而非生硬一次渲染
 - 希望在视口可见时再触发动画
@@ -18,7 +18,7 @@ group:
 
 > 与 [TypingAnimation](./typing-animation) 的区别：`TypingAnimation` 是**逐字打字机**效果（可循环、可删除），`TextAnimate` 是**整段一次性入场**（每段元素以错峰 stagger 同时入场）。
 
-## 代码演示
+## 代码演示 {#demo}
 
 <code src="../demos/text-animate-playground.tsx">API Playground - 全部 animation × by × duration</code>
 
@@ -45,14 +45,14 @@ group:
 
 > 所有 `React.HTMLAttributes<HTMLElement>` 上的属性（除 `children`）也会透传到底层元素。
 
-## 行为说明
+## 行为说明 {#notes}
 
 1. **stagger 节奏**：默认情况下每个 segment 的延迟为 `delay + i * (duration / segments.length)`；自定义 `variants` 时按拆分粒度的预设步长（character: 30ms, word/line/text/mix: 50–60ms）执行。
 2. **`startOnView`**：默认仅在元素至少 50% 可见时触发动画；如果希望立即播放可设 `startOnView={false}`。
 3. **`once`**：默认 `false`，元素离开视口后再次进入会重新触发；如果希望只播放一次设为 `true`。
 4. **无障碍**：当 `accessible` 为 `true` 且 `children` 是字符串时，容器会带上 `aria-label`，每个 segment `aria-hidden`，避免读屏器逐字读出。
 
-## 工具函数
+## 工具函数 {#utils}
 
 | 名称                            | 说明                                                                     |
 | ------------------------------- | ------------------------------------------------------------------------ |

@@ -5,13 +5,13 @@ group:
   order: 1
 ---
 
-# Input 输入框
+# Input 输入框 {#input}
 
 输入框组件用于用户输入文本。
 
 > 💡 **说明**：本页展示的 `Input` 与 `Select` 直接使用 Ant Design 的原生组件，`@ant-design/agentic-ui` 未包装额外的输入控件。Agentic 场景下的多行 / 流式输入请使用 [`MarkdownInputField`](./markdownInputField.md)。完整 API 请参考 [Ant Design Input](https://ant.design/components/input-cn) 与 [Ant Design Select](https://ant.design/components/select-cn)。
 
-## 代码演示
+## 代码演示 {#demo}
 
 ```tsx
 import { SearchOutlined } from '@ant-design/icons';

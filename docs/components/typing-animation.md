@@ -6,11 +6,11 @@ group:
   order: 5
 ---
 
-# TypingAnimation 打字机动画
+# TypingAnimation 打字机动画 {#typinganimation}
 
 `TypingAnimation` 提供逐字符的打字机效果，支持单条文本、词语轮播、循环、可配置光标样式。底层为 `setTimeout` 推进 + IntersectionObserver 控制启动，不依赖 framer-motion。
 
-## 何时使用
+## 何时使用 {#when-to-use}
 
 - 需要模拟「智能体逐字回答」的视觉效果
 - 需要在 Hero / 引导区轮播多句标语
@@ -18,7 +18,7 @@ group:
 
 > 与 [TextAnimate](./text-animate) 的区别：`TextAnimate` 整段同时入场（按词 / 字符错峰），`TypingAnimation` 逐字符依次出现并支持删除回退、循环切换。
 
-## 代码演示
+## 代码演示 {#demo}
 
 <code src="../demos/typing-animation.tsx">基础打字机、词语轮播与光标样式</code>
 
@@ -45,7 +45,7 @@ group:
 
 > 所有 `React.HTMLAttributes<HTMLElement>` 上的属性（除 `children`）也会透传到底层元素。
 
-## 行为说明
+## 行为说明 {#notes}
 
 1. **`children` vs `words`**：传 `words` 时进入「多句轮播」模式（输入 → 停顿 → 删除 → 切换下一句），不传时使用 `children` 单条输入。
 2. **`loop`**：仅在多句模式或希望最后一句反复输入时使用；单句 + `loop={false}` 时，到达末尾即停止并隐藏光标。

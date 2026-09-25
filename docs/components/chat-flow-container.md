@@ -1,4 +1,4 @@
----
+﻿---
 title: ChatLayout - 对话流容器组件
 atomId: ChatLayout
 group:
@@ -6,47 +6,47 @@ group:
   order: 2
 ---
 
-# ChatLayout - 对话流容器组件
+# ChatLayout - 对话流容器组件 {#chatlayout}
 
 该组件提供了一个完整的对话流容器，包含头部区域、内容区域和底部区域。
 
-## 基础用法
+## 基础用法 {#basic-usage}
 
 含左侧 `History`、头部、消息区与底部任务条，贴近完整产品布局。
 
 <code src="../demos/ChatFlowContainer/index.tsx" iframe=620>完整产品布局 - 侧栏 + 头部 + 消息流 + 任务条</code>
 
-## 无主栏 · 固定高度
+## 无主栏 · 固定高度 {#no-main-column-fixed-height}18} {#no-main-column-fixed-height}
 
 无会话侧栏，父级给定高度即可；适合嵌入设置抽屉、弹层或分栏右侧等场景。
 
 <code src="../demos/ChatFlowContainer/no-sidebar.tsx" iframe=640>无主栏 · 固定高度嵌入</code>
 
-## 带 Markdown 输入框
+## 带 Markdown 输入框 {#markdown}
 
 底部使用 `MarkdownInputField`，`scrollBehavior` 为 `auto`。
 
 <code src="../demos/ChatFlowContainer/with-input.tsx" iframe=620>带输入框</code>
 
-## 底部最小高度
+## 底部最小高度 {#footer-min-height}
 
 通过 `footerHeight` 为多行输入等较高的 `footer` 预留最小高度，避免内容被遮挡。
 
 <code src="../demos/ChatFlowContainer/footer-height.tsx" iframe=640>footerHeight 与多行底部</code>
 
-## 滚动状态监听
+## 滚动状态监听 {#status}
 
 使用 `onScrollStateChange` 的 `isPinned` 控制「回到底部」浮动按钮；与流式追加消息配合时常用。
 
 <code src="../demos/ChatFlowContainer/scroll-state.tsx" iframe=680>滚动状态与回到底部</code>
 
-## 关闭底部背景动效
+## 关闭底部背景动效 {#disable-footer-bg-animation}
 
 `showFooterBackground={false}`，仅保留底部操作区。
 
 <code src="../demos/ChatFlowContainer/without-footer.tsx" iframe=620>关闭底部背景动效</code>
 
-## API 参考
+## API 参考 {#api}
 
 ### ChatLayoutProps
 
@@ -128,7 +128,7 @@ group:
 | scrollToBottom  | 手动滚动到底部；`behavior` 默认 `'auto'` 立即滚动，传 `'smooth'` 走 rAF 渐进滚动 | `(behavior?: 'smooth' \| 'auto') => void` | -      | -    |
 | isAtBottom      | 当前滚动容器是否贴近底部                                                         | `() => boolean`                           | -      | -    |
 
-## 设计理念
+## 设计理念 {#design-philosophy}
 
 1. 组件需要父容器有明确的高度才能正常显示
 2. 内容区域支持自动滚动，建议配合虚拟滚动使用大量数据

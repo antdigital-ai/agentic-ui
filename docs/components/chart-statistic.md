@@ -7,18 +7,18 @@ group:
   order: 4
 ---
 
-# ChartStatistic 指标卡
+# ChartStatistic 指标卡 {#chartstatistic}
 
 用于显示单个关键指标数据的卡片组件，支持自定义格式化、主题切换、尺寸调整和弹性布局等功能。常与面积图、折线图、柱状图等图表的 `statistic` 属性搭配使用。
 
-## 何时使用
+## 何时使用 {#when-to-use}
 
 - 需要突出显示关键业务指标时
 - 构建数据仪表盘或概览页面
 - 需要配合图表组件展示汇总数据
 - 需要统一的数值展示格式和样式
 
-## 代码演示
+## 代码演示 {#demo}
 
 <code src="../demos/charts/chartStatic.tsx" background="var(--main-bg-color)" iframe=540></code>
 <code src="../demos/charts/chart-statistic-dark.tsx" background="#141414" iframe=320></code>
@@ -43,9 +43,9 @@ group:
 | block          | 是否使用块级布局（弹性占用空间，多个时平分父容器宽度） | `boolean`                                                           | `false`     | -    |
 | extra          | 右上角自定义内容（图标、按钮等）                       | `React.ReactNode`                                                   | -           | -    |
 
-## 特性说明
+## 特性说明 {#notes}
 
-### 数值格式化
+### 数值格式化 {#number-formatting}
 
 组件提供了灵活的数值格式化能力：
 
@@ -55,12 +55,12 @@ group:
 4. **前缀后缀**：支持添加货币符号、单位等
 5. **自定义格式化**：通过 `formatter` 函数完全自定义显示内容和样式
 
-### 主题支持
+### 主题支持 {#theme-support}
 
 - **Light 主题**：适用于浅色背景，文字颜色为深色
 - **Dark 主题**：适用于深色背景，文字颜色为浅色，支持悬停状态
 
-### 尺寸规格
+### 尺寸规格 {#size-specs}
 
 | 尺寸    | 标题字号 | 数值字号 | 使用场景     |
 | ------- | -------- | -------- | ------------ |
@@ -68,7 +68,7 @@ group:
 | default | 13px     | 24px     | 常规使用     |
 | large   | 13px     | 30px     | 重要指标突出 |
 
-### 布局模式
+### 布局模式 {#layout-mode}
 
 - **普通模式**：固定最小宽度 160px，内容居左对齐
 - **Block 模式**：弹性布局，自动占用可用空间

@@ -7,11 +7,11 @@ group:
   order: 4
 ---
 
-# BoxPlotChart 箱线图
+# BoxPlotChart 箱线图 {#boxplotchart}
 
 箱线图用于展示数据分布的统计图表，自动计算最小值、Q1、中位数、Q3、最大值，支持多系列分组和异常值显示。
 
-## 代码演示
+## 代码演示 {#demo}
 
 <code src="../demos/charts/boxplot/boxplot.tsx" background="var(--main-bg-color)" iframe=540></code>
 <code src="../demos/charts/boxplot/boxplot-multi-series.tsx" background="var(--main-bg-color)" title="多系列箱线图" iframe=540></code>
@@ -54,9 +54,9 @@ group:
 | category    | 分类（用于筛选）         | `string`   | -      | -    |
 | filterLabel | 二级筛选标签（可选）     | `string`   | -      | -    |
 
-## 说明
+## 说明 {#notes}
 
-### 统计值计算
+### 统计值计算 {#stats-calculation}
 
 组件自动从原始数据数组计算以下统计值：
 
@@ -68,7 +68,7 @@ group:
 - **均值（mean）**: 平均值
 - **异常值（outliers）**: 超出 1.5 × IQR 范围的值
 
-### 异常值检测
+### 异常值检测 {#outlier-detection}
 
 使用 IQR（四分位距）方法检测异常值：
 
@@ -77,10 +77,10 @@ group:
 - 上界 = Q3 + 1.5 × IQR
 - 超出上下界的值被标记为异常值
 
-### 多系列支持
+### 多系列支持 {#multi-series}
 
 当数据包含 `type` 字段时，组件自动按类型分组显示多个系列，便于对比不同组别的数据分布。
 
-### 筛选功能
+### 筛选功能 {#filtering}
 
 当数据包含 `category` 字段时，组件自动显示筛选器，支持按分类切换数据视图。
