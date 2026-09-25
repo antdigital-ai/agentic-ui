@@ -191,10 +191,13 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
         offset: [0, -12],
       }}
       content={extra}
-      styles={{
-        root: POPOVER_SHARED_STYLE,
-        body: { ...POPOVER_SHARED_STYLE, padding: 'var(--padding-0-5x)' },
-      }}
+      styles={
+        {
+          root: POPOVER_SHARED_STYLE,
+          body: { ...POPOVER_SHARED_STYLE, padding: 'var(--padding-0-5x)' },
+          content: { ...POPOVER_SHARED_STYLE, padding: 'var(--padding-0-5x)' },
+        } as any
+      }
       arrow={false}
       placement={isLeft ? 'bottomLeft' : 'bottomRight'}
     >

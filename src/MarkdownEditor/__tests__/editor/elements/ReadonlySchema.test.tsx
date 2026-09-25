@@ -172,5 +172,9 @@ describe('ReadonlySchema', () => {
 
     expect(screen.getByTestId('schema-container')).toBeInTheDocument();
     expect(screen.getByTestId('apaasify-render')).toBeInTheDocument();
+    expect(screen.getByTestId('schema-container')).toHaveAttribute(
+      'data-apaasify-content',
+      'true',
+    );
   });
 });

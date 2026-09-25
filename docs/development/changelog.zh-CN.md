@@ -28,6 +28,19 @@ group:
 
 - MarkdownEditor
   - 🐞 修复表格闪动：删除表格行入场动画（`tbody tr` 的 `agenticMdBlurFadeIn`）。流式增量会反复重挂表格行导致 blur 淡入重放；`agenticMdBlurFadeIn` keyframes 仅保留供 `MarkdownRenderer` 流式逐词淡入使用。
+  - 🐞 修复 readonly 流式渲染松散列表时条目被反复追加；多块解析结果现在会在进入 Slate 前合并相邻同类列表，并收紧 hash 快速路径的结构校验。[#722](https://github.com/antdigital-ai/agentic-ui/issues/722)
+  - 🐞 修复 IME 组合文本全部删除后，`compositionend` 回补旧片段导致残留首字符的问题。[#721](https://github.com/antdigital-ai/agentic-ui/issues/721)
+  - 🐞 apaasify 自定义渲染内容使用浏览器原生复制，不再被 Slate 的 schema 片段复制逻辑覆盖。[#201](https://github.com/antdigital-ai/agentic-ui/issues/201)
+
+- MarkdownInputField
+  - 🆕 新增 `suggestionProps`，支持通过 `enabled: false` 关闭内部 Dropdown，并可配置 `getPopupContainer`、`destroyOnHidden`、`forceRender` 与 `placement`。[#682](https://github.com/antdigital-ai/agentic-ui/issues/682)
+
+- 📦 兼容性
+  - 📦 支持 Ant Design 5.29.3 至 6.x：`antd` 改为 peer dependency，开发环境升级至 antd 6，并新增 antd 5/6 双版本 CI；移除不兼容 antd 6 的 Pro Components 运行时依赖。[#649](https://github.com/antdigital-ai/agentic-ui/issues/649)
+  - 🛠 升级 `@ant-design/cssinjs` 与 `@ant-design/cssinjs-utils` 至 2.x，并兼容 antd 5/6 的 Popover 语义样式键。
+
+- 📖 文档
+  - 📖 补充 Agentic UI 与 Ant Design X 的定位差异，以及 ProxySandbox 执行 Coding Agent 生成代码的安全边界。[#668](https://github.com/antdigital-ai/agentic-ui/issues/668) [#213](https://github.com/antdigital-ai/agentic-ui/issues/213) [#330](https://github.com/antdigital-ai/agentic-ui/issues/330)
 
 - MarkdownRenderer
   - 🆕 新增 GPT 风格流式逐词淡入：`streaming` 时默认对新词淡入，已显示内容复用 DOM、不闪烁；纯 CSS，尊重 `prefers-reduced-motion`；代码块 / 表格 / 公式不拆词。

@@ -6,6 +6,7 @@ import {
 } from '../../MarkdownEditor';
 import type { SendButtonCustomizationProps } from '../SendButton';
 import type { SkillModeConfig } from '../SkillModeBar';
+import type { SuggestionProps } from '../Suggestion';
 import type { CreateRecognizer } from '../VoiceInput';
 import type { AttachmentConfig } from './attachment';
 import type { ActionsSlotState, SlotRenderState } from './slots';
@@ -120,6 +121,14 @@ export type MarkdownInputFieldProps = {
   ) => void;
 
   tagInputProps?: MarkdownEditorProps['tagInputProps'];
+
+  /**
+   * Internal suggestion dropdown configuration.
+   * Set `enabled: false` when tag suggestions are not used. Shadow DOM hosts
+   * can provide `getPopupContainer` to keep the trigger and popup in one root.
+   * @default { enabled: true }
+   */
+  suggestionProps?: SuggestionProps;
   /**
    * 背景颜色列表 - 用于生成渐变背景效果
    * @description 推荐使用 3-4 种颜色以获得最佳视觉效果

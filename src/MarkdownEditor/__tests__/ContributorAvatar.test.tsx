@@ -64,9 +64,8 @@ describe('ContributorAvatar Component', () => {
         <ContributorAvatar item={mockItem} index={0} className="test-avatar" />,
       );
 
-      // The avatar should be wrapped by tooltip
-      const avatarDiv = screen.getByText('Jo').closest('div[aria-describedby]');
-      expect(avatarDiv).toBeInTheDocument();
+      // Keep an accessible name independent of Tooltip's version-specific DOM.
+      expect(screen.getByLabelText('John Doe')).toBeInTheDocument();
     });
 
     it('should handle names with different lengths', () => {

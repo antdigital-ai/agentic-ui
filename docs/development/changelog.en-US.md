@@ -28,6 +28,19 @@ group:
 
 - MarkdownEditor
   - 🐞 Fixed table flickering by removing the table row entry animation (`agenticMdBlurFadeIn` on `tbody tr`). Streaming remounts rows and used to replay the blur fade-in; keyframes are kept only for `MarkdownRenderer` word-by-word fade-in.
+  - 🐞 Fixed duplicated items while readonly streaming loose lists. Multi-block parser output now merges adjacent lists before entering Slate, and the hash fast path also validates tree shape.[#722](https://github.com/antdigital-ai/agentic-ui/issues/722)
+  - 🐞 Fixed stale IME composition text being restored after the entire uncommitted buffer was deleted.[#721](https://github.com/antdigital-ai/agentic-ui/issues/721)
+  - 🐞 apaasify custom-rendered content now uses native browser copy instead of being replaced by the backing Slate schema fragment.[#201](https://github.com/antdigital-ai/agentic-ui/issues/201)
+
+- MarkdownInputField
+  - 🆕 Added `suggestionProps` to disable the internal Dropdown with `enabled: false` or configure `getPopupContainer`, `destroyOnHidden`, `forceRender`, and `placement`.[#682](https://github.com/antdigital-ai/agentic-ui/issues/682)
+
+- 📦 Compatibility
+  - 📦 Added Ant Design 5.29.3 through 6.x support: `antd` is now a peer dependency, development uses antd 6, an antd 5/6 CI matrix was added, and the antd-6-incompatible Pro Components runtime dependency was removed.[#649](https://github.com/antdigital-ai/agentic-ui/issues/649)
+  - 🛠 Upgraded `@ant-design/cssinjs` and `@ant-design/cssinjs-utils` to 2.x and made Popover semantic style keys work across antd 5/6.
+
+- 📖 Docs
+  - 📖 Documented how Agentic UI differs from Ant Design X and the safety boundary for running Coding Agent output with ProxySandbox.[#668](https://github.com/antdigital-ai/agentic-ui/issues/668) [#213](https://github.com/antdigital-ai/agentic-ui/issues/213) [#330](https://github.com/antdigital-ai/agentic-ui/issues/330)
 
 - MarkdownRenderer
   - 🆕 Added GPT-style streaming word-by-word fade-in: while `streaming`, new words fade in individually; already-shown content reuses DOM without flickering. Pure CSS, honors `prefers-reduced-motion`; skips code blocks / tables / formulas.

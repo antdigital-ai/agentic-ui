@@ -24,6 +24,18 @@ ProxySandbox 是一个强大的 JavaScript 代码执行沙箱系统，提供安�
 
 ## 快速开始
 
+### Coding Agent 生成代码的支持边界
+
+ProxySandbox 可以执行 Coding Agent 生成的受限 JavaScript，并可将结果写入显式注入的 `shadowRoot`。它不会在浏览器内安装 npm 依赖、运行任意构建工具，或安全地执行未经审核的 Node.js/系统命令。
+
+推荐让 Agent 输出以下任一种协议：
+
+- 返回纯数据，再由 React 组件负责渲染。
+- 输出本项目的低代码 Schema，交给 `SchemaRenderer` 渲染。
+- 输出不含外部依赖的 DOM 脚本，并只操作注入的 `shadowRoot`。
+
+需要渲染完整 React/Vue 工程或安装第三方依赖时，应使用服务端容器或独立 iframe 构建沙箱；不要把这类代码直接交给 ProxySandbox。无论代码来源为何，都应保留超时、全局对象白名单和资源限制。
+
 ### 基本使用
 
 ```tsx | pure

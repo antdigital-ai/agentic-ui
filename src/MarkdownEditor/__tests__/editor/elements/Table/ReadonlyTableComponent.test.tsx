@@ -357,7 +357,7 @@ describe('ReadonlyTableComponent', () => {
         expect(document.querySelector('.ant-modal-wrap')).toBeInTheDocument();
       });
       const modalBody = document.querySelector(
-        '.ant-modal-content .ant-agentic-md-editor-content-table',
+        '.ant-modal-content .ant-agentic-md-editor-content-table, .ant-modal-container .ant-agentic-md-editor-content-table',
       ) as HTMLElement;
       expect(modalBody).toBeInTheDocument();
       const fiberKey = Object.keys(modalBody).find((k) =>

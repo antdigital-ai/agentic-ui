@@ -116,13 +116,25 @@ const styleUtils = genStyleUtils<
     };
   },
   useToken: () => {
-    const { theme, token } = antdTheme.useToken();
+    const { getPrefixCls } = useContext(AntdConfigProvider.ConfigContext);
+    const { theme, token, cssVar } = antdTheme.useToken() as ReturnType<
+      typeof antdTheme.useToken
+    > & {
+      cssVar?: { prefix?: string; key?: string };
+    };
     return {
-      theme,
+      // antd 5 and 6 resolve Theme from different cssinjs package instances;
+      // the runtime contract is compatible even though the private TS field is nominal.
+      theme: theme as any,
       realToken: token as GlobalToken,
       // 组件库默认关闭 hashId，避免与宿主 antd hashId 叠加。
       hashId: '',
       token: token as GlobalToken,
+      cssVar: cssVar ?? {
+        prefix: getPrefixCls(),
+        key: 'css-var-root',
+      },
+      zeroRuntime: false,
     };
   },
   useCSP: () => {
@@ -151,16 +163,32 @@ const styleUtils = genStyleUtils<
  * export const useStyle = genStyleHooks('Bubble', genStyle);
  * ```
  */
-export const genStyleHooks: typeof styleUtils.genStyleHooks =
-  styleUtils.genStyleHooks;
+export const genStyleHooks = ((...args: any[]) => {
+  const useGeneratedStyle = (styleUtils.genStyleHooks as any)(...args);
+  return (...hookArgs: any[]) => {
+    const [hashId, cssVarCls] = useGeneratedStyle(...hookArgs);
+    // Keep the library's historical tuple shape. cssinjs-utils 2.x removed
+    // the first wrapSSR slot, while all agentic-ui style hooks intentionally
+    // destructure `[, hashId]` for compatibility with antd 5.
+    return [null, hashId, cssVarCls] as const;
+  };
+}) as unknown as typeof styleUtils.genStyleHooks;
 
 /**
  * 同 antd `genComponentStyleHook`：与 `genStyleHooks` 类似，但不接管 CSS Var 注册。
  * 元组第 0 位为 identity 占位（保持上游类型兼容），调用方使用
  * `const [, hashId] = useStyle(...)` 跳过它。
  */
-export const genComponentStyleHook: typeof styleUtils.genComponentStyleHook =
-  styleUtils.genComponentStyleHook;
+export const genComponentStyleHook = ((...args: any[]) => {
+  const useGeneratedStyle = (styleUtils.genComponentStyleHook as any)(...args);
+  return (...hookArgs: any[]) => {
+    const generated = useGeneratedStyle(...hookArgs);
+    const [hashId, cssVarCls] = Array.isArray(generated)
+      ? generated
+      : [generated, undefined];
+    return [null, hashId, cssVarCls] as const;
+  };
+}) as unknown as typeof styleUtils.genComponentStyleHook;
 
 /**
  * 同 antd `genSubStyleComponent`：返回一个 SubStyle 组件，用于在父组件内挂载子样式。

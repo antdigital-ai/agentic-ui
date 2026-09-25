@@ -277,6 +277,7 @@ export default () => {
 | `onFocus`                | 当输入字段获得焦点时触发的回调函数             | `(value: string, schema: Elements[], e: FocusEvent) => void`         | -         | -    |
 | `onBlur`                 | 当输入字段失去焦点时触发的回调函数             | `(value: string, schema: Elements[], e: MouseEvent) => void`         | -         | -    |
 | `tagInputProps`          | 标签输入的相关属性                             | `MarkdownEditorProps['tagInputProps']`                               | -         | -    |
+| `suggestionProps`        | 内部建议下拉框配置；可关闭下拉框或指定弹层容器 | `SuggestionProps`                                                    | -         | -    |
 | `borderRadius`           | 边框圆角大小                                   | `number`                                                             | `12`      | -    |
 | `attachment`             | 附件配置                                       | `{ enable?: boolean } & AttachmentButtonProps`                       | -         | -    |
 | `voiceRecognizer`        | 语音输入配置                                   | `CreateRecognizer`                                                   | -         | -    |

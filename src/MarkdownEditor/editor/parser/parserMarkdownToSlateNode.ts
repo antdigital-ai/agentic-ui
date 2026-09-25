@@ -1,6 +1,7 @@
 import type { RootContent } from 'mdast';
 import { Element } from 'slate';
 
+import type { FormulaConfig } from '../../../Config/formulaConfig';
 import { ChartTypeConfig, Elements } from '../../el';
 import { MarkdownEditorPlugin } from '../../plugin';
 import { preprocessNormalizeLeafToContainerDirective } from './constants';
@@ -28,7 +29,6 @@ import {
   preprocessNonStandardHtmlTags,
   preprocessThinkTags,
 } from './parse/parseHtml';
-import type { FormulaConfig } from '../../../Config/formulaConfig';
 import { handleInlineMath, handleMath } from './parse/parseMath';
 import { handleImage } from './parse/parseMedia';
 import {
@@ -45,6 +45,48 @@ const parseCache = new Map<string, Elements[]>();
  */
 export const clearParseCache = (): void => {
   parseCache.clear();
+};
+
+type HashedElement = Elements & { hash?: string };
+
+const isTopLevelList = (node: Elements): boolean =>
+  node.type === 'numbered-list' || node.type === 'bulleted-list';
+
+/**
+ * Align multi-block parser output with the tree produced by list normalization.
+ *
+ * Loose Markdown lists are split at blank lines, so parsing each block produces
+ * adjacent list nodes. Slate immediately merges those nodes, while the incoming
+ * schema used to keep them separate. On the next streaming update the hash fast
+ * path then compared two differently shaped trees and repeatedly inserted the
+ * current list item. Return fresh nodes so cached parse results remain immutable.
+ */
+const mergeAdjacentLists = (schema: Elements[]): Elements[] => {
+  const merged: HashedElement[] = [];
+
+  for (const node of schema as HashedElement[]) {
+    const previous = merged[merged.length - 1];
+    if (
+      previous &&
+      isTopLevelList(previous) &&
+      isTopLevelList(node) &&
+      previous.type === node.type
+    ) {
+      merged[merged.length - 1] = {
+        ...previous,
+        children: [...previous.children, ...node.children],
+        hash:
+          previous.hash && node.hash
+            ? `${previous.hash}+${node.hash}`
+            : undefined,
+      } as HashedElement;
+      continue;
+    }
+
+    merged.push(node);
+  }
+
+  return merged;
 };
 
 /**
@@ -688,7 +730,7 @@ export const parserMarkdownToSlateNode = (
   }
 
   return {
-    schema: allSchemas,
+    schema: mergeAdjacentLists(allSchemas),
     links: [],
   };
 };

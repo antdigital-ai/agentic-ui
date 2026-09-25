@@ -690,11 +690,16 @@ export function Media({
       >
         <Popover
           arrow={false}
-          styles={{
-            body: {
-              padding: 8,
-            },
-          }}
+          styles={
+            {
+              body: {
+                padding: 8,
+              },
+              content: {
+                padding: 8,
+              },
+            } as any
+          }
           trigger="click"
           open={state().selected && !readonly ? undefined : false}
           content={

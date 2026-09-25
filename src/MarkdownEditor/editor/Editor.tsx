@@ -28,11 +28,9 @@ import {
   MarkdownEditorInstance,
   MarkdownEditorProps,
 } from '../types';
-import { LazyElement } from './components/LazyElement';
 import { EditorEditable } from './components/EditorEditable';
+import { LazyElement } from './components/LazyElement';
 import { MElement, MLeaf } from './elements';
-import { buildFootnoteDefinitionChangePayload } from './utils/footnoteDisplay';
-import { applyTableMinSizeToSchema } from './utils/genTableMinSize';
 import {
   handleFilesPaste,
   handleHtmlPaste,
@@ -49,12 +47,11 @@ import { useKeyboard } from './plugins/useKeyboard';
 import { useOnchange } from './plugins/useOnchange';
 import { useEditorStore } from './store';
 import { useStyle } from './style';
-import { MARKDOWN_EDITOR_EVENTS, copy, parserSlateNodeToMarkdown } from './utils';
 import {
-  cleanWordHtml,
-  htmlToMarkdown,
-  isWordHtml,
-} from './utils/htmlToMarkdown';
+  MARKDOWN_EDITOR_EVENTS,
+  copy,
+  parserSlateNodeToMarkdown,
+} from './utils';
 import {
   EditorUtils,
   findByPathAndText,
@@ -64,10 +61,17 @@ import {
   isEventHandled,
   isPath,
 } from './utils/editorUtils';
+import { buildFootnoteDefinitionChangePayload } from './utils/footnoteDisplay';
+import { applyTableMinSizeToSchema } from './utils/genTableMinSize';
 import {
+  cleanWordHtml,
+  htmlToMarkdown,
+  isWordHtml,
+} from './utils/htmlToMarkdown';
+import {
+  clearImeEnterCommitGuard,
   commitImeCompositionTextIfMissing,
   getEditorTextSnapshot,
-  clearImeEnterCommitGuard,
   markImeEnterCommitGuard,
   scheduleClearInputComposition,
 } from './utils/isImeComposing';
@@ -193,6 +197,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     useState(false);
   const [hasEmptyRootParagraph, setHasEmptyRootParagraph] = useState(false);
   const lastCompositionDataRef = useRef('');
+  const sawCompositionUpdateRef = useRef(false);
 
   const plugins = useContext(PluginContext);
 
@@ -495,6 +500,17 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
       operationType: 'copy' | 'cut',
     ): boolean => {
       try {
+        // apaasify renderers own their DOM content. Let the browser copy the
+        // visible native selection instead of replacing it with the backing
+        // Slate schema/code fragment (#201).
+        if (
+          operationType === 'copy' &&
+          event.target instanceof Element &&
+          event.target.closest('[data-apaasify-content="true"]')
+        ) {
+          return false;
+        }
+
         // 1. 如果事件已被处理，则直接返回
         if (isEventHandled(event)) {
           return false;
@@ -745,11 +761,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     // 2. text/html —— 大文档守门，超阈值降级到 text/plain
     const htmlMaxBytes = pasteConfig?.htmlMaxBytes ?? 1_048_576;
     const htmlOversize = htmlMaxBytes > 0 && cachedHtml.length > htmlMaxBytes;
-    if (
-      cachedHtml &&
-      !htmlOversize &&
-      allowedTypes.includes('text/html')
-    ) {
+    if (cachedHtml && !htmlOversize && allowedTypes.includes('text/html')) {
       // 2a. Word/Office HTML：先 cleanWordHtml + htmlToMarkdown 转 markdown，
       // 再走 markdown 解析流水线，比 docxDeserializer 直接 HTML→Slate 更稳。
       const wordToMd = pasteConfig?.convertWordToMarkdown !== false;
@@ -823,10 +835,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
       return;
     }
     // 5. text/plain（含从 oversize HTML 降级过来的情形）
-    if (
-      (cachedPlain || htmlOversize) &&
-      allowedTypes.includes('text/plain')
-    ) {
+    if ((cachedPlain || htmlOversize) && allowedTypes.includes('text/plain')) {
       const text = (cachedPlain || '').trim();
       if (!text) return;
 
@@ -869,8 +878,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
             plugins,
             allowedTypes,
             {
-              parseMarkdownInPlainText:
-                pasteConfig?.parseMarkdownInPlainText,
+              parseMarkdownInPlainText: pasteConfig?.parseMarkdownInPlainText,
             },
           )
         ) {
@@ -946,6 +954,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
    */
   const onCompositionStart = () => {
     lastCompositionDataRef.current = '';
+    sawCompositionUpdateRef.current = false;
     activateInputComposition();
 
     // Re-anchor Slate selection from the actual DOM caret position.
@@ -974,9 +983,11 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
    * compositionupdate；微信下每次 update 都刷新组合态，避免 inputComposition 卡住。
    */
   const onCompositionUpdate = (event: React.CompositionEvent) => {
-    if (event.data) {
-      lastCompositionDataRef.current = event.data;
-    }
+    // Empty data is meaningful: it means the user deleted the uncommitted IME
+    // buffer. Keeping an earlier non-empty update would reinsert its first
+    // character when compositionend arrives with empty data (#721).
+    sawCompositionUpdateRef.current = true;
+    lastCompositionDataRef.current = event.data;
 
     if (isWeChat()) {
       activateInputComposition();
@@ -997,8 +1008,11 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
   const onCompositionEnd = useRefFunction((event?: React.CompositionEvent) => {
     markImeEnterCommitGuard();
 
-    const composedText = event?.data || lastCompositionDataRef.current;
+    const composedText =
+      event?.data ||
+      (sawCompositionUpdateRef.current ? lastCompositionDataRef.current : '');
     lastCompositionDataRef.current = '';
+    sawCompositionUpdateRef.current = false;
     if (composedText) {
       commitImeCompositionTextIfMissing(
         markdownEditorRef.current,

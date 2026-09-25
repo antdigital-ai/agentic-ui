@@ -162,7 +162,7 @@ const ColorfulPopover = ({ children, supportedFormat }: RenderProps) => {
       content={content}
       trigger="hover"
       placement="top"
-      styles={{ body: { padding: 0 } }}
+      styles={{ body: { padding: 0 }, content: { padding: 0 } } as any}
     >
       {children as React.ReactElement}
     </Popover>

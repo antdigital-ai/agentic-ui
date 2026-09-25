@@ -1,4 +1,4 @@
-import type { MenuProps } from 'antd';
+import type { DropdownProps, MenuProps } from 'antd';
 import { Dropdown, Spin } from 'antd';
 import { useMergedState } from 'rc-util';
 import React, { useEffect, useRef, useState } from 'react';
@@ -39,6 +39,14 @@ interface SuggestionTagInputProps {
    * 第二参数为调用方上下文（如外层 RenderProps），按需透传，未使用时可忽略。
    */
   onChange?: (value: string, props?: any) => void;
+}
+
+export interface SuggestionProps extends Pick<
+  DropdownProps,
+  'destroyOnHidden' | 'forceRender' | 'getPopupContainer' | 'placement'
+> {
+  /** Whether to mount the internal suggestion dropdown. */
+  enabled?: boolean;
 }
 
 /**
@@ -111,6 +119,7 @@ const EMPTY_ITEMS: ReadonlyArray<{ key: string | number; label: string }> =
 export const Suggestion: React.FC<{
   children: React.ReactNode;
   tagInputProps?: SuggestionTagInputProps;
+  suggestionProps?: SuggestionProps;
 }> = (props) => {
   const onSelectRef =
     useRef<(value: string, path?: number[]) => void | undefined>(undefined);
@@ -256,6 +265,25 @@ export const Suggestion: React.FC<{
     },
   );
 
+  const suggestionEnabled =
+    props.suggestionProps?.enabled ?? props.tagInputProps?.enable ?? true;
+
+  if (!suggestionEnabled) {
+    return (
+      <SuggestionContext.Provider
+        value={{
+          open: false,
+          setOpen,
+          isRender: false,
+          onSelectRef,
+          triggerNodeContext,
+        }}
+      >
+        {props.children}
+      </SuggestionContext.Provider>
+    );
+  }
+
   return (
     <SuggestionContext.Provider
       value={{
@@ -282,9 +310,10 @@ export const Suggestion: React.FC<{
                 },
               }
         }
-        forceRender
-        destroyOnHidden={false}
-        placement="top"
+        forceRender={props.suggestionProps?.forceRender ?? true}
+        destroyOnHidden={props.suggestionProps?.destroyOnHidden ?? false}
+        getPopupContainer={props.suggestionProps?.getPopupContainer}
+        placement={props.suggestionProps?.placement ?? 'top'}
         onOpenChange={(isOpenChanged) => {
           if (isOpenChanged) return;
           setOpen(isOpenChanged);

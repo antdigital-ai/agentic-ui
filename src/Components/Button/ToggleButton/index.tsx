@@ -51,6 +51,7 @@ export const ToggleButton = forwardRef<HTMLDivElement, ToggleButtonProps>(
           }}
         >
           <Button
+            autoInsertSpace={false}
             disabled={disabled}
             onClick={onClick}
             className={classNames(`${prefixCls}-button`, hashId)}

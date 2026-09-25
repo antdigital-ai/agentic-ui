@@ -1,0 +1,33 @@
+name: Ant Design compatibility
+
+on:
+  pull_request:
+    paths:
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'src/**'
+      - '.github/workflows/antd-compatibility.yml'
+  push:
+    branches: [main]
+
+jobs:
+  compatibility:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        antd: ['5.29.3', '6.6.5']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Select Ant Design ${{ matrix.antd }}
+        run: pnpm add --save-dev --ignore-workspace-root-check --lockfile=false antd@${{ matrix.antd }}
+      - run: pnpm tsc --noEmit
+      - run: pnpm exec vitest run src/MarkdownInputField src/MarkdownEditor/__tests__/BaseMarkdownEditor.test.tsx --mode full

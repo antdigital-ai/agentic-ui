@@ -27,7 +27,7 @@ export const ContributorAvatar: React.FC<ContributorAvatarProps> = (props) => {
   const { item: { name } = {}, index = 0 } = props;
   return (
     <Tooltip title={name}>
-      <div className={props.className}>
+      <div className={props.className} aria-label={name}>
         <Avatar
           size={14}
           alt={name}

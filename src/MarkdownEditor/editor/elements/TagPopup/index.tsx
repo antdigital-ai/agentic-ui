@@ -1,4 +1,3 @@
-import { runFunction } from '@ant-design/pro-components';
 import { ChevronDown } from '@sofa-design/icons';
 import { ConfigProvider, Dropdown, MenuProps } from 'antd';
 import classNames from 'clsx';
@@ -447,11 +446,13 @@ export const TagPopup = (props: RenderProps) => {
   );
 
   const containerStyle = {
-    ...runFunction(props.tagTextStyle, {
-      ...props,
-      text: props.text,
-      placeholder,
-    }),
+    ...(typeof props.tagTextStyle === 'function'
+      ? props.tagTextStyle({
+          ...props,
+          text: props.text,
+          placeholder,
+        })
+      : props.tagTextStyle),
   };
 
   const handleContainerClick = (e: MouseEvent) =>

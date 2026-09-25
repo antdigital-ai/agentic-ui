@@ -640,6 +640,29 @@ describe('Editor branches - handleClipboardCopy', () => {
     vi.restoreAllMocks();
   });
 
+  it('leaves apaasify content copy to the browser', () => {
+    setupStore({ readonly: true });
+    renderEditor({});
+
+    const container = document.createElement('div');
+    container.dataset.apaasifyContent = 'true';
+    const target = document.createElement('span');
+    container.appendChild(target);
+    const event = {
+      preventDefault: vi.fn(),
+      clipboardData: {
+        clearData: vi.fn(),
+        setData: vi.fn(),
+      },
+      target,
+    } as any;
+
+    editableProps.onCopy(event);
+
+    expect(event.preventDefault).not.toHaveBeenCalled();
+    expect(event.clipboardData.clearData).not.toHaveBeenCalled();
+  });
+
   it('copy with valid selection sets clipboard data and returns true', () => {
     const { editor } = setupStore({ readonly: false });
     editor.selection = {

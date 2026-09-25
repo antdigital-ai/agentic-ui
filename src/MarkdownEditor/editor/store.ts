@@ -22,16 +22,16 @@ import { ReactEditor } from 'slate-react';
 import type { Elements, FootnoteDefinitionNode, ListNode } from '../el';
 import type { MarkdownEditorPlugin } from '../plugin';
 import { CommentDataType, MarkdownEditorProps } from '../types';
+import { EditorStoreContext } from './editorStoreContext';
+import type { ParserMarkdownToSlateNodeConfig } from './parser/parserMarkdownToSlateNode';
 import { parserMdToSchema } from './parser/parserMdToSchema';
 import { parserSlateNodeToMarkdown } from './parser/parserSlateNodeToMarkdown';
 import { getOffsetLeft, getOffsetTop } from './utils/dom';
+import type { EditorSelChangePayload } from './utils/editorSelChange';
 import { EditorUtils, findByPathAndText } from './utils/editorUtils';
 import { KeyboardTask, Methods } from './utils/keyboard';
-import type { ParserMarkdownToSlateNodeConfig } from './parser/parserMarkdownToSlateNode';
 import type { MarkdownToHtmlOptions } from './utils/markdownToHtml';
 import { markdownToHtmlSync } from './utils/markdownToHtml';
-import type { EditorSelChangePayload } from './utils/editorSelChange';
-import { EditorStoreContext } from './editorStoreContext';
 
 export { EditorStoreContext };
 
@@ -618,7 +618,11 @@ export class EditorStore {
             const chunk = chunks[i];
             if (chunk.trim()) {
               try {
-                const { schema } = parserMdToSchema(chunk, plugins, this.parserConfig);
+                const { schema } = parserMdToSchema(
+                  chunk,
+                  plugins,
+                  this.parserConfig,
+                );
 
                 if (schema.length > 0) {
                   if (isFirstBatch) {
@@ -1042,6 +1046,16 @@ export class EditorStore {
   }
 
   /**
+   * Normalizers may change an inserted node's children without updating its
+   * parser hash. A matching hash is therefore a safe shortcut only while the
+   * immediate tree shape also matches.
+   */
+  private isUnchangedByHash(newNode: Node, oldNode: Node): boolean {
+    if (!newNode.hash || newNode.hash !== oldNode.hash) return false;
+    return (newNode.children?.length ?? 0) === (oldNode.children?.length ?? 0);
+  }
+
+  /**
    * 内部方法：生成差异操作，不进行排序。
    * 递归调用时使用此方法，避免重复排序。
    */
@@ -1084,7 +1098,7 @@ export class EditorStore {
       const oldNode = oldNodes[i];
 
       // 提前检查 hash，相同则跳过
-      if (newNode.hash && oldNode.hash && newNode.hash === oldNode.hash) {
+      if (this.isUnchangedByHash(newNode, oldNode)) {
         continue;
       }
 
@@ -1116,7 +1130,7 @@ export class EditorStore {
     operations: UpdateOperation[],
   ): void {
     // 如果两个节点的 hash 相同，跳过比较
-    if (newNode.hash && oldNode.hash && newNode.hash === oldNode.hash) {
+    if (this.isUnchangedByHash(newNode, oldNode)) {
       return;
     }
 

@@ -447,11 +447,16 @@ export function EditorImage({
     >
       <Popover
         arrow={false}
-        styles={{
-          body: {
-            padding: 8,
-          },
-        }}
+        styles={
+          {
+            body: {
+              padding: 8,
+            },
+            content: {
+              padding: 8,
+            },
+          } as any
+        }
         trigger="hover"
         open={state().selected ? undefined : false}
         content={

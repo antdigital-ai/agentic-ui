@@ -18,7 +18,7 @@ import React from 'react';
 export const SuggestionContext = React.createContext<{
   open?: boolean;
   setOpen?: (open: boolean) => void;
-  isRender: true;
+  isRender: boolean;
   onSelectRef?: React.MutableRefObject<
     ((value: string) => void | undefined) | undefined
   >;

@@ -239,14 +239,22 @@ export default () => {
       const titleText = (node?.origin_text as string) || hostText;
       return (
         <Popover
-          styles={{
-            body: {
-              padding: 0,
-              borderRadius: 'var(--radius-card-base)',
-              boxShadow: 'var(--shadow-control-lg)',
-              overflow: 'hidden',
-            },
-          }}
+          styles={
+            {
+              body: {
+                padding: 0,
+                borderRadius: 'var(--radius-card-base)',
+                boxShadow: 'var(--shadow-control-lg)',
+                overflow: 'hidden',
+              },
+              content: {
+                padding: 0,
+                borderRadius: 'var(--radius-card-base)',
+                boxShadow: 'var(--shadow-control-lg)',
+                overflow: 'hidden',
+              },
+            } as any
+          }
           arrow={false}
           content={
             <FootnotePopverContent

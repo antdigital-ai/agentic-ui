@@ -274,11 +274,16 @@ export const SendActions: React.FC<SendActionsProps> = ({
           <>
             <Popover
               trigger="click"
-              styles={{
-                body: {
-                  padding: 4,
-                },
-              }}
+              styles={
+                {
+                  body: {
+                    padding: 4,
+                  },
+                  content: {
+                    padding: 4,
+                  },
+                } as any
+              }
               arrow={false}
               content={
                 <div

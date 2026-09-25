@@ -1,7 +1,7 @@
 import { LoadingOutlined } from '@ant-design/icons';
-import { useMountMergeState } from '@ant-design/pro-components';
 import { Checkbox, ConfigProvider, Dropdown, Space } from 'antd';
 import classNames from 'clsx';
+import { useMergedState } from 'rc-util';
 import React, { useContext, useEffect, useMemo } from 'react';
 import { ElementProps, ListItemNode } from '../../../el';
 import { useMEditor } from '../../../hooks/editor';
@@ -16,7 +16,7 @@ const MentionsUser = (props: {
   const [loading, setLoading] = React.useState(false);
   const [users, setUsers] = React.useState<Mentions[]>([]);
 
-  const [selectedUsers, setSelectedUsers] = useMountMergeState<Mentions[]>(
+  const [selectedUsers, setSelectedUsers] = useMergedState<Mentions[]>(
     props.mentions || [],
     {
       value: props.mentions,

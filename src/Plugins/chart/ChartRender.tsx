@@ -1,11 +1,13 @@
 import { CopyOutlined, DownOutlined, SettingOutlined } from '@ant-design/icons';
-import { ProForm, ProFormSelect } from '@ant-design/pro-components';
 import {
+  Button,
   ConfigProvider,
   Descriptions,
   Dropdown,
+  Form,
   message,
   Popover,
+  Select,
   Table,
 } from 'antd';
 import { DescriptionsItemType } from 'antd/es/descriptions';
@@ -1086,24 +1088,24 @@ export const ChartRender: React.FC<{
       ) : null,
       <Popover
         arrow={false}
-        styles={{
-          body: {
-            padding: 8,
-          },
-        }}
+        styles={
+          {
+            body: {
+              padding: 8,
+            },
+            content: {
+              padding: 8,
+            },
+          } as any
+        }
         key="config"
         title={i18n?.locale?.configChart || '配置图表'}
         trigger={'click'}
         getPopupContainer={() => document.body}
         content={
           <ConfigProvider componentSize="small">
-            <ProForm
+            <Form
               prefixCls={chartConfigFormPrefixCls}
-              submitter={{
-                searchConfig: {
-                  submitText: i18n?.locale?.updateChart || '更新',
-                },
-              }}
               style={{
                 width: 300,
               }}
@@ -1130,43 +1132,40 @@ export const ChartRender: React.FC<{
                     gap: 8,
                   }}
                 >
-                  <ProFormSelect
-                    label="X"
-                    name="x"
-                    fieldProps={{
-                      onClick: (e) => {
+                  <Form.Item label="X" name="x">
+                    <Select
+                      onClick={(e) => {
                         e.stopPropagation();
-                      },
-                    }}
-                    options={config.columns
-                      ?.filter((item: any) => item.title)
-                      ?.map((item: any) => {
-                        return {
+                      }}
+                      options={config.columns
+                        ?.filter((item: any) => item.title)
+                        ?.map((item: any) => ({
                           label: item.title,
                           value: item.dataIndex,
-                        };
-                      })}
-                  />
-                  <ProFormSelect
-                    name="y"
-                    label="Y"
-                    fieldProps={{
-                      onClick: (e) => {
+                        }))}
+                    />
+                  </Form.Item>
+                  <Form.Item name="y" label="Y">
+                    <Select
+                      onClick={(e) => {
                         e.stopPropagation();
-                      },
-                    }}
-                    options={config.columns
-                      ?.filter((item: any) => item.title)
-                      ?.map((item: any) => {
-                        return {
+                      }}
+                      options={config.columns
+                        ?.filter((item: any) => item.title)
+                        ?.map((item: any) => ({
                           label: item.title,
                           value: item.dataIndex,
-                        };
-                      })}
-                  />
+                        }))}
+                    />
+                  </Form.Item>
                 </div>
               </div>
-            </ProForm>
+              <Form.Item>
+                <Button type="primary" htmlType="submit">
+                  {i18n?.locale?.updateChart || '更新'}
+                </Button>
+              </Form.Item>
+            </Form>
           </ConfigProvider>
         }
       >

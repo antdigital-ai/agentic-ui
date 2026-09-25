@@ -47,7 +47,18 @@ group:
 | **React**      | 18.x  | 前端框架   | 使用最新的React特性，包括Hooks、Suspense等 |
 | **TypeScript** | 5.x   | 类型系统   | 提供完整的类型安全，提高代码质量           |
 | **Slate.js**   | 0.94+ | 编辑器核心 | 可定制的富文本编辑器框架                   |
-| **Ant Design** | 5.x   | UI组件库   | 企业级UI设计语言和React组件库              |
+| **Ant Design** | 5/6   | UI组件库   | 支持 5.29.3 及以上、低于 7 的版本          |
+
+## 与 Ant Design X 的定位差异 {#comparison-with-ant-design-x}
+
+`@ant-design/agentic-ui` 与 Ant Design X 可以独立选择，并非要求同时安装的上下游关系：
+
+- Agentic UI 更侧重完整智能体工作台，包括多步任务、工具调用、Workspace、富 Markdown 编辑和可扩展渲染协议。
+- Ant Design X 更侧重基于 Ant Design 体系快速搭建通用对话界面与模型交互。
+- 已经使用本库的 Workspace、MarkdownEditor、ThoughtChain 等复合能力时，优先继续使用 Agentic UI。
+- 只需要轻量聊天组件、并希望紧跟 Ant Design 官方组件体系时，可优先评估 Ant Design X。
+
+两者可以在同一业务中按页面使用，但应统一宿主 `antd` 版本和主题配置，避免重复实现同一种聊天交互。
 
 ### 开发工具
 

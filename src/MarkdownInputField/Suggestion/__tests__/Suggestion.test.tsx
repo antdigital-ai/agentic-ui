@@ -55,6 +55,17 @@ const SelectBinder: React.FC<{ onSelect: (value: string) => void }> = ({
 };
 
 describe('Suggestion', () => {
+  it('does not mount a dropdown when disabled', () => {
+    const { container } = render(
+      <Suggestion suggestionProps={{ enabled: false }}>
+        <button type="button">Trigger</button>
+      </Suggestion>,
+    );
+
+    expect(container.querySelector('[data-testid="dropdown"]')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Trigger' })).toBeInTheDocument();
+  });
+
   afterEach(() => {
     dropdownPropsHistory.length = 0;
     vi.clearAllMocks();
@@ -121,9 +132,9 @@ describe('Suggestion', () => {
   });
 
   it('loads async items when items is a function', async () => {
-    const items = vi.fn().mockResolvedValue([
-      { key: 'async', label: 'Async item' },
-    ]);
+    const items = vi
+      .fn()
+      .mockResolvedValue([{ key: 'async', label: 'Async item' }]);
 
     render(
       <Suggestion tagInputProps={{ items, open: true }}>
@@ -332,7 +343,8 @@ describe('Suggestion', () => {
       expect(dropdownRender).toHaveBeenCalled();
     });
 
-    const wrapper = screen.getByTestId('popup').firstElementChild as HTMLElement;
+    const wrapper = screen.getByTestId('popup')
+      .firstElementChild as HTMLElement;
     const event = new KeyboardEvent('keydown', {
       bubbles: true,
       cancelable: true,

@@ -94,11 +94,16 @@ export const LanguageSelector = (props: LanguageSelectorProps) => {
     <Popover
       arrow={false}
       open={open}
-      styles={{
-        body: {
-          padding: 8,
-        },
-      }}
+      styles={
+        {
+          body: {
+            padding: 8,
+          },
+          content: {
+            padding: 8,
+          },
+        } as any
+      }
       trigger={['click']}
       placement={'bottomLeft'}
       onOpenChange={(visible) => {
@@ -154,7 +159,10 @@ export const LanguageSelector = (props: LanguageSelectorProps) => {
             }}
             className={'lang-select'}
           >
-            <Input prefix={<SearchOutlined />} placeholder={i18n.locale['code.searchLanguage']} />
+            <Input
+              prefix={<SearchOutlined />}
+              placeholder={i18n.locale['code.searchLanguage']}
+            />
           </AutoComplete>
         </div>
       }

@@ -61,6 +61,7 @@ export const Schema: React.FC<RenderElementProps> = (props) => {
         <div
           {...node.attributes}
           data-testid="schema-container"
+          data-apaasify-content="true"
           contentEditable={false}
           style={{
             display: 'flex',

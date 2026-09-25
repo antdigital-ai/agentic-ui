@@ -50,6 +50,7 @@ export const ReadonlySchema: React.FC<RenderElementProps> = React.memo(
           <div
             {...node.attributes}
             data-testid="schema-container"
+            data-apaasify-content="true"
             contentEditable={false}
             style={{
               display: 'flex',

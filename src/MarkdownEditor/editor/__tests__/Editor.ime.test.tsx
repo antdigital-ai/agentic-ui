@@ -118,4 +118,32 @@ describe('SlateMarkdownEditor IME composition', () => {
 
     expect(SlateEditor.string(editor, [])).toBe('，');
   });
+
+  it('does not restore an IME buffer that was deleted before compositionend', async () => {
+    const { editor, storeResult } = createStoreResult();
+    testState.storeResult = storeResult;
+
+    render(
+      <SlateMarkdownEditor
+        initSchemaValue={[{ type: 'paragraph', children: [{ text: '' }] }]}
+        prefixCls="ant-md-editor"
+      />,
+    );
+
+    const editableProps = getEditableProps();
+    editableProps.onCompositionStart();
+    editableProps.onCompositionUpdate({
+      data: 'nihao',
+    } as React.CompositionEvent<HTMLDivElement>);
+    editableProps.onCompositionUpdate({
+      data: '',
+    } as React.CompositionEvent<HTMLDivElement>);
+    editableProps.onCompositionEnd({
+      data: '',
+    } as React.CompositionEvent<HTMLDivElement>);
+
+    await Promise.resolve();
+
+    expect(SlateEditor.string(editor, [])).toBe('');
+  });
 });

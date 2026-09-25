@@ -409,6 +409,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
             )}
 
             <Suggestion
+              suggestionProps={props.suggestionProps}
               tagInputProps={{
                 enable: true,
                 type: 'dropdown',

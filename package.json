@@ -4,14 +4,6 @@
   "description": "面向智能体的 UI 组件库，提供多步推理可视化、工具调用展示、任务执行协同等 Agentic UI 能力",
   "repository": "git@github.com:ant-design/agentic-ui.git",
   "license": "MIT",
-  "packageManager": "pnpm@9.15.9",
-  "engines": {
-    "node": ">=18.17.0",
-    "pnpm": ">=9.15.9 <10"
-  },
-  "main": "dist/index.js",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
   "sideEffects": [
     "**/*.css",
     "**/*.less",
@@ -54,6 +46,9 @@
     "./dist/*": "./dist/*",
     "./package.json": "./package.json"
   },
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist",
     "guidelines"
@@ -61,7 +56,6 @@
   "scripts": {
     "bench:parsemd": "vitest --run src/MarkdownEditor/__tests__/editor/parseMd.benchmark.test.ts",
     "build": "father build",
-    "minify:lottie": "node scripts/minify-lottie-json.mjs",
     "build:watch": "father dev",
     "check:demo": "node scripts/checkDemoFiles.js",
     "check:test-imports": "node scripts/checkTestImports.js",
@@ -72,6 +66,7 @@
     "lint": "eslint \"{src,test}/**/*.{js,jsx,ts,tsx}\" && stylelint \"{src,test}/**/*.{css,less}\"",
     "lint:css": "stylelint \"{src,test}/**/*.{css,less}\"",
     "lint:es": "eslint \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
+    "minify:lottie": "node scripts/minify-lottie-json.mjs",
     "playwright:install": "playwright install --with-deps chromium",
     "prepare": "husky install && dumi setup",
     "prepublishOnly": "npm run build",
@@ -106,10 +101,9 @@
     "ajv-keywords": "5.1.0"
   },
   "dependencies": {
-    "@ant-design/cssinjs": "^1.24.0",
-    "@ant-design/cssinjs-utils": "^1.1.3",
+    "@ant-design/cssinjs": "^2.1.2",
+    "@ant-design/cssinjs-utils": "^2.1.2",
     "@ant-design/icons": "^5.6.1",
-    "@ant-design/pro-components": "^2.8.10",
     "@ant-design/theme-token": "^0.0.20",
     "@babel/runtime": "^7.28.6",
     "@better-scroll/core": "^2.5.1",
@@ -126,7 +120,6 @@
     "ace-builds": "^1.43.6",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
-    "antd": "^5.29.3",
     "blob-util": "^2.0.2",
     "chart.js": "^4.5.1",
     "chartjs-plugin-datalabels": "^2.2.0",
@@ -211,6 +204,7 @@
     "@vitejs/plugin-react": "^5.2.0",
     "@vitest/coverage-istanbul": "^4.1.5",
     "@vitest/ui": "^4.1.5",
+    "antd": "^6.6.5",
     "cross-env": "^7.0.3",
     "dumi": "^2.4.21",
     "dumi-theme-antd-style": "^0.31.1",
@@ -238,8 +232,14 @@
     "vitest": "^4.1.5"
   },
   "peerDependencies": {
+    "antd": ">=5.29.3 <7",
     "react": ">=16.9.0",
     "react-dom": ">=16.9.0"
+  },
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=18.17.0",
+    "pnpm": ">=9.15.9 <10"
   },
   "publishConfig": {
     "access": "public"
