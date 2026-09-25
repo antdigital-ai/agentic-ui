@@ -1,10 +1,3 @@
-import ChartIcon from '../../../icons/chart.svg';
-import ColorPencilIcon from '../../../icons/color-pencil.svg';
-import OtherIcon from '../../../icons/other.svg';
-import ReadIcon from '../../../icons/read.svg';
-import TranslateIcon from '../../../icons/translate.svg';
-import WriteIcon from '../../../icons/write.svg';
-import React from 'react';
 import {
   ActionIconBox,
   ActionItemBox,
@@ -14,43 +7,56 @@ import {
   ToggleButton,
 } from '@ant-design/agentic-ui';
 import { AimOutlined, GlobalOutlined } from '@ant-design/icons';
+import React from 'react';
+import { useSiteI18n } from '../../../i18n';
+import ChartIcon from '../../../icons/chart.svg';
+import ColorPencilIcon from '../../../icons/color-pencil.svg';
+import OtherIcon from '../../../icons/other.svg';
+import ReadIcon from '../../../icons/read.svg';
+import TranslateIcon from '../../../icons/translate.svg';
+import WriteIcon from '../../../icons/write.svg';
 import { CardDescription, CardTitle, DesignCard } from '../style';
 
-const createRecognizer: CreateRecognizer = async ({ onPartial }) => {
-  let timer: ReturnType<typeof setInterval>;
-  return {
-    start: async () => {
-      // 真实场景应启动麦克风与ASR服务，这里仅用计时器模拟持续的转写片段
-      let i = 0;
-      timer = setInterval(() => {
-        onPartial(`语音片段${i} `);
-        i += 1;
-      }, 500);
-    },
-    stop: async () => {
-      clearInterval(timer);
-    },
+const createVoiceRecognizer = (segmentLabel: string): CreateRecognizer => {
+  return async ({ onPartial }) => {
+    let timer: ReturnType<typeof setInterval>;
+    return {
+      start: async () => {
+        // 真实场景应启动麦克风与ASR服务，这里仅用计时器模拟持续的转写片段
+        let i = 0;
+        timer = setInterval(() => {
+          onPartial(`${segmentLabel}${i} `);
+          i += 1;
+        }, 500);
+      },
+      stop: async () => {
+        clearInterval(timer);
+      },
+    };
   };
 };
 
 const SuperInputCard: React.FC = () => {
   const [value, setValue] = React.useState('');
+  const { messages } = useSiteI18n();
+  const skillMessages = messages.support.superInput.skills;
 
   return (
     <DesignCard>
-      <CardTitle>超级输入框</CardTitle>
+      <CardTitle>{messages.support.superInput.title}</CardTitle>
       <CardDescription>
-        用户与 AI
-        交互的核心入口，集成了文本、语音、图像等多种输入方式和拓展能力，通过实时解析和反馈，实现自然、高效的人机对话。
+        {messages.support.superInput.description}
       </CardDescription>
       <div style={{ margin: '24px 0' }}>
         <MarkdownInputField
-          voiceRecognizer={createRecognizer}
+          voiceRecognizer={createVoiceRecognizer(
+            messages.support.superInput.voiceSegment,
+          )}
           value={value}
           onChange={(newValue) => {
             setValue(newValue);
           }}
-          placeholder="请输入问题..."
+          placeholder={messages.support.superInput.placeholder}
           attachment={{
             enable: true,
             maxFileSize: 10 * 1024 * 1024, // 10MB
@@ -79,51 +85,51 @@ const SuperInputCard: React.FC = () => {
           beforeToolsRender={() => {
             const skills: Array<{ name: string; icon: React.ReactElement }> = [
               {
-                name: '翻译',
+                name: skillMessages.translate,
                 icon: (
                   <img
                     src={TranslateIcon}
-                    alt="翻译"
+                    alt={skillMessages.translate}
                     style={{ width: 20, height: 20 }}
                   />
                 ),
               },
               {
-                name: '阅读',
+                name: skillMessages.read,
                 icon: (
                   <img
                     src={ReadIcon}
-                    alt="阅读"
+                    alt={skillMessages.read}
                     style={{ width: 20, height: 20 }}
                   />
                 ),
               },
               {
-                name: '图表',
+                name: skillMessages.chart,
                 icon: (
                   <img
                     src={ChartIcon}
-                    alt="图表"
+                    alt={skillMessages.chart}
                     style={{ width: 20, height: 20 }}
                   />
                 ),
               },
               {
-                name: '写作',
+                name: skillMessages.write,
                 icon: (
                   <img
                     src={WriteIcon}
-                    alt="写作"
+                    alt={skillMessages.write}
                     style={{ width: 20, height: 20 }}
                   />
                 ),
               },
               {
-                name: '其他',
+                name: skillMessages.other,
                 icon: (
                   <img
                     src={OtherIcon}
-                    alt="其他"
+                    alt={skillMessages.other}
                     style={{ width: 20, height: 20 }}
                   />
                 ),
@@ -161,21 +167,21 @@ const SuperInputCard: React.FC = () => {
               icon={<AimOutlined />}
               onClick={() => console.log('深度思考 clicked')}
             >
-              深度思考
+              {messages.support.superInput.deepThink}
             </ToggleButton>,
             <ToggleButton
               key="internetSearch"
               icon={<GlobalOutlined />}
               onClick={() => console.log('联网搜索 clicked')}
             >
-              联网搜索
+              {messages.support.superInput.webSearch}
             </ToggleButton>,
           ]}
           actionsRender={(state, defaultActions) => {
             return [
               <ActionIconBox
                 showTitle={state.collapseSendActions}
-                title="提示词库"
+                title={messages.support.superInput.promptLibrary}
                 key="prompt"
                 style={{
                   padding: 8,
@@ -184,7 +190,7 @@ const SuperInputCard: React.FC = () => {
               >
                 <img
                   src={ColorPencilIcon}
-                  alt="提示词库"
+                  alt={messages.support.superInput.promptLibrary}
                   style={{ width: 15, height: 15 }}
                 />
               </ActionIconBox>,

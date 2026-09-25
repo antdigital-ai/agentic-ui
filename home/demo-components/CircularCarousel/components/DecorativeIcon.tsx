@@ -1,5 +1,5 @@
-import designStrategyIcon from '../../../assets/design-strategy-icon.png';
 import React from 'react';
+import designStrategyIcon from '../../../assets/design-strategy-icon.png';
 
 // SVG paths for decorative icons
 const svgPaths = {

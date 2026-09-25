@@ -1,5 +1,5 @@
-import designStrategyIcon from '../../../../../assets/design-strategy-icon.png';
 import { CSSProperties } from 'react';
+import designStrategyIcon from '../../../../../assets/design-strategy-icon.png';
 export const topSection: CSSProperties = {
   display: 'flex',
   alignItems: 'center',

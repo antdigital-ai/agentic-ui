@@ -1,11 +1,12 @@
+import { motion } from 'framer-motion';
+import React from 'react';
 import componentsBg from '../../../assets/components-bg.png';
 import visualAssetsBg from '../../../assets/visual-assets-bg.png';
 import {
   PC_COMPONENT_DESIGN_RESOURCE_URL,
   PC_COMPONENT_URL,
 } from '../../../constants/links';
-import React from 'react';
-import { motion } from 'framer-motion';
+import { useSiteI18n } from '../../../i18n';
 import {
   DesignResourceCard,
   DesignResourceCardContent,
@@ -65,6 +66,8 @@ const svgPaths = {
 };
 
 const PCComponentsMenu: React.FC = () => {
+  const { messages } = useSiteI18n();
+
   return (
     <MenuContainer>
       {/* <RightEdgeDivider />
@@ -121,7 +124,7 @@ const PCComponentsMenu: React.FC = () => {
                           color: '#343a45',
                         }}
                       >
-                        PC 组件
+                        {messages.menu.pcSectionTitle}
                       </span>
                     </div>
 
@@ -147,9 +150,11 @@ const PCComponentsMenu: React.FC = () => {
                             );
                           }}
                         >
-                          <NavItemTitle>组件 Components</NavItemTitle>
+                          <NavItemTitle>
+                            {messages.menu.components}
+                          </NavItemTitle>
                           <NavItemDescription>
-                            提供组件和开发接入指南
+                            {messages.menu.componentsDesc}
                           </NavItemDescription>
                         </NavItem>
                       </motion.div>
@@ -167,9 +172,9 @@ const PCComponentsMenu: React.FC = () => {
                             );
                           }}
                         >
-                          <NavItemTitle>演示 Demo</NavItemTitle>
+                          <NavItemTitle>{messages.menu.demo}</NavItemTitle>
                           <NavItemDescription>
-                            通过演示demo更快构建智能体产品
+                            {messages.menu.demoDesc}
                           </NavItemDescription>
                         </NavItem>
                       </motion.div>
@@ -187,7 +192,7 @@ const PCComponentsMenu: React.FC = () => {
                             );
                           }}
                         >
-                          <NavItemTitle>更新日志 Changelog</NavItemTitle>
+                          <NavItemTitle>{messages.menu.changelog}</NavItemTitle>
                         </NavItem>
                       </motion.div>
                     </div>
@@ -215,7 +220,7 @@ const PCComponentsMenu: React.FC = () => {
                           id="Vector (Stroke)"
                         />
                       </svg>
-                      设计资源
+                      {messages.menu.designResources}
                     </DesignResourcesTitle>
 
                     {/* 设计资源卡片网格 */}
@@ -350,10 +355,10 @@ const PCComponentsMenu: React.FC = () => {
                               }}
                             >
                               <DesignResourceCardTitle>
-                                视觉风格手册
+                                {messages.menu.visualManualTitle}
                               </DesignResourceCardTitle>
                               <DesignResourceCardDescription>
-                                提供 chatbot 、插图等视觉资源
+                                {messages.menu.visualManualDesc}
                               </DesignResourceCardDescription>
                             </div>
                           </DesignResourceCardContent>
@@ -490,10 +495,10 @@ const PCComponentsMenu: React.FC = () => {
                               }}
                             >
                               <DesignResourceCardTitle>
-                                组件库设计资源
+                                {messages.menu.componentLibTitle}
                               </DesignResourceCardTitle>
                               <DesignResourceCardDescription>
-                                提供设计组件库和 Agent 设计指南
+                                {messages.menu.componentLibDesc}
                               </DesignResourceCardDescription>
                             </div>
                           </DesignResourceCardContent>

@@ -4,10 +4,12 @@ import componentIconBg from '../../assets/component-icon.png';
 import componentMobileBg from '../../assets/component-mobile-bg.png';
 import componentsBg from '../../assets/components-bg.png';
 import visualAssetsBg from '../../assets/visual-assets-bg.png';
+import { useSiteI18n } from '../../i18n';
 import ChevronDownIcon from '../../icons/chevron-down.svg';
 import LinkIcon from '../../icons/link.svg';
 import LogoIcon from '../../icons/logo.svg';
 import SearchIcon from '../../icons/search.svg';
+import TranslateIcon from '../../icons/translate.svg';
 import { PCComponentsMenu } from './components';
 import SearchDropdown from './components/SearchDropdown';
 import { useImagePreload } from './hooks/useImagePreload';
@@ -15,6 +17,7 @@ import {
   DropdownMenu,
   DropdownWrapper,
   HeaderWrapper,
+  LanguageToggle,
   Logo,
   LogoContainer,
   LogoText,
@@ -44,6 +47,7 @@ const Header: React.FC = () => {
   const [searchDropdownVisible, setSearchDropdownVisible] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
+  const { locale, toggleLocale, messages } = useSiteI18n();
 
   // 预加载 dropdown 中的图片
   const dropdownImages = [
@@ -112,14 +116,13 @@ const Header: React.FC = () => {
   const relativePath = getRelativePath();
 
   const menuItems: MenuItemConfig[] = [
-    { name: '首页', path: '/home' },
+    { name: messages.nav.home, path: '/home' },
     {
-      name: 'PC 组件',
+      name: messages.nav.pcComponents,
       hasDropdown: true,
       dropdownNode: <PCComponentsMenu />,
     },
-    { name: '样板间', path: '/showroom', disabled: true },
-  
+    { name: messages.nav.showroom, path: '/showroom', disabled: true },
   ];
 
   // 判断是否为当前激活的路由
@@ -279,11 +282,23 @@ const Header: React.FC = () => {
           />
         </StyledSearchIcon>
         <StyledInput
-          placeholder="搜索内容"
+          placeholder={messages.nav.searchPlaceholder}
           value={searchValue}
           onChange={handleSearchChange}
           onFocus={() => searchValue && setSearchDropdownVisible(true)}
         />
+        <LanguageToggle
+          onClick={toggleLocale}
+          title={messages.nav.switchLanguage}
+          aria-label={messages.nav.switchLanguage}
+        >
+          <img
+            src={TranslateIcon}
+            alt={messages.nav.switchLanguage}
+            style={{ width: '18px', height: '18px' }}
+          />
+          <span>{locale === 'zh-CN' ? 'EN' : '中'}</span>
+        </LanguageToggle>
         {/* <AIBadge>AI</AIBadge> */}
         <SearchDropdown
           visible={searchDropdownVisible}

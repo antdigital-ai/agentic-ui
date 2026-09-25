@@ -1,5 +1,5 @@
-import React from 'react';
 import { motion, useTransform } from 'framer-motion';
+import React from 'react';
 
 const ANGLE_STEP = 15;
 const RADIUS = 2000;

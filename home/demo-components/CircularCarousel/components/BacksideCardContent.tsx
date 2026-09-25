@@ -1,10 +1,12 @@
 import React from 'react';
+import { useSiteI18n } from '../../../i18n';
 import { CardCarousel } from './CardCarousel';
 import { DesignStrategyIcon } from './DecorativeIcon';
 import { Rotate3DIcon } from './Rotate3DIcon';
 
 // Top Section with Design Strategy Label
 function TopSection() {
+  const { messages } = useSiteI18n();
   return (
     <div
       style={{
@@ -24,7 +26,7 @@ function TopSection() {
             color: 'rgba(84, 93, 109, 0.65)',
           }}
         >
-          设计策略
+          {messages.common.designStrategy}
         </span>
       </div>
       {/* Rotate Icon */}
@@ -35,13 +37,15 @@ function TopSection() {
 
 // Title Section
 function TitleSection({ feature }: { feature?: any }) {
+  const { messages } = useSiteI18n();
   // 处理 title 为数组或字符串的情况
+  const fallbackTitle = messages.features.f01.title;
   const titleStr = Array.isArray(feature?.title)
     ? feature.title.join(' ')
-    : feature?.title || 'O1. 精准预期';
+    : feature?.title || fallbackTitle.join(' ');
   const parts = titleStr.split('.');
-  const num = parts[0] ? parts[0] + '.' : 'O1.';
-  const text = parts[1] ? parts[1].trim() : '精准预期';
+  const num = parts[0] ? parts[0] + '.' : '';
+  const text = parts[1] ? parts[1].trim() : '';
 
   return (
     <div
@@ -78,8 +82,7 @@ function TitleSection({ feature }: { feature?: any }) {
           lineHeight: '22px',
         }}
       >
-        {feature?.description ||
-          '对话启动与意图确立阶段，边界的精准是信任的基石'}
+        {feature?.description || messages.features.f01.description}
       </div>
     </div>
   );
@@ -87,6 +90,7 @@ function TitleSection({ feature }: { feature?: any }) {
 
 // Design Pattern Label
 function DesignPatternLabel() {
+  const { messages } = useSiteI18n();
   return (
     <div
       style={{
@@ -111,7 +115,7 @@ function DesignPatternLabel() {
           lineHeight: '22px',
         }}
       >
-        设计模式
+        {messages.common.designPattern}
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import React from 'react';
 import { ONE_TOKEN_URL } from '../../../constants/links';
+import { useSiteI18n } from '../../../i18n';
 import LinkIcon from '../../../icons/link.svg';
 import {
   CardContainer,
@@ -14,6 +15,8 @@ import {
 } from '../style';
 
 const DesignManualCards: React.FC = () => {
+  const { messages } = useSiteI18n();
+
   return (
     <div
       style={{
@@ -45,9 +48,11 @@ const DesignManualCards: React.FC = () => {
             </CardIcon>
           </CardIconWrapper>
           <CardContent>
-            <ManualCardTitle>未来设计系统 OneToken</ManualCardTitle>
+            <ManualCardTitle>
+              {messages.support.manualCards.oneTokenTitle}
+            </ManualCardTitle>
             <ManualCardDescription>
-              设计语言跨组件库支持方案
+              {messages.support.manualCards.oneTokenDesc}
             </ManualCardDescription>
           </CardContent>
           <ManualCardExpandIcon>

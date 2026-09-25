@@ -5,18 +5,20 @@ export const PageWrapper = styled.div`
   min-height: 100vh;
   background: #fff;
   position: relative;
+
+  [data-prefers-color='dark'] & {
+    background: #0a0c10;
+  }
 `;
 
 /**
  * 带左右分隔线的容器组件
  * 每个模块单独添加分隔线
- * 使用 fixed 定位确保分隔线始终可见，不受父容器 overflow 影响
  */
 export const SectionWithDividers = styled.div`
   position: relative;
   width: 100%;
 
-  /* 左侧垂直分隔线 - 使用 fixed 定位，相对于视口 */
   &::before {
     content: '';
     position: absolute;
@@ -29,7 +31,6 @@ export const SectionWithDividers = styled.div`
     pointer-events: none;
   }
 
-  /* 右侧垂直分隔线 - 使用 fixed 定位，相对于视口 */
   &::after {
     content: '';
     position: absolute;
@@ -40,6 +41,13 @@ export const SectionWithDividers = styled.div`
     background: rgba(44, 62, 93, 0.07);
     z-index: 1;
     pointer-events: none;
+  }
+
+  [data-prefers-color='dark'] & {
+    &::before,
+    &::after {
+      background: rgba(255, 255, 255, 0.08);
+    }
   }
 `;
 
@@ -53,7 +61,7 @@ export const SectionWithBorders = styled.div<{ backgroundColor?: string }>`
   display: flex;
   justify-content: center;
   min-height: 100%;
-  background: ${({ backgroundColor }) => backgroundColor};
+  background: ${(props) => props.backgroundColor ?? 'transparent'};
 
   /* 覆盖层外层容器：动态匹配 ScrollableContent 的宽度（包含 16px padding） */
   &::before {
@@ -72,13 +80,13 @@ export const SectionWithBorders = styled.div<{ backgroundColor?: string }>`
     z-index: 2;
   }
 
-  // /* 内部容器：最小宽度 1056px，最大宽度 1440px，居中对齐 */
-  // > * {
-  //   min-width: 1056px;
-  //   max-width: 1440px;
-  //   width: 100%;
-  //   position: relative;
-  //   height: 100%;
-  //   z-index: 0;
-  // }
+  [data-prefers-color='dark'] & {
+    background: ${(props) =>
+      props.backgroundColor ? '#101319' : 'transparent'};
+
+    &::before {
+      border-left-color: rgba(255, 255, 255, 0.08);
+      border-right-color: rgba(255, 255, 255, 0.08);
+    }
+  }
 `;

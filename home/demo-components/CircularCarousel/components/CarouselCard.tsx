@@ -1,5 +1,5 @@
-import React from 'react';
 import { motion, useTransform } from 'framer-motion';
+import React from 'react';
 import { CardFlipContainer, CardMotionContainer, CardWrapper } from '../style';
 import { ActiveCard, BacksideCardState, InactiveCard } from './cardStates';
 import { CornerMarks } from './cardStates/CornerMarks';
@@ -76,10 +76,7 @@ export const CarouselCard: React.FC<CarouselCardProps> = ({
       {/* 3D Perspective Container */}
       <CardWrapper $isActive={isActive}>
         {/* Flipping Container */}
-        <CardFlipContainer
-          $isActive={isActive}
-          style={{}}
-        >
+        <CardFlipContainer $isActive={isActive} style={{}}>
           {/* Corner Plus Marks - Now inside flip container to flip with card */}
           <CornerMarks />
 

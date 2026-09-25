@@ -1,5 +1,5 @@
-import { styled } from 'styled-components';
 import { Input } from 'antd';
+import { styled } from 'styled-components';
 
 export const HeaderWrapper = styled.header`
   position: fixed;
@@ -180,6 +180,28 @@ export const StyledSearchIcon = styled.div`
   & > svg {
     width: 10px;
     height: 10px;
+  }
+`;
+
+export const LanguageToggle = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  padding: 0 8px;
+  margin-inline-end: 4px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  font-family: 'PingFang SC';
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(80, 92, 113, 0.9);
+  transition: background 0.2s;
+
+  &:hover {
+    background: rgba(0, 28, 57, 0.06);
   }
 `;
 

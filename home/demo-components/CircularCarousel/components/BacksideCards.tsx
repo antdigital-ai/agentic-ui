@@ -1,5 +1,6 @@
-import StartStar from '../../../icons/startStar.svg';
 import React from 'react';
+import { useSiteI18n, type SiteMessages } from '../../../i18n';
+import StartStar from '../../../icons/startStar.svg';
 
 // Common Card Header Component
 interface CardHeaderProps {
@@ -40,16 +41,22 @@ function CardHeader({ title }: CardHeaderProps) {
 
 // Generic Backside Card Component
 export interface BacksideCardProps {
-  title: string;
+  /** Dictionary key under messages.gallery used to resolve the card title */
+  titleKey?: keyof SiteMessages['gallery'];
+  title?: string;
   src: string;
   height?: string;
 }
 
 export function BacksideCard({
+  titleKey,
   title,
   src,
   height = '174px',
 }: BacksideCardProps) {
+  const { messages } = useSiteI18n();
+  const resolvedTitle = titleKey ? messages.gallery[titleKey] : title;
+
   return (
     <div
       style={{
@@ -59,7 +66,7 @@ export function BacksideCard({
         width: '320px',
       }}
     >
-      <CardHeader title={title} />
+      <CardHeader title={resolvedTitle ?? ''} />
       <div
         style={{
           height,

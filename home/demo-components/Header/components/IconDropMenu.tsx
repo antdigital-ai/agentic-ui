@@ -1,7 +1,11 @@
-import componentsBg from '../../../assets/component-icon.png';
-import { DESIGN_RESOURCE_PC_URL, ICON_LIBRARY_URL } from '../../../constants/links';
-import React from 'react';
 import { motion } from 'framer-motion';
+import React from 'react';
+import componentsBg from '../../../assets/component-icon.png';
+import {
+  DESIGN_RESOURCE_PC_URL,
+  ICON_LIBRARY_URL,
+} from '../../../constants/links';
+import { useSiteI18n } from '../../../i18n';
 import {
   DesignResourceCard,
   DesignResourceCardContent,
@@ -61,6 +65,7 @@ const svgPaths = {
 };
 
 const IconDropMenu: React.FC = () => {
+  const { messages } = useSiteI18n();
   return (
     <MenuContainer>
       <ScrollableWrapper>
@@ -132,8 +137,12 @@ const IconDropMenu: React.FC = () => {
                             window.open(ICON_LIBRARY_URL, '_blank');
                           }}
                         >
-                          <NavItemTitle>图标库 Icon library</NavItemTitle>
-                          <NavItemDescription>图标库引用</NavItemDescription>
+                          <NavItemTitle>
+                            {messages.menu.iconLibrary}
+                          </NavItemTitle>
+                          <NavItemDescription>
+                            {messages.menu.iconLibraryDesc}
+                          </NavItemDescription>
                         </NavItem>
                       </motion.div>
                     </div>
@@ -158,7 +167,7 @@ const IconDropMenu: React.FC = () => {
                           id="Vector (Stroke)"
                         />
                       </svg>
-                      设计资源
+                      {messages.menu.designResources}
                     </DesignResourcesTitle>
 
                     {/* 设计资源卡片网格 */}
@@ -286,10 +295,10 @@ const IconDropMenu: React.FC = () => {
                               }}
                             >
                               <DesignResourceCardTitle>
-                                图标设计资源
+                                {messages.menu.iconDesignTitle}
                               </DesignResourceCardTitle>
                               <DesignResourceCardDescription>
-                                图标设计规范和资源
+                                {messages.menu.iconDesignDesc}
                               </DesignResourceCardDescription>
                             </div>
                           </DesignResourceCardContent>

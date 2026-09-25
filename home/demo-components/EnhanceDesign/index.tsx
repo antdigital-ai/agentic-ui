@@ -1,5 +1,6 @@
-import VectorIcon from '../../icons/vector.svg';
 import React, { useEffect, useRef, useState } from 'react';
+import { useSiteI18n } from '../../i18n';
+import VectorIcon from '../../icons/vector.svg';
 import { CanvasTab, CardTab, MarkdownTab, SchemaTab } from './components';
 import {
   Container,
@@ -17,6 +18,7 @@ import {
 const EnhanceDesign: React.FC = () => {
   const [activeTab, setActiveTab] = useState('schema');
   const containerRef = useRef<HTMLDivElement>(null);
+  const { messages } = useSiteI18n();
 
   useEffect(() => {
     const element = containerRef.current;
@@ -52,23 +54,23 @@ const EnhanceDesign: React.FC = () => {
   const tabs = [
     {
       key: 'markdown',
-      label: 'Markdown 渲染规范',
-      description: '支持标准 Markdown 和 GFM 全部语法，公式图脚注完美渲染',
+      label: messages.enhance.tabs.markdown.label,
+      description: messages.enhance.tabs.markdown.description,
     },
     {
       key: 'schema',
-      label: 'SchemaJson 图表渲染',
-      description: 'JSON 配置生成可视化图表',
+      label: messages.enhance.tabs.schema.label,
+      description: messages.enhance.tabs.schema.description,
     },
     {
       key: 'canvas',
-      label: 'MultiCanvas 扩展画布',
-      description: 'AI 生成内容的多模态协同与预览空间',
+      label: messages.enhance.tabs.canvas.label,
+      description: messages.enhance.tabs.canvas.description,
     },
     {
       key: 'card',
-      label: 'Card 行业卡片',
-      description: '行业标准卡片快速验证方案',
+      label: messages.enhance.tabs.card.label,
+      description: messages.enhance.tabs.card.description,
     },
   ];
 
@@ -97,7 +99,9 @@ const EnhanceDesign: React.FC = () => {
             style={{ width: '25px', height: '25px' }}
           />
           <SectionTitle>
-            <span style={{ backgroundColor: 'white' }}>提升你的设计</span>
+            <span style={{ backgroundColor: 'white' }}>
+              {messages.enhance.sectionTitle}
+            </span>
           </SectionTitle>
           <SectionSubtitle>
             <span
@@ -108,7 +112,7 @@ const EnhanceDesign: React.FC = () => {
                 backgroundColor: 'white',
               }}
             >
-              多模态输出
+              {messages.enhance.subtitlePrefix}
             </span>
             <span
               style={{
@@ -124,7 +128,7 @@ const EnhanceDesign: React.FC = () => {
                 color: 'transparent',
               }}
             >
-              渲染方案
+              {messages.enhance.subtitleSuffix}
             </span>
           </SectionSubtitle>
         </SectionHeader>

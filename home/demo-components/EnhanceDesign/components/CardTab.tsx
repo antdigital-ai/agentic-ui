@@ -1,11 +1,13 @@
 import React from 'react';
+import { useSiteI18n } from '../../../i18n';
 import { CardContent } from '../style';
 import FinancialProductsCompareCard from './FinancialProductsCompareCard';
-import { mockCompareData } from './FinancialProductsCompareCard/mockData';
 import TabPreview from './TabPreview';
 
 const CardTab: React.FC = () => {
-  const codeExample = JSON.stringify(mockCompareData, null, 2);
+  const { messages } = useSiteI18n();
+  const cardDemo = messages.enhance.cardDemo;
+  const codeExample = JSON.stringify(cardDemo.mockData, null, 2);
 
   const contentExample = (
     <CardContent>
@@ -20,8 +22,10 @@ const CardTab: React.FC = () => {
       >
         <div style={{ maxWidth: '335px', width: '100%' }}>
           <FinancialProductsCompareCard
-            data={mockCompareData}
-            btnText="查看详细对比"
+            data={cardDemo.mockData}
+            btnText={cardDemo.btnText}
+            modalTitle={cardDemo.modalTitle}
+            modalHeading={cardDemo.modalHeading}
           />
         </div>
       </div>

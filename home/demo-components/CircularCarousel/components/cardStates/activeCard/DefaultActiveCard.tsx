@@ -1,6 +1,7 @@
-import designStrategyIcon from '../../../../../assets/design-strategy-icon-white.png';
-import React from 'react';
 import { motion } from 'framer-motion';
+import React from 'react';
+import designStrategyIcon from '../../../../../assets/design-strategy-icon-white.png';
+import { useSiteI18n } from '../../../../../i18n';
 import { CheckCircleIcon } from '../../CheckCircleIcon';
 import { Rotate3DIcon } from '../../Rotate3DIcon';
 import { FeatureItem } from '../types';
@@ -26,6 +27,7 @@ export const DefaultActiveCard: React.FC<DefaultActiveCardProps> = ({
     const rgb = themeColor.split(',').map((c) => parseInt(c.trim()));
     return [rgb];
   }, [themeColor]);
+  const { messages } = useSiteI18n();
 
   return (
     <CardFront
@@ -79,7 +81,9 @@ export const DefaultActiveCard: React.FC<DefaultActiveCardProps> = ({
               alt="design-strategy"
               style={CardStyles.dashedIcon}
             />
-            <span style={CardStyles.topSectionLabel(true)}>设计策略</span>
+            <span style={CardStyles.topSectionLabel(true)}>
+              {messages.common.designStrategy}
+            </span>
           </div>
           <Rotate3DIcon size={24} color="white" />
         </motion.div>
@@ -123,7 +127,9 @@ export const DefaultActiveCard: React.FC<DefaultActiveCardProps> = ({
               alt="design-strategy"
               style={CardStyles.dashedIcon}
             />
-            <span style={CardStyles.bottomSectionLabel(true)}>评估指标</span>
+            <span style={CardStyles.bottomSectionLabel(true)}>
+              {messages.common.evaluationMetrics}
+            </span>
           </div>
 
           <div style={CardStyles.metricsList}>

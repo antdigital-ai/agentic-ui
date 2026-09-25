@@ -1,4 +1,5 @@
 import React from 'react';
+import { useSiteI18n } from '../../i18n';
 import TitleIcon from '../../icons/titleIcon.svg';
 import HeroButtons from './components/HeroButtons';
 import { RollingText } from './components/RollingText';
@@ -17,21 +18,21 @@ import {
 } from './style';
 
 const Hero: React.FC = () => {
-  const text = '让模糊，变精准';
+  const { messages } = useSiteI18n();
 
   return (
     <HeroWrapper>
-      <LeftBackgroundImage src={LeftBG} alt="Left Background" />
-      <RightBackgroundImage src={RightBG} alt="Right Background" />
+      <LeftBackgroundImage src={LeftBG} alt="" aria-hidden="true" />
+      <RightBackgroundImage src={RightBG} alt="" aria-hidden="true" />
       <ContentContainer>
         <Badge>
-          <img src={TitleIcon} alt="Title Icon" />
-          <BadgeText>蚂蚁数科一站式企业 Agent 应用</BadgeText>
+          <img src={TitleIcon} alt="" />
+          <BadgeText>{messages.hero.badge}</BadgeText>
         </Badge>
 
         <TitleContainer>
           <MainTitle>
-            <RollingText text={text}></RollingText>
+            <RollingText text={messages.hero.title}></RollingText>
           </MainTitle>
         </TitleContainer>
 

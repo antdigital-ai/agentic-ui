@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { useSiteI18n } from '../../i18n';
 import VectorIcon from '../../icons/vector.svg';
 import AIChatbot from '../AIChatbot';
 import {
@@ -25,6 +26,7 @@ import {
 } from './style';
 
 const SupportDesign: React.FC = () => {
+  const { messages } = useSiteI18n();
   const scrollableContentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -70,10 +72,10 @@ const SupportDesign: React.FC = () => {
       </TopVectorIcon>
       <Container>
         <SectionHeader>
-          <SectionTitle>支持你的设计</SectionTitle>
+          <SectionTitle>{messages.support.sectionTitle}</SectionTitle>
           <SectionSubtitle>
             <span style={{ fontSize: '48px', fontWeight: 600, color: '#000' }}>
-              75个基础
+              {messages.support.subtitlePrefix}
             </span>
             <span
               style={{
@@ -89,7 +91,7 @@ const SupportDesign: React.FC = () => {
                 color: 'transparent',
               }}
             >
-              设计范式
+              {messages.support.subtitleSuffix}
             </span>
           </SectionSubtitle>
         </SectionHeader>

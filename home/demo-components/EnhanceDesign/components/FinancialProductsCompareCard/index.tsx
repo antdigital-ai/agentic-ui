@@ -18,7 +18,9 @@ import type { CommonCompareCardProps } from './types';
 
 const FinancialProductsCompareCard: React.FC<CommonCompareCardProps> = ({
   data,
-  btnText = '查看详细对比',
+  btnText,
+  modalTitle,
+  modalHeading,
   onDetailClick,
 }) => {
   // 更多
@@ -123,7 +125,7 @@ const FinancialProductsCompareCard: React.FC<CommonCompareCardProps> = ({
 
       {/* 详细对比弹窗 */}
       <Modal
-        title="详细对比"
+        title={modalTitle}
         open={moreVisible}
         onCancel={() => setMoreVisible(false)}
         footer={null}
@@ -131,7 +133,7 @@ const FinancialProductsCompareCard: React.FC<CommonCompareCardProps> = ({
       >
         <div style={{ padding: '16px' }}>
           <div style={{ marginBottom: '16px' }}>
-            <h3>产品对比详情</h3>
+            <h3>{modalHeading}</h3>
           </div>
           <div style={{ maxHeight: '60vh', overflowY: 'auto' }}>
             {data?.totalCompareIndicatorList?.map(

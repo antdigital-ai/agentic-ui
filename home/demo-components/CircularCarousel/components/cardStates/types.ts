@@ -7,5 +7,6 @@ export interface FeatureItem {
   color: string;
 }
 
-// Re-export FEATURES to avoid deep relative imports
-export { FEATURES } from '../../data';
+// Re-export FeatureItem type; FEATURES data is now language-aware,
+// use useFeatures() hook from '../../data' instead of a static import.
+export { useFeatures } from '../../data';

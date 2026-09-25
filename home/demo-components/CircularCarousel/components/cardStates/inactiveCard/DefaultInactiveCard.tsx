@@ -1,5 +1,6 @@
-import React from 'react';
 import { motion } from 'framer-motion';
+import React from 'react';
+import { useSiteI18n } from '../../../../../i18n';
 import { getGradientSvg } from '../../BacksideCard';
 import { CheckCircleIcon } from '../../CheckCircleIcon';
 import { FolderStackIcon } from '../../FolderStackIcon';
@@ -64,6 +65,7 @@ export const DefaultInactiveCard: React.FC<DefaultInactiveCardProps> = ({
   themeColor,
 }) => {
   const bgImage = getGradientSvg(themeColor);
+  const { messages } = useSiteI18n();
 
   return (
     <CardFront $isActive={false} $bgImage={bgImage} $themeColor={themeColor}>
@@ -71,7 +73,9 @@ export const DefaultInactiveCard: React.FC<DefaultInactiveCardProps> = ({
       <div style={CardStyles.topSection}>
         <div style={CardStyles.topSectionLeft}>
           <div style={CardStyles.dashedIcon} />
-          <span style={CardStyles.topSectionLabel(false)}>设计策略</span>
+          <span style={CardStyles.topSectionLabel(false)}>
+            {messages.common.designStrategy}
+          </span>
         </div>
         <Rotate3DIcon size={24} color="rgba(80, 92, 113, 0.35)" />
       </div>
@@ -107,7 +111,9 @@ export const DefaultInactiveCard: React.FC<DefaultInactiveCardProps> = ({
       <div style={CardStyles.bottomSection}>
         <div style={CardStyles.bottomSectionHeader}>
           <div style={CardStyles.dashedIcon} />
-          <span style={CardStyles.bottomSectionLabel(false)}>评估指标</span>
+          <span style={CardStyles.bottomSectionLabel(false)}>
+            {messages.common.evaluationMetrics}
+          </span>
         </div>
 
         <div style={CardStyles.metricsList}>

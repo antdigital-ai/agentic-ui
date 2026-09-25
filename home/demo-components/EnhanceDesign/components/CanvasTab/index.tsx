@@ -1,10 +1,14 @@
-import React, { useRef } from 'react';
 import { Workspace } from '@ant-design/agentic-ui';
+import React, { useRef } from 'react';
+import { useSiteI18n } from '../../../../i18n';
 import { CardContent } from '../../style';
 import TabPreview from '../TabPreview';
 
 // 直接使用底层的 Mermaid 组件，避免 Slate 属性要求
-const MermaidRenderer: React.FC<{ code: string }> = ({ code }) => {
+const MermaidRenderer: React.FC<{ code: string; renderError: string }> = ({
+  code,
+  renderError,
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [svgContent, setSvgContent] = React.useState<string>('');
   const [error, setError] = React.useState<string>('');
@@ -18,7 +22,7 @@ const MermaidRenderer: React.FC<{ code: string }> = ({ code }) => {
         setSvgContent(result.svg);
         setError('');
       } catch (err) {
-        setError(err instanceof Error ? err.message : '渲染失败');
+        setError(err instanceof Error ? err.message : renderError);
         setSvgContent('');
       }
     };
@@ -26,7 +30,7 @@ const MermaidRenderer: React.FC<{ code: string }> = ({ code }) => {
     if (code) {
       renderMermaid();
     }
-  }, [code]);
+  }, [code, renderError]);
 
   return (
     <div
@@ -68,26 +72,28 @@ const MermaidRenderer: React.FC<{ code: string }> = ({ code }) => {
 };
 
 const CanvasTab: React.FC = () => {
+  const { messages } = useSiteI18n();
+  const canvasMessages = messages.enhance.tabs.canvas;
   // Mermaid 流程图代码
-  const mermaidCode = `graph TD
-    A[开始] --> B[知识查询]
-    B -->|有结果| C[回答]
-    B -->|无结果| D[回答]
-    C --> E[结束]
-    D --> E`;
+  const mermaidCode = canvasMessages.mermaidContent;
 
   const contentExample = (
     <CardContent>
       <div style={{ width: '100%', height: '500px' }}>
         <Workspace
-          title="流程画布"
-          onTabChange={(key: string) => console.log('切换到标签页:', key)}
-          onClose={() => console.log('关闭工作空间')}
+          title={canvasMessages.workspaceTitle}
+          onTabChange={(key: string) => console.log('Tab changed:', key)}
+          onClose={() => console.log('Workspace closed')}
           pure
         >
-          <Workspace.Custom tab={{ key: 'flow', title: '流程图' }}>
+          <Workspace.Custom
+            tab={{ key: 'flow', title: canvasMessages.flowTab }}
+          >
             <div style={{ padding: '20px', height: '100%', overflow: 'auto' }}>
-              <MermaidRenderer code={mermaidCode} />
+              <MermaidRenderer
+                code={mermaidCode}
+                renderError={canvasMessages.renderError}
+              />
             </div>
           </Workspace.Custom>
         </Workspace>

@@ -32,5 +32,7 @@ export interface CommonCompareCardProps {
     detailCompareIndicatorListDescLinkText?: string; // 详情数据描述链接文本
   };
   btnText?: string; // 按钮文本
+  modalTitle?: string; // 详情弹窗标题
+  modalHeading?: string; // 详情弹窗内标题
   onDetailClick?: () => void; // 点击"查看详细对比"按钮的回调函数
 }

@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
 import { animate, motion, useMotionValue } from 'framer-motion';
+import React, { useEffect, useRef, useState } from 'react';
 import { CarouselCard } from './components/CarouselCard';
 import { CarouselWheel } from './components/CarouselWheel';
-import { FEATURES } from './data';
+import { useFeatures } from './data';
 import {
   ActiveIndicatorWrapper,
   BackgroundGradient,
@@ -38,6 +38,7 @@ const CircularCarousel: React.FC<{
 }> = ({ onTabChange }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const FEATURES = useFeatures();
 
   // Motion value for the current index - used for smooth transitions
   const smoothIndex = useMotionValue(0);

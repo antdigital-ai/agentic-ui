@@ -6,6 +6,7 @@ import {
   MessageBubbleData,
 } from '@ant-design/agentic-ui';
 import React, { useEffect, useRef, useState } from 'react';
+import { useSiteI18n } from '../../../i18n';
 import {
   CardDescription,
   CardTitle,
@@ -102,58 +103,16 @@ const createMockMessage = (
   fileMap: fileMap || new Map(),
 });
 
-// 初始消息内容
-const INITIAL_MESSAGES = {
-  assistant: `### 我是 Ant Design 聊天助手
-可以帮你：
-
-- **回答问题** - 解答技术相关疑问
-- **代码示例** - 提供组件使用示例  
-- **设计建议** - 给出设计方案建议
-- **文档说明** - 解释 API 和功能
-
-你想了解什么呢？`,
-
-  user: `帮我规划一条从长沙到重庆的高速路线`,
-
-  assistantResponse: `这个任务会比较复杂，我会尽力完成。在开发过程中，我可能会向您请教一些具体细节或偏好。
-
-让我为您规划从长沙到重庆的高速路线：
-
-**推荐路线：**
-1. **长沙 → 常德** (长张高速 G5513)
-2. **常德 → 张家界** (长张高速 G5513)
-3. **张家界 → 恩施** (张南高速 G5515)
-4. **恩施 → 重庆** (沪渝高速 G50)
-
-**总里程：** 约 650 公里
-**预计时间：** 7-8 小时（不含休息）
-
-**注意事项：**
-- 山区路段较多，注意安全驾驶
-- 建议在服务区适当休息
-- 关注实时路况信息`,
-
-  bubbleDoc: `## Bubble 组件功能文档
-
-Bubble 组件是一个功能丰富的聊天气泡组件，支持：
-
-- 多种消息类型（文本、文件、图片等）
-- 自定义渲染配置
-- 左右布局切换
-- 文件附件展示
-
-以下是相关的设计文档和示例图片：`,
-};
-
 const DialogFlowCard = () => {
+  const { messages } = useSiteI18n();
   const containerRef = useRef<ChatLayoutRef>(null);
   const [bubbleList, setBubbleList] = useState<MessageBubbleData[]>([]);
   const messageTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const demoMessages = messages.support.dialogFlowDemo;
 
   // 用户和助手元数据
   const userMeta = {
-    name: '用户',
+    name: demoMessages.userName,
     avatar: '',
   };
 
@@ -170,7 +129,7 @@ const DialogFlowCard = () => {
     // 第1条：助手欢迎消息
     const timer1 = setTimeout(() => {
       setBubbleList([
-        createMockMessage('msg-0', 'assistant', INITIAL_MESSAGES.assistant),
+        createMockMessage('msg-0', 'assistant', demoMessages.assistantGreeting),
       ]);
     }, 0);
 
@@ -178,7 +137,7 @@ const DialogFlowCard = () => {
     const timer2 = setTimeout(() => {
       setBubbleList((prev: MessageBubbleData[]) => [
         ...prev,
-        createMockMessage('msg-1', 'user', INITIAL_MESSAGES.user),
+        createMockMessage('msg-1', 'user', demoMessages.userRouteRequest),
       ]);
     }, 2000);
 
@@ -186,11 +145,7 @@ const DialogFlowCard = () => {
     const timer3 = setTimeout(() => {
       setBubbleList((prev: MessageBubbleData[]) => [
         ...prev,
-        createMockMessage(
-          'msg-2',
-          'assistant',
-          INITIAL_MESSAGES.assistantResponse,
-        ),
+        createMockMessage('msg-2', 'assistant', demoMessages.routeResponse),
       ]);
     }, 4000);
 
@@ -198,7 +153,7 @@ const DialogFlowCard = () => {
     const timer4 = setTimeout(() => {
       setBubbleList((prev: MessageBubbleData[]) => [
         ...prev,
-        createMockMessage('msg-3', 'user', '这是第1条消息'),
+        createMockMessage('msg-3', 'user', demoMessages.followUp),
       ]);
     }, 6000);
 
@@ -209,7 +164,7 @@ const DialogFlowCard = () => {
         createMockMessage(
           'msg-4',
           'assistant',
-          INITIAL_MESSAGES.bubbleDoc,
+          demoMessages.bubbleDoc,
           mockInlineFileMap,
         ),
       ]);
@@ -223,13 +178,13 @@ const DialogFlowCard = () => {
         clearTimeout(messageTimerRef.current);
       }
     };
-  }, []);
+  }, [demoMessages]);
 
   return (
     <DesignCard>
-      <CardTitle>对话流</CardTitle>
+      <CardTitle>{messages.support.dialogFlow.title}</CardTitle>
       <CardDescription>
-        组织和展示完整对话历史，管理整个对话流的布局和滚动。
+        {messages.support.dialogFlow.description}
       </CardDescription>
       <DialogFlowWrapper
         style={{ marginTop: '42px', height: '400px', position: 'relative' }}

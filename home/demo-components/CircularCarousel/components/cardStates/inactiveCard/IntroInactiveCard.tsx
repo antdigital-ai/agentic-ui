@@ -1,7 +1,8 @@
 import React from 'react';
+import { useSiteI18n } from '../../../../../i18n';
 import { getGradientSvg } from '../../BacksideCard';
 import { Rotate3DIcon } from '../../Rotate3DIcon';
-import { FeatureItem, FEATURES } from '../types';
+import { FeatureItem, useFeatures } from '../types';
 import * as CardStyles from './introInactiveCardStyle';
 import { CardFront } from './style';
 
@@ -16,7 +17,8 @@ export const IntroInactiveCard: React.FC<IntroInactiveCardProps> = ({
 }) => {
   const bgImage = getGradientSvg(themeColor);
   // Get other features (excluding intro)
-  const otherFeatures = FEATURES.filter((f) => f.id !== 'intro');
+  const otherFeatures = useFeatures().filter((f) => f.id !== 'intro');
+  const { messages } = useSiteI18n();
 
   return (
     <CardFront $isActive={false} $bgImage={bgImage} $themeColor={themeColor}>
@@ -24,7 +26,9 @@ export const IntroInactiveCard: React.FC<IntroInactiveCardProps> = ({
       <div style={CardStyles.topSection}>
         <div style={CardStyles.topSectionLeft}>
           <div style={CardStyles.dashedIcon} />
-          <span style={CardStyles.topSectionLabel(false)}>设计策略</span>
+          <span style={CardStyles.topSectionLabel(false)}>
+            {messages.common.designStrategy}
+          </span>
         </div>
         <Rotate3DIcon size={24} color="rgba(80, 92, 113, 0.35)" />
       </div>
@@ -58,7 +62,9 @@ export const IntroInactiveCard: React.FC<IntroInactiveCardProps> = ({
       >
         <div style={CardStyles.bottomSectionHeader}>
           <div style={CardStyles.dashedIcon} />
-          <span style={CardStyles.bottomSectionLabel(false)}>设计策略</span>
+          <span style={CardStyles.bottomSectionLabel(false)}>
+            {messages.common.designStrategy}
+          </span>
         </div>
 
         <div

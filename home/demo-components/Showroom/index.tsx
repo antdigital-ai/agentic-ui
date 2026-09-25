@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSiteI18n } from '../../i18n';
 import showroomImage1 from './assets/showroom-1.png';
 import showroomImage2 from './assets/showroom-2.png';
 import showroomImage3 from './assets/showroom-3.png';
@@ -36,6 +37,7 @@ const INACTIVE_SCALE = 0.75; // 非激活卡片缩放
 const ANIMATION_DURATION = 600; // 动画持续时间（毫秒）
 
 const Showroom: React.FC = () => {
+  const { messages } = useSiteI18n();
   const [activeIndex, setActiveIndex] = useState(2); // 默认中间卡片激活
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -73,11 +75,14 @@ const Showroom: React.FC = () => {
         </DiamondIcon>
 
         {/* Subtitle */}
-        <ShowroomSubtitle>快速开始你的设计</ShowroomSubtitle>
+        <ShowroomSubtitle>{messages.showroom.subtitle}</ShowroomSubtitle>
 
         {/* Title */}
         <ShowroomTitle>
-          行业设计<ShowroomTitleHighlight>样板间</ShowroomTitleHighlight>
+          {messages.showroom.titlePrefix}
+          <ShowroomTitleHighlight>
+            {messages.showroom.titleHighlight}
+          </ShowroomTitleHighlight>
         </ShowroomTitle>
 
         {/* Carousel */}
@@ -219,8 +224,8 @@ const Showroom: React.FC = () => {
         </CarouselContainer>
 
         {/* Coming Soon */}
-        <ComingSoonTitle>敬请期待</ComingSoonTitle>
-        <ComingSoonText>即将到来</ComingSoonText>
+        <ComingSoonTitle>{messages.showroom.comingSoonTitle}</ComingSoonTitle>
+        <ComingSoonText>{messages.showroom.comingSoonText}</ComingSoonText>
       </Container>
     </SectionWrapper>
   );

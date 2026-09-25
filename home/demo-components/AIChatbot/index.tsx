@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSiteI18n } from '../../i18n';
 import LinkIcon from '../../icons/link.svg';
 import BoltIconSelected from './icons/bolt.png';
 import BoltIcon from './icons/bolt.svg';
@@ -45,6 +46,7 @@ import {
 } from './style';
 
 const AIChatbot: React.FC = () => {
+  const { messages } = useSiteI18n();
   const [selectedDressing, setSelectedDressing] = useState(7); // 放大镜选项
   const [selectedSkin, setSelectedSkin] = useState(1); // 紫色皮肤选项
 
@@ -155,7 +157,7 @@ const AIChatbot: React.FC = () => {
               <div>
                 <SectionTitle style={{ marginRight: '8px' }}>AI</SectionTitle>
                 <SectionTitle>Chatbot</SectionTitle>
-                <SectionSubtitle>自定义你的 AI 形象</SectionSubtitle>
+                <SectionSubtitle>{messages.chatbot.subtitle}</SectionSubtitle>
               </div>
               <ExpandIcon
                 onClick={() => {
@@ -286,8 +288,12 @@ const AIChatbot: React.FC = () => {
                     borderRadius: '12px',
                   }}
                 >
-                  <CategoryLabel>个性装扮</CategoryLabel>
-                  <CategoryLabelEn>Dressing</CategoryLabelEn>
+                  <CategoryLabel>
+                    {messages.chatbot.dressingLabel}
+                  </CategoryLabel>
+                  <CategoryLabelEn>
+                    {messages.chatbot.dressingLabelEn}
+                  </CategoryLabelEn>
                 </div>
               </AvatarCardContent>
             </LabelCard>
@@ -339,8 +345,10 @@ const AIChatbot: React.FC = () => {
                     borderRadius: '8px',
                   }}
                 >
-                  <CategoryLabel>肤色</CategoryLabel>
-                  <CategoryLabelEn>Skin</CategoryLabelEn>
+                  <CategoryLabel>{messages.chatbot.skinLabel}</CategoryLabel>
+                  <CategoryLabelEn>
+                    {messages.chatbot.skinLabelEn}
+                  </CategoryLabelEn>
                 </div>
               </AvatarCardContent>
             </LabelCard>

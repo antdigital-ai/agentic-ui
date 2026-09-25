@@ -1,7 +1,8 @@
-import designStrategyIcon from '../../../../../assets/design-strategy-icon.png';
-import { COMPONENT_LIBRARY_URL } from '../../../../../constants/links';
 import { Button } from 'antd';
 import React from 'react';
+import designStrategyIcon from '../../../../../assets/design-strategy-icon.png';
+import { COMPONENT_LIBRARY_URL } from '../../../../../constants/links';
+import { useSiteI18n } from '../../../../../i18n';
 import { getGradientSvg } from '../../BacksideCard';
 import { Rotate3DIcon } from '../../Rotate3DIcon';
 import { FeatureItem } from '../types';
@@ -17,6 +18,7 @@ export const IntroBacksideCard: React.FC<IntroBacksideCardProps> = ({
   themeColor,
 }) => {
   const bgImage = getGradientSvg(themeColor);
+  const { messages } = useSiteI18n();
 
   return (
     <CardBack $borderColor={themeColor}>
@@ -77,7 +79,7 @@ export const IntroBacksideCard: React.FC<IntroBacksideCardProps> = ({
                   color: 'rgba(84, 93, 109, 0.65)',
                 }}
               >
-                设计原则
+                {messages.common.designPrinciples}
               </span>
             </div>
             <Rotate3DIcon size={24} color="#343A45" />
@@ -101,28 +103,6 @@ export const IntroBacksideCard: React.FC<IntroBacksideCardProps> = ({
             )}
           </div>
 
-          {/* Description Text */}
-          {/* <p
-            style={{
-              fontFamily: 'PingFang SC',
-              fontSize: '24px',
-              fontStyle: 'normal',
-              fontWeight: '500',
-              lineHeight: 'normal',
-              alignSelf: 'stretch',
-            }}
-          >
-            <span style={{ color: 'var(---, rgba(80, 92, 113, 0.36))' }}>
-              精准不只是结果准确,也是将用户
-            </span>
-            <span style={{ color: '#343A45' }}>意图转化为结果</span>
-            <span style={{ color: 'var(---, rgba(80, 92, 113, 0.36))' }}>
-              过程中,对用户
-            </span>
-            <span style={{ color: '#343A45' }}>
-              目标不多不少、恰到好处的把握。
-            </span>
-          </p> */}
           <p
             style={{
               color: '#343A45',
@@ -135,7 +115,7 @@ export const IntroBacksideCard: React.FC<IntroBacksideCardProps> = ({
             }}
           >
             <span style={{ color: '#343A45' }}>
-              用 AI 智能加速工作流程，同时保障过程准确、透明、可干预。
+              {messages.common.introDescription}
             </span>
           </p>
         </div>
@@ -171,7 +151,7 @@ export const IntroBacksideCard: React.FC<IntroBacksideCardProps> = ({
               border: 'none',
             }}
           >
-            了解更多
+            {messages.common.learnMore}
           </Button>
         </div>
       </div>

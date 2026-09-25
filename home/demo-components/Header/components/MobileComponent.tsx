@@ -5,6 +5,7 @@ import {
   DESIGN_RESOURCE_MOBILE_URL,
   MOBILE_COMPONENT_LIBRARY_URL,
 } from '../../../constants/links';
+import { useSiteI18n } from '../../../i18n';
 import {
   DesignResourceCard,
   DesignResourceCardContent,
@@ -64,6 +65,7 @@ const svgPaths = {
 };
 
 const MobileComponentsMenu: React.FC = () => {
+  const { messages } = useSiteI18n();
   return (
     <MenuContainer>
       <ScrollableWrapper>
@@ -135,9 +137,11 @@ const MobileComponentsMenu: React.FC = () => {
                             window.open(MOBILE_COMPONENT_LIBRARY_URL, '_blank');
                           }}
                         >
-                          <NavItemTitle>组件 Components</NavItemTitle>
+                          <NavItemTitle>
+                            {messages.menu.components}
+                          </NavItemTitle>
                           <NavItemDescription>
-                            提供组件和开发接入指南
+                            {messages.menu.componentsDesc}
                           </NavItemDescription>
                         </NavItem>
                       </motion.div>
@@ -163,7 +167,7 @@ const MobileComponentsMenu: React.FC = () => {
                           id="Vector (Stroke)"
                         />
                       </svg>
-                      设计资源
+                      {messages.menu.designResources}
                     </DesignResourcesTitle>
 
                     {/* 设计资源卡片网格 */}
@@ -291,10 +295,10 @@ const MobileComponentsMenu: React.FC = () => {
                               }}
                             >
                               <DesignResourceCardTitle>
-                                Mobile 组件库设计资源
+                                {messages.menu.mobileComponents}
                               </DesignResourceCardTitle>
                               <DesignResourceCardDescription>
-                                提供设计组件库和设计指南
+                                {messages.menu.mobileComponentsDesc}
                               </DesignResourceCardDescription>
                             </div>
                           </DesignResourceCardContent>

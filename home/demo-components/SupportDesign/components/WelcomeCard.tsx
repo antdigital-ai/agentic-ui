@@ -1,12 +1,15 @@
-import React from 'react';
 import { GradientText, Robot, WelcomeMessage } from '@ant-design/agentic-ui';
+import React from 'react';
+import { useSiteI18n } from '../../../i18n';
 import { CardDescription, CardTitle, SmallCard } from '../style';
 
 const WelcomeCard: React.FC = () => {
+  const { messages } = useSiteI18n();
+
   return (
     <SmallCard $hasDotPattern={true} hasRightBorder={true}>
-      <CardTitle>欢迎语</CardTitle>
-      <CardDescription>通过简短友好的欢迎语引入使用场景</CardDescription>
+      <CardTitle>{messages.support.welcome.title}</CardTitle>
+      <CardDescription>{messages.support.welcome.description}</CardDescription>
       <div
         style={{
           marginTop: '24px',
@@ -19,7 +22,7 @@ const WelcomeCard: React.FC = () => {
         <WelcomeMessage
           title={
             <>
-              我是
+              {messages.support.welcome.messageTitlePrefix}
               <GradientText
                 colors={['#1D3052', '#1D3052', '#D3CEFF', '#8D83FF', '#1D3052']}
                 animationSpeed={10}
@@ -34,7 +37,7 @@ const WelcomeCard: React.FC = () => {
           classNames={{
             title: 'font-size: 21px !important; font-weight: 600 !important;',
           }}
-          description="Agent 一站式设计与搭建解决方案"
+          description={messages.support.welcome.messageDescription}
         />
       </div>
     </SmallCard>

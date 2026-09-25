@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion';
 import React from 'react';
 import designStrategyIcon from '../../../../../assets/design-strategy-icon-white.png';
+import { useSiteI18n } from '../../../../../i18n';
 import { Rotate3DIcon } from '../../Rotate3DIcon';
-import { FeatureItem, FEATURES } from '../types';
+import { FeatureItem, useFeatures } from '../types';
 import * as CardStyles from './introActiveCardStyle';
 import { MakeCanvasRevealEffect } from './make-canvas-reveal-effect';
 import { CardFront } from './style';
@@ -21,7 +22,8 @@ export const IntroActiveCard: React.FC<IntroActiveCardProps> = ({
   smoothIndex: _smoothIndex, // eslint-disable-line @typescript-eslint/no-unused-vars
 }) => {
   // Get other features (excluding intro)
-  const otherFeatures = FEATURES.filter((f) => f.id !== 'intro');
+  const otherFeatures = useFeatures().filter((f) => f.id !== 'intro');
+  const { messages } = useSiteI18n();
 
   // 将 themeColor 从 "r, g, b" 格式转换为 [[r, g, b]] 数组格式
   const colors = React.useMemo(() => {
@@ -81,7 +83,9 @@ export const IntroActiveCard: React.FC<IntroActiveCardProps> = ({
               alt="design-strategy"
               style={CardStyles.dashedIcon}
             />
-            <span style={CardStyles.topSectionLabel(true)}>设计原则</span>
+            <span style={CardStyles.topSectionLabel(true)}>
+              {messages.common.designPrinciples}
+            </span>
           </div>
           <Rotate3DIcon size={24} color="white" />
         </motion.div>
@@ -129,7 +133,9 @@ export const IntroActiveCard: React.FC<IntroActiveCardProps> = ({
               alt="design-strategy"
               style={CardStyles.dashedIcon}
             />
-            <span style={CardStyles.bottomSectionLabel(true)}>设计策略</span>
+            <span style={CardStyles.bottomSectionLabel(true)}>
+              {messages.common.designStrategy}
+            </span>
           </div>
 
           <div

@@ -9,6 +9,10 @@ export const HeroWrapper = styled.section`
   background: rgb(255, 255, 255);
   position: relative;
   overflow: hidden;
+
+  [data-prefers-color='dark'] & {
+    background: #0a0c10;
+  }
 `;
 
 export const ContentContainer = styled.div`
@@ -52,6 +56,10 @@ export const MainTitle = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+
+  [data-prefers-color='dark'] & {
+    color: #f2f4f8;
+  }
 `;
 
 export const StaggeredText = styled.span`
