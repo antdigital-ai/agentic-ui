@@ -1,8 +1,11 @@
 import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
+const RAIL_WIDTH = 200;
+
 const genStyle: GenStyleFn<'OfficeViewer'> = (token) => ({
   [token.componentCls]: {
     position: 'relative',
+    display: 'flex',
     width: '100%',
     boxSizing: 'border-box',
     borderRadius: token.borderRadius,
@@ -10,8 +13,31 @@ const genStyle: GenStyleFn<'OfficeViewer'> = (token) => ({
     background: token.colorBgContainer,
     overflow: 'hidden',
 
-    '&-host': {
+    '&-rail': {
+      flexShrink: 0,
+      order: -1,
+      width: RAIL_WIDTH,
+      height: '100%',
+      overflow: 'auto',
+      padding: token.paddingXS,
+      background: token.colorFillQuaternary,
+      borderInlineEnd: `1px solid ${token.colorBorderSecondary}`,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: token.paddingXS,
+    },
+
+    '&-rail canvas': {
       width: '100%',
+      display: 'block',
+      borderRadius: token.borderRadiusSM,
+      border: `1px solid ${token.colorBorderSecondary}`,
+      transition: 'border-color 0.2s',
+    },
+
+    '&-host': {
+      flex: 1,
+      minWidth: 0,
       height: '100%',
       overflow: 'auto',
     },

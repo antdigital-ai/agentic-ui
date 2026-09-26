@@ -36,4 +36,6 @@ export interface OfficeViewerProps {
   onError?: (error: Error) => void;
   /** 未安装 `@silurus/ooxml` 时的自定义降级内容 */
   missingDependencyRender?: React.ReactNode;
+  /** PPTX 是否启用左侧缩略图侧栏（默认开启；关闭后 PPTX 走连续滚动视图） */
+  enableSlideRail?: boolean;
 }
