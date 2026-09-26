@@ -47,7 +47,7 @@ interface PptxViewerLike extends DestroyableViewer {
   goToSlide: (index: number) => Promise<void> | void;
 }
 
-const THUMBNAIL_WIDTH = 168;
+const THUMBNAIL_WIDTH = 120;
 const THUMBNAIL_DPR = 2;
 
 /**
@@ -150,7 +150,7 @@ export function useOfficeViewer({
             })),
           );
 
-          // 缩略图 rail：canvas 逐页渲染，点击跳转主画布
+          // 缩略图 rail：每页一张「卡片」（canvas + 页码），点击跳转主画布
           rail.innerHTML = '';
           const itemWidth = THUMBNAIL_WIDTH;
           const itemHeight = Math.round(
@@ -159,16 +159,34 @@ export function useOfficeViewer({
           );
           const railCanvases: HTMLCanvasElement[] = [];
           for (let index = 0; index < total; index++) {
+            const card = document.createElement('div');
+            card.className = `${rail.className.replace('-rail', '')}-rail-card`;
+            card.addEventListener('click', () => goToSlide(index));
+
             const canvas = document.createElement('canvas');
             canvas.width = itemWidth * THUMBNAIL_DPR;
             canvas.height = itemHeight * THUMBNAIL_DPR;
-            canvas.style.width = '100%';
-            canvas.style.display = 'block';
-            canvas.style.borderRadius = '4px';
-            canvas.addEventListener('click', () => goToSlide(index));
-            rail.appendChild(canvas);
+            canvas.className = `${rail.className.replace('-rail', '')}-rail-canvas`;
+            card.appendChild(canvas);
+
+            const pageNo = document.createElement('span');
+            pageNo.className = `${rail.className.replace('-rail', '')}-rail-page`;
+            pageNo.textContent = String(index + 1);
+            card.appendChild(pageNo);
+
+            rail.appendChild(card);
             railCanvases.push(canvas);
           }
+
+          const syncActiveCard = (index: number) => {
+            Array.from(rail.children).forEach((card, i) => {
+              card.classList.toggle(
+                `${rail.className.replace('-rail', '')}-rail-card-active`,
+                i === index,
+              );
+            });
+          };
+          syncActiveCard(0);
 
           // 主区：完整 PptxViewer 单页浏览（自带翻页/缩放/文本层）
           const mainCanvas = document.createElement('canvas');
@@ -178,7 +196,10 @@ export function useOfficeViewer({
           host.appendChild(mainCanvas);
           const instance = new PptxViewer(mainCanvas, {
             ...loadOpts,
-            onSlideChange: (index: number) => setCurrentSlide(index),
+            onSlideChange: (index: number) => {
+              setCurrentSlide(index);
+              syncActiveCard(index);
+            },
           });
           await instance.load(source);
           viewer = instance;

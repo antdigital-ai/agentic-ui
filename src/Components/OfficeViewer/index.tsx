@@ -61,6 +61,14 @@ const OfficeViewerComponent: React.FC<OfficeViewerProps> = ({
       style={{ ...style, height }}
       data-testid={prefixCls}
     >
+      {/* 缩略图 canvas 由 hook 直接绘制在 rail 内 */}
+      {isPptx && enableSlideRail && (
+        <div
+          ref={railRef}
+          className={`${prefixCls}-rail`}
+          data-slide-count={slides.length}
+        />
+      )}
       <div ref={hostRef} className={`${prefixCls}-host`} />
 
       {status === 'loading' && (
@@ -92,15 +100,6 @@ const OfficeViewerComponent: React.FC<OfficeViewerProps> = ({
             {error?.message || 'Office 文档预览失败'}
           </span>
         </div>
-      )}
-
-      {/* 缩略图 canvas 由 hook 直接绘制在 rail 内 */}
-      {isPptx && enableSlideRail && (
-        <div
-          ref={railRef}
-          className={`${prefixCls}-rail`}
-          data-slide-count={slides.length}
-        />
       )}
     </div>
   );
