@@ -229,6 +229,10 @@ export function useOfficeViewer({
               await presentation.renderSlide(railCanvases[index], index, {
                 width: itemWidth * THUMBNAIL_DPR,
               });
+              // renderSlide 会写入内联宽高（按传入 width 定宽），
+              // 清掉后交由 rail-card 的 width:100% 自适应，避免缩略图溢出被裁切
+              railCanvases[index].style.width = '100%';
+              railCanvases[index].style.height = 'auto';
               if (!cancelled) {
                 setSlides((prev) => {
                   const next = [...prev];
