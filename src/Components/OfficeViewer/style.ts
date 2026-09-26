@@ -27,6 +27,38 @@ const genStyle: GenStyleFn<'OfficeViewer'> = (token) => ({
       flexDirection: 'column',
       alignItems: 'center',
       gap: RAIL_ITEM_GAP,
+      transition: 'width 0.25s ease, padding 0.25s ease',
+
+      '&-collapsed': {
+        width: 0,
+        paddingInline: 0,
+        borderInlineEnd: 'none',
+        overflow: 'hidden',
+      },
+    },
+
+    // 侧栏展开/收起手柄（骑在分界线上）
+    '&-rail-toggle': {
+      flexShrink: 0,
+      width: 16,
+      height: 48,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      alignSelf: 'center',
+      padding: 0,
+      border: `1px solid ${token.colorBorderSecondary}`,
+      borderInlineStart: 'none',
+      borderRadius: `${token.borderRadius}px 0 0 ${token.borderRadius}px`,
+      background: token.colorBgContainer,
+      color: token.colorTextSecondary,
+      cursor: 'pointer',
+      zIndex: 1,
+
+      '&:hover': {
+        color: token.colorPrimary,
+        borderColor: token.colorPrimaryBorder,
+      },
     },
 
     // 每个 slide 一张白色卡片，由 hook 直接插入（包裹 div + canvas）
@@ -63,6 +95,12 @@ const genStyle: GenStyleFn<'OfficeViewer'> = (token) => ({
       height: '100%',
       overflow: 'auto',
       background: token.colorBgContainer,
+    },
+
+    // PPTX 单页模式：画布在 host 内水平居中（fitPage 后宽度小于可用宽时）
+    '&-host-center': {
+      display: 'flex',
+      justifyContent: 'center',
     },
 
     '&-status': {

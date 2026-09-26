@@ -36,8 +36,7 @@ pnpm add @silurus/ooxml
 | 属性                    | 说明                                                                  | 类型                                    | 默认值   | 版本 |
 | ----------------------- | --------------------------------------------------------------------- | --------------------------------------- | -------- | ---- |
 | className               | 自定义类名                                                            | `string`                                | -        | -    |
-| enableSlideRail         | PPTX 是否启用左侧缩略图侧栏；关闭后 PPTX 走连续滚动视图              | `boolean`                               | `true`   | -    |
-| file                    | 文件源：URL、`File`/`Blob` 或 `ArrayBuffer`                           | `File \| Blob \| string \| ArrayBuffer` | -        | -    |
+| enableSlideRail         | PPTX 是否启用左侧缩略图侧栏；关闭后 PPTX 走连续滚动视图              | `boolean`                               | `true`   | -    || file                    | 文件源：URL、`File`/`Blob` 或 `ArrayBuffer`                           | `File \| Blob \| string \| ArrayBuffer` | -        | -    |
 | fileName                | 用于扩展名推断的文件名（`file` 为 ArrayBuffer 时建议传入）            | `string`                                | -        | -    |
 | fileType                | 显式指定格式；缺省按 `fileName` / URL / File.name 推断                | `'docx' \| 'xlsx' \| 'pptx'`            | -        | -    |
 | height                  | 容器高度                                                              | `number \| string`                      | `480`    | -    |
@@ -52,6 +51,6 @@ pnpm add @silurus/ooxml
 
 1. 仅支持 **Office Open XML**（`.docx` / `.xlsx` / `.pptx`）；旧版 `.doc` / `.xls` / `.ppt` 不可预览。
 2. Workspace `File` 预览已接入：点击符合扩展名的文件时自动走 `OfficeViewer`；未安装 peer 时显示安装提示。
-3. PPTX 默认展示左侧缩略图侧栏，点击缩略图跳转对应页；`enableSlideRail: false` 时退化为连续滚动视图。
+3. PPTX 默认展示左侧缩略图侧栏，点击缩略图跳转对应页；侧栏可通过分界处的手柄按钮展开/收起（收起后主区自动铺满）；`enableSlideRail: false` 时退化为连续滚动视图。
 3. 生产环境建议将 `*_parser_bg.wasm` 托管到自有 CDN，再通过 `wasmUrl` 传入。
 4. 数学公式、ChartEx 等可选引擎需自行从 `@silurus/ooxml/math` 等入口引入并传入上游选项（本组件默认不捆绑）。

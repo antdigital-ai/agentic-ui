@@ -1,6 +1,7 @@
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { ConfigProvider, Spin } from 'antd';
 import classNames from 'clsx';
-import React, { memo, useContext, useMemo, useRef } from 'react';
+import React, { memo, useContext, useMemo, useRef, useState } from 'react';
 import { useOfficeViewerStyle } from './style';
 import type { OfficeViewerProps } from './types';
 import { useOfficeViewer } from './useOfficeViewer';
@@ -34,6 +35,7 @@ const OfficeViewerComponent: React.FC<OfficeViewerProps> = ({
   const { hashId } = useOfficeViewerStyle(prefixCls);
   const hostRef = useRef<HTMLDivElement>(null);
   const railRef = useRef<HTMLDivElement>(null);
+  const [railCollapsed, setRailCollapsed] = useState(false);
 
   // 仅 PPTX 且未显式关闭侧栏时，把 rail 宿主传给 hook
   const isPptx = useMemo(
@@ -63,13 +65,32 @@ const OfficeViewerComponent: React.FC<OfficeViewerProps> = ({
     >
       {/* 缩略图 canvas 由 hook 直接绘制在 rail 内 */}
       {isPptx && enableSlideRail && (
-        <div
-          ref={railRef}
-          className={`${prefixCls}-rail`}
-          data-slide-count={slides.length}
-        />
+        <>
+          <div
+            ref={railRef}
+            className={classNames(`${prefixCls}-rail`, {
+              [`${prefixCls}-rail-collapsed`]: railCollapsed,
+            })}
+            data-slide-count={slides.length}
+          />
+          <button
+            type="button"
+            className={`${prefixCls}-rail-toggle`}
+            aria-expanded={!railCollapsed}
+            aria-label={railCollapsed ? '展开缩略图侧栏' : '收起缩略图侧栏'}
+            title={railCollapsed ? '展开侧栏' : '收起侧栏'}
+            onClick={() => setRailCollapsed((prev) => !prev)}
+          >
+            {railCollapsed ? <RightOutlined /> : <LeftOutlined />}
+          </button>
+        </>
       )}
-      <div ref={hostRef} className={`${prefixCls}-host`} />
+      <div
+        ref={hostRef}
+        className={classNames(`${prefixCls}-host`, {
+          [`${prefixCls}-host-center`]: isPptx && enableSlideRail,
+        })}
+      />
 
       {status === 'loading' && (
         <div className={`${prefixCls}-status`}>
