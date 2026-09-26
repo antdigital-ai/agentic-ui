@@ -4,6 +4,9 @@ import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 const RAIL_WIDTH = 152;
 const RAIL_ITEM_GAP = 12;
 
+/** 预览区域内边距 */
+const HOST_PADDING = 8;
+
 const genStyle: GenStyleFn<'OfficeViewer'> = (token) => ({
   [token.componentCls]: {
     position: 'relative',
@@ -93,6 +96,7 @@ const genStyle: GenStyleFn<'OfficeViewer'> = (token) => ({
       flex: 1,
       minWidth: 0,
       height: '100%',
+      padding: HOST_PADDING,
       overflow: 'auto',
       background: token.colorBgContainer,
     },
