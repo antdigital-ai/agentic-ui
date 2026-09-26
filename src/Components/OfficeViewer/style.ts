@@ -29,25 +29,32 @@ const genStyle: GenStyleFn<'OfficeViewer'> = (token) => ({
       gap: RAIL_ITEM_GAP,
     },
 
-    // 每个 slide 一张白色卡片，由 hook 直接插入（包裹 div + canvas + 页码）
+    // 每个 slide 一张白色卡片，由 hook 直接插入（包裹 div + canvas）
     '&-rail-card': {
       width: '100%',
       background: token.colorBgContainer,
       borderRadius: token.borderRadiusLG,
       border: `1px solid ${token.colorBorderSecondary}`,
-      boxShadow: token.boxShadowTertiary,
-      overflow: 'hidden',
-      transition: 'border-color 0.2s, box-shadow 0.2s',
+      boxShadow: `${token.boxShadowTertiary}, 0 4px 12px rgba(0, 0, 0, 0.1)`,
+      transition:
+        'border-color 0.2s, box-shadow 0.2s, transform 0.2s',
     },
 
     '&-rail-card-active': {
       borderColor: token.colorPrimary,
-      boxShadow: `0 0 0 2px ${token.colorPrimaryBorder}`,
+      boxShadow: `0 0 0 2px ${token.colorPrimaryBorder}, 0 4px 12px rgba(0, 0, 0, 0.1)`,
     },
 
     '&-rail-canvas': {
       width: '100%',
       display: 'block',
+      borderRadius: `${token.borderRadiusLG - 1}px ${token.borderRadiusLG - 1}px 0 0`,
+    },
+
+    '&-main-canvas': {
+      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.12)',
+      borderRadius: token.borderRadiusLG,
+      background: token.colorBgContainer,
     },
 
     '&-host': {

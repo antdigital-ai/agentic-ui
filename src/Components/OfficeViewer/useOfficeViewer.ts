@@ -186,6 +186,7 @@ export function useOfficeViewer({
 
           // 主区：完整 PptxViewer 单页浏览（自带翻页/缩放/文本层）
           const mainCanvas = document.createElement('canvas');
+          mainCanvas.className = `${host.className.replace('-host', '')}-main-canvas`;
           mainCanvas.style.width = '100%';
           mainCanvas.style.height = '100%';
           mainCanvas.style.display = 'block';
