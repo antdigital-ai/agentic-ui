@@ -195,15 +195,18 @@ export function useOfficeViewer({
           mainCanvas.style.height = '100%';
           mainCanvas.style.display = 'block';
           host.appendChild(mainCanvas);
-          const instance = new PptxViewer(mainCanvas, {
-            ...loadOpts,
-            onSlideChange: (index: number) => {
-              setCurrentSlide(index);
-              syncActiveCard(index);
+          const instance = PptxViewer.fromPresentation(
+            mainCanvas,
+            presentation,
+            {
+              ...loadOpts,
+              onSlideChange: (index: number) => {
+                setCurrentSlide(index);
+                syncActiveCard(index);
+              },
             },
-          });
-          await instance.load(source);
-          // 主区尽量铺满：按可用宽高自适应到整页
+          );
+          // 主区尽量铺满：按可用宽高自适应到整页（免 load，presentation 已就绪）
           await instance.fitPage();
           viewer = instance;
           viewerRef.current = instance;
@@ -222,30 +225,32 @@ export function useOfficeViewer({
             resizeObserver.disconnect();
           };
 
-          // 逐页渲染缩略图
-          for (let index = 0; index < total; index++) {
-            if (cancelled) return;
-            try {
-              await presentation.renderSlide(railCanvases[index], index, {
-                width: itemWidth * THUMBNAIL_DPR,
-              });
-              // renderSlide 会写入内联宽高（按传入 width 定宽），
-              // 清掉后交由 rail-card 的 width:100% 自适应，避免缩略图溢出被裁切
-              railCanvases[index].style.width = '100%';
-              railCanvases[index].style.height = 'auto';
-              if (!cancelled) {
-                setSlides((prev) => {
-                  const next = [...prev];
-                  next[index] = { index, rendered: true };
-                  return next;
+          // 逐页渲染缩略图（后台异步，不阻塞主视图 ready）
+          (async () => {
+            for (let index = 0; index < total; index++) {
+              if (cancelled) return;
+              try {
+                await presentation.renderSlide(railCanvases[index], index, {
+                  width: itemWidth * THUMBNAIL_DPR,
                 });
+                // renderSlide 会写入内联宽高（按传入 width 定宽），
+                // 清掉后交由 rail-card 的 width:100% 自适应，避免缩略图溢出被裁切
+                railCanvases[index].style.width = '100%';
+                railCanvases[index].style.height = 'auto';
+                if (!cancelled) {
+                  setSlides((prev) => {
+                    const next = [...prev];
+                    next[index] = { index, rendered: true };
+                    return next;
+                  });
+                }
+              } catch {
+                // 单页渲染失败保留占位
               }
-            } catch {
-              // 单页渲染失败保留占位
             }
-          }
-          // 缩略图已直接绘制在 rail canvas 上，释放共享解析副本
-          presentation.destroy();
+            // 缩略图已全部绘制在 rail canvas 上，释放共享解析副本
+            presentation.destroy();
+          })();
         } else {
           const { PptxScrollViewer } =
             mod as typeof import('@silurus/ooxml/pptx');
