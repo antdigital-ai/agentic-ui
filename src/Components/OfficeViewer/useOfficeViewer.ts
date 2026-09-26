@@ -73,6 +73,7 @@ export function useOfficeViewer({
   const callbacksRef = useRef({ onLoad, onError });
   callbacksRef.current = { onLoad, onError };
   const viewerRef = useRef<DestroyableViewer | null>(null);
+  const fitRafCleanupRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -202,8 +203,24 @@ export function useOfficeViewer({
             },
           });
           await instance.load(source);
+          // 主区尽量铺满：按可用宽高自适应到整页
+          await instance.fitPage();
           viewer = instance;
           viewerRef.current = instance;
+
+          // 容器尺寸变化时重新铺满（去抖）
+          let fitRaf = 0;
+          const resizeObserver = new ResizeObserver(() => {
+            cancelAnimationFrame(fitRaf);
+            fitRaf = requestAnimationFrame(() => {
+              instance.fitPage();
+            });
+          });
+          resizeObserver.observe(host);
+          fitRafCleanupRef.current = () => {
+            cancelAnimationFrame(fitRaf);
+            resizeObserver.disconnect();
+          };
 
           // 逐页渲染缩略图
           for (let index = 0; index < total; index++) {
@@ -265,6 +282,9 @@ export function useOfficeViewer({
       if (hostRef.current) {
         hostRef.current.innerHTML = '';
       }
+      // ResizeObserver 随 viewer destroy 失效，此处仅做引用清理
+      fitRafCleanupRef.current?.();
+      fitRafCleanupRef.current = null;
     };
   }, [file, fileType, fileName, wasmUrl, hostRef, railRef]);
 
