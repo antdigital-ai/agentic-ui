@@ -79,6 +79,9 @@ export function useOfficeViewer({
   useEffect(() => {
     let cancelled = false;
     let viewer: DestroyableViewer | null = null;
+    // PPTX：presentation 是主视图引擎与缩略图渲染的共享资源，
+    // 由本 effect 创建、cleanup 统一释放（提前销毁会让引擎失效，卡片点击翻页失灵）
+    let ownedPresentation: { destroy: () => void } | null = null;
 
     const goToSlide = (index: number) => {
       setCurrentSlide(index);
@@ -168,6 +171,7 @@ export function useOfficeViewer({
             presentation.destroy();
             return;
           }
+          ownedPresentation = presentation;
 
           const rail = railRef.current;
           const total = presentation.slideCount;
@@ -277,8 +281,7 @@ export function useOfficeViewer({
                 // 单页渲染失败保留占位
               }
             }
-            // 缩略图已全部绘制在 rail canvas 上，释放共享解析副本
-            presentation.destroy();
+            // presentation 仍作为主视图引擎使用，随 effect cleanup 统一释放
           })();
         } else {
           const { PptxScrollViewer } =
@@ -312,11 +315,18 @@ export function useOfficeViewer({
     return () => {
       cancelled = true;
       try {
+        // 先销毁 viewer：其解绑完成后引擎才能安全释放
         viewer?.destroy();
       } catch {
         /* ignore destroy errors on unmount */
       }
       viewerRef.current = null;
+      try {
+        ownedPresentation?.destroy();
+      } catch {
+        /* ignore destroy errors on unmount */
+      }
+      ownedPresentation = null;
       if (hostRef.current) {
         hostRef.current.innerHTML = '';
       }
