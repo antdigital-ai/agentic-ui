@@ -140,6 +140,10 @@ export class UrlDataSourceStrategy implements DataSourceStrategy {
     switch (category) {
       case FileCategory.Image:
         return PreviewCapability.BASIC;
+      case FileCategory.Word:
+      case FileCategory.Excel:
+      case FileCategory.Presentation:
+        return PreviewCapability.FULL;
       default:
         return PreviewCapability.NONE;
     }
@@ -226,6 +230,27 @@ export class FileDataSourceStrategy implements DataSourceStrategy {
     if (this.isCodeMimeType(mimeType)) return FileCategory.Code;
     if (mimeType.startsWith('text/')) return FileCategory.Text;
     if (mimeType === 'application/pdf') return FileCategory.PDF;
+    if (
+      mimeType ===
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+      mimeType === 'application/msword'
+    ) {
+      return FileCategory.Word;
+    }
+    if (
+      mimeType ===
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+      mimeType === 'application/vnd.ms-excel'
+    ) {
+      return FileCategory.Excel;
+    }
+    if (
+      mimeType ===
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation' ||
+      mimeType === 'application/vnd.ms-powerpoint'
+    ) {
+      return FileCategory.Presentation;
+    }
     return FileCategory.Other;
   }
 
@@ -240,6 +265,9 @@ export class FileDataSourceStrategy implements DataSourceStrategy {
       case FileCategory.Image:
       case FileCategory.Video:
       case FileCategory.PDF:
+      case FileCategory.Word:
+      case FileCategory.Excel:
+      case FileCategory.Presentation:
         return PreviewCapability.FULL;
       default:
         return PreviewCapability.NONE;

@@ -20,6 +20,7 @@ import type { FileNode } from '../types';
 import { formatLastModified } from '../utils';
 import { fileTypeProcessor } from './FileTypeProcessor';
 import { MediaPreview } from './preview/components/MediaPreview';
+import { OfficePreview } from './preview/components/OfficePreview';
 import { PlaceholderContent } from './preview/components/PlaceholderContent';
 import { UnsupportedFileCard } from './preview/components/UnsupportedFileCard';
 import { usePreviewContent } from './preview/usePreviewContent';
@@ -279,6 +280,19 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
         return (
           <MediaPreview
             category={typeInference.category}
+            file={file}
+            previewUrl={dataSource.previewUrl}
+            prefixCls={prefixCls}
+            hashId={hashId}
+            locale={locale}
+          />
+        );
+
+      case 'word':
+      case 'excel':
+      case 'presentation':
+        return (
+          <OfficePreview
             file={file}
             previewUrl={dataSource.previewUrl}
             prefixCls={prefixCls}

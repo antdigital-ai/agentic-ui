@@ -111,8 +111,13 @@ export class FileTypeProcessor {
     const canPreview = this.determinePreviewCapability(
       typeInference,
       dataSource,
+      file,
     );
-    const previewMode = this.determinePreviewMode(typeInference, dataSource);
+    const previewMode = this.determinePreviewMode(
+      typeInference,
+      dataSource,
+      file,
+    );
 
     return {
       typeInference,
@@ -173,11 +178,23 @@ export class FileTypeProcessor {
   }
 
   /**
+   * 是否为 Office Open XML（docx/xlsx/pptx）；旧版二进制格式不可预览
+   */
+  private isOoxmlPreviewable(file: FileNode): boolean {
+    const raw = (file.name || file.url || '').toLowerCase();
+    const path = raw.split('?')[0].split('#')[0];
+    return (
+      path.endsWith('.docx') || path.endsWith('.xlsx') || path.endsWith('.pptx')
+    );
+  }
+
+  /**
    * 确定预览能力
    */
   private determinePreviewCapability(
     typeInference: FileTypeInference,
     dataSource: DataSourceResult,
+    file: FileNode,
   ): boolean {
     // 如果数据源不支持预览，则无法预览
     if (dataSource.previewCapability === PreviewCapability.NONE) {
@@ -187,6 +204,15 @@ export class FileTypeProcessor {
     // 对于基础预览能力，只支持特定类型
     if (dataSource.previewCapability === PreviewCapability.BASIC) {
       return typeInference.category === FileCategory.Image;
+    }
+
+    const officeCategories = [
+      FileCategory.Word,
+      FileCategory.Excel,
+      FileCategory.Presentation,
+    ];
+    if (officeCategories.includes(typeInference.category)) {
+      return this.isOoxmlPreviewable(file);
     }
 
     // 完全预览能力支持更多类型
@@ -206,8 +232,9 @@ export class FileTypeProcessor {
   private determinePreviewMode(
     typeInference: FileTypeInference,
     dataSource: DataSourceResult,
+    file: FileNode,
   ): 'inline' | 'modal' | 'external' | 'none' {
-    if (!this.determinePreviewCapability(typeInference, dataSource)) {
+    if (!this.determinePreviewCapability(typeInference, dataSource, file)) {
       return 'none';
     }
 
@@ -222,6 +249,11 @@ export class FileTypeProcessor {
       case FileCategory.Audio:
         return 'inline';
       case FileCategory.PDF:
+        return 'inline';
+      case FileCategory.Word:
+      case FileCategory.Excel:
+      case FileCategory.Presentation:
+        // 与 PDF 一致：在文件预览面板内联展示
         return 'inline';
       default:
         return 'external';
