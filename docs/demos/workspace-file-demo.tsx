@@ -35,7 +35,7 @@ const WorkspaceFileDemo: React.FC = () => {
           // type: 'word',// 非必填，会自动推断
           size: '2.3MB',
           lastModified: '12:30',
-          url: '/downloads/project-requirements.docx',
+          url: '/office-samples/sample.docx',
           canPreview: true,
           canShare: true,
         },
@@ -69,7 +69,7 @@ const WorkspaceFileDemo: React.FC = () => {
           // type: 'excel',
           size: '1.2MB',
           lastModified: '2025-08-01 10:20:00',
-          url: '/downloads/data-statistics.xlsx',
+          url: '/office-samples/sample.xlsx',
         },
       ],
     },

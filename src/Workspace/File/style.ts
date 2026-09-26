@@ -455,6 +455,13 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
         minHeight: 0, // 确保 flex 子项可以收缩
         padding: '16px',
       },
+
+      // Office 文档预览容器：撑满内容区，OfficeViewer 内部按容器自适应
+      [`&-office`]: {
+        flex: 1,
+        minHeight: 0,
+        width: '100%',
+      },
       '&-content-loading': {
         padding: '0 12px',
         flex: 1,

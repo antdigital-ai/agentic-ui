@@ -24,6 +24,7 @@ export interface OfficePreviewProps {
  * Workspace 内 Office 文档预览（docx / xlsx / pptx）
  *
  * 懒加载 `OfficeViewer`；源优先级：file.file → previewUrl → file.url
+ * 容器通过 `&-office` 撑满预览区，OfficeViewer 高度 100% 自适应
  */
 export const OfficePreview: FC<OfficePreviewProps> = ({
   file,
