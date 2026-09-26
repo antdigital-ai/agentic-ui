@@ -25,9 +25,9 @@ pnpm add @silurus/ooxml
 
 ## 代码演示 {#demo}
 
-<code src="../demos/office-viewer-basic.tsx">基础用法 - 本地选择 Office 文件预览</code>
+<code src="../demos/office-viewer-basic.tsx">基础用法 - 预置三件套样例预览</code>
 
-<code src="../demos/office-viewer-wasm-url.tsx">自定义 wasmUrl - xlsx 预览</code>
+<code src="../demos/office-viewer-wasm-url.tsx">自定义 wasmUrl - xlsx 样例预览</code>
 
 ## API
 
