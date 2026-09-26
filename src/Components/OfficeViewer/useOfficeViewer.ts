@@ -153,6 +153,8 @@ export function useOfficeViewer({
 
           // 缩略图 rail：每页一张「卡片」（canvas + 页码），点击跳转主画布
           rail.innerHTML = '';
+          // rail 可能带 collapsed 等附加类，取首个类名剥离 -rail 得到组件前缀
+          const railBaseCls = rail.className.split(' ')[0].replace('-rail', '');
           const itemWidth = THUMBNAIL_WIDTH;
           const itemHeight = Math.round(
             itemWidth *
@@ -161,13 +163,13 @@ export function useOfficeViewer({
           const railCanvases: HTMLCanvasElement[] = [];
           for (let index = 0; index < total; index++) {
             const card = document.createElement('div');
-            card.className = `${rail.className.replace('-rail', '')}-rail-card`;
+            card.className = `${railBaseCls}-rail-card`;
             card.addEventListener('click', () => goToSlide(index));
 
             const canvas = document.createElement('canvas');
             canvas.width = itemWidth * THUMBNAIL_DPR;
             canvas.height = itemHeight * THUMBNAIL_DPR;
-            canvas.className = `${rail.className.replace('-rail', '')}-rail-canvas`;
+            canvas.className = `${railBaseCls}-rail-canvas`;
             card.appendChild(canvas);
 
             rail.appendChild(card);
@@ -177,7 +179,7 @@ export function useOfficeViewer({
           const syncActiveCard = (index: number) => {
             Array.from(rail.children).forEach((card, i) => {
               card.classList.toggle(
-                `${rail.className.replace('-rail', '')}-rail-card-active`,
+                `${railBaseCls}-rail-card-active`,
                 i === index,
               );
             });
@@ -186,7 +188,9 @@ export function useOfficeViewer({
 
           // 主区：完整 PptxViewer 单页浏览（自带翻页/缩放/文本层）
           const mainCanvas = document.createElement('canvas');
-          mainCanvas.className = `${host.className.replace('-host', '')}-main-canvas`;
+          // host 可能带 host-center 等附加类，取首个类名剥离 -host 得到组件前缀
+          const baseCls = host.className.split(' ')[0].replace('-host', '');
+          mainCanvas.className = `${baseCls}-main-canvas`;
           mainCanvas.style.width = '100%';
           mainCanvas.style.height = '100%';
           mainCanvas.style.display = 'block';
