@@ -54,3 +54,10 @@ pnpm add @silurus/ooxml
 3. PPTX 默认展示左侧缩略图侧栏，点击缩略图跳转对应页；侧栏可通过分界处的手柄按钮展开/收起（收起后主区自动铺满）；`enableSlideRail: false` 时退化为连续滚动视图。
 3. 生产环境建议将 `*_parser_bg.wasm` 托管到自有 CDN，再通过 `wasmUrl` 传入。
 4. 数学公式、ChartEx 等可选引擎需自行从 `@silurus/ooxml/math` 等入口引入并传入上游选项（本组件默认不捆绑）。
+
+## 内容复制 {#copy}
+
+三种格式均支持复制内容，无需额外配置：
+
+- **docx / pptx**：内置透明文本层（`enableTextSelection` 默认开启），可直接用鼠标划选文字后 `Ctrl/Cmd+C` 复制。
+- **xlsx**：点选 / 框选单元格后按 `Ctrl/Cmd+C`，选中区域以 TSV（制表符分隔）写入剪贴板，可直接粘贴到 Excel / 表格。

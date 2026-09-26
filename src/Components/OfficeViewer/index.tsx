@@ -90,6 +90,7 @@ const OfficeViewerComponent: React.FC<OfficeViewerProps> = ({
         className={classNames(`${prefixCls}-host`, {
           [`${prefixCls}-host-center`]: isPptx && enableSlideRail,
         })}
+        data-testid={`${prefixCls}-host`}
       />
 
       {status === 'loading' && (

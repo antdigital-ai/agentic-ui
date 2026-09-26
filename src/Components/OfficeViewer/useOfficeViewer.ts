@@ -74,6 +74,7 @@ export function useOfficeViewer({
   callbacksRef.current = { onLoad, onError };
   const viewerRef = useRef<DestroyableViewer | null>(null);
   const fitRafCleanupRef = useRef<(() => void) | null>(null);
+  const xlsxCopyCleanupRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -124,7 +125,11 @@ export function useOfficeViewer({
         if (resolvedType === 'docx') {
           const { DocxScrollViewer } =
             mod as typeof import('@silurus/ooxml/docx');
-          const instance = new DocxScrollViewer(host, loadOpts);
+          // enableTextSelection：渲染透明文本层，支持划选 + Ctrl/Cmd+C 复制
+          const instance = new DocxScrollViewer(host, {
+            ...loadOpts,
+            enableTextSelection: true,
+          });
           await instance.load(source);
           viewer = instance;
         } else if (resolvedType === 'xlsx') {
@@ -132,6 +137,28 @@ export function useOfficeViewer({
           const instance = new XlsxViewer(host, loadOpts);
           await instance.load(source);
           viewer = instance;
+          // XLSX 无文本层；选中单元格后 Ctrl/Cmd+C 由库内 copySelection 处理，
+          // 这里补挂全局 keydown，避免焦点不在视口时复制失效
+          const handleCopyKey = (event: KeyboardEvent) => {
+            if (
+              (event.ctrlKey || event.metaKey) &&
+              event.key.toLowerCase() === 'c' &&
+              !event.defaultPrevented &&
+              !event.isComposing &&
+              host.contains(event.target as Node)
+            ) {
+              const target = event.target as HTMLElement;
+              const isFormField =
+                target?.isContentEditable ||
+                ['INPUT', 'TEXTAREA', 'SELECT'].includes(target?.tagName);
+              if (isFormField) return;
+              event.preventDefault();
+              void instance.copySelection();
+            }
+          };
+          host.addEventListener('keydown', handleCopyKey);
+          xlsxCopyCleanupRef.current = () =>
+            host.removeEventListener('keydown', handleCopyKey);
         } else if (railRef?.current) {
           const { PptxPresentation, PptxViewer } =
             mod as typeof import('@silurus/ooxml/pptx');
@@ -200,6 +227,8 @@ export function useOfficeViewer({
             presentation,
             {
               ...loadOpts,
+              // enableTextSelection：文本层覆盖在画布上，可划选复制文字
+              enableTextSelection: true,
               onSlideChange: (index: number) => {
                 setCurrentSlide(index);
                 syncActiveCard(index);
@@ -291,9 +320,11 @@ export function useOfficeViewer({
       if (hostRef.current) {
         hostRef.current.innerHTML = '';
       }
-      // ResizeObserver 随 viewer destroy 失效，此处仅做引用清理
+      // ResizeObserver / XLSX 复制快捷键随 viewer destroy 失效，此处仅做引用清理
       fitRafCleanupRef.current?.();
       fitRafCleanupRef.current = null;
+      xlsxCopyCleanupRef.current?.();
+      xlsxCopyCleanupRef.current = null;
     };
   }, [file, fileType, fileName, wasmUrl, hostRef, railRef]);
 

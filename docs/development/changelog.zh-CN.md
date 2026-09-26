@@ -14,6 +14,7 @@ group:
 - OfficeViewer
   - 🆕 新增 `OfficeViewer` 组件：基于 optional peer `@silurus/ooxml` 预览 docx / xlsx / pptx；未安装时降级提示，WASM 默认 CDN 可经 `wasmUrl` 覆盖。
   - 🆕 PPTX 新增左侧缩略图侧栏（`enableSlideRail`，默认开启）：点击缩略图跳转对应页，关闭后退化为连续滚动视图。
+  - 🆕 支持复制内容：docx / pptx 默认启用文本层可划选复制（`enableTextSelection`）；xlsx 选中单元格后 `Ctrl/Cmd+C` 以 TSV 写入剪贴板。
 - Workspace
   - 🆕 `File` 预览接入 Office 三件套：`.docx` / `.xlsx` / `.pptx` 可内联预览；旧版 `.doc` / `.xls` / `.ppt` 与 `csv` 仍不走 Office 预览。
 

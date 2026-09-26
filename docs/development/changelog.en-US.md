@@ -14,6 +14,7 @@ group:
 - OfficeViewer
   - 🆕 Added `OfficeViewer` to preview docx / xlsx / pptx via optional peer `@silurus/ooxml`; shows a fallback when the peer is missing; WASM defaults to CDN and can be overridden with `wasmUrl`.
   - 🆕 PPTX now renders a slide thumbnail rail (`enableSlideRail`, on by default): click a thumbnail to jump to that slide; disable it to fall back to the continuous scroll view.
+  - 🆕 Copy support: docx / pptx enable a selectable text layer by default (`enableTextSelection`); xlsx copies the selected cells as TSV via `Ctrl/Cmd+C`.
 - Workspace
   - 🆕 `File` preview now supports Office Open XML (`.docx` / `.xlsx` / `.pptx`); legacy `.doc` / `.xls` / `.ppt` and `csv` remain outside the Office preview path.
 

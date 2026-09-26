@@ -8,6 +8,8 @@ import { getDefaultWasmUrl, inferOfficeFileType } from '../utils';
 
 const loadMock = vi.fn().mockResolvedValue(undefined);
 const destroyMock = vi.fn();
+const docxCtorMock = vi.fn();
+const xlsxCopyMock = vi.fn().mockResolvedValue({ status: 'copied' });
 
 vi.mock('@silurus/ooxml/docx', () => ({
   DocxScrollViewer: class {
@@ -15,8 +17,10 @@ vi.mock('@silurus/ooxml/docx', () => ({
     destroy = destroyMock;
     constructor(
       public container: HTMLElement,
-      public opts?: { wasmUrl?: string | URL },
-    ) {}
+      public opts?: Record<string, unknown>,
+    ) {
+      docxCtorMock(container, opts);
+    }
   },
 }));
 
@@ -24,6 +28,7 @@ vi.mock('@silurus/ooxml/xlsx', () => ({
   XlsxViewer: class {
     load = loadMock;
     destroy = destroyMock;
+    copySelection = xlsxCopyMock;
     constructor(
       public container: HTMLElement,
       public opts?: { wasmUrl?: string | URL },
@@ -111,5 +116,48 @@ describe('OfficeViewer', () => {
       ).toBeTruthy();
     });
     expect(loadMock).not.toHaveBeenCalled();
+  });
+
+  it('DOCX 应开启文本层以支持划选复制', async () => {
+    render(
+      <ConfigProvider>
+        <OfficeViewer file="/sample.docx" fileType="docx" />
+      </ConfigProvider>,
+    );
+    await waitFor(() => {
+      expect(loadMock).toHaveBeenCalled();
+    });
+    expect(docxCtorMock).toHaveBeenCalled();
+    expect(docxCtorMock.mock.calls[0][1]).toMatchObject({
+      enableTextSelection: true,
+    });
+  });
+
+  it('XLSX 应支持 Ctrl/Cmd+C 触发 copySelection', async () => {
+    render(
+      <ConfigProvider>
+        <OfficeViewer file="/sample.xlsx" fileType="xlsx" />
+      </ConfigProvider>,
+    );
+    await waitFor(() => {
+      expect(loadMock).toHaveBeenCalled();
+    });
+
+    const host = document.querySelector(
+      '[data-testid="ant-office-viewer-host"]',
+    ) as HTMLElement;
+    expect(host).toBeTruthy();
+
+    host.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'c',
+        ctrlKey: true,
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+    await waitFor(() => {
+      expect(xlsxCopyMock).toHaveBeenCalled();
+    });
   });
 });
