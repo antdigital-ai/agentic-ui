@@ -50,16 +50,6 @@ const genStyle: GenStyleFn<'OfficeViewer'> = (token) => ({
       display: 'block',
     },
 
-    '&-rail-page': {
-      display: 'block',
-      textAlign: 'center',
-      padding: `${token.paddingXXS}px 0`,
-      fontSize: token.fontSizeSM,
-      color: token.colorTextSecondary,
-      borderTop: `1px solid ${token.colorBorderSecondary}`,
-      background: token.colorBgContainer,
-    },
-
     '&-host': {
       flex: 1,
       minWidth: 0,

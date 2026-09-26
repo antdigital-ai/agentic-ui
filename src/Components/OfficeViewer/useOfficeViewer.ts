@@ -170,11 +170,6 @@ export function useOfficeViewer({
             canvas.className = `${rail.className.replace('-rail', '')}-rail-canvas`;
             card.appendChild(canvas);
 
-            const pageNo = document.createElement('span');
-            pageNo.className = `${rail.className.replace('-rail', '')}-rail-page`;
-            pageNo.textContent = String(index + 1);
-            card.appendChild(pageNo);
-
             rail.appendChild(card);
             railCanvases.push(canvas);
           }
