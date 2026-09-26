@@ -9,6 +9,13 @@ group:
 
 # Changelog
 
+## v2.32.48
+
+- OfficeViewer
+  - 🆕 新增 `OfficeViewer` 组件：基于 optional peer `@silurus/ooxml` 预览 docx / xlsx / pptx；未安装时降级提示，WASM 默认 CDN 可经 `wasmUrl` 覆盖。
+- Workspace
+  - 🆕 `File` 预览接入 Office 三件套：`.docx` / `.xlsx` / `.pptx` 可内联预览；旧版 `.doc` / `.xls` / `.ppt` 与 `csv` 仍不走 Office 预览。
+
 ## v2.32.47
 
 - Test
