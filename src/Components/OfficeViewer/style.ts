@@ -96,7 +96,9 @@ const genStyle: GenStyleFn<'OfficeViewer'> = (token) => ({
       flex: 1,
       minWidth: 0,
       height: '100%',
-      padding: HOST_PADDING,
+      // 用 margin 而非 padding 留白：viewer 的 fitPage 以 clientWidth/Height
+      // 计算缩放，padding 会被计入导致画布超出内容区撑出滚动条
+      margin: HOST_PADDING,
       overflow: 'auto',
       background: token.colorBgContainer,
     },
