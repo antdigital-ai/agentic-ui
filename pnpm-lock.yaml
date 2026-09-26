@@ -246,6 +246,9 @@ importers:
       '@playwright/test':
         specifier: ^1.58.0
         version: 1.58.0
+      '@silurus/ooxml':
+        specifier: ^0.88.0
+        version: 0.88.0
       '@swc/core':
         specifier: ^1.15.11
         version: 1.15.11
@@ -2481,6 +2484,9 @@ packages:
     resolution: {integrity: sha512-hvHcUIPIyzNPRmvPNIbA/R68zZKv7XHUcNrYJZTB8QsVE0KKuuGuEK98yCeCy32vZXQBl/PrHGOYMXeuqZrU0w==}
     peerDependencies:
       chart.js: ^4.1.1
+
+  '@silurus/ooxml@0.88.0':
+    resolution: {integrity: sha512-dhMs1/U5fB5bh/Hv8BNTgCsHVNOl+qkquohsROblku7jghsmd1BZAE//LR6omB7aCVLGJ3sp4IqzqdkgT5wicQ==}
 
   '@sinclair/typebox@0.27.8':
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
@@ -12417,6 +12423,8 @@ snapshots:
     dependencies:
       '@sgratzl/boxplots': 2.0.0
       chart.js: 4.5.1
+
+  '@silurus/ooxml@0.88.0': {}
 
   '@sinclair/typebox@0.27.8': {}
 

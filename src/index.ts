@@ -642,6 +642,17 @@ export {
   type SandboxRendererProps,
   type SandboxRendererStatus,
 } from './Components/SandboxRenderer';
+
+export {
+  OfficeViewer,
+  getDefaultWasmUrl,
+  inferOfficeFileType,
+  OOXML_CDN_BASE,
+  OOXML_CDN_VERSION,
+  type OfficeFileType,
+  type OfficeViewerProps,
+  type OfficeViewerStatus,
+} from './Components/OfficeViewer';
 export {
   LayoutHeader,
   type LayoutHeaderConfig,
