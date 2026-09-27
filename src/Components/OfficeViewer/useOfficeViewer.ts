@@ -92,7 +92,15 @@ export function useOfficeViewer({
 
     const goToSlide = (index: number) => {
       setCurrentSlide(index);
-      (viewerRef.current as PptxViewerLike | null)?.goToSlide?.(index);
+      const viewer = viewerRef.current as PptxViewerLike | null;
+      viewer?.goToSlide?.(index);
+      // 主画布淡入动画：移除类后下一帧加回，重触发 CSS animation
+      const canvas = viewer?.canvasElement;
+      if (canvas) {
+        canvas.classList.remove(`${canvas.className.split(' ')[0]}-fade-in`);
+        void canvas.offsetWidth;
+        canvas.classList.add(`${canvas.className.split(' ')[0]}-fade-in`);
+      }
     };
 
     const run = async () => {

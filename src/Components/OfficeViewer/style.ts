@@ -71,13 +71,33 @@ const genStyle: GenStyleFn<'OfficeViewer'> = (token) => ({
       borderRadius: token.borderRadiusLG,
       border: `1px solid ${token.colorBorderSecondary}`,
       boxShadow: `${token.boxShadowTertiary}, 0 4px 12px rgba(0, 0, 0, 0.1)`,
+      cursor: 'pointer',
       transition:
-        'border-color 0.2s, box-shadow 0.2s, transform 0.2s',
+        'border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease',
+
+      '&:hover': {
+        borderColor: token.colorPrimaryBorder,
+        transform: 'translateY(-2px)',
+      },
+
+      // 点击时轻微下压
+      '&:active': {
+        transform: 'translateY(0) scale(0.98)',
+        transitionDuration: '0.1s',
+      },
     },
 
     '&-rail-card-active': {
       borderColor: token.colorPrimary,
-      boxShadow: `0 0 0 2px ${token.colorPrimaryBorder}, 0 4px 12px rgba(0, 0, 0, 0.1)`,
+      boxShadow: `0 0 0 2px ${token.colorPrimaryBorder}, 0 6px 16px rgba(0, 0, 0, 0.12)`,
+      transform: 'scale(1.04)',
+
+      '&:hover': {
+        transform: 'scale(1.04) translateY(-2px)',
+      },
+
+      // 选中卡片激活瞬间用 keyframe 从普通态弹出，切换更明显
+      animation: 'otk-office-viewer-card-pop 0.3s ease',
     },
 
     '&-rail-canvas': {
@@ -90,6 +110,11 @@ const genStyle: GenStyleFn<'OfficeViewer'> = (token) => ({
       boxShadow: '0 4px 16px rgba(0, 0, 0, 0.12)',
       borderRadius: token.borderRadiusLG,
       background: token.colorBgContainer,
+
+      // 翻页淡入（goToSlide 时重触发）
+      '&-fade-in': {
+        animation: 'otk-office-viewer-slide-fade-in 0.25s ease',
+      },
     },
 
     '&-host': {
@@ -152,6 +177,19 @@ const genStyle: GenStyleFn<'OfficeViewer'> = (token) => ({
       fontFamily: 'monospace',
       fontSize: token.fontSizeSM,
       color: token.colorText,
+    },
+
+    // 选中卡片切换时的弹出动画（与 componentCls 同级，避免污染全局）
+    '@keyframes otk-office-viewer-card-pop': {
+      '0%': { transform: 'scale(0.96)' },
+      '60%': { transform: 'scale(1.07)' },
+      '100%': { transform: 'scale(1.04)' },
+    },
+
+    // 主画布翻页时的淡入动画
+    '@keyframes otk-office-viewer-slide-fade-in': {
+      from: { opacity: 0 },
+      to: { opacity: 1 },
     },
   },
 });
