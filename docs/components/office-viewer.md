@@ -35,19 +35,20 @@ pnpm add @silurus/ooxml
 
 ### OfficeViewerProps
 
-| 属性                    | 说明                                                                  | 类型                         | 默认值   | 版本 |
-| ----------------------- | --------------------------------------------------------------------- | ---------------------------- | -------- | ---- | --- | ---- | ------------------------------------------- | --------------------------------------- | --- | --- |
-| className               | 自定义类名                                                            | `string`                     | -        | -    |
-| enableSlideRail         | PPTX 是否启用左侧缩略图侧栏；关闭后 PPTX 走连续滚动视图               | `boolean`                    | `true`   | -    |     | file | 文件源：URL、`File`/`Blob` 或 `ArrayBuffer` | `File \| Blob \| string \| ArrayBuffer` | -   | -   |
-| fileName                | 用于扩展名推断的文件名（`file` 为 ArrayBuffer 时建议传入）            | `string`                     | -        | -    |
-| fileType                | 显式指定格式；缺省按 `fileName` / URL / File.name 推断                | `'docx' \| 'xlsx' \| 'pptx'` | -        | -    |
-| height                  | 容器高度                                                              | `number \| string`           | `480`    | -    |
-| loadingRender           | 自定义加载中内容                                                      | `React.ReactNode`            | -        | -    |
-| missingDependencyRender | 未安装 `@silurus/ooxml` 时的自定义降级内容                            | `React.ReactNode`            | -        | -    |
-| onError                 | 加载或渲染失败回调                                                    | `(error: Error) => void`     | -        | -    |
-| onLoad                  | 文档加载完成回调                                                      | `() => void`                 | -        | -    |
-| style                   | 自定义内联样式                                                        | `React.CSSProperties`        | -        | -    |
-| wasmUrl                 | WASM 解析器地址；未传时按格式指向 jsDelivr 上的 `@silurus/ooxml` 资产 | `string \| URL`              | CDN 默认 | -    |
+| 属性                    | 说明                                                                  | 类型                                    | 默认值   | 版本 |
+| ----------------------- | --------------------------------------------------------------------- | --------------------------------------- | -------- | ---- |
+| className               | 自定义类名                                                            | `string`                                | -        | -    |
+| enableSlideRail         | PPTX 是否启用左侧缩略图侧栏；关闭后 PPTX 走连续滚动视图               | `boolean`                               | `true`   | -    |
+| file                    | 文件源：URL、`File`/`Blob` 或 `ArrayBuffer`                           | `File \| Blob \| string \| ArrayBuffer` | -        | -    |
+| fileName                | 用于扩展名推断的文件名（`file` 为 ArrayBuffer 时建议传入）            | `string`                                | -        | -    |
+| fileType                | 显式指定格式；缺省按 `fileName` / URL / File.name 推断                | `'docx' \| 'xlsx' \| 'pptx'`            | -        | -    |
+| height                  | 容器高度                                                              | `number \| string`                      | `480`    | -    |
+| loadingRender           | 自定义加载中内容                                                      | `React.ReactNode`                       | -        | -    |
+| missingDependencyRender | 未安装 `@silurus/ooxml` 时的自定义降级内容                            | `React.ReactNode`                       | -        | -    |
+| onError                 | 加载或渲染失败回调                                                    | `(error: Error) => void`                | -        | -    |
+| onLoad                  | 文档加载完成回调                                                      | `() => void`                            | -        | -    |
+| style                   | 自定义内联样式                                                        | `React.CSSProperties`                   | -        | -    |
+| wasmUrl                 | WASM 解析器地址；未传时按格式指向 jsDelivr 上的 `@silurus/ooxml` 资产 | `string \| URL`                         | CDN 默认 | -    |
 
 ## 注意事项 {#notes}
 
