@@ -5,13 +5,24 @@ import {
   OfficeViewer,
 } from '@ant-design/agentic-ui';
 import {
+  DownloadOutlined,
   FileExcelOutlined,
   FilePptOutlined,
   FileWordOutlined,
   ZoomInOutlined,
 } from '@ant-design/icons';
-import { Alert, Button, Card, Modal, Segmented, Tag } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
+import {
+  Alert,
+  Button,
+  Card,
+  Descriptions,
+  Modal,
+  Segmented,
+  Space,
+  Tag,
+  Typography,
+} from 'antd';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { OFFICE_SAMPLES } from './office-viewer-samples';
 
 type OfficeKind = 'docx' | 'xlsx' | 'pptx';
@@ -26,6 +37,12 @@ interface OfficeFileItem {
 }
 
 type DemoView = 'render' | 'source';
+
+const KIND_LABEL: Record<OfficeKind, string> = {
+  docx: 'Word 文档',
+  xlsx: 'Excel 表格',
+  pptx: 'PowerPoint 演示',
+};
 
 const OFFICE_MARKDOWN = `## 本周产出文档
 
@@ -83,12 +100,13 @@ const inferKind = (item: OfficeFileItem): OfficeKind | null => {
   return null;
 };
 
-/** Word / Excel：紧凑文件卡片，点击打开详情预览 */
+/** Word / Excel：紧凑文件卡片，点击打开轻量详情 */
 const SimpleFileCard: React.FC<{
   item: OfficeFileItem;
   onPreview: (item: OfficeFileItem) => void;
 }> = ({ item, onPreview }) => {
-  const meta = KIND_META[inferKind(item) ?? 'docx'];
+  const kind = inferKind(item) ?? 'docx';
+  const meta = KIND_META[kind];
   return (
     <Card
       hoverable
@@ -124,7 +142,7 @@ const SimpleFileCard: React.FC<{
           {item.title || item.name}
         </div>
         <div style={{ color: '#999', fontSize: 12, marginTop: 2 }}>
-          {meta.label} · 点击预览
+          {meta.label} · 点击查看详情
         </div>
       </div>
     </Card>
@@ -289,7 +307,7 @@ const PptxSlideListCard: React.FC<{
                   lineHeight: '18px',
                 }}
               >
-                {thumb.index + 1}
+                第 {thumb.index + 1} 页 · 点击查看详情
               </span>
             </div>
           ))}
@@ -343,16 +361,22 @@ const OfficeFileList: React.FC<{
 const OfficeViewerMarkdownDemo: React.FC = () => {
   const [view, setView] = useState<DemoView>('render');
   const [preview, setPreview] = useState<OfficeFileItem | null>(null);
+  const [showFullPreview, setShowFullPreview] = useState(false);
+
+  const openPreview = useCallback((item: OfficeFileItem) => {
+    setPreview(item);
+    setShowFullPreview(false);
+  }, []);
 
   const plugins = useMemo(
     () => [
       createRendererCodeBlockPlugin({
         'agentic-ui-office': ({ code }) => (
-          <OfficeFileList code={code} onPreview={setPreview} />
+          <OfficeFileList code={code} onPreview={openPreview} />
         ),
       }),
     ],
-    [],
+    [openPreview],
   );
 
   const previewKind = preview ? inferKind(preview) : null;
@@ -364,7 +388,7 @@ const OfficeViewerMarkdownDemo: React.FC = () => {
         showIcon
         style={{ marginBottom: 12 }}
         message="Markdown 内渲染 Office 卡片"
-        description="通过 createRendererCodeBlockPlugin 注册 `agentic-ui-office` 代码块渲染器：Word / Excel 渲染为文件卡片，PPTX 卡片内展示幻灯片缩略图列表；点击卡片打开详情预览（需安装 optional peer @silurus/ooxml）。"
+        description="通过 createRendererCodeBlockPlugin 注册 `agentic-ui-office` 代码块渲染器：Word / Excel 渲染为文件卡片，PPTX 卡片内展示幻灯片缩略图列表；点击卡片先展示轻量详情，再点「完整预览」进入 OfficeViewer（需安装 optional peer @silurus/ooxml）。"
       />
       <Segmented
         style={{ marginBottom: 12 }}
@@ -411,19 +435,85 @@ const OfficeViewerMarkdownDemo: React.FC = () => {
         title={preview?.title || preview?.name}
         footer={null}
         centered
-        width="min(1080px, 94vw)"
+        width={showFullPreview ? 'min(1080px, 94vw)' : 520}
         destroyOnHidden
-        onCancel={() => setPreview(null)}
+        onCancel={() => {
+          setPreview(null);
+          setShowFullPreview(false);
+        }}
       >
-        {preview && (
-          <OfficeViewer
-            key={preview.url}
-            file={preview.url}
-            fileName={preview.name}
-            fileType={previewKind ?? undefined}
-            height="70vh"
-          />
-        )}
+        {preview &&
+          (showFullPreview ? (
+            <OfficeViewer
+              key={preview.url}
+              file={preview.url}
+              fileName={preview.name}
+              fileType={previewKind ?? undefined}
+              height="70vh"
+            />
+          ) : (
+            <div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  marginBottom: 16,
+                }}
+              >
+                <span
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: 10,
+                    background: `${(previewKind ? KIND_META[previewKind] : KIND_META.docx).color}1a`,
+                    color: (previewKind
+                      ? KIND_META[previewKind]
+                      : KIND_META.docx
+                    ).color,
+                    fontSize: 26,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  {(previewKind ? KIND_META[previewKind] : KIND_META.docx).icon}
+                </span>
+                <Typography.Title level={5} style={{ margin: 0 }}>
+                  {preview.title || preview.name}
+                </Typography.Title>
+              </div>
+              <Descriptions
+                column={1}
+                size="small"
+                style={{ marginBottom: 20 }}
+                items={[
+                  { key: 'name', label: '文件名', children: preview.name },
+                  {
+                    key: 'kind',
+                    label: '类型',
+                    children: previewKind
+                      ? KIND_LABEL[previewKind]
+                      : '未知（缺少扩展名）',
+                  },
+                  { key: 'url', label: '来源', children: preview.url },
+                ]}
+              />
+              <Space style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Button onClick={() => window.open(preview.url)}>
+                  <DownloadOutlined /> 下载
+                </Button>
+                <Button
+                  type="primary"
+                  icon={<ZoomInOutlined />}
+                  onClick={() => setShowFullPreview(true)}
+                >
+                  完整预览
+                </Button>
+              </Space>
+            </div>
+          ))}
       </Modal>
     </div>
   );
