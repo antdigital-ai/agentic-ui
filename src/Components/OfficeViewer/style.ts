@@ -67,6 +67,8 @@ const genStyle: GenStyleFn<'OfficeViewer'> = (token) => ({
     // 每个 slide 一张白色卡片，由 hook 直接插入（包裹 div + canvas）
     '&-rail-card': {
       width: '100%',
+      // 裁掉子画布溢出（如缩放动画瞬间），保证圆角处不漏内容
+      overflow: 'hidden',
       background: token.colorBgContainer,
       borderRadius: token.borderRadiusLG,
       border: `1px solid ${token.colorBorderSecondary}`,
