@@ -104,10 +104,11 @@ const genStyle: GenStyleFn<'OfficeViewer'> = (token) => ({
       background: token.colorBgContainer,
     },
 
-    // PPTX 单页模式：画布在 host 内水平居中（fitPage 后宽度小于可用宽时）
+    // PPTX 单页模式：画布在 host 内水平垂直居中（fitPage 后小于可用宽高时）
     '&-host-center': {
       display: 'flex',
       justifyContent: 'center',
+      alignItems: 'center',
     },
 
     '&-status': {

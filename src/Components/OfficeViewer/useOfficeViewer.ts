@@ -45,10 +45,17 @@ interface DestroyableViewer {
 
 interface PptxViewerLike extends DestroyableViewer {
   goToSlide: (index: number) => Promise<void> | void;
+  fitPage: () => Promise<void> | void;
+  getScale: () => number;
+  setScale: (scale: number) => Promise<void> | void;
+  canvasElement: HTMLCanvasElement;
 }
 
 const THUMBNAIL_WIDTH = 120;
 const THUMBNAIL_DPR = 2;
+
+/** PPTX 主画布四周留白：为阴影预留呼吸空间 */
+const MAIN_CANVAS_INSET = 8;
 
 /**
  * 在 host 容器内挂载 Viewer：
@@ -238,9 +245,26 @@ export function useOfficeViewer({
                 syncActiveCard(index);
               },
             },
-          );
-          // 主区尽量铺满：按可用宽高自适应到整页（免 load，presentation 已就绪）
-          await instance.fitPage();
+          ) as PptxViewerLike;
+
+          // fitPage 以 host clientWidth/Height 铺满画布，会顶满容器把阴影裁掉；
+          // 包一层：把可用宽高各收 MAIN_CANVAS_INSET * 2 再做整页自适应
+          const fitPageWithInset = async () => {
+            await instance.fitPage();
+            const natural = mainCanvas.getBoundingClientRect();
+            const naturalW = Math.round(natural.width);
+            const naturalH = Math.round(natural.height);
+            const fitScale = instance.getScale();
+            const scaleX =
+              naturalW > 0 ? (naturalW - MAIN_CANVAS_INSET * 2) / naturalW : 1;
+            const scaleY =
+              naturalH > 0 ? (naturalH - MAIN_CANVAS_INSET * 2) / naturalH : 1;
+            const next = fitScale * Math.min(scaleX, scaleY);
+            if (next > 0 && next < fitScale) {
+              await instance.setScale(next);
+            }
+          };
+          await fitPageWithInset();
           viewer = instance;
           viewerRef.current = instance;
 
@@ -249,7 +273,7 @@ export function useOfficeViewer({
           const resizeObserver = new ResizeObserver(() => {
             cancelAnimationFrame(fitRaf);
             fitRaf = requestAnimationFrame(() => {
-              instance.fitPage();
+              fitPageWithInset();
             });
           });
           resizeObserver.observe(host);
