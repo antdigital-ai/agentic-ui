@@ -1,0 +1,432 @@
+import {
+  createRendererCodeBlockPlugin,
+  getDefaultWasmUrl,
+  MarkdownRenderer,
+  OfficeViewer,
+} from '@ant-design/agentic-ui';
+import {
+  FileExcelOutlined,
+  FilePptOutlined,
+  FileWordOutlined,
+  ZoomInOutlined,
+} from '@ant-design/icons';
+import { Alert, Button, Card, Modal, Segmented, Tag } from 'antd';
+import React, { useEffect, useMemo, useState } from 'react';
+import { OFFICE_SAMPLES } from './office-viewer-samples';
+
+type OfficeKind = 'docx' | 'xlsx' | 'pptx';
+
+interface OfficeFileItem {
+  /** 文件名（含扩展名，用于类型识别与兜底标题） */
+  name: string;
+  /** 卡片展示标题（可选） */
+  title?: string;
+  /** 文件地址 */
+  url: string;
+}
+
+type DemoView = 'render' | 'source';
+
+const OFFICE_MARKDOWN = `## 本周产出文档
+
+智能体已整理好本次评审材料，**点击卡片**即可在线预览：
+
+- Word / Excel 渲染为紧凑文件卡片，点击打开详情
+- PPTX 卡片内直接渲染 **幻灯片缩略图列表**，点击任意一页查看详情
+
+\`\`\`agentic-ui-office
+{
+  "files": [
+    {
+      "name": "项目立项说明书.docx",
+      "title": "项目立项说明书",
+      "url": "${OFFICE_SAMPLES.docx.url}"
+    },
+    {
+      "name": "预算明细表.xlsx",
+      "title": "预算明细表",
+      "url": "${OFFICE_SAMPLES.xlsx.url}"
+    },
+    {
+      "name": "评审汇报.pptx",
+      "title": "评审汇报",
+      "url": "${OFFICE_SAMPLES.pptx.url}"
+    }
+  ]
+}
+\`\`\`
+`;
+
+const KIND_META: Record<
+  OfficeKind,
+  { icon: React.ReactNode; color: string; label: string }
+> = {
+  docx: { icon: <FileWordOutlined />, color: '#2b7cd3', label: 'Word' },
+  xlsx: { icon: <FileExcelOutlined />, color: '#1e7145', label: 'Excel' },
+  pptx: { icon: <FilePptOutlined />, color: '#d24726', label: 'PPT' },
+};
+
+const parseOfficeFiles = (code: string): OfficeFileItem[] => {
+  try {
+    const parsed = JSON.parse(code) as { files?: OfficeFileItem[] };
+    return (parsed.files ?? []).filter((item) => !!item?.url);
+  } catch {
+    return [];
+  }
+};
+
+const inferKind = (item: OfficeFileItem): OfficeKind | null => {
+  const source = `${item.name || ''}${item.url || ''}`.toLowerCase();
+  if (source.includes('.docx')) return 'docx';
+  if (source.includes('.xlsx')) return 'xlsx';
+  if (source.includes('.pptx')) return 'pptx';
+  return null;
+};
+
+/** Word / Excel：紧凑文件卡片，点击打开详情预览 */
+const SimpleFileCard: React.FC<{
+  item: OfficeFileItem;
+  onPreview: (item: OfficeFileItem) => void;
+}> = ({ item, onPreview }) => {
+  const meta = KIND_META[inferKind(item) ?? 'docx'];
+  return (
+    <Card
+      hoverable
+      size="small"
+      styles={{ body: { display: 'flex', alignItems: 'center', gap: 12 } }}
+      onClick={() => onPreview(item)}
+    >
+      <span
+        style={{
+          width: 44,
+          height: 44,
+          borderRadius: 10,
+          background: `${meta.color}1a`,
+          color: meta.color,
+          fontSize: 24,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+        }}
+      >
+        {meta.icon}
+      </span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            fontWeight: 600,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {item.title || item.name}
+        </div>
+        <div style={{ color: '#999', fontSize: 12, marginTop: 2 }}>
+          {meta.label} · 点击预览
+        </div>
+      </div>
+    </Card>
+  );
+};
+
+interface SlideThumb {
+  index: number;
+  dataUrl?: string;
+}
+
+const THUMB_WIDTH = 160;
+const THUMB_DPR = 2;
+const DEFAULT_SLIDE_RATIO = 16 / 9;
+
+/** PPTX：卡片内渲染幻灯片缩略图列表，点击查看详情预览 */
+const PptxSlideListCard: React.FC<{
+  item: OfficeFileItem;
+  onPreview: (item: OfficeFileItem) => void;
+}> = ({ item, onPreview }) => {
+  const [thumbs, setThumbs] = useState<SlideThumb[]>([]);
+  const [slideRatio, setSlideRatio] = useState(DEFAULT_SLIDE_RATIO);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    // presentation 供循环渲染缩略图使用，cleanup 时统一释放
+    let presentation: { destroy: () => void } | null = null;
+
+    const run = async () => {
+      setThumbs([]);
+      setFailed(false);
+      setSlideRatio(DEFAULT_SLIDE_RATIO);
+      try {
+        const { PptxPresentation } = await import('@silurus/ooxml/pptx');
+        const pres = await PptxPresentation.load(item.url, {
+          wasmUrl: getDefaultWasmUrl('pptx'),
+        });
+        if (cancelled) {
+          pres.destroy();
+          return;
+        }
+        presentation = pres;
+        setSlideRatio(pres.slideWidth / Math.max(1, pres.slideHeight));
+        setThumbs(
+          Array.from({ length: pres.slideCount }, (_, index) => ({ index })),
+        );
+
+        for (let index = 0; index < pres.slideCount; index++) {
+          if (cancelled) return;
+          const canvas = document.createElement('canvas');
+          canvas.width = THUMB_WIDTH * THUMB_DPR;
+          canvas.height = Math.round(
+            (THUMB_WIDTH * THUMB_DPR * pres.slideHeight) /
+              Math.max(1, pres.slideWidth),
+          );
+          await pres.renderSlide(canvas, index, {
+            width: THUMB_WIDTH * THUMB_DPR,
+          });
+          if (cancelled) return;
+          const dataUrl = canvas.toDataURL();
+          setThumbs((prev) =>
+            prev.map((thumb) =>
+              thumb.index === index ? { ...thumb, dataUrl } : thumb,
+            ),
+          );
+        }
+      } catch {
+        if (!cancelled) setFailed(true);
+      }
+    };
+
+    void run();
+    return () => {
+      cancelled = true;
+      presentation?.destroy();
+    };
+  }, [item.url]);
+
+  const meta = KIND_META.pptx;
+
+  return (
+    <Card
+      size="small"
+      style={{ gridColumn: '1 / -1' }}
+      title={
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ color: meta.color, fontSize: 18 }}>{meta.icon}</span>
+          {item.title || item.name}
+          {thumbs.length > 0 && <Tag>{thumbs.length} 页</Tag>}
+        </span>
+      }
+      extra={
+        <Button
+          type="link"
+          size="small"
+          icon={<ZoomInOutlined />}
+          onClick={() => onPreview(item)}
+        >
+          查看详情
+        </Button>
+      }
+    >
+      {failed ? (
+        <div style={{ color: '#999' }}>
+          幻灯片加载失败：请确认已安装 @silurus/ooxml
+        </div>
+      ) : (
+        <div style={{ display: 'flex', gap: 12, overflowX: 'auto' }}>
+          {thumbs.map((thumb) => (
+            <div
+              key={thumb.index}
+              onClick={() => onPreview(item)}
+              style={{
+                position: 'relative',
+                flexShrink: 0,
+                width: THUMB_WIDTH,
+                aspectRatio: String(slideRatio),
+                borderRadius: 8,
+                overflow: 'hidden',
+                border: '1px solid #f0f0f0',
+                background: '#fafafa',
+                cursor: 'pointer',
+              }}
+            >
+              {thumb.dataUrl ? (
+                <img
+                  src={thumb.dataUrl}
+                  alt={`第 ${thumb.index + 1} 页`}
+                  style={{
+                    display: 'block',
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#bbb',
+                    fontSize: 12,
+                  }}
+                >
+                  加载中…
+                </div>
+              )}
+              <span
+                style={{
+                  position: 'absolute',
+                  left: 6,
+                  bottom: 6,
+                  padding: '0 6px',
+                  borderRadius: 4,
+                  background: 'rgba(0, 0, 0, 0.45)',
+                  color: '#fff',
+                  fontSize: 12,
+                  lineHeight: '18px',
+                }}
+              >
+                {thumb.index + 1}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </Card>
+  );
+};
+
+/** agentic-ui-office 代码块 → Office 卡片列表 */
+const OfficeFileList: React.FC<{
+  code: string;
+  onPreview: (item: OfficeFileItem) => void;
+}> = ({ code, onPreview }) => {
+  const files = useMemo(() => parseOfficeFiles(code), [code]);
+
+  if (!files.length) {
+    return (
+      <pre>agentic-ui-office：JSON 解析失败，需提供 {'{ files: [...] }'}</pre>
+    );
+  }
+
+  const pptxFiles = files.filter((item) => inferKind(item) === 'pptx');
+  const plainFiles = files.filter((item) => inferKind(item) !== 'pptx');
+
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+        gap: 12,
+        margin: '12px 0',
+      }}
+    >
+      {plainFiles.map((item) => (
+        <SimpleFileCard key={item.url} item={item} onPreview={onPreview} />
+      ))}
+      {pptxFiles.map((item) => (
+        <PptxSlideListCard key={item.url} item={item} onPreview={onPreview} />
+      ))}
+    </div>
+  );
+};
+
+/**
+ * Markdown 中渲染 Office 卡片：
+ * - 经 createRendererCodeBlockPlugin 注册 `agentic-ui-office` 代码块渲染器
+ * - Word / Excel 渲染为文件卡片；PPTX 卡片内展示幻灯片缩略图列表
+ * - 点击卡片打开 Modal，用 OfficeViewer 查看详情
+ */
+const OfficeViewerMarkdownDemo: React.FC = () => {
+  const [view, setView] = useState<DemoView>('render');
+  const [preview, setPreview] = useState<OfficeFileItem | null>(null);
+
+  const plugins = useMemo(
+    () => [
+      createRendererCodeBlockPlugin({
+        'agentic-ui-office': ({ code }) => (
+          <OfficeFileList code={code} onPreview={setPreview} />
+        ),
+      }),
+    ],
+    [],
+  );
+
+  const previewKind = preview ? inferKind(preview) : null;
+
+  return (
+    <div>
+      <Alert
+        type="info"
+        showIcon
+        style={{ marginBottom: 12 }}
+        message="Markdown 内渲染 Office 卡片"
+        description="通过 createRendererCodeBlockPlugin 注册 `agentic-ui-office` 代码块渲染器：Word / Excel 渲染为文件卡片，PPTX 卡片内展示幻灯片缩略图列表；点击卡片打开详情预览（需安装 optional peer @silurus/ooxml）。"
+      />
+      <Segmented
+        style={{ marginBottom: 12 }}
+        value={view}
+        options={[
+          { label: '渲染效果', value: 'render' },
+          { label: 'Markdown 源码', value: 'source' },
+        ]}
+        onChange={(value) => setView(value as DemoView)}
+      />
+      {view === 'render' ? (
+        <div
+          style={{
+            border: '1px dashed #d9d9d9',
+            borderRadius: 8,
+            padding: 16,
+            background: '#fafafa',
+          }}
+        >
+          <MarkdownRenderer content={OFFICE_MARKDOWN} plugins={plugins} />
+        </div>
+      ) : (
+        <pre
+          style={{
+            margin: 0,
+            padding: 16,
+            maxHeight: 420,
+            overflow: 'auto',
+            background: '#1f1f1f',
+            color: '#e6e6e6',
+            borderRadius: 8,
+            fontSize: 12,
+            lineHeight: 1.6,
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+          }}
+        >
+          {OFFICE_MARKDOWN}
+        </pre>
+      )}
+
+      <Modal
+        open={!!preview}
+        title={preview?.title || preview?.name}
+        footer={null}
+        centered
+        width="min(1080px, 94vw)"
+        destroyOnHidden
+        onCancel={() => setPreview(null)}
+      >
+        {preview && (
+          <OfficeViewer
+            key={preview.url}
+            file={preview.url}
+            fileName={preview.name}
+            fileType={previewKind ?? undefined}
+            height="70vh"
+          />
+        )}
+      </Modal>
+    </div>
+  );
+};
+
+export default OfficeViewerMarkdownDemo;

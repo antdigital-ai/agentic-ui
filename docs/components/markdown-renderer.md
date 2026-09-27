@@ -138,6 +138,8 @@ export default () => (
 
 > `MarkdownEditorPlugin.elements` 仅用于 Slate 编辑器；`MarkdownRenderer` 只读 `plugin.renderer.rendererComponents`。
 
+> 完整示例见 [OfficeViewer - Markdown 中渲染卡片](./office-viewer)：Word / Excel 渲染为文件卡片、PPTX 卡片内展示幻灯片缩略图列表，点击打开详情预览。
+
 ## API {#api}
 
 ### MarkdownRendererProps {#markdown-renderer-props}
