@@ -282,9 +282,9 @@ describe('Editor deepen7 safe residual branches', () => {
       });
     });
     // 同构 trim 臂
-    expect(('  **bold**  ' || '').trim()).toBe('**bold**');
-    expect(('  plain  ' || '').trim()).toBe('plain');
-    expect(('' || '').trim()).toBe('');
+    expect('  **bold**  '.trim()).toBe('**bold**');
+    expect('  plain  '.trim()).toBe('plain');
+    expect(''.trim()).toBe('');
     expect(document.body).toBeTruthy();
   });
 });

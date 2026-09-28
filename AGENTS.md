@@ -88,7 +88,7 @@ pnpm run test:full      # 全量 Vitest（`--mode full`；与 `test:coverage:ful
 pnpm run test:coverage  # 生成覆盖率（默认同上精简集）
 pnpm run test:coverage:full  # 全量测试 + 覆盖率（`--mode full`；Codecov workflow / 发布前）
 pnpm run test:e2e       # 运行 E2E 测试
-pnpm run lint           # 代码检查（ESLint + Stylelint）
+pnpm run lint           # 代码检查（oxlint + Stylelint）
 pnpm run prettier       # 代码格式化
 pnpm tsc                # TypeScript 类型检查
 ```
@@ -440,7 +440,7 @@ const Component = () => {
 
 | 工具      | 用途         | 配置文件         |
 | --------- | ------------ | ---------------- |
-| ESLint    | 代码质量检查 | `.eslintrc.js`   |
+| oxlint    | 代码质量检查 | `.oxlintrc.json` |
 | Stylelint | 样式检查     | `.stylelintrc`   |
 | Prettier  | 代码格式化   | `.prettierrc.js` |
 
@@ -845,7 +845,7 @@ export type { ComponentNameProps, ComponentNameRef } from './types';
 ### 开发工具
 
 - **编辑器**: 推荐 VS Code 或其他支持 TypeScript 的编辑器
-- **代码检查**: ESLint (@umijs/lint) + Stylelint
+- **代码检查**: oxlint + Stylelint
 - **格式化**: Prettier
 - **类型检查**: TypeScript 5.9+ 严格模式
 - **Git hooks**: Husky + lint-staged
@@ -865,7 +865,7 @@ export type { ComponentNameProps, ComponentNameRef } from './types';
 | ---------------------- | --------------- |
 | `package.json`         | 项目配置和脚本  |
 | `tsconfig.json`        | TypeScript 配置 |
-| `.eslintrc.js`         | ESLint 配置     |
+| `.oxlintrc.json`       | oxlint 配置     |
 | `.stylelintrc`         | Stylelint 配置  |
 | `.prettierrc.js`       | Prettier 配置   |
 | `vitest.config.ts`     | Vitest 配置     |
@@ -965,4 +965,4 @@ pnpm run build
 - **组件路由**：组件页路径由文档 frontmatter 生成，并非全部能从组件名直接拼出（例如 `MarkdownEditor` 的 URL 与 `/components/markdown-editor` 不一定一致）。直接猜 URL 可能 404，优先点顶部「组件」再走左侧栏导航。
 - **测试范围**：`pnpm test` 默认跑精简集（见 `vitest.config.ts` 的 exclude）。验证单个组件用 `pnpm test -- src/<Component>` 更快；全量用 `pnpm run test:full`（已带 `--max-old-space-size=8192`）。
 - **E2E**：`pnpm run test:e2e` 需先 `pnpm run playwright:install`（下载 Chromium，未纳入 update script）。
-- **校验顺序**：提交前依次 `pnpm run lint`、`pnpm tsc`、相关 `pnpm test`，与 `.husky/pre-commit`（eslint + stylelint）一致。
+- **校验顺序**：提交前依次 `pnpm run lint`、`pnpm tsc`、相关 `pnpm test`，与 `.husky/pre-commit`（oxlint + stylelint）一致。

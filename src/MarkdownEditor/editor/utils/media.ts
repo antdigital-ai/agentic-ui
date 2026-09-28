@@ -81,7 +81,7 @@ export const convertRemoteImages = async (
           }
         }
       } else if (item?.children?.length) {
-        stack.push(...item?.children);
+        stack.push(...(item?.children ?? []));
       }
     }
   }
