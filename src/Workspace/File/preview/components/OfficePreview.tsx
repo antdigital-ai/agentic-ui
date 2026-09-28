@@ -12,11 +12,15 @@ const LazyOfficeViewer = lazy(() =>
 );
 
 export interface OfficePreviewProps {
+  /** Workspace 文件节点（取 file.file / previewUrl / file.url 作为预览源） */
   file: FileNode;
   /** 来自 dataSource.previewUrl；也可回退到 file.url */
   previewUrl?: string;
+  /** 组件类名前缀 */
   prefixCls: string;
+  /** cssinjs hash 类名 */
   hashId: string;
+  /** 国际化文案 */
   locale?: Record<string, any>;
 }
 

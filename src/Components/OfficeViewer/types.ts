@@ -3,6 +3,7 @@ import type React from 'react';
 /** Office Open XML 可预览格式（不含旧版二进制 .doc/.xls/.ppt） */
 export type OfficeFileType = 'docx' | 'xlsx' | 'pptx';
 
+/** 组件生命周期状态：idle（未传入 file）→ loading → ready / error / missing-dependency */
 export type OfficeViewerStatus =
   | 'idle'
   | 'loading'
@@ -15,7 +16,7 @@ export interface OfficeViewerProps {
   file?: File | Blob | string | ArrayBuffer;
   /** 显式指定格式；缺省时按 `fileName` / URL / File.name 扩展名推断 */
   fileType?: OfficeFileType;
-  /** 用于扩展名推断的文件名（当 `file` 为 ArrayBuffer 或无扩展名 URL 时必传） */
+  /** 用于扩展名推断与展示的文件名；`file` 为 ArrayBuffer 或 URL 无扩展名时必传 */
   fileName?: string;
   /**
    * WASM 解析器地址（覆盖默认 CDN）

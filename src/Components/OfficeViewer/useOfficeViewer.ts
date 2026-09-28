@@ -13,29 +13,41 @@ import {
 } from './utils';
 
 export interface SlideThumbnail {
+  /** 幻灯片下标（从 0 开始） */
   index: number;
   /** 缩略图是否已渲染到 rail canvas；失败时为 false（显示占位） */
   rendered: boolean;
 }
 
 interface UseOfficeViewerOptions {
+  /** 文件源：远程 URL、本地 File/Blob，或已读入的 ArrayBuffer */
   file?: File | Blob | string | ArrayBuffer;
+  /** 显式指定格式；缺省时按 fileName / URL / File.name 扩展名推断 */
   fileType?: OfficeFileType;
+  /** 用于扩展名推断的文件名 */
   fileName?: string;
+  /** WASM 解析器地址；缺省使用 jsDelivr CDN */
   wasmUrl?: string | URL;
+  /** 主视图渲染宿主 */
   hostRef: React.RefObject<HTMLDivElement | null>;
   /** PPTX：缩略图侧栏渲染宿主（缺省则退化为连续滚动视图） */
   railRef?: React.RefObject<HTMLDivElement | null>;
+  /** 文档加载完成回调 */
   onLoad?: () => void;
+  /** 加载或渲染失败回调 */
   onError?: (error: Error) => void;
 }
 
 interface UseOfficeViewerResult {
+  /** 组件生命周期状态 */
   status: OfficeViewerStatus;
+  /** 加载或渲染失败时的错误对象 */
   error: Error | null;
-  /** 仅 PPTX 且启用侧栏时返回 */
+  /** PPTX 缩略图列表（仅 PPTX 且启用侧栏时非空） */
   slides: SlideThumbnail[];
+  /** 当前页下标（仅 PPTX） */
   currentSlide: number;
+  /** 跳转到指定页（仅 PPTX） */
   goToSlide: (index: number) => void;
 }
 
@@ -54,14 +66,21 @@ interface PptxViewerLike extends DestroyableViewer {
 const THUMBNAIL_WIDTH = 120;
 const THUMBNAIL_DPR = 2;
 
-/** PPTX 主画布四周留白：为阴影预留呼吸空间 */
+/** PPTX 主画布四周留白（px）：为阴影预留呼吸空间 */
 const MAIN_CANVAS_INSET = 8;
 
 /**
- * 在 host 容器内挂载 Viewer：
+ * 在 host 容器内挂载 Office Viewer（命令式渲染，内部直操作 DOM）
+ *
  * - DOCX：DocxScrollViewer 连续滚动
  * - XLSX：XlsxViewer（自带 Sheet 页签）
  * - PPTX：PptxViewer 单页 + 侧栏缩略图（railRef 缺省时退化为 PptxScrollViewer）
+ *
+ * viewer 实例与 PPTX presentation 均由内部 effect 创建，卸载或依赖变化时统一销毁；
+ * 回调经 ref 转发，避免 onLoad / onError 变化触发重新加载
+ *
+ * @param options - 见 {@link UseOfficeViewerOptions}
+ * @returns 状态、缩略图列表与翻页方法，见 {@link UseOfficeViewerResult}
  */
 export function useOfficeViewer({
   file,

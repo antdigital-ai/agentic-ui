@@ -83,6 +83,7 @@ const KIND_META: Record<
   pptx: { icon: <FilePptOutlined />, color: '#d24726', label: 'PPT' },
 };
 
+/** 解析 agentic-ui-office 代码块 JSON；格式非法或缺 files 时返回空数组 */
 const parseOfficeFiles = (code: string): OfficeFileItem[] => {
   try {
     const parsed = JSON.parse(code) as { files?: OfficeFileItem[] };
@@ -92,6 +93,7 @@ const parseOfficeFiles = (code: string): OfficeFileItem[] => {
   }
 };
 
+/** 按 name / url 中的扩展名推断格式；无法识别时返回 null */
 const inferKind = (item: OfficeFileItem): OfficeKind | null => {
   const source = `${item.name || ''}${item.url || ''}`.toLowerCase();
   if (source.includes('.docx')) return 'docx';
@@ -154,11 +156,18 @@ interface SlideThumb {
   dataUrl?: string;
 }
 
+/** 缩略图尺寸与 DPR 常量（2x 保证 retina 清晰度） */
 const THUMB_WIDTH = 160;
 const THUMB_DPR = 2;
+/** 加载完成前的兜底宽高比 */
 const DEFAULT_SLIDE_RATIO = 16 / 9;
 
-/** PPTX：卡片内渲染幻灯片缩略图列表，点击查看详情预览 */
+/**
+ * PPTX：卡片内渲染幻灯片缩略图列表
+ *
+ * 用 PptxPresentation 逐页离屏渲染为 dataUrl（不渲染文档正文），
+ * 点击任意一页 / 「查看详情」回调 onPreview 打开详情
+ */
 const PptxSlideListCard: React.FC<{
   item: OfficeFileItem;
   onPreview: (item: OfficeFileItem) => void;
@@ -317,7 +326,11 @@ const PptxSlideListCard: React.FC<{
   );
 };
 
-/** agentic-ui-office 代码块 → Office 卡片列表 */
+/**
+ * agentic-ui-office 代码块 → Office 卡片列表
+ *
+ * Word / Excel 渲染为 SimpleFileCard；PPTX 渲染为 PptxSlideListCard（占满整行）
+ */
 const OfficeFileList: React.FC<{
   code: string;
   onPreview: (item: OfficeFileItem) => void;
@@ -353,10 +366,11 @@ const OfficeFileList: React.FC<{
 };
 
 /**
- * Markdown 中渲染 Office 卡片：
+ * Markdown 中渲染 Office 卡片 demo
+ *
  * - 经 createRendererCodeBlockPlugin 注册 `agentic-ui-office` 代码块渲染器
  * - Word / Excel 渲染为文件卡片；PPTX 卡片内展示幻灯片缩略图列表
- * - 点击卡片打开 Modal，用 OfficeViewer 查看详情
+ * - 点击卡片先弹轻量详情（文件信息 + 下载），再点「完整预览」进入 OfficeViewer
  */
 const OfficeViewerMarkdownDemo: React.FC = () => {
   const [view, setView] = useState<DemoView>('render');
