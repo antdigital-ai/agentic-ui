@@ -1,4 +1,4 @@
-﻿# MarkdownInputField 重构待办 {#markdowninputfield}
+# MarkdownInputField 重构待办 {#markdowninputfield}
 
 > 本文用于记录 `src/MarkdownInputField` 的架构 review 结论与后续重构计划。
 > 仅作为内部跟进 issue 使用，不发布到组件文档。

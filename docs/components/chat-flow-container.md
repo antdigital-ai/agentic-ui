@@ -1,4 +1,4 @@
-﻿---
+---
 title: ChatLayout - 对话流容器组件
 atomId: ChatLayout
 group:
