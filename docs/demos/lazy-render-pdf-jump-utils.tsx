@@ -50,7 +50,7 @@ export const scrollToAndLoadParagraph = (
   paragraphId: string,
   options?: {
     /** 滚动容器的 ref */
-    containerRef?: React.RefObject<HTMLElement>;
+    containerRef?: React.RefObject<HTMLElement | null>;
     /** 滚动动画持续时间（ms） */
     scrollDuration?: number;
     /** 强制加载延迟（ms），等待滚动动画完成 */

@@ -14,7 +14,7 @@ import {
  */
 export const useMermaidRender = (
   code: string,
-  divRef: React.RefObject<HTMLDivElement>,
+  divRef: React.RefObject<HTMLDivElement | null>,
   id: string,
   isVisible: boolean,
   themeToken?: MermaidThemeToken,

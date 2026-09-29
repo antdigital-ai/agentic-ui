@@ -1,9 +1,9 @@
 import { MarkdownEditor, MarkdownEditorInstance } from '@ant-design/agentic-ui';
 import { Button } from 'antd';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 export default () => {
-  const editorRef = React.useRef<MarkdownEditorInstance>();
+  const editorRef = useRef<MarkdownEditorInstance | null>(null);
   useEffect(() => {
     const insertMarkdown = () => {
       editorRef.current?.store.setMDContent(

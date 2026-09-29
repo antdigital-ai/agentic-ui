@@ -8,7 +8,7 @@ import { getCodeBlockPlainText } from '../../../MarkdownEditor/editor/utils/code
 import { CodeNode } from '../../../MarkdownEditor/el';
 
 interface AceEditorContainerProps {
-  dom: RefObject<HTMLDivElement>;
+  dom: RefObject<HTMLDivElement | null>;
   element: CodeNode;
   children: React.ReactNode;
 }

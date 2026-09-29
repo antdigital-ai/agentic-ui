@@ -282,7 +282,7 @@ export type MarkdownInputFieldProps = {
    * @type {React.MutableRefObject<MarkdownEditorInstance | undefined>}
    * @example
    * ```tsx
-   * const editorRef = useRef<MarkdownEditorInstance>();
+   * const editorRef = useRef<MarkdownEditorInstance | null>(null);
    *
    * <MarkdownInputField
    *   inputRef={editorRef}
@@ -292,7 +292,7 @@ export type MarkdownInputFieldProps = {
    * editorRef.current?.store?.clearContent();
    * ```
    */
-  inputRef?: React.MutableRefObject<MarkdownEditorInstance | undefined>;
+  inputRef?: React.MutableRefObject<MarkdownEditorInstance | null | undefined>;
 
   /**
    * 自定义叶子节点渲染函数
@@ -421,7 +421,7 @@ export type MarkdownInputFieldProps = {
    * </div>
    * ```
    */
-  targetRef?: React.RefObject<HTMLDivElement>;
+  targetRef?: React.RefObject<HTMLDivElement | null>;
 
   /**
    * 测试 ID

@@ -9,7 +9,7 @@ import { CodeElement } from '@ant-design/agentic-ui/Plugins/code';
 import { MermaidElement } from '@ant-design/agentic-ui/Plugins/mermaid';
 import { ExportOutlined } from '@ant-design/icons';
 import { Popover } from 'antd';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 const defaultValue = `根据提供的上下文数据，微软最近的股票并没有大涨，反而表现不佳。以下是相关信息的总结：
 
@@ -33,7 +33,7 @@ const defaultValue = `根据提供的上下文数据，微软最近的股票并�
 `;
 
 export default () => {
-  const editorRef = React.useRef<MarkdownEditorInstance>();
+  const editorRef = useRef<MarkdownEditorInstance | null>(null);
   const [nodeList, setNodeList] = React.useState<
     {
       id: any;

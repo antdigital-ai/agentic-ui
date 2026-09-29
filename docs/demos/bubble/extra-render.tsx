@@ -42,7 +42,7 @@ const mockMessages = [
 ];
 
 export default function ExtraRenderDemo() {
-  const bubbleRef = useRef<any>();
+  const bubbleRef = useRef<any | null>(null);
   const [likes, setLikes] = useState<Record<string, boolean>>({});
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
   const [customMode, setCustomMode] = useState<

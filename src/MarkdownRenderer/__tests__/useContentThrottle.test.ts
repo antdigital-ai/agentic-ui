@@ -5,7 +5,9 @@ import { installRafStub } from './installRafStub';
 
 describe('useContentThrottle', () => {
   beforeEach(() => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
+    // 严格 fake timers：React 19 挂载更慢，shouldAdvanceTime 的真实时间
+    // 漂移会让帧在断言前提前推进，破坏逐帧断言的确定性
+    vi.useFakeTimers();
     installRafStub();
   });
 

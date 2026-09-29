@@ -14,13 +14,11 @@ const extractSingleChildText = (node: React.ReactNode): string => {
   if (node === null || node === undefined || node === false) return '';
   if (typeof node === 'string' || typeof node === 'number') return String(node);
   if (Array.isArray(node)) return node.map(extractSingleChildText).join('');
-  if (
-    React.isValidElement(node) &&
-    node.props !== undefined &&
-    node.props.children !== undefined &&
-    node.props.children !== null
-  ) {
-    return extractSingleChildText(node.props.children);
+  if (React.isValidElement(node)) {
+    const { children } = node.props as { children?: React.ReactNode };
+    if (children !== undefined && children !== null) {
+      return extractSingleChildText(children);
+    }
   }
   return '';
 };

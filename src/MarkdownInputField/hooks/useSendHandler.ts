@@ -11,7 +11,9 @@ interface UseSendHandlerParams {
   >;
   /** 来自 SendButton 的可选额外禁用，独立于 props.disabled */
   sendDisabled?: boolean;
-  markdownEditorRef: React.MutableRefObject<MarkdownEditorInstance | undefined>;
+  markdownEditorRef: React.MutableRefObject<
+    MarkdownEditorInstance | null | undefined
+  >;
   /** 防止快速连续触发 onSend；keyboard / 按钮共用 */
   isSendingRef: React.MutableRefObject<boolean>;
   isLoading: boolean;

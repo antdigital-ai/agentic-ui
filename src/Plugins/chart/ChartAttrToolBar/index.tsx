@@ -66,7 +66,7 @@ export const ChartAttrToolBar: React.FC<{
   const { markdownEditorRef, readonly } = useEditorStore();
   const i18n = useContext(I18nContext);
 
-  const chartNodeRef = useRef<NodeEntry<ChartNode>>();
+  const chartNodeRef = useRef<NodeEntry<ChartNode> | null>(null);
 
   const remove = useRefFunction(() => {
     const chart = props.node;
@@ -75,7 +75,7 @@ export const ChartAttrToolBar: React.FC<{
     Transforms.delete(markdownEditorRef.current, {
       at: EditorUtils.findPath(markdownEditorRef.current, chart!),
     });
-    chartNodeRef.current = undefined;
+    chartNodeRef.current = null;
     ReactEditor.focus(markdownEditorRef.current);
   });
 

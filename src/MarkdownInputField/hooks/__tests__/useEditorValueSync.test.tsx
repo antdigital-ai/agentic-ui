@@ -39,7 +39,7 @@ const makeMockEditorInstance = () => {
 
 /** 组合 hook：用一个 ref 容器配合 useEditorValueSync，模拟主组件接线方式。 */
 const useHarness = (value: string | undefined) => {
-  const markdownEditorRef = useRef<MarkdownEditorInstance>();
+  const markdownEditorRef = useRef<MarkdownEditorInstance | null>(null);
   const { onEditorChange } = useEditorValueSync({ value, markdownEditorRef });
   return { markdownEditorRef, onEditorChange };
 };

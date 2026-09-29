@@ -48,7 +48,7 @@ export interface EditorStoreContextType {
   /** 是否启用打字机模式 */
   typewriter: boolean;
   /** 根容器引用 */
-  rootContainer?: React.MutableRefObject<HTMLDivElement | undefined>;
+  rootContainer?: React.MutableRefObject<HTMLDivElement | null | undefined>;
   /** 设置显示评论列表 */
   setShowComment: (list: CommentDataType[]) => void;
   /** 是否为只读模式 */

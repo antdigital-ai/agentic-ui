@@ -20,7 +20,7 @@ const useSmartScrollShadow = (sensitivity = 1) => {
   });
 
   const elementRef = useRef<HTMLDivElement>(null);
-  const rafId = useRef<number>();
+  const rafId = useRef<number | null>(null);
 
   const checkScroll = useCallback(() => {
     const element = elementRef.current;
@@ -60,7 +60,7 @@ const useSmartScrollShadow = (sensitivity = 1) => {
       if (rafId.current) return;
       rafId.current = requestAnimationFrame(() => {
         checkScroll();
-        rafId.current = undefined;
+        rafId.current = null;
       });
     };
 

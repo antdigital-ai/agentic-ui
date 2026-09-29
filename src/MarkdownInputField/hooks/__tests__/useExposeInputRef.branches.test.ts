@@ -9,7 +9,7 @@ import { useExposeInputRef } from '../useExposeInputRef';
 import { useInputFieldRefContainer } from '../useInputFieldRefContainer';
 
 const useHarness = (params: {
-  inputRef: React.MutableRefObject<MarkdownEditorInstance | undefined>;
+  inputRef: React.MutableRefObject<MarkdownEditorInstance | null | undefined>;
   setValue: (v: string) => void;
 }) => {
   const { markdownEditorRef } = useInputFieldRefContainer();

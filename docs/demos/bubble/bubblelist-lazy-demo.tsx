@@ -56,7 +56,7 @@ const generateMessages = (): MessageBubbleData[] => {
 
 export default () => {
   const bubbleListRef = useRef<HTMLDivElement>(null);
-  const bubbleRef = useRef<any>();
+  const bubbleRef = useRef<any | null>(null);
   const [lazyEnabled, setLazyEnabled] = useState(true);
   const [renderTime, setRenderTime] = useState<number | null>(null);
 

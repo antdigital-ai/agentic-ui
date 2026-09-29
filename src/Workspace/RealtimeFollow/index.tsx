@@ -339,7 +339,7 @@ export const RealtimeFollow: React.FC<{
 }> = ({ data, htmlViewMode = 'preview', prefixCls, hashId }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const finalPrefixCls = prefixCls || getPrefixCls('workspace-realtime');
-  const mdInstance = useRef<MarkdownEditorInstance>();
+  const mdInstance = useRef<MarkdownEditorInstance | null>(null);
   const isTestEnv = isTestEnvironment();
   const { containerRef: autoScrollRef, scrollToBottom } = useAutoScroll({
     SCROLL_TOLERANCE,

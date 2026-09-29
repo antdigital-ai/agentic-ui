@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { fileTypeProcessor } from '../FileTypeProcessor';
 import type { FileNode } from '../../types';
+import { fileTypeProcessor } from '../FileTypeProcessor';
 
 const node = (name: string, overrides: Partial<FileNode> = {}): FileNode => ({
   name,

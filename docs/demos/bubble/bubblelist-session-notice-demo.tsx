@@ -52,7 +52,7 @@ const initialMessages: MessageBubbleData[] = [
 
 export default () => {
   const bubbleListRef = useRef<HTMLDivElement>(null);
-  const bubbleRef = useRef<any>();
+  const bubbleRef = useRef<any | null>(null);
   const [bubbleList, setBubbleList] =
     useState<MessageBubbleData[]>(initialMessages);
 

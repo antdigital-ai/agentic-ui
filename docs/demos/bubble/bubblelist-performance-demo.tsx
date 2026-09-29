@@ -29,7 +29,7 @@ const createMockMessage = (
 
 export default () => {
   const bubbleListRef = useRef<HTMLDivElement>(null);
-  const bubbleRef = useRef<any>();
+  const bubbleRef = useRef<any | null>(null);
 
   // 状态管理
   const [messageCount, setMessageCount] = useState(100);

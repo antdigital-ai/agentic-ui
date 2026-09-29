@@ -9,7 +9,9 @@ import type { MarkdownInputFieldProps } from '../types/MarkdownInputFieldProps';
 
 interface UseKeyboardHandlerParams {
   props: Pick<MarkdownInputFieldProps, 'triggerSendKey' | 'onSend'>;
-  markdownEditorRef: React.MutableRefObject<MarkdownEditorInstance | undefined>;
+  markdownEditorRef: React.MutableRefObject<
+    MarkdownEditorInstance | null | undefined
+  >;
   /** 由 useSendHandler 提供的稳定函数引用 */
   sendMessage: () => Promise<void> | void;
 }

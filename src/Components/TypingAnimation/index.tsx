@@ -48,7 +48,10 @@ export interface TypingAnimationProps extends Omit<
  * - SSR/无 IntersectionObserver 环境下默认返回 true（与原行为兼容，
  *   避免在测试或老旧环境中动画永不开始）
  */
-function useInViewOnce(ref: React.RefObject<Element>, amount: number): boolean {
+function useInViewOnce(
+  ref: React.RefObject<Element | null>,
+  amount: number,
+): boolean {
   const [inView, setInView] = useState<boolean>(() => {
     if (typeof window === 'undefined') return true;
     if (typeof IntersectionObserver === 'undefined') return true;

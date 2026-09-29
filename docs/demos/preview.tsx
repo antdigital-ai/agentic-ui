@@ -7,7 +7,7 @@ import { ChartElement } from '@ant-design/agentic-ui/Plugins/chart';
 import { CodeElement } from '@ant-design/agentic-ui/Plugins/code';
 import { MermaidElement } from '@ant-design/agentic-ui/Plugins/mermaid';
 import { Tooltip } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   energyFundDemoCommentList,
   energyFundDemoMentionUsers,
@@ -15,7 +15,7 @@ import {
 import { newEnergyFundContent } from './shared/newEnergyFundContent';
 
 export default () => {
-  const editorRef = React.useRef<MarkdownEditorInstance>();
+  const editorRef = useRef<MarkdownEditorInstance | null>(null);
   const [list, setList] = useState(energyFundDemoCommentList);
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -148,7 +148,8 @@ export default () => {
             <strong>plugins</strong>: 插件数组，用于扩展编辑器功能
           </li>
           <li>
-            <strong>fncProps</strong>: 脚注引用配置，含 render、renderMobileModal、onFootnoteDefinitionChange
+            <strong>fncProps</strong>: 脚注引用配置，含
+            render、renderMobileModal、onFootnoteDefinitionChange
           </li>
           <li>
             <strong>onChange</strong>: 内容变化时的回调函数

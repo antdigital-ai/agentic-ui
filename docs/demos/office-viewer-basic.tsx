@@ -1,10 +1,7 @@
 import { OfficeViewer } from '@ant-design/agentic-ui';
 import { Alert, Segmented, Space, Upload } from 'antd';
 import React, { useState } from 'react';
-import {
-  OFFICE_SAMPLES,
-  type OfficeSampleKey,
-} from './office-viewer-samples';
+import { OFFICE_SAMPLES, type OfficeSampleKey } from './office-viewer-samples';
 
 /**
  * 预置常见三件套样例 + 可选本地文件预览（需安装 @silurus/ooxml）
@@ -67,7 +64,9 @@ const OfficeViewerBasicDemo: React.FC = () => {
           </a>
         )}
       </Space>
-      <p style={{ margin: '0 0 8px', color: '#666', fontSize: 13 }}>{message}</p>
+      <p style={{ margin: '0 0 8px', color: '#666', fontSize: 13 }}>
+        {message}
+      </p>
       <OfficeViewer
         key={localFile ? localFile.name : sample.url}
         file={file}

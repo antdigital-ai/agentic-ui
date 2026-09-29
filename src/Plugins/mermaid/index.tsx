@@ -64,10 +64,10 @@ export function MermaidElement(props: ElementProps<CodeNode>) {
     hide: props.element.language === 'mermaid',
     lang: props.element.language || '',
   });
-  const pathRef = useRef<Path>();
+  const pathRef = useRef<Path | null>(null);
   const [selected, path] = useSelStatus(props.element);
   pathRef.current = path;
-  const editorRef = useRef<Ace.Editor>();
+  const editorRef = useRef<Ace.Editor | null>(null);
 
   useEffect(() => {
     if (

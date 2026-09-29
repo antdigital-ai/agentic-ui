@@ -20,7 +20,9 @@ const OfficeViewerWasmUrlDemo: React.FC = () => {
         message={`wasmUrl = ${wasmUrl}`}
         description="生产环境建议将 *_parser_bg.wasm 托管到自有 CDN，再经 wasmUrl 传入。"
       />
-      <p style={{ margin: '0 0 8px', color: '#666', fontSize: 13 }}>{message}</p>
+      <p style={{ margin: '0 0 8px', color: '#666', fontSize: 13 }}>
+        {message}
+      </p>
       <OfficeViewer
         file={sample.url}
         fileType="xlsx"

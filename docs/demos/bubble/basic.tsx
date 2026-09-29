@@ -115,7 +115,7 @@ const mockFileMessage: MessageBubbleData = {
 };
 
 export default () => {
-  const bubbleRef = useRef<any>();
+  const bubbleRef = useRef<any | null>(null);
   const [mockMessage, setMockMessage] = useState<MessageBubbleData>(
     () => defaultMockMessage,
   );

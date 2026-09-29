@@ -91,7 +91,7 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
   const filePrefixCls = getPrefixCls('workspace-file');
   const { hashId } = useFileStyle(filePrefixCls);
   const prefixCls = `${filePrefixCls}-preview`;
-  const editorRef = useRef<MarkdownEditorInstance>();
+  const editorRef = useRef<MarkdownEditorInstance | null>(null);
 
   const { processResult, contentState } = usePreviewContent(
     file,

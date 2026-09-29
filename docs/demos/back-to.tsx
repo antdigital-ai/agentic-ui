@@ -28,7 +28,7 @@ const createMockMessage = (
 });
 
 export default () => {
-  const bubbleRef = useRef<any>();
+  const bubbleRef = useRef<any | null>(null);
 
   // 状态管理
   const [bubbleList] = useState<MessageBubbleData[]>(() => {

@@ -303,19 +303,22 @@ export const FileComponent: FC<{
           ) {
             setPreviewFile(file);
             const content = React.isValidElement(previewData)
-              ? React.cloneElement(previewData as React.ReactElement, {
-                  setPreviewHeader: (header: React.ReactNode) =>
-                    setCustomPreviewHeader(header),
-                  back: handleBackToList,
-                  download: () => handleDownloadInPreview(file),
-                  share: () => {
-                    if (onShare) {
-                      onShare(file, undefined);
-                    } else {
-                      handleDefaultShare(file);
-                    }
+              ? React.cloneElement(
+                  previewData as React.ReactElement<Record<string, unknown>>,
+                  {
+                    setPreviewHeader: (header: React.ReactNode) =>
+                      setCustomPreviewHeader(header),
+                    back: handleBackToList,
+                    download: () => handleDownloadInPreview(file),
+                    share: () => {
+                      if (onShare) {
+                        onShare(file, undefined);
+                      } else {
+                        handleDefaultShare(file);
+                      }
+                    },
                   },
-                })
+                )
               : (previewData as React.ReactNode);
             setCustomPreviewHeader(null);
             setCustomPreviewContent(content);

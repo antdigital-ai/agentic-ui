@@ -1,12 +1,6 @@
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
-import React, {
-  memo,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { memo, useContext, useEffect, useRef, useState } from 'react';
 import {
   createSandbox,
   DEFAULT_SANDBOX_CONFIG,

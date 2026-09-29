@@ -155,7 +155,7 @@ export type TagPopupProps = {
  */
 const getNodePath = (
   editor: BaseEditor & ReactEditor,
-  domRef: React.RefObject<HTMLDivElement>,
+  domRef: React.RefObject<HTMLDivElement | null>,
 ) => {
   if (!domRef.current) return null;
   try {
@@ -170,11 +170,11 @@ const getNodePath = (
 
 const updateNodeContext = (
   editor: BaseEditor & ReactEditor,
-  domRef: React.RefObject<HTMLDivElement>,
+  domRef: React.RefObject<HTMLDivElement | null>,
   suggestionContext: SuggestionContextValue,
   props: RenderProps,
   onSelect: RenderProps['onSelect'],
-  pathRef: React.MutableRefObject<number[] | undefined>,
+  pathRef: React.MutableRefObject<number[] | null | undefined>,
 ) => {
   const path = getNodePath(editor, domRef);
   if (!path) return;
@@ -238,20 +238,20 @@ const initializeAutoOpen = (
   suggestionContext?.setOpen?.(true);
 };
 
-const handleMouseEnter = (domRef: React.RefObject<HTMLDivElement>) => {
+const handleMouseEnter = (domRef: React.RefObject<HTMLDivElement | null>) => {
   const target = domRef.current;
   if (!target) return;
   target.removeAttribute('data-no-focus');
 };
 
-const handleMouseLeave = (domRef: React.RefObject<HTMLDivElement>) => {
+const handleMouseLeave = (domRef: React.RefObject<HTMLDivElement | null>) => {
   const target = domRef.current;
   if (!target) return;
   target.setAttribute('data-no-focus', '');
 };
 
 const createDefaultDom = (
-  domRef: React.RefObject<HTMLDivElement>,
+  domRef: React.RefObject<HTMLDivElement | null>,
   baseCls: string,
   loading: boolean,
   selectedItems: TagPopupItem,
@@ -296,7 +296,7 @@ const getRenderDom = (
   props: RenderProps,
   defaultDom: ReactNode,
   onSelect: RenderProps['onSelect'],
-  currentNodePath: React.MutableRefObject<number[] | undefined>,
+  currentNodePath: React.MutableRefObject<number[] | null | undefined>,
 ) => {
   if (!tagRender) return defaultDom;
 
@@ -316,7 +316,7 @@ const handlePanelClick = (
   suggestionContext: SuggestionContextValue,
   props: RenderProps,
   onSelect: RenderProps['onSelect'],
-  currentNodePath: React.MutableRefObject<number[] | undefined>,
+  currentNodePath: React.MutableRefObject<number[] | null | undefined>,
 ) => {
   if (suggestionContext?.triggerNodeContext) {
     suggestionContext.triggerNodeContext.current = {
@@ -355,7 +355,7 @@ const handleClick = (
   type: string | undefined,
   suggestionContext: SuggestionContextValue,
   onSelect: RenderProps['onSelect'],
-  currentNodePath: React.MutableRefObject<number[] | undefined>,
+  currentNodePath: React.MutableRefObject<number[] | null | undefined>,
 ) => {
   e.preventDefault();
   e.stopPropagation();
@@ -375,7 +375,7 @@ export const TagPopup = (props: RenderProps) => {
   const suggestionContext = useContext(SuggestionContext);
   const antdContext = useContext(ConfigProvider.ConfigContext);
   const baseCls = antdContext?.getPrefixCls('agentic-md-editor-tag-popup');
-  const currentNodePath = useRef<number[]>();
+  const currentNodePath = useRef<number[] | null>(null);
 
   useEffect(() => {
     const path = getNodePath(editor, domRef);

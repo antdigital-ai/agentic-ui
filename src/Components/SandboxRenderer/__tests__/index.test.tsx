@@ -13,9 +13,7 @@ describe('SandboxRenderer', () => {
       </ConfigProvider>,
     );
 
-    const host = container.querySelector(
-      '[class*="sandbox-renderer-host"]',
-    );
+    const host = container.querySelector('[class*="sandbox-renderer-host"]');
     expect(host).toBeInTheDocument();
   });
 

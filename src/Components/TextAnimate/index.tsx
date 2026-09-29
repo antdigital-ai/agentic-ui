@@ -112,7 +112,7 @@ const staggerTimings: Record<AnimationType, number> = {
  * - SSR / 无 IntersectionObserver 环境直接返回 true，与 framer-motion fallback 行为一致
  */
 function useInViewObserver(
-  ref: React.RefObject<Element>,
+  ref: React.RefObject<Element | null>,
   amount: number,
   once: boolean,
 ): boolean {

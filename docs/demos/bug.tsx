@@ -941,7 +941,7 @@ const mdList = [
 ];
 
 const Rerender = () => {
-  const instance = useRef<MarkdownEditorInstance>();
+  const instance = useRef<MarkdownEditorInstance | null>(null);
   useEffect(() => {
     const run = async () => {
       if (process.env.NODE_ENV === 'test') {

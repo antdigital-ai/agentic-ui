@@ -69,14 +69,13 @@ const restoreJinjaDollarInChildren = (
     if (typeof child === 'string') {
       return child.split(JINJA_DOLLAR_PLACEHOLDER).join('$');
     }
-    if (
-      React.isValidElement(child) &&
-      child.props.children !== undefined &&
-      child.props.children !== null
-    ) {
-      return React.cloneElement(child as React.ReactElement<any>, {
-        children: restoreJinjaDollarInChildren(child.props.children),
-      });
+    if (React.isValidElement(child)) {
+      const props = child.props as { children?: React.ReactNode };
+      if (props.children !== undefined && props.children !== null) {
+        return React.cloneElement(child as React.ReactElement<any>, {
+          children: restoreJinjaDollarInChildren(props.children),
+        });
+      }
     }
     return child;
   });

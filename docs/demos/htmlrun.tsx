@@ -1,6 +1,6 @@
 import { MarkdownEditor, MarkdownEditorInstance } from '@ant-design/agentic-ui';
 import { Tooltip } from 'antd';
-import React from 'react';
+import React, { useRef } from 'react';
 const defaultValue = `以下是使用HTML、CSS和JavaScript实现的七色旋转背景，并带有速度控制滑块的代码：
 
 \`\`\`html
@@ -139,7 +139,7 @@ background: conic-gradient(
 );
 \`\`\``;
 export default () => {
-  const editorRef = React.useRef<MarkdownEditorInstance>();
+  const editorRef = useRef<MarkdownEditorInstance | null>(null);
 
   return (
     <>

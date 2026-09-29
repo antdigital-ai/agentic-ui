@@ -24,7 +24,7 @@ export interface LanguageSelectorProps {
     katex?: any;
   };
   /** 容器引用，用于焦点管理 */
-  containerRef?: React.RefObject<HTMLDivElement>;
+  containerRef?: React.RefObject<HTMLDivElement | null>;
   /** 语言变更回调函数 */
   setLanguage?: (language: string) => void;
 }

@@ -368,7 +368,7 @@ export interface BubbleProps<
   /**
    * 列表引用
    */
-  bubbleListRef?: React.RefObject<HTMLDivElement>;
+  bubbleListRef?: React.RefObject<HTMLDivElement | null>;
 
   /**
    * 是否只读

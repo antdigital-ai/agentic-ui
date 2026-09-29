@@ -901,7 +901,7 @@ const Mdlist = [
   },
 ];
 export default () => {
-  const instance = useRef<MarkdownEditorInstance>();
+  const instance = useRef<MarkdownEditorInstance | null>(null);
   useEffect(() => {
     let md = '';
     const list = newEnergyFundContent.split('');

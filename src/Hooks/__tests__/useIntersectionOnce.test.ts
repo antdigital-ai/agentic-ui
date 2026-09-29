@@ -12,7 +12,7 @@ import {
 
 describe('useIntersectionOnce', () => {
   let targetEl: HTMLDivElement;
-  let targetRef: RefObject<HTMLDivElement>;
+  let targetRef: RefObject<HTMLDivElement | null>;
   let observerCallback: (entries: IntersectionObserverEntry[]) => void;
   let mockObserve: ReturnType<typeof vi.fn>;
   let mockDisconnect: ReturnType<typeof vi.fn>;

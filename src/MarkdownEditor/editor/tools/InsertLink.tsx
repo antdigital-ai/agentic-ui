@@ -58,7 +58,7 @@ export const InsertLink = () => {
   const { markdownContainerRef, openInsertLink$, domRect, markdownEditorRef } =
     useEditorStore();
   const { locale } = useContext(I18nContext);
-  const selRef = useRef<Selection>();
+  const selRef = useRef<Selection | null>(null);
   const inputRef = useRef<InputRef>(null);
 
   const [state, setState] = useGetSetState({

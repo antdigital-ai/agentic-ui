@@ -357,7 +357,7 @@ export type MarkdownEditorProps = {
    */
   typewriter?: boolean;
 
-  rootContainer?: React.MutableRefObject<HTMLDivElement | undefined>;
+  rootContainer?: React.MutableRefObject<HTMLDivElement | null | undefined>;
   slideMode?: boolean;
   containerClassName?: string;
   floatBar?: { enable?: boolean };

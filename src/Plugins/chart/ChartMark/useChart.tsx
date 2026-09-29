@@ -6,5 +6,5 @@ export type ChartProps = {
   yField: string;
   index: number;
   colorLegend?: string;
-  chartRef?: React.MutableRefObject<Chart | undefined>;
+  chartRef?: React.MutableRefObject<Chart | null | undefined>;
 };

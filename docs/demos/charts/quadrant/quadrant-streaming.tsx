@@ -18,7 +18,7 @@ const QuadrantStreamingDemo: React.FC = () => {
   ];
 
   const [count, setCount] = useState(0);
-  const timerRef = useRef<ReturnType<typeof setInterval>>();
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     const tick = () => {

@@ -76,7 +76,7 @@ export const TagMarkInputDemo: React.FC<TagMarkInputDemoProps> = ({
   style,
   tagInputItems,
 }) => {
-  const inputRef = useRef<MarkdownEditorInstance>();
+  const inputRef = useRef<MarkdownEditorInstance | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { handleSend, handleStop } = useDemoSend();
 

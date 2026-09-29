@@ -42,7 +42,7 @@ export default () => {
   const [activeKeys, setActiveKeys] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<TaskItem[]>([]);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const stepRef = useRef(0);
 
   const buildItems = useCallback(

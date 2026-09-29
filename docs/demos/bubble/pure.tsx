@@ -87,7 +87,7 @@ Pure 模式是 Bubble 组件的简洁版本，特点：
 ];
 
 export default () => {
-  const bubbleRef = useRef<any>();
+  const bubbleRef = useRef<any | null>(null);
   const [isPureMode, setIsPureMode] = useState(true);
   const [showComparison, setShowComparison] = useState(false);
 

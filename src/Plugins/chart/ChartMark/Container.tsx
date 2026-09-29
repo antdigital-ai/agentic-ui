@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { debounce } from '../utils';
 
 export const Container: React.FC<{
-  chartRef: React.MutableRefObject<Chart | undefined>;
+  chartRef: React.MutableRefObject<Chart | null | undefined>;
   htmlRef: React.MutableRefObject<HTMLDivElement | null>;
   index: number;
   children?: React.ReactNode;

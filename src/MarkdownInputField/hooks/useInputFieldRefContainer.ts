@@ -14,14 +14,16 @@ import type { MarkdownEditorInstance } from '../../MarkdownEditor';
  * 见 `useEditorValueSync` / `useExposeInputRef`。
  */
 export interface InputFieldRefContainer {
-  markdownEditorRef: React.MutableRefObject<MarkdownEditorInstance | undefined>;
-  quickActionsRef: React.RefObject<HTMLDivElement>;
-  actionsRef: React.RefObject<HTMLDivElement>;
+  markdownEditorRef: React.MutableRefObject<
+    MarkdownEditorInstance | null | undefined
+  >;
+  quickActionsRef: React.RefObject<HTMLDivElement | null>;
+  actionsRef: React.RefObject<HTMLDivElement | null>;
   isSendingRef: React.MutableRefObject<boolean>;
 }
 
 export const useInputFieldRefContainer = (): InputFieldRefContainer => {
-  const markdownEditorRef = useRef<MarkdownEditorInstance>();
+  const markdownEditorRef = useRef<MarkdownEditorInstance | null>(null);
   const quickActionsRef = useRef<HTMLDivElement>(null);
   const actionsRef = useRef<HTMLDivElement>(null);
   const isSendingRef = useRef(false);

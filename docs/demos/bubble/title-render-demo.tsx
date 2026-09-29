@@ -125,7 +125,7 @@ const TITLE_STYLE_LABELS: Record<TitleStyle, { label: string; desc: string }> =
   };
 
 export default () => {
-  const bubbleRef = useRef<any>();
+  const bubbleRef = useRef<any | null>(null);
   const [titleStyle, setTitleStyle] = useState<TitleStyle>('default');
 
   const defaultTitleRender = (

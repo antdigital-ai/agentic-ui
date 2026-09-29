@@ -95,7 +95,7 @@ console.log("这是普通的 JavaScript 代码");
 `;
 
 export default function SimpleToMarkdownExample() {
-  const editorRef = useRef<MarkdownEditorInstance>();
+  const editorRef = useRef<MarkdownEditorInstance | null>(null);
 
   const handleExportMarkdown = () => {
     if (editorRef.current) {

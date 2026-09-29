@@ -4,8 +4,8 @@ import { BaseEditor, createEditor, Transforms } from 'slate';
 import { HistoryEditor, withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';
 import { describe, expect, it, vi } from 'vitest';
-import { MatchKey } from '../match';
 import { withMarkdown } from '../../withMarkdown';
+import { MatchKey } from '../match';
 
 type TestEditor = BaseEditor & ReactEditor & HistoryEditor;
 
@@ -22,9 +22,9 @@ describe('MatchKey 即时转换（WYSIWYG，#59）', () => {
     // 光标位于第二段 "#" 之后
     Transforms.select(editor, { path: [1, 0], offset: 1 });
 
-    const matchKey = new MatchKey(
-      { current: editor } as React.MutableRefObject<TestEditor>,
-    );
+    const matchKey = new MatchKey({
+      current: editor,
+    } as React.MutableRefObject<TestEditor>);
     const event = {
       key: ' ',
       preventDefault: vi.fn(),
@@ -46,9 +46,9 @@ describe('MatchKey 即时转换（WYSIWYG，#59）', () => {
     ] as any;
     Transforms.select(editor, { path: [1, 0], offset: 1 });
 
-    const matchKey = new MatchKey(
-      { current: editor } as React.MutableRefObject<TestEditor>,
-    );
+    const matchKey = new MatchKey({
+      current: editor,
+    } as React.MutableRefObject<TestEditor>);
     const event = {
       key: ' ',
       preventDefault: vi.fn(),

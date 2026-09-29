@@ -644,16 +644,6 @@ export {
 } from './Components/SandboxRenderer';
 
 export {
-  OfficeViewer,
-  getDefaultWasmUrl,
-  inferOfficeFileType,
-  OOXML_CDN_BASE,
-  OOXML_CDN_VERSION,
-  type OfficeFileType,
-  type OfficeViewerProps,
-  type OfficeViewerStatus,
-} from './Components/OfficeViewer';
-export {
   LayoutHeader,
   type LayoutHeaderConfig,
   type LayoutHeaderProps,
@@ -694,6 +684,16 @@ export {
   type ThinkingLottieProps,
   type ThreeThinkingLottieProps,
 } from './Components/lotties';
+export {
+  OOXML_CDN_BASE,
+  OOXML_CDN_VERSION,
+  OfficeViewer,
+  getDefaultWasmUrl,
+  inferOfficeFileType,
+  type OfficeFileType,
+  type OfficeViewerProps,
+  type OfficeViewerStatus,
+} from './Components/OfficeViewer';
 export {
   BlowingWindLottie,
   BouncingLottie,

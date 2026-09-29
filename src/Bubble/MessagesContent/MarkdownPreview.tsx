@@ -20,7 +20,7 @@ export interface MarkdownPreviewProps {
   typing?: boolean;
   extra?: React.ReactNode;
   docListNode?: React.ReactNode;
-  htmlRef?: React.RefObject<HTMLDivElement>;
+  htmlRef?: React.RefObject<HTMLDivElement | null>;
   isFinished?: boolean;
   style?: React.CSSProperties;
   originData?: MessageBubbleData;

@@ -243,15 +243,14 @@ export class ProxySandbox {
       createElementNS: (ns: string, tagName: string) =>
         document.createElementNS(ns, tagName) as any,
       createTextNode: (data: string) => document.createTextNode(data) as any,
-      createDocumentFragment: () =>
-        document.createDocumentFragment() as any,
+      createDocumentFragment: () => document.createDocumentFragment() as any,
       createComment: (data: string) => document.createComment(data) as any,
       // 查询能力全部限定在 renderRoot 内
       getElementById: (id: string) =>
         (renderRoot as any).getElementById?.(id) ??
-          (isShadow
-            ? null
-            : (renderRoot as HTMLElement).querySelector(`#${CSS.escape(id)}`)),
+        (isShadow
+          ? null
+          : (renderRoot as HTMLElement).querySelector(`#${CSS.escape(id)}`)),
       querySelector: (selector: string) =>
         (renderRoot as any).querySelector(selector),
       querySelectorAll: (selector: string) =>

@@ -73,7 +73,7 @@ const RoleIcon: React.FC<{ isAssistant: boolean }> = ({ isAssistant }) =>
   isAssistant ? <RobotOutlined /> : <UserOutlined />;
 
 export default () => {
-  const bubbleRef = useRef<any>();
+  const bubbleRef = useRef<any | null>(null);
   const [avatarStyle, setAvatarStyle] = useState<AvatarStyle>('default');
 
   const createBaseAvatar = (props: BubbleProps, borderColor: string) => (
