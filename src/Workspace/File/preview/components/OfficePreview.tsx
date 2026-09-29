@@ -39,7 +39,10 @@ export const OfficePreview: FC<OfficePreviewProps> = ({
 }) => {
   const source: File | Blob | string | undefined =
     file.file || previewUrl || file.url || undefined;
-  const fileType = inferOfficeFileType(file.name || previewUrl || file.url);
+  // display name 可能无扩展名：先按 name 推断，失败再回退到预览 URL
+  const fileType =
+    inferOfficeFileType(file.name) ??
+    inferOfficeFileType(previewUrl || file.url);
 
   if (!source || !fileType) {
     return (

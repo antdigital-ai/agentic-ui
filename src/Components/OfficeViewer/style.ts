@@ -64,7 +64,7 @@ const genStyle: GenStyleFn<'OfficeViewer'> = (token) => ({
       },
     },
 
-    // 每个 slide 一张白色卡片，由 hook 直接插入（包裹 div + canvas）
+    // 每个 slide 一张白色卡片，由 hook 直接插入（<button> 包裹 canvas）
     '&-rail-card': {
       width: '100%',
       // 裁掉子画布溢出（如缩放动画瞬间），保证圆角处不漏内容
@@ -76,6 +76,13 @@ const genStyle: GenStyleFn<'OfficeViewer'> = (token) => ({
       cursor: 'pointer',
       transition:
         'border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease',
+
+      // 卡片是 <button>：重置 UA 默认样式
+      padding: 0,
+      font: 'inherit',
+      textAlign: 'inherit',
+      appearance: 'none',
+      display: 'block',
 
       '&:hover': {
         borderColor: token.colorPrimaryBorder,

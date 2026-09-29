@@ -5,7 +5,11 @@ import React, { memo, useContext, useMemo, useRef, useState } from 'react';
 import { useOfficeViewerStyle } from './style';
 import type { OfficeViewerProps } from './types';
 import { useOfficeViewer } from './useOfficeViewer';
-import { DEFAULT_HEIGHT } from './utils';
+import {
+  DEFAULT_HEIGHT,
+  inferOfficeFileType,
+  resolveSourceLabel,
+} from './utils';
 
 /**
  * OfficeViewer —— 基于 `@silurus/ooxml`（optional peer）的 Office 三件套预览组件
@@ -53,12 +57,13 @@ const OfficeViewerComponent: React.FC<OfficeViewerProps> = ({
   const railRef = useRef<HTMLDivElement>(null);
   const [railCollapsed, setRailCollapsed] = useState(false);
 
-  // 仅 PPTX 且未显式关闭侧栏时，把 rail 宿主传给 hook
+  // 仅 PPTX 且未显式关闭侧栏时，把 rail 宿主传给 hook。
+  // 与 hook 内部一致：从 fileType / fileName / URL / File.name 推断，
+  // 保证带 query 的 URL（如 deck.pptx?token=...）也能命中
   const isPptx = useMemo(
     () =>
       fileType === 'pptx' ||
-      (!!fileName && fileName.toLowerCase().endsWith('.pptx')) ||
-      (typeof file === 'string' && file.toLowerCase().endsWith('.pptx')),
+      inferOfficeFileType(resolveSourceLabel(file, fileName)) === 'pptx',
     [fileType, fileName, file],
   );
 

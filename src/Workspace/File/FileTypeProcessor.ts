@@ -179,13 +179,18 @@ export class FileTypeProcessor {
 
   /**
    * 是否为 Office Open XML（docx/xlsx/pptx）；旧版二进制格式不可预览
+   *
+   * 与 inferFileType 的推断顺序对齐：name 与 url 任一命中 OOXML 扩展名即可，
+   * 避免仅 url 带扩展名（如 display name 无后缀）的文件被误判为不可预览
    */
   private isOoxmlPreviewable(file: FileNode): boolean {
-    const raw = (file.name || file.url || '').toLowerCase();
-    const path = raw.split('?')[0].split('#')[0];
-    return (
-      path.endsWith('.docx') || path.endsWith('.xlsx') || path.endsWith('.pptx')
-    );
+    return [file.name, file.url].some((candidate) => {
+      if (!candidate) return false;
+      const path = candidate.toLowerCase().split('?')[0].split('#')[0];
+      return (
+        path.endsWith('.docx') || path.endsWith('.xlsx') || path.endsWith('.pptx')
+      );
+    });
   }
 
   /**

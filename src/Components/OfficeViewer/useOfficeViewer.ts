@@ -227,9 +227,23 @@ export function useOfficeViewer({
           );
           const railCanvases: HTMLCanvasElement[] = [];
           for (let index = 0; index < total; index++) {
-            const card = document.createElement('div');
+            // 用 <button> 承载卡片：天然可聚焦、Enter/Space 触发 click，
+            // 对键盘与读屏用户等价于点击跳转
+            const card = document.createElement('button');
+            card.type = 'button';
             card.className = `${railBaseCls}-rail-card`;
+            card.setAttribute('aria-label', `跳转到第 ${index + 1} 张幻灯片`);
             card.addEventListener('click', () => goToSlide(index));
+            // 显式处理 Enter/Space：preventDefault 阻止原生激活重复触发 click
+            card.addEventListener('keydown', (event) => {
+              if (
+                (event.key === 'Enter' || event.key === ' ') &&
+                !event.isComposing
+              ) {
+                event.preventDefault();
+                goToSlide(index);
+              }
+            });
 
             const canvas = document.createElement('canvas');
             canvas.width = itemWidth * THUMBNAIL_DPR;
