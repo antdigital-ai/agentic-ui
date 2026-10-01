@@ -8,8 +8,10 @@ import type { MarkdownInputFieldProps } from '../types/MarkdownInputFieldProps';
 
 interface UseEnlargeAndContainerHandlerParams {
   props: Pick<MarkdownInputFieldProps, 'disabled' | 'typing'>;
-  markdownEditorRef: React.MutableRefObject<MarkdownEditorInstance | undefined>;
-  inputRef: React.RefObject<HTMLDivElement>;
+  markdownEditorRef: React.MutableRefObject<
+    MarkdownEditorInstance | null | undefined
+  >;
+  inputRef: React.RefObject<HTMLDivElement | null>;
   isEnlarged: boolean;
   setIsEnlarged: (enlarged: boolean) => void;
 }

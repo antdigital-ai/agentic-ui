@@ -79,7 +79,7 @@ export const shouldRenderBeforeContent = (
 export const AIBubble: React.FC<
   BubbleProps & {
     deps?: any[];
-    bubbleRef?: MutableRefObject<any | undefined>;
+    bubbleRef?: MutableRefObject<any | null | undefined>;
   }
 > = memo((props) => {
   const {

@@ -6,7 +6,7 @@ import { useStyle } from './style';
 
 interface TopOperatingAreaProps {
   isShowBackTo?: boolean;
-  targetRef?: React.RefObject<HTMLDivElement>;
+  targetRef?: React.RefObject<HTMLDivElement | null>;
   operationBtnRender?: () => React.ReactNode;
 }
 const TopOperatingArea: React.FC<TopOperatingAreaProps> = (props) => {

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   MarkdownEditor,
   MarkdownEditorInstance,
@@ -11,7 +11,7 @@ import { MarkdownFormatter } from '../Plugins/formatter';
 export const MarkdownEditorUpdate = (
   props: MarkdownEditorProps & { isFinished?: boolean },
 ) => {
-  const editorRef = React.useRef<MarkdownEditorInstance>();
+  const editorRef = useRef<MarkdownEditorInstance | null>(null);
 
   useEffect(() => {
     const formatted = MarkdownFormatter.format(props.initValue || '');

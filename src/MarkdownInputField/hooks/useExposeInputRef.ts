@@ -6,7 +6,9 @@ interface UseExposeInputRefParams {
   /** 由调用方传入的对外 ref */
   inputRef: MarkdownInputFieldProps['inputRef'];
   /** 由 useInputFieldRefContainer 提供的内部编辑器实例 ref */
-  markdownEditorRef: React.MutableRefObject<MarkdownEditorInstance | undefined>;
+  markdownEditorRef: React.MutableRefObject<
+    MarkdownEditorInstance | null | undefined
+  >;
   /** 受控 value 的 setter，需在 setMDContent 调用时同步触发，确保发送按钮等派生状态正确 */
   setValue: (value: string) => void;
 }

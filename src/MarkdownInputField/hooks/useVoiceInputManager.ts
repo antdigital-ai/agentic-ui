@@ -8,7 +8,7 @@ export interface VoiceInputManagerProps {
   voiceRecognizer?: CreateRecognizer;
 
   /** Markdown 编辑器实例 */
-  editorRef?: React.MutableRefObject<MarkdownEditorInstance | undefined>;
+  editorRef?: React.MutableRefObject<MarkdownEditorInstance | null | undefined>;
 
   /** 值变化回调 */
   onValueChange?: (value: string) => void;

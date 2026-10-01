@@ -58,7 +58,7 @@ import { UserBubble } from './UserBubble';
 const BubbleComponent: React.FC<
   BubbleProps & {
     deps?: any[];
-    bubbleRef?: MutableRefObject<any | undefined>;
+    bubbleRef?: MutableRefObject<any | null | undefined>;
   }
 > = (props) => {
   const { originData } = props;

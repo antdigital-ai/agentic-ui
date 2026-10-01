@@ -3,7 +3,7 @@ import {
   MarkdownEditorInstance,
   parserMdToSchema,
 } from '@ant-design/agentic-ui';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { newEnergyFundContent } from './shared/newEnergyFundContent';
 
 const defaultValue =
@@ -153,7 +153,7 @@ class EditorCore {
 ## 结语
 本文展示了现代代码编辑器的核心技术实现方案，涵盖从基础架构到高级功能的完整技术栈。实际开发中需要根据具体需求在性能、扩展性和易用性之间进行权衡。建议通过开源项目（如VS Code、Atom）研究更多实现细节，持续优化编辑器的人机交互体验。`;
 export default () => {
-  const markdownRef = React.useRef<MarkdownEditorInstance>();
+  const markdownRef = useRef<MarkdownEditorInstance | null>(null);
 
   useEffect(() => {
     setInterval(() => {

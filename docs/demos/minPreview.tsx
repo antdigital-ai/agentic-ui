@@ -1,12 +1,12 @@
 import { MarkdownEditor, MarkdownEditorInstance } from '@ant-design/agentic-ui';
 import { Button } from 'antd';
-import React from 'react';
+import React, { useRef } from 'react';
 import { newEnergyFundContent } from './shared/newEnergyFundContent';
 
 export default () => {
   const [value, setValue] = React.useState(() => newEnergyFundContent);
 
-  const markdownEditorRef = React.useRef<MarkdownEditorInstance>();
+  const markdownEditorRef = useRef<MarkdownEditorInstance | null>(null);
   return (
     <div
       style={{

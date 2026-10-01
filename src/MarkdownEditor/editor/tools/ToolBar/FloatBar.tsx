@@ -21,7 +21,7 @@ export const FloatBar = (props: { readonly: boolean }) => {
     useEditorStore();
   const [isOpen, setIsOpen] = useState(false);
 
-  const sel = React.useRef<BaseRange>();
+  const sel = useRef<BaseRange | null>(null);
 
   const resize = useRefFunction((force = false) => {
     if (domRect && floatBarRef.current) {

@@ -94,7 +94,7 @@ export function AceEditor({
   const posRef = useRef({ row: 0, column: 0 });
   const pasted = useRef(false);
   const debounceTimer = useRef(0);
-  const editorRef = useRef<Ace.Editor>();
+  const editorRef = useRef<Ace.Editor | null>(null);
   const dom = useRef<HTMLDivElement>(null);
   // 记录 Ace 会话当前使用的语言，用于语言变更时动态切换而不是销毁重建
   const aceLanguageRef = useRef<string | null | undefined>(element.language);
@@ -312,7 +312,7 @@ export function AceEditor({
       clearTimeout(modeTimer);
       clearTimeout(debounceTimer.current);
       if (editorRef.current === codeEditor) {
-        editorRef.current = undefined;
+        editorRef.current = null;
       }
       codeEditor.destroy();
     };

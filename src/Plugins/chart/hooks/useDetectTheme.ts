@@ -134,6 +134,7 @@ let listeners: Array<() => void> = [];
 let currentTheme: 'light' | 'dark' = 'light';
 let observerRef: MutationObserver | null = null;
 let mediaQueryRef: MediaQueryList | null = null;
+let themeChangeListenerRef: (() => void) | null = null;
 let refCount = 0;
 
 const DEFAULT_CSS_VARIABLE = '--color-gray-bg-page';
@@ -181,6 +182,7 @@ function subscribeTheme(listener: () => void): () => void {
 
     mediaQueryRef = window.matchMedia('(prefers-color-scheme: dark)');
     mediaQueryRef.addEventListener('change', updateTheme);
+    themeChangeListenerRef = updateTheme;
   }
 
   return () => {
@@ -192,8 +194,12 @@ function subscribeTheme(listener: () => void): () => void {
       observerRef?.disconnect();
       observerRef = null;
       if (mediaQueryRef) {
-        mediaQueryRef.removeEventListener('change', () => {});
+        mediaQueryRef.removeEventListener(
+          'change',
+          themeChangeListenerRef as () => void,
+        );
         mediaQueryRef = null;
+        themeChangeListenerRef = null;
       }
     }
   };

@@ -35,7 +35,7 @@ const useIsomorphicLayoutEffect =
  *   避免父组件每次渲染传新对象时 effect 反复重建
  */
 export const useIntersectionOnce = <T extends Element>(
-  targetRef: RefObject<T>,
+  targetRef: RefObject<T | null>,
   options: UseIntersectionOnceOptions = {},
 ) => {
   const { root, rootMargin, threshold } = options;

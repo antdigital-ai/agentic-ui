@@ -470,7 +470,7 @@ export const useSystemKeyboard = (
   }>,
   store: EditorStore,
   props: MarkdownEditorProps,
-  markdownContainerRef?: React.RefObject<HTMLDivElement>,
+  markdownContainerRef?: React.RefObject<HTMLDivElement | null>,
 ) => {
   const task = useMemo(() => {
     return new KeyboardTask(store, props);

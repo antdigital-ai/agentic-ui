@@ -171,7 +171,7 @@ export function ChatComposerForImeDemo({
   placeholder,
   style,
 }: ChatComposerForImeDemoProps) {
-  const inputRef = useRef<MarkdownEditorInstance>();
+  const inputRef = useRef<MarkdownEditorInstance | null>(null);
   const inputWrapperRef = useRef<HTMLDivElement>(null);
   const composerWrapRef = useRef<HTMLDivElement>(null);
   const skipDraftPersistRef = useRef(false);

@@ -85,7 +85,7 @@ Bubble 组件支持自定义标题渲染，可以：
 type RenderMode = 'default' | 'custom' | 'enhanced';
 
 export default () => {
-  const bubbleRef = useRef<any>();
+  const bubbleRef = useRef<any | null>(null);
   const [renderMode, setRenderMode] = useState<RenderMode>('default');
 
   const defaultTitleRender = (props: any) => {

@@ -51,8 +51,7 @@ export class MatchKey {
     const isFirstParagraph = !Path.hasPrevious(node[1]);
     for (let n of TextMatchNodes) {
       if (
-        (n as { gatedByMatchInputToNode?: boolean })
-          .gatedByMatchInputToNode &&
+        (n as { gatedByMatchInputToNode?: boolean }).gatedByMatchInputToNode &&
         !this.isMatchInputToNodeEnabled() &&
         isFirstParagraph
       ) {

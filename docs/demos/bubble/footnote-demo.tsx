@@ -9,7 +9,7 @@ import {
 import { LinkOutlined } from '@ant-design/icons';
 import { ArrowUpRight } from '@sofa-design/icons';
 import { Popover } from 'antd';
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 
 function isValidUrl(input: string) {
   try {
@@ -271,7 +271,7 @@ export default () => {
     },
   );
 
-  const bubbleRef = React.useRef<any>();
+  const bubbleRef = useRef<any | null>(null);
   const conversation: MessageBubbleData[] = useMemo(
     () => [
       {

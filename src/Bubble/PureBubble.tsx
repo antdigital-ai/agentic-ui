@@ -18,7 +18,7 @@ import type { BubbleExtraProps } from './types/BubbleExtra';
 export const PureBubble: React.FC<
   BubbleProps & {
     deps?: any[];
-    bubbleRef?: MutableRefObject<any | undefined>;
+    bubbleRef?: MutableRefObject<any | null | undefined>;
   }
 > = memo((props) => {
   const {
@@ -337,13 +337,13 @@ export const PureBubble: React.FC<
 export const PureAIBubble: React.FC<
   BubbleProps & {
     deps?: any[];
-    bubbleRef?: MutableRefObject<any | undefined>;
+    bubbleRef?: MutableRefObject<any | null | undefined>;
   }
 > = memo((props) => <PureBubble {...props} placement="left" />);
 
 export const PureUserBubble: React.FC<
   BubbleProps & {
     deps?: any[];
-    bubbleRef?: MutableRefObject<any | undefined>;
+    bubbleRef?: MutableRefObject<any | null | undefined>;
   }
 > = memo((props) => <PureBubble {...props} placement="right" />);

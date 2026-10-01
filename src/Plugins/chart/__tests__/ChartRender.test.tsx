@@ -14,7 +14,6 @@ import { I18nContext } from '../../../I18n';
 
 vi.mock('antd', async (importOriginal) => {
   const actual = await importOriginal<typeof import('antd')>();
-  const React = await import('react');
   return {
     ...actual,
     Dropdown: ({

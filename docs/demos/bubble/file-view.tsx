@@ -9,7 +9,7 @@ import {
 } from './shared';
 
 export default () => {
-  const bubbleRef = useRef<any>();
+  const bubbleRef = useRef<any | null>(null);
 
   const mockMessage: MessageBubbleData = {
     id: '1',

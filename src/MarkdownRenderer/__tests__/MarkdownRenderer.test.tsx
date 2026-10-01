@@ -235,36 +235,44 @@ describe('MarkdownRenderer', () => {
   });
 
   it('流式模式下应按限流顺序逐步输出', async () => {
-    const ref = React.createRef<MarkdownRendererRef>();
-    const throttleOptions = { charsPerFrame: 5, speed: 1 as const };
+    // shouldAdvanceTime 的真实时间漂移在 React 19 下会跨帧推进，
+    // 本用例需要精确帧控制：临时切换为严格 fake timers
+    vi.useFakeTimers();
+    try {
+      const ref = React.createRef<MarkdownRendererRef>();
+      const throttleOptions = { charsPerFrame: 5, speed: 1 as const };
 
-    const { rerender } = render(
-      <MarkdownRenderer
-        ref={ref}
-        content="Hello World"
-        streaming={true}
-        throttleOptions={throttleOptions}
-      />,
-    );
-
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(32);
-    });
-    expect(ref.current?.getDisplayedContent()).toContain('Hello');
-    expect(ref.current?.getDisplayedContent()).not.toBe('Hello World');
-
-    await act(async () => {
-      rerender(
+      const { rerender } = render(
         <MarkdownRenderer
           ref={ref}
           content="Hello World"
           streaming={true}
-          isFinished
           throttleOptions={throttleOptions}
         />,
       );
-    });
-    expect(ref.current?.getDisplayedContent()).toBe('Hello World');
+
+      // 恰好一帧：5 字符，未到全文
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(16);
+      });
+      expect(ref.current?.getDisplayedContent()).toContain('Hello');
+      expect(ref.current?.getDisplayedContent()).not.toBe('Hello World');
+
+      await act(async () => {
+        rerender(
+          <MarkdownRenderer
+            ref={ref}
+            content="Hello World"
+            streaming={true}
+            isFinished
+            throttleOptions={throttleOptions}
+          />,
+        );
+      });
+      expect(ref.current?.getDisplayedContent()).toBe('Hello World');
+    } finally {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+    }
   });
 
   it('流式 isFinished 应 flush 全部内容', () => {

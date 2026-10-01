@@ -642,6 +642,7 @@ export {
   type SandboxRendererProps,
   type SandboxRendererStatus,
 } from './Components/SandboxRenderer';
+
 export {
   LayoutHeader,
   type LayoutHeaderConfig,
@@ -683,6 +684,16 @@ export {
   type ThinkingLottieProps,
   type ThreeThinkingLottieProps,
 } from './Components/lotties';
+export {
+  OOXML_CDN_BASE,
+  OOXML_CDN_VERSION,
+  OfficeViewer,
+  getDefaultWasmUrl,
+  inferOfficeFileType,
+  type OfficeFileType,
+  type OfficeViewerProps,
+  type OfficeViewerStatus,
+} from './Components/OfficeViewer';
 export {
   BlowingWindLottie,
   BouncingLottie,

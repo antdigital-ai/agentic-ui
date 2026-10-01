@@ -3,5 +3,5 @@
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$root" || exit 1
-"$root/node_modules/.bin/eslint" "{src,test}/**/*.{js,jsx,ts,tsx}" &&
+"$root/node_modules/.bin/oxlint" src &&
   "$root/node_modules/.bin/stylelint" "{src,test}/**/*.{css,less}"

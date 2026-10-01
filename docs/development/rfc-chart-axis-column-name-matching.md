@@ -1,4 +1,4 @@
-﻿# RFC：图表注释中 `x` / `y` 与表头列名的宽松匹配 {#rfc-chart-axis-column-name-matching}
+# RFC：图表注释中 `x` / `y` 与表头列名的宽松匹配 {#rfc-chart-axis-column-name-matching}
 
 ## 背景 {#background}
 

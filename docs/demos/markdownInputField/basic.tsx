@@ -25,7 +25,8 @@ export default () => {
         <Text code>{'${placeholder:…}'}</Text> 占位块下拉。
         <Text strong> Mark</Text>：输入 <Text code>@</Text> /{' '}
         <Text code>/</Text> 或点输入框左侧 @、/ 按钮，插入{' '}
-        <Text code>&lt;mark&gt;</Text> 高亮（删空正文后装饰会自动清理；连续两次空格或两次 Enter 可移出 mark）。
+        <Text code>&lt;mark&gt;</Text>{' '}
+        高亮（删空正文后装饰会自动清理；连续两次空格或两次 Enter 可移出 mark）。
       </Text>
       <TagMarkInputDemo
         style={inputMinStyle}

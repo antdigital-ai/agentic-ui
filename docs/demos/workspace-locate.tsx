@@ -79,7 +79,7 @@ const WEB_AVATAR_SRC_LIST: string[] = [
 ];
 
 const WorkspaceFileLocateDemo: React.FC = () => {
-  const bubbleRef = useRef<any>();
+  const bubbleRef = useRef<any | null>(null);
   const deps: any[] = [];
   const highlightTimersRef = useRef<Record<string, number>>({});
 

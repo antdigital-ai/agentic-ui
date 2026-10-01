@@ -20,6 +20,7 @@ import type { FileNode } from '../types';
 import { formatLastModified } from '../utils';
 import { fileTypeProcessor } from './FileTypeProcessor';
 import { MediaPreview } from './preview/components/MediaPreview';
+import { OfficePreview } from './preview/components/OfficePreview';
 import { PlaceholderContent } from './preview/components/PlaceholderContent';
 import { UnsupportedFileCard } from './preview/components/UnsupportedFileCard';
 import { usePreviewContent } from './preview/usePreviewContent';
@@ -90,7 +91,7 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
   const filePrefixCls = getPrefixCls('workspace-file');
   const { hashId } = useFileStyle(filePrefixCls);
   const prefixCls = `${filePrefixCls}-preview`;
-  const editorRef = useRef<MarkdownEditorInstance>();
+  const editorRef = useRef<MarkdownEditorInstance | null>(null);
 
   const { processResult, contentState } = usePreviewContent(
     file,
@@ -279,6 +280,19 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
         return (
           <MediaPreview
             category={typeInference.category}
+            file={file}
+            previewUrl={dataSource.previewUrl}
+            prefixCls={prefixCls}
+            hashId={hashId}
+            locale={locale}
+          />
+        );
+
+      case 'word':
+      case 'excel':
+      case 'presentation':
+        return (
+          <OfficePreview
             file={file}
             previewUrl={dataSource.previewUrl}
             prefixCls={prefixCls}

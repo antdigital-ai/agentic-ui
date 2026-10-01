@@ -1,4 +1,4 @@
-﻿# RFC：基于 `chartType` 注释 + Markdown 表格的文档站卡片列表 {#rfc-markdown-table-card-grid}
+# RFC：基于 `chartType` 注释 + Markdown 表格的文档站卡片列表 {#rfc-markdown-table-card-grid}
 
 ## 背景 {#background}
 

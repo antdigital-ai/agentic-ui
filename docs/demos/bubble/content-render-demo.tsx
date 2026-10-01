@@ -6,7 +6,7 @@ import React, { useRef, useState } from 'react';
 import { BubbleDemoCard } from './BubbleDemoCard';
 
 export default () => {
-  const bubbleRef = useRef<any>();
+  const bubbleRef = useRef<any | null>(null);
   const [contentStyle, setContentStyle] = useState<
     'default' | 'metadata' | 'loading' | 'enhanced'
   >('default');

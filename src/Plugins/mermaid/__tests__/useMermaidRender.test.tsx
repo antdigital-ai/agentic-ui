@@ -19,7 +19,7 @@ vi.mock('../utils', async () => {
 });
 
 describe('useMermaidRender', () => {
-  let divRef: React.RefObject<HTMLDivElement>;
+  let divRef: React.RefObject<HTMLDivElement | null>;
   let divElement: HTMLDivElement;
   let mockLoadMermaid: ReturnType<typeof vi.fn>;
   let mockRenderSvgToContainer: ReturnType<typeof vi.fn>;

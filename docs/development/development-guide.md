@@ -1,4 +1,4 @@
-﻿---
+---
 nav:
   title: 项目研发
   order: 3
@@ -60,7 +60,6 @@ pnpm start
 {
   "recommendations": [
     "esbenp.prettier-vscode",
-    "dbaeumer.vscode-eslint",
     "bradlc.vscode-tailwindcss",
     "ms-vscode.vscode-typescript-next",
     "formulahendry.auto-rename-tag",
@@ -74,9 +73,6 @@ pnpm start
 ```json
 {
   "editor.formatOnSave": true,
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
-  },
   "typescript.preferences.importModuleSpecifier": "relative"
 }
 ```
@@ -135,7 +131,7 @@ agentic-ui/
 
 3. **编码规范**
    - 遵循 TypeScript 最佳实践
-   - 使用 ESLint 和 Prettier 保证代码质量
+   - 使用 oxlint 和 Prettier 保证代码质量
    - 添加必要的注释和文档
 
 4. **测试编写**
@@ -769,7 +765,7 @@ A: 检查清单：
 ### 代码质量要求 {#code-quality-standards}
 
 - **测试覆盖率**: 新功能需要有相应的测试，保持覆盖率在 80% 以上
-- **代码风格**: 遵循项目的 ESLint 和 Prettier 配置
+- **代码风格**: 遵循项目的 oxlint 和 Prettier 配置
 - **文档更新**: 新功能需要更新相应的文档和示例
 - **向后兼容**: 避免破坏性变更，如有必要需要提供迁移指南
 

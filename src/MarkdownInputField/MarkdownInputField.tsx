@@ -373,7 +373,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
           style={{
             display: 'flex',
             flexDirection: 'column',
-            borderRadius: !!props.toolsRender ? 0 : 'inherit',
+            borderRadius: props.toolsRender ? 0 : 'inherit',
             borderTopLeftRadius: 'inherit',
             borderTopRightRadius: 'inherit',
             height: isEnlarged ? '100%' : 'auto',

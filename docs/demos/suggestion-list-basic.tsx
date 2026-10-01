@@ -51,7 +51,7 @@ const items = [
 ];
 
 export default function SuggestionListBasicDemo() {
-  const bubbleRef = useRef<any>();
+  const bubbleRef = useRef<any | null>(null);
   const [list] = useState<MessageBubbleData[]>([initAssistant]);
 
   const handleAsk = async (text: string) => {

@@ -55,7 +55,7 @@ const DocCardsStreamingDemo: React.FC = () => {
   ];
 
   const [count, setCount] = useState(0);
-  const timerRef = useRef<ReturnType<typeof setInterval>>();
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // 简易自增；演示用，组件本身对增量数据无特殊要求
   useEffect(() => {

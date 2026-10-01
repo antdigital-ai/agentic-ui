@@ -262,7 +262,7 @@ const greeting = "Hello, World!";
 `;
 
 export default function MarkdownParseConvertDemo() {
-  const editorRef = useRef<MarkdownEditorInstance>();
+  const editorRef = useRef<MarkdownEditorInstance | null>(null);
   const [exportedMarkdown, setExportedMarkdown] = useState('');
   const [activeTab, setActiveTab] = useState('editor');
 

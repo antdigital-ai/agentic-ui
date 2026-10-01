@@ -30,7 +30,7 @@ function createMockEditorInstance(): MarkdownEditorInstance {
 
 /** 组合 hook：模拟主组件接线方式（容器 + 透出）。 */
 const useHarness = (params: {
-  inputRef: React.MutableRefObject<MarkdownEditorInstance | undefined>;
+  inputRef: React.MutableRefObject<MarkdownEditorInstance | null | undefined>;
   setValue: (v: string) => void;
 }) => {
   const { markdownEditorRef } = useInputFieldRefContainer();

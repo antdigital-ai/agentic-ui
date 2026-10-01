@@ -4,7 +4,7 @@ import useClickAway from '../useClickAway';
 
 describe('useClickAway', () => {
   let mockCallback: ReturnType<typeof vi.fn>;
-  let mockRef: React.RefObject<HTMLDivElement>;
+  let mockRef: React.RefObject<HTMLDivElement | null>;
 
   beforeEach(() => {
     mockCallback = vi.fn();

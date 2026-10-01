@@ -25,7 +25,7 @@ const MODEL_ID = 'Qwen3-0.6B-q0f16-MLC';
  * WebLLM 与 MarkdownInputField 结合示例（需安装 @mlc-ai/web-llm）
  */
 export default () => {
-  const inputRef = useRef<MarkdownEditorInstance>();
+  const inputRef = useRef<MarkdownEditorInstance | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const messagesRef = useRef<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);

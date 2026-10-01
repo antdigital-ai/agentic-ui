@@ -45,7 +45,7 @@ const sampleMessages: MessageBubbleData[] = [
 
 export default () => {
   const bubbleListRef = useRef<HTMLDivElement>(null);
-  const bubbleRef = useRef<any>();
+  const bubbleRef = useRef<any | null>(null);
 
   // 配置状态
   const [listLoading, setListLoading] = useState(false);

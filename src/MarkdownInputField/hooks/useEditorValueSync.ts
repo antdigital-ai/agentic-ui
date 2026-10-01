@@ -7,7 +7,9 @@ interface UseEditorValueSyncParams {
   /** 受控的外部 value */
   value: string | undefined;
   /** 由 useInputFieldRefContainer 提供的编辑器实例 ref */
-  markdownEditorRef: React.MutableRefObject<MarkdownEditorInstance | undefined>;
+  markdownEditorRef: React.MutableRefObject<
+    MarkdownEditorInstance | null | undefined
+  >;
 }
 
 interface UseEditorValueSyncResult {

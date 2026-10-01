@@ -39,7 +39,7 @@ interface UseInputFieldGeometryParams {
 
 interface UseInputFieldGeometryReturn {
   /** 输入框最外层容器 ref，用于 ResizeObserver 监听宽度，触发 collapseSendActions */
-  inputRef: React.RefObject<HTMLDivElement>;
+  inputRef: React.RefObject<HTMLDivElement | null>;
   /** 容器宽度小于阈值时折叠发送区操作按钮 */
   collapseSendActions: boolean;
 

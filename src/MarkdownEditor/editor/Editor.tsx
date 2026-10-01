@@ -190,7 +190,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
 
   const changedMark = useRef(false);
   const value = useRef<any[]>([EditorUtils.p]);
-  const nodeRef = useRef<MarkdownEditorInstance>();
+  const nodeRef = useRef<MarkdownEditorInstance | null>(null);
   const first = useRef(true);
   const cancelClearInputCompositionRef = useRef<(() => void) | null>(null);
   const [suppressPlaceholderForIme, setSuppressPlaceholderForIme] =
@@ -644,7 +644,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
         EditorUtils.deleteAll(markdownEditorRef.current);
       }
     } else {
-      nodeRef.current = undefined;
+      nodeRef.current = null;
     }
   };
 

@@ -197,7 +197,8 @@ export const MdElements: Record<string, MdNode> = {
         return !(list && !Path.hasPrevious(ctx.node[1]));
       }
       return false;
-    },    run: (ctx) => {
+    },
+    run: (ctx) => {
       Transforms.delete(ctx.editor, {
         at: ctx.path,
       });

@@ -1,5 +1,5 @@
 import { MarkdownEditor, MarkdownEditorInstance } from '@ant-design/agentic-ui';
-import React from 'react';
+import React, { useRef } from 'react';
 
 const defaultValue = `要使用 HTML 和 CSS 实现一个“跳舞”的效果，我们可以结合 CSS 动画来让某个元素产生“跳舞”的动画。下面是一个简单的例子，展示如何使一个“人”图标形象地“跳舞”。
 
@@ -57,7 +57,7 @@ body {
 要更丰富地展示这个效果，你可以尝试改变跳舞的关键帧，调整动画的持续时间，或者改变图像的形状和大小等。`;
 
 export default () => {
-  const editorRef = React.useRef<MarkdownEditorInstance>();
+  const editorRef = useRef<MarkdownEditorInstance | null>(null);
 
   return (
     <>

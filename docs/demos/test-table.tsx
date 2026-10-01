@@ -5,7 +5,7 @@ import {
 } from '@ant-design/agentic-ui';
 import { ConfigProvider, Divider } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
-import React from 'react';
+import React, { useRef } from 'react';
 
 const defaultValue = `<!--{"mergeCells":[{"row":1,"col":0,"rowspan":13,"colspan":1}],"colWidths":[152,373,300,88]}-->
 | 大类别   | 子问题                          | 详情 | 是否符合 |
@@ -58,8 +58,8 @@ const defaultValue = `<!--{"mergeCells":[{"row":1,"col":0,"rowspan":13,"colspan"
 `;
 
 export default () => {
-  const markdownEditorRef = React.useRef<MarkdownEditorInstance>();
-  const markdownEditor2Ref = React.useRef<MarkdownEditorInstance>();
+  const markdownEditorRef = useRef<MarkdownEditorInstance | null>(null);
+  const markdownEditor2Ref = useRef<MarkdownEditorInstance | null>(null);
 
   return (
     <div

@@ -63,7 +63,7 @@ const getContentStyle = (
 export const UserBubble: React.FC<
   BubbleProps & {
     deps?: any[];
-    bubbleRef?: MutableRefObject<any | undefined>;
+    bubbleRef?: MutableRefObject<any | null | undefined>;
     quote?: QuoteProps;
   }
 > = memo((props) => {

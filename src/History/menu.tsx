@@ -55,7 +55,6 @@ export interface GroupMenuProps {
 const MenuItem: React.FC<{
   item: MenuItemType;
   isSelected: boolean;
-  inlineIndent: number;
   onSelect: (key: string) => void;
   level?: number;
   prefixCls: string;
@@ -73,7 +72,6 @@ const MenuItem: React.FC<{
 }> = ({
   item,
   isSelected,
-  inlineIndent = 0,
   onSelect,
   level = 0,
   prefixCls,
@@ -134,7 +132,6 @@ const MenuItem: React.FC<{
               key={child.key}
               item={child}
               isSelected={currentSelectedKey === child.key}
-              inlineIndent={inlineIndent}
               onSelect={onSelect}
               level={level + 1}
               prefixCls={prefixCls}
@@ -197,7 +194,6 @@ export const GroupMenu: React.FC<GroupMenuProps> = (props) => {
     items = [],
     selectedKeys = [],
     onSelect,
-    inlineIndent = 20,
     className,
     classNames: propsClassNames = {},
     style,
@@ -246,7 +242,6 @@ export const GroupMenu: React.FC<GroupMenuProps> = (props) => {
             key={item.key}
             item={item}
             isSelected={currentSelectedKey === item.key}
-            inlineIndent={inlineIndent}
             onSelect={handleSelect}
             classNames={propsClassNames}
             prefixCls={prefixCls}

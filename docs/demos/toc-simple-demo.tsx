@@ -5,7 +5,7 @@ import React, { useEffect, useRef } from 'react';
 const { Title, Paragraph } = Typography;
 
 export default () => {
-  const editorRef = useRef<MarkdownEditorInstance>();
+  const editorRef = useRef<MarkdownEditorInstance | null>(null);
 
   // 简单的测试内容，包含多个标题层级
   const testContent = `# 测试 TocHeading 功能
