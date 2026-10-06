@@ -178,7 +178,7 @@ describe('LoadImage Component', () => {
 
       render(<LoadImage {...props} />);
       const img = screen.getByAltText('Test Icon');
-      expect(img).toHaveAttribute('src', '');
+      expect(img).not.toHaveAttribute('src');
     });
 
     it('应该处理 null src', () => {
