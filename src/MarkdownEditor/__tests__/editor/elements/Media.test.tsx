@@ -363,7 +363,7 @@ describe('Media', () => {
       );
 
       const resizeImage = screen.getByTestId('resize-image');
-      expect(resizeImage).toHaveAttribute('src', '');
+      expect(resizeImage).not.toHaveAttribute('src');
     });
 
     it('应该处理空的alt属性', () => {

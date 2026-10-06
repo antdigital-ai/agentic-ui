@@ -1,5 +1,5 @@
 /**
- * ActionIconBox deepen safe：child.props 缺省走 ?? {}。
+ * ActionIconBox iconStyle 合并回归测试。
  */
 import '@testing-library/jest-dom';
 import { cleanup, render } from '@testing-library/react';
@@ -18,21 +18,16 @@ describe('ActionIconBox deepen safe residual branches', () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
   });
 
-  it('iconStyle + 无 props 的 element：合并 style', () => {
-    const orphan = Object.create(null);
-    orphan.type = 'span';
-    orphan.key = null;
-    orphan.ref = null;
-    orphan.props = undefined;
-    orphan.$$typeof = Symbol.for('react.element');
-
+  it('iconStyle 与子元素已有 style 合并', () => {
     const { container } = render(
       <ActionIconBox title="t" iconStyle={{ color: 'red' }}>
-        {orphan as any}
+        <span style={{ display: 'block' }} />
       </ActionIconBox>,
     );
-    expect(
-      container.querySelector('span') || container.firstChild,
-    ).toBeTruthy();
+
+    expect(container.querySelector('span span')).toHaveStyle({
+      color: 'red',
+      display: 'block',
+    });
   });
 });
