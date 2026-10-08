@@ -6,21 +6,21 @@ group:
   order: 3
 ---
 
-# TextLoading 文字加载 {#textloading}
+# TextLoading 文字加载
 
 一个轻量级的文字加载组件，通过纯CSS动画展示优雅的光泽流动效果。
 
-## 代码演示 {#demo}
+## 代码演示
 
-<code src="../demos/textLoading-basic.tsx">基础用法</code>
+<code src="../demos/textLoading-basic.tsx" description="基础用法"></code>
 
-<code src="../demos/textLoading-custom.tsx">自定义文本和样式</code>
+<code src="../demos/textLoading-custom.tsx" description="自定义文本和样式"></code>
 
-<code src="../demos/textLoading-theme.tsx">主题切换</code>
+<code src="../demos/textLoading-theme.tsx" description="主题切换"></code>
 
-<code src="../demos/textLoading-dark.tsx">暗色主题</code>
+<code src="../demos/textLoading-dark.tsx" description="暗色主题"></code>
 
-<code src="../demos/textLoading-disabled.tsx">禁用动画</code>
+<code src="../demos/textLoading-disabled.tsx" description="禁用动画"></code>
 
 ## API
 
@@ -35,7 +35,7 @@ group:
 | style     | 容器样式                                                | `React.CSSProperties` | -              | -    |
 | fontSize  | 字体大小                                                | `number \| string`    | -              | -    |
 
-### 特性 {#features}
+### 特性
 
 - ✨ **纯CSS动画**: 使用CSS渐变和动画实现，无需额外依赖
 - 🎨 **优雅效果**: 光泽从右到左流动，营造高级的视觉体验
@@ -45,7 +45,7 @@ group:
 - ♿ **无障碍友好**: 内置ARIA属性，提供良好的可访问性
 - 🎛️ **动画控制**: 支持禁用动画，适应不同使用场景
 
-### 动画细节 {#animation-details}
+### 动画细节
 
 组件使用CSS线性渐变和背景定位动画实现闪光效果：
 
@@ -68,7 +68,7 @@ group:
 - **背景尺寸**: 200% × 100%，确保流畅的过渡效果
 - **背景裁剪**: 使用 `background-clip: text` 将渐变限制在文字内
 
-### 使用场景 {#use-cases}
+### 使用场景
 
 - **加载提示**: 在数据加载时显示友好的等待文字
 - **状态指示**: 表示某个操作正在进行中

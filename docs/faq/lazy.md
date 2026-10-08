@@ -8,18 +8,18 @@ group:
   order: 3
 ---
 
-# 懒加载渲染 (Lazy Render) {#lazy-lazy-render}
+# 懒加载渲染 (Lazy Render)
 
 `BaseMarkdownEditor` 支持懒加载渲染模式，通过 `IntersectionObserver` API 实现按需渲染，显著提升大型文档的渲染性能。
 
-## 何时使用 {#when-to-use}
+## 何时使用
 
 - 文档内容很长，包含大量元素
 - 需要优化首屏加载性能
 - 文档包含大量图片、表格等复杂元素
 - 移动端或性能较低的设备
 
-## 工作原理 {#how-it-works}
+## 工作原理
 
 启用懒加载后，每个编辑器元素都会被 `LazyElement` 组件包裹。该组件使用 `IntersectionObserver` 监听元素是否进入视口：
 
@@ -27,9 +27,9 @@ group:
 2. **进入视口**：当元素即将进入视口时（可配置提前量），开始渲染实际内容
 3. **保持渲染**：元素一旦被渲染，会保持渲染状态，不会卸载
 
-## 基本使用 {#basic-usage}
+## 基本使用
 
-```tsx | pure
+```tsx pure
 import { BaseMarkdownEditor } from '@ant-design/agentic-ui';
 
 export default () => {
@@ -43,11 +43,11 @@ export default () => {
 };
 ```
 
-## 配置选项 {#config-options}
+## 配置选项
 
 通过 `lazy` 对象可以自定义懒加载行为：
 
-```tsx | pure
+```tsx pure
 import { BaseMarkdownEditor } from '@ant-design/agentic-ui';
 
 export default () => {
@@ -65,7 +65,7 @@ export default () => {
 };
 ```
 
-### 配置说明 {#notes-config}
+### 配置说明
 
 | 属性                   | 说明                  | 类型       | 默认值    | 版本 |
 | ---------------------- | --------------------- | ---------- | --------- | ---- |
@@ -74,11 +74,11 @@ export default () => {
 | lazy.rootMargin        | 提前加载距离          | `string`   | `'200px'` | -    |
 | lazy.renderPlaceholder | 自定义占位符渲染函数  | `function` | -         | -    |
 
-## 自定义占位符渲染 {#custom}
+## 自定义占位符渲染
 
 通过 `renderPlaceholder` 函数，你可以完全自定义懒加载时的占位符显示内容：
 
-```tsx | pure
+```tsx pure
 <BaseMarkdownEditor
   lazy={{
     enable: true,
@@ -100,7 +100,7 @@ export default () => {
 />
 ```
 
-### renderPlaceholder 参数说明 {#notes-renderplaceholder}
+### renderPlaceholder 参数说明
 
 | 属性              | 说明                 | 类型            | 默认值 | 版本 |
 | ----------------- | -------------------- | --------------- | ------ | ---- |
@@ -112,9 +112,9 @@ export default () => {
 | elementInfo.index | 元素在文档中的索引   | `number`        | -      | -    |
 | elementInfo.total | 元素总数量           | `number`        | -      | -    |
 
-### 占位符样式示例 {#example-style}
+### 占位符样式示例
 
-```tsx | pure
+```tsx pure
 // 渐变背景占位符
 renderPlaceholder: ({ height, style, isIntersecting }) => (
   <div
@@ -166,13 +166,13 @@ renderPlaceholder: ({ height, style }) => (
 );
 ```
 
-## 性能优化建议 {#performance-tips}
+## 性能优化建议
 
-### 1. 调整 rootMargin {#rootmargin}
+### 1. 调整 rootMargin
 
 `rootMargin` 控制提前加载的距离。较大的值可以让内容提前加载，避免用户看到占位符：
 
-```tsx | pure
+```tsx pure
 // 提前 500px 加载，适合滚动速度较快的场景
 lazy={{ enable: true, rootMargin: '500px' }}
 
@@ -180,11 +180,11 @@ lazy={{ enable: true, rootMargin: '500px' }}
 lazy={{ enable: true, rootMargin: '0px' }}
 ```
 
-### 2. 设置合适的占位符高度 {#set-placeholder-height}
+### 2. 设置合适的占位符高度
 
 `placeholderHeight` 应该接近实际元素的高度，以减少布局抖动：
 
-```tsx | pure
+```tsx pure
 // 根据内容类型设置不同高度
 lazy={{
   enable: true,
@@ -192,11 +192,11 @@ lazy={{
 }}
 ```
 
-### 3. 只读模式下使用 {#readonly-mode}
+### 3. 只读模式下使用
 
 懒加载特别适合只读模式的长文档：
 
-```tsx | pure
+```tsx pure
 <BaseMarkdownEditor
   lazy={{ enable: true }}
   readonly={true}
@@ -204,11 +204,11 @@ lazy={{
 />
 ```
 
-### 4. 动态加载长文档内容 {#content}
+### 4. 动态加载长文档内容
 
 对于需要动态设置内容的场景，可以使用 `setMDContent` 方法配合 `options` 参数来优化长文档的加载性能：
 
-```tsx | pure
+```tsx pure
 import {
   BaseMarkdownEditor,
   MarkdownEditorInstance,
@@ -237,7 +237,7 @@ export default () => {
 };
 ```
 
-#### setMDContent Options 配置说明 {#notes-setmdcontent-options}
+#### setMDContent Options 配置说明
 
 | 属性       | 说明                                                        | 类型                         | 默认值   | 版本 |
 | ---------- | ----------------------------------------------------------- | ---------------------------- | -------- | ---- |
@@ -265,14 +265,14 @@ export default () => {
 
 这样可以避免大文档解析时卡住主线程，同时提供更好的用户体验。
 
-## 注意事项 {#notes}
+## 注意事项
 
 1. **表格元素**：表格的单元格和行不会被懒加载包裹，以保持表格结构的完整性
 2. **编辑模式**：懒加载在编辑模式下可能会影响编辑体验，建议主要在只读模式下使用
 3. **首屏内容**：调整 `rootMargin` 以确保首屏内容能够立即加载
 4. **布局抖动**：设置合适的 `placeholderHeight` 可以减少滚动时的布局跳动
 
-### 加载可靠性优化 {#loading-reliability}
+### 加载可靠性优化
 
 为了解决偶发加载不出来的问题，`LazyElement` 组件实现了双重保障机制：
 
@@ -291,7 +291,7 @@ export default () => {
 
 **方案 1：增加 rootMargin 提前加载距离**
 
-```tsx | pure
+```tsx pure
 lazy={{
   enable: true,
   rootMargin: '500px', // 更大的提前加载范围
@@ -300,7 +300,7 @@ lazy={{
 
 **方案 2：使用自定义占位符来观察加载状态**
 
-```tsx | pure
+```tsx pure
 lazy={{
   enable: true,
   renderPlaceholder: ({ height, style, isIntersecting, elementInfo }) => (
@@ -312,9 +312,9 @@ lazy={{
 }}
 ```
 
-## 性能对比 {#comparison}
+## 性能对比
 
-### 懒加载渲染性能 {#lazy}
+### 懒加载渲染性能
 
 在包含 1000+ 段落的长文档测试中：
 
@@ -324,7 +324,7 @@ lazy={{
 | 内存占用     | ~150MB   | ~50MB      | **3x**  |
 | 滚动流畅度   | 偶尔卡顿 | 流畅       | ✅      |
 
-### setMDContent 优化性能 {#setmdcontent}
+### setMDContent 优化性能
 
 在处理 50000000+ 字符的超长文档时：
 
@@ -340,7 +340,7 @@ lazy={{
 
 ### MarkdownEditorProps
 
-```tsx | pure
+```tsx pure
 interface MarkdownEditorProps {
   /**
    * 懒加载渲染配置
@@ -370,7 +370,7 @@ interface MarkdownEditorProps {
 
 动态设置编辑器内容的方法，支持性能优化配置：
 
-```tsx | pure
+```tsx pure
 /**
  * 从 markdown 文本设置编辑器内容
  * @param md - Markdown 字符串
@@ -398,7 +398,7 @@ setMDContent(
 
 **使用示例**：
 
-```tsx | pure
+```tsx pure
 // 通过 editorRef 访问 store
 const editorRef = useRef<MarkdownEditorInstance>(null);
 
@@ -412,16 +412,16 @@ await editorRef.current?.store.setMDContent(longMarkdown, undefined, {
 });
 ```
 
-## 示例 {#examples}
+## 示例
 
-### 懒加载渲染示例 {#example-lazy}
+### 懒加载渲染示例
 
-<code src="../demos/lazy-render-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/lazy-render-demo.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-### setMDContent 动态加载示例 {#example-setmdcontent}
+### setMDContent 动态加载示例
 
-<code src="../demos/setmd-content-demo.tsx" background="var(--main-bg-color)" iframe=680></code>
+<code src="../demos/setmd-content-demo.tsx" background="var(--main-bg-color)" iframe="680"></code>
 
-### 懒加载 PDF 跳转示例 {#example-pdf}
+### 懒加载 PDF 跳转示例
 
-<code src="../demos/lazy-render-pdf-jump-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/lazy-render-pdf-jump-demo.tsx" background="var(--main-bg-color)" iframe="540"></code>

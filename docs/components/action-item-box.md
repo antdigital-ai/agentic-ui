@@ -6,11 +6,11 @@ group:
   order: 2
 ---
 
-# ActionItemBox 操作项盒子 {#actionitembox}
+# ActionItemBox 操作项盒子
 
 用于展示带有图标、标题和描述的可操作项目，常用于技能列表、快捷操作等场景。
 
-## 代码演示 {#demo}
+## 代码演示
 
 ```tsx
 import { ActionItemBox } from '@ant-design/agentic-ui';

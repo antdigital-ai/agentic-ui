@@ -6,19 +6,19 @@ group:
   order: 2
 ---
 
-# LayoutHeader 布局头部 {#layout-layoutheader}
+# LayoutHeader 布局头部
 
 `LayoutHeader` 是一个通用的布局头部组件，通常与 `AgenticLayout` 或 `ChatLayout` 配合使用，提供标题显示、侧边栏折叠控制和分享功能。
 
-## 代码演示 {#demo}
+## 代码演示
 
 ### API Playground
 
 通过控制面板调试 `title` / `showShare` / `leftCollapsible` / `rightCollapsible` / 受控折叠与 `leftExtra` / `rightExtra` 自定义内容。
 
-<code src="../demos/layout-header-playground.tsx">API Playground - 全部核心 props</code>
+<code src="../demos/layout-header-playground.tsx" description="API Playground - 全部核心 props"></code>
 
-### 最小用法 {#minimal-usage}
+### 最小用法
 
 ```tsx
 import { LayoutHeader } from '@ant-design/agentic-ui';
@@ -54,7 +54,7 @@ export default () => (
 | rightExtra            | 自定义右侧内容（分享按钮右侧） | `ReactNode`                    | -       | -    |
 | className             | 自定义类名                     | `string`                       | -       | -    |
 
-## 模式说明 {#notes-mode}
+## 模式说明
 
 `LayoutHeader` 使用 `rc-util` 的 `useMergedState` 来管理折叠状态，同时支持受控和非受控模式。
 

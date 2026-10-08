@@ -1,0 +1,20 @@
+[
+  {
+    "type": "section-header",
+    "label": "通用"
+  },
+  "chart",
+  "chat",
+  "components",
+  "content-types",
+  "editor",
+  "history",
+  "i18n",
+  "jinja",
+  "layout",
+  "markdown-input-field",
+  "plugins",
+  "schema-editor",
+  "video",
+  "workspace"
+]

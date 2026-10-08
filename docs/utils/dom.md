@@ -7,11 +7,11 @@ group:
   order: 5
 ---
 
-# DOM 工具函数 {#dom}
+# DOM 工具函数
 
 `dom.ts` 提供了一系列用于 DOM 操作和处理的工具函数。
 
-## 功能描述 {#description}
+## 功能描述
 
 这个模块包含以下主要功能：
 
@@ -20,9 +20,9 @@ group:
 - **媒体类型检测** - 根据文件名或 URL 判断媒体类型
 - **选区操作** - 获取选区矩形信息
 
-## API 参考 {#api}
+## API 参考
 
-### 位置计算 {#position-calculation}
+### 位置计算
 
 #### `getOffsetTop(dom: HTMLElement, target: HTMLElement = document.body): number`
 
@@ -37,7 +37,7 @@ group:
 
 - `number` - 垂直偏移量（像素）
 
-```typescript | pure
+```typescript pure
 import { getOffsetTop } from '@ant-design/agentic-ui';
 
 const element = document.getElementById('my-element');
@@ -58,7 +58,7 @@ console.log(`元素距离顶部 ${offsetTop}px`);
 
 - `number` - 水平偏移量（像素）
 
-```typescript | pure
+```typescript pure
 import { getOffsetLeft } from '@ant-design/agentic-ui';
 
 const element = document.getElementById('my-element');
@@ -66,7 +66,7 @@ const offsetLeft = getOffsetLeft(element);
 console.log(`元素距离左侧 ${offsetLeft}px`);
 ```
 
-### 字符串处理 {#string-processing}
+### 字符串处理
 
 #### `slugify(str: string): string`
 
@@ -90,7 +90,7 @@ console.log(`元素距离左侧 ${offsetLeft}px`);
 - 确保不以数字开头
 - 转换为小写
 
-```typescript | pure
+```typescript pure
 import { slugify } from '@ant-design/agentic-ui';
 
 console.log(slugify('Hello World!')); // 'hello-world'
@@ -98,7 +98,7 @@ console.log(slugify('Café & Résumé')); // 'cafe-resume'
 console.log(slugify('123 Number')); // '_123-number'
 ```
 
-### 媒体类型检测 {#types}
+### 媒体类型检测
 
 #### `getMediaType(name?: string, alt?: string): string`
 
@@ -121,7 +121,7 @@ console.log(slugify('123 Number')); // '_123-number'
 - **文档**：`.md`, `.markdown`
 - **附件**：其他文件类型
 
-```typescript | pure
+```typescript pure
 import { getMediaType } from '@ant-design/agentic-ui';
 
 // 根据文件扩展名判断
@@ -138,7 +138,7 @@ console.log(getMediaType('file', 'data:image/png;base64,...')); // 'image'
 console.log(getMediaType('file', 'video:mp4')); // 'video'
 ```
 
-### 选区操作 {#selection-operations}
+### 选区操作
 
 #### `getSelRect(): DOMRect | null`
 
@@ -148,7 +148,7 @@ console.log(getMediaType('file', 'video:mp4')); // 'video'
 
 - `DOMRect | null` - 选区矩形信息，如果没有选区则返回 `null`
 
-```typescript | pure
+```typescript pure
 import { getSelRect } from '@ant-design/agentic-ui';
 
 const selection = window.getSelection();
@@ -161,11 +161,11 @@ if (selection && !selection.isCollapsed) {
 }
 ```
 
-## 使用场景 {#use-cases}
+## 使用场景
 
-### 编辑器定位 {#editor-positioning}
+### 编辑器定位
 
-```typescript | pure
+```typescript pure
 // 计算工具栏位置
 const editorElement = document.querySelector('.agentic-ui');
 const toolbarElement = document.querySelector('.toolbar');
@@ -180,9 +180,9 @@ if (editorElement && toolbarElement) {
 }
 ```
 
-### 媒体文件处理 {#media-file-handling}
+### 媒体文件处理
 
-```typescript | pure
+```typescript pure
 // 处理文件上传
 const handleFileUpload = (file: File) => {
   const mediaType = getMediaType(file.name);
@@ -207,9 +207,9 @@ const handleFileUpload = (file: File) => {
 };
 ```
 
-### URL 友好化 {#url}
+### URL 友好化
 
-```typescript | pure
+```typescript pure
 // 生成锚点链接
 const generateAnchor = (text: string) => {
   const slug = slugify(text);
@@ -223,9 +223,9 @@ const generateFileName = (title: string) => {
 };
 ```
 
-### 选区操作 {#selection-operations-2}
+### 选区操作
 
-```typescript | pure
+```typescript pure
 // 显示选区信息
 const showSelectionInfo = () => {
   const rect = getSelRect();
@@ -243,14 +243,14 @@ const showSelectionInfo = () => {
 };
 ```
 
-## 注意事项 {#notes}
+## 注意事项
 
 1. **DOM 依赖**：这些函数需要在浏览器环境中使用
 2. **性能考虑**：`getOffsetTop` 和 `getOffsetLeft` 会遍历 DOM 树
 3. **兼容性**：确保目标浏览器支持相关 DOM API
 4. **错误处理**：函数会处理无效的 DOM 元素和参数
 
-## 扩展性 {#extensibility}
+## 扩展性
 
 这些工具函数可以进一步扩展：
 

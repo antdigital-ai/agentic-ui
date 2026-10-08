@@ -14,11 +14,12 @@ export const useDemoSend = () => {
     sendAbortRef.current = controller;
     try {
       await new Promise<void>((resolve, reject) => {
-        const timer = window.setTimeout(resolve, 1000);
+        // Node SSR 环境无 window：setTimeout/clearTimeout 全局等价可用
+        const timer = setTimeout(resolve, 1000);
         controller.signal.addEventListener(
           'abort',
           () => {
-            window.clearTimeout(timer);
+            clearTimeout(timer);
             reject(new DOMException('Aborted', 'AbortError'));
           },
           { once: true },

@@ -12,17 +12,17 @@ group:
 
 基于 Slate.js 的 Markdown 编辑器组件，支持实时编辑、只读渲染、评论、图片上传、Jinja 模板等能力。
 
-## 何时使用 {#when-to-use}
+## 何时使用
 
 - 需要一个所见即所得的 Markdown 编辑器
 - 需要只读渲染 Markdown 内容（支持轻量 `markdown` 模式和完整 `slate` 模式）
 - 需要评论、图片上传、代码高亮、表格编辑等扩展能力
 
-## 代码演示 {#demo}
+## 代码演示
 
-### 基础用法 {#basic-usage}
+### 基础用法
 
-```tsx | pure
+```tsx pure
 import { MarkdownEditor } from '@ant-design/agentic-ui';
 
 export default () => {
@@ -36,9 +36,9 @@ export default () => {
 };
 ```
 
-### 只读模式 {#readonly-mode}
+### 只读模式
 
-```tsx | pure
+```tsx pure
 import { MarkdownEditor } from '@ant-design/agentic-ui';
 
 export default () => {
@@ -52,9 +52,9 @@ export default () => {
 };
 ```
 
-### 轻量只读渲染（renderMode: markdown） {#readonly-rendermode-markdown}
+### 轻量只读渲染（renderMode: markdown）
 
-```tsx | pure
+```tsx pure
 import { MarkdownEditor } from '@ant-design/agentic-ui';
 
 export default () => {
@@ -69,7 +69,7 @@ export default () => {
 };
 ```
 
-#### Markdown 模式自定义块（plugins.renderer） {#custom-plugins-renderer}
+#### Markdown 模式自定义块（plugins.renderer）
 
 `renderMode: 'markdown'` 下，Slate 侧 `plugins[].elements` **不会**生效；请使用 `plugins[].renderer`：
 
@@ -112,9 +112,9 @@ export default () => (
 | 当前内容        | `editorRef.current.getDisplayedContent()` / `store.getMDContent()`                           |
 | 包装默认 DOM    | `eleRender`                                                                                  |
 
-### 自定义工具栏 {#custom-toolbar}
+### 自定义工具栏
 
-```tsx | pure
+```tsx pure
 import { MarkdownEditor } from '@ant-design/agentic-ui';
 import { Button } from 'antd';
 
@@ -137,9 +137,9 @@ export default () => {
 };
 ```
 
-### 图片上传 {#upload}
+### 图片上传
 
-```tsx | pure
+```tsx pure
 import { MarkdownEditor } from '@ant-design/agentic-ui';
 
 export default () => {
@@ -158,9 +158,9 @@ export default () => {
 };
 ```
 
-### 评论功能 {#comment}
+### 评论功能
 
-```tsx | pure
+```tsx pure
 import { MarkdownEditor } from '@ant-design/agentic-ui';
 import { useState } from 'react';
 
@@ -193,9 +193,9 @@ export default () => {
 };
 ```
 
-### 流式输出 {#streaming}
+### 流式输出
 
-```tsx | pure
+```tsx pure
 import { MarkdownEditor } from '@ant-design/agentic-ui';
 
 export default () => {
@@ -215,7 +215,7 @@ export default () => {
 
 ### MarkdownEditorProps
 
-#### 布局与样式 {#style-layout}
+#### 布局与样式
 
 | 属性               | 说明                                                                                 | 类型                  | 默认值   | 版本 |
 | ------------------ | ------------------------------------------------------------------------------------ | --------------------- | -------- | ---- |
@@ -228,7 +228,7 @@ export default () => {
 | style              | 容器自定义样式，支持 CSS 变量自定义表格样式（`--agentic-ui-table-border-radius` 等） | `React.CSSProperties` | -        | -    |
 | width              | 编辑器宽度                                                                           | `string \| number`    | `'100%'` | -    |
 
-#### 内容与模式 {#content-mode}
+#### 内容与模式
 
 | 属性            | 说明                                                                                                                                                                                                                  | 类型                     | 默认值    | 版本 |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ | --------- | ---- |
@@ -261,7 +261,7 @@ export default () => {
 | flushOnComplete           | 流式结束时是否立即展示剩余内容                               | `boolean` | `true` |
 | speed                     | 速度倍率                                                     | `number`  | `1`    |
 
-#### 工具栏 (toolBar) {#toolbar-toolbar}
+#### 工具栏 (toolBar)
 
 | 属性      | 说明                   | 类型                | 默认值  | 版本 |
 | --------- | ---------------------- | ------------------- | ------- | ---- |
@@ -284,40 +284,40 @@ export default () => {
 
 历史：`'undo'` | `'redo'`
 
-#### 浮动工具栏 (floatBar) {#toolbar-floatbar}
+#### 浮动工具栏 (floatBar)
 
 | 属性   | 说明               | 类型      | 默认值 | 版本 |
 | ------ | ------------------ | --------- | ------ | ---- |
 | enable | 是否启用浮动工具栏 | `boolean` | -      | -    |
 
-#### 文本区域 (textAreaProps) {#textareaprops}
+#### 文本区域 (textAreaProps)
 
 | 属性        | 说明             | 类型      | 默认值 | 版本 |
 | ----------- | ---------------- | --------- | ------ | ---- |
 | enable      | 是否启用文本区域 | `boolean` | -      | -    |
 | placeholder | 占位符文本       | `string`  | -      | -    |
 
-#### 拖拽 (drag) {#drag-drag}
+#### 拖拽 (drag)
 
 | 属性   | 说明             | 类型      | 默认值 | 版本 |
 | ------ | ---------------- | --------- | ------ | ---- |
 | enable | 是否启用拖拽功能 | `boolean` | -      | -    |
 
-#### Markdown 输入 (markdown) {#markdown}
+#### Markdown 输入 (markdown)
 
 | 属性             | 说明                                                                                         | 类型      | 默认值  | 版本 |
 | ---------------- | -------------------------------------------------------------------------------------------- | --------- | ------- | ---- |
 | matchInputToNode | 是否启用输入到节点匹配（如输入 `- ` 转为列表）；未开启时仅文档首段受保护，正文段落仍即时转换 | `boolean` | `false` | -    |
 | matchLeaf        | 是否启用叶子节点匹配                                                                         | `boolean` | -       | -    |
 
-#### 图片 (image) {#image}
+#### 图片 (image)
 
 | 属性   | 说明                       | 类型                                                                  | 默认值 | 版本 |
 | ------ | -------------------------- | --------------------------------------------------------------------- | ------ | ---- |
 | render | 自定义图片渲染函数         | `(props: ImageProps, defaultDom: React.ReactNode) => React.ReactNode` | -      | -    |
 | upload | 图片上传函数，返回图片 URL | `(files: File[] \| string[]) => Promise<string[] \| string>`          | -      | -    |
 
-#### 评论 (comment) {#comment-comment}
+#### 评论 (comment)
 
 | 属性                | 说明                                                                                      | 类型                                                                                                                                                                                     | 默认值 | 版本 |
 | ------------------- | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ---- |
@@ -332,7 +332,7 @@ export default () => {
 | onDelete            | 删除评论回调                                                                              | `(id: string \| number, comment: CommentDataType) => void`                                                                                                                               | -      | -    |
 | onEdit              | 编辑评论回调                                                                              | `(id: string \| number, comment: CommentDataType) => void`                                                                                                                               | -      | -    |
 | onSubmit            | 评论提交回调                                                                              | `(id: string \| number, comment: CommentDataType) => void`                                                                                                                               | -      | -    |
-| placeholder         | 评论输入框占位符，未提供时回退到顶层的 [`titlePlaceholderContent`](#reference-and-others) | `string`                                                                                                                                                                                 | -      | -    |
+| placeholder         | 评论输入框占位符，未提供时回退到顶层的 [`titlePlaceholderContent`](#引用与其他) | `string`                                                                                                                                                                                 | -      | -    |
 
 #### CommentDataType
 
@@ -350,7 +350,7 @@ export default () => {
 | updateTime   | 更新时间     | `number`                            | -      | -    |
 | user         | 评论用户     | `{ name: string; avatar?: string }` | -      | -    |
 
-#### 代码块 (codeProps) {#codeprops}
+#### 代码块 (codeProps)
 
 | 属性                            | 说明                                                                                                                                     | 类型                                                                                         | 默认值                              | 版本    |
 | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ----------------------------------- | ------- |
@@ -363,7 +363,7 @@ export default () => {
 | viewModeLabels                  | 视图模式标签配置                                                                                                                         | `{ preview?: string; code?: string }`                                                        | `{ preview: '预览', code: '代码' }` | -       |
 | ...                             | 支持所有 [Ace.EditorOptions](https://ace.c9.io/#nav=api&api=editor)                                                                      | `Partial<Ace.EditorOptions>`                                                                 | -                                   | -       |
 
-#### 表格 (tableConfig) {#table-tableconfig}
+#### 表格 (tableConfig)
 
 | 属性         | 说明                         | 类型                                                                                     | 默认值 | 版本 |
 | ------------ | ---------------------------- | ---------------------------------------------------------------------------------------- | ------ | ---- |
@@ -374,7 +374,7 @@ export default () => {
 | previewTitle | 预览模式标题                 | `string`                                                                                 | -      | -    |
 | pure         | 是否启用纯净模式（无工具栏） | `boolean`                                                                                | -      | -    |
 
-#### 懒加载 (lazy) {#lazy-lazy}
+#### 懒加载 (lazy)
 
 | 属性              | 说明                               | 类型                                                                                                                                                                | 默认值    | 版本 |
 | ----------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ---- |
@@ -383,7 +383,7 @@ export default () => {
 | renderPlaceholder | 自定义占位渲染                     | `(props: { height: number; style: React.CSSProperties; isIntersecting: boolean; elementInfo?: { type: string; index: number; total: number } }) => React.ReactNode` | -         | -    |
 | rootMargin        | IntersectionObserver rootMargin    | `string`                                                                                                                                                            | `'200px'` | -    |
 
-#### Jinja 模板 (jinja) {#jinja}
+#### Jinja 模板 (jinja)
 
 | 属性          | 说明                                 | 类型                                  | 默认值 | 版本 |
 | ------------- | ------------------------------------ | ------------------------------------- | ------ | ---- |
@@ -408,7 +408,7 @@ export default () => {
 | template    | 模板内容         | `string` | -      | -    |
 | title       | 模板标题         | `string` | -      | -    |
 
-#### 粘贴配置 (pasteConfig) {#config-pasteconfig}
+#### 粘贴配置 (pasteConfig)
 
 | 属性          | 说明             | 类型       | 默认值  | 版本 |
 | ------------- | ---------------- | ---------- | ------- | ---- |
@@ -416,14 +416,14 @@ export default () => {
 | allowedTypes  | 允许的粘贴类型   | `string[]` | -       | -    |
 | plainTextOnly | 是否仅粘贴纯文本 | `boolean`  | `false` | -    |
 
-#### 链接配置 (linkConfig) {#config-linkconfig}
+#### 链接配置 (linkConfig)
 
 | 属性         | 说明                                      | 类型                                | 默认值 | 版本 |
 | ------------ | ----------------------------------------- | ----------------------------------- | ------ | ---- |
 | onClick      | 链接点击回调，返回 `false` 可阻止默认行为 | `(url?: string) => boolean \| void` | -      | -    |
 | openInNewTab | 是否在新标签页打开链接                    | `boolean`                           | -      | -    |
 
-#### 标签输入 (tagInputProps) {#taginputprops}
+#### 标签输入 (tagInputProps)
 
 | 属性        | 说明                          | 类型                    | 默认值 | 版本 |
 | ----------- | ----------------------------- | ----------------------- | ------ | ---- |
@@ -432,7 +432,7 @@ export default () => {
 | type        | 弹出方式                      | `'panel' \| 'dropdown'` | -      | -    |
 | ...         | 支持 `TagPopupProps` 所有属性 | `TagPopupProps`         | -      | -    |
 
-#### 插入自动补全 (insertAutocompleteProps) {#insertautocompleteprops}
+#### 插入自动补全 (insertAutocompleteProps)
 
 | 属性          | 说明               | 类型                                                                                   | 默认值 | 版本 |
 | ------------- | ------------------ | -------------------------------------------------------------------------------------- | ------ | ---- |
@@ -441,7 +441,7 @@ export default () => {
 | optionsRender | 操作选项渲染       | `(options: ItemType[]) => ItemType[]`                                                  | -      | -    |
 | runInsertTask | 执行插入任务的函数 | `(task: InsertAutocompleteItem, offset: { x: number; y: number }) => Promise<boolean>` | -      | -    |
 
-#### 自定义渲染 {#custom}
+#### 自定义渲染
 
 | 属性          | 说明                                                                         | 类型                                                                                                           | 默认值 | 版本 |
 | ------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ------ | ---- |
@@ -449,7 +449,7 @@ export default () => {
 | eleRender     | 自定义元素渲染（仅 `renderMode: 'markdown'`），返回 `undefined` 回退默认渲染 | `(props: MarkdownRendererEleProps, defaultDom: React.ReactNode) => React.ReactNode`                            | -      | -    |
 | leafRender    | 自定义叶子节点渲染                                                           | `(props: Record<string, any> & { children: React.ReactNode }, defaultDom: React.ReactNode) => React.ReactNode` | -      | -    |
 
-#### 事件回调 {#events-callback}
+#### 事件回调
 
 | 属性              | 说明                                  | 类型                                                                                          | 默认值 | 版本 |
 | ----------------- | ------------------------------------- | --------------------------------------------------------------------------------------------- | ------ | ---- |
@@ -459,7 +459,7 @@ export default () => {
 | onPaste           | 粘贴回调，返回 `false` 可阻止默认粘贴 | `(e: React.ClipboardEvent<HTMLDivElement>) => boolean \| void`                                | -      | -    |
 | onSelectionChange | 选区变化回调                          | `(selection: Selection \| null, selectedMarkdown: string, selectedNodes: Elements[]) => void` | -      | -    |
 
-#### 引用与其他 {#reference-and-others}
+#### 引用与其他
 
 | 属性                    | 说明                                                                                                                                  | 类型                                                                                                                                  | 默认值 | 版本 |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------ | ---- |

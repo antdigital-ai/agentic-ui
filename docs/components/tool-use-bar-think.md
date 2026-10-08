@@ -6,7 +6,7 @@ group:
   order: 3
 ---
 
-# ToolUseBarThink 深度思考 {#thinking-toolusebarthink}
+# ToolUseBarThink 深度思考
 
 `ToolUseBarThink` 是一个独立的「深度思考」展示组件，用于在 Agent 对话流中呈现长链路思考过程（thinking）。它与 [ToolUseBar](./tool-use-bar) 同属工具调用展示族，但拥有独立的样式与交互：
 
@@ -14,19 +14,19 @@ group:
 - 内容超长（默认 200px 高度）时支持二级展开 / 收起
 - 提供 `light` 轻量模式，与文本流内嵌呈现
 
-## 何时使用 {#when-to-use}
+## 何时使用
 
 - 智能体执行较长推理 / 思考过程，需要对外呈现思考摘要或流式 `thinkContent`
 - 思考过程为「展示用」，与具体工具调用解耦时（不需要 `ToolUseBar` 的工具列表概念）
 - 希望在对话流中以一个独立卡片单独展示「正在思考 / 思考完成」状态
 
-## 代码演示 {#demo}
+## 代码演示
 
-<code src="../demos/tool-use-bar-think-playground.tsx">API Playground - 状态 / 受控 / 流式 / 自定义样式</code>
+<code src="../demos/tool-use-bar-think-playground.tsx" description="API Playground - 状态 / 受控 / 流式 / 自定义样式"></code>
 
-<code src="../demos/tool-use-bar-think-standalone.tsx">深度思考 - 流式与多状态对比</code>
+<code src="../demos/tool-use-bar-think-standalone.tsx" description="深度思考 - 流式与多状态对比"></code>
 
-<code src="../demos/tool-use-bar-think-simple.tsx">深度思考 - 简化用法</code>
+<code src="../demos/tool-use-bar-think-simple.tsx" description="深度思考 - 简化用法"></code>
 
 ## API
 
@@ -74,7 +74,7 @@ group:
 
 `styles` 与 `classNames` 字段一一对应，类型为 `React.CSSProperties`，用法相同。
 
-## 行为说明 {#notes}
+## 行为说明
 
 1. **Loading 自动展开**：当 `status === 'loading'` 时，组件会自动将 `expanded` 置为 `true`，便于用户实时看到流式输出的思考内容。
 2. **二级展开**：当 `thinkContent` 高度超过 200px 时，会在底部显示「展开 / 收起」按钮，避免长思考占据过多版面。
@@ -82,7 +82,7 @@ group:
 4. **Light 模式**：`light={true}` 时使用更紧凑的样式（无独立图标容器、悬浮时切换 chevron），适合行内嵌入。
 5. **可控 / 非可控**：`expanded` / `floatingExpanded` 同时支持受控与非受控，未传值时使用 `defaultExpanded` / `defaultFloatingExpanded` 作为初始值。
 
-## 与 ToolUseBar 的关系 {#toolusebar}
+## 与 ToolUseBar 的关系
 
 | 维度     | ToolUseBar                   | ToolUseBarThink              |
 | -------- | ---------------------------- | ---------------------------- |

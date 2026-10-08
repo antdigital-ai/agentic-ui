@@ -7,72 +7,72 @@ group:
   order: 3
 ---
 
-# Markdown 输入框 {#markdown}
+# Markdown 输入框
 
-## 基本用法（Tag + Mark）{#tag-mark-basic}
+## 基本用法（Tag + Mark）
 
-<code src="../demos/markdownInputField/basic.tsx" background="var(--main-bg-color)" iframe=640></code>
+<code src="../demos/markdownInputField/basic.tsx" background="var(--main-bg-color)" iframe="640"></code>
 
-## 中文输入法（IME Enter）{#ime-compose-enter}
+## 中文输入法（IME Enter）
 
-<code src="../demos/markdownInputField/ime-compose-enter.tsx" background="var(--main-bg-color)" iframe=640></code>
+<code src="../demos/markdownInputField/ime-compose-enter.tsx" background="var(--main-bg-color)" iframe="640"></code>
 
-## 圆角 {#border-radius}
+## 圆角
 
-<code src="../demos/markdownInputField/border-radius.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/markdownInputField/border-radius.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
 ## dropdownRender
 
-<code src="../demos/markdownInputField/dropdown-render.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/markdownInputField/dropdown-render.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-## 自定义 Tag {#custom-tag}
+## 自定义 Tag
 
-<code src="../demos/markdownInputField/custom-tag.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/markdownInputField/custom-tag.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-## 文件上传 {#upload}
+## 文件上传
 
-<code src="../demos/markdownInputField/attachment-basic.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/markdownInputField/attachment-basic.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-## 多行滚动 {#multiline-scroll}
+## 多行滚动
 
-<code src="../demos/markdownInputField/scroll.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/markdownInputField/scroll.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-## 禁用 {#disabled}
+## 禁用
 
-<code src="../demos/markdownInputField/disabled.tsx" background="var(--main-bg-color)" iframe=420></code>
+<code src="../demos/markdownInputField/disabled.tsx" background="var(--main-bg-color)" iframe="420"></code>
 
-## 焦点事件 {#events}
+## 焦点事件
 
-<code src="../demos/markdownInputField/on-focus.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/markdownInputField/on-focus.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-## webllm 助手集成 {#webllm}
+## webllm 助手集成
 
-<code src="../demos/markdownInputField/web-llm.tsx" background="var(--main-bg-color)" iframe=720></code>
+<code src="../demos/markdownInputField/web-llm.tsx" background="var(--main-bg-color)" iframe="720"></code>
 
-## 自定义发送按钮 {#custom}
+## 自定义发送按钮
 
-<code src="../demos/markdownInputField/custom-send-button.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/markdownInputField/custom-send-button.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-## 自定义发送（高级） {#custom-2}
+## 自定义发送（高级）
 
-<code src="../demos/markdownInputField/custom-send-advanced.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/markdownInputField/custom-send-advanced.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-## 自定义附件弹窗 {#custom-attachment}
+## 自定义附件弹窗
 
-<code src="../demos/markdownInputField/custom-attachment-popover.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/markdownInputField/custom-attachment-popover.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-## 上传响应处理 {#upload-2}
+## 上传响应处理
 
-<code src="../demos/markdownInputField/upload-with-response.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/markdownInputField/upload-with-response.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-## 禁用悬停动画 {#disable-hover-animation}
+## 禁用悬停动画
 
-<code src="../demos/markdownInputField/disable-hover-animation.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/markdownInputField/disable-hover-animation.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-## 粘贴配置 {#config-paste}
+## 粘贴配置
 
-<code src="../demos/paste-config.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/paste-config.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-## 引用输入 {#quote-input}
+## 引用输入
 
-<code src="../demos/quote-with-input-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/quote-with-input-demo.tsx" background="var(--main-bg-color)" iframe="540"></code>

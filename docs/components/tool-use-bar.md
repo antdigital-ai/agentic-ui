@@ -6,13 +6,13 @@ group:
   order: 3
 ---
 
-# ToolUseBar 组件 {#toolusebar}
+# ToolUseBar 组件
 
 ToolUseBar 是一个用于显示工具调用列表的组件，支持工具状态显示和交互功能。
 
-## 代码演示 {#demo}
+## 代码演示
 
-### 轻量思考 {#thinking}
+### 轻量思考
 
 ```tsx
 import { ToolUseBarThink } from '@ant-design/agentic-ui';
@@ -48,15 +48,15 @@ export default () => {
 };
 ```
 
-<code src="../demos/tool-use-bar-basic.tsx">基础用法 - 多状态工具列表</code>
+<code src="../demos/tool-use-bar-basic.tsx" description="基础用法 - 多状态工具列表"></code>
 
-<code src="../demos/tool-use-bar-active-keys.tsx">受控激活 - activeKeys</code>
+<code src="../demos/tool-use-bar-active-keys.tsx" description="受控激活 - activeKeys"></code>
 
-<code src="../demos/tool-use-bar-expanded-keys.tsx">受控展开 - expandedKeys</code>
+<code src="../demos/tool-use-bar-expanded-keys.tsx" description="受控展开 - expandedKeys"></code>
 
-<code src="../demos/tool-use-bar-think-standalone.tsx">深度思考 - ToolUseBarThink</code>
+<code src="../demos/tool-use-bar-think-standalone.tsx" description="深度思考 - ToolUseBarThink"></code>
 
-<code src="../demos/tool-use-bar-think-simple.tsx">深度思考 - 多状态对比</code>
+<code src="../demos/tool-use-bar-think-simple.tsx" description="深度思考 - 多状态对比"></code>
 
 ## API
 
@@ -93,7 +93,7 @@ export default () => {
 | toolTarget   | 工具目标                           | `React.ReactNode`                             | -      | -    |
 | type         | 工具类型，'summary' 为特殊的总结项 | `'summary' \| 'normal' \| string`             | -      | -    |
 
-## 状态样式 {#style-status}
+## 状态样式
 
 组件会根据工具状态显示不同的样式：
 
@@ -103,7 +103,7 @@ export default () => {
 - `error`: 错误状态
 - `active`: 激活状态（通过 activeKeys 控制）
 
-## ToolUseBarThink 独立组件 {#toolusebarthink}
+## ToolUseBarThink 独立组件
 
 `ToolUseBarThink` 是一个独立的「深度思考」展示组件，与 `ToolUseBar` 同属工具调用展示族但拥有独立的样式与交互（默认展开收起、Loading 浮动展开按钮、二级展开收起、`light` 轻量模式等）。
 
@@ -123,7 +123,7 @@ export default () => {
 | floatingExpanded / defaultFloatingExpanded | Loading 浮动展开按钮（受控 / 非受控） | `boolean`                             | `false` |
 | onFloatingExpandedChange                   | 浮动展开状态变化回调                  | `(floatingExpanded: boolean) => void` | -       |
 
-## 注意事项 {#notes}
+## 注意事项
 
 1. `activeKeys` 数组中的 ID 必须与 `tools` 中的 `id` 匹配
 2. 如果不提供 `onActiveKeysChange`，`activeKeys` 将不会生效

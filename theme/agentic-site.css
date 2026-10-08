@@ -1,0 +1,118 @@
+/**
+ * Agentic UI 文档站全局样式。
+ *
+ * 职责：
+ * 1. 桥接 Rspress 明暗主题（html.dark）与组件库调色板（[data-prefers-color="dark"]）
+ * 2. 定义 --main-bg-color（demo background 属性依赖）
+ * 3. DemoCard 预览卡片样式
+ *
+ * 调色板本体在 theme/palette.css。
+ */
+@import './palette.css';
+
+:root {
+  /* demo 容器默认背景（dumi --main-bg-color 等价物） */
+  --main-bg-color: #fff;
+  --demo-card-border: #e4e9ec;
+  --demo-card-meta-bg: #fff;
+}
+
+html.dark {
+  --main-bg-color: #152833;
+  --demo-card-border: #344c59;
+  --demo-card-meta-bg: #0d1b24;
+}
+
+/* Rspress 用 html.dark；组件库/图表用 data-prefers-color，双向同步 */
+html.dark[data-prefers-color='light'],
+html.dark:not([data-prefers-color]) {
+  color-scheme: dark;
+}
+
+/* ---- DemoCard ---- */
+.demo-card {
+  border: 1px solid var(--demo-card-border);
+  border-radius: 8px;
+  margin-block: 16px;
+  overflow: hidden;
+}
+
+.demo-card__canvas {
+  padding: 16px;
+  transition: background-color 0.3s;
+}
+
+.demo-card__canvas iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.demo-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  border-block-start: 1px solid var(--demo-card-border);
+  background: var(--demo-card-meta-bg);
+}
+
+.demo-card__desc h5 {
+  margin: 0 0 2px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.demo-card__desc h5 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.demo-card__desc p {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.72;
+}
+
+.demo-card__actions {
+  flex-shrink: 0;
+}
+
+.demo-card__action {
+  border: 1px solid var(--demo-card-border);
+  background: transparent;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  color: inherit;
+}
+
+.demo-card__source {
+  padding: 12px 16px;
+  font-size: 13px;
+  border-block-start: 1px dashed var(--demo-card-border);
+}
+
+/* ---- standalone demo 容器页（/~demos/<id>）：文档站共享 globalStyles ---- */
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* ---- 首页：脱离 Rspress 正文容器，全宽渲染 HomePage ---- */
+.agentic-home-fullscreen {
+  /* 抵消 Rspress 内容容器宽度约束，回到视口宽度 */
+  width: 100vw;
+  margin-inline-start: calc(50% - 50vw);
+  overflow-x: hidden;
+}
+
+/* 首页自带 Hero 顶部留白，隐藏正文占位标题，避免双重 head */
+.agentic-home-fullscreen + h1,
+.agentic-home-fullscreen ~ .rp-title {
+  display: none;
+}

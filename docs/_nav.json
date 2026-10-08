@@ -1,0 +1,32 @@
+[
+  {
+    "text": "组件",
+    "link": "/components",
+    "activeMatch": "^/components/"
+  },
+  {
+    "text": "插件",
+    "link": "/plugin/",
+    "activeMatch": "^/plugin/"
+  },
+  {
+    "text": "项目研发",
+    "link": "/development",
+    "activeMatch": "^/development/"
+  },
+  {
+    "text": "Demo",
+    "link": "/demos-pages/",
+    "activeMatch": "^/demos-pages/"
+  },
+  {
+    "text": "基础能力",
+    "link": "/utils/",
+    "activeMatch": "^/utils/"
+  },
+  {
+    "text": "常见问题",
+    "link": "/faq",
+    "activeMatch": "^/faq/"
+  }
+]

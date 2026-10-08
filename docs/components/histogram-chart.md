@@ -7,18 +7,18 @@ group:
   order: 4
 ---
 
-# HistogramChart 直方图 {#histogramchart}
+# HistogramChart 直方图
 
 直方图用于展示数据分布频率，自动使用 Sturges 规则计算分箱数量，支持多系列堆叠和频率显示。
 
-## 代码演示 {#demo}
+## 代码演示
 
-<code src="../demos/charts/histogram/histogram.tsx" background="var(--main-bg-color)" iframe=540></code>
-<code src="../demos/charts/histogram/histogram-multi-series.tsx" background="var(--main-bg-color)" title="多系列直方图" iframe=540></code>
-<code src="../demos/charts/histogram/histogram-frequency.tsx" background="var(--main-bg-color)" title="频率直方图" iframe=540></code>
-<code src="../demos/charts/histogram/histogram-custom-bins.tsx" background="var(--main-bg-color)" title="自定义分箱数量" iframe=540></code>
-<code src="../demos/charts/histogram/histogram-with-filter.tsx" background="var(--main-bg-color)" title="带筛选的直方图" iframe=540></code>
-<code src="../demos/charts/histogram/histogram-dark.tsx" background="#141414" title="暗黑主题" iframe=520></code>
+<code src="../demos/charts/histogram/histogram.tsx" background="var(--main-bg-color)" iframe="540"></code>
+<code src="../demos/charts/histogram/histogram-multi-series.tsx" background="var(--main-bg-color)" title="多系列直方图" iframe="540"></code>
+<code src="../demos/charts/histogram/histogram-frequency.tsx" background="var(--main-bg-color)" title="频率直方图" iframe="540"></code>
+<code src="../demos/charts/histogram/histogram-custom-bins.tsx" background="var(--main-bg-color)" title="自定义分箱数量" iframe="540"></code>
+<code src="../demos/charts/histogram/histogram-with-filter.tsx" background="var(--main-bg-color)" title="带筛选的直方图" iframe="540"></code>
+<code src="../demos/charts/histogram/histogram-dark.tsx" background="#141414" title="暗黑主题" iframe="520"></code>
 
 ## API
 
@@ -58,9 +58,9 @@ group:
 | category    | 分类（用于筛选）         | `string` | -      | -    |
 | filterLabel | 二级筛选标签（可选）     | `string` | -      | -    |
 
-## 说明 {#notes}
+## 说明
 
-### 自动分箱 {#auto-binning}
+### 自动分箱
 
 组件默认使用 **Sturges 规则** 自动计算分箱数量：
 
@@ -70,7 +70,7 @@ k = ceil(log2(n) + 1)
 
 其中 `n` 为数据点数量。这是一种适用于正态分布数据的简单规则。
 
-### 自定义分箱 {#custom}
+### 自定义分箱
 
 通过 `binCount` 属性可以手动指定分箱数量，适用于：
 
@@ -78,20 +78,20 @@ k = ceil(log2(n) + 1)
 - 对分箱精度有特定要求的场景
 - 需要对比不同数据集时保持一致的分箱
 
-### 频率模式 {#mode-mode}
+### 频率模式
 
 默认显示计数（每个分箱中的数据点数量），设置 `showFrequency={true}` 可切换为显示频率（占比），便于：
 
 - 比较不同样本量的数据分布
 - 查看数据的相对分布而非绝对数量
 
-### 多系列支持 {#multi-series}
+### 多系列支持
 
 当数据包含 `type` 字段时，组件自动按类型分组显示多个系列：
 
 - `stacked={true}`（默认）：堆叠显示，便于查看总体分布
 - `stacked={false}`：并排显示，便于对比各组分布
 
-### 筛选功能 {#filtering}
+### 筛选功能
 
 当数据包含 `category` 字段时，组件自动显示筛选器，支持按分类切换数据视图。

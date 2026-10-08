@@ -8,11 +8,11 @@ group:
   order: 3
 ---
 
-# MarkdownInputField - 输入框 {#markdowninputfield}
+# MarkdownInputField - 输入框
 
 `MarkdownInputField` 是一个带发送功能的 Markdown 输入字段组件，允许用户编辑 Markdown 内容并通过按钮或快捷键发送。
 
-## 功能特点 {#features}
+## 功能特点
 
 - 📝 支持 Markdown 输入
 - 📎 支持附件上传
@@ -20,7 +20,7 @@ group:
 - 🍵 支持插槽输入
 - 🎯 支持技能模式
 
-<code src="../demos/markdownInputField/basic.tsx" background="var(--main-bg-color)" iframe=640></code>
+<code src="../demos/markdownInputField/basic.tsx" background="var(--main-bg-color)" iframe="640"></code>
 
 ```tsx
 import { message } from 'antd';
@@ -216,11 +216,11 @@ export default () => {
 };
 ```
 
-## 快捷键 {#shortcuts}
+## 快捷键
 
 组件支持以下快捷键操作，可以通过 `triggerSendKey` 属性配置发送行为。
 
-### 发送与换行 {#send-and-newline}
+### 发送与换行
 
 | 模式             | 发送快捷键                                          | 换行快捷键                          | 适用场景                       |
 | :--------------- | :-------------------------------------------------- | :---------------------------------- | :----------------------------- |
@@ -232,7 +232,7 @@ export default () => {
 > 1.  **移动端适配**：在移动设备上，为防止误触，强制使用 `'Mod+Enter'` 模式（即点击键盘回车键仅换行，不发送）。
 > 2.  **输入法兼容**：在中文输入法（IME）组字/选词过程中，按 <kbd>Enter</kbd> 键不会触发发送。
 
-### 编辑器通用快捷键 {#shortcuts-2}
+### 编辑器通用快捷键
 
 除了发送快捷键外，组件还支持以下 Markdown 编辑常用的快捷键：
 
@@ -242,7 +242,7 @@ export default () => {
 | <kbd>Cmd</kbd> + <kbd>I</kbd> / <kbd>Ctrl</kbd> + <kbd>I</kbd>                                       | 斜体                 |
 | <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> / <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> | 删除线               |
 | <kbd>Option</kbd> + <kbd>`</kbd> / <kbd>Alt</kbd> + <kbd>`</kbd>                                     | 行内代码             |
-| <kbd>Cmd</kbd> + <kbd>\</kbd> / <kbd>Ctrl</kbd> + <kbd>\</kbd>                                       | 清除格式             |
+| <kbd>Cmd</kbd> + <kbd>\\</kbd> / <kbd>Ctrl</kbd> + <kbd>\\</kbd>                                     | 清除格式             |
 | <kbd>Cmd</kbd> + <kbd>1</kbd>~<kbd>4</kbd> / <kbd>Ctrl</kbd> + <kbd>1</kbd>~<kbd>4</kbd>             | 标题 H1 ~ H4         |
 | <kbd>Cmd</kbd> + <kbd>0</kbd> / <kbd>Ctrl</kbd> + <kbd>0</kbd>                                       | 转换为普通段落       |
 | <kbd>Cmd</kbd> + <kbd>]</kbd> / <kbd>Ctrl</kbd> + <kbd>]</kbd>                                       | 增加标题级别（变小） |
@@ -303,7 +303,7 @@ export default () => {
 | `disableHoverAnimation`  | 是否禁用 hover 动画                            | `boolean`                                                            | `false`   | -    |
 | `bgColorList`            | 背景颜色列表                                   | `string[]`                                                           | -         | -    |
 
-### 类型定义 {#type-definitions}
+### 类型定义
 
 #### AttachmentButtonProps
 
@@ -358,9 +358,9 @@ export default () => {
 | `background`      | 默认状态下的背景颜色   | `string` | -      | -    |
 | `backgroundHover` | Hover 状态下的背景颜色 | `string` | -      | -    |
 
-## 示例 {#examples}
+## 示例
 
-### 基础使用 {#basic}
+### 基础使用
 
 ```tsx
 import { MarkdownInputField, ToggleButton } from '@ant-design/agentic-ui';
@@ -441,13 +441,13 @@ const App = () => {
 export default App;
 ```
 
-### AI 回复中的输入指引 {#ai-replying-typing-hint}
+### AI 回复中的输入指引
 
 当 `typing` 为 `true`（例如 AI 正在流式输出）或发送中的 `onSend` 尚未 resolve，且当前输入为空时，输入区左侧会显示带动画的提示文案（国际化键 `input.typing.hint`），比仅依赖发送按钮 loading 更明显。`typing` 为 `true` 时输入区为只读，无法编辑或语音输入，附件按钮亦不可用。
 
-<code src="../demos/markdownInputField/typing-hint.tsx" background="var(--main-bg-color)" iframe=800></code>
+<code src="../demos/markdownInputField/typing-hint.tsx" background="var(--main-bg-color)" iframe="800"></code>
 
-### 小屏幕 {#small-screen}
+### 小屏幕
 
 ```tsx
 import { message } from 'antd';
@@ -638,7 +638,7 @@ export default () => {
 };
 ```
 
-### 启用语音输入按钮（支持句级回调） {#callback-voice}
+### 启用语音输入按钮（支持句级回调）
 
 ```tsx
 import {
@@ -716,7 +716,7 @@ export default () => {
 > - 再次点击语音按钮结束录音。
 > - 录音过程中点击发送按钮将先停止录音，再发送当前输入内容。
 
-### 自定义触发键和样式 {#custom-style}
+### 自定义触发键和样式
 
 ```tsx
 import { MarkdownInputField, ToggleButton } from '@ant-design/agentic-ui';
@@ -752,7 +752,7 @@ export default () => {
 };
 ```
 
-### 启用提示词优化 {#prompt-optimization}
+### 启用提示词优化
 
 ```tsx
 import { MarkdownInputField, ToggleButton } from '@ant-design/agentic-ui';
@@ -801,25 +801,25 @@ export default () => {
 };
 ```
 
-### 放大 {#zoom}
+### 放大
 
 `MarkdownInputField` 支持放大功能，用户可以通过点击放大图标将输入框扩展到指定的容器内，提供更大的编辑空间。此功能特别适用于需要编写长文本或复杂内容的场景。
 
-#### 相关属性 {#props}
+#### 相关属性
 
 | 属性               | 说明                                               | 类型                           | 默认值  | 版本 |
 | ------------------ | -------------------------------------------------- | ------------------------------ | ------- | ---- |
 | `enlargeable`      | 是否启用放大功能                                   | `boolean`                      | `false` | -    |
 | `enlargeTargetRef` | 放大时的目标容器引用，必须是一个具有定位属性的元素 | `React.RefObject<HTMLElement>` | -       | -    |
 
-#### 使用注意事项 {#usage-notes}
+#### 使用注意事项
 
 1. **容器定位**：目标容器必须具有相对定位（`position: relative`）或其他非静态定位
 2. **容器尺寸**：确保目标容器有足够的空间容纳放大后的输入框
 3. **z-index**：放大后的输入框具有较高的 z-index 值，确保不被其他元素遮盖
 4. **响应式设计**：在移动端或小屏幕设备上使用时，建议调整目标容器尺寸
 
-#### 基本示例 {#basic-example}
+#### 基本示例
 
 ```tsx
 import { MarkdownInputField, ToggleButton } from '@ant-design/agentic-ui';
@@ -860,7 +860,7 @@ export default () => {
 };
 ```
 
-### 便捷操作区域 {#quick-actions}
+### 便捷操作区域
 
 便捷操作区提供了在输入框上方自定义操作按钮的功能。
 
@@ -989,7 +989,7 @@ export default () => {
 };
 ````
 
-### 启用附件功能 {#attachment}
+### 启用附件功能
 
 ```tsx
 import { MarkdownInputField, ToggleButton } from '@ant-design/agentic-ui';
@@ -1067,29 +1067,29 @@ export default () => {
 };
 ```
 
-### 最大文件限制与错误展示 {#file-limit-errors}
+### 最大文件限制与错误展示
 
 通过 `maxFileSize`（单文件最大字节数）和 `maxFileCount`（最大文件数量）可限制附件选择。当文件超过大小限制时，该文件会以**错误状态**出现在附件列表中，并展示「超过 xxx KB」等错误文案；超过数量限制时，多选会被拦截。
 
-#### 文件超过最大值报错 {#file-size-error}
+#### 文件超过最大值报错
 
 下方 Demo 中单文件限制为 **100KB**，选择超过该大小的文件时，该文件会以错误状态出现在附件列表并展示「超过 xxx KB」的报错提示。
 
-<code src="../demos/markdownInputField/max-file-size-error.tsx" background="var(--main-bg-color)" iframe=800></code>
+<code src="../demos/markdownInputField/max-file-size-error.tsx" background="var(--main-bg-color)" iframe="800"></code>
 
-#### 文件数量超限回调 {#callback}
+#### 文件数量超限回调
 
 通过 `onExceedMaxCount` 回调，可以在文件数量超过 `maxFileCount` 限制时收到通知，由消费者决定如何展示提示信息，而不是静默失败。
 
-<code src="../demos/markdownInputField/max-file-count-exceed.tsx" background="var(--main-bg-color)" iframe=800></code>
+<code src="../demos/markdownInputField/max-file-count-exceed.tsx" background="var(--main-bg-color)" iframe="800"></code>
 
-### uploadWithResponse - 获取完整上传响应 {#full-uploadwithresponse}
+### uploadWithResponse - 获取完整上传响应
 
 使用 `uploadWithResponse` 接口可以返回完整的上传响应对象，包含文件ID、URL、状态等详细信息。响应数据会自动存储在 `file.uploadResponse` 中。
 
-<code src="../demos/markdownInputField/upload-with-response.tsx" background="var(--main-bg-color)" iframe=800></code>
+<code src="../demos/markdownInputField/upload-with-response.tsx" background="var(--main-bg-color)" iframe="800"></code>
 
-#### uploadWithResponse 接口定义 {#uploadwithresponse}
+#### uploadWithResponse 接口定义
 
 ```typescript
 uploadWithResponse?: (
@@ -1098,7 +1098,7 @@ uploadWithResponse?: (
 ) => Promise<UploadResponse>;
 ```
 
-#### UploadResponse 类型 {#types-uploadresponse}
+#### UploadResponse 类型
 
 | 属性         | 说明             | 类型                            | 默认值 | 版本 |
 | ------------ | ---------------- | ------------------------------- | ------ | ---- |
@@ -1111,7 +1111,7 @@ uploadWithResponse?: (
 | errorMessage | 错误消息         | `string \| null`                | -      | -    |
 | fileSize     | 文件大小（字节） | `number \| null`                | -      | -    |
 
-#### 特性 {#features-2}
+#### 特性
 
 - ✅ 返回完整的响应对象，包含更多元信息
 - ✅ 响应数据自动存储在 `file.uploadResponse` 中
@@ -1119,7 +1119,7 @@ uploadWithResponse?: (
 - ✅ 优先级高于旧的 `upload` 接口
 - ✅ 向后兼容，可与 `upload` 接口共存
 
-#### 使用示例 {#examples-2}
+#### 使用示例
 
 ```typescript
 <MarkdownInputField
@@ -1148,13 +1148,13 @@ uploadWithResponse?: (
 />
 ```
 
-### 自定义附件按钮渲染 {#custom-attachment}
+### 自定义附件按钮渲染
 
 通过 `attachment.render` 属性，您可以完全替换默认的 `AttachmentButtonPopover` 组件，实现自定义的附件按钮交互体验。
 
-<code src="../demos/markdownInputField/custom-attachment-popover.tsx" background="var(--main-bg-color)" iframe=800></code>
+<code src="../demos/markdownInputField/custom-attachment-popover.tsx" background="var(--main-bg-color)" iframe="800"></code>
 
-#### render 属性 {#props-render}
+#### render 属性
 
 | 属性   | 说明               | 类型                                         | 默认值 | 版本 |
 | ------ | ------------------ | -------------------------------------------- | ------ | ---- |
@@ -1175,13 +1175,13 @@ uploadWithResponse?: (
 | extensions | 支持的文件扩展名数组 | `string[]`        | -      | -    |
 | icon       | 文件类型图标         | `React.ReactNode` | -      | -    |
 
-#### 兼容性 {#compatibility}
+#### 兼容性
 
 - 完全向后兼容，不使用 `render` 时保持原有行为
 - 支持所有现有的 `AttachmentButton` 属性
 - 可与其他附件配置选项（如 `supportedFormat`、`maxFileSize` 等）配合使用
 
-### 自定义操作按钮 {#custom}
+### 自定义操作按钮
 
 ```tsx
 import { MarkdownInputField, ToggleButton } from '@ant-design/agentic-ui';
@@ -1265,7 +1265,7 @@ export default () => {
 };
 ```
 
-### 获取编辑器实例 {#get-editor-instance}
+### 获取编辑器实例
 
 ```tsx
 import { MarkdownInputField, ToggleButton } from '@ant-design/agentic-ui';
@@ -1319,7 +1319,7 @@ const App = () => {
 export default App;
 ```
 
-### 焦点事件处理 {#events}
+### 焦点事件处理
 
 ```tsx
 import { MarkdownInputField, ToggleButton } from '@ant-design/agentic-ui';
@@ -1388,7 +1388,7 @@ export default () => {
 };
 ```
 
-### 自定义叶子节点渲染 {#custom-2}
+### 自定义叶子节点渲染
 
 ```tsx
 import { MarkdownInputField, ToggleButton } from '@ant-design/agentic-ui';
@@ -1438,18 +1438,14 @@ export default () => {
         // 自定义代码样式
         if (leaf.code) {
           return (
-            <code
-              style={{
+            <code style="{{"
                 color: '#d83931',
                 backgroundColor: '#fff2f0',
                 padding: '2px 6px',
                 borderRadius: '6px',
                 border: '1px solid #ffccc7',
                 fontFamily: 'Monaco, Consolas, monospace',
-              }}
-            >
-              {children}
-            </code>
+              }} description="{children}"></code>
           );
         }
 
@@ -1465,7 +1461,7 @@ export default () => {
 };
 ```
 
-### 技能模式 {#mode-mode}
+### 技能模式
 
 ```tsx
 import { Tag, Button, Space, Switch, Divider } from 'antd';
@@ -1641,9 +1637,9 @@ export default () => {
 };
 ```
 
-### 粘贴配置 {#config-paste}
+### 粘贴配置
 
-```tsx | pure
+```tsx pure
 import { MarkdownInputField, ToggleButton } from '@ant-design/agentic-ui';
 
 export default () => {

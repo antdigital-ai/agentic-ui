@@ -6,13 +6,13 @@ group:
   order: 1
 ---
 
-# VisualList 视觉列表 {#list-visuallist}
+# VisualList 视觉列表
 
 一个灵活的图片列表组件，支持多种尺寸、形状和自定义渲染。基于 css-in-js 样式系统，提供良好的主题支持和样式隔离。
 
-## 代码演示 {#demo}
+## 代码演示
 
-<code src="../demos/visual-list.tsx">基础用法 - 头像列表与形状</code>
+<code src="../demos/visual-list.tsx" description="基础用法 - 头像列表与形状"></code>
 
 ## API
 
@@ -47,11 +47,11 @@ group:
 | title | 图片标题                       | `string` | -      | -    |
 | href  | 链接地址，如果提供则图片可点击 | `string` | -      | -    |
 
-## 使用示例 {#examples}
+## 使用示例
 
-### 基础用法 {#basic-usage}
+### 基础用法
 
-```tsx | pure
+```tsx pure
 import { VisualList, VisualListItem } from '@ant-design/agentic-ui';
 
 const imageData: VisualListItem[] = [
@@ -74,9 +74,9 @@ const imageData: VisualListItem[] = [
 <VisualList data={imageData} />;
 ```
 
-### 不同形状 {#shapes}
+### 不同形状
 
-```tsx | pure
+```tsx pure
 // 圆形头像
 <VisualList data={imageData} shape="circle" />
 
@@ -84,9 +84,9 @@ const imageData: VisualListItem[] = [
 <VisualList data={imageData} shape="default" />
 ```
 
-### 组件变体 {#variants}
+### 组件变体
 
-```tsx | pure
+```tsx pure
 // 带边框
 <VisualList data={imageData} variant="outline" />
 
@@ -94,22 +94,22 @@ const imageData: VisualListItem[] = [
 <VisualList data={imageData} variant="borderless" />
 ```
 
-### 带描述文字 {#with-description}
+### 带描述文字
 
-```tsx | pure
+```tsx pure
 <VisualList data={imageData} description="这里是列表的描述信息" />
 ```
 
-### 数据过滤 {#filter}
+### 数据过滤
 
-```tsx | pure
+```tsx pure
 // 只显示有链接的图片
 <VisualList data={imageData} filter={(item) => item.href !== undefined} />
 ```
 
-### 自定义渲染 {#custom}
+### 自定义渲染
 
-```tsx | pure
+```tsx pure
 <VisualList
   data={imageData}
   renderItem={(item, index) => (
@@ -121,9 +121,9 @@ const imageData: VisualListItem[] = [
 />
 ```
 
-### 空状态和加载状态 {#status}
+### 空状态和加载状态
 
-```tsx | pure
+```tsx pure
 // 空状态
 <VisualList
   data={[]}
@@ -138,7 +138,7 @@ const imageData: VisualListItem[] = [
 />
 ```
 
-## 样式定制 {#style}
+## 样式定制
 
 组件使用了以下的样式变量，可以通过 CSS-in-JS 进行样式定制：
 
@@ -164,7 +164,7 @@ const imageData: VisualListItem[] = [
 }
 ```
 
-## 设计理念 {#design-philosophy}
+## 设计理念
 
 - **灵活性**: 支持多种尺寸、形状和自定义渲染
 - **可访问性**: 提供完整的键盘导航和屏幕阅读器支持

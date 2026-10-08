@@ -8,13 +8,11 @@ group:
 title: markdownToHtml 工具函数
 ---
 
-<!-- markdownlint-disable-next-line MD025 -->
-
-# markdownToHtml 工具函数 {#markdowntohtml}
+# markdownToHtml 工具函数
 
 `markdownToHtml` 是一个用于将 Markdown 内容转换为 HTML 的工具函数集合。
 
-## 功能描述 {#description}
+## 功能描述
 
 这个工具提供了两个主要函数：
 
@@ -29,7 +27,7 @@ title: markdownToHtml 工具函数
 - **HTML 内联** - 支持在 Markdown 中嵌入 HTML
 - **特殊字符处理** - 修复特殊字符在粗体中的显示问题
 
-## API 参考 {#api}
+## API 参考
 
 ### `markdownToHtml(markdown: string, plugins?: MarkdownToHtmlOptions): Promise<string>`
 
@@ -70,30 +68,30 @@ const plugins: MarkdownToHtmlOptions = [...DEFAULT_MARKDOWN_REMARK_PLUGINS];
 
 - `string` - 转换后的 HTML 字符串
 
-## 使用示例 {#examples}
+## 使用示例
 
-### 异步转换 {#async-transform}
+### 异步转换
 
-```typescript | pure
+```typescript pure
 import { markdownToHtml } from '@ant-design/agentic-ui';
 
 const markdown = `
-# 标题 {#title}
+# 标题
 
 这是一个**粗体**和*斜体*的段落。
 
-## 列表 {#list}
+## 列表
 
 - 项目 1
 - 项目 2
 
-## 代码 {#code}
+## 代码
 
 \`\`\`javascript
 console.log('Hello, World!');
 \`\`\`
 
-## 数学公式 {#math-formulas}
+## 数学公式
 
 $$
 E = mc^2
@@ -104,9 +102,9 @@ const html = await markdownToHtml(markdown);
 console.log(html);
 ```
 
-### 同步转换 {#sync-transform}
+### 同步转换
 
-```typescript | pure
+```typescript pure
 import { markdownToHtmlSync } from '@ant-design/agentic-ui';
 
 const markdown = '# 标题\n\n这是一个段落。';
@@ -114,9 +112,9 @@ const html = markdownToHtmlSync(markdown);
 console.log(html);
 ```
 
-### 自定义 remark 插件 {#custom-remark}
+### 自定义 remark 插件
 
-```typescript | pure
+```typescript pure
 import remarkDirective from 'remark-directive';
 import {
   DEFAULT_MARKDOWN_REMARK_PLUGINS,
@@ -136,9 +134,9 @@ const html = await markdownToHtml(markdown, [
 ]);
 ```
 
-### 关闭默认插件 {#disable-default-plugins}
+### 关闭默认插件
 
-```typescript | pure
+```typescript pure
 import remarkGfm from 'remark-gfm';
 import {
   DEFAULT_MARKDOWN_REMARK_PLUGINS,
@@ -153,7 +151,7 @@ const html = markdownToHtmlSync(
 );
 ```
 
-```typescript | pure
+```typescript pure
 import { markdownToHtmlSync } from '@ant-design/agentic-ui';
 
 const markdown = '# 标题\n\n这是一个段落。';
@@ -161,9 +159,9 @@ const html = markdownToHtmlSync(markdown);
 console.log(html);
 ```
 
-## 支持的 Markdown 特性 {#markdown}
+## 支持的 Markdown 特性
 
-### 基础语法 {#basic}
+### 基础语法
 
 - **标题**：`#` 到 `######`
 - **段落**：普通文本段落
@@ -195,7 +193,7 @@ console.log(html);
 
 - **删除线**：`~~删除的文本~~`
 
-### 数学公式 {#math-formulas-2}
+### 数学公式
 
 - **行内公式**：`$E = mc^2$`
 - **块级公式**：
@@ -215,13 +213,13 @@ author: 作者名
 date: 2024-01-01
 ---
 
-# 文档内容 {#content}
+# 文档内容
 ```
 
-### HTML 内联 {#html}
+### HTML 内联
 
 ```markdown
-# 标题 {#title-2}
+# 标题
 
 <div class="custom-class">
   自定义 HTML 内容
@@ -230,7 +228,7 @@ date: 2024-01-01
 <iframe src="https://example.com"></iframe>
 ```
 
-## 处理流程 {#processing-flow}
+## 处理流程
 
 默认处理流程使用以下 unified 插件（可通过自定义 `MarkdownToHtmlOptions` 完全覆盖）：
 
@@ -244,7 +242,7 @@ date: 2024-01-01
 8. **rehypeKatex** - KaTeX 数学公式渲染
 9. **rehypeStringify** - 输出 HTML 字符串
 
-## 错误处理 {#error-handling}
+## 错误处理
 
 两个函数都包含错误处理机制：
 
@@ -252,19 +250,19 @@ date: 2024-01-01
 - 返回空字符串作为默认值
 - 不会抛出异常，确保程序稳定性
 
-## 性能考虑 {#performance-notes}
+## 性能考虑
 
-### 异步 vs 同步 {#vs}
+### 异步 vs 同步
 
 - **异步版本**：适合处理大量内容或需要非阻塞操作
 - **同步版本**：适合简单转换或需要立即结果
 
-### 内存使用 {#memory-usage}
+### 内存使用
 
 - 转换过程会创建中间 AST（抽象语法树）
 - 对于大型文档，建议使用异步版本避免阻塞
 
-## 配置选项 {#config-options}
+## 配置选项
 
 当前实现使用固定的配置：
 
@@ -272,14 +270,14 @@ date: 2024-01-01
 - `allowDangerousHtml: true` - 允许危险的 HTML 内容
 - 支持 YAML 前置元数据
 
-## 使用场景 {#use-cases}
+## 使用场景
 
 - **预览功能**：将编辑的 Markdown 转换为 HTML 进行预览
 - **导出功能**：将 Markdown 文档导出为 HTML 格式
 - **内容渲染**：在应用中显示 Markdown 内容
 - **文档生成**：生成静态网站或文档页面
 
-## 注意事项 {#notes}
+## 注意事项
 
 1. **依赖项**：需要安装 `unified` 生态系统相关包
 2. **数学公式**：需要 KaTeX CSS 样式支持

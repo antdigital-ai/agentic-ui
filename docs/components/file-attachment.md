@@ -7,13 +7,13 @@ group:
   order: 4
 ---
 
-# 文件附件 {#attachment}
+# 文件附件
 
 文件附件是 Bubble 组件的内置功能，用于在对话气泡中展示和处理多种类型的文件，支持图片预览、文档展示和文件下载。
 
 > 💡 文件附件功能通过 `Bubble` 组件的 `fileMap` 属性使用，无需单独引入。如需独立使用文件列表组件，请参考 [FileMapView](./FileMapView.md)。
 
-## ✨ 功能特点 {#features}
+## ✨ 功能特点
 
 - 📁 **多格式支持**：支持图片、PDF、Word、JSON 等多种文件格式
 - 🖼️ **图片预览**：图片文件自动展示缩略图
@@ -21,15 +21,15 @@ group:
 - ⬇️ **文件下载**：支持文件预览和下载操作
 - 🎨 **灵活布局**：根据文件数量和类型自动调整布局
 
-## 代码演示 {#demo}
+## 代码演示
 
-### 基础用法 {#basic-usage}
+### 基础用法
 
 演示如何处理和展示不同类型的文件附件，支持多种文件格式。
 
-<code src="../demos/bubble/file-view.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/bubble/file-view.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-## API 参考 {#api}
+## API 参考
 
 ### AttachmentFile
 
@@ -78,13 +78,13 @@ interface MessageBubbleData {
 | onDownload | 文件下载回调     | `(file: AttachmentFile) => void`                           |
 | onViewAll  | 查看所有文件回调 | `(files: AttachmentFile[]) => boolean \| Promise<boolean>` |
 
-## 使用说明 {#usage}
+## 使用说明
 
-### 基本用法 {#basic-usage-2}
+### 基本用法
 
 在 Bubble 组件中通过 `fileMap` 属性传入文件：
 
-```tsx | pure
+```tsx pure
 import {
   Bubble,
   MessageBubbleData,
@@ -135,9 +135,9 @@ const message: MessageBubbleData = {
 <Bubble originData={message} />;
 ```
 
-### 支持的文件类型 {#types}
+### 支持的文件类型
 
-#### 图片格式 {#image-formats}
+#### 图片格式
 
 | 格式 | MIME 类型       |
 | ---- | --------------- |
@@ -147,7 +147,7 @@ const message: MessageBubbleData = {
 | WebP | `image/webp`    |
 | SVG  | `image/svg+xml` |
 
-#### 文档格式 {#document-formats}
+#### 文档格式
 
 | 格式       | MIME 类型                                                                |
 | ---------- | ------------------------------------------------------------------------ |
@@ -156,7 +156,7 @@ const message: MessageBubbleData = {
 | PowerPoint | `application/vnd.ms-powerpoint`, `application/vnd.openxmlformats-...`    |
 | Excel      | `application/vnd.ms-excel`, `application/vnd.openxmlformats-...`         |
 
-#### 数据格式 {#data-format}
+#### 数据格式
 
 | 格式 | MIME 类型            |
 | ---- | -------------------- |
@@ -165,11 +165,11 @@ const message: MessageBubbleData = {
 | TXT  | `text/plain`         |
 | MD   | `text/markdown`      |
 
-### 限制显示数量 {#limit-display-count}
+### 限制显示数量
 
 当文件较多时，可以限制初始显示数量：
 
-```tsx | pure
+```tsx pure
 <Bubble
   originData={message}
   fileViewConfig={{
@@ -184,9 +184,9 @@ const message: MessageBubbleData = {
 />
 ```
 
-### 自定义更多操作 {#custom}
+### 自定义更多操作
 
-```tsx | pure
+```tsx pure
 import { Popover, Button } from 'antd';
 import {
   MoreOutlined,
@@ -218,21 +218,21 @@ import {
 />;
 ```
 
-## 使用场景 {#use-cases}
+## 使用场景
 
 - **文档分享**：AI 生成报告、文档后展示下载
 - **图片展示**：展示 AI 生成的图片或相关图片资料
 - **数据导出**：提供 JSON、CSV 等数据文件下载
 - **混合内容**：同时展示多种类型的文件附件
 
-## 最佳实践 {#best-practices}
+## 最佳实践
 
 1. **预览优化**：为图片提供压缩后的 `previewUrl`，提升加载速度
 2. **类型标注**：确保 `type` 字段使用正确的 MIME 类型
 3. **数量控制**：大量文件时使用 `maxDisplayCount` 限制初始显示
 4. **错误处理**：处理文件加载失败的情况，提供友好提示
 
-## 相关组件 {#related-components}
+## 相关组件
 
 - [Bubble 气泡组件](./bubble.md) - 消息气泡容器
 - [FileMapView 文件预览](./FileMapView.md) - 独立的文件列表组件

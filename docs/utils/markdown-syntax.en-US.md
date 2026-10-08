@@ -151,7 +151,7 @@ Use container syntax to create different types of tip blocks; they render as sty
 
 **Note**: Blank lines between the opening line and content are allowed.
 
-<code src="../demos/tip-blocks-demo.tsx" background="var(--main-bg-color)" iframe=480></code>
+<code src="../demos/tip-blocks-demo.tsx" background="var(--main-bg-color)" iframe="480"></code>
 
 ```markdown
 :::info
@@ -220,10 +220,10 @@ import { Card } from 'antd';
 
 ### Advanced Table Configuration
 
-You can configure a normal Markdown table as an advanced table using the HTML comment `<!-- { "chartType": "table" } -->`.
+You can configure a normal Markdown table as an advanced table using the HTML comment `{/* { "chartType": "table" } */}`.
 
 ```markdown
-<!-- {"chartType": "table"} -->
+{/* {"chartType": "table"} */}
 
 | Name     | Age | Occupation |
 | :------- | :-- | :--------- |
@@ -236,7 +236,7 @@ You can configure a normal Markdown table as an advanced table using the HTML co
 Similarly, supports rendering various chart types, such as bar charts (`bar`), pie charts (`pie`), etc.
 
 ```markdown
-<!-- {"chartType": "bar", "x": "Product", "y": "Sales"} -->
+{/* {"chartType": "bar", "x": "Product", "y": "Sales"} */}
 
 | Product | Sales |
 | :------ | :---- |

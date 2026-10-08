@@ -1,0 +1,12 @@
+[
+  {
+    "type": "section-header",
+    "label": "通用"
+  },
+  "faq",
+  {
+    "type": "file",
+    "name": "lazy",
+    "label": "性能优化"
+  }
+]

@@ -7,20 +7,20 @@ group:
   order: 6
 ---
 
-# 对话流 {#chat-flow}
+# 对话流
 
-## 对话流容器 {#chat-flow-container}
+## 对话流容器
 
-<code src="../demos/ChatFlowContainer/index.tsx" iframe=620></code>
+<code src="../demos/ChatFlowContainer/index.tsx" iframe="620"></code>
 
-## 对话流容器(带输入框) {#chat-flow-container-with-input}15} {#chat-flow-container-with-input}
+## 对话流容器(带输入框)
 
-<code src="../demos/ChatFlowContainer/with-input.tsx" iframe=620></code>
+<code src="../demos/ChatFlowContainer/with-input.tsx" iframe="620"></code>
 
-## 对话流容器(不包含底部) {#chat-flow-container-no-footer}19} {#chat-flow-container-no-footer}
+## 对话流容器(不包含底部)
 
-<code src="../demos/ChatFlowContainer/without-footer.tsx" iframe=620></code>
+<code src="../demos/ChatFlowContainer/without-footer.tsx" iframe="620"></code>
 
-## 欢迎消息 {#message}
+## 欢迎消息
 
-<code src="../demos/welcome/index.tsx" iframe=620></code>
+<code src="../demos/welcome/index.tsx" iframe="620"></code>

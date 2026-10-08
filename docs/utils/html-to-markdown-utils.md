@@ -7,11 +7,11 @@ group:
   order: 7
 ---
 
-# HTML 到 Markdown 转换工具 {#html-markdown}
+# HTML 到 Markdown 转换工具
 
 这个模块提供了一套无依赖的 HTML 到 Markdown 转换工具，可以独立使用。
 
-## 功能特性 {#features}
+## 功能特性
 
 - 🚀 **无依赖**: 只使用浏览器原生 API，无需额外依赖
 - 🎯 **类型安全**: 完整的 TypeScript 类型定义
@@ -19,17 +19,17 @@ group:
 - 📦 **模块化**: 提供多个独立的工具函数
 - 🧪 **测试覆盖**: 完整的单元测试
 
-## 安装 {#installation}
+## 安装
 
 ```bash
 npm install agentic-ui
 ```
 
-## 使用方法 {#methods}
+## 使用方法
 
-### 基本转换 {#basic}
+### 基本转换
 
-```typescript | pure
+```typescript pure
 import { htmlToMarkdown } from '@ant-design/agentic-ui';
 
 const html = '<h1>标题</h1><p>这是一个段落。</p>';
@@ -37,9 +37,9 @@ const markdown = htmlToMarkdown(html);
 // 输出: # 标题\n\n这是一个段落。\n\n
 ```
 
-### 带选项的转换 {#options}
+### 带选项的转换
 
-```typescript | pure
+```typescript pure
 import {
   htmlToMarkdown,
   type HtmlToMarkdownOptions,
@@ -57,9 +57,9 @@ const html =
 const markdown = htmlToMarkdown(html, options);
 ```
 
-### 批量转换 {#batch-convert}
+### 批量转换
 
-```typescript | pure
+```typescript pure
 import { batchHtmlToMarkdown } from '@ant-design/agentic-ui';
 
 const htmlFragments = ['<h1>标题1</h1>', '<p>段落1</p>', '<h2>标题2</h2>'];
@@ -68,18 +68,18 @@ const results = batchHtmlToMarkdown(htmlFragments);
 // 输出: ['# 标题1\n\n', '段落1\n\n', '## 标题2\n\n']
 ```
 
-### HTML 检测 {#html}
+### HTML 检测
 
-```typescript | pure
+```typescript pure
 import { isHtml } from '@ant-design/agentic-ui';
 
 console.log(isHtml('<p>内容</p>')); // true
 console.log(isHtml('普通文本')); // false
 ```
 
-### 文本提取 {#text-extraction}
+### 文本提取
 
-```typescript | pure
+```typescript pure
 import { extractTextFromHtml } from '@ant-design/agentic-ui';
 
 const html = '<h1>标题</h1><p>这是<strong>粗体</strong>文本。</p>';
@@ -87,9 +87,9 @@ const text = extractTextFromHtml(html);
 // 输出: "标题这是粗体文本。"
 ```
 
-### HTML 清理 {#html-2}
+### HTML 清理
 
-```typescript | pure
+```typescript pure
 import { cleanHtml } from '@ant-design/agentic-ui';
 
 const html = '  <p>  内容  </p>  ';
@@ -97,7 +97,7 @@ const cleaned = cleanHtml(html);
 // 输出: "<p>内容</p>"
 ```
 
-## API 参考 {#api}
+## API 参考
 
 ### `htmlToMarkdown(html: string, options?: HtmlToMarkdownOptions): string`
 
@@ -116,7 +116,7 @@ const cleaned = cleanHtml(html);
 
 转换选项接口：
 
-```typescript | pure
+```typescript pure
 interface HtmlToMarkdownOptions {
   /** 是否保留换行符 */
   preserveLineBreaks?: boolean;
@@ -178,9 +178,9 @@ interface HtmlToMarkdownOptions {
 
 - 清理后的 HTML 字符串
 
-## 支持的 HTML 标签 {#html-3}
+## 支持的 HTML 标签
 
-### 块级元素 {#block-elements}
+### 块级元素
 
 - `<h1>` - `<h6>` → `#` - `######`
 - `<p>` → 段落
@@ -191,7 +191,7 @@ interface HtmlToMarkdownOptions {
 - `<hr>` → 分隔线
 - `<div>` → 容器
 
-### 内联元素 {#inline-elements}
+### 内联元素
 
 - `<strong>`, `<b>` → `**粗体**`
 - `<em>`, `<i>` → `*斜体*`
@@ -201,11 +201,11 @@ interface HtmlToMarkdownOptions {
 - `<img>` → `![图片](URL)`
 - `<br>` → 换行
 
-## 示例 {#examples}
+## 示例
 
-### 复杂 HTML 转换 {#html-4}
+### 复杂 HTML 转换
 
-```typescript | pure
+```typescript pure
 const complexHtml = `
   <div>
     <h1>文章标题</h1>
@@ -227,9 +227,9 @@ const complexHtml = `
 const markdown = htmlToMarkdown(complexHtml);
 ```
 
-### 自定义处理器 {#custom}
+### 自定义处理器
 
-```typescript | pure
+```typescript pure
 const options: HtmlToMarkdownOptions = {
   imageHandler: (src, alt) => {
     // 添加 CDN 前缀
@@ -248,14 +248,14 @@ const html =
 const markdown = htmlToMarkdown(html, options);
 ```
 
-## 注意事项 {#notes}
+## 注意事项
 
 1. **浏览器环境**: 这些工具需要在浏览器环境中运行，因为它们使用了 `DOMParser`
 2. **HTML 解析**: 使用浏览器原生的 HTML 解析器，确保兼容性
 3. **性能考虑**: 对于大量 HTML 内容，建议分批处理
 4. **错误处理**: 函数会优雅地处理无效的 HTML 输入
 
-## 测试 {#testing}
+## 测试
 
 运行测试：
 
@@ -263,6 +263,6 @@ const markdown = htmlToMarkdown(html, options);
 npm test htmlToMarkdown.test.ts
 ```
 
-## 贡献 {#contributing}
+## 贡献
 
 欢迎提交 Issue 和 Pull Request 来改进这个工具。
