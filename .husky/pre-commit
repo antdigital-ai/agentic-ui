@@ -4,4 +4,5 @@
 root="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$root" || exit 1
 "$root/node_modules/.bin/oxlint" src &&
-  "$root/node_modules/.bin/stylelint" "{src,test}/**/*.{css,less}"
+  "$root/node_modules/.bin/stylelint" "{src,test}/**/*.{css,less}" &&
+  node scripts/strip-utf8-bom.mjs

@@ -93,13 +93,16 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
-      "prettier --write"
+      "prettier --write",
+      "node scripts/strip-bom-stdin.mjs"
     ],
     "*.{css,less}": [
-      "prettier --write"
+      "prettier --write",
+      "node scripts/strip-bom-stdin.mjs"
     ],
     "*.{md,json}": [
-      "prettier --write --no-error-on-unmatched-pattern"
+      "prettier --write --no-error-on-unmatched-pattern",
+      "node scripts/strip-bom-stdin.mjs"
     ]
   },
   "overrides": {
