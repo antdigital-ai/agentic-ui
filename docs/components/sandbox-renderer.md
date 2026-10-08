@@ -26,17 +26,17 @@ group:
 
 ### SandboxRendererProps
 
-| 属性       | 说明                                                       | 类型                     | 默认值 | 版本 |
-| ---------- | ---------------------------------------------------------- | ------------------------ | ------ | ---- |
-| className  | 自定义类名                                                 | `string`                 | -      | -    |
-| code       | 要执行的 JavaScript 代码，可通过 `document` / `shadowRoot` 操作渲染容器 | `string` | -      | -    |
-| globals    | 注入到沙箱的额外全局变量（代码内可直接访问）               | `Record<string, unknown>` | -      | -    |
-| height     | 渲染容器高度                                               | `number \| string`       | `320`  | -    |
-| onExecute  | 执行成功回调，参数为代码 `return` 的值                     | `(result: unknown) => void` | -   | -    |
-| onError    | 执行失败回调                                               | `(error: Error) => void` | -      | -    |
-| showStatus | 是否展示执行状态（加载中 / 错误提示）                      | `boolean`                | `true` | -    |
-| style      | 自定义内联样式                                             | `React.CSSProperties`    | -      | -    |
-| timeout    | 代码执行超时时间（毫秒）                                   | `number`                 | `3000` | -    |
+| 属性       | 说明                                                                    | 类型                        | 默认值 | 版本 |
+| ---------- | ----------------------------------------------------------------------- | --------------------------- | ------ | ---- |
+| className  | 自定义类名                                                              | `string`                    | -      | -    |
+| code       | 要执行的 JavaScript 代码，可通过 `document` / `shadowRoot` 操作渲染容器 | `string`                    | -      | -    |
+| globals    | 注入到沙箱的额外全局变量（代码内可直接访问）                            | `Record<string, unknown>`   | -      | -    |
+| height     | 渲染容器高度                                                            | `number \| string`          | `320`  | -    |
+| onExecute  | 执行成功回调，参数为代码 `return` 的值                                  | `(result: unknown) => void` | -      | -    |
+| onError    | 执行失败回调                                                            | `(error: Error) => void`    | -      | -    |
+| showStatus | 是否展示执行状态（加载中 / 错误提示）                                   | `boolean`                   | `true` | -    |
+| style      | 自定义内联样式                                                          | `React.CSSProperties`       | -      | -    |
+| timeout    | 代码执行超时时间（毫秒）                                                | `number`                    | `3000` | -    |
 
 ## 安全边界 {#security}
 
