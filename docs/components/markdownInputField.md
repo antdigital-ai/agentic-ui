@@ -232,7 +232,34 @@ export default () => {
 > 1.  **移动端适配**：在移动设备上，为防止误触，强制使用 `'Mod+Enter'` 模式（即点击键盘回车键仅换行，不发送）。
 > 2.  **输入法兼容**：在中文输入法（IME）组字/选词过程中，按 <kbd>Enter</kbd> 键不会触发发送。
 
-### 编辑器通用快捷键 {#shortcuts-2}
+### 输入历史导航
+
+开启 `inputHistory.enable` 后（对齐桌面 IDE 聊天输入框行为）：
+
+| 快捷键              | 行为                                                       |
+| :------------------ | :--------------------------------------------------------- |
+| <kbd>↑</kbd>        | 光标位于内容开头时，回溯上一条已发送内容                    |
+| <kbd>↓</kbd>        | 光标位于内容末尾时，前进到下一条（回到栈顶时找回编辑中内容） |
+
+- 发送成功的内容自动进入历史栈（去重、上限默认 100 条，可配 `maxLength`）；
+- 回溯前当前编辑中的内容会被暂存，按 <kbd>↓</kbd> 到栈顶可找回；
+- 历史仅保存在组件实例内存中，不跨会话持久化。
+
+### 拖拽上传
+
+配置 `attachment.enable` 且提供 `upload` / `uploadWithResponse` 后，直接把文件拖入输入框即可上传（含格式、大小、数量校验），拖拽悬停时会显示高亮覆盖层。
+
+```tsx | pure
+<MarkdownInputField
+  attachment={{
+    enable: true,
+    accept: '.pdf,.doc,.docx,image/*',
+    upload: async (file) => URL.createObjectURL(file),
+  }}
+/>
+```
+
+### 编辑器通用快捷键
 
 除了发送快捷键外，组件还支持以下 Markdown 编辑常用的快捷键：
 
@@ -301,6 +328,9 @@ export default () => {
 | `onMaxLengthExceeded`    | 当输入达到最大长度限制时的回调函数             | `(value: string) => void`                                            | -         | -    |
 | `sendButtonProps`        | 发送按钮配置                                   | `SendButtonCustomizationProps`                                       | -         | -    |
 | `disableHoverAnimation`  | 是否禁用 hover 动画                            | `boolean`                                                            | `false`   | -    |
+| `disableFocusAnimation`  | 是否禁用聚焦边框光束动画                       | `boolean`                                                            | `false`   | -    |
+| `inputHistory`           | 输入历史导航配置（↑/↓ 翻阅已发送内容）         | `{ enable?: boolean; maxLength?: number }`                           | -         | -    |
+| `followups`              | 建议问题配置（输入框下方可点击发送/回填）       | `{ items?: { text: string; fillOnly?: boolean; icon?: ReactNode; title?: string }[] }` | - | -    |
 | `bgColorList`            | 背景颜色列表                                   | `string[]`                                                           | -         | -    |
 
 ### 类型定义 {#type-definitions}

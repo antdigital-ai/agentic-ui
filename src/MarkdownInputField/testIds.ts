@@ -25,4 +25,8 @@ export const MARKDOWN_INPUT_FIELD_TEST_IDS = {
   MORE_ACTIONS: 'markdown-input-field-more-actions',
   /** 附件列表 */
   ATTACHMENT_LIST: 'markdown-input-field-attachment-list',
+  /** 拖拽上传覆盖层 */
+  DND_OVERLAY: 'markdown-input-field-dnd-overlay',
+  /** 建议问题区 */
+  FOLLOWUPS: 'markdown-input-field-followups',
 } as const;

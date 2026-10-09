@@ -132,4 +132,35 @@ describe('useSendHandler', () => {
     expect(params.stopRecording).toHaveBeenCalled();
     expect(params.props.onSend).toHaveBeenCalledWith('hi');
   });
+
+  it('locks before stopping recording so repeated submissions cannot race', async () => {
+    let stop!: () => void;
+    const stopping = new Promise<void>((resolve) => {
+      stop = resolve;
+    });
+    const params = createDefaultParams({ recording: true });
+    params.stopRecording.mockReturnValue(stopping);
+    params.props.onSend = vi.fn().mockResolvedValue(undefined);
+    const { result } = renderHook(() => useSendHandler(params));
+    const first = result.current.sendMessage('followup');
+    await result.current.sendMessage('duplicate');
+    expect(params.stopRecording).toHaveBeenCalledTimes(1);
+    expect(params.props.onSend).not.toHaveBeenCalled();
+    expect(params.isSendingRef.current).toBe(true);
+    stop();
+    await first;
+    expect(params.props.onSend).toHaveBeenCalledExactlyOnceWith('followup');
+    expect(params.isSendingRef.current).toBe(false);
+  });
+
+  it('releases the submission lock when content is empty', async () => {
+    const params = createDefaultParams();
+    params.props.onSend = vi.fn().mockResolvedValue(undefined);
+    const { result } = renderHook(() => useSendHandler(params));
+    await result.current.sendMessage('  ');
+    expect(params.props.onSend).not.toHaveBeenCalled();
+    expect(params.isSendingRef.current).toBe(false);
+    await result.current.sendMessage('followup');
+    expect(params.props.onSend).toHaveBeenCalledExactlyOnceWith('followup');
+  });
 });

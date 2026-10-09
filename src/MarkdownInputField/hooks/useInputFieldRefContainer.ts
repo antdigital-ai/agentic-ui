@@ -15,7 +15,7 @@ import type { MarkdownEditorInstance } from '../../MarkdownEditor';
  */
 export interface InputFieldRefContainer {
   markdownEditorRef: React.MutableRefObject<
-    MarkdownEditorInstance | null | undefined
+    MarkdownEditorInstance | undefined
   >;
   quickActionsRef: React.RefObject<HTMLDivElement | null>;
   actionsRef: React.RefObject<HTMLDivElement | null>;
@@ -23,7 +23,9 @@ export interface InputFieldRefContainer {
 }
 
 export const useInputFieldRefContainer = (): InputFieldRefContainer => {
-  const markdownEditorRef = useRef<MarkdownEditorInstance | null>(null);
+  const markdownEditorRef = useRef<MarkdownEditorInstance | undefined>(
+    undefined,
+  );
   const quickActionsRef = useRef<HTMLDivElement>(null);
   const actionsRef = useRef<HTMLDivElement>(null);
   const isSendingRef = useRef(false);

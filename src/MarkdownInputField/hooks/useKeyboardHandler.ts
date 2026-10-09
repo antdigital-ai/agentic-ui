@@ -1,11 +1,14 @@
 import React from 'react';
-import { Editor, Transforms } from 'slate';
+import { BaseEditor, Editor, Transforms } from 'slate';
+import type { HistoryEditor } from 'slate-history';
+import type { ReactEditor } from 'slate-react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import type { MarkdownEditorInstance } from '../../MarkdownEditor';
 import { isCodeBlockAceInputTarget } from '../../MarkdownEditor/editor/utils/codeBlockBehavior';
 import { isImeComposing } from '../../MarkdownEditor/editor/utils/isImeComposing';
 import { isMobileDevice } from '../AttachmentButton/utils';
 import type { MarkdownInputFieldProps } from '../types/MarkdownInputFieldProps';
+import type { useInputHistory } from './useInputHistory';
 
 interface UseKeyboardHandlerParams {
   props: Pick<MarkdownInputFieldProps, 'triggerSendKey' | 'onSend'>;
@@ -14,7 +17,53 @@ interface UseKeyboardHandlerParams {
   >;
   /** 由 useSendHandler 提供的稳定函数引用 */
   sendMessage: () => Promise<void> | void;
+  /** 输入历史导航（useInputHistory 返回值）；未启用时不拦截方向键 */
+  inputHistory?: ReturnType<typeof useInputHistory>;
 }
+
+type SlateEditorLike = (BaseEditor & ReactEditor & HistoryEditor) | undefined;
+
+/** 空段落节点的序列化形态，用于判定空文档 */
+const EMPTY_PARAGRAPH_JSON = JSON.stringify({
+  type: 'paragraph',
+  children: [{ text: '' }],
+});
+
+/**
+ * 判断 Slate 选区是否位于文档最前（含跨选区锚点 / 焦点两种形态）。
+ * 对齐 dtcoder-ide：仅光标在第一行行首时 ↑ 才翻历史，否则保留多行编辑行为。
+ * 空文档（selection 被清空）视为位于开头——与 IDE 发送清空后 ↑ 可回溯一致。
+ */
+const isCursorAtDocStart = (editor: SlateEditorLike): boolean => {
+  if (!editor) return false;
+  const isEmptyDoc =
+    editor.children.length === 0 ||
+    (editor.children.length === 1 &&
+      JSON.stringify(editor.children[0]) === EMPTY_PARAGRAPH_JSON);
+  if (isEmptyDoc) return true;
+  if (!editor.selection) return false;
+  const focus = editor.selection.focus;
+  const start = Editor.start(editor, []);
+  return (
+    focus.path.length === start.path.length &&
+    focus.path.every((n, i) => n === start.path[i]) &&
+    focus.offset <= start.offset
+  );
+};
+
+/**
+ * 判断 Slate 选区是否位于文档最后（isCursorAtDocStart 的末尾镜像）。
+ */
+const isCursorAtDocEnd = (editor: SlateEditorLike): boolean => {
+  if (!editor?.selection) return false;
+  const focus = editor.selection.focus;
+  const end = Editor.end(editor, []);
+  return (
+    focus.path.length === end.path.length &&
+    focus.path.every((n, i) => n === end.path[i]) &&
+    focus.offset >= end.offset
+  );
+};
 
 /**
  * 键盘事件处理 Hook。
@@ -22,6 +71,7 @@ interface UseKeyboardHandlerParams {
  * 由原 useMarkdownInputFieldHandlers 拆分而来，处理：
  *  - 中文输入法 / Composition 期间不响应
  *  - Home / End / Ctrl+A 的光标移动与全选
+ *  - ↑ / ↓ 在文档边界处切换输入历史（对齐 dtcoder-ide）
  *  - 根据 triggerSendKey 决定 Enter 或 Mod+Enter 触发发送
  *  - 移动端强制 Mod+Enter，避免 Enter 误触
  */
@@ -29,6 +79,7 @@ export const useKeyboardHandler = ({
   props,
   markdownEditorRef,
   sendMessage,
+  inputHistory,
 }: UseKeyboardHandlerParams) => {
   const handleKeyDown = useRefFunction(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -49,6 +100,30 @@ export const useKeyboardHandler = ({
       const inCodeBlockTextInput =
         isCodeBlockAceInputTarget(e.target) ||
         isCodeBlockAceInputTarget(document.activeElement);
+
+      // ↑ / ↓：光标位于首行行首（↑）或末行行尾（↓）时切换输入历史（对齐 IDE 行为）
+      if (inputHistory && !isMod && !isShift && !inCodeBlockTextInput) {
+        if (e.key === 'ArrowUp' && isCursorAtDocStart(editor ?? undefined)) {
+          const prev = inputHistory.previous();
+          if (prev !== undefined) {
+            e.preventDefault();
+            e.stopPropagation();
+            inputHistory.restore(prev);
+            return;
+          }
+        } else if (
+          e.key === 'ArrowDown' &&
+          isCursorAtDocEnd(editor ?? undefined)
+        ) {
+          const nextValue = inputHistory.next();
+          if (nextValue !== undefined) {
+            e.preventDefault();
+            e.stopPropagation();
+            inputHistory.restore(nextValue);
+            return;
+          }
+        }
+      }
 
       // Home：移动到文档开头
       if (e.key === 'Home' && !isMod && editor && !inCodeBlockTextInput) {

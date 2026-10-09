@@ -115,7 +115,9 @@ vi.mock('../hooks/useInputFieldRefContainer', () => ({
 
 vi.mock('../hooks/useEditorValueSync', () => ({
   useEditorValueSync: () => ({
-    onEditorChange: vi.fn(),
+    onEditorChange: vi.fn(() => true),
+    onEditorReady: vi.fn(),
+    flushPendingValue: vi.fn(),
   }),
 }));
 
@@ -140,7 +142,8 @@ vi.mock('../hooks/useInputFieldGeometry', () => ({
 }));
 
 vi.mock('../hooks/useMarkdownInputFieldState', () => ({
-  useMarkdownInputFieldState: () => ({
+  // setValue 是唯一的通知出口（内部会同步调用 props.onChange），mock 需保留该契约
+  useMarkdownInputFieldState: (props: { onChange?: (v: string) => void }) => ({
     isHover: false,
     setHover: vi.fn(),
     isLoading: false,
@@ -148,7 +151,7 @@ vi.mock('../hooks/useMarkdownInputFieldState', () => ({
     isEnlarged: false,
     setIsEnlarged: vi.fn(),
     value: '',
-    setValue: vi.fn(),
+    setValue: vi.fn((next: string) => props.onChange?.(next)),
     fileMap: {},
     setFileMap: vi.fn(),
   }),

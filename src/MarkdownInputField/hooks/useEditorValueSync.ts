@@ -1,75 +1,153 @@
 import { useEffect, useRef } from 'react';
+import { Editor, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import type { MarkdownEditorInstance } from '../../MarkdownEditor';
 
 interface UseEditorValueSyncParams {
-  /** 受控的外部 value */
   value: string | undefined;
-  /** 由 useInputFieldRefContainer 提供的编辑器实例 ref */
-  markdownEditorRef: React.MutableRefObject<
-    MarkdownEditorInstance | null | undefined
-  >;
+  markdownEditorRef: React.MutableRefObject<MarkdownEditorInstance | undefined>;
 }
 
 interface UseEditorValueSyncResult {
-  /**
-   * 由 MarkdownInputField 的 onChange handler 调用，
-   * 用于记录「编辑器最近一次发出的 value」，避免回写造成光标抖动 / 白屏。
-   */
-  onEditorChange: (value: string) => void;
+  /** False while an external replacement is waiting for IME to commit. */
+  onEditorChange: (value: string) => boolean;
+  onEditorReady: (instance: MarkdownEditorInstance | undefined) => void;
+  flushPendingValue: () => void;
 }
 
-/**
- * 把外部受控的 `value` 同步到底层 MarkdownEditor。
- *
- * 单一职责：仅处理「外部 value → 编辑器内容」的单向同步及其防御逻辑。
- *
- * 防御策略：
- * 1. **来源守卫**：若 `props.value` 与 `lastEditorValueRef` 相等，说明该 value
- *    本就是编辑器自己刚刚 emit 出去再回流的，无需写回。
- * 2. **聚焦守卫**：若编辑器正处于聚焦状态（用户正在敲键），父级因 debounce/批
- *    更新而迟到的 stale `props.value` 一旦写入，会触发 `ReactEditor.deselect()`
- *    抛 `InvalidStateError`（"Failed to execute 'collapseToEnd' on 'Selection'"）
- *    导致整棵树白屏。此时直接跳过写回。
- *
- * `store.ts` 中 `_safeDeselect` 是兜底防御；不调用 `setMDContent` 才是干净修复。
- */
+/** Keep controlled values authoritative without rewriting a live editor echo. */
 export const useEditorValueSync = ({
   value,
   markdownEditorRef,
 }: UseEditorValueSyncParams): UseEditorValueSyncResult => {
-  /**
-   * 记录编辑器自身最近一次 emit 的 value。
-   * 当 `props.value === lastEditorValueRef.current` 时，
-   * 说明该次 props 变更只是受控回流，编辑器内部已经是最新状态。
-   */
-  const lastEditorValueRef = useRef<string | undefined>(undefined);
+  const lastEditorChangeRef = useRef<{
+    value: string;
+    children: Editor['children'] | undefined;
+  } | null>(null);
+  const pendingValueRef = useRef<{ value: string } | null>(null);
+  const cancelFlushRef = useRef<(() => void) | null>(null);
 
   const onEditorChange = useRefFunction((next: string) => {
-    lastEditorValueRef.current = next;
+    // A late composition callback must not overwrite a requested draft/reset.
+    if (pendingValueRef.current) return false;
+    lastEditorChangeRef.current = {
+      value: next,
+      children: markdownEditorRef.current?.markdownEditorRef?.current?.children,
+    };
+    return true;
   });
 
-  useEffect(() => {
-    if (!markdownEditorRef.current) return;
+  const synchronizeValue = useRefFunction(() => {
+    // undefined releases control; it is not a request to clear the document.
+    if (value === undefined) {
+      cancelFlushRef.current?.();
+      cancelFlushRef.current = null;
+      pendingValueRef.current = null;
+      return;
+    }
 
-    // Guard 1：来自编辑器自身的回流，跳过。
-    if (value === lastEditorValueRef.current) return;
+    const instance = markdownEditorRef.current;
+    if (!instance) {
+      pendingValueRef.current = { value };
+      return;
+    }
+    const slateEditor = instance.markdownEditorRef?.current;
+    const lastChange = lastEditorChangeRef.current;
+    if (
+      lastChange?.value === value &&
+      lastChange.children === slateEditor?.children
+    ) {
+      pendingValueRef.current = null;
+      return;
+    }
 
-    // Guard 2：编辑器聚焦中（用户正在打字），跳过 stale 写回。
-    const slateEditor = markdownEditorRef.current?.markdownEditorRef?.current;
+    if (instance.store.getMDContent?.() === value) {
+      pendingValueRef.current = null;
+      return;
+    }
+
+    if (instance.store.inputComposition) {
+      pendingValueRef.current = { value };
+      return;
+    }
+
+    let focused = false;
     if (slateEditor) {
       try {
-        if (ReactEditor.isFocused(slateEditor)) return;
+        focused = ReactEditor.isFocused(slateEditor);
       } catch {
-        // 编辑器正在被销毁时 ReactEditor.isFocused 可能抛错，忽略。
+        // The old Slate instance may be unmounting.
       }
     }
 
-    markdownEditorRef.current?.store?.setMDContent(value ?? '');
-    // markdownEditorRef 本身是稳定的容器引用，无需作为依赖。
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
+    pendingValueRef.current = null;
+    lastEditorChangeRef.current = null;
+    // EditorStore replaces nodes using safe Slate deselection and avoids native
+    // DOM deselection while focused. Never discard a real update due to focus.
+    instance.store.setMDContent(value);
+    if (focused && slateEditor) {
+      try {
+        Transforms.select(slateEditor, Editor.end(slateEditor, []));
+      } catch {
+        // An unmounting editor may no longer contain an editable point.
+      }
+    }
+  });
 
-  return { onEditorChange };
+  const onEditorReady = useRefFunction(
+    (instance: MarkdownEditorInstance | undefined) => {
+      markdownEditorRef.current = instance;
+      if (instance) synchronizeValue();
+    },
+  );
+
+  const flushPendingValue = useRefFunction(() => {
+    if (!pendingValueRef.current) return;
+    if (!markdownEditorRef.current?.store.inputComposition) {
+      cancelFlushRef.current?.();
+      cancelFlushRef.current = null;
+      synchronizeValue();
+      return;
+    }
+    if (cancelFlushRef.current) return;
+
+    let frame: number | undefined;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let cancelled = false;
+    cancelFlushRef.current = () => {
+      cancelled = true;
+      if (frame !== undefined) cancelAnimationFrame(frame);
+      if (timer !== undefined) clearTimeout(timer);
+    };
+    const flush = () => {
+      if (cancelled) return;
+      cancelFlushRef.current = null;
+      // Both native compositionend and the editor's IME fallback can request a
+      // flush. A later callback must not overwrite input after the first flush.
+      if (pendingValueRef.current) synchronizeValue();
+    };
+    // Slate commits IME text and clears inputComposition over two frames.
+    if (typeof requestAnimationFrame === 'function') {
+      frame = requestAnimationFrame(() => {
+        frame = requestAnimationFrame(flush);
+      });
+    } else {
+      timer = setTimeout(flush, 0);
+    }
+  });
+
+  useEffect(() => {
+    synchronizeValue();
+  }, [value, synchronizeValue]);
+
+  useEffect(
+    () => () => {
+      cancelFlushRef.current?.();
+      pendingValueRef.current = null;
+    },
+    [],
+  );
+
+  return { onEditorChange, onEditorReady, flushPendingValue };
 };

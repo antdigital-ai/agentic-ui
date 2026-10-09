@@ -1,143 +1,192 @@
-/**
- * useEditorValueSync Hook 单元测试
- * 验证「外部 value → 编辑器」单向同步及两道防御守卫：
- *  - Guard 1：来自编辑器自身回流的 value 不回写
- *  - Guard 2：编辑器聚焦时跳过 stale 写回（防 InvalidStateError 白屏）
- */
-
 import { act, renderHook } from '@testing-library/react';
 import { useRef } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { createEditor, Node, Transforms } from 'slate';
+import { withHistory } from 'slate-history';
+import { ReactEditor, withReact } from 'slate-react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { MarkdownEditorInstance } from '../../../MarkdownEditor';
+import { EditorStore } from '../../../MarkdownEditor/editor/store';
+import { scheduleClearInputComposition } from '../../../MarkdownEditor/editor/utils/isImeComposing';
 import { useEditorValueSync } from '../useEditorValueSync';
 
-// ReactEditor.isFocused 读自 Slate 内部状态，mock 以便控制聚焦态。
-vi.mock('slate-react', async () => {
-  const actual =
-    await vi.importActual<typeof import('slate-react')>('slate-react');
-  return {
-    ...actual,
-    ReactEditor: {
-      ...actual.ReactEditor,
-      isFocused: vi.fn().mockReturnValue(false),
-    },
+function makeEditorInstance() {
+  const editor = createEditor();
+  editor.children = [{ type: 'paragraph', children: [{ text: 'initial' }] }];
+  const store = {
+    inputComposition: false,
+    setMDContent: vi.fn((value: string) => {
+      editor.children = [{ type: 'paragraph', children: [{ text: value }] }];
+      editor.selection = null;
+    }),
   };
-});
-
-/** 构造一个最小可用的 MarkdownEditorInstance，带可监听的 setMDContent。 */
-const makeMockEditorInstance = () => {
-  const setMDContent = vi.fn();
   return {
-    store: { setMDContent },
-    markdownEditorRef: {
-      current: {
-        // 占位即可，ReactEditor.isFocused 已被 mock
-      },
-    },
+    store,
+    markdownEditorRef: { current: editor },
   } as unknown as MarkdownEditorInstance;
-};
+}
 
-/** 组合 hook：用一个 ref 容器配合 useEditorValueSync，模拟主组件接线方式。 */
-const useHarness = (value: string | undefined) => {
-  const markdownEditorRef = useRef<MarkdownEditorInstance | null>(null);
-  const { onEditorChange } = useEditorValueSync({ value, markdownEditorRef });
-  return { markdownEditorRef, onEditorChange };
-};
+function useHarness(
+  value: string | undefined,
+  instance?: MarkdownEditorInstance,
+) {
+  const markdownEditorRef = useRef(instance);
+  return {
+    ...useEditorValueSync({ value, markdownEditorRef }),
+    markdownEditorRef,
+  };
+}
+
+afterEach(() => vi.restoreAllMocks());
 
 describe('useEditorValueSync', () => {
-  it('外部 value 变化（非编辑器自身回流）时，调用 setMDContent 写回', async () => {
-    const { result, rerender } = renderHook(({ value }) => useHarness(value), {
-      initialProps: { value: '' as string | undefined },
-    });
-
-    const mockEditor = makeMockEditorInstance();
-    act(() => {
-      result.current.markdownEditorRef.current = mockEditor;
-    });
-
-    rerender({ value: 'external update' });
-    await act(async () => {});
-
-    expect(mockEditor.store.setMDContent).toHaveBeenCalledWith(
-      'external update',
+  it('applies external replacements while focused and restores a valid collapsed selection', () => {
+    vi.spyOn(ReactEditor, 'isFocused').mockReturnValue(true);
+    const instance = makeEditorInstance();
+    const { rerender } = renderHook(
+      ({ value }) => useHarness(value, instance),
+      { initialProps: { value: 'initial' } },
     );
+    vi.mocked(instance.store.setMDContent).mockClear();
+    rerender({ value: 'next draft' });
+    expect(instance.store.setMDContent).toHaveBeenCalledWith('next draft');
+    expect(instance.markdownEditorRef.current.selection).toEqual({
+      anchor: { path: [0, 0], offset: 10 },
+      focus: { path: [0, 0], offset: 10 },
+    });
+    rerender({ value: '' });
+    expect(instance.store.setMDContent).toHaveBeenLastCalledWith('');
   });
 
-  it('Guard 1：当 props.value 等于编辑器最近一次 emit 的 value 时跳过写回', async () => {
-    const { result, rerender } = renderHook(({ value }) => useHarness(value), {
-      initialProps: { value: '' as string | undefined },
-    });
-
-    const mockEditor = makeMockEditorInstance();
+  it('skips only an echo of the current emitted document', () => {
+    const instance = makeEditorInstance();
+    const { result, rerender } = renderHook(
+      ({ value }) => useHarness(value, instance),
+      { initialProps: { value: 'initial' } },
+    );
+    vi.mocked(instance.store.setMDContent).mockClear();
     act(() => {
-      result.current.markdownEditorRef.current = mockEditor;
+      result.current.onEditorChange('emitted');
     });
+    rerender({ value: 'emitted' });
+    expect(instance.store.setMDContent).not.toHaveBeenCalled();
 
-    // 模拟编辑器刚刚 emit 'hello'
-    act(() => {
-      result.current.onEditorChange('hello');
-    });
-
-    // 父组件受控回流相同值
-    rerender({ value: 'hello' });
-    await act(async () => {});
-
-    expect(mockEditor.store.setMDContent).not.toHaveBeenCalled();
+    instance.markdownEditorRef.current.children = [
+      { type: 'paragraph', children: [{ text: 'unreported edit' }] },
+    ];
+    rerender({ value: 'another draft' });
+    rerender({ value: 'emitted' });
+    expect(instance.store.setMDContent).toHaveBeenLastCalledWith('emitted');
   });
 
-  it('Guard 2：编辑器聚焦时跳过 stale 写回，避免 InvalidStateError', async () => {
-    const { ReactEditor } = await import('slate-react');
-    vi.mocked(ReactEditor.isFocused).mockReturnValue(true);
-
-    const { result, rerender } = renderHook(({ value }) => useHarness(value), {
-      initialProps: { value: 'a' as string | undefined },
-    });
-
-    const mockEditor = makeMockEditorInstance();
+  it('allows the parent to restore an older emitted draft', () => {
+    const instance = makeEditorInstance();
+    const { result, rerender } = renderHook(
+      ({ value }) => useHarness(value, instance),
+      { initialProps: { value: 'initial' } },
+    );
     act(() => {
-      result.current.markdownEditorRef.current = mockEditor;
+      result.current.onEditorChange('old draft');
     });
-
-    rerender({ value: 'ab' });
-    await act(async () => {});
-
-    expect(mockEditor.store.setMDContent).not.toHaveBeenCalled();
-
-    // restore
-    vi.mocked(ReactEditor.isFocused).mockReturnValue(false);
+    rerender({ value: 'old draft' });
+    act(() => {
+      result.current.onEditorChange('new draft');
+    });
+    rerender({ value: 'new draft' });
+    vi.mocked(instance.store.setMDContent).mockClear();
+    rerender({ value: 'old draft' });
+    expect(instance.store.setMDContent).toHaveBeenCalledWith('old draft');
   });
 
-  it('props.value 为 undefined 且未聚焦时，写入空字符串', async () => {
-    const { result, rerender } = renderHook(({ value }) => useHarness(value), {
-      initialProps: { value: '' as string | undefined },
-    });
-
-    const mockEditor = makeMockEditorInstance();
-    act(() => {
-      result.current.markdownEditorRef.current = mockEditor;
-      result.current.onEditorChange('');
-    });
-
-    // 模拟父组件先 set 'hello' 再 reset 为 undefined
-    act(() => {
-      result.current.onEditorChange('hello');
-    });
-    rerender({ value: 'hello' });
-
+  it('keeps content when the parent releases control with undefined', () => {
+    const instance = makeEditorInstance();
+    const { rerender } = renderHook(
+      ({ value }) => useHarness(value, instance),
+      { initialProps: { value: 'initial' as string | undefined } },
+    );
+    vi.mocked(instance.store.setMDContent).mockClear();
     rerender({ value: undefined });
-    await act(async () => {});
-
-    expect(mockEditor.store.setMDContent).toHaveBeenCalledWith('');
+    expect(instance.store.setMDContent).not.toHaveBeenCalled();
   });
 
-  it('编辑器实例尚未就绪时，不抛错也不调用 setMDContent', async () => {
-    const { rerender } = renderHook(({ value }) => useHarness(value), {
-      initialProps: { value: '' as string | undefined },
+  it('applies the latest value when the editor becomes ready after props change', () => {
+    const { result, rerender } = renderHook(({ value }) => useHarness(value), {
+      initialProps: { value: 'first' },
     });
+    rerender({ value: 'latest' });
+    const instance = makeEditorInstance();
+    act(() => {
+      result.current.onEditorReady(instance);
+    });
+    expect(instance.store.setMDContent).toHaveBeenCalledWith('latest');
+  });
 
-    // 不挂载 mockEditor，直接触发 value 变化
-    expect(() => {
-      rerender({ value: 'no editor yet' });
-    }).not.toThrow();
+  it('defers IME replacements and blocks late composition output until the latest external value is applied', () => {
+    vi.spyOn(globalThis, 'requestAnimationFrame').mockImplementation(
+      (callback) => {
+        callback(0);
+        return 0;
+      },
+    );
+    const instance = makeEditorInstance();
+    const { result, rerender } = renderHook(
+      ({ value }) => useHarness(value, instance),
+      { initialProps: { value: 'initial' } },
+    );
+    vi.mocked(instance.store.setMDContent).mockClear();
+    instance.store.inputComposition = true;
+    rerender({ value: 'draft 1' });
+    rerender({ value: 'draft 2' });
+    expect(instance.store.setMDContent).not.toHaveBeenCalled();
+    expect(result.current.onEditorChange('old IME text')).toBe(false);
+    instance.store.inputComposition = false;
+    act(() => {
+      result.current.flushPendingValue();
+    });
+    expect(instance.store.setMDContent).toHaveBeenCalledExactlyOnceWith(
+      'draft 2',
+    );
+    expect(result.current.onEditorChange('draft 2')).toBe(true);
+  });
+
+  it('does not repeat a pending IME replacement after new typing between animation frames', () => {
+    let nextFrame: FrameRequestCallback[] = [];
+    vi.spyOn(globalThis, 'requestAnimationFrame').mockImplementation(
+      (callback) => {
+        nextFrame.push(callback);
+        return nextFrame.length;
+      },
+    );
+    const frame = () => {
+      const callbacks = nextFrame;
+      nextFrame = [];
+      act(() => callbacks.forEach((callback) => callback(0)));
+    };
+    const editor = withReact(withHistory(createEditor()));
+    editor.children = [{ type: 'paragraph', children: [{ text: 'initial' }] }];
+    const markdownEditorRef = { current: editor };
+    const store = new EditorStore(markdownEditorRef);
+    const instance = { store, markdownEditorRef } as MarkdownEditorInstance;
+    const { result, rerender } = renderHook(
+      ({ value }) => useHarness(value, instance),
+      { initialProps: { value: 'initial' } },
+    );
+    store.inputComposition = true;
+    rerender({ value: 'requested draft' });
+    act(() => {
+      scheduleClearInputComposition(() => {
+        store.inputComposition = false;
+        result.current.flushPendingValue();
+      });
+      result.current.flushPendingValue();
+    });
+    frame();
+    frame();
+    expect(Node.string(editor)).toBe('requested draft');
+    act(() =>
+      Transforms.insertText(editor, '! ', { at: { path: [0, 0], offset: 0 } }),
+    );
+    frame();
+    frame();
+    expect(Node.string(editor)).toBe('! requested draft');
   });
 });

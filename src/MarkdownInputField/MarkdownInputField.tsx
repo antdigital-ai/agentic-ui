@@ -4,6 +4,7 @@ import React, { memo, useContext, useState } from 'react';
 import { TextLoading } from '../Components/lotties/TextLoading';
 import { useLocale } from '../I18n';
 import { BaseMarkdownEditor } from '../MarkdownEditor';
+import { BorderBeamAnimation } from './BorderBeamAnimation';
 import {
   DEFAULT_BORDER_RADIUS_PX,
   ENLARGED_DEFAULT_HEIGHT_PX,
@@ -11,11 +12,14 @@ import {
   ROOT_TAB_INDEX,
 } from './constants';
 import { useFileUploadManager } from './FileUploadManager';
+import { Followups } from './Followups';
+import { useDropZone } from './hooks/useDropZone';
 import { useEditorValueSync } from './hooks/useEditorValueSync';
 import { useEnlargeAndContainerHandler } from './hooks/useEnlargeAndContainerHandler';
 import { useExposeInputRef } from './hooks/useExposeInputRef';
 import { useInputFieldGeometry } from './hooks/useInputFieldGeometry';
 import { useInputFieldRefContainer } from './hooks/useInputFieldRefContainer';
+import { useInputHistory } from './hooks/useInputHistory';
 import { useKeyboardHandler } from './hooks/useKeyboardHandler';
 import { useMarkdownInputFieldState } from './hooks/useMarkdownInputFieldState';
 import { usePasteHandler } from './hooks/usePasteHandler';
@@ -122,6 +126,8 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
   });
 
   const [isFocused, setIsFocused] = useState(false);
+  // 边框光束动画完成标记：一次聚焦只播一轮，避免长聚焦下循环闪烁
+  const [beamAnimationComplete, setBeamAnimationComplete] = useState(false);
 
   // 各类按钮存在性 & 计数：纯布尔运算，原 useMarkdownInputFieldActions hook
   // 已被内联到此处，避免为 5 行计算单开 hook + 在主组件做胶水。
@@ -167,16 +173,25 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
   const { markdownEditorRef, quickActionsRef, actionsRef, isSendingRef } =
     useInputFieldRefContainer();
 
-  const { onEditorChange } = useEditorValueSync({
-    value: props.value,
-    markdownEditorRef,
-  });
+  const { onEditorChange, onEditorReady, flushPendingValue } =
+    useEditorValueSync({
+      value: props.value,
+      markdownEditorRef,
+    });
 
   useExposeInputRef({
     inputRef: props.inputRef,
     markdownEditorRef,
     setValue,
   });
+
+  // 输入历史导航（对齐 dtcoder-ide）：仅在显式开启时拦截 ↑/↓
+  const inputHistory = useInputHistory({
+    markdownEditorRef,
+    setValue,
+    maxLength: props.inputHistory?.maxLength,
+  });
+  const historyEnabled = !!props.inputHistory?.enable;
 
   // 文件上传管理
   const {
@@ -207,7 +222,6 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
     props: {
       disabled: props.disabled,
       typing: props.typing,
-      onChange: props.onChange,
       onSend: props.onSend,
       allowEmptySubmit: props.allowEmptySubmit,
     },
@@ -221,6 +235,8 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
     setFileMap,
     recording,
     stopRecording,
+    pushHistory: historyEnabled ? inputHistory.push : undefined,
+    resetHistory: historyEnabled ? inputHistory.reset : undefined,
   });
 
   const { handlePaste } = usePasteHandler({
@@ -229,10 +245,22 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
     setFileMap,
   });
 
+  // 拖拽文件上传（对齐 dtcoder-ide）：attachment.enable 时自动生效
+  const { isDragOver, dropHandlers } = useDropZone({
+    props: {
+      attachment: props.attachment,
+      disabled: props.disabled,
+      typing: props.typing,
+    },
+    fileMap,
+    setFileMap,
+  });
+
   const { handleKeyDown } = useKeyboardHandler({
     props: { triggerSendKey: props.triggerSendKey, onSend: props.onSend },
     markdownEditorRef,
     sendMessage,
+    inputHistory: historyEnabled ? inputHistory : undefined,
   });
 
   const { handleEnlargeClick, handleContainerClick, activeInput } =
@@ -297,7 +325,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
       uploadImage={uploadImage}
       onStartRecording={startRecording}
       onStopRecording={stopRecording}
-      onSend={sendMessage}
+      onSend={() => sendMessage()}
       onStop={() => {
         setIsLoading(false);
         props.onStop?.();
@@ -368,7 +396,32 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
         onMouseLeave={() => setHover(false)}
         onClick={handleContainerClick}
         onKeyDown={handleKeyDown}
+        onCompositionEnd={flushPendingValue}
+        {...dropHandlers}
       >
+        {/* 聚焦边框光束动画（对齐 dtcoder-ide 聚焦反馈，一次聚焦播一轮） */}
+        <BorderBeamAnimation
+          isVisible={
+            isFocused &&
+            !beamAnimationComplete &&
+            !props.disableFocusAnimation &&
+            !props.disabled
+          }
+          borderRadius={borderRadius || DEFAULT_BORDER_RADIUS_PX}
+          onAnimationComplete={() => setBeamAnimationComplete(true)}
+        />
+        {/* 拖拽文件覆盖层（对齐 dtcoder-ide chat-dnd-overlay） */}
+        {isDragOver ? (
+          <div
+            className={classNames(`${baseCls}-dnd-overlay`, hashId)}
+            data-testid={MARKDOWN_INPUT_FIELD_TEST_IDS.DND_OVERLAY}
+            aria-live="polite"
+          >
+            <span className={classNames(`${baseCls}-dnd-overlay-text`, hashId)}>
+              {locale['input.dnd.hint']}
+            </span>
+          </div>
+        ) : null}
         <div
           style={{
             display: 'flex',
@@ -417,7 +470,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
               }}
             >
               <BaseMarkdownEditor
-                editorRef={markdownEditorRef}
+                editorRef={onEditorReady}
                 leafRender={props.leafRender}
                 style={{
                   width: '100%',
@@ -449,13 +502,12 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                 }}
                 initValue={props.value}
                 onChange={(value) => {
+                  if (!onEditorChange(value)) return;
                   // 检查并限制字符数
                   if (props.maxLength !== undefined) {
                     if (value.length > props.maxLength) {
                       const truncatedValue = value.slice(0, props.maxLength);
-                      onEditorChange(truncatedValue);
                       setValue(truncatedValue);
-                      props.onChange?.(truncatedValue);
                       props.onMaxLengthExceeded?.(value);
                       // 更新编辑器内容以反映截断后的值
                       markdownEditorRef.current?.store?.setMDContent(
@@ -467,19 +519,20 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                   // Record the value the editor just produced so the external
                   // props.value sync effect skips the redundant setMDContent call
                   // that would disrupt the live Slate selection while typing.
-                  onEditorChange(value);
                   setValue(value);
-                  props.onChange?.(value);
                 }}
                 onFocus={(value, schema, e) => {
                   onFocus?.(value, schema, e);
                   activeInput(true);
                   setIsFocused(true);
+                  setBeamAnimationComplete(false);
                 }}
                 onBlur={(value, schema, e) => {
                   onBlur?.(value, schema, e);
                   activeInput(false);
                   setIsFocused(false);
+                  setBeamAnimationComplete(false);
+                  flushPendingValue();
                 }}
                 onPaste={(e) => {
                   handlePaste(e);
@@ -496,6 +549,10 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                   ...markdownConfig,
                 }}
                 {...markdownPropsRest}
+                onCompositionActiveChange={(active) => {
+                  markdownProps?.onCompositionActiveChange?.(active);
+                  if (!active) flushPendingValue();
+                }}
               >
                 {props?.quickActionRender ||
                 props.refinePrompt?.enable ||
@@ -513,7 +570,6 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                     editorRef={markdownEditorRef}
                     onValueChange={(text) => {
                       setValue(text);
-                      props.onChange?.(text);
                     }}
                     quickActionRender={props.quickActionRender}
                     prefixCls={baseCls}
@@ -558,6 +614,35 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
           sendActionsNode
         )}
       </div>
+      {props.followups?.items?.length ? (
+        <Followups
+          items={props.followups.items}
+          disabled={
+            props.disabled ||
+            props.typing ||
+            isLoading ||
+            resolveSendDisabled(props.sendButtonProps, fileUploadStatus)
+          }
+          onSelect={(item) => {
+            if (
+              props.disabled ||
+              props.typing ||
+              isLoading ||
+              isSendingRef.current ||
+              resolveSendDisabled(props.sendButtonProps, fileUploadStatus)
+            ) {
+              return;
+            }
+            if (item.fillOnly) {
+              // 仅回填输入框，不直接发送
+              markdownEditorRef.current?.store?.setMDContent(item.text);
+              setValue(item.text);
+              return;
+            }
+            void sendMessage(item.text).catch(() => {});
+          }}
+        />
+      ) : null}
     </>
   );
 };

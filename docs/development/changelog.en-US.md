@@ -48,7 +48,37 @@ group:
 
 ## Unreleased
 
+- Bubble
+  - ⚡️ Mount reference entries only while expanded and release hidden content when collapsing or closing previews; reuse the editor's Slate synchronization to avoid duplicate parsing and retain plugin configuration.
+
+- MarkdownRenderer
+  - ⚡️ Remove word-animation nodes from sealed blocks and completed streams, merging adjacent text while preserving formatting, charts, and media instances; keep visible paragraphs mounted when streaming ends.
+
+- TaskList / ToolUseBarThink / ToolUseBar
+  - ⚡️ Defer collapsed task and thinking content until its first expansion, retaining custom content state afterward; update only the toggled task row and omit empty hidden tool containers.
+
+- Workspace
+  - ⚡️ Reduce DOM elements in file rows, tree leaves, and search results, mounting image previews on demand; stabilize file data references to avoid rerendering files when another group collapses.
+
 - MarkdownEditor
+  - ⚡️ Use Slate dirty paths for ordinary edits and selection changes, avoiding repeated full-document sanitization, copying, and serialization while preserving full validation for imports and forced normalization.
+  - ⚡️ Render bold text on the existing Slate leaf instead of an extra decorative `span`; preserve ordinary React child identities when restoring Jinja placeholders.
+  - ⚡️ Mount table row and column index actions and outside-click listeners only while active and isolate stable action context, reducing hidden DOM, global listeners and rerenders during large-table edits.
+  - 🐞 Cache highlights by node and Jinja configuration and merge each range once without mutating external caches; avoid recalculating placeholders on selection changes.
+  - ⚡️ Load task assignee suggestions only when first opened and avoid writing empty assignments on mounting, preventing request bursts and document updates in large task lists.
+  - ⚡️ Remove redundant media, readonly image and drag icon wrappers; release hidden image and media toolbar contents on close while preserving Slate selection mappings and player instances.
+  - ⚡️ Reduce full-document subscriptions in tags, cards, and table cells; batch column insertion/removal normalization and reuse column-width calculations for unchanged cells.
+  - ⚡️ Initialize the editable editor and initial document once instead of reparsing Markdown on prop echoes; load tag suggestions only when opened and load shared panel suggestions once.
+  - 🐞 Preserve edited drafts when toggling readonly or updating plugins together with initial values; readonly source updates continue to synchronize.
+  - 🐞 Fix stale selection paths when pasting across paragraphs; preserve selected text when `onPaste` returns `false`.
+  - 🐞 Use the same plugin-aware serialization for autosave and `store.getMDContent()`; isolate Markdown parsing caches by plugins and configuration to prevent mixed node results.
+  - 🐞 Cancel pending frames when clearing content or replacing an asynchronous load, preventing old content from returning and older tasks from removing newer cancellation handles.
+  - ⚡️ Load images, video, and audio through their displayed elements, removing duplicate preloaders and document writes on mounting; mount resize handles only for selected images and preload only player metadata.
+  - 🐞 Persist the final image dimensions when resizing ends and reflect external size and URL updates; resizing and deletion still target the original media after nodes move.
+  - 🐞 Fix card caching hiding media dimensions, URL changes, and removal; preserve player position when editing media descriptions or dimensions.
+  - 🐞 Create a visible paragraph after selected media when typing, pressing Enter, or pasting; deletion retains a valid caret and supports one-step undo without hidden text, empty cards, or invalid paths.
+  - 🐞 Unify copy and cut for images, players, and attachments; remove content only after clipboard writes succeed, with plugin serialization, moved-node protection, and one-step undo.
+  - 🐞 Enforce media-link request timeouts and prevent duplicate insertions or late results overwriting new edits; preserve file order and media types when pasting multiple uploads.
   - 🐞 Fixed table flickering by removing the table row entry animation (`agenticMdBlurFadeIn` on `tbody tr`). Streaming remounts rows and used to replay the blur fade-in; keyframes are kept only for `MarkdownRenderer` word-by-word fade-in.
   - 🐞 Fixed duplicated items while readonly streaming loose lists. Multi-block parser output now merges adjacent lists before entering Slate, and the hash fast path also validates tree shape.[#722](https://github.com/antdigital-ai/agentic-ui/issues/722)
   - 🐞 Fixed stale IME composition text being restored after the entire uncommitted buffer was deleted.[#721](https://github.com/antdigital-ai/agentic-ui/issues/721)
@@ -63,6 +93,14 @@ group:
 
 - 📖 Docs
   - 📖 Documented how Agentic UI differs from Ant Design X and the safety boundary for running Coding Agent output with ProxySandbox.[#668](https://github.com/antdigital-ai/agentic-ui/issues/668) [#213](https://github.com/antdigital-ai/agentic-ui/issues/213) [#330](https://github.com/antdigital-ai/agentic-ui/issues/330)
+
+- MarkdownInputField
+  - 🆕 Added `inputHistory` navigation (aligned with the desktop IDE chat input): `↑`/`↓` recall previously sent content at the start/end of the draft, stashing the in-progress draft; history lives only in component memory.
+  - 🆕 Added drag-and-drop upload: with `attachment` configured, drop files onto the input (format, size, and count checks included, with a hover highlight overlay).
+  - 🆕 Added `followups` suggestion chips: click to send or fill the input (`fillOnly`), width-aligned with the field.
+  - 💄 Slash / tag chips now play a one-shot character wave + icon sweep animation on insert (aligned with the desktop IDE composer), honoring `prefers-reduced-motion`.
+  - 🐞 Synchronize external controlled clears, conversation changes, and draft updates while focused, preserving protection for editor echoes and IME composition.
+  - 🐞 Route Followups through the shared send pipeline, respecting disabled, typing, send-button restrictions, and concurrent-send guards; notify `onChange` once through state updates for edits, truncation, quick actions, and fills.
 
 - MarkdownRenderer
   - 🆕 Added GPT-style streaming word-by-word fade-in: while `streaming`, new words fade in individually; already-shown content reuses DOM without flickering. Pure CSS, honors `prefers-reduced-motion`; skips code blocks / tables / formulas.

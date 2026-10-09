@@ -366,6 +366,7 @@ export const cnLabels = {
   'input.sendButtonAriaLabel.send': '发送消息',
   'input.sendButtonAriaLabel.stop': '停止生成',
   'input.typing.hint': 'AI 正在回复中，请稍候...',
+  'input.dnd.hint': '拖放以上传文件',
   // Other translations
   'common.name': '名称',
   'common.updateTime': '更新时间',
@@ -869,6 +870,7 @@ export const enLabels: typeof cnLabels = {
   'input.sendButtonAriaLabel.send': 'Send message',
   'input.sendButtonAriaLabel.stop': 'Stop generating',
   'input.typing.hint': 'AI is replying, please wait...',
+  'input.dnd.hint': 'Drop to attach files',
   // Other translations
   'common.name': 'Name',
   'common.updateTime': 'Update Time',
