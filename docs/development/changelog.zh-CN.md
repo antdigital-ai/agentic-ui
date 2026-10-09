@@ -49,6 +49,19 @@ group:
 ## 未发布 {#unreleased}
 
 - MarkdownEditor
+  - ⚡️ 普通输入和选区变更改用 Slate 脏路径规范化，避免反复清洗、复制及序列化整棵文档；保留导入数据与强制规范化的完整校验。
+  - ⚡️ 减少 Tag、卡片与表格单元格的全文订阅；合并增删列的规范化批次，复用未变单元格的列宽计算。
+  - ⚡️ 编辑态只初始化一次编辑器与初始文档，避免属性回显重复解析 Markdown；Tag 候选项仅在打开时加载，共享面板只加载一次。
+  - 🐞 切换只读或同时更新插件与初始值时保留当前编辑草稿；只读内容更新仍正常同步。
+  - 🐞 修复跨段选区粘贴使用过期路径的问题；`onPaste` 返回 `false` 时保留选中文字。
+  - 🐞 自动保存与 `store.getMDContent()` 统一使用插件序列化；Markdown 解析缓存按插件与配置隔离，避免不同插件串用节点。
+  - 🐞 清空正文或替换异步加载任务时取消旧帧，避免旧内容重新出现或旧任务覆盖新任务的取消句柄。
+  - ⚡️ 图片与音视频使用实际展示元素加载，移除重复预加载与挂载时的文档写入；未选中图片不挂载缩放手柄，音视频仅预加载元数据。
+  - 🐞 图片缩放按松手时的最终尺寸保存，支持外部尺寸与地址更新；节点移动后缩放和删除仍作用于原媒体。
+  - 🐞 修复卡片缓存遮蔽媒体尺寸、地址及删除更新的问题；修改音视频说明或尺寸时保留播放位置。
+  - 🐞 选中媒体后输入、回车或粘贴时在卡片后创建可见段落；删除保留有效光标并支持单步撤销，避免隐藏文字、空卡片与路径错误。
+  - 🐞 统一图片、音视频与附件的复制和剪切入口；剪贴板写入成功后才删除正文，支持插件序列化、路径移动保护与单步撤销。
+  - 🐞 媒体链接插入支持真实请求超时与重复操作互斥，异步结果不再覆盖等待期间的新编辑；多文件粘贴保留文件顺序与类型。
   - 🐞 修复表格闪动：删除表格行入场动画（`tbody tr` 的 `agenticMdBlurFadeIn`）。流式增量会反复重挂表格行导致 blur 淡入重放；`agenticMdBlurFadeIn` keyframes 仅保留供 `MarkdownRenderer` 流式逐词淡入使用。
   - 🐞 修复 readonly 流式渲染松散列表时条目被反复追加；多块解析结果现在会在进入 Slate 前合并相邻同类列表，并收紧 hash 快速路径的结构校验。[#722](https://github.com/antdigital-ai/agentic-ui/issues/722)
   - 🐞 修复 IME 组合文本全部删除后，`compositionend` 回补旧片段导致残留首字符的问题。[#721](https://github.com/antdigital-ai/agentic-ui/issues/721)
@@ -63,6 +76,10 @@ group:
 
 - 📖 文档
   - 📖 补充 Agentic UI 与 Ant Design X 的定位差异，以及 ProxySandbox 执行 Coding Agent 生成代码的安全边界。[#668](https://github.com/antdigital-ai/agentic-ui/issues/668) [#213](https://github.com/antdigital-ai/agentic-ui/issues/213) [#330](https://github.com/antdigital-ai/agentic-ui/issues/330)
+
+- MarkdownInputField
+  - 🐞 聚焦时也同步外部受控值的清空、会话与草稿更新，保留编辑器自身回显及输入法组合输入的保护。
+  - 🐞 Followups 接入统一发送管线，遵守禁用、生成中、发送按钮禁用及发送互斥；输入、截断、快捷操作与回填统一通过状态更新通知一次 `onChange`。
 
 - MarkdownRenderer
   - 🆕 新增 GPT 风格流式逐词淡入：`streaming` 时默认对新词淡入，已显示内容复用 DOM、不闪烁；纯 CSS，尊重 `prefers-reduced-motion`；代码块 / 表格 / 公式不拆词。

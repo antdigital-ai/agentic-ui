@@ -1,6 +1,7 @@
 import { Editor, Transforms } from 'slate';
 import { MarkdownEditorPlugin } from '../../plugin';
 import { parserMdToSchema } from '../parser/parserMdToSchema';
+import { prepareMediaPaste } from './prepareMediaPaste';
 
 /**
  * 解析Markdown并插入节点
@@ -22,17 +23,16 @@ export const parseMarkdownToNodesAndInsert = (
     nodes.push({ type: 'paragraph', children: [{ text: '' }] });
   }
   const fragment = nodes;
+  prepareMediaPaste(editor);
   const sel = editor.selection;
-  if (sel && Editor.hasPath(editor, sel.anchor.path)) {
-    if (editor.children.length < 1) {
-      Transforms.insertNodes(editor, fragment);
-      return;
-    }
-    const selectString = Editor.string(editor, sel);
-    if (selectString) {
-      Transforms.removeNodes(editor, { at: sel });
-    }
-    Transforms.insertNodes(editor, fragment, { at: sel });
+  if (
+    sel &&
+    editor.children.length > 0 &&
+    Editor.hasPath(editor, sel.anchor.path) &&
+    Editor.hasPath(editor, sel.focus.path)
+  ) {
+    // insertFragment 会随删除操作更新选区，避免跨段替换后复用旧路径。
+    Transforms.insertFragment(editor, fragment, { at: sel });
     return true;
   }
   Transforms.insertNodes(editor, fragment);

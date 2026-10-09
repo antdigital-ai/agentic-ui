@@ -216,13 +216,15 @@ export class EditorStore {
     markdownToHtmlOptions?: MarkdownToHtmlOptions;
     parserConfig?: ParserMarkdownToSlateNodeConfig;
   }) {
-    if (options.plugins !== undefined) {
+    if (Object.prototype.hasOwnProperty.call(options, 'plugins')) {
       this.plugins = options.plugins;
     }
-    if (options.markdownToHtmlOptions !== undefined) {
+    if (
+      Object.prototype.hasOwnProperty.call(options, 'markdownToHtmlOptions')
+    ) {
       this.markdownToHtmlOptions = options.markdownToHtmlOptions;
     }
-    if (options.parserConfig !== undefined) {
+    if (Object.prototype.hasOwnProperty.call(options, 'parserConfig')) {
       this.parserConfig = options.parserConfig;
     }
   }
@@ -376,6 +378,7 @@ export class EditorStore {
    * Clears all content from the editor, replacing it with an empty paragraph.
    */
   clearContent() {
+    this.cancelSetMDContent();
     EditorUtils.replaceEditorContent(this._editor.current, [
       { type: 'paragraph', children: [{ text: '' }] },
     ]);
@@ -391,7 +394,7 @@ export class EditorStore {
    * @param options - 可选的配置参数
    *   - chunkSize: 分块大小阈值，默认 5000 字符。超过此大小会启用分批处理
    *   - separator: 分隔符，默认为双换行符 '\n\n'，用于拆分长文本
-   *   - useRAF: 是否使用 requestAnimationFrame 优化，默认 true，避免长文本处理时卡顿
+   *   - useRAF: 是否使用 requestAnimationFrame 优化，默认 false，避免长文本处理时卡顿
    *   - batchSize: 每帧处理的节点数量，默认 50，仅在 useRAF=true 时生效
    *   - onProgress: 进度回调函数，接收当前进度 (0-1) 作为参数
    * @returns 如果使用 RAF，返回 Promise；否则同步执行
@@ -408,14 +411,15 @@ export class EditorStore {
     },
   ): void | Promise<void> {
     if (md === undefined) return;
+    // Every explicit replacement supersedes pending frames, even when clearing
+    // an already empty document or supplying its currently visible content.
+    this.cancelSetMDContent();
     if (!md) {
       if (this._shouldSkipSetContent('')) return;
       this.clearContent();
       return;
     }
     if (this._shouldSkipSetContent(md)) return;
-
-    this.cancelSetMDContent();
 
     const chunkSize = options?.chunkSize ?? 5000;
     const separator = options?.separator ?? /\n\n/;
@@ -456,9 +460,7 @@ export class EditorStore {
    */
   private _shouldSkipSetContent(md: string): boolean {
     try {
-      const currentMD = parserSlateNodeToMarkdown(
-        this._editor.current.children,
-      );
+      const currentMD = this.getMDContent();
       return md.trim() === currentMD.trim();
     } catch (error) {
       console.warn(
@@ -582,6 +584,13 @@ export class EditorStore {
       const parseChunksPerFrame = Math.max(1, Math.floor(batchSize / 10)); // 每帧解析的 chunk 数
       let isFirstBatch = true;
       let rafId: number | null = null;
+      const clearCurrentOperation = () => {
+        // A cancelled frame can run after another load has already started.
+        // It must not remove the newer load's cancellation handle.
+        if (this._currentAbortController?.signal === signal) {
+          this._currentAbortController = null;
+        }
+      };
 
       // 边解析边插入
       const parseAndInsertNextBatch = () => {
@@ -592,7 +601,7 @@ export class EditorStore {
               cancelAnimationFrame(rafId);
               rafId = null;
             }
-            this._currentAbortController = null;
+            clearCurrentOperation();
             reject(new Error('Operation was cancelled'));
             return;
           }
@@ -603,7 +612,7 @@ export class EditorStore {
               cancelAnimationFrame(rafId);
               rafId = null;
             }
-            this._currentAbortController = null;
+            clearCurrentOperation();
             reject(new Error('Editor instance is no longer available'));
             return;
           }
@@ -662,7 +671,7 @@ export class EditorStore {
             // 所有内容处理完成
             this._safeDeselect();
             rafId = null;
-            this._currentAbortController = null;
+            clearCurrentOperation();
             resolve();
           }
         } catch (error) {
@@ -671,7 +680,7 @@ export class EditorStore {
             cancelAnimationFrame(rafId);
             rafId = null;
           }
-          this._currentAbortController = null;
+          clearCurrentOperation();
           reject(error);
         }
       };

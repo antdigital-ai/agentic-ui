@@ -40,7 +40,11 @@ vi.mock('../../MarkdownEditor', () => ({
     // editorRef 是 MarkdownInputField 实际使用的入参，需要把 store 挂上
     React.useEffect(() => {
       if (props.editorRef) {
-        props.editorRef.current = exposeStore;
+        if (typeof props.editorRef === 'function') {
+          props.editorRef(exposeStore);
+        } else {
+          props.editorRef.current = exposeStore;
+        }
       }
     }, [props.editorRef, exposeStore]);
 
@@ -413,40 +417,28 @@ describe('MarkdownInputField - voiceInput', () => {
     // partial deltas for current sentence
     handlersRef?.onPartial('hello');
     await vi.waitFor(() => {
-      expect(handleChange).toHaveBeenLastCalledWith('hello', expect.anything());
+      expect(handleChange).toHaveBeenLastCalledWith('hello');
     });
     handlersRef?.onPartial('hello ');
     await vi.waitFor(() => {
-      expect(handleChange).toHaveBeenLastCalledWith(
-        'hello ',
-        expect.anything(),
-      );
+      expect(handleChange).toHaveBeenLastCalledWith('hello ');
     });
 
     // sentence end -> finalize
     handlersRef?.onSentenceEnd('hello world');
     await vi.waitFor(() => {
-      expect(handleChange).toHaveBeenLastCalledWith(
-        'hello world',
-        expect.anything(),
-      );
+      expect(handleChange).toHaveBeenLastCalledWith('hello world');
     });
 
     // next sentence should start after previous content
     handlersRef?.onSentenceBegin();
     handlersRef?.onPartial('foo');
     await vi.waitFor(() => {
-      expect(handleChange).toHaveBeenLastCalledWith(
-        'hello worldfoo',
-        expect.anything(),
-      );
+      expect(handleChange).toHaveBeenLastCalledWith('hello worldfoo');
     });
     handlersRef?.onSentenceEnd('foo.');
     await vi.waitFor(() => {
-      expect(handleChange).toHaveBeenLastCalledWith(
-        'hello worldfoo.',
-        expect.anything(),
-      );
+      expect(handleChange).toHaveBeenLastCalledWith('hello worldfoo.');
     });
   });
 
@@ -489,7 +481,7 @@ describe('MarkdownInputField - voiceInput', () => {
     // inject some partial text so there is content to send
     handlersRef?.onPartial('msg');
     await vi.waitFor(() => {
-      expect(handleChange).toHaveBeenCalledWith('msg', expect.anything());
+      expect(handleChange).toHaveBeenCalledWith('msg');
     });
 
     // click send

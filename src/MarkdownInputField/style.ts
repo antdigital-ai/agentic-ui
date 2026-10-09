@@ -327,6 +327,50 @@ const genStyle: GenerateStyle<
         animationIterationCount: 'infinite',
       },
     },
+
+    // 建议问题区（对齐 dtcoder-ide interactive-input-followups 布局）
+    [`${token.componentCls}-followups`]: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: '8px',
+      width: '100%',
+      maxWidth: 980,
+      marginTop: '12px',
+      font: 'var(--font-text-body-base)',
+    },
+    [`${token.componentCls}-followups-item`]: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 6,
+      maxWidth: '100%',
+      padding: '5px 12px',
+      border: `1px solid ${token.colorBorderSecondary}`,
+      borderRadius: '999px',
+      backgroundColor: 'var(--color-gray-bg-card-white)',
+      color: 'var(--color-gray-text-default)',
+      font: 'var(--font-text-paragraph-base)',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease',
+      '&:hover': {
+        borderColor: token.colorPrimary,
+        color: token.colorPrimary,
+        backgroundColor: token.colorBgContainer,
+      },
+      '&:focus-visible': {
+        outline: `2px solid ${token.colorPrimary}`,
+        outlineOffset: 1,
+      },
+    },
+    [`${token.componentCls}-followups-item-icon`]: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      flexShrink: 0,
+    },
+    [`${token.componentCls}-followups-item-text`]: {
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+    },
     [`${token.componentCls}-before-tools`]: {
       display: 'flex',
       gap: 8,

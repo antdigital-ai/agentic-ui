@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ReadonlyEditorImage } from '../../../../editor/elements/Image/ReadonlyEditorImage';
@@ -109,53 +109,27 @@ describe('ReadonlyEditorImage', () => {
     });
   });
 
-  it('initial() 创建的 img onerror 会调用 setState({ loadSuccess: false })', async () => {
-    const capturedImgs: HTMLImageElement[] = [];
-    const origCreateElement = Document.prototype.createElement.bind(
-      document,
-    ) as typeof document.createElement;
-    const mockSetState = vi.fn();
-    vi.mocked(editorUtils.useGetSetState).mockImplementation(
-      (initialState: any) => {
-        const stateRef = { current: { ...initialState } };
-        const get = () => stateRef.current;
-        const set = (patch: any) => {
-          mockSetState(patch);
-          Object.assign(stateRef.current, patch);
-        };
-        return [get, set];
-      },
+  it('visible image errors show the configured fallback and a new URL retries', () => {
+    const { container, rerender } = render(
+      <ReadonlyEditorImage {...defaultProps} />,
     );
-    vi.spyOn(document, 'createElement').mockImplementation(
-      (tagName: string) => {
-        const el = origCreateElement(tagName) as HTMLImageElement;
-        if (tagName === 'img') capturedImgs.push(el);
-        return el;
-      },
-    );
+    const image = container.querySelector('img')!;
+    fireEvent.error(image);
+    expect(container.querySelector('img')).toBeNull();
+    expect(screen.getByText('test alt')).toBeInTheDocument();
 
-    render(
+    rerender(
       <ReadonlyEditorImage
         {...defaultProps}
-        element={{ ...defaultElement, finished: true } as any}
+        element={
+          { ...defaultElement, url: 'https://example.com/retry.png' } as any
+        }
       />,
     );
-
-    await waitFor(() => {
-      expect(capturedImgs.length).toBeGreaterThanOrEqual(1);
-    });
-    // initial() 创建的 img 未 append 到 document，ReadonlyImage 的 img 在 DOM 中
-    const initialImg =
-      capturedImgs.find((img) => !document.contains(img)) ??
-      capturedImgs[capturedImgs.length - 1];
-    act(() => {
-      initialImg?.onerror?.({} as Event);
-    });
-    // initial() 内先 setState({ type })、setState({ url })，img onerror 时 setState({ loadSuccess: false })
-    expect(mockSetState).toHaveBeenCalledWith(
-      expect.objectContaining({ loadSuccess: false }),
+    expect(container.querySelector('img')).toHaveAttribute(
+      'src',
+      'https://example.com/retry.png',
     );
-    vi.mocked(document.createElement).mockRestore();
   });
 
   it('应渲染 ReadonlyImage 并传递 width/height', () => {
@@ -250,23 +224,15 @@ describe('ReadonlyEditorImage', () => {
     vi.mocked(document.createElement).mockRestore();
   });
 
-  it('getMediaType 返回 video 时 initial 不创建 img', async () => {
-    vi.mocked(domUtils.getMediaType).mockReturnValue('video');
+  it('renders the visible image without running media type detection or its own preloader', () => {
     const createEl = vi.spyOn(document, 'createElement');
-
-    render(
-      <ReadonlyEditorImage
-        {...defaultProps}
-        element={{ ...defaultElement, finished: true } as any}
-      />,
-    );
-
-    await waitFor(() => {
-      expect(domUtils.getMediaType).toHaveBeenCalled();
-    });
-    // 仅 ReadonlyImage 子组件会创建 img，本组件 initial() 在 type=video 时不创建 img，故仅子组件产生的 img 调用
-    const imgCalls = createEl.mock.calls.filter((c) => c[0] === 'img');
-    expect(imgCalls.length).toBeLessThanOrEqual(2);
+    const { container } = render(<ReadonlyEditorImage {...defaultProps} />);
+    expect(domUtils.getMediaType).not.toHaveBeenCalled();
+    expect(container.querySelectorAll('img')).toHaveLength(1);
+    // Ant Design itself may create one detached status probe.
+    expect(
+      createEl.mock.calls.filter(([tag]) => tag === 'img').length,
+    ).toBeLessThanOrEqual(2);
     createEl.mockRestore();
   });
 

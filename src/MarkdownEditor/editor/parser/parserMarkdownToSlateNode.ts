@@ -39,6 +39,31 @@ import { getMarkdownParser } from './remarkParse';
 
 // 全局解析缓存
 const parseCache = new Map<string, Elements[]>();
+const pluginCacheIdentities = new WeakMap<object, number>();
+let nextPluginCacheIdentity = 0;
+
+const getPluginCacheIdentity = (value: object): number => {
+  const cachedIdentity = pluginCacheIdentities.get(value);
+  if (cachedIdentity !== undefined) return cachedIdentity;
+  const identity = nextPluginCacheIdentity++;
+  pluginCacheIdentities.set(value, identity);
+  return identity;
+};
+
+const getPluginsCacheKey = (plugins?: MarkdownEditorPlugin[]): string =>
+  plugins
+    ?.map(
+      (plugin) =>
+        `${getPluginCacheIdentity(plugin)}:${
+          plugin.parseMarkdown
+            ?.map(
+              (rule) =>
+                `${getPluginCacheIdentity(rule.match)},${getPluginCacheIdentity(rule.convert)}`,
+            )
+            .join(';') ?? ''
+        }`,
+    )
+    .join('|') ?? '';
 
 /**
  * 清空解析缓存
@@ -244,10 +269,12 @@ const splitMarkdownIntoBlocks = (
   const configStr = config ? JSON.stringify(config) : '';
   const pluginsCount = plugins?.length || 0;
   const configHash = simpleHash(`${configStr}_${pluginsCount}`);
+  // 函数不能通过 JSON.stringify 区分；保留插件与规则顺序，并识别运行时规则替换。
+  const pluginsKey = getPluginsCacheKey(plugins);
 
   return mergedBlocks.map((content, index) => ({
     content,
-    hash: `${simpleHash(content)}_${configHash}_${index}`,
+    hash: `${simpleHash(content)}_${configHash}_${index}${pluginsKey ? `_${pluginsKey}` : ''}`,
   }));
 };
 /**

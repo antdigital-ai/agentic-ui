@@ -7,7 +7,7 @@ import type { MarkdownInputFieldProps } from '../types/MarkdownInputFieldProps';
 interface UseSendHandlerParams {
   props: Pick<
     MarkdownInputFieldProps,
-    'disabled' | 'typing' | 'onChange' | 'onSend' | 'allowEmptySubmit'
+    'disabled' | 'typing' | 'onSend' | 'allowEmptySubmit'
   >;
   /** 来自 SendButton 的可选额外禁用，独立于 props.disabled */
   sendDisabled?: boolean;
@@ -48,7 +48,7 @@ export const useSendHandler = ({
   recording,
   stopRecording,
 }: UseSendHandlerParams) => {
-  const sendMessage = useRefFunction(async () => {
+  const sendMessage = useRefFunction(async (submittedValue?: string) => {
     // 整体输入禁用
     if (props.disabled) return;
     if (props.typing) return;
@@ -58,38 +58,38 @@ export const useSendHandler = ({
     if (isSendingRef.current) return;
     // 发送按钮独立禁用（如未上传完成）
     if (sendDisabled) return;
+    if (!props.onSend) return;
 
-    // 优先停止录音再发送
-    if (recording) await stopRecording();
-    const mdValue = markdownEditorRef?.current?.store?.getMDContent();
+    // Acquire before the first await so recording and followup sends share the
+    // same lock as keyboard and button submissions.
+    isSendingRef.current = true;
+    try {
+      if (recording) await stopRecording();
+      const mdValue =
+        submittedValue ?? markdownEditorRef.current?.store?.getMDContent();
 
-    // mdValue 与 value 不一致且非空时同步外部状态
-    if (mdValue !== value && mdValue) {
-      props.onChange?.(mdValue);
-    }
-
-    // 纯空白视为空内容：trim 后为空时统一以空串处理，
-    // 这样 allowEmptySubmit 场景下「只有空格」与「完全为空」语义一致。
-    const trimmedMdValue = (mdValue ?? '').trim();
-    const effectiveValue = trimmedMdValue ? mdValue! : '';
-
-    // allowEmptySubmit 开启时即使内容为空也允许触发
-    if (props.onSend && (props.allowEmptySubmit || trimmedMdValue)) {
-      isSendingRef.current = true;
-      setIsLoading(true);
-      try {
-        await props.onSend(effectiveValue);
-        markdownEditorRef?.current?.store?.clearContent();
-        props.onChange?.('');
-        setValue('');
-        setFileMap?.(new Map());
-      } catch (error) {
-        console.error('Send message failed:', error);
-        throw error;
-      } finally {
-        setIsLoading(false);
-        isSendingRef.current = false;
+      if (submittedValue === undefined && mdValue !== value && mdValue) {
+        setValue(mdValue);
       }
+
+      // 纯空白视为空内容：trim 后为空时统一以空串处理，
+      // 这样 allowEmptySubmit 场景下「只有空格」与「完全为空」语义一致。
+      const trimmedMdValue = (mdValue ?? '').trim();
+      const effectiveValue = trimmedMdValue ? mdValue || '' : '';
+
+      // allowEmptySubmit 开启时即使内容为空也允许触发
+      if (!props.allowEmptySubmit && !trimmedMdValue) return;
+      setIsLoading(true);
+      await props.onSend(effectiveValue);
+      markdownEditorRef?.current?.store?.clearContent();
+      setValue('');
+      setFileMap?.(new Map());
+    } catch (error) {
+      console.error('Send message failed:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+      isSendingRef.current = false;
     }
   });
 

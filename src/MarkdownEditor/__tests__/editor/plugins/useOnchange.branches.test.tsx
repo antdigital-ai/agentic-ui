@@ -25,6 +25,7 @@ const mockSetRefreshFloatBar = vi.fn(
 const selChange$ = new Subject<any>();
 
 const storeState: {
+  store: { getMDContent: typeof mockParser };
   readonly: boolean;
   refreshFloatBar: number;
   floatBarRevision: number;
@@ -34,6 +35,7 @@ const storeState: {
   markdownEditorRef: { current: ReturnType<typeof createEditor> | null };
   selChange$: Subject<any>;
 } = {
+  store: { getMDContent: mockParser },
   readonly: false,
   refreshFloatBar: 0,
   floatBarRevision: 0,
@@ -56,10 +58,6 @@ vi.mock('../../../../Hooks/useDebounceFn', () => ({
 
 vi.mock('../../../editor/store', () => ({
   useEditorStore: () => storeState,
-}));
-
-vi.mock('../../../editor/utils', () => ({
-  parserSlateNodeToMarkdown: (...args: any[]) => mockParser(...args),
 }));
 
 describe('useOnchange targeted coverage', () => {

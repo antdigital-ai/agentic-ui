@@ -1,7 +1,6 @@
 import React from 'react';
 import { debugInfo } from '../../../../Utils/debugUtils';
 import { ElementProps, ParagraphNode } from '../../../el';
-import { useSelStatus } from '../../../hooks/editor';
 import { useEditorStore } from '../../store';
 import { DragHandle } from '../../tools/DragHandle';
 
@@ -11,14 +10,7 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
     align,
     children: props.element.children,
   });
-  const { store, markdownContainerRef, readonly } = useEditorStore();
-  const [selected] = useSelStatus(props.element);
-
-  debugInfo('Paragraph - 渲染', {
-    selected,
-    readonly,
-    align,
-  });
+  const { store, markdownContainerRef } = useEditorStore();
 
   return (
     <div

@@ -1,6 +1,8 @@
-import { Editor, Operation } from 'slate';
+import { Editor, Operation, Path, Transforms } from 'slate';
 import {
   collectCardPathsForTextOperation,
+  deleteSelectedMedia,
+  getSelectedMediaBlockPath,
   handleCardDeleteBackward,
   handleCardInsertNodeOperation,
   handleCardRemoveNodeOperation,
@@ -13,10 +15,28 @@ import {
  * Card 块：用 Slate 推荐的 editor 方法覆写处理输入，apply 仅保留 Operation 级逻辑。
  *
  * - insertText / insertFragment / deleteBackward：card-before 禁写、card-after 重定向到卡后
+ * - deleteBackward / deleteForward：删除选中的媒体并保留可编辑光标位置
  * - apply：remove_node、insert_node，以及文本变更后的空 card 清理
  */
 export const withCardPlugin = (editor: Editor) => {
-  const { apply, deleteBackward, insertFragment, insertText } = editor;
+  const {
+    apply,
+    deleteBackward,
+    deleteForward,
+    insertBreak,
+    insertFragment,
+    insertText,
+  } = editor;
+
+  editor.insertBreak = () => {
+    const mediaBlockPath = getSelectedMediaBlockPath(editor);
+    if (!mediaBlockPath) return insertBreak();
+    Transforms.insertNodes(
+      editor,
+      { type: 'paragraph', children: [{ text: '' }] },
+      { at: Path.next(mediaBlockPath), select: true },
+    );
+  };
 
   editor.apply = (operation: Operation) => {
     if (
@@ -61,6 +81,10 @@ export const withCardPlugin = (editor: Editor) => {
     if (!handleCardDeleteBackward(editor, unit, deleteBackward)) {
       deleteBackward(unit);
     }
+  };
+
+  editor.deleteForward = (unit) => {
+    if (!deleteSelectedMedia(editor)) deleteForward(unit);
   };
 
   return editor;

@@ -24,6 +24,7 @@ vi.mock('../../../store', () => ({
 }));
 
 vi.mock('../../../../hooks/editor', () => ({
+  useElementSelected: () => true,
   useSelStatus: () => [true, [0]],
 }));
 
@@ -63,7 +64,8 @@ vi.mock('../../../../../Utils/htmlUrlSafety', () => ({
   UNSAFE_URL_PLAIN_TEXT_STYLE: { color: 'red' },
 }));
 
-vi.mock('../../Image', () => ({
+vi.mock('../../Image', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../Image')>()),
   ReadonlyImage: (p: any) => (
     <img data-testid="ro-img" src={p.src} alt={p.alt} />
   ),
@@ -113,7 +115,7 @@ describe('Media deepen3 residual branches', () => {
     vi.restoreAllMocks();
   });
 
-  it('pdf/other 类型；无 mediaType 触发 updateElement', async () => {
+  it('pdf/other 类型；无 mediaType 挂载不写文档', async () => {
     render(
       <Media
         element={
@@ -131,7 +133,7 @@ describe('Media deepen3 residual branches', () => {
     await act(async () => {
       await Promise.resolve();
     });
-    expect(setNodes).toHaveBeenCalled();
+    expect(setNodes).not.toHaveBeenCalled();
   });
 
   it('image finished=false：超时显示 alt；readonly 用 ReadonlyImage', async () => {

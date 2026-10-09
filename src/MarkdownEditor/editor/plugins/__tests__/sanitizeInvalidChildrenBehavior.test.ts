@@ -6,6 +6,33 @@ import {
 } from '../sanitizeInvalidChildrenBehavior';
 
 describe('sanitizeInvalidChildrenBehavior', () => {
+  it('preserves valid node and root references', () => {
+    const leaf = { text: 'valid' };
+    const paragraph = { type: 'paragraph', children: [leaf] };
+    const root = [paragraph];
+
+    expect(sanitizeNode(leaf)).toBe(leaf);
+    expect(sanitizeNode(paragraph)).toBe(paragraph);
+    expect(sanitizeEditorChildren(root)).toBe(root);
+  });
+
+  it('only replaces the ancestry of a repaired child', () => {
+    const valid = { type: 'paragraph', children: [{ text: 'keep' }] };
+    const invalid = {
+      type: 'paragraph',
+      children: [{ text: 'repair' }, undefined],
+    };
+    const root = [valid, invalid];
+
+    const result = sanitizeEditorChildren(root);
+
+    expect(result).not.toBe(root);
+    expect(result[0]).toBe(valid);
+    expect(result[1]).not.toBe(invalid);
+    expect(result[1].children[0]).toBe(invalid.children[0]);
+    expect(invalid.children).toHaveLength(2);
+  });
+
   it('sanitizeEditorChildren 去掉 undefined 子节点', () => {
     const result = sanitizeEditorChildren([
       {

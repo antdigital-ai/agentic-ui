@@ -11,9 +11,15 @@ import { Button, ConfigProvider, Input, Menu, Tabs } from 'antd';
 import { ItemType } from 'antd/es/breadcrumb/Breadcrumb';
 import classNames from 'clsx';
 import isHotkey from 'is-hotkey';
-import React, { useContext, useEffect, useMemo, useRef } from 'react';
+import React, {
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+} from 'react';
 import ReactDOM from 'react-dom';
-import { Editor, Element, Node, Transforms } from 'slate';
+import { Editor, Element, Node, Transforms, type PathRef } from 'slate';
 import { ReactEditor } from 'slate-react';
 import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { I18nContext, LocalKeys } from '../../../I18n';
@@ -270,6 +276,11 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
     path: number[];
     isTop: boolean;
   }>({ path: [], isTop: true });
+  const mediaRequestGenerationRef = useRef(0);
+  const mediaRequestRef = useRef<{
+    generation: number;
+    pathRef: PathRef;
+  } | null>(null);
   const [state, setState] = useLocalState({
     index: 0,
     filterOptions: [] as InsertOptions[],
@@ -291,7 +302,14 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
     }
   });
 
+  const cancelMediaRequest = useRefFunction(() => {
+    mediaRequestGenerationRef.current += 1;
+    mediaRequestRef.current?.pathRef.unref();
+    mediaRequestRef.current = null;
+  });
+
   const close = useRefFunction(() => {
+    cancelMediaRequest();
     setState({
       filterOptions: [],
       options: [],
@@ -300,10 +318,16 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
       insertLink: false,
       insertAttachment: false,
       insertUrl: '',
+      loading: false,
     });
     // 组件仅挂载于浏览器；window 守卫为死分支
     window.removeEventListener('click', clickClose);
   });
+
+  useLayoutEffect(() => {
+    if (!openInsertCompletion) cancelMediaRequest();
+    return cancelMediaRequest;
+  }, [openInsertCompletion, cancelMediaRequest]);
 
   const runInsertTask = useRefFunction(
     async (
@@ -470,6 +494,16 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
    * 插入媒体
    */
   const insertMedia = useRefFunction(async () => {
+    if (mediaRequestRef.current) return;
+    const editor = markdownEditorRef.current;
+    if (!Node.has(editor, ctx.current.path)) return;
+    const target = Node.get(editor, ctx.current.path);
+    if (!Element.isElement(target)) return;
+    const request = {
+      generation: ++mediaRequestGenerationRef.current,
+      pathRef: Editor.pathRef(editor, ctx.current.path),
+    };
+    mediaRequestRef.current = request;
     setState({ loading: true });
     try {
       let url = state.insertUrl;
@@ -487,28 +521,45 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
       if (!type) {
         throw new Error();
       }
-      Transforms.insertText(markdownEditorRef.current, '', {
-        at: {
-          anchor: Editor.start(markdownEditorRef.current, ctx.current.path),
-          focus: Editor.end(markdownEditorRef.current, ctx.current.path),
-        },
+      const path = request.pathRef.current;
+      if (
+        request.generation !== mediaRequestGenerationRef.current ||
+        markdownEditorRef.current !== editor ||
+        !path ||
+        !Node.has(editor, path) ||
+        Node.get(editor, path) !== target
+      ) {
+        return;
+      }
+      const node = EditorUtils.createMediaNode(url, type, {}) as CardNode;
+      // setNodes ignores children. Replace the complete card only after the
+      // request succeeds and the original block is still unchanged.
+      Editor.withoutNormalizing(editor, () => {
+        Transforms.removeNodes(editor, { at: path });
+        Transforms.insertNodes(editor, node, { at: path, select: true });
       });
-      const node = EditorUtils.createMediaNode(url, 'image', {}) as CardNode;
-      Transforms.setNodes(markdownEditorRef.current, node, {
-        at: ctx.current.path,
-      });
-      EditorUtils.focus(markdownEditorRef.current);
-      const [n] = Editor.nodes(markdownEditorRef.current, {
+      EditorUtils.focus(editor);
+      const [n] = Editor.nodes(editor, {
         match: (n) => !!n.type,
         mode: 'lowest',
       });
       selChange$.next({
-        sel: markdownEditorRef.current.selection,
+        sel: editor.selection,
         node: n,
       });
       close();
+    } catch {
+      // Keep the URL and original block available for retry after a failed
+      // lookup, invalid URL, or a target removed before the request began.
     } finally {
-      setState({ loading: false });
+      if (mediaRequestRef.current === request) {
+        // A failed lookup can be retried after surrounding blocks moved. A
+        // deleted target has no valid retry anchor until the panel is reopened.
+        ctx.current.path = request.pathRef.current ?? [];
+        request.pathRef.unref();
+        mediaRequestRef.current = null;
+        setState({ loading: false });
+      }
     }
   });
 

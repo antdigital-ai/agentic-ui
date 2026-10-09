@@ -78,12 +78,16 @@ vi.mock('slate', () => ({
     parent: vi.fn(() => [{ type: 'root', children: [] }, []]),
     isBlock: vi.fn(() => true),
     isVoid: vi.fn(() => false),
+    pathRef: vi.fn((_editor, path) => ({ current: path, unref: vi.fn() })),
+    withoutNormalizing: vi.fn((_editor, callback) => callback()),
   },
   Element: {
     isElement: vi.fn(() => true),
   },
   Node: {
     string: vi.fn(() => ''),
+    has: vi.fn(() => true),
+    get: vi.fn(() => paragraphNode),
   },
   Transforms: {
     insertNodes: vi.fn(),
@@ -972,7 +976,7 @@ describe('InsertAutocomplete insertMedia', () => {
         expect(getRemoteMediaType).toHaveBeenCalledWith(
           'https://example.com/photo.jpg',
         );
-        expect(Transforms.setNodes).toHaveBeenCalled();
+        expect(Transforms.insertNodes).toHaveBeenCalled();
       }
     }
   });

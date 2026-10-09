@@ -1,5 +1,6 @@
+import { Node } from 'slate';
 import { describe, expect, it, vi } from 'vitest';
-import type { TableNode } from '../../../../types/Table';
+import type { TableNode, TrNode } from '../../../../types/Table';
 import { getReadonlyTableColWidths } from '../getTableColWidths';
 
 /** 构造仅一行的简单表格节点，用于按内容宽度测试 */
@@ -19,6 +20,82 @@ function tableWithOneRow(cellTexts: string[]): TableNode {
 }
 
 describe('getReadonlyTableColWidths', () => {
+  it('reuses unchanged cell measurements and updates content outside sampled rows', () => {
+    const element: TableNode = {
+      type: 'table',
+      children: Array.from(
+        { length: 20 },
+        () => tableWithOneRow(['short', 'short', 'short']).children[0],
+      ),
+    };
+    const stringSpy = vi.spyOn(Node, 'string');
+    const cellReads = () =>
+      stringSpy.mock.calls.filter(([node]) => node.type === 'table-cell')
+        .length;
+    const initial = getReadonlyTableColWidths({
+      columnCount: 3,
+      element,
+      containerWidth: 1000,
+    });
+    expect(cellReads()).toBe(60);
+
+    stringSpy.mockClear();
+    expect(
+      getReadonlyTableColWidths({
+        columnCount: 3,
+        element,
+        containerWidth: 800,
+      }),
+    ).toEqual(initial);
+    expect(cellReads()).toBe(0);
+
+    const changedRow = tableWithOneRow([
+      'short',
+      'a much longer value from the last row',
+      'short',
+    ]).children[0] as TrNode;
+    const previousRow = element.children[19] as TrNode;
+    changedRow.children[0] = previousRow.children[0];
+    changedRow.children[2] = previousRow.children[2];
+    const updated: TableNode = {
+      ...element,
+      children: [...element.children.slice(0, 19), changedRow],
+    };
+    const result = getReadonlyTableColWidths({
+      columnCount: 3,
+      element: updated,
+      containerWidth: 1000,
+    });
+    expect(cellReads()).toBe(1);
+    expect(parseFloat(String(result[1]))).toBeGreaterThan(
+      parseFloat(String(initial[1])),
+    );
+    stringSpy.mockRestore();
+  });
+
+  it('stops reading rows after the smart width sample is full', () => {
+    const element: TableNode = {
+      type: 'table',
+      children: Array.from(
+        { length: 20 },
+        () => tableWithOneRow(['a', 'b', 'c', 'd', 'e', 'f']).children[0],
+      ),
+    };
+    const unvisitedRow = element.children[5];
+    Object.defineProperty(unvisitedRow, 'type', {
+      configurable: true,
+      get: () => 'table-row',
+    });
+    const typeSpy = vi.spyOn(unvisitedRow, 'type', 'get');
+    getReadonlyTableColWidths({
+      columnCount: 6,
+      element,
+      containerWidth: 1000,
+    });
+    expect(typeSpy).not.toHaveBeenCalled();
+    typeSpy.mockRestore();
+  });
+
   it('显式传入 colWidths 时返回该值', () => {
     const result = getReadonlyTableColWidths({
       columnCount: 3,

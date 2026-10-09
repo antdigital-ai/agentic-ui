@@ -27,6 +27,55 @@ const storeState: any = {
   readonly: false,
 };
 
+// The component fixture delegates removal; real Slate behavior is covered by
+// MediaCard.deletion.regression.test.tsx.
+vi.mock(
+  '../../../editor/plugins/cardPluginBehavior',
+  async (importOriginal) => {
+    const actual =
+      await importOriginal<
+        typeof import('../../../editor/plugins/cardPluginBehavior')
+      >();
+    return {
+      ...actual,
+      deleteMediaAtPath: vi.fn<typeof actual.deleteMediaAtPath>(
+        (editor, path) => {
+          Transforms.removeNodes(editor, { at: path });
+          return true;
+        },
+      ),
+    };
+  },
+);
+
+const currentImageNode = vi.hoisted(() => ({ current: undefined as unknown }));
+vi.mock('slate-react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('slate-react')>();
+  return {
+    ...actual,
+    useSelected: () => true,
+    ReactEditor: {
+      ...actual.ReactEditor,
+      findPath: (_editor: unknown, node: unknown) => {
+        currentImageNode.current = node;
+        return [0, 0];
+      },
+    },
+  };
+});
+vi.mock('slate', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('slate')>();
+  return {
+    ...actual,
+    Node: { ...actual.Node, get: () => currentImageNode.current },
+    Editor: {
+      ...actual.Editor,
+      withoutNormalizing: (_editor: unknown, callback: () => void) =>
+        callback(),
+    },
+  };
+});
+
 vi.mock('antd', () => {
   const confirm = vi.fn();
   return {
@@ -96,6 +145,7 @@ vi.mock('../../../../Components/ActionIconBox', () => ({
 }));
 
 vi.mock('../../../hooks/editor', () => ({
+  useElementSelected: () => true,
   useSelStatus: vi.fn(() => [false, [0, 0]]),
 }));
 
@@ -222,10 +272,10 @@ describe('Image targeted coverage', () => {
       </EditorImage>,
     );
 
-    const probe = createdImgs.find((img) => img.crossOrigin === 'anonymous');
+    const probe = document.querySelector('img')!;
     expect(probe).toBeTruthy();
-    probe!.onerror?.(new Event('error') as any);
-    probe!.onload?.(new Event('load') as any);
+    fireEvent.error(probe!);
+
     createSpy.mockRestore();
   });
 
@@ -410,10 +460,10 @@ describe('Image targeted coverage', () => {
     );
 
     // EditorImage 探测 img.onerror → loadSuccess=false → MediaErrorLink(alt)
-    const probe = createdImgs.find((img) => img.crossOrigin === 'anonymous');
+    const probe = document.querySelector('img')!;
     expect(probe).toBeTruthy();
     act(() => {
-      probe!.onerror?.(new Event('error') as any);
+      fireEvent.error(probe!);
     });
     expect(screen.getByTestId('media-error-link')).toHaveTextContent('我的图');
     createSpy.mockRestore();

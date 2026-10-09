@@ -27,6 +27,7 @@ vi.mock('../../../store', () => ({
 }));
 
 vi.mock('../../../../hooks/editor', () => ({
+  useElementSelected: () => true,
   useSelStatus: () => [true, [0]],
 }));
 
@@ -67,7 +68,8 @@ vi.mock('../../../../../Utils/htmlUrlSafety', () => ({
   UNSAFE_URL_PLAIN_TEXT_STYLE: { color: 'red' },
 }));
 
-vi.mock('../../Image', () => ({
+vi.mock('../../Image', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../Image')>()),
   ReadonlyImage: (p: any) => (
     <img data-testid="ro-img" src={p.src} alt={p.alt} />
   ),

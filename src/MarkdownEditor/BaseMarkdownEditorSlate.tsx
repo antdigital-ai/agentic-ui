@@ -95,9 +95,10 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
     [props.plugins],
   );
 
-  const markdownEditorRef = useRef(
+  const [initialEditor] = useState(() =>
     createMarkdownSlateEditor(props.plugins || []),
   );
+  const markdownEditorRef = useRef(initialEditor);
   const pluginsCompositionKeyRef = useRef(pluginsCompositionKey);
   const [slateRemountKey, setSlateRemountKey] = useState(0);
   const [pluginRemountInitSchema, setPluginRemountInitSchema] = useState<
@@ -217,20 +218,25 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
     });
   }, [store, props.plugins, props.markdownToHtmlOptions, parserConfig]);
 
+  const [initialContent] = useState(() => ({
+    markdown: initValue,
+    schema: props.initSchemaValue,
+  }));
+  // Editable content is owned by Slate after mounting. Controlled input echoes
+  // must not parse the same document back into an unused initial schema.
+  const sourceMarkdown = readonly ? initValue : initialContent.markdown;
+  const sourceSchema = readonly ? props.initSchemaValue : initialContent.schema;
+
   const initSchemaValue = useMemo(() => {
-    const parseResult = parserMdToSchema(
-      initValue || '',
-      pluginsForInitParseRef.current || [],
-      parserConfig,
-    );
-    let list = parseResult?.schema || [];
-
-    if (!props.readonly && list.length === 0) {
-      list = [...list, EditorUtils.p];
-    }
-
     const schema =
-      props.initSchemaValue || (initValue ? list : copy([EditorUtils.p]));
+      sourceSchema ||
+      (sourceMarkdown
+        ? parserMdToSchema(
+            sourceMarkdown,
+            pluginsForInitParseRef.current || [],
+            parserConfig,
+          ).schema
+        : copy([EditorUtils.p]));
 
     const filtered =
       schema?.filter((item: any) => {
@@ -255,11 +261,7 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
       }) || [];
 
     return EditorUtils.coalesceRootAllEmptyParagraphs(filtered) as Elements[];
-  }, [initValue, props.readonly, props.initSchemaValue]);
-
-  useEffect(() => {
-    setPluginRemountInitSchema(undefined);
-  }, [initValue, props.initSchemaValue]);
+  }, [sourceMarkdown, sourceSchema]);
 
   const slateInitSchemaValue = pluginRemountInitSchema ?? initSchemaValue;
 
@@ -294,18 +296,37 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
 
   const [schema, setSchema] = useState<Elements[]>(initSchemaValue);
 
-  useEffect(() => {
-    setSchema(initSchemaValue);
-  }, [initSchemaValue]);
+  const lastContentSourceRef = useRef<{
+    markdown: string | undefined;
+    schema: Elements[] | undefined;
+  } | null>(null);
 
-  // 只读流式：外部通过 initValue 累加时 initSchemaValue 会变，但 Slate initialNote 仅随 instance 重置。
-  // 与 ThoughtChainList/MarkdownEditorUpdate 一致，用 updateNodeList 同步文档树，避免中间态 schema 残留堆叠。
+  // Readonly streams accept new content; changing readonly alone must preserve
+  // the current Slate document instead of restoring its initial value.
   useEffect(() => {
+    const previous = lastContentSourceRef.current;
+    lastContentSourceRef.current = {
+      markdown: initValue,
+      schema: props.initSchemaValue,
+    };
     if (!readonly) {
       return;
     }
+    // 首次挂载（previous 为 null）也要同步文档树；此后仅在内容源真正
+    // 变化时更新，readonly 翻转本身不动当前文档。
+    if (
+      previous &&
+      previous.markdown === initValue &&
+      previous.schema === props.initSchemaValue
+    ) {
+      return;
+    }
+    // A readonly source update also takes precedence over content preserved for
+    // a plugin remount in this render. Editable prop echoes keep that snapshot.
+    setPluginRemountInitSchema(undefined);
     store.updateNodeList(initSchemaValue);
-  }, [readonly, initSchemaValue, store]);
+    setSchema(initSchemaValue);
+  }, [readonly, initValue, props.initSchemaValue, initSchemaValue, store]);
 
   // toc 关闭时无人消费 schema，无需 setState 触发整树 re-render；
   // toc 开启时延迟到稳定后再更新，TOC 跟随节奏可接受地放慢。

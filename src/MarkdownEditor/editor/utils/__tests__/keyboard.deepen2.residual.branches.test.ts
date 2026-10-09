@@ -120,7 +120,7 @@ describe('useSystemKeyboard deepen2 residual branches', () => {
     expect(() => dispatch({ key: 'c', ctrlKey: true })).not.toThrow();
   });
 
-  it('attach 缺 size 仍复制', () => {
+  it('attach 缺 size 的复制快捷键保留浏览器剪贴板事件', () => {
     editor.children = [
       {
         type: 'attach',
@@ -133,8 +133,11 @@ describe('useSystemKeyboard deepen2 residual branches', () => {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [0, 0], offset: 0 },
     };
-    dispatch({ key: 'c', ctrlKey: true });
-    expect(copy).toHaveBeenCalledWith(expect.stringContaining('attach://'));
+    const before = JSON.stringify(editor.children);
+    const event = dispatch({ key: 'c', ctrlKey: true });
+    expect(copy).not.toHaveBeenCalled();
+    expect(event.defaultPrevented).toBe(false);
+    expect(JSON.stringify(editor.children)).toBe(before);
   });
 
   it('arrowUp 在 media 且 findPrev 有路径时安全', async () => {

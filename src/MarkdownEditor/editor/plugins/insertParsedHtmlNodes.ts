@@ -5,8 +5,7 @@ import { jsx } from 'slate-hyperscript';
 import { debugInfo } from '../../../Utils/debugUtils';
 import { EditorUtils } from '../utils';
 import { docxDeserializer } from '../utils/docx/docxDeserializer';
-
-import { BackspaceKey } from './hotKeyCommands/backspace';
+import { prepareMediaPaste } from './prepareMediaPaste';
 
 // 性能优化常量
 const BATCH_SIZE = 10; // 每批处理的节点数量
@@ -575,7 +574,10 @@ export const insertParsedHtmlNodes = async (
     const fragmentsToUpload = fragmentList.filter(
       (f) => !shouldExcludeFromUpload(f),
     );
+    if (!fragmentsToUpload.length) return false;
     await upLoadFileBatch(fragmentsToUpload, editorProps);
+    if (!fragmentsToUpload.length) return false;
+    prepareMediaPaste(editor);
 
     // 5. 获取当前节点
     let [node] = Editor.nodes<Element>(editor, {
@@ -585,7 +587,11 @@ export const insertParsedHtmlNodes = async (
     const selection = editor.selection;
 
     // 6. 如果没有选区或路径无效，直接插入
-    if (!selection || !Editor.hasPath(editor, selection.anchor.path)) {
+    if (
+      !selection ||
+      !Editor.hasPath(editor, selection.anchor.path) ||
+      !Editor.hasPath(editor, selection.focus.path)
+    ) {
       debugInfo('insertParsedHtmlNodes - 无有效选区，直接插入');
       const processedNodes = fragmentsToUpload?.map((item) => {
         if (!item.type) {
@@ -602,29 +608,6 @@ export const insertParsedHtmlNodes = async (
       await insertNodesBatch(editor, processedNodes);
       debugInfo('insertParsedHtmlNodes - 节点插入完成');
       return true;
-    }
-
-    // 7. 处理非折叠选区
-    if (!Range.isCollapsed(selection)) {
-      debugInfo('insertParsedHtmlNodes - 处理非折叠选区', {
-        selectionRange: {
-          anchor: selection.anchor,
-          focus: selection.focus,
-        },
-      });
-      const back = new BackspaceKey(editor);
-      back.range();
-      Transforms.select(editor, Range.start(selection));
-      setTimeout(() => {
-        const node = Editor?.node(editor, [0]);
-        if (
-          editor.children.length > 1 &&
-          node?.[0]?.type === 'paragraph' &&
-          !Node.string(node[0])
-        ) {
-          Transforms.delete(editor, { at: [0] });
-        }
-      });
     }
 
     // 8. 获取特殊节点类型
@@ -679,6 +662,29 @@ export const insertParsedHtmlNodes = async (
 
     // 处理表格单元格
     if (inner && node?.[0].type === 'table-cell') {
+      return true;
+    }
+
+    // 解析成功后交给 Slate 一次性替换范围。提前删除会使跨段选区路径失效，
+    // 也会让后续不支持的分支返回 false 时丢失原文。
+    if (!Range.isCollapsed(selection)) {
+      Transforms.insertFragment(
+        editor,
+        node?.[0].type === 'table-cell'
+          ? getTextsNode(fragmentsToUpload)
+          : fragmentsToUpload.map((item) => {
+              if (!item.type) return { type: 'paragraph', children: [item] };
+              if (item.type === 'code') {
+                return {
+                  ...item,
+                  value: Node.string(item),
+                  language: item.language || 'txt',
+                };
+              }
+              return item;
+            }),
+        { at: selection },
+      );
       return true;
     }
 

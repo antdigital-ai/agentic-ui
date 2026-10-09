@@ -16,7 +16,7 @@ interface TableNode {
   children?: TableRowNode[];
 }
 
-const EMPTY_TABLE_CELL = {
+const createEmptyTableCell = () => ({
   type: 'table-cell',
   children: [
     {
@@ -24,7 +24,7 @@ const EMPTY_TABLE_CELL = {
       children: [{ text: '' }],
     },
   ],
-};
+});
 
 function getTableNode(editor: Editor, tablePath: number[]): TableNode | null {
   const [tableNode] = Editor.node(editor, tablePath);
@@ -199,7 +199,7 @@ export function insertTableRow(
 
   const rowNode = {
     type: 'table-row',
-    children: Array.from({ length: columnCount }, () => EMPTY_TABLE_CELL),
+    children: Array.from({ length: columnCount }, createEmptyTableCell),
   };
   const insertIndex =
     position === 'before' ? rowIndex : Math.min(rowIndex + 1, rowCount);
@@ -220,12 +220,14 @@ export function removeTableColumn(
   }
 
   const rowCount = getTableRowCount(tableNode);
-  for (let rowIndex = 0; rowIndex < rowCount; rowIndex += 1) {
-    const cellPath = [...tablePath, rowIndex, columnIndex];
-    if (Editor.hasPath(editor, cellPath)) {
-      Transforms.removeNodes(editor, { at: cellPath });
+  Editor.withoutNormalizing(editor, () => {
+    for (let rowIndex = 0; rowIndex < rowCount; rowIndex += 1) {
+      const cellPath = [...tablePath, rowIndex, columnIndex];
+      if (Editor.hasPath(editor, cellPath)) {
+        Transforms.removeNodes(editor, { at: cellPath });
+      }
     }
-  }
+  });
 }
 
 export function insertTableColumn(
@@ -239,8 +241,12 @@ export function insertTableColumn(
 
   const rowCount = getTableRowCount(tableNode);
   const insertOffset = position === 'before' ? 0 : 1;
-  for (let rowIndex = 0; rowIndex < rowCount; rowIndex += 1) {
-    const insertPath = [...tablePath, rowIndex, columnIndex + insertOffset];
-    Transforms.insertNodes(editor, EMPTY_TABLE_CELL, { at: insertPath });
-  }
+  Editor.withoutNormalizing(editor, () => {
+    for (let rowIndex = 0; rowIndex < rowCount; rowIndex += 1) {
+      const insertPath = [...tablePath, rowIndex, columnIndex + insertOffset];
+      Transforms.insertNodes(editor, createEmptyTableCell(), {
+        at: insertPath,
+      });
+    }
+  });
 }

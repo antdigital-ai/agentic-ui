@@ -25,10 +25,10 @@ import { withVoidNodes } from './withVoidNodes';
  * 8. `withCodeTagPlugin` — `apply`、`insertText`、`insertBreak`、`deleteBackward`
  * 9. `withFootnoteReferenceNormalize` — `normalizeNode`
  * 10. `withOrphanInlineLeafNormalize` — `normalizeNode`
- * 11. `withSanitizeInvalidChildren` — `normalize`、`normalizeNode`（非法 children）
+ * 11. `withSanitizeInvalidChildren` — `apply`（导入节点预检）、`normalize`、`normalizeNode`（非法 children）
  *
  * ### `apply` 调用链（由外到内，先执行外层）
- * `withCodeTagPlugin` → `withSchemaPlugin` → `withLinkAndMediaPlugin` → `withCardPlugin` → … → Slate 默认。
+ * `withSanitizeInvalidChildren` → `withCodeTagPlugin` → `withSchemaPlugin` → `withLinkAndMediaPlugin` → `withCardPlugin` → … → Slate 默认。
  *
  * 部分插件在「已处理」时会 **不调用内层 `apply`**（例如 schema/link 的 `split_node` 改为 `insertNodes`），
  * Undo 仅撤销实际进入 history 的操作；行为见 `withMarkdownHistory.integration.test.ts`。

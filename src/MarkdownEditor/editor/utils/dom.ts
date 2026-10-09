@@ -97,7 +97,7 @@ export const getMediaType = (name?: string, alt?: string) => {
     if (mainType === 'audio') return 'audio';
     return 'other';
   }
-  const originName = name.split('?')[0];
+  const originName = name.split(/[?#]/)[0];
   const ext = originName.toLowerCase().match(/\.\w+$/)?.[0];
   if (!ext && originName !== name) return 'image';
   if (!ext) return 'other';

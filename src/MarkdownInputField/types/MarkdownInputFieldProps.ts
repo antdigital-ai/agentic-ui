@@ -4,6 +4,7 @@ import {
   MarkdownEditorInstance,
   MarkdownEditorProps,
 } from '../../MarkdownEditor';
+import type { FollowupItem } from '../Followups';
 import type { SendButtonCustomizationProps } from '../SendButton';
 import type { SkillModeConfig } from '../SkillModeBar';
 import type { SuggestionProps } from '../Suggestion';
@@ -11,7 +12,7 @@ import type { CreateRecognizer } from '../VoiceInput';
 import type { AttachmentConfig } from './attachment';
 import type { ActionsSlotState, SlotRenderState } from './slots';
 
-export type { ActionsSlotState, SlotRenderState };
+export type { ActionsSlotState, FollowupItem, SlotRenderState };
 
 /**
  * Markdown 输入字段的属性接口
@@ -516,6 +517,27 @@ export type MarkdownInputFieldProps = {
    * ```
    */
   disableHoverAnimation?: boolean;
+
+  /**
+   * 建议问题（followups）配置
+   * @description 在输入框下方渲染可点击的建议问题。点击默认通过统一发送管线发送该文本；
+   * 条目设置 fillOnly 时仅回填输入框不发送（对齐 dtcoder-ide ChatFollowups 交互）。
+   * @example
+   * ```tsx
+   * <MarkdownInputField
+   *   followups={{
+   *     items: [
+   *       { text: '解释这段代码' },
+   *       { text: '补充单元测试', fillOnly: true },
+   *     ],
+   *   }}
+   * />
+   * ```
+   */
+  followups?: {
+    /** 建议问题列表 */
+    items?: FollowupItem[];
+  };
 
   /**
    * 主题模式

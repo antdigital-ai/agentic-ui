@@ -17,10 +17,10 @@ describe('useInputFieldRefContainer', () => {
     expect(result.current.isSendingRef).toBeDefined();
   });
 
-  it('markdownEditorRef.current 初始为 null，DOM ref 初始为 null，isSendingRef 初始为 false', () => {
+  it('markdownEditorRef.current 初始为 undefined，DOM ref 初始为 null，isSendingRef 初始为 false', () => {
     const { result } = renderHook(() => useInputFieldRefContainer());
 
-    expect(result.current.markdownEditorRef.current).toBeNull();
+    expect(result.current.markdownEditorRef.current).toBeUndefined();
     expect(result.current.quickActionsRef.current).toBeNull();
     expect(result.current.actionsRef.current).toBeNull();
     expect(result.current.isSendingRef.current).toBe(false);

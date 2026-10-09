@@ -261,47 +261,48 @@ export default () => {
 
 ## API
 
-| 属性                     | 说明                                           | 类型                                                                 | 默认值    | 版本 |
-| ------------------------ | ---------------------------------------------- | -------------------------------------------------------------------- | --------- | ---- |
-| `value`                  | 当前的 markdown 文本值                         | `string`                                                             | -         | -    |
-| `onChange`               | 当输入值改变时触发的回调函数                   | `(value: string) => void`                                            | -         | -    |
-| `placeholder`            | 输入字段的占位文本                             | `string`                                                             | -         | -    |
-| `style`                  | 应用于输入字段的内联样式                       | `React.CSSProperties`                                                | -         | -    |
-| `className`              | 应用于输入字段的 CSS 类名                      | `string`                                                             | -         | -    |
-| `disabled`               | 是否禁用输入字段                               | `boolean`                                                            | -         | -    |
-| `typing`                 | AI 回复中等场景下为 true，输入区只读并显示提示 | `boolean`                                                            | -         | -    |
-| `allowEmptySubmit`       | 是否允许在内容为空时也触发发送                 | `boolean`                                                            | `false`   | -    |
-| `triggerSendKey`         | 触发发送操作的键盘快捷键                       | `'Enter' \| 'Mod+Enter'`                                             | `'Enter'` | -    |
-| `onSend`                 | 当内容发送时触发的异步回调函数                 | `(value: string) => Promise<void>`                                   | -         | -    |
-| `onStop`                 | 正在输入中时点击发送按钮的回调函数             | `() => void`                                                         | -         | -    |
-| `onFocus`                | 当输入字段获得焦点时触发的回调函数             | `(value: string, schema: Elements[], e: FocusEvent) => void`         | -         | -    |
-| `onBlur`                 | 当输入字段失去焦点时触发的回调函数             | `(value: string, schema: Elements[], e: MouseEvent) => void`         | -         | -    |
-| `tagInputProps`          | 标签输入的相关属性                             | `MarkdownEditorProps['tagInputProps']`                               | -         | -    |
-| `suggestionProps`        | 内部建议下拉框配置；可关闭下拉框或指定弹层容器 | `SuggestionProps`                                                    | -         | -    |
-| `borderRadius`           | 边框圆角大小                                   | `number`                                                             | `12`      | -    |
-| `attachment`             | 附件配置                                       | `{ enable?: boolean } & AttachmentButtonProps`                       | -         | -    |
-| `voiceRecognizer`        | 语音输入配置                                   | `CreateRecognizer`                                                   | -         | -    |
-| `actionsRender`          | 自定义渲染操作按钮的函数                       | `(props, defaultActions) => React.ReactNode[]`                       | -         | -    |
-| `toolsRender`            | 自定义渲染操作按钮前内容的函数                 | `(props) => React.ReactNode[]`                                       | -         | -    |
-| `beforeToolsRender`      | 自定义渲染输入框上方的工具栏区域               | `(props) => React.ReactNode`                                         | -         | -    |
-| `quickActionRender`      | 自定义右上操作按钮渲染函数                     | `(props) => React.ReactNode[]`                                       | -         | -    |
-| `leafRender`             | 自定义叶子节点渲染函数                         | `(props, defaultDom) => React.ReactElement`                          | -         | -    |
-| `inputRef`               | 输入框引用                                     | `React.MutableRefObject<MarkdownEditorInstance>`                     | -         | -    |
-| `skillMode`              | 技能模式配置                                   | `SkillModeConfig`                                                    | -         | -    |
-| `onSkillModeOpenChange`  | 技能模式状态变化回调                           | `(open: boolean) => void`                                            | -         | -    |
-| `pasteConfig`            | 粘贴配置                                       | `{ enabled?: boolean; allowedTypes?: string[] }`                     | -         | -    |
-| `refinePrompt`           | 提示词优化配置                                 | `{ enable: boolean; onRefine: (input: string) => Promise<string>; }` | -         | -    |
-| `enlargeable`            | 放大功能配置                                   | `{ enable?: boolean; height?: number; }`                             | -         | -    |
-| `isShowTopOperatingArea` | 是否显示顶部操作区域                           | `boolean`                                                            | `false`   | -    |
-| `targetRef`              | 顶部操作区域回到顶部/底部功能的目标元素引用    | `React.RefObject<HTMLDivElement>`                                    | -         | -    |
-| `operationBtnRender`     | 顶部操作区域自定义操作按钮渲染函数             | `() => React.ReactNode`                                              | -         | -    |
-| `isShowBackTo`           | 是否在顶部操作区域显示回到顶部/底部按钮        | `boolean`                                                            | `true`    | -    |
-| `maxHeight`              | 输入框的最大高度                               | `number \| string`                                                   | -         | -    |
-| `maxLength`              | 输入文本的最大字符数限制                       | `number`                                                             | -         | -    |
-| `onMaxLengthExceeded`    | 当输入达到最大长度限制时的回调函数             | `(value: string) => void`                                            | -         | -    |
-| `sendButtonProps`        | 发送按钮配置                                   | `SendButtonCustomizationProps`                                       | -         | -    |
-| `disableHoverAnimation`  | 是否禁用 hover 动画                            | `boolean`                                                            | `false`   | -    |
-| `bgColorList`            | 背景颜色列表                                   | `string[]`                                                           | -         | -    |
+| 属性                     | 说明                                           | 类型                                                                                   | 默认值    | 版本 |
+| ------------------------ | ---------------------------------------------- | -------------------------------------------------------------------------------------- | --------- | ---- |
+| `value`                  | 当前的 markdown 文本值                         | `string`                                                                               | -         | -    |
+| `onChange`               | 当输入值改变时触发的回调函数                   | `(value: string) => void`                                                              | -         | -    |
+| `placeholder`            | 输入字段的占位文本                             | `string`                                                                               | -         | -    |
+| `style`                  | 应用于输入字段的内联样式                       | `React.CSSProperties`                                                                  | -         | -    |
+| `className`              | 应用于输入字段的 CSS 类名                      | `string`                                                                               | -         | -    |
+| `disabled`               | 是否禁用输入字段                               | `boolean`                                                                              | -         | -    |
+| `typing`                 | AI 回复中等场景下为 true，输入区只读并显示提示 | `boolean`                                                                              | -         | -    |
+| `allowEmptySubmit`       | 是否允许在内容为空时也触发发送                 | `boolean`                                                                              | `false`   | -    |
+| `triggerSendKey`         | 触发发送操作的键盘快捷键                       | `'Enter' \| 'Mod+Enter'`                                                               | `'Enter'` | -    |
+| `onSend`                 | 当内容发送时触发的异步回调函数                 | `(value: string) => Promise<void>`                                                     | -         | -    |
+| `onStop`                 | 正在输入中时点击发送按钮的回调函数             | `() => void`                                                                           | -         | -    |
+| `onFocus`                | 当输入字段获得焦点时触发的回调函数             | `(value: string, schema: Elements[], e: FocusEvent) => void`                           | -         | -    |
+| `onBlur`                 | 当输入字段失去焦点时触发的回调函数             | `(value: string, schema: Elements[], e: MouseEvent) => void`                           | -         | -    |
+| `tagInputProps`          | 标签输入的相关属性                             | `MarkdownEditorProps['tagInputProps']`                                                 | -         | -    |
+| `suggestionProps`        | 内部建议下拉框配置；可关闭下拉框或指定弹层容器 | `SuggestionProps`                                                                      | -         | -    |
+| `borderRadius`           | 边框圆角大小                                   | `number`                                                                               | `12`      | -    |
+| `attachment`             | 附件配置                                       | `{ enable?: boolean } & AttachmentButtonProps`                                         | -         | -    |
+| `voiceRecognizer`        | 语音输入配置                                   | `CreateRecognizer`                                                                     | -         | -    |
+| `actionsRender`          | 自定义渲染操作按钮的函数                       | `(props, defaultActions) => React.ReactNode[]`                                         | -         | -    |
+| `toolsRender`            | 自定义渲染操作按钮前内容的函数                 | `(props) => React.ReactNode[]`                                                         | -         | -    |
+| `beforeToolsRender`      | 自定义渲染输入框上方的工具栏区域               | `(props) => React.ReactNode`                                                           | -         | -    |
+| `quickActionRender`      | 自定义右上操作按钮渲染函数                     | `(props) => React.ReactNode[]`                                                         | -         | -    |
+| `leafRender`             | 自定义叶子节点渲染函数                         | `(props, defaultDom) => React.ReactElement`                                            | -         | -    |
+| `inputRef`               | 输入框引用                                     | `React.MutableRefObject<MarkdownEditorInstance>`                                       | -         | -    |
+| `skillMode`              | 技能模式配置                                   | `SkillModeConfig`                                                                      | -         | -    |
+| `onSkillModeOpenChange`  | 技能模式状态变化回调                           | `(open: boolean) => void`                                                              | -         | -    |
+| `pasteConfig`            | 粘贴配置                                       | `{ enabled?: boolean; allowedTypes?: string[] }`                                       | -         | -    |
+| `refinePrompt`           | 提示词优化配置                                 | `{ enable: boolean; onRefine: (input: string) => Promise<string>; }`                   | -         | -    |
+| `enlargeable`            | 放大功能配置                                   | `{ enable?: boolean; height?: number; }`                                               | -         | -    |
+| `isShowTopOperatingArea` | 是否显示顶部操作区域                           | `boolean`                                                                              | `false`   | -    |
+| `targetRef`              | 顶部操作区域回到顶部/底部功能的目标元素引用    | `React.RefObject<HTMLDivElement>`                                                      | -         | -    |
+| `operationBtnRender`     | 顶部操作区域自定义操作按钮渲染函数             | `() => React.ReactNode`                                                                | -         | -    |
+| `isShowBackTo`           | 是否在顶部操作区域显示回到顶部/底部按钮        | `boolean`                                                                              | `true`    | -    |
+| `maxHeight`              | 输入框的最大高度                               | `number \| string`                                                                     | -         | -    |
+| `maxLength`              | 输入文本的最大字符数限制                       | `number`                                                                               | -         | -    |
+| `onMaxLengthExceeded`    | 当输入达到最大长度限制时的回调函数             | `(value: string) => void`                                                              | -         | -    |
+| `sendButtonProps`        | 发送按钮配置                                   | `SendButtonCustomizationProps`                                                         | -         | -    |
+| `disableHoverAnimation`  | 是否禁用 hover 动画                            | `boolean`                                                                              | `false`   | -    |
+| `followups`              | 建议问题配置（输入框下方可点击发送/回填）      | `{ items?: { text: string; fillOnly?: boolean; icon?: ReactNode; title?: string }[] }` | -         | -    |
+| `bgColorList`            | 背景颜色列表                                   | `string[]`                                                                             | -         | -    |
 
 ### 类型定义 {#type-definitions}
 

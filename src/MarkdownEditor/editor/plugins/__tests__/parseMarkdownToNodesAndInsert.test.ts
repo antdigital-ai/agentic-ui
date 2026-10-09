@@ -1,4 +1,4 @@
-import { createEditor, Transforms } from 'slate';
+import { createEditor, Node, Transforms } from 'slate';
 import { vi } from 'vitest';
 import { parseMarkdownToNodesAndInsert } from '../parseMarkdownToNodesAndInsert';
 
@@ -22,7 +22,7 @@ describe('parseMarkdownToNodesAndInsert', () => {
     insertSpy.mockRestore();
   });
 
-  it('有选区且 children 为空时只 insert 不 return true', () => {
+  it('空文档的无效选区不会阻止插入', () => {
     const editor = createEditor();
     editor.children = [];
     editor.selection = {
@@ -34,38 +34,25 @@ describe('parseMarkdownToNodesAndInsert', () => {
     const result = parseMarkdownToNodesAndInsert(editor, 'x');
 
     expect(insertSpy).toHaveBeenCalled();
-    expect(result).toBeUndefined();
+    expect(result).toBe(true);
     insertSpy.mockRestore();
   });
 
-  it('有选区且有选中文本时应 removeNodes 再 insert', () => {
+  it('替换跨段选区并保留范围外文本', () => {
     const editor = createEditor();
-    editor.children = [{ type: 'paragraph', children: [{ text: 'hello' }] }];
+    editor.children = [
+      { type: 'paragraph', children: [{ text: 'hello' }] },
+      { type: 'paragraph', children: [{ text: 'world' }] },
+    ];
     editor.selection = {
-      anchor: { path: [0, 0], offset: 0 },
-      focus: { path: [0, 0], offset: 5 },
+      anchor: { path: [0, 0], offset: 2 },
+      focus: { path: [1, 0], offset: 3 },
     };
-    const removeSpy = vi
-      .spyOn(Transforms, 'removeNodes')
-      .mockImplementation(() => {});
-    const insertSpy = vi
-      .spyOn(Transforms, 'insertNodes')
-      .mockImplementation(() => {});
 
     const result = parseMarkdownToNodesAndInsert(editor, 'new');
 
-    expect(removeSpy).toHaveBeenCalledWith(
-      editor,
-      expect.objectContaining({ at: expect.anything() }),
-    );
-    expect(insertSpy).toHaveBeenCalledWith(
-      editor,
-      expect.any(Array),
-      expect.objectContaining({ at: expect.anything() }),
-    );
+    expect(editor.children.map(Node.string)).toEqual(['henewld']);
     expect(result).toBe(true);
-    removeSpy.mockRestore();
-    insertSpy.mockRestore();
   });
 
   it('无有效选区时直接 insert 并 return true', () => {

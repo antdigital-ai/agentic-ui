@@ -230,26 +230,28 @@ export const NativeTableEditor = {
     const rowCount = (tableNode as any).children.length;
 
     // 为每一行插入新单元格
-    for (let i = 0; i < rowCount; i++) {
-      const rowPath = [...tablePath, i];
-      const rowNode = (tableNode as any).children[i] as any;
-      const colCount = rowNode.children.length;
+    Editor.withoutNormalizing(editor, () => {
+      for (let i = 0; i < rowCount; i++) {
+        const rowPath = [...tablePath, i];
+        const rowNode = (tableNode as any).children[i] as any;
+        const colCount = rowNode.children.length;
 
-      const newCell: Node = {
-        type: 'table-cell',
-        children: [
-          {
-            type: 'paragraph',
-            children: [{ text: '' }],
-          },
-        ],
-      };
+        const newCell: Node = {
+          type: 'table-cell',
+          children: [
+            {
+              type: 'paragraph',
+              children: [{ text: '' }],
+            },
+          ],
+        };
 
-      const insertPath =
-        position === 'left' ? [...rowPath, 0] : [...rowPath, colCount];
+        const insertPath =
+          position === 'left' ? [...rowPath, 0] : [...rowPath, colCount];
 
-      Transforms.insertNodes(editor, newCell, { at: insertPath });
-    }
+        Transforms.insertNodes(editor, newCell, { at: insertPath });
+      }
+    });
   },
 
   /**
@@ -277,10 +279,12 @@ export const NativeTableEditor = {
     }
 
     // 删除每一行的对应列
-    for (let i = 0; i < rowCount; i++) {
-      const cellPath = [...tablePath, i, colIndex];
-      Transforms.removeNodes(editor, { at: cellPath });
-    }
+    Editor.withoutNormalizing(editor, () => {
+      for (let i = 0; i < rowCount; i++) {
+        const cellPath = [...tablePath, i, colIndex];
+        Transforms.removeNodes(editor, { at: cellPath });
+      }
+    });
   },
 
   /**

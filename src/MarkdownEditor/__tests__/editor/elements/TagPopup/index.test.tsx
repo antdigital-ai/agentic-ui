@@ -1,13 +1,13 @@
 import { render } from '@testing-library/react';
 import React from 'react';
 import { BaseEditor } from 'slate';
-import { ReactEditor, useSlate } from 'slate-react';
+import { ReactEditor, useSlateStatic } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TagPopup } from '../../../../editor/elements/TagPopup/index';
 
 // Mock Slate hooks
 vi.mock('slate-react', () => ({
-  useSlate: vi.fn(),
+  useSlateStatic: vi.fn(),
   ReactEditor: {
     toSlateNode: vi.fn(),
     findPath: vi.fn(),
@@ -56,7 +56,7 @@ describe('TagPopup 组件', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useSlate as any).mockReturnValue(mockEditor);
+    (useSlateStatic as any).mockReturnValue(mockEditor);
     (ReactEditor.toSlateNode as any).mockReturnValue({});
     (ReactEditor.findPath as any).mockReturnValue([0, 0]);
   });

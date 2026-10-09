@@ -64,6 +64,7 @@ vi.mock('../../../editor/store', () => ({
 }));
 
 vi.mock('../../../hooks/editor', () => ({
+  useElementSelected: () => false,
   useSelStatus: () => [false, [0]],
 }));
 

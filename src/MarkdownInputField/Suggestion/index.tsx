@@ -2,7 +2,6 @@ import type { DropdownProps, MenuProps } from 'antd';
 import { Dropdown, Spin } from 'antd';
 import { useMergedState } from 'rc-util';
 import React, { useEffect, useRef, useState } from 'react';
-import { useRefFunction } from '../../Hooks/useRefFunction';
 // SuggestionContext 提取到独立文件，打断与 TagPopup 的循环依赖
 import { SuggestionContext } from './SuggestionContext';
 
@@ -184,7 +183,8 @@ export const Suggestion: React.FC<{
   }, [items]);
 
   useEffect(() => {
-    if (typeof items !== 'function') {
+    if (typeof items !== 'function' || !open) {
+      setLoading(false);
       return;
     }
     let cancelled = false;
@@ -229,41 +229,41 @@ export const Suggestion: React.FC<{
     // 依赖 items：函数引用变化（如外部 useCallback 更新依赖）时重新加载，避免拿到陈旧结果
   }, [open, items]);
 
-  const dropdownRenderRender = useRefFunction(
-    (defaultDropdownContent: React.ReactNode) => {
-      if (dropdownRender) {
-        return (
-          <div
-            style={{
-              width: '100%',
-              height: '100%',
-            }}
-            onKeyDown={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-            }}
-          >
-            {loading ? (
-              <Spin />
-            ) : (
-              dropdownRender(defaultDropdownContent, {
-                ...props,
-                ...triggerNodeContext.current,
-                onSelect: (value: string, path?: number[]) => {
-                  onSelectRef.current?.(`${value}`, path);
-                  setOpen(false);
-                },
-              })
-            )}
-          </div>
-        );
-      } else if (menu! && items!) {
-        return notFoundContent || '';
-      } else {
-        return defaultDropdownContent;
-      }
-    },
-  );
+  // 渲染期直接捕获最新 loading：Dropdown 的 popupRender 可能在本次渲染内
+  // 被同步调用（含测试 mock），useRefFunction 的 latest-ref 闭包会滞后一轮。
+  const dropdownRenderRender = (defaultDropdownContent: React.ReactNode) => {
+    if (dropdownRender) {
+      return (
+        <div
+          style={{
+            width: '100%',
+            height: '100%',
+          }}
+          onKeyDown={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+        >
+          {loading ? (
+            <Spin />
+          ) : (
+            dropdownRender(defaultDropdownContent, {
+              ...props,
+              ...triggerNodeContext.current,
+              onSelect: (value: string, path?: number[]) => {
+                onSelectRef.current?.(`${value}`, path);
+                setOpen(false);
+              },
+            })
+          )}
+        </div>
+      );
+    } else if (menu! && items!) {
+      return notFoundContent || '';
+    } else {
+      return defaultDropdownContent;
+    }
+  };
 
   const suggestionEnabled =
     props.suggestionProps?.enabled ?? props.tagInputProps?.enable ?? true;

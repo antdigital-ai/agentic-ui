@@ -123,18 +123,27 @@ export function sanitizeNode(node: Node): Node {
   }
 
   const sanitizedChildren: Node[] = [];
+  let changed = false;
   for (let i = 0; i < rawChildren.length; i += 1) {
     if (!(i in rawChildren)) {
+      changed = true;
       continue;
     }
     const child = rawChildren[i];
     if (!isValidChild(child)) {
+      changed = true;
       if (child !== undefined && child !== null) {
         sanitizedChildren.push(sanitizeNode(rebuildOrDefaultBlock(child)));
       }
       continue;
     }
-    sanitizedChildren.push(sanitizeNode(child));
+    const sanitizedChild = sanitizeNode(child);
+    changed ||= sanitizedChild !== child;
+    sanitizedChildren.push(sanitizedChild);
+  }
+
+  if (!changed && sanitizedChildren.length > 0) {
+    return node;
   }
 
   const children =
@@ -144,7 +153,14 @@ export function sanitizeNode(node: Node): Node {
   return { ...rest, children } as Node;
 }
 
-/** 不可变方式整树清洗，供 replaceEditorContent 使用。 */
+/** sanitizeNode 仅在修复时创建新节点，比较子节点引用即可判断是否有变更。 */
+export const areNodeArraysEqual = (a: Node[], b: Node[]): boolean =>
+  a === b ||
+  (Array.isArray(a) &&
+    a.length === b.length &&
+    a.every((node, index) => node === b[index]));
+
+/** 不可变方式整树清洗；合法节点和合法根保留引用，避免复制业务数据。 */
 export const sanitizeEditorChildren = (raw: unknown): Node[] => {
   if (!Array.isArray(raw)) {
     return [createDefaultBlock()];
@@ -153,11 +169,11 @@ export const sanitizeEditorChildren = (raw: unknown): Node[] => {
   if (compacted.length === 0) {
     return [createDefaultBlock()];
   }
-  return compacted.map((child) => sanitizeNode(child));
+  const sanitized = compacted.map((child) => sanitizeNode(child));
+  return areNodeArraysEqual(raw as Node[], sanitized)
+    ? (raw as Node[])
+    : sanitized;
 };
-
-export const areNodeArraysEqual = (a: Node[], b: Node[]): boolean =>
-  JSON.stringify(a) === JSON.stringify(b);
 
 const rootChildrenNeedDirectAssignment = (raw: unknown): boolean =>
   !Array.isArray(raw) || childArrayHasInvalidEntries(raw);

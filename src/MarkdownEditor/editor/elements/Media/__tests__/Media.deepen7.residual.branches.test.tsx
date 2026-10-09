@@ -27,6 +27,7 @@ vi.mock('../../../store', () => ({
 }));
 
 vi.mock('../../../../hooks/editor', () => ({
+  useElementSelected: () => true,
   useSelStatus: () => [true, [0]],
 }));
 
@@ -68,7 +69,8 @@ vi.mock('../../../../../Utils/htmlUrlSafety', () => ({
   UNSAFE_URL_PLAIN_TEXT_STYLE: { color: 'red' },
 }));
 
-vi.mock('../../Image', () => ({
+vi.mock('../../Image', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../Image')>()),
   ReadonlyImage: (p: any) => (
     <img data-testid="ro-img" src={p.src} alt={p.alt} />
   ),
@@ -172,7 +174,7 @@ describe('Media deepen7 residual branches', () => {
     await act(async () => {
       await Promise.resolve();
     });
-    const img = screen.getByTestId('resize-image');
+    const img = screen.getByAltText('image');
     Object.defineProperty(img, 'naturalWidth', {
       configurable: true,
       value: 2000,
@@ -183,6 +185,8 @@ describe('Media deepen7 residual branches', () => {
     });
     fireEvent.load(img);
     expect(screen.getByTestId('rnd')).toBeInTheDocument();
+    expect(img).toHaveAttribute('width', '400');
+    expect(img).toHaveAttribute('height', '200');
   });
 
   it('video 失败：无 alt 走 state.url / element.url 臂', async () => {

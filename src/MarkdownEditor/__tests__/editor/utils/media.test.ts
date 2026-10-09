@@ -117,6 +117,7 @@ describe('Media Utils', () => {
     });
 
     it('应该处理超时', async () => {
+      vi.useFakeTimers();
       const mockResponse = {
         ok: true,
         headers: {
@@ -130,10 +131,10 @@ describe('Media Utils', () => {
         });
       });
 
-      const result = await getRemoteMediaType('https://example.com/unknown');
-
-      // 由于URL以http开头，会通过文件扩展名识别为image类型
-      expect(result).toBe('image');
+      const result = getRemoteMediaType('https://example.com/unknown');
+      await vi.advanceTimersByTimeAsync(1000);
+      expect(await result).toBeNull();
+      vi.useRealTimers();
     });
 
     it('应该处理没有content-type头的情况', async () => {

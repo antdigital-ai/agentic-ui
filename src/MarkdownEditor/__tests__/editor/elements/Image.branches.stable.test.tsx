@@ -4,6 +4,7 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
+import { Transforms } from 'slate';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   EditorImage,
@@ -23,6 +24,43 @@ vi.mock('@ant-design/icons', () => ({
   DeleteFilled: () => <span data-testid="delete-icon" />,
   LoadingOutlined: () => <span data-testid="loading-icon" />,
 }));
+
+// The component fixture delegates removal; real Slate behavior is covered by
+// MediaCard.deletion.regression.test.tsx.
+vi.mock(
+  '../../../editor/plugins/cardPluginBehavior',
+  async (importOriginal) => {
+    const actual =
+      await importOriginal<
+        typeof import('../../../editor/plugins/cardPluginBehavior')
+      >();
+    return {
+      ...actual,
+      deleteMediaAtPath: vi.fn<typeof actual.deleteMediaAtPath>(
+        (editor, path) => {
+          Transforms.removeNodes(editor, { at: path });
+          return true;
+        },
+      ),
+    };
+  },
+);
+
+const currentImageNode = vi.hoisted(() => ({ current: undefined as unknown }));
+vi.mock('slate-react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('slate-react')>();
+  return {
+    ...actual,
+    useSelected: () => true,
+    ReactEditor: {
+      ...actual.ReactEditor,
+      findPath: (_editor: unknown, node: unknown) => {
+        currentImageNode.current = node;
+        return [0, 0];
+      },
+    },
+  };
+});
 
 vi.mock('antd', () => ({
   Image: (props: any) => (
@@ -86,6 +124,7 @@ vi.mock('../../../editor/store', () => ({
 }));
 
 vi.mock('../../../hooks/editor', () => ({
+  useElementSelected: () => true,
   useSelStatus: () => [false, [0]],
 }));
 
@@ -130,6 +169,12 @@ vi.mock('slate', async () => {
   const actual = await vi.importActual<typeof import('slate')>('slate');
   return {
     ...actual,
+    Node: { ...actual.Node, get: () => currentImageNode.current },
+    Editor: {
+      ...actual.Editor,
+      withoutNormalizing: (_editor: unknown, callback: () => void) =>
+        callback(),
+    },
     Transforms: {
       ...actual.Transforms,
       setNodes: (...args: any[]) => mocks.setNodesSpy(...args),
@@ -206,8 +251,8 @@ describe('Image stable branches', () => {
       </EditorImage>,
     );
 
-    const probe = createdImgs.find((img) => img.crossOrigin === 'anonymous');
-    probe?.onerror?.(new Event('error') as any);
+    const probe = document.querySelector('img')!;
+    fireEvent.error(probe!);
     await waitFor(() => {
       expect(screen.getByTestId('media-error')).toBeInTheDocument();
     });
@@ -262,7 +307,7 @@ describe('Image stable branches', () => {
     expect(mocks.setNodesSpy.mock.calls.length).toBeGreaterThanOrEqual(2);
   });
 
-  it('EditorImage 无 mediaType 时写入 mediaType', () => {
+  it('EditorImage 无 mediaType 时不应在挂载阶段写入 Slate', () => {
     render(
       <EditorImage
         element={{ ...baseElement, mediaType: undefined }}
@@ -271,11 +316,7 @@ describe('Image stable branches', () => {
         {null}
       </EditorImage>,
     );
-    expect(mocks.setNodesSpy).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ mediaType: 'image' }),
-      expect.anything(),
-    );
+    expect(mocks.setNodesSpy).not.toHaveBeenCalled();
   });
 
   it('ReadonlyImage 加载失败显示链接', async () => {

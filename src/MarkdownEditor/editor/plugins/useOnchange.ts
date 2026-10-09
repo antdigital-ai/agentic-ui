@@ -5,7 +5,6 @@ import { useDebounceFn } from '../../../Hooks/useDebounceFn';
 import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { Elements } from '../../el';
 import { useEditorStore } from '../store';
-import { parserSlateNodeToMarkdown } from '../utils';
 
 const floatBarIgnoreNode = new Set(['code']);
 
@@ -37,6 +36,7 @@ export function useOnchange(
   const selectionTrackingEnabled = options?.selectionTrackingEnabled !== false;
 
   const {
+    store,
     setRefreshFloatBar,
     bumpFloatBarRevision,
     setDomRect,
@@ -49,10 +49,7 @@ export function useOnchange(
     if (!onChange) return;
     const editor = markdownEditorRef.current;
     if (!editor) return;
-    onChange(
-      parserSlateNodeToMarkdown(editor.children),
-      editor.children as Elements[],
-    );
+    onChange(store.getMDContent(), editor.children as Elements[]);
   }, wait);
 
   return useRefFunction((_value: any, _operations: BaseOperation[]) => {

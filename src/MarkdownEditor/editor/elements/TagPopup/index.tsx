@@ -10,7 +10,8 @@ import React, {
   useState,
 } from 'react';
 import { BaseEditor } from 'slate';
-import { ReactEditor, useSlate } from 'slate-react';
+import { ReactEditor, useSlateStatic } from 'slate-react';
+import { useRefFunction } from '../../../../Hooks/useRefFunction';
 import { SuggestionContext } from '../../../../MarkdownInputField/Suggestion/SuggestionContext';
 
 type TagPopupItem = Array<{
@@ -18,6 +19,8 @@ type TagPopupItem = Array<{
   key: string | number;
   onClick?: (v: string) => void;
 }>;
+
+const EMPTY_ITEMS: TagPopupItem = [];
 
 type SuggestionContextValue = React.ContextType<typeof SuggestionContext>;
 
@@ -198,30 +201,6 @@ const updateNodeContext = (
   }
 };
 
-const loadItemsData = async (
-  items:
-    | TagPopupItem
-    | ((props: RenderProps) => Promise<TagPopupItem>)
-    | undefined,
-  props: RenderProps,
-  setLoading: (loading: boolean) => void,
-  setSelectedItems: (items: TagPopupItem) => void,
-) => {
-  if (typeof items !== 'function') return;
-
-  setLoading(true);
-  try {
-    const result = await items(props);
-    if (Array.isArray(result)) {
-      setSelectedItems(result);
-    }
-  } catch {
-    // items 加载失败时保留已有选项，避免未处理的 Promise rejection
-  } finally {
-    setLoading(false);
-  }
-};
-
 const initializeAutoOpen = (
   autoOpen: boolean | undefined,
   type: string | undefined,
@@ -367,8 +346,8 @@ const handleClick = (
 };
 
 export const TagPopup = (props: RenderProps) => {
-  const { onSelect, items, children, type } = props;
-  const editor = useSlate();
+  const { items, children, type } = props;
+  const editor = useSlateStatic();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = React.useState(false);
   const domRef = useRef<HTMLDivElement>(null);
@@ -376,13 +355,30 @@ export const TagPopup = (props: RenderProps) => {
   const antdContext = useContext(ConfigProvider.ConfigContext);
   const baseCls = antdContext?.getPrefixCls('agentic-md-editor-tag-popup');
   const currentNodePath = useRef<number[] | null>(null);
-
+  // Resolve the path when selecting: unrelated edits can move this tag without
+  // changing its text, and do not require a subscription to the whole document.
+  const onSelect = useRefFunction<NonNullable<RenderProps['onSelect']>>(
+    (...args) => {
+      const [value, path, tagNode] = args;
+      const currentPath = getNodePath(editor, domRef);
+      if (currentPath) currentNodePath.current = currentPath;
+      const resolvedPath = currentPath || path || currentNodePath.current || [];
+      if (args.length > 2) {
+        props.onSelect?.(value, resolvedPath, tagNode);
+      } else {
+        props.onSelect?.(value, resolvedPath);
+      }
+    },
+  );
+  const isDropdown = type === 'dropdown';
+  const dropdownOpen = props.open ?? open;
+  const isOpen = isDropdown ? dropdownOpen : suggestionContext?.open || false;
   useEffect(() => {
     const path = getNodePath(editor, domRef);
     if (path) {
       currentNodePath.current = path;
     }
-  }, [editor.children, props.text]);
+  }, [editor, props.text]);
 
   useEffect(() => {
     updateNodeContext(
@@ -396,12 +392,46 @@ export const TagPopup = (props: RenderProps) => {
   }, [props.text]);
 
   const [selectedItems, setSelectedItems] = useState(() => {
-    return typeof items === 'function' ? [] : (items ?? []);
+    return typeof items === 'function' ? EMPTY_ITEMS : (items ?? EMPTY_ITEMS);
   });
 
   useEffect(() => {
-    loadItemsData(items, props, setLoading, setSelectedItems);
-  }, [open, items]);
+    if (typeof items !== 'function') {
+      setSelectedItems(items ?? EMPTY_ITEMS);
+    }
+  }, [items]);
+
+  useEffect(() => {
+    // Panel suggestions are loaded once by the shared Suggestion component.
+    // A closed dropdown must not issue a request for every tag in the document.
+    if (typeof items !== 'function' || !isDropdown || !dropdownOpen) {
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setLoading(true);
+    const loadItems = async () => {
+      try {
+        const result = await items(props);
+        if (!cancelled && Array.isArray(result)) {
+          setSelectedItems(result);
+        }
+      } catch (error) {
+        if (!cancelled && process.env.NODE_ENV !== 'production') {
+          console.warn('[TagPopup] items() loading failed:', error);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    void loadItems();
+    return () => {
+      cancelled = true;
+    };
+    // The loader receives the current props when the popup opens or text changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dropdownOpen, isDropdown, items, props.text]);
 
   useEffect(() => {
     props.onChange?.(props.text || '', {
@@ -418,7 +448,6 @@ export const TagPopup = (props: RenderProps) => {
   }, []);
 
   const placeholder = props.placeholder;
-  const isOpen = type === 'dropdown' ? open : suggestionContext?.open || false;
   const defaultDom = createDefaultDom(
     domRef,
     baseCls,
@@ -466,22 +495,25 @@ export const TagPopup = (props: RenderProps) => {
       currentNodePath,
     );
 
-  const isDropdown = type === 'dropdown';
-
   const dropdownMenu = {
     items: selectedItems as MenuProps['items'],
     onClick: (e: any) => {
       onSelect?.(e.key?.trim() || '', currentNodePath.current || []);
       suggestionContext?.setOpen?.(false);
       setOpen(false);
+      props.onOpenChange?.(false);
     },
   } as MenuProps;
 
   const content = isDropdown ? (
     <Dropdown
       trigger={['click']}
-      open={open}
-      onOpenChange={setOpen}
+      open={dropdownOpen}
+      onOpenChange={(nextOpen) => {
+        if (nextOpen && !canOpen(props, placeholder)) return;
+        setOpen(nextOpen);
+        props.onOpenChange?.(nextOpen);
+      }}
       menu={dropdownMenu}
     >
       {renderDom}
