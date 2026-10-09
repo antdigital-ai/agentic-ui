@@ -1,7 +1,7 @@
 [
   {
     "text": "组件",
-    "link": "/components",
+    "link": "/components/",
     "activeMatch": "^/components/"
   },
   {
@@ -11,7 +11,7 @@
   },
   {
     "text": "项目研发",
-    "link": "/development",
+    "link": "/development/",
     "activeMatch": "^/development/"
   },
   {
@@ -26,7 +26,7 @@
   },
   {
     "text": "常见问题",
-    "link": "/faq",
+    "link": "/faq/",
     "activeMatch": "^/faq/"
   }
 ]

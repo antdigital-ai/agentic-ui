@@ -1,6 +1,7 @@
 import React from 'react';
 import { START_USING_URL } from '../../../constants/links';
 import { useSiteI18n } from '../../../i18n';
+import { navigateToSiteUrl } from '../../../utils/navigate';
 import { ButtonsContainer } from '../style';
 import StartButtonComponent from './StartButton';
 
@@ -12,7 +13,7 @@ const HeroButtons: React.FC = () => {
       <StartButtonComponent
         text={messages.hero.startButton}
         onClick={() => {
-          window.open(START_USING_URL);
+          navigateToSiteUrl(START_USING_URL);
         }}
       />
     </ButtonsContainer>

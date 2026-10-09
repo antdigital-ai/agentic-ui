@@ -1,10 +1,12 @@
 /**
- * 外部链接常量
- * 统一管理所有 window.open 使用的硬编码链接
+ * 站点链接常量。
+ *
+ * 站内链接统一走相对路径：本地开发、vercel 预览与线上域名均可正确跳转，
+ * 不再硬编码 agentic.antdigital.ai 绝对域名（新窗口打开的语义由调用方决定）。
  */
 
 // 组件库相关链接
-export const COMPONENT_LIBRARY_URL = 'https://.antdigital.ai/components';
+export const COMPONENT_LIBRARY_URL = '/components';
 
 export const ICON_LIBRARY_URL = '';
 
@@ -20,9 +22,9 @@ export const DESIGN_RESOURCE_MOBILE_URL =
 export const ONE_TOKEN_URL = '';
 
 export const PC_COMPONENT_URL = {
-  COMPONENTS: 'https://agentic.antdigital.ai/components/ai-label',
-  DEMO: 'https://agentic.antdigital.ai/demos-pages',
-  CHANGELOG: 'https://agentic.antdigital.ai/',
+  COMPONENTS: '/components',
+  DEMO: '/demos-pages/',
+  CHANGELOG: '/development/changelog.zh-CN/',
 };
 
 export const PC_COMPONENT_DESIGN_RESOURCE_URL = {
@@ -31,6 +33,5 @@ export const PC_COMPONENT_DESIGN_RESOURCE_URL = {
     'https://mgdone.alibaba-inc.com/file/160470677089831?fileOpenFrom=home&page_id=1076%3A26856&devMode=true',
 };
 
-export const START_USING_URL =
-  'https://agentic.antdigital.ai/components/chat-flow-container';
-export const AI_CHATBOT_URL = 'https://agentic.antdigital.ai/components/robot';
+export const START_USING_URL = '/components/chat-flow-container';
+export const AI_CHATBOT_URL = '/components/robot';

@@ -16,6 +16,8 @@ export const BOM = Buffer.from([0xef, 0xbb, 0xbf]);
 const GLOB_PATTERNS = [
   'src/**/*.{ts,tsx,js,jsx,mjs,cjs}',
   'docs/**/*.{ts,tsx,js,jsx,md}',
+  'home/**/*.{ts,tsx,js,jsx}',
+  'theme/**/*.{ts,tsx,css}',
   'scripts/**/*.{js,mjs,ts}',
   'tests/**/*.{ts,tsx,js}',
   'e2e/**/*.{ts,tsx}',

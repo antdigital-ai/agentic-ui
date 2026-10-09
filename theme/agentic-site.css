@@ -105,9 +105,9 @@ body {
 
 /* ---- 首页：脱离 Rspress 正文容器，全宽渲染 HomePage ---- */
 .agentic-home-fullscreen {
-  /* 抵消 Rspress 内容容器宽度约束，回到视口宽度 */
-  width: 100vw;
-  margin-inline-start: calc(50% - 50vw);
+  /* 抵消 Rspress 内容容器宽度约束；100% 不含滚动条，避免 100vw 的横向溢出 */
+  width: 100%;
+  margin-inline: calc(50% - 50%);
   overflow-x: hidden;
 }
 

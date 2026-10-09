@@ -99,20 +99,9 @@ const StartButtonComponent = ({
   text: string;
   onClick: () => void;
 }) => {
-  const [isHovered, setIsHovered] = React.useState(false);
-
-  const handleClick = () => {
-    if (isHovered) {
-      onClick();
-    }
-  };
-
+  // 视觉过渡完全由 CSS :hover 驱动；点击不设 hover 门槛，保证触屏与合成点击可用
   return (
-    <StyledButton
-      onClick={handleClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <StyledButton onClick={onClick}>
       {/* 1. 扩张圆：初始隐藏，不占位，z-index 为 1 */}
       <ExpansionCircle />
 
