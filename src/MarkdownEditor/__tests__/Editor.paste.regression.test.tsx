@@ -63,6 +63,22 @@ describe('paste selection replacement', () => {
         'text/plain': 'X',
       },
     ],
+    [
+      'invalid fragment with plain text fallback',
+      {
+        'application/x-slate-md-fragment': JSON.stringify([
+          { type: 'paragraph', children: ['invalid'] },
+        ]),
+        'text/plain': 'X',
+      },
+    ],
+    [
+      'non-array fragment with plain text fallback',
+      {
+        'application/x-slate-md-fragment': JSON.stringify({ invalid: true }),
+        'text/plain': 'X',
+      },
+    ],
   ])('replaces a cross paragraph selection with %s', async (_name, data) => {
     const { editor, paste } = await mountEditor();
     await paste(data);

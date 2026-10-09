@@ -113,7 +113,7 @@ describe('handlePaste deepen branches', () => {
     expect(mocks.createMediaNode).toHaveBeenCalled();
   });
 
-  it('handleSlateMarkdownFragment：单 paragraph 空 children 仍返回 true', () => {
+  it('handleSlateMarkdownFragment：单 paragraph 空 children 返回 false，允许格式兜底', () => {
     const clip = {
       getData: (t: string) =>
         t.includes('slate')
@@ -121,7 +121,7 @@ describe('handlePaste deepen branches', () => {
           : '',
     } as DataTransfer;
     expect(handleSlateMarkdownFragment(editor, clip, editor.selection)).toBe(
-      true,
+      false,
     );
   });
 

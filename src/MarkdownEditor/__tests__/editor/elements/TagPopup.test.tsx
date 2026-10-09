@@ -48,7 +48,7 @@ vi.mock('slate-react', async () => {
           typeof domNode === 'object' &&
           'getAttribute' in domNode
         ) {
-          return { text: 'test' };
+          return mockEditor.children[0].children[0];
         }
         throw new Error('Cannot resolve a Slate node from DOM node');
       }),

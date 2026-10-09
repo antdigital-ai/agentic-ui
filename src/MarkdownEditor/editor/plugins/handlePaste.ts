@@ -132,7 +132,9 @@ export const handleSlateMarkdownFragment = (
       return true;
     }
 
-    if (fragment.length === 0) return true;
+    // An empty/invalid Slate payload has inserted nothing. Let the caller try
+    // the remaining allowed formats without deleting the current selection.
+    if (fragment.length === 0) return false;
     prepareMediaPaste(editor);
     EditorUtils.replaceSelectedNode(editor, fragment);
     return true;

@@ -1,12 +1,15 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { ReactEditor, useSlateStatic } from 'slate-react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Editor, Node } from 'slate';
+import { useSlateStatic } from 'slate-react';
 import type { CodeNode } from '../../../el';
 import { useEditorStore } from '../../store';
 import {
   handleCodeBlockTextInputKeyDown,
+  isCodeBlockElement,
   setCodeBlockNodes,
 } from '../../utils/codeBlockBehavior';
 import { getCodeBlockPlainText } from '../../utils/codeBlockPlainText';
+import { findElementPath } from '../../utils/findElementPath';
 
 const TEXTAREA_STYLE: React.CSSProperties = {
   boxSizing: 'border-box',
@@ -37,10 +40,10 @@ export const SimpleCodeBlockEditor: React.FC<SimpleCodeBlockEditorProps> = ({
 }) => {
   const editor = useSlateStatic();
   const { readonly } = useEditorStore();
-  const path = ReactEditor.findPath(editor, element);
   const body = getCodeBlockPlainText(element);
   const [draft, setDraft] = useState(body);
   const [isComposing, setIsComposing] = useState(false);
+  const composingRef = useRef(false);
 
   useEffect(() => {
     if (isComposing) return;
@@ -49,24 +52,53 @@ export const SimpleCodeBlockEditor: React.FC<SimpleCodeBlockEditorProps> = ({
 
   const commitValue = useCallback(
     (next: string) => {
+      const path = findElementPath(editor, element, {
+        matchKey: true,
+        search: true,
+      });
+      if (readonly || !path || !Editor.hasPath(editor, path)) return;
+      const currentNode = Node.get(editor, path);
+      if (!isCodeBlockElement(currentNode)) return;
+      if (
+        getCodeBlockPlainText(currentNode) === next &&
+        currentNode.otherProps?.finished === true
+      ) {
+        return;
+      }
       setCodeBlockNodes(editor, path, {
         value: next,
         otherProps: {
-          ...element.otherProps,
+          ...currentNode.otherProps,
           finished: true,
         },
       });
     },
-    [editor, element.otherProps, path],
+    [editor, element, readonly],
   );
 
   const onChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const next = event.target.value;
+    if (readonly) return;
     setDraft(next);
+    if (composingRef.current) return;
     commitValue(next);
   };
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    event.stopPropagation();
+    if (
+      readonly ||
+      composingRef.current ||
+      event.nativeEvent.isComposing ||
+      event.keyCode === 229
+    ) {
+      return;
+    }
+    const path = findElementPath(editor, element, {
+      matchKey: true,
+      search: true,
+    });
+    if (!path || !isCodeBlockElement(Node.get(editor, path))) return;
     const result = handleCodeBlockTextInputKeyDown(
       editor,
       path,
@@ -77,7 +109,6 @@ export const SimpleCodeBlockEditor: React.FC<SimpleCodeBlockEditorProps> = ({
       event.preventDefault();
       return;
     }
-    event.stopPropagation();
   };
 
   const stopSlatePointerBubble = (
@@ -93,9 +124,14 @@ export const SimpleCodeBlockEditor: React.FC<SimpleCodeBlockEditorProps> = ({
       value={draft}
       readOnly={readonly}
       onChange={onChange}
-      onCompositionStart={() => setIsComposing(true)}
+      onCompositionStart={() => {
+        composingRef.current = true;
+        setIsComposing(true);
+      }}
       onCompositionEnd={(event) => {
+        composingRef.current = false;
         setIsComposing(false);
+        setDraft(event.currentTarget.value);
         commitValue(event.currentTarget.value);
       }}
       onKeyDown={onKeyDown}

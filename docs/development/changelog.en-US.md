@@ -61,6 +61,10 @@ group:
   - ⚡️ Reduce DOM elements in file rows, tree leaves, and search results, mounting image previews on demand; stabilize file data references to avoid rerendering files when another group collapses.
 
 - MarkdownEditor
+  - 🐞 Validate current Slate node identity when updating nodes, embedded code, and Tags so moving, deleting, or replacing content cannot write into a neighboring node; keep table index paths synchronized with structural edits.
+  - 🐞 Fix backward and keyboard selections in readonly editors and selection ownership across editors; loading Markdown only clears this editor's native selection, and focus callbacks retain plugin serialization.
+  - ⚡️ Coalesce selection notifications, cancel pending work on unmount, and deduplicate unchanged document selections to avoid repeated callbacks, serialization, and measurements; still reposition the floating toolbar for matching text at different locations.
+  - ⚡️ Preserve existing empty text leaves during code input to avoid redundant Slate removals and insertions; commit IME text after composition ends, guard structural shortcuts during composition or readonly mode, and preserve pending debounced input when switching to readonly.
   - ⚡️ Use Slate dirty paths for ordinary edits and selection changes, avoiding repeated full-document sanitization, copying, and serialization while preserving full validation for imports and forced normalization.
   - ⚡️ Render bold text on the existing Slate leaf instead of an extra decorative `span`; preserve ordinary React child identities when restoring Jinja placeholders.
   - ⚡️ Mount table row and column index actions and outside-click listeners only while active and isolate stable action context, reducing hidden DOM, global listeners and rerenders during large-table edits.
@@ -70,7 +74,7 @@ group:
   - ⚡️ Reduce full-document subscriptions in tags, cards, and table cells; batch column insertion/removal normalization and reuse column-width calculations for unchanged cells.
   - ⚡️ Initialize the editable editor and initial document once instead of reparsing Markdown on prop echoes; load tag suggestions only when opened and load shared panel suggestions once.
   - 🐞 Preserve edited drafts when toggling readonly or updating plugins together with initial values; readonly source updates continue to synchronize.
-  - 🐞 Fix stale selection paths when pasting across paragraphs; preserve selected text when `onPaste` returns `false`.
+  - 🐞 Fix stale selection paths when pasting across paragraphs; preserve selected text when `onPaste` returns `false` and allow plain-text fallback for empty or invalid Slate clipboard fragments.
   - 🐞 Use the same plugin-aware serialization for autosave and `store.getMDContent()`; isolate Markdown parsing caches by plugins and configuration to prevent mixed node results.
   - 🐞 Cancel pending frames when clearing content or replacing an asynchronous load, preventing old content from returning and older tasks from removing newer cancellation handles.
   - ⚡️ Load images, video, and audio through their displayed elements, removing duplicate preloaders and document writes on mounting; mount resize handles only for selected images and preload only player metadata.

@@ -45,17 +45,12 @@ describe('MarkdownEditor hooks/editor', () => {
         .spyOn(SlateReactEditor, 'findPath')
         .mockImplementation((ed, node) => {
           // 传入 current 时返回 [1]，否则返回 [0]（el 的 path）
-          if (node && (node as any).currentPath)
-            return (node as any).currentPath;
+          if (node === editor.children[1]) return [1];
           return [0];
         });
 
       const el0 = editor.children[0];
-      const currentEl = {
-        type: 'paragraph',
-        children: [{ text: 'b' }],
-        currentPath: [1],
-      };
+      const currentEl = editor.children[1];
 
       const TestComp = () => {
         const [, update] = useMEditor(el0 as any);

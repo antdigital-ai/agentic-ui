@@ -40,7 +40,14 @@ const mockEditor = {
 };
 
 const mockEditorStore = {
-  store: { editor: { focus: vi.fn() } },
+  store: {
+    editor: {
+      focus: vi.fn(),
+      children: [
+        { type: 'code', value: 'const a=1', children: [{ text: '' }] },
+      ],
+    },
+  },
   readonly: false,
   editorProps: { codeProps: { theme: 'github' } },
 };
@@ -66,6 +73,10 @@ vi.mock('../../loadAceEditor', () => ({
 
 vi.mock('../../../../MarkdownEditor/editor/store', () => ({
   useEditorStore: () => mockEditorStore,
+}));
+
+vi.mock('../../../../MarkdownEditor/editor/utils/findElementPath', () => ({
+  findElementPath: () => [0],
 }));
 
 vi.mock('../../../../MarkdownEditor/editor/utils/editorUtils', () => ({

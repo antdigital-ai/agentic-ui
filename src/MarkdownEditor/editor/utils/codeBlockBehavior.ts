@@ -1,4 +1,4 @@
-import { Editor, Element, Node, Path, Transforms } from 'slate';
+import { Editor, Element, Node, Path, Text, Transforms } from 'slate';
 import type { CodeNode } from '../../el';
 import { EditorUtils } from './editorUtils';
 
@@ -29,8 +29,11 @@ export const setCodeBlockNodes = (
     if ('value' in data) {
       const placeholderPath = [...path, 0];
       if (Editor.hasPath(editor, placeholderPath)) {
-        Transforms.removeNodes(editor, { at: placeholderPath });
-        Transforms.insertNodes(editor, { text: '' }, { at: placeholderPath });
+        const placeholder = Node.get(editor, placeholderPath);
+        if (!Text.isText(placeholder) || placeholder.text !== '') {
+          Transforms.removeNodes(editor, { at: placeholderPath });
+          Transforms.insertNodes(editor, { text: '' }, { at: placeholderPath });
+        }
       }
     }
   });

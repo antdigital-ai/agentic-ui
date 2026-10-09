@@ -29,6 +29,7 @@ import { parserSlateNodeToMarkdown } from './parser/parserSlateNodeToMarkdown';
 import { getOffsetLeft, getOffsetTop } from './utils/dom';
 import type { EditorSelChangePayload } from './utils/editorSelChange';
 import { EditorUtils, findByPathAndText } from './utils/editorUtils';
+import { getEditorDOMSelection } from './utils/getEditorDOMSelection';
 import { KeyboardTask, Methods } from './utils/keyboard';
 import type { MarkdownToHtmlOptions } from './utils/markdownToHtml';
 import { markdownToHtmlSync } from './utils/markdownToHtml';
@@ -543,16 +544,13 @@ export class EditorStore {
   /**
    * 安全地取消编辑器选区。
    *
-   * ReactEditor.deselect() 内部调用 window.getSelection().removeAllRanges()，
-   * 当编辑器处于聚焦状态时，浏览器要求必须存在活跃选区才能操作，
-   * 否则抛出 InvalidStateError("Failed to execute 'collapseToEnd' on 'Selection'")。
-   *
-   * 双重防御策略：
-   * 1. isFocused 检查 —— 大多数情况下直接跳过（性能优先）
-   * 2. try-catch —— 覆盖 isFocused 与 deselect 之间的竞态窗口
+   * ReactEditor.deselect() 会清空所在文档或 ShadowRoot 的浏览器选区，
+   * 因此只处理属于当前编辑器的选区，避免刷新正文时干扰其他编辑器。
+   * 聚焦时保留原有保护，try-catch 覆盖 DOM 卸载或焦点切换的竞态。
    */
   private _safeDeselect(): void {
     if (ReactEditor.isFocused(this._editor.current)) return;
+    if (!getEditorDOMSelection(this._editor.current)) return;
     try {
       ReactEditor.deselect(this._editor.current);
     } catch {

@@ -5,14 +5,24 @@ import { SimpleCodeBlockEditor } from '../SimpleCodeBlockEditor';
 
 const commit = vi.hoisted(() => vi.fn());
 const keyDownResult = vi.hoisted(() => ({ current: 'handled' as string }));
-vi.mock('slate-react', () => ({
-  useSlateStatic: () => ({}),
-  ReactEditor: { findPath: () => [0] },
+vi.mock('slate-react', async () => {
+  const actual =
+    await vi.importActual<typeof import('slate-react')>('slate-react');
+  const { createEditor } = await import('slate');
+  const editor = actual.withReact(createEditor());
+  editor.children = [{ type: 'code', value: 'x', children: [{ text: '' }] }];
+  return { ...actual, useSlateStatic: () => editor };
+});
+vi.mock('../../../utils/findElementPath', () => ({
+  findElementPath: () => [0],
 }));
 vi.mock('../../../store', () => ({
   useEditorStore: () => ({ readonly: false }),
 }));
-vi.mock('../../../utils/codeBlockBehavior', () => ({
+vi.mock('../../../utils/codeBlockBehavior', async () => ({
+  ...(await vi.importActual<typeof import('../../../utils/codeBlockBehavior')>(
+    '../../../utils/codeBlockBehavior',
+  )),
   handleCodeBlockTextInputKeyDown: () => keyDownResult.current,
   setCodeBlockNodes: commit,
 }));

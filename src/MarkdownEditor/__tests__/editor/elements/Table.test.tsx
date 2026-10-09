@@ -21,6 +21,7 @@ vi.mock('../../../hooks/editor', () => ({
 }));
 
 vi.mock('slate-react', () => ({
+  useSlateSelector: vi.fn(() => [0]),
   useSlateSelection: vi.fn(),
   useSlateStatic: vi.fn(() => ({
     children: [{ children: [] }],

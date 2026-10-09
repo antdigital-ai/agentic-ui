@@ -33,7 +33,7 @@ vi.mock('slate-react', async () => {
     useSlateStatic: () => editor,
     ReactEditor: {
       ...actual.ReactEditor,
-      toSlateNode: vi.fn(() => ({ type: 'tag' })),
+      toSlateNode: vi.fn(() => editor.children[0].children[0]),
       findPath: vi.fn(() => [0, 0]),
     },
   };
@@ -54,6 +54,10 @@ const renderTagPopup = (
 describe('TagPopup 分支覆盖', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(ReactEditor.toSlateNode).mockImplementation(
+      (editor) => editor.children[0].children[0],
+    );
+    vi.mocked(ReactEditor.findPath).mockReturnValue([0, 0]);
   });
 
   afterEach(() => {
@@ -480,8 +484,7 @@ describe('TagPopup 分支覆盖', () => {
     expect(container.querySelector('[data-tag-popup-input]')).toBeTruthy();
   });
 
-  it('panel onSelect 空 path 传空数组', async () => {
-    // getNodePath 失败时 currentNodePath 保持 undefined，onSelect 第二参为 []
+  it('panel onSelect 无法解析当前节点时忽略选择', async () => {
     vi.mocked(ReactEditor.toSlateNode).mockImplementation(() => {
       throw new Error('no node');
     });
@@ -501,14 +504,16 @@ describe('TagPopup 分支覆盖', () => {
     fireEvent.click(document.querySelector('[class*="tag-popup"]')!);
     await waitFor(() => expect(ctx.onSelectRef.current).toBeDefined());
     ctx.onSelectRef.current?.('opt');
-    expect(onSelect).toHaveBeenCalledWith('opt', []);
+    expect(onSelect).not.toHaveBeenCalled();
   });
 });
 
 describe('TagPopup istanbul residual', () => {
   afterEach(() => {
     vi.mocked(ReactEditor.findPath).mockReturnValue([0, 0]);
-    vi.mocked(ReactEditor.toSlateNode).mockReturnValue({ type: 'tag' } as any);
+    vi.mocked(ReactEditor.toSlateNode).mockImplementation(
+      (editor) => editor.children[0].children[0],
+    );
   });
 
   it('findPath 抛错时仍可渲染', () => {

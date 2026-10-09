@@ -2,6 +2,7 @@ import classNames from 'clsx';
 import React, { startTransition, useEffect, useRef, useState } from 'react';
 import { Editor, Node, Transforms } from 'slate';
 import { useEditorStore } from '../../MarkdownEditor/editor/store';
+import { findElementPath } from '../../MarkdownEditor/editor/utils/findElementPath';
 import { ElementProps, InlineKatexNode } from '../../MarkdownEditor/el';
 import { useSelStatus } from '../../MarkdownEditor/hooks/editor';
 import { loadKatex } from './loadKatex';
@@ -144,10 +145,14 @@ export const InlineKatex = ({
         contentEditable={false}
         ref={renderEl}
         onClick={() => {
-          Transforms.select(
-            markdownEditorRef.current,
-            Editor.end(markdownEditorRef.current, path),
-          );
+          const editor = markdownEditorRef.current;
+          const currentPath = findElementPath(editor, element, {
+            cachedPath: path,
+            matchKey: true,
+            search: true,
+          });
+          if (!currentPath) return;
+          Transforms.select(editor, Editor.end(editor, currentPath));
         }}
         style={{
           margin: '0 0.25rem',

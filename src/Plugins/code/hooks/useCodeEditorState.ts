@@ -5,11 +5,16 @@
 
 import { useEffect } from 'react';
 import { useGetSetState } from 'react-use';
+import { Node } from 'slate';
 import { ReactEditor } from 'slate-react';
 import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { useEditorStore } from '../../../MarkdownEditor/editor/store';
-import { setCodeBlockNodes } from '../../../MarkdownEditor/editor/utils/codeBlockBehavior';
+import {
+  isCodeBlockElement,
+  setCodeBlockNodes,
+} from '../../../MarkdownEditor/editor/utils/codeBlockBehavior';
 import { getSlateElementPlainText } from '../../../MarkdownEditor/editor/utils/codeBlockPlainText';
+import { findElementPath } from '../../../MarkdownEditor/editor/utils/findElementPath';
 import { CodeNode } from '../../../MarkdownEditor/el';
 import { useSelStatus } from '../../../MarkdownEditor/hooks/editor';
 
@@ -21,7 +26,7 @@ interface CodeEditorState {
 }
 
 export function useCodeEditorState(element: CodeNode) {
-  const { store, markdownEditorRef } = useEditorStore();
+  const { store, markdownEditorRef, readonly } = useEditorStore();
   const [selected, path] = useSelStatus(element);
 
   // 组件内部状态
@@ -34,7 +39,18 @@ export function useCodeEditorState(element: CodeNode) {
 
   // 更新代码节点数据
   const update = useRefFunction((data: Partial<CodeNode>) => {
-    setCodeBlockNodes(store.editor, path, data);
+    if (readonly) return;
+    const currentPath = findElementPath(store.editor, element, {
+      cachedPath: path,
+      matchKey: true,
+      search: true,
+    });
+    if (
+      currentPath &&
+      isCodeBlockElement(Node.get(store.editor, currentPath))
+    ) {
+      setCodeBlockNodes(store.editor, currentPath, data);
+    }
   });
 
   // 处理编辑器选中状态的边框显示

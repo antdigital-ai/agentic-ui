@@ -103,7 +103,7 @@ describe('handlePaste 分支覆盖', () => {
       expect(result).toBe(true);
     });
 
-    it('空 fragment 数组时返回 true', () => {
+    it('空 fragment 数组时返回 false，允许其他格式兜底', () => {
       mockClipboard.getData.mockReturnValue(JSON.stringify([]));
 
       const result = handleSlateMarkdownFragment(
@@ -114,7 +114,7 @@ describe('handlePaste 分支覆盖', () => {
           focus: { path: [0, 0], offset: 0 },
         },
       );
-      expect(result).toBe(true);
+      expect(result).toBe(false);
     });
 
     it('应过滤掉非法 Slate 节点（非 Element 非 Text）', () => {
@@ -135,7 +135,7 @@ describe('handlePaste 分支覆盖', () => {
       expect(result).toBe(true);
     });
 
-    it('非数组 JSON 按空 fragment 处理返回 true', () => {
+    it('非数组 JSON 按空 fragment 处理返回 false', () => {
       mockClipboard.getData.mockReturnValue(JSON.stringify({ not: 'array' }));
 
       const result = handleSlateMarkdownFragment(
@@ -143,7 +143,7 @@ describe('handlePaste 分支覆盖', () => {
         mockClipboard as unknown as DataTransfer,
         null,
       );
-      expect(result).toBe(true);
+      expect(result).toBe(false);
     });
 
     it('card 类型节点应被包裹 card-before/card-after', () => {
@@ -697,7 +697,7 @@ describe('handlePaste istanbul residual', () => {
     mockClipboard = { getData: vi.fn(), files: [] };
   });
 
-  it('fragment JSON 为原始字符串时按空数组处理返回 true', () => {
+  it('fragment JSON 为原始字符串时按空数组处理返回 false', () => {
     mockClipboard.getData.mockReturnValue('"just-string"');
     expect(
       handleSlateMarkdownFragment(
@@ -705,10 +705,10 @@ describe('handlePaste istanbul residual', () => {
         mockClipboard as unknown as DataTransfer,
         editor.selection!,
       ),
-    ).toBe(true);
+    ).toBe(false);
   });
 
-  it('fragment 数组无有效节点时按空 fragment 返回 true', () => {
+  it('fragment 数组无有效节点时按空 fragment 返回 false', () => {
     // { type: 'x' } 无 children → 非 Element；无 text → 非 Text → filter 后 length 0
     mockClipboard.getData.mockReturnValue(JSON.stringify([{ type: 'x' }]));
     expect(
@@ -717,10 +717,10 @@ describe('handlePaste istanbul residual', () => {
         mockClipboard as unknown as DataTransfer,
         editor.selection!,
       ),
-    ).toBe(true);
+    ).toBe(false);
   });
 
-  it('单段落 children 缺失时返回 true', () => {
+  it('单段落 children 缺失时返回 false', () => {
     mockClipboard.getData.mockReturnValue(
       JSON.stringify([{ type: 'paragraph' }]),
     );
@@ -730,7 +730,7 @@ describe('handlePaste istanbul residual', () => {
         mockClipboard as unknown as DataTransfer,
         editor.selection!,
       ),
-    ).toBe(true);
+    ).toBe(false);
   });
 
   it('HTTP 音视频扩展仍走 createMediaNode', () => {

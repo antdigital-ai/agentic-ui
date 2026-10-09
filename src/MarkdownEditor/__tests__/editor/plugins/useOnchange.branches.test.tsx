@@ -60,6 +60,15 @@ vi.mock('../../../editor/store', () => ({
   useEditorStore: () => storeState,
 }));
 
+// These branch fixtures have no mounted Editable; DOM ownership is covered by
+// useOnchange.selectionBridge.regression.test.tsx with real Slate DOM nodes.
+vi.mock('../../../editor/utils/getEditorDOMSelection', () => ({
+  getEditorDOMSelection: () => {
+    const selection = window.getSelection();
+    return selection ? { rangeCount: 1, ...selection } : null;
+  },
+}));
+
 describe('useOnchange targeted coverage', () => {
   beforeEach(() => {
     vi.useFakeTimers({ shouldAdvanceTime: true });

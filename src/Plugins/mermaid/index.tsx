@@ -5,7 +5,6 @@ import React, { useContext, useEffect, useRef } from 'react';
 import { useGetSetState } from 'react-use';
 
 import { Copy } from '@sofa-design/icons';
-import { Path } from 'slate';
 import { ReactEditor } from 'slate-react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { I18nContext } from '../../I18n';
@@ -64,9 +63,7 @@ export function MermaidElement(props: ElementProps<CodeNode>) {
     hide: props.element.language === 'mermaid',
     lang: props.element.language || '',
   });
-  const pathRef = useRef<Path | null>(null);
   const [selected, path] = useSelStatus(props.element);
-  pathRef.current = path;
   const editorRef = useRef<Ace.Editor | null>(null);
 
   useEffect(() => {

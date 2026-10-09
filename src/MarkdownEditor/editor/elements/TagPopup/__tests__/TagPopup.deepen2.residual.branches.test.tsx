@@ -31,9 +31,10 @@ vi.mock('slate-react', async () => {
   return {
     ...actual,
     useSlate: () => editor,
+    useSlateStatic: () => editor,
     ReactEditor: {
       ...actual.ReactEditor,
-      toSlateNode: vi.fn(() => ({ type: 'tag' })),
+      toSlateNode: vi.fn(() => editor.children[0].children[0]),
       findPath: vi.fn(() => [0, 0]),
     },
   };

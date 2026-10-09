@@ -1,26 +1,27 @@
-import { useMemo } from 'react';
-import { ReactEditor } from 'slate-react';
-import { useEditorStore } from '../../../store';
+import { useCallback, useRef } from 'react';
+import { Editor, Node, Path } from 'slate';
+import { useSlateSelector } from 'slate-react';
+import { findElementPath } from '../../../utils/findElementPath';
+
+const isSamePath = (a: Path | null | undefined, b: Path | null | undefined) =>
+  a === b || (a != null && b != null && Path.equals(a, b));
 
 /**
- * 解析 Slate 元素在文档中的 path，不订阅选区变化。
+ * 仅在元素路径改变时更新，不随选区变化重渲染。
  * 用于表格行号/列头等 chrome，避免 useSelStatus / useSlate 导致整表重渲染。
  */
 export function useSlateElementPath(element: unknown): number[] | undefined {
-  const { markdownEditorRef } = useEditorStore();
-
-  return useMemo(() => {
-    const editor = markdownEditorRef.current;
-    if (!editor || element === null || element === undefined) {
-      return undefined;
-    }
-    try {
-      return ReactEditor.findPath(
-        editor,
-        element as Parameters<typeof ReactEditor.findPath>[1],
-      );
-    } catch {
-      return undefined;
-    }
-  }, [markdownEditorRef, element]);
+  const cachedPath = useRef<Path | undefined>(undefined);
+  const getPath = useCallback(
+    (editor: Editor) => {
+      if (!Node.isNode(element)) return undefined;
+      cachedPath.current = findElementPath(editor, element, {
+        cachedPath: cachedPath.current,
+      });
+      return cachedPath.current;
+    },
+    [element],
+  );
+  // Structural edits update Slate's maps during Editable's render.
+  return useSlateSelector(getPath, isSamePath, { deferred: true });
 }

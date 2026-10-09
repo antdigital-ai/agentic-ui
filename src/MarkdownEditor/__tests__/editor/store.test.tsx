@@ -1840,7 +1840,9 @@ describe('EditorStore', () => {
       store.setMDContent(shortMd);
 
       expect(editor.children.length).toBeGreaterThan(0);
-      expect(ReactEditor.deselect).toHaveBeenCalled();
+      expect(editor.selection).toBeNull();
+      // No mounted Editable owns a DOM selection in this fixture.
+      expect(ReactEditor.deselect).not.toHaveBeenCalled();
     });
 
     it('应该对长文本进行拆分处理（大于 5000 字符）', async () => {
@@ -1936,7 +1938,9 @@ describe('EditorStore', () => {
       store.setMDContent(content, undefined, { chunkSize: 500, useRAF: false });
 
       expect(editor.children.length).toBeGreaterThan(0);
-      expect(ReactEditor.deselect).toHaveBeenCalled();
+      expect(editor.selection).toBeNull();
+      // No mounted Editable owns a DOM selection in this fixture.
+      expect(ReactEditor.deselect).not.toHaveBeenCalled();
     });
 
     it('应该支持自定义分隔符（字符串）', async () => {
@@ -2029,7 +2033,9 @@ describe('EditorStore', () => {
 
       // 即使有分隔符也不应该拆分，因为内容小于 chunkSize
       expect(editor.children.length).toBeGreaterThan(0);
-      expect(ReactEditor.deselect).toHaveBeenCalled();
+      expect(editor.selection).toBeNull();
+      // No mounted Editable owns a DOM selection in this fixture.
+      expect(ReactEditor.deselect).not.toHaveBeenCalled();
     });
 
     it('应该支持使用 requestAnimationFrame 避免卡顿', async () => {
@@ -2084,7 +2090,9 @@ describe('EditorStore', () => {
       // 同步执行，不返回 Promise
       expect(result).toBeUndefined();
       expect(editor.children.length).toBeGreaterThan(0);
-      expect(ReactEditor.deselect).toHaveBeenCalled();
+      expect(editor.selection).toBeNull();
+      // No mounted Editable owns a DOM selection in this fixture.
+      expect(ReactEditor.deselect).not.toHaveBeenCalled();
     });
 
     it('应该支持进度回调', async () => {

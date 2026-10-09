@@ -8,6 +8,7 @@ import { useOnchange } from '../useOnchange';
 
 const { storeState } = vi.hoisted(() => ({
   storeState: {
+    store: { getMDContent: vi.fn(() => 'md-out') },
     setRefreshFloatBar: vi.fn(),
     bumpFloatBarRevision: vi.fn(),
     setDomRect: vi.fn(),
@@ -27,10 +28,6 @@ vi.mock('../../../../Hooks/useDebounceFn', () => ({
 
 vi.mock('../../../../Hooks/useRefFunction', () => ({
   useRefFunction: (fn: any) => fn,
-}));
-
-vi.mock('../../utils', () => ({
-  parserSlateNodeToMarkdown: () => 'md-out',
 }));
 
 describe('useOnchange deepen2 residual branches', () => {

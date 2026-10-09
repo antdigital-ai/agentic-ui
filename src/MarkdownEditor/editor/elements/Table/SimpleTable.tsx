@@ -1,11 +1,11 @@
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
-import React, { useContext, useMemo } from 'react';
-import { ReactEditor, RenderElementProps } from 'slate-react';
-import { useEditorStore } from '../../store';
+import React, { useContext } from 'react';
+import { RenderElementProps } from 'slate-react';
 import { TableNode } from '../../types/Table';
 import { SlateTable } from './Table';
 import { TablePropsProvider } from './TableContext';
+import { useSlateElementPath } from './utils/useSlateElementPath';
 
 /**
  * 简单表格组件 - 仅支持只读显示
@@ -14,19 +14,7 @@ import { TablePropsProvider } from './TableContext';
 export const SimpleTable = (props: RenderElementProps) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const baseCls = getPrefixCls('agentic-md-editor-content-table');
-  const { markdownEditorRef } = useEditorStore();
-
-  const tablePath = useMemo(() => {
-    const editor = markdownEditorRef.current;
-    if (!editor) {
-      return [];
-    }
-    try {
-      return ReactEditor.findPath(editor, props.element);
-    } catch {
-      return [];
-    }
-  }, [markdownEditorRef, props.element]);
+  const tablePath = useSlateElementPath(props.element);
 
   return (
     <TablePropsProvider

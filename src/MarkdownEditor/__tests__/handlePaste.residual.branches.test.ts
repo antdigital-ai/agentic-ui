@@ -205,13 +205,13 @@ describe('handlePaste residual branches', () => {
     const empty = {
       getData: (t: string) => (t.includes('slate') ? '[]' : ''),
     } as any;
-    expect(handleSlateMarkdownFragment(editor, empty, null)).toBe(true);
+    expect(handleSlateMarkdownFragment(editor, empty, null)).toBe(false);
 
     const notArr = {
       getData: (t: string) =>
         t.includes('slate') ? JSON.stringify({ a: 1 }) : '',
     } as any;
-    expect(handleSlateMarkdownFragment(editor, notArr, null)).toBe(true);
+    expect(handleSlateMarkdownFragment(editor, notArr, null)).toBe(false);
 
     const para = {
       getData: (t: string) =>

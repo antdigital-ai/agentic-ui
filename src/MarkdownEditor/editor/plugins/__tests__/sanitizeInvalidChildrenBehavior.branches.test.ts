@@ -70,7 +70,9 @@ describe('sanitizeInvalidChildrenBehavior 分支覆盖', () => {
 
   it('sanitizeEditorChildren 空压缩结果补默认段', () => {
     expect(sanitizeEditorChildren([])).toEqual([createDefaultBlock()]);
-    expect(areNodeArraysEqual([{ text: 'a' }], [{ text: 'a' }])).toBe(true);
+    const leaf = { text: 'a' };
+    expect(areNodeArraysEqual([leaf], [leaf])).toBe(true);
+    expect(areNodeArraysEqual([leaf], [{ text: 'a' }])).toBe(false);
     expect(areNodeArraysEqual([{ text: 'a' }], [{ text: 'b' }])).toBe(false);
   });
 

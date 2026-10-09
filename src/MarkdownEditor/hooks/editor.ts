@@ -4,10 +4,11 @@ import { ReactEditor, useSlateSelector, useSlateStatic } from 'slate-react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { EditorStore, useEditorStore } from '../editor/store';
 import { useGetSetState } from '../editor/utils';
-import { EditorUtils } from '../editor/utils/editorUtils';
+import { findElementPath } from '../editor/utils/findElementPath';
 import { useSubject } from './subscribe';
 
-const isSamePath = (a: Path | null, b: Path) => a !== null && Path.equals(a, b);
+const isSamePath = (a: Path | null | undefined, b: Path | null | undefined) =>
+  a === b || (a != null && b != null && Path.equals(a, b));
 
 /** A removed element may still have a queued selector and stale DOM path mapping. */
 export const useElementSelected = (element: BaseElement): boolean => {
@@ -72,9 +73,11 @@ export const useMEditor = (el: BaseElement) => {
 
   const update = useRefFunction(
     (props: Record<string, any>, current?: BaseElement) => {
-      Transforms.setNodes(editor, props, {
-        at: ReactEditor.findPath(editor, current || el),
+      const path = findElementPath(editor, current || el, {
+        matchKey: true,
+        search: true,
       });
+      if (path) Transforms.setNodes(editor, props, { at: path });
     },
   );
 
@@ -99,18 +102,12 @@ export const useMEditor = (el: BaseElement) => {
 export const useSelStatus = (element: any) => {
   const editor = useSlateStatic();
   const { store, markdownEditorRef, selChange$ } = useEditorStore();
-  const cachedPath = useRef<Path | null>(null);
+  const cachedPath = useRef<Path | undefined>(undefined);
   const getElementPath = useCallback(
     (currentEditor: Editor) => {
-      const path = cachedPath.current;
-      // Text/selection operations preserve paths. Only resolve the DOM mapping
-      // again when a structural operation moved this element.
-      try {
-        if (path && Node.get(currentEditor, path) === element) return path;
-      } catch {
-        // A removed sibling can make the previously valid path out of bounds.
-      }
-      cachedPath.current = EditorUtils.findPath(currentEditor, element);
+      cachedPath.current = findElementPath(currentEditor, element, {
+        cachedPath: cachedPath.current,
+      });
       return cachedPath.current;
     },
     [element],
@@ -128,11 +125,19 @@ export const useSelStatus = (element: any) => {
     selChange$,
     (ctx) => {
       const path = getElementPath(markdownEditorRef.current);
-      const selected = ctx ? Path.equals(path, ctx.node?.[1] || []) : false;
+      const selected = !!(
+        ctx &&
+        path &&
+        Path.equals(path, ctx.node?.[1] || [])
+      );
       if (state().selected === selected) return;
       setState({ selected });
     },
     [element, selChange$, getElementPath],
   );
-  return [state().selected, elementPath, store] as [boolean, Path, EditorStore];
+  return [
+    state().selected && elementPath !== undefined,
+    elementPath,
+    store,
+  ] as [boolean, Path | undefined, EditorStore];
 };

@@ -100,12 +100,18 @@ const mockEditorStart = vi.hoisted(() =>
 );
 
 vi.mock('slate', () => ({
+  Node: { get: () => ({ type: 'code', children: [{ text: '' }] }) },
+  Element: { isElement: () => true },
   Editor: {
     withoutNormalizing: vi.fn((_editor: any, fn: () => void) => fn()),
     start: mockEditorStart,
   },
   Transforms: mockTransforms,
   Path: { next: (p: number[]) => [...p, 0] },
+}));
+
+vi.mock('../../../../MarkdownEditor/editor/utils/findElementPath', () => ({
+  findElementPath: () => [0, 1],
 }));
 
 const mockEditorStore = {

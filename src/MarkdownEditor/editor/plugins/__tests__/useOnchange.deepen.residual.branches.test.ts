@@ -8,6 +8,7 @@ import { useOnchange } from '../useOnchange';
 
 const { storeState } = vi.hoisted(() => ({
   storeState: {
+    store: { getMDContent: vi.fn(() => 'md-out') },
     setRefreshFloatBar: vi.fn(
       (updater?: boolean | ((prev: boolean) => boolean)) => {
         if (typeof updater === 'function') updater(false);
@@ -33,8 +34,11 @@ vi.mock('../../../../Hooks/useRefFunction', () => ({
   useRefFunction: (fn: any) => fn,
 }));
 
-vi.mock('../../utils', () => ({
-  parserSlateNodeToMarkdown: () => 'md-out',
+vi.mock('../../utils/getEditorDOMSelection', () => ({
+  getEditorDOMSelection: () => {
+    const selection = window.getSelection();
+    return selection ? { rangeCount: 1, ...selection } : null;
+  },
 }));
 
 describe('useOnchange deepen residual branches', () => {

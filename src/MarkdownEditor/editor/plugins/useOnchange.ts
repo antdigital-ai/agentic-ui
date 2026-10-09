@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { BaseOperation, Editor, Element, NodeEntry, Path, Range } from 'slate';
 import { useDebounceFn } from '../../../Hooks/useDebounceFn';
 import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { Elements } from '../../el';
 import { useEditorStore } from '../store';
+import { getEditorDOMSelection } from '../utils/getEditorDOMSelection';
 
 const floatBarIgnoreNode = new Set(['code']);
 
@@ -15,8 +16,8 @@ export interface UseOnchangeOptions {
   wait?: number;
   /**
    * 是否需要选区跟踪（FloatBar / onSelectionChange）。
-   * 关闭时仅在内容变化时跑 Editor.nodes / selChange$ / DOMRect 计算，
-   * 纯光标移动直接早返。
+   * 关闭时跳过 Editor.nodes / selChange$ / DOMRect 计算，
+   * 仅在内容变化时触发 onChange。
    */
   selectionTrackingEnabled?: boolean;
 }
@@ -32,6 +33,9 @@ export function useOnchange(
   options?: UseOnchangeOptions,
 ) {
   const rangeContent = useRef('');
+  const measuredSelection = useRef<Range | null>(null);
+  const measuredDocument = useRef<Editor['children'] | null>(null);
+  const selectionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wait = options?.wait ?? DEFAULT_ONCHANGE_DEBOUNCE_WAIT;
   const selectionTrackingEnabled = options?.selectionTrackingEnabled !== false;
 
@@ -44,6 +48,23 @@ export function useOnchange(
     markdownEditorRef,
     selChange$,
   } = useEditorStore();
+
+  const cancelSelectionNotification = useCallback(() => {
+    if (selectionTimer.current !== null) {
+      clearTimeout(selectionTimer.current);
+      selectionTimer.current = null;
+    }
+  }, []);
+
+  useEffect(
+    () => cancelSelectionNotification,
+    [
+      cancelSelectionNotification,
+      readonly,
+      selectionTrackingEnabled,
+      selChange$,
+    ],
+  );
 
   const onChangeDebounce = useDebounceFn(async () => {
     if (!onChange) return;
@@ -82,12 +103,32 @@ export function useOnchange(
         mode: 'lowest',
       });
 
-      setTimeout(() => {
-        selChange$.next({
-          sel,
-          node: node as NodeEntry<any>,
-        });
-      });
+      cancelSelectionNotification();
+      selectionTimer.current = setTimeout(() => {
+        selectionTimer.current = null;
+        if (markdownEditorRef.current !== editor) return;
+        // React may have committed structural changes since this task was
+        // queued. Resolve the latest selection and paths together.
+        const selection = editor.selection;
+        if (!selection) {
+          selChange$.next(null);
+          return;
+        }
+        try {
+          const [currentNode] = Editor.nodes<Element>(editor, {
+            match: (n) => Element.isElement(n),
+            mode: 'lowest',
+          });
+          selChange$.next({
+            sel: selection,
+            node: currentNode as NodeEntry<Element>,
+          });
+        } catch (error) {
+          if (process.env.NODE_ENV !== 'production') {
+            console.error('[useOnchange] selection tracking failed:', error);
+          }
+        }
+      }, 0);
 
       if (!node) return;
 
@@ -99,11 +140,24 @@ export function useOnchange(
         Path.equals(Path.parent(sel.focus.path), Path.parent(sel.anchor.path))
       ) {
         if (typeof window === 'undefined') return;
-        const domSelection = window.getSelection();
-        const domRange = domSelection?.getRangeAt(0);
+        const domSelection = getEditorDOMSelection(editor);
+        if (!domSelection?.rangeCount) {
+          rangeContent.current = '';
+          measuredSelection.current = null;
+          measuredDocument.current = null;
+          setDomRect?.(null);
+          return;
+        }
+        const domRange = domSelection.getRangeAt(0);
 
-        if (!domRange?.toString()?.trim()) return;
-        if (rangeContent.current === domRange?.toString()) {
+        const text = domRange?.toString() || '';
+        if (!text.trim()) return;
+        if (
+          rangeContent.current === text &&
+          measuredSelection.current &&
+          Range.equals(measuredSelection.current, sel) &&
+          measuredDocument.current === editor.children
+        ) {
           if (bumpFloatBarRevision) {
             bumpFloatBarRevision();
           } else {
@@ -111,7 +165,9 @@ export function useOnchange(
           }
           return;
         }
-        rangeContent.current = domRange?.toString() || '';
+        rangeContent.current = text;
+        measuredSelection.current = sel;
+        measuredDocument.current = editor.children;
         const rect = domRange?.getBoundingClientRect();
         if (rect) {
           setDomRect?.(rect);
@@ -120,6 +176,8 @@ export function useOnchange(
         }
       } else {
         rangeContent.current = '';
+        measuredSelection.current = null;
+        measuredDocument.current = null;
         setDomRect?.(null);
       }
     } catch (error) {

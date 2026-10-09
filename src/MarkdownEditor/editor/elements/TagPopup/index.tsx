@@ -13,6 +13,7 @@ import { BaseEditor } from 'slate';
 import { ReactEditor, useSlateStatic } from 'slate-react';
 import { useRefFunction } from '../../../../Hooks/useRefFunction';
 import { SuggestionContext } from '../../../../MarkdownInputField/Suggestion/SuggestionContext';
+import { findElementPath } from '../../utils/findElementPath';
 import { ChipWave } from './ChipWave';
 import { consumeTagChipWave, prefersReducedMotion } from './chipWaveMotion';
 
@@ -119,7 +120,8 @@ export type TagPopupProps = {
    * 标签文本的样式，可以是样式对象或返回样式对象的函数
    */
   tagTextStyle?:
-    ((props: RenderProps) => React.CSSProperties) | React.CSSProperties;
+    | ((props: RenderProps) => React.CSSProperties)
+    | React.CSSProperties;
   /**
    * 标签文本的类名
    */
@@ -164,7 +166,10 @@ const getNodePath = (
   if (!domRef.current) return null;
   try {
     const slateNode = ReactEditor.toSlateNode(editor, domRef.current);
-    return ReactEditor.findPath(editor, slateNode);
+    return (
+      findElementPath(editor, slateNode, { matchKey: true, search: true }) ||
+      null
+    );
   } catch (error) {
     // 如果无法从 DOM 节点解析 Slate 节点，返回 null
     // 这在测试环境或某些边缘情况下可能会发生
@@ -354,6 +359,7 @@ export const TagPopup = (props: RenderProps) => {
   const [loading, setLoading] = React.useState(false);
   const [chipWavePlaying, setChipWavePlaying] = useState(false);
   const domRef = useRef<HTMLDivElement>(null);
+  const nodeDomRef = useRef<HTMLDivElement>(null);
   const suggestionContext = useContext(SuggestionContext);
   const antdContext = useContext(ConfigProvider.ConfigContext);
   const baseCls = antdContext?.getPrefixCls('agentic-md-editor-tag-popup');
@@ -362,14 +368,16 @@ export const TagPopup = (props: RenderProps) => {
   // changing its text, and do not require a subscription to the whole document.
   const onSelect = useRefFunction<NonNullable<RenderProps['onSelect']>>(
     (...args) => {
-      const [value, path, tagNode] = args;
-      const currentPath = getNodePath(editor, domRef);
-      if (currentPath) currentNodePath.current = currentPath;
-      const resolvedPath = currentPath || path || currentNodePath.current || [];
+      const [value, , tagNode] = args;
+      const currentPath = getNodePath(editor, nodeDomRef);
+      // Shared suggestions can complete after the tag has moved or disappeared.
+      // A cached DOM path must never target the new occupant of that position.
+      if (!currentPath) return;
+      currentNodePath.current = currentPath;
       if (args.length > 2) {
-        props.onSelect?.(value, resolvedPath, tagNode);
+        props.onSelect?.(value, currentPath, tagNode);
       } else {
-        props.onSelect?.(value, resolvedPath);
+        props.onSelect?.(value, currentPath);
       }
     },
   );
@@ -381,7 +389,7 @@ export const TagPopup = (props: RenderProps) => {
   const chipWaveClaimedTextRef = useRef<string | null | undefined>(null);
 
   useEffect(() => {
-    const path = getNodePath(editor, domRef);
+    const path = getNodePath(editor, nodeDomRef);
     if (path) {
       currentNodePath.current = path;
     }
@@ -403,7 +411,7 @@ export const TagPopup = (props: RenderProps) => {
   useEffect(() => {
     updateNodeContext(
       editor,
-      domRef,
+      nodeDomRef,
       suggestionContext,
       props,
       onSelect,
@@ -557,6 +565,7 @@ export const TagPopup = (props: RenderProps) => {
 
   return (
     <div
+      ref={nodeDomRef}
       className={containerClassName}
       style={containerStyle}
       onClick={handleContainerClick}

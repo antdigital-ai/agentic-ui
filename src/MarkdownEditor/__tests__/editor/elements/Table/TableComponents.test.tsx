@@ -7,6 +7,7 @@ import { Slate, withReact } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TableCellIndex } from '../../../../editor/elements/Table/TableCellIndex';
 import { TableCellIndexSpacer } from '../../../../editor/elements/Table/TableCellIndexSpacer';
+import { TablePropsProvider } from '../../../../editor/elements/Table/TableContext';
 import { TableRowIndex } from '../../../../editor/elements/Table/TableRowIndex';
 import { Td } from '../../../../editor/elements/Table/Td';
 
@@ -124,13 +125,15 @@ describe('Table 组件测试', () => {
       return render(
         <ConfigProvider>
           <Slate editor={editor} initialValue={editor.children as any}>
-            <table>
-              <tbody>
-                <tr>
-                  <TableCellIndex {...defaultProps} />
-                </tr>
-              </tbody>
-            </table>
+            <TablePropsProvider tablePath={[0]}>
+              <table>
+                <tbody>
+                  <tr>
+                    <TableCellIndex {...defaultProps} />
+                  </tr>
+                </tbody>
+              </table>
+            </TablePropsProvider>
           </Slate>
         </ConfigProvider>,
       );
@@ -196,6 +199,7 @@ describe('Table 组件测试', () => {
 
     it('应该包含删除图标', () => {
       renderTableCellIndex();
+      fireEvent.click(document.querySelector('td')!);
       const deleteIcon = document.querySelector(
         '.ant-agentic-md-editor-table-cell-index-delete-icon',
       );
@@ -204,17 +208,23 @@ describe('Table 组件测试', () => {
 
     it('应该处理删除按钮点击', () => {
       renderTableCellIndex();
+      fireEvent.click(document.querySelector('td')!);
       const deleteButton = document.querySelector(
         '.ant-agentic-md-editor-table-cell-index-delete-icon',
       );
       if (deleteButton) {
         fireEvent.click(deleteButton);
       }
-      expect(deleteButton).toBeInTheDocument();
+      expect(
+        document.querySelector(
+          '.ant-agentic-md-editor-table-cell-index-delete-icon',
+        ),
+      ).toBeNull();
     });
 
     it('应该在 shouldShowDeleteIcon 为 true 时显示操作按钮', () => {
       const { container } = renderTableCellIndex({ rowIndex: 0 });
+      fireEvent.click(container.querySelector('td')!);
       const actionButtons = container.querySelector(
         '.ant-agentic-md-editor-table-cell-index-action-buttons',
       );
@@ -281,13 +291,15 @@ describe('Table 组件测试', () => {
       return render(
         <ConfigProvider>
           <Slate editor={editor} initialValue={editor.children as any}>
-            <table>
-              <tbody>
-                <tr>
-                  <TableCellIndexSpacer {...defaultProps} />
-                </tr>
-              </tbody>
-            </table>
+            <TablePropsProvider tablePath={[0]}>
+              <table>
+                <tbody>
+                  <tr>
+                    <TableCellIndexSpacer {...defaultProps} />
+                  </tr>
+                </tbody>
+              </table>
+            </TablePropsProvider>
           </Slate>
         </ConfigProvider>,
       );
@@ -353,6 +365,7 @@ describe('Table 组件测试', () => {
 
     it('应该包含删除图标', () => {
       renderTableCellIndexSpacer();
+      fireEvent.click(document.querySelector('td')!);
       const deleteIcon = document.querySelector(
         '.ant-agentic-md-editor-table-cell-index-spacer-delete-icon',
       );
@@ -361,13 +374,18 @@ describe('Table 组件测试', () => {
 
     it('应该处理删除按钮点击', () => {
       renderTableCellIndexSpacer();
+      fireEvent.click(document.querySelector('td')!);
       const deleteButton = document.querySelector(
         '.ant-agentic-md-editor-table-cell-index-spacer-delete-icon',
       );
       if (deleteButton) {
         fireEvent.click(deleteButton);
       }
-      expect(deleteButton).toBeInTheDocument();
+      expect(
+        document.querySelector(
+          '.ant-agentic-md-editor-table-cell-index-spacer-delete-icon',
+        ),
+      ).toBeNull();
     });
 
     it('应该设置正确的 padding', () => {

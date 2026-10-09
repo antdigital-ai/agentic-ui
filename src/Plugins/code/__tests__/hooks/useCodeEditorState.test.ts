@@ -13,6 +13,7 @@ vi.mock('slate', () => ({
     hasPath: () => false,
   },
   Node: {
+    get: () => ({ type: 'code', children: [{ text: '' }] }),
     string: (node: unknown): string => {
       const slateNode = node as {
         children?: unknown;
@@ -33,6 +34,9 @@ vi.mock('slate', () => ({
   Transforms: {
     setNodes: (...args: unknown[]) => mockSetNodes(...args),
   },
+  Element: {
+    isElement: () => true,
+  },
 }));
 
 const mockIsFocused = vi.fn(() => false);
@@ -52,6 +56,9 @@ vi.mock('../../../../MarkdownEditor/editor/store', () => ({
 }));
 
 const mockUseSelStatus = vi.fn(() => [false, [0, 0]]);
+vi.mock('../../../../MarkdownEditor/editor/utils/findElementPath', () => ({
+  findElementPath: () => [0, 0],
+}));
 vi.mock('../../../../MarkdownEditor/hooks/editor', () => ({
   useSelStatus: (el: unknown) => mockUseSelStatus(el),
 }));

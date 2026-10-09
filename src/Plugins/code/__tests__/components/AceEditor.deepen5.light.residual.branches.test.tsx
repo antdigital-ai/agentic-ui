@@ -9,7 +9,14 @@ import React, { useEffect } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockEditorStore = vi.hoisted(() => ({
-  store: { editor: { focus: vi.fn() } },
+  store: {
+    editor: {
+      focus: vi.fn(),
+      children: [
+        { type: 'code', value: 'const a=1', children: [{ text: '' }] },
+      ],
+    },
+  },
   readonly: false,
   editorProps: {} as Record<string, any>,
 }));
@@ -72,8 +79,8 @@ vi.mock('../../../../MarkdownEditor/editor/utils/ace', () => ({
   getAceLangs,
 }));
 
-vi.mock('../../../../MarkdownEditor/editor/utils/codeBlockBehavior', () => ({
-  handleCodeBlockAceKeyDown: vi.fn(() => 'passthrough'),
+vi.mock('../../../../MarkdownEditor/editor/utils/findElementPath', () => ({
+  findElementPath: () => [0],
 }));
 
 vi.mock('../../../../MarkdownEditor/editor/parser/json-parse', () => ({

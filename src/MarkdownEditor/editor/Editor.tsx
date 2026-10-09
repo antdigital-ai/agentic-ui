@@ -69,13 +69,13 @@ import {
   EditorUtils,
   findByPathAndText,
   findLeafPath,
-  getSelectionFromDomSelection,
   hasEditableTarget,
   isEventHandled,
   isPath,
 } from './utils/editorUtils';
 import { buildFootnoteDefinitionChangePayload } from './utils/footnoteDisplay';
 import { applyTableMinSizeToSchema } from './utils/genTableMinSize';
+import { getEditorDOMSelection } from './utils/getEditorDOMSelection';
 import {
   cleanWordHtml,
   htmlToMarkdown,
@@ -213,6 +213,26 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
   const sawCompositionUpdateRef = useRef(false);
 
   const plugins = useContext(PluginContext);
+  const selectionRectInvalidatedRef = useRef(false);
+  const previousSelectionNotificationRef = useRef<{
+    editor: ReactEditor;
+    children: Editor['children'];
+    selection: BaseSelection;
+    readonly: boolean;
+    callback: MEditorProps['onSelectionChange'];
+    plugins: typeof plugins | undefined;
+  } | null>(null);
+
+  const readDOMSelection = useRefFunction(() => {
+    const editor = markdownEditorRef.current;
+    const domSelection = getEditorDOMSelection(editor);
+    return domSelection
+      ? ReactEditor.toSlateRange(editor, domSelection, {
+          exactMatch: false,
+          suppressThrow: true,
+        })
+      : null;
+  });
 
   const onKeyDown = useKeyboard(store, markdownEditorRef, props);
   // 选区跟踪开关：FloatBar 启用 或 提供了 onSelectionChange 才需要每次都跑 Editor.nodes/DOMRect
@@ -262,130 +282,97 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     return map;
   }, [props.comment?.commentList]);
 
-  const handleSelectionChange = useDebounceFn(
-    async (e?: React.SyntheticEvent<HTMLDivElement>) => {
-      // 只读且不需要选区（无 onSelectionChange、无 FloatBar）时，跳过选区同步与 DOM 测量，提升性能
-      if (
-        readonly &&
-        !props.onSelectionChange &&
-        (!props.reportMode || props.floatBar?.enable === false)
-      ) {
-        setDomRect?.(null);
-        return;
-      }
-      const currentSelection = markdownEditorRef.current.selection;
+  const handleSelectionChange = useDebounceFn(() => {
+    // 只读且不需要选区（无 onSelectionChange、无 FloatBar）时，跳过选区同步与 DOM 测量，提升性能
+    if (
+      readonly &&
+      !props.onSelectionChange &&
+      (!props.reportMode || props.floatBar?.enable === false)
+    ) {
+      setDomRect?.(null);
+      return;
+    }
+    const editor = markdownEditorRef.current;
+    const currentSelection = readonly ? readDOMSelection() : editor.selection;
+    if (readonly) {
+      // Never retain another editor's native selection as this editor's range.
+      editor.selection = currentSelection;
+    }
+    const activePlugins = store ? store.plugins : plugins;
+    const previous = previousSelectionNotificationRef.current;
+    const selectionUnchanged =
+      previous?.editor === editor &&
+      previous.children === editor.children &&
+      previous.readonly === readonly &&
+      previous.callback === props.onSelectionChange &&
+      previous.plugins === activePlugins &&
+      (previous.selection === currentSelection ||
+        (previous.selection &&
+          currentSelection &&
+          Range.equals(previous.selection, currentSelection)));
 
-      // 获取选中内容的 markdown 和节点
-      const getSelectionContent = (selection: BaseSelection | null) => {
-        if (!selection || Range.isCollapsed(selection)) {
-          return { markdown: '', nodes: [] };
-        }
-
-        try {
-          const fragment = Editor.fragment(
-            markdownEditorRef.current,
-            selection,
-          );
-          const markdown = parserSlateNodeToMarkdown(
-            fragment,
-            '',
-            undefined,
-            store ? store.plugins : plugins,
-          );
-          return { markdown, nodes: fragment };
-        } catch (error) {
-          console.error('Failed to get selection content:', error);
-          return { markdown: '', nodes: [] };
-        }
-      };
-
-      if (!readonly) {
-        // 非只读模式下的选区处理
-        const event = new CustomEvent<BaseSelection>(
-          MARKDOWN_EDITOR_EVENTS.SELECTIONCHANGE,
-          {
-            ...e,
-            detail: currentSelection,
-          },
-        );
-        markdownContainerRef?.current?.dispatchEvent(event);
-
-        // 调用 props.onSelectionChange 回调
-        if (props.onSelectionChange) {
-          const { markdown, nodes } = getSelectionContent(currentSelection);
-          props.onSelectionChange(currentSelection, markdown, nodes);
-        }
-
-        return;
-      }
-      if (typeof window === 'undefined') return;
-      // 只读模式下的选区处理
-      const domSelection = window.getSelection();
-      if (!domSelection) {
-        setDomRect?.(null);
-        // 调用 props.onSelectionChange 回调（无选中）
-        if (props.onSelectionChange) {
-          props.onSelectionChange(null, '', []);
-        }
-        return;
+    // 获取选中内容的 markdown 和节点
+    const getSelectionContent = (selection: BaseSelection | null) => {
+      if (!selection || Range.isCollapsed(selection)) {
+        return { markdown: '', nodes: [] };
       }
 
       try {
-        const selection = getSelectionFromDomSelection(
-          markdownEditorRef.current,
-          domSelection,
+        const fragment = Editor.fragment(editor, selection);
+        const markdown = parserSlateNodeToMarkdown(
+          fragment,
+          '',
+          undefined,
+          activePlugins,
         );
-
-        if (selection) {
-          // 更新编辑器的选区
-          markdownEditorRef.current.selection = selection;
-
-          // 触发选区变化事件
-          const event = new CustomEvent<BaseSelection>(
-            MARKDOWN_EDITOR_EVENTS.SELECTIONCHANGE,
-            {
-              detail: selection,
-            },
-          );
-          markdownContainerRef?.current?.dispatchEvent(event);
-
-          // 调用 props.onSelectionChange 回调
-          if (props.onSelectionChange) {
-            const { markdown, nodes } = getSelectionContent(selection);
-            props.onSelectionChange(selection, markdown, nodes);
-          }
-
-          if (
-            !Range.isCollapsed(selection) &&
-            Editor.hasPath(markdownEditorRef.current, selection.anchor.path) &&
-            Editor.hasPath(markdownEditorRef.current, selection.focus.path)
-          ) {
-            try {
-              const range = ReactEditor.toDOMRange(
-                markdownEditorRef.current,
-                selection,
-              );
-              const rect = range?.getBoundingClientRect();
-              setDomRect?.(rect ?? null);
-            } catch {
-              setDomRect?.(null);
-            }
-          } else {
-            setDomRect?.(null);
-          }
-        } else {
-          setDomRect?.(null);
-          // 调用 props.onSelectionChange 回调（无选中）
-          if (props.onSelectionChange) {
-            props.onSelectionChange(null, '', []);
-          }
-        }
+        return { markdown, nodes: fragment };
       } catch (error) {
-        console.error('Selection change error:', error);
+        console.error('Failed to get selection content:', error);
+        return { markdown: '', nodes: [] };
       }
-    },
-    16,
-  );
+    };
+
+    if (!selectionUnchanged) {
+      previousSelectionNotificationRef.current = {
+        editor,
+        children: editor.children,
+        selection: currentSelection,
+        readonly,
+        callback: props.onSelectionChange,
+        plugins: activePlugins,
+      };
+      const event = new CustomEvent<BaseSelection>(
+        MARKDOWN_EDITOR_EVENTS.SELECTIONCHANGE,
+        { detail: currentSelection },
+      );
+      markdownContainerRef?.current?.dispatchEvent(event);
+      if (props.onSelectionChange) {
+        const { markdown, nodes } = getSelectionContent(currentSelection);
+        props.onSelectionChange(currentSelection, markdown, nodes);
+      }
+    }
+
+    if (!readonly) return;
+    if (selectionUnchanged && !selectionRectInvalidatedRef.current) return;
+    selectionRectInvalidatedRef.current = false;
+    if (
+      props.reportMode &&
+      props.floatBar?.enable !== false &&
+      currentSelection &&
+      !Range.isCollapsed(currentSelection) &&
+      Editor.hasPath(editor, currentSelection.anchor.path) &&
+      Editor.hasPath(editor, currentSelection.focus.path)
+    ) {
+      try {
+        const range = ReactEditor.toDOMRange(editor, currentSelection);
+        setDomRect?.(range?.getBoundingClientRect() ?? null);
+      } catch {
+        setDomRect?.(null);
+      }
+    } else {
+      setDomRect?.(null);
+    }
+  }, 16);
 
   // 添加选区变化的监听
   useEffect(() => {
@@ -413,13 +400,32 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     };
     container.addEventListener('mouseup', handlePointerUp);
     container.addEventListener('touchend', handlePointerUp, { passive: true });
+    // React onSelect does not cover keyboard/native selections in readOnly DOM.
+    const document = container.ownerDocument;
+    const handleNativeSelectionChange = () => {
+      const editor = markdownEditorRef.current;
+      if (
+        getEditorDOMSelection(editor) ||
+        editor.selection ||
+        previousSelectionNotificationRef.current?.selection
+      ) {
+        handleSelectionChange.run();
+      }
+    };
+    if (readonly && selectionTrackingEnabled) {
+      document.addEventListener('selectionchange', handleNativeSelectionChange);
+    }
 
     return () => {
       container.removeEventListener('mouseup', handlePointerUp);
       container.removeEventListener('touchend', handlePointerUp);
+      document.removeEventListener(
+        'selectionchange',
+        handleNativeSelectionChange,
+      );
       handleSelectionChange.cancel();
     };
-  }, [readonly, markdownContainerRef?.current]);
+  }, [readonly, selectionTrackingEnabled, markdownContainerRef?.current]);
 
   const emitFootnoteDefinitionChange = useRefFunction((schema: Elements[]) => {
     const onFootnoteDefinitionChange =
@@ -455,12 +461,14 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
 
     // 更新当前值引用
     value.current = v;
-    setHasEmptyRootParagraph(
-      v.some(
-        (node) =>
-          node.type === 'paragraph' && node.children?.at?.(0)?.text === '',
-      ),
-    );
+    if (hasContentChanges) {
+      setHasEmptyRootParagraph(
+        v.some(
+          (node) =>
+            node.type === 'paragraph' && node.children?.at?.(0)?.text === '',
+        ),
+      );
+    }
     // 触发onChange回调
     onChange(v, operations);
     // 检查是否存在非选区变化操作，如有则标记内容已变更
@@ -477,6 +485,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     if (props?.typewriter) return;
     if (readonly) {
       // 点击时清除工具栏
+      selectionRectInvalidatedRef.current = true;
       setDomRect?.(null);
       return;
     }
@@ -603,21 +612,9 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
           operationType === 'copy' &&
           !hasEditableTarget(markdownEditorRef.current, event.target)
         ) {
-          const domSelection = window.getSelection();
-          if (domSelection) {
-            markdownEditorRef.current.selection = getSelectionFromDomSelection(
-              markdownEditorRef.current,
-              domSelection,
-            );
-          }
+          editor.selection = readDOMSelection();
         } else if (operationType === 'cut') {
-          const domSelection = window.getSelection();
-          if (domSelection) {
-            markdownEditorRef.current.selection = getSelectionFromDomSelection(
-              markdownEditorRef.current,
-              domSelection,
-            );
-          }
+          editor.selection = readDOMSelection();
         }
 
         // 如果无法获取选区，则直接返回
@@ -1047,16 +1044,9 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     // internal composition range to drift: it still points at the previous
     // candidate span, so insertCompositionText appends instead of replacing.
     try {
-      const domSel = window.getSelection();
-      if (domSel && domSel.rangeCount > 0) {
-        const slateRange = ReactEditor.toSlateRange(
-          markdownEditorRef.current,
-          domSel,
-          { exactMatch: false, suppressThrow: true },
-        );
-        if (slateRange) {
-          Transforms.select(markdownEditorRef.current, slateRange);
-        }
+      const slateRange = readDOMSelection();
+      if (slateRange) {
+        Transforms.select(markdownEditorRef.current, slateRange);
       }
     } catch {
       // DOM/Slate range conversion can fail in edge cases; ignore
@@ -1476,8 +1466,8 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
             hashId,
           )}
           style={props.style}
-          onSelect={(e) => {
-            handleSelectionChange.run(e);
+          onSelect={() => {
+            handleSelectionChange.run();
           }}
           onCut={(event: React.ClipboardEvent<HTMLDivElement>) => {
             // 内部成功时已 preventDefault；失败时让浏览器原生 cut 兜底，
@@ -1486,13 +1476,14 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
           }}
           onFocus={(e) => {
             props.onFocus?.(
-              parserSlateNodeToMarkdown(markdownEditorRef.current.children),
+              store.getMDContent(),
               markdownEditorRef.current.children,
               e,
             );
           }}
           onBlur={() => {
             // 失去焦点时清除工具栏
+            selectionRectInvalidatedRef.current = true;
             setDomRect?.(null);
           }}
           onMouseDown={checkEnd}

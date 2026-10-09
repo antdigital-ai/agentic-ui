@@ -15,14 +15,19 @@
 import type { Ace } from 'ace-builds';
 import isHotkey from 'is-hotkey';
 import { startTransition, useEffect, useRef, useState } from 'react';
-import type { Path } from 'slate';
+import { Node, type Editor, type Path } from 'slate';
 import { useRefFunction } from '../../../Hooks/useRefFunction';
 import partialParse from '../../../MarkdownEditor/editor/parser/json-parse';
 import { useEditorStore } from '../../../MarkdownEditor/editor/store';
 import { getAceLangs, modeMap } from '../../../MarkdownEditor/editor/utils/ace';
-import { handleCodeBlockAceKeyDown } from '../../../MarkdownEditor/editor/utils/codeBlockBehavior';
+import {
+  handleCodeBlockAceKeyDown,
+  isCodeBlockElement,
+  setCodeBlockNodes,
+} from '../../../MarkdownEditor/editor/utils/codeBlockBehavior';
 import { getCodeBlockPlainText } from '../../../MarkdownEditor/editor/utils/codeBlockPlainText';
 import { EditorUtils } from '../../../MarkdownEditor/editor/utils/editorUtils';
+import { findElementPath } from '../../../MarkdownEditor/editor/utils/findElementPath';
 import { CodeNode } from '../../../MarkdownEditor/el';
 import { loadAceEditor, loadAceTheme } from '../loadAceEditor';
 
@@ -43,10 +48,17 @@ interface AceEditorProps {
   onUpdate: (data: Partial<CodeNode>) => void;
   onShowBorderChange: (show: boolean) => void;
   onHideChange: (hide: boolean) => void;
-  path: Path;
+  path?: Path;
   isSelected?: boolean;
   onSelectionChange?: (selected: boolean) => void;
   theme: string;
+}
+
+interface PendingCodeDraft {
+  editor: Editor;
+  element: CodeNode;
+  originalValue: string;
+  value: string;
 }
 
 /**
@@ -80,7 +92,6 @@ export function AceEditor({
   onUpdate,
   onShowBorderChange,
   onHideChange,
-  path,
   isSelected = false,
   onSelectionChange,
   ...props
@@ -90,11 +101,12 @@ export function AceEditor({
 
   // 各种引用
   const codeRef = useRef(codePlainSource);
-  const pathRef = useRef<Path>(path);
   const posRef = useRef({ row: 0, column: 0 });
   const pasted = useRef(false);
   const debounceTimer = useRef(0);
   const editorRef = useRef<Ace.Editor | null>(null);
+  const composingRef = useRef(false);
+  const pendingDraftRef = useRef<PendingCodeDraft | null>(null);
   const dom = useRef<HTMLDivElement>(null);
   // 记录 Ace 会话当前使用的语言，用于语言变更时动态切换而不是销毁重建
   const aceLanguageRef = useRef<string | null | undefined>(element.language);
@@ -102,11 +114,6 @@ export function AceEditor({
   // Ace Editor 异步加载状态
   const [aceLoaded, setAceLoaded] = useState(false);
   const aceModuleRef = useRef<typeof import('ace-builds') | null>(null);
-
-  // 更新路径引用
-  useEffect(() => {
-    pathRef.current = path;
-  }, [path]);
 
   // 异步加载 Ace Editor 库
   useEffect(() => {
@@ -141,11 +148,29 @@ export function AceEditor({
 
   // 键盘：空块删除、Mod+Enter 跳出；Enter/Tab 等由 Ace 处理，不再 dispatch 到 window
   const handleKeyDown = useRefFunction((e: KeyboardEvent) => {
+    if (
+      readonly ||
+      composingRef.current ||
+      e.isComposing ||
+      e.keyCode === 229
+    ) {
+      return;
+    }
+    const currentPath = findElementPath(store.editor, element, {
+      matchKey: true,
+      search: true,
+    });
+    if (
+      !currentPath ||
+      !isCodeBlockElement(Node.get(store.editor, currentPath))
+    ) {
+      return;
+    }
     const result = handleCodeBlockAceKeyDown(
       store.editor,
-      pathRef.current,
+      currentPath,
       e,
-      codeRef.current,
+      editorRef.current?.getValue() ?? codeRef.current,
     );
     if (result === 'handled') {
       if (isHotkey('mod+enter', e)) {
@@ -153,6 +178,75 @@ export function AceEditor({
       }
       return;
     }
+  });
+
+  const commitCodeValue = useRefFunction((codeEditor: Ace.Editor) => {
+    if (readonly || composingRef.current || editorRef.current !== codeEditor) {
+      return;
+    }
+    const draft = pendingDraftRef.current;
+    if (!draft) return;
+    pendingDraftRef.current = null;
+    if (draft.editor !== store.editor) return;
+    const currentPath = findElementPath(store.editor, draft.element, {
+      matchKey: true,
+      search: true,
+    });
+    if (!currentPath) return;
+    const currentNode = Node.get(store.editor, currentPath);
+    if (
+      !isCodeBlockElement(currentNode) ||
+      getCodeBlockPlainText(currentNode) !== draft.originalValue
+    ) {
+      return;
+    }
+    const value = draft.value;
+    if (value === codeRef.current) return;
+    onUpdate({ value });
+    codeRef.current = value;
+  });
+
+  const flushDraftBeforeReadonly = useRefFunction(() => {
+    const draft = pendingDraftRef.current;
+    if (!readonly || !draft || draft.editor !== store.editor) return;
+    const currentPath = findElementPath(store.editor, draft.element, {
+      matchKey: true,
+      search: true,
+    });
+    if (!currentPath) return;
+    const currentNode = Node.get(store.editor, currentPath);
+    if (
+      !isCodeBlockElement(currentNode) ||
+      getCodeBlockPlainText(currentNode) !== draft.originalValue
+    ) {
+      return;
+    }
+    // Preserve edits accepted while editable; readonly itself accepts no input.
+    setCodeBlockNodes(store.editor, currentPath, { value: draft.value });
+    codeRef.current = draft.value;
+  });
+
+  const queueCodeValue = useRefFunction((codeEditor: Ace.Editor) => {
+    if (readonly || composingRef.current || editorRef.current !== codeEditor) {
+      return;
+    }
+    const currentPath = findElementPath(store.editor, element, {
+      matchKey: true,
+      search: true,
+    });
+    if (!currentPath) return;
+    const currentNode = Node.get(store.editor, currentPath);
+    if (!isCodeBlockElement(currentNode)) return;
+    pendingDraftRef.current = {
+      editor: store.editor,
+      element: currentNode,
+      originalValue: getCodeBlockPlainText(currentNode),
+      value: codeEditor.getValue(),
+    };
+    clearTimeout(debounceTimer.current);
+    debounceTimer.current = window.setTimeout(() => {
+      commitCodeValue(codeEditor);
+    }, 100);
   });
 
   // 配置编辑器事件
@@ -165,6 +259,14 @@ export function AceEditor({
     });
 
     const textarea = dom.current!.querySelector('textarea');
+    const onCompositionStart = () => {
+      composingRef.current = true;
+      clearTimeout(debounceTimer.current);
+    };
+    const onCompositionEnd = () => {
+      composingRef.current = false;
+      queueCodeValue(codeEditor);
+    };
 
     // 聚焦事件
     codeEditor.on('focus', () => {
@@ -207,16 +309,22 @@ export function AceEditor({
 
     // 键盘事件
     textarea?.addEventListener('keydown', handleKeyDown);
+    textarea?.addEventListener('compositionstart', onCompositionStart);
+    textarea?.addEventListener('compositionend', onCompositionEnd);
 
     // 内容变化事件
     codeEditor.on('change', () => {
-      if (readonly) return;
-      clearTimeout(debounceTimer.current);
-      debounceTimer.current = window.setTimeout(() => {
-        onUpdate({ value: codeEditor.getValue() });
-        codeRef.current = codeEditor.getValue();
-      }, 100);
+      if (readonly || composingRef.current) return;
+      queueCodeValue(codeEditor);
     });
+
+    return () => {
+      textarea?.removeEventListener('keydown', handleKeyDown);
+      textarea?.removeEventListener('compositionstart', onCompositionStart);
+      textarea?.removeEventListener('compositionend', onCompositionEnd);
+      composingRef.current = false;
+      clearTimeout(debounceTimer.current);
+    };
   });
 
   const setAceMode = useRefFunction(
@@ -263,7 +371,8 @@ export function AceEditor({
 
     const codeProps = editorProps.codeProps || {};
 
-    let value = codePlainSource;
+    // A mode transition can flush the pending draft in the previous cleanup.
+    let value = codeRef.current;
     const shouldFormatJsonInAce =
       element.language === 'json' && element.otherProps?.finished !== false;
     if (shouldFormatJsonInAce) {
@@ -303,14 +412,14 @@ export function AceEditor({
       setAceMode(codeEditor, element.language, false);
     }, 16);
 
-    if (!readonly) {
-      // 配置编辑器事件
-      setupEditorEvents(codeEditor);
-    }
+    const cleanupEvents = !readonly ? setupEditorEvents(codeEditor) : undefined;
 
     return () => {
       clearTimeout(modeTimer);
       clearTimeout(debounceTimer.current);
+      if (!readonly) flushDraftBeforeReadonly();
+      pendingDraftRef.current = null;
+      cleanupEvents?.();
       if (editorRef.current === codeEditor) {
         editorRef.current = null;
       }
