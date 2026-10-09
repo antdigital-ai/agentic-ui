@@ -53,7 +53,7 @@ export const TaskList = memo(
 
     const [internalExpandedKeys, setInternalExpandedKeys] = useMergedState<
       string[]
-    >(getDefaultExpandedKeys(items, isControlled), {
+    >(() => getDefaultExpandedKeys(items, isControlled), {
       value: expandedKeys,
       onChange: onExpandedKeysChange,
     });
@@ -73,7 +73,13 @@ export const TaskList = memo(
       onChange: (val) => onOpenChange?.(val),
     });
 
-    const [shouldRenderContent, setShouldRenderContent] = useState(true);
+    const [shouldRenderContent, setShouldRenderContent] =
+      useState(simpleExpanded);
+
+    const expandedKeySet = useMemo(
+      () => new Set(internalExpandedKeys),
+      [internalExpandedKeys],
+    );
 
     const simpleWrapperRef = useRef<HTMLDivElement>(null);
     const didMountRef = useRef(false);
@@ -189,12 +195,12 @@ export const TaskList = memo(
             isLast={index === visibleItems.length - 1}
             prefixCls={prefixCls}
             hashId={hashId}
-            expandedKeys={internalExpandedKeys}
+            expanded={expandedKeySet.has(item.key)}
             onToggle={handleToggle}
           />
         ));
       },
-      [prefixCls, hashId, internalExpandedKeys, handleToggle],
+      [prefixCls, hashId, expandedKeySet, handleToggle],
     );
 
     if (variant !== 'simple') {
@@ -265,7 +271,7 @@ export const TaskList = memo(
             [`${simpleCls}-content-expanded`]: simpleExpanded,
           })}
         >
-          {shouldRenderContent ? (
+          {simpleExpanded || shouldRenderContent ? (
             <div className={classNames(`${simpleCls}-list`, hashId)}>
               {renderItems(visibleItems)}
             </div>

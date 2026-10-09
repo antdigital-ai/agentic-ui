@@ -21,8 +21,7 @@ vi.mock('../../Components/Loading', () => ({
   ),
 }));
 
-// 折叠改为基于 CSS 的 grid 0fr/1fr 过渡：内容节点始终保留在 DOM 中，
-// 通过 `*-body-collapsed` class 区分展开/折叠态。
+// 曾展开过的自定义正文保留状态，通过 `*-body-collapsed` 区分折叠态。
 const findBody = (contentText: string): HTMLElement => {
   const node = screen.getByText(contentText);
   let el: HTMLElement | null = node;
@@ -654,8 +653,8 @@ describe('TaskList', () => {
       expectBodyExpanded('Pending content 1');
       expectBodyExpanded('Pending content 2');
 
-      // 检查未展开的任务 body 处于 collapsed 态（DOM 仍保留）
-      expectBodyCollapsed('Another pending content');
+      // 初始收起的正文尚未挂载。
+      expect(screen.queryByText('Another pending content')).toBeNull();
     });
 
     it('点击时应该调用 onExpandedKeysChange 回调', () => {
@@ -718,7 +717,7 @@ describe('TaskList', () => {
 
       // 初始状态：只有第一个任务展开
       expectBodyExpanded('Success content');
-      expectBodyCollapsed('Pending content 1');
+      expect(screen.queryByText('Pending content 1')).toBeNull();
 
       // 更新 expandedKeys
       expandedKeys = ['1', '2'];
@@ -843,10 +842,10 @@ describe('TaskList', () => {
       expect(screen.queryByText('Running content')).not.toBeInTheDocument();
     });
 
-    it('收起时应始终显示最后一个任务', () => {
+    it('初始收起时仅挂载摘要，不挂载最后一个任务', () => {
       render(<TaskList items={simpleItems} variant="simple" />);
 
-      expect(screen.getByText('Pending Task')).toBeInTheDocument();
+      expect(screen.queryByText('Pending Task')).not.toBeInTheDocument();
       expect(screen.queryByText('Completed Task')).not.toBeInTheDocument();
       expect(screen.queryByText('Running Task')).not.toBeInTheDocument();
     });
@@ -1113,10 +1112,10 @@ describe('TaskList', () => {
       ).toBeInTheDocument();
     });
 
-    it('收起且存在 error 项时仍只展示最后一个任务', () => {
+    it('初始收起且存在 error 项时仍仅挂载摘要', () => {
       render(<TaskList items={simpleItemsWithError} variant="simple" />);
 
-      expect(screen.getByText('Error Task')).toBeInTheDocument();
+      expect(screen.queryByText('Error Task')).not.toBeInTheDocument();
       expect(screen.queryByText('Task 1')).not.toBeInTheDocument();
     });
 
@@ -1158,7 +1157,7 @@ describe('TaskList', () => {
       ).not.toBeInTheDocument();
     });
 
-    it('收起状态只显示最后一条任务', () => {
+    it('受控初始收起状态不挂载隐藏的任务行', () => {
       const errorItems = [
         {
           key: '1',
@@ -1177,7 +1176,7 @@ describe('TaskList', () => {
       render(<TaskList items={errorItems} variant="simple" open={false} />);
 
       expect(screen.queryByText('Task 1')).not.toBeInTheDocument();
-      expect(screen.getByText('Error Task')).toBeInTheDocument();
+      expect(screen.queryByText('Error Task')).not.toBeInTheDocument();
     });
 
     it('展开后存在 error 项时仍展示全部任务（工具失败不等同于整任务取消）', async () => {

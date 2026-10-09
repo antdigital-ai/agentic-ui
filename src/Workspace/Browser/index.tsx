@@ -148,17 +148,14 @@ export const BrowserItemComponent: React.FC<BrowserItemProps> = ({
         >
           <Tooltip title={item.title} mouseEnterDelay={0.5}>
             <a
+              className={classNames(`${prefixCls}-result-item-title`, hashId)}
               href={item.url}
               target="_blank"
               rel="noreferrer"
               style={{ color: 'inherit' }}
               onClick={handleOpen}
             >
-              <div
-                className={classNames(`${prefixCls}-result-item-title`, hashId)}
-              >
-                {item.title}
-              </div>
+              {item.title}
             </a>
           </Tooltip>
         </div>
@@ -272,16 +269,14 @@ export const BrowserList: React.FC<BrowserListProps> = ({
 
   return (
     <div data-testid="browser-list">
-      <header
-        className={classNames(`${prefixCls}-header-wrapper`, hashId)}
-        style={{
-          borderBottom: showHeader
-            ? '1px solid rgba(20, 22, 28, 0.1)'
-            : ('none' as any),
-        }}
-      >
-        {showHeader &&
-          (customHeader || (
+      {showHeader && (
+        <header
+          className={classNames(`${prefixCls}-header-wrapper`, hashId)}
+          style={{
+            borderBottom: '1px solid rgba(20, 22, 28, 0.1)',
+          }}
+        >
+          {customHeader || (
             <div className={classNames(`${prefixCls}-header`, hashId)}>
               <BrowserHeader activeLabel={activeLabel} onBack={onBack} />
 
@@ -293,8 +288,9 @@ export const BrowserList: React.FC<BrowserListProps> = ({
                     })}
               </Tag>
             </div>
-          ))}
-      </header>
+          )}
+        </header>
+      )}
       <List
         dataSource={safeItems}
         split={false}

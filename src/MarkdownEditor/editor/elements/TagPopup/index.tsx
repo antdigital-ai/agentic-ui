@@ -10,14 +10,19 @@ import React, {
   useState,
 } from 'react';
 import { BaseEditor } from 'slate';
-import { ReactEditor, useSlate } from 'slate-react';
+import { ReactEditor, useSlateStatic } from 'slate-react';
+import { useRefFunction } from '../../../../Hooks/useRefFunction';
 import { SuggestionContext } from '../../../../MarkdownInputField/Suggestion/SuggestionContext';
+import { ChipWave } from './ChipWave';
+import { consumeTagChipWave, prefersReducedMotion } from './chipWaveMotion';
 
 type TagPopupItem = Array<{
   label: string;
   key: string | number;
   onClick?: (v: string) => void;
 }>;
+
+const EMPTY_ITEMS: TagPopupItem = [];
 
 type SuggestionContextValue = React.ContextType<typeof SuggestionContext>;
 
@@ -114,8 +119,7 @@ export type TagPopupProps = {
    * 标签文本的样式，可以是样式对象或返回样式对象的函数
    */
   tagTextStyle?:
-    | ((props: RenderProps) => React.CSSProperties)
-    | React.CSSProperties;
+    ((props: RenderProps) => React.CSSProperties) | React.CSSProperties;
   /**
    * 标签文本的类名
    */
@@ -198,30 +202,6 @@ const updateNodeContext = (
   }
 };
 
-const loadItemsData = async (
-  items:
-    | TagPopupItem
-    | ((props: RenderProps) => Promise<TagPopupItem>)
-    | undefined,
-  props: RenderProps,
-  setLoading: (loading: boolean) => void,
-  setSelectedItems: (items: TagPopupItem) => void,
-) => {
-  if (typeof items !== 'function') return;
-
-  setLoading(true);
-  try {
-    const result = await items(props);
-    if (Array.isArray(result)) {
-      setSelectedItems(result);
-    }
-  } catch {
-    // items 加载失败时保留已有选项，避免未处理的 Promise rejection
-  } finally {
-    setLoading(false);
-  }
-};
-
 const initializeAutoOpen = (
   autoOpen: boolean | undefined,
   type: string | undefined,
@@ -259,6 +239,7 @@ const createDefaultDom = (
   text: string | undefined,
   placeholder: string | undefined,
   isOpen: boolean,
+  chipWaveNode?: React.ReactNode,
 ) => {
   const isEmpty = !text?.trim();
   const hasItems = selectedItems?.length > 0;
@@ -278,7 +259,7 @@ const createDefaultDom = (
       title={placeholder}
       contentEditable={!hasItems ? undefined : false}
     >
-      {children}
+      {chipWaveNode ?? children}
       {hasItems && (
         <ChevronDown
           className={classNames(`${baseCls}-arrow`, {
@@ -367,22 +348,57 @@ const handleClick = (
 };
 
 export const TagPopup = (props: RenderProps) => {
-  const { onSelect, items, children, type } = props;
-  const editor = useSlate();
+  const { items, children, type } = props;
+  const editor = useSlateStatic();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = React.useState(false);
+  const [chipWavePlaying, setChipWavePlaying] = useState(false);
   const domRef = useRef<HTMLDivElement>(null);
   const suggestionContext = useContext(SuggestionContext);
   const antdContext = useContext(ConfigProvider.ConfigContext);
   const baseCls = antdContext?.getPrefixCls('agentic-md-editor-tag-popup');
   const currentNodePath = useRef<number[] | null>(null);
+  // Resolve the path when selecting: unrelated edits can move this tag without
+  // changing its text, and do not require a subscription to the whole document.
+  const onSelect = useRefFunction<NonNullable<RenderProps['onSelect']>>(
+    (...args) => {
+      const [value, path, tagNode] = args;
+      const currentPath = getNodePath(editor, domRef);
+      if (currentPath) currentNodePath.current = currentPath;
+      const resolvedPath = currentPath || path || currentNodePath.current || [];
+      if (args.length > 2) {
+        props.onSelect?.(value, resolvedPath, tagNode);
+      } else {
+        props.onSelect?.(value, resolvedPath);
+      }
+    },
+  );
+  const isDropdown = type === 'dropdown';
+  const dropdownOpen = props.open ?? open;
+  const isOpen = isDropdown ? dropdownOpen : suggestionContext?.open || false;
+  // 已尝试认领的文本：同一文本只认领一次，避免该文本上的后续
+  // rerender（选区变化等）反复触发消费检查
+  const chipWaveClaimedTextRef = useRef<string | null | undefined>(null);
 
   useEffect(() => {
     const path = getNodePath(editor, domRef);
     if (path) {
       currentNodePath.current = path;
     }
-  }, [editor.children, props.text]);
+    // 插入波浪动画（对齐 dtcoder-ide composerChipShimmer）：
+    // onSelect 登记的一次性插入意图，key 为 chip 最终文本；props.text
+    // 同步到位后认领，成功即播放一轮。Set.delete 保证只播一次。
+    // prefers-reduced-motion 下直接丢弃意图（不渲染动画形态）。
+    if (
+      chipWaveClaimedTextRef.current !== props.text &&
+      !prefersReducedMotion()
+    ) {
+      chipWaveClaimedTextRef.current = props.text;
+      if (props.text && consumeTagChipWave(editor, props.text)) {
+        setChipWavePlaying(true);
+      }
+    }
+  }, [editor, props.text]);
 
   useEffect(() => {
     updateNodeContext(
@@ -396,12 +412,46 @@ export const TagPopup = (props: RenderProps) => {
   }, [props.text]);
 
   const [selectedItems, setSelectedItems] = useState(() => {
-    return typeof items === 'function' ? [] : (items ?? []);
+    return typeof items === 'function' ? EMPTY_ITEMS : (items ?? EMPTY_ITEMS);
   });
 
   useEffect(() => {
-    loadItemsData(items, props, setLoading, setSelectedItems);
-  }, [open, items]);
+    if (typeof items !== 'function') {
+      setSelectedItems(items ?? EMPTY_ITEMS);
+    }
+  }, [items]);
+
+  useEffect(() => {
+    // Panel suggestions are loaded once by the shared Suggestion component.
+    // A closed dropdown must not issue a request for every tag in the document.
+    if (typeof items !== 'function' || !isDropdown || !dropdownOpen) {
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setLoading(true);
+    const loadItems = async () => {
+      try {
+        const result = await items(props);
+        if (!cancelled && Array.isArray(result)) {
+          setSelectedItems(result);
+        }
+      } catch (error) {
+        if (!cancelled && process.env.NODE_ENV !== 'production') {
+          console.warn('[TagPopup] items() loading failed:', error);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    void loadItems();
+    return () => {
+      cancelled = true;
+    };
+    // The loader receives the current props when the popup opens or text changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dropdownOpen, isDropdown, items, props.text]);
 
   useEffect(() => {
     props.onChange?.(props.text || '', {
@@ -418,7 +468,18 @@ export const TagPopup = (props: RenderProps) => {
   }, []);
 
   const placeholder = props.placeholder;
-  const isOpen = type === 'dropdown' ? open : suggestionContext?.open || false;
+  // 插入波浪动画（对齐 dtcoder-ide composerChipShimmer）：认领成功的那一次
+  // 渲染播放波形态，动画结束或未认领时透传 children 原样渲染。
+  const chipWaveNode = (
+    <ChipWave
+      playing={chipWavePlaying}
+      text={props.text || ''}
+      prefixCls={baseCls}
+      onFinished={() => setChipWavePlaying(false)}
+    >
+      {children}
+    </ChipWave>
+  );
   const defaultDom = createDefaultDom(
     domRef,
     baseCls,
@@ -428,6 +489,7 @@ export const TagPopup = (props: RenderProps) => {
     props.text,
     placeholder,
     isOpen,
+    chipWaveNode,
   );
   const renderDom = getRenderDom(
     props.tagRender,
@@ -466,22 +528,25 @@ export const TagPopup = (props: RenderProps) => {
       currentNodePath,
     );
 
-  const isDropdown = type === 'dropdown';
-
   const dropdownMenu = {
     items: selectedItems as MenuProps['items'],
     onClick: (e: any) => {
       onSelect?.(e.key?.trim() || '', currentNodePath.current || []);
       suggestionContext?.setOpen?.(false);
       setOpen(false);
+      props.onOpenChange?.(false);
     },
   } as MenuProps;
 
   const content = isDropdown ? (
     <Dropdown
       trigger={['click']}
-      open={open}
-      onOpenChange={setOpen}
+      open={dropdownOpen}
+      onOpenChange={(nextOpen) => {
+        if (nextOpen && !canOpen(props, placeholder)) return;
+        setOpen(nextOpen);
+        props.onOpenChange?.(nextOpen);
+      }}
       menu={dropdownMenu}
     >
       {renderDom}

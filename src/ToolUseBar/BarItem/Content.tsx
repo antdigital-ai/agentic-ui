@@ -422,7 +422,7 @@ const ToolContentComponent: React.FC<ToolContentProps> = ({
         </div>
       ) : null}
 
-      {!showContent ? (
+      {!showContent && (contentDom || errorDom) ? (
         <div
           style={{
             overflow: 'hidden',

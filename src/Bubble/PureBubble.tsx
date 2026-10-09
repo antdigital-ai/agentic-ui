@@ -8,6 +8,7 @@ import { runRender } from './AIBubble';
 import { BubbleAvatar } from './Avatar';
 import type { ChatConfigType } from './BubbleConfigProvide';
 import { BubbleConfigContext } from './BubbleConfigProvide';
+import { bubblePropsAreEqual } from './bubblePropsAreEqual';
 import { MessagesContext } from './MessagesContent/BubbleContext';
 import { BubbleExtra } from './MessagesContent/BubbleExtra';
 import { useStyle } from './style';
@@ -332,7 +333,7 @@ export const PureBubble: React.FC<
       </>
     </MessagesContext.Provider>
   );
-});
+}, bubblePropsAreEqual);
 
 export const PureAIBubble: React.FC<
   BubbleProps & {

@@ -55,6 +55,8 @@ const isFileNodeReturn = (value: unknown): value is FileNode => {
   return typeof (value as { name?: unknown }).name === 'string';
 };
 
+const EMPTY_NODES: NonNullable<FileProps['nodes']> = [];
+
 const toSegmentAccessibleName = (
   raw: ReactNode | undefined,
   fallback: string,
@@ -170,7 +172,7 @@ export const FileComponent: FC<{
     new WeakMap(),
   );
 
-  const safeNodes = nodes || [];
+  const safeNodes = nodes || EMPTY_NODES;
   const fileNodeByRelativePath = useMemo(
     () => buildFileNodeRelativePathIndex(safeNodes),
     [safeNodes],
@@ -186,7 +188,7 @@ export const FileComponent: FC<{
   // 注入稳定 ID（基于 WeakMap 缓存）
   const ensureNodeWithStableId = useRefFunction(
     <T extends FileNode | GroupNode>(node: T): T => {
-      if (node.id) return { ...node };
+      if (node.id) return node;
 
       let cachedId = nodeIdCacheRef.current.get(node);
       if (!cachedId) {
@@ -196,6 +198,25 @@ export const FileComponent: FC<{
 
       return { ...node, id: cachedId };
     },
+  );
+
+  const isFlat = useMemo(
+    () => safeNodes.every((node) => !('children' in node)),
+    [safeNodes],
+  );
+  const displayNodes = useMemo(
+    () =>
+      (isFlat ? safeNodes.slice(0, flatVisibleCount) : safeNodes).map(
+        (node) => {
+          const nodeWithId = ensureNodeWithStableId(node);
+          if (!('children' in nodeWithId)) return nodeWithId;
+          return {
+            ...nodeWithId,
+            children: nodeWithId.children.map(ensureNodeWithStableId),
+          };
+        },
+      ),
+    [safeNodes, isFlat, flatVisibleCount, ensureNodeWithStableId],
   );
 
   // 返回列表（供预览页/外部调用）
@@ -517,21 +538,14 @@ export const FileComponent: FC<{
     }
 
     // 纯扁平列表（无 group）才走分页
-    const isFlat = safeNodes.every((n) => !('children' in n));
-    const nodesToRender = isFlat
-      ? safeNodes.slice(0, flatVisibleCount)
-      : safeNodes;
     const flatRemaining = isFlat ? safeNodes.length - flatVisibleCount : 0;
     const flatHasMore = flatRemaining > 0;
 
-    const items = nodesToRender.map((node: FileNode | GroupNode) => {
-      const nodeWithId = ensureNodeWithStableId(node);
-
+    const items = displayNodes.map((nodeWithId: FileNode | GroupNode) => {
       if ('children' in nodeWithId) {
         const groupNode: GroupNode = {
           ...nodeWithId,
           collapsed: collapsedGroups[nodeWithId.id!] ?? nodeWithId.collapsed,
-          children: nodeWithId.children.map(ensureNodeWithStableId),
         };
         return (
           <FileGroup
@@ -594,7 +608,7 @@ export const FileComponent: FC<{
   };
 
   // 隐藏的 antd Image，用于触发图片预览
-  const ImagePreviewComponent = (
+  const ImagePreviewComponent = imagePreview.src ? (
     <Image
       className={classNames(`${prefixCls}-hidden-image`, hashId)}
       src={imagePreview.src}
@@ -605,7 +619,7 @@ export const FileComponent: FC<{
         },
       }}
     />
-  );
+  ) : null;
 
   // 预览页路由
   if (previewFile) {

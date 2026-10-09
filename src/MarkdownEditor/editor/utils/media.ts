@@ -15,25 +15,36 @@ export const getRemoteMediaType = async (url: string) => {
     if (mainType === 'audio') return 'audio';
     return 'other';
   }
+  let timeout: ReturnType<typeof setTimeout> | undefined;
   try {
     const type = getMediaType(url);
     if (type !== 'other') return type;
     let contentType = '';
     const controller = new AbortController();
-    const res = await fetch(url, {
-      method: 'HEAD',
-      signal: controller.signal,
+    // Start the deadline before the request. Aborting after HEAD has resolved
+    // leaves a stalled server blocking the insert-media UI indefinitely.
+    const deadline = new Promise<never>((_, reject) => {
+      timeout = setTimeout(() => {
+        controller.abort();
+        reject(new Error('Media type request timed out'));
+      }, 1000);
     });
+    const res = await Promise.race([
+      fetch(url, {
+        method: 'HEAD',
+        signal: controller.signal,
+      }),
+      deadline,
+    ]);
     if (!res.ok) {
       throw new Error();
     }
-    setTimeout(() => {
-      controller.abort();
-    }, 1000);
     contentType = res.headers.get('content-type') || '';
-    return contentType.split('/')[0];
+    return contentType.split('/')[0].trim().toLowerCase();
   } catch (e) {
     return null;
+  } finally {
+    if (timeout !== undefined) clearTimeout(timeout);
   }
 };
 

@@ -2,12 +2,16 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { Checkbox, ConfigProvider, Dropdown, Space } from 'antd';
 import classNames from 'clsx';
 import { useMergedState } from 'rc-util';
-import React, { useContext, useEffect, useMemo } from 'react';
+import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import { ElementProps, ListItemNode } from '../../../el';
 import { useMEditor } from '../../../hooks/editor';
 import { useEditorStore } from '../../store';
 
-type Mentions = { name: string; avatar?: string; id: string };
+interface Mentions {
+  name: string;
+  avatar?: string;
+  id?: string;
+}
 
 const MentionsUser = (props: {
   onSelect: (mentions: Mentions[]) => void;
@@ -15,6 +19,7 @@ const MentionsUser = (props: {
 }) => {
   const [loading, setLoading] = React.useState(false);
   const [users, setUsers] = React.useState<Mentions[]>([]);
+  const [open, setOpen] = React.useState(false);
 
   const [selectedUsers, setSelectedUsers] = useMergedState<Mentions[]>(
     props.mentions || [],
@@ -24,27 +29,40 @@ const MentionsUser = (props: {
     },
   );
   const { editorProps, readonly } = useEditorStore();
-  const onSearch = async (text: string) => {
+  const loadMentions = editorProps?.comment?.loadMentions;
+  const loaded = useRef<typeof loadMentions>(undefined);
+
+  useEffect(() => {
+    if (!open || readonly || !loadMentions || loaded.current === loadMentions) {
+      setLoading(false);
+      return;
+    }
+    let active = true;
     setLoading(true);
-    const list =
-      (await editorProps?.comment?.loadMentions?.(text)) || ([] as any);
-    setUsers(list);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    onSearch('');
-  }, [readonly]);
-
-  useEffect(() => {
-    props.onSelect(selectedUsers);
-  }, [selectedUsers]);
+    Promise.resolve()
+      .then(() => loadMentions(''))
+      .then((list) => {
+        if (!active) return;
+        setUsers(list || []);
+        loaded.current = loadMentions;
+      })
+      .catch(() => {
+        if (active) setUsers([]);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [open, readonly, loadMentions]);
 
   const mentionsPlaceholder =
     editorProps?.comment?.mentionsPlaceholder || '指派给';
 
   return useMemo(() => {
     if (readonly) {
+      if (!selectedUsers.length) return null;
       return (
         <Space>
           {selectedUsers.length
@@ -84,6 +102,8 @@ const MentionsUser = (props: {
         }}
       >
         <Dropdown
+          open={open}
+          onOpenChange={setOpen}
           menu={{
             items: users.map((u) => ({
               type: 'item',
@@ -163,6 +183,7 @@ const MentionsUser = (props: {
     loading,
     selectedUsers,
     readonly,
+    open,
   ]);
 };
 
@@ -210,7 +231,7 @@ export const ListItem = ({
         />
       </span>
     );
-  }, [element.checked, isTask]);
+  }, [element.checked, isTask, baseCls, update]);
 
   const mentionsUser = React.useMemo(() => {
     if (!isTask) return null;
@@ -224,7 +245,7 @@ export const ListItem = ({
         mentions={element.mentions}
       />
     );
-  }, [element.mentions]);
+  }, [element.mentions, isTask, update]);
 
   return React.useMemo(() => {
     if (listItemRender) {
@@ -264,5 +285,16 @@ export const ListItem = ({
         {children}
       </li>
     );
-  }, [checkbox, mentionsUser, attributes, element.children, listItemRender]);
+  }, [
+    checkbox,
+    mentionsUser,
+    attributes,
+    element,
+    children,
+    listItemRender,
+    baseCls,
+    isTask,
+    store,
+    markdownContainerRef,
+  ]);
 };

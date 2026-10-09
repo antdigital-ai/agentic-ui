@@ -3,6 +3,7 @@ import type { CodeNode, Elements } from '../../../el';
 import { setCodeBlockNodes } from '../../utils/codeBlockBehavior';
 import { getCodeBlockPlainText } from '../../utils/codeBlockPlainText';
 import { EditorUtils } from '../../utils/editorUtils';
+import { deleteSelectedMedia } from '../cardPluginBehavior';
 export class BackspaceKey {
   constructor(private readonly editor: Editor) {}
 
@@ -34,6 +35,7 @@ export class BackspaceKey {
   run() {
     const sel = this.editor.selection;
     if (!sel) return;
+    if (deleteSelectedMedia(this.editor)) return true;
     const nodes = Array.from<any>(
       Editor.nodes<Elements>(this.editor, {
         mode: 'lowest',

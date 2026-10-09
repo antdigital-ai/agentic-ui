@@ -113,6 +113,14 @@ export const DocInfoList: React.FC<DocInfoListProps> = ({
           onClick={() => {
             setExpanded(!expanded);
           }}
+          role="button"
+          tabIndex={0}
+          aria-expanded={!expanded}
+          onKeyDown={(event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            event.preventDefault();
+            setExpanded((previous) => !previous);
+          }}
         >
           <span
             style={{
@@ -185,7 +193,7 @@ export const DocInfoList: React.FC<DocInfoListProps> = ({
             background: '#FBFCFD',
           }}
         >
-          {docInfoList.map((item, index) => {
+          {(expanded ? [] : docInfoList).map((item, index) => {
             const dom = (
               <div
                 key={index}
@@ -199,7 +207,7 @@ export const DocInfoList: React.FC<DocInfoListProps> = ({
                 }}
                 style={
                   {
-                    '--doc-item-delay': `${index * 0.05}s`,
+                    '--doc-item-delay': `${Math.min(index, 4) * 0.05}s`,
                   } as React.CSSProperties
                 }
               >
@@ -302,6 +310,7 @@ export const DocInfoList: React.FC<DocInfoListProps> = ({
               <Popover
                 key={index}
                 placement="left"
+                destroyOnHidden
                 content={
                   <div
                     style={{

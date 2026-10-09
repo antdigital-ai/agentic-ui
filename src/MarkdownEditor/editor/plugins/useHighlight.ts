@@ -17,7 +17,7 @@ const JINJA_COMMENT_REG = /\{#[^\n]*?#\}/g;
 
 export const cacheTextNode = new WeakMap<
   object,
-  { path: Path; range: Range[] }
+  { path: Path; range: Range[]; jinjaEnabled?: boolean }
 >();
 
 export const clearInlineKatex = (editor: Editor) => {
@@ -382,79 +382,63 @@ const processJinjaMatchesOnFullText = (
 
 export function useHighlight(store?: EditorStore, jinjaEnabled?: boolean) {
   return ([node, path]: NodeEntry): Range[] => {
-    // 快速路径：非元素节点或不在高亮节点列表中
     if (!Element.isElement(node) || !highlightNodes.has(node.type)) {
       return [];
     }
 
+    // Plugin decorations belong to the store; never append inline matches to them.
     const ranges = store?.highlightCache.get(node) || [];
-    const cacheText = cacheTextNode.get(node);
-    const isCached = cacheText && Path.equals(cacheText.path, path);
+    if (!PARAGRAPH_TYPES.has(node.type)) return ranges;
 
-    // 处理 paragraph 和 table-cell
-    if (PARAGRAPH_TYPES.has(node.type)) {
-      if (isCached) {
-        ranges.push(...cacheText.range);
-      } else {
-        const allTextRanges: any[] = [];
-        const children = node.children;
-        const childrenLength = children.length;
+    const cached = cacheTextNode.get(node);
+    if (
+      cached &&
+      Path.equals(cached.path, path) &&
+      !!cached.jinjaEnabled === !!jinjaEnabled
+    ) {
+      return ranges.concat(cached.range);
+    }
 
-        const fullText = Node.string(node);
-
-        for (let i = 0; i < childrenLength; i++) {
-          const child = children[i];
-
-          // 处理 footnote 和 HTML
-          if (child.text && !EditorUtils.isDirtLeaf(child)) {
-            allTextRanges.push(...processTextMatches(child.text, path, i));
-          }
-
-          // 处理链接
-          if (child.text && !child.url && !child.docId && !child.hash) {
-            allTextRanges.push(...processLinkMatches(child.text, path, i));
-          }
-        }
-
-        // Jinja 在整段文本上匹配，支持 {% if `x` %} 等被 inline code 分割的语法
-        if (jinjaEnabled && fullText) {
-          allTextRanges.push(
-            ...processJinjaMatchesOnFullText(fullText, path, children),
-          );
-        }
-
-        // 统一缓存
-        cacheTextNode.set(node, { path, range: allTextRanges });
-        ranges.push(...allTextRanges);
+    const textRanges: Range[] = [];
+    const children = node.children;
+    for (let i = 0; i < children.length; i++) {
+      const child = children[i];
+      if (child.text && !EditorUtils.isDirtLeaf(child)) {
+        textRanges.push(...processTextMatches(child.text, path, i));
+      }
+      if (child.text && !child.url && !child.docId && !child.hash) {
+        textRanges.push(...processLinkMatches(child.text, path, i));
       }
     }
 
-    // 处理特殊段落（代码块或表格行）
+    if (jinjaEnabled) {
+      const text = Node.string(node);
+      if (text) {
+        textRanges.push(...processJinjaMatchesOnFullText(text, path, children));
+      }
+    }
+
     if (
       node.type === 'paragraph' &&
-      node.children.length === 1 &&
-      !EditorUtils.isDirtLeaf(node.children[0])
+      children.length === 1 &&
+      !EditorUtils.isDirtLeaf(children[0])
     ) {
-      if (isCached) {
-        ranges.push(...cacheText.range);
-      } else {
-        const str = Node.string(node);
-        const strLength = str.length;
-
-        if (str.startsWith('```')) {
-          const range = createRange(path, 0, 0, 3, { color: '#a3a3a3' });
-          ranges.push(range);
-          cacheTextNode.set(node, { path, range: [range] });
-        } else if (TABLE_ROW_REG.test(str)) {
-          const range = createRange(path, 0, 0, strLength, {
-            color: '#a3a3a3',
-          });
-          ranges.push(range);
-          cacheTextNode.set(node, { path, range: [range] });
-        }
+      const text = Node.string(node);
+      if (text.startsWith('```')) {
+        textRanges.push(createRange(path, 0, 0, 3, { color: '#a3a3a3' }));
+      } else if (TABLE_ROW_REG.test(text)) {
+        textRanges.push(
+          createRange(path, 0, 0, text.length, { color: '#a3a3a3' }),
+        );
       }
     }
 
-    return ranges;
+    // Cache the complete result once so warm and cold decoration are identical.
+    cacheTextNode.set(node, {
+      path,
+      range: textRanges,
+      jinjaEnabled: !!jinjaEnabled,
+    });
+    return ranges.concat(textRanges);
   };
 }

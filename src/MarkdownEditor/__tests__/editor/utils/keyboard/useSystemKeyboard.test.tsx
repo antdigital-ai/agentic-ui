@@ -206,18 +206,23 @@ describe('useSystemKeyboard', () => {
     expect(selectSpy).toHaveBeenCalled();
   });
 
-  it('应该处理复制和剪切媒体节点', async () => {
+  it('媒体复制快捷键保留浏览器剪贴板事件处理', async () => {
     const mockElement = {
       addEventListener: vi.fn(),
       removeEventListener: vi.fn(),
     } as any;
     const mockRef = { current: mockElement };
 
-    const mediaNode = [
-      { type: 'media', url: 'https://x.com/a.jpg', height: 100 },
-      [0, 0] as any,
+    editor.children = [
+      {
+        type: 'media',
+        url: 'https://x.com/a.jpg',
+        height: 100,
+        children: [{ text: '' }],
+      },
     ];
-    vi.spyOn(Editor, 'nodes').mockReturnValue([mediaNode] as any);
+    Transforms.select(editor, { path: [0, 0], offset: 0 });
+    const before = JSON.stringify(editor.children);
 
     renderHook(() => {
       useSystemKeyboard(keyTask$, store, mockProps, mockRef);
@@ -235,23 +240,30 @@ describe('useSystemKeyboard', () => {
     eventHandler(copyEvent);
 
     const { default: copy } = await import('copy-to-clipboard');
-    expect(copy).toHaveBeenCalledWith(
-      'media://file?url=https://x.com/a.jpg&height=100',
-    );
+    expect(copy).not.toHaveBeenCalled();
+    expect(copyEvent.preventDefault).not.toHaveBeenCalled();
+    expect(copyEvent.stopPropagation).not.toHaveBeenCalled();
+    expect(JSON.stringify(editor.children)).toBe(before);
   });
 
-  it('应该处理复制和剪切附件节点', async () => {
+  it('附件复制快捷键保留浏览器剪贴板事件处理', async () => {
     const mockElement = {
       addEventListener: vi.fn(),
       removeEventListener: vi.fn(),
     } as any;
     const mockRef = { current: mockElement };
 
-    const attachNode = [
-      { type: 'attach', url: 'https://x.com/f.pdf', name: 'f.pdf', size: 100 },
-      [0, 0] as any,
+    editor.children = [
+      {
+        type: 'attach',
+        url: 'https://x.com/f.pdf',
+        name: 'f.pdf',
+        size: 100,
+        children: [{ text: '' }],
+      },
     ];
-    vi.spyOn(Editor, 'nodes').mockReturnValue([attachNode] as any);
+    Transforms.select(editor, { path: [0, 0], offset: 0 });
+    const before = JSON.stringify(editor.children);
 
     renderHook(() => {
       useSystemKeyboard(keyTask$, store, mockProps, mockRef);
@@ -268,23 +280,24 @@ describe('useSystemKeyboard', () => {
     eventHandler(copyEvent);
 
     const { default: copy } = await import('copy-to-clipboard');
-    expect(copy).toHaveBeenCalledWith(
-      'attach://file?size=100&name=f.pdf&url=https://x.com/f.pdf',
-    );
+    expect(copy).not.toHaveBeenCalled();
+    expect(copyEvent.preventDefault).not.toHaveBeenCalled();
+    expect(copyEvent.stopPropagation).not.toHaveBeenCalled();
+    expect(JSON.stringify(editor.children)).toBe(before);
   });
 
-  it('mod+x 媒体节点时应剪切并 Transforms.delete', () => {
+  it('媒体剪切快捷键不在剪贴板事件之前删除文档', () => {
     const mockElement = {
       addEventListener: vi.fn(),
       removeEventListener: vi.fn(),
     } as any;
     const mockRef = { current: mockElement };
 
-    const mediaNode = [
-      { type: 'media', url: 'https://x.com/a.jpg' },
-      [0, 0] as any,
+    editor.children = [
+      { type: 'media', url: 'https://x.com/a.jpg', children: [{ text: '' }] },
     ];
-    vi.spyOn(Editor, 'nodes').mockReturnValue([mediaNode] as any);
+    Transforms.select(editor, { path: [0, 0], offset: 0 });
+    const before = JSON.stringify(editor.children);
     const deleteSpy = vi.spyOn(Transforms, 'delete');
 
     renderHook(() => {
@@ -293,14 +306,18 @@ describe('useSystemKeyboard', () => {
     });
 
     const eventHandler = mockElement.addEventListener.mock.calls[0][1];
-    eventHandler({
+    const cutEvent = {
       key: 'x',
       ctrlKey: true,
       preventDefault: vi.fn(),
       stopPropagation: vi.fn(),
-    });
-
-    expect(deleteSpy).toHaveBeenCalledWith(store.editor, { at: [0, 0] });
+    };
+    eventHandler(cutEvent);
+    expect(deleteSpy).not.toHaveBeenCalled();
+    expect(cutEvent.preventDefault).not.toHaveBeenCalled();
+    expect(cutEvent.stopPropagation).not.toHaveBeenCalled();
+    expect(JSON.stringify(editor.children)).toBe(before);
+    deleteSpy.mockRestore();
   });
 
   it('应该处理删除媒体节点', () => {
@@ -310,10 +327,14 @@ describe('useSystemKeyboard', () => {
     } as any;
     const mockRef = { current: mockElement };
 
-    const mediaNode = [{ type: 'media', url: 'x' }, [0, 0] as any];
-    vi.spyOn(Editor, 'nodes').mockReturnValue([mediaNode] as any);
+    if (vi.isMockFunction(Editor.nodes)) vi.mocked(Editor.nodes).mockRestore();
+    editor.children = [{ type: 'media', url: 'x', children: [{ text: '' }] }];
+    Transforms.select(editor, { path: [0, 0], offset: 0 });
     const removeSpy = vi.spyOn(Transforms, 'removeNodes');
     const insertSpy = vi.spyOn(Transforms, 'insertNodes');
+    const focusSpy = vi
+      .spyOn(ReactEditor, 'focus')
+      .mockImplementation(() => {});
 
     renderHook(() => {
       useSystemKeyboard(keyTask$, store, mockProps, mockRef);
@@ -324,12 +345,21 @@ describe('useSystemKeyboard', () => {
     const backspaceEvent = {
       key: 'Backspace',
       preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
     };
     eventHandler(backspaceEvent);
 
     expect(backspaceEvent.preventDefault).toHaveBeenCalled();
+    expect(backspaceEvent.stopPropagation).toHaveBeenCalled();
     expect(removeSpy).toHaveBeenCalled();
     expect(insertSpy).toHaveBeenCalled();
+    expect(editor.children).toEqual([
+      { type: 'paragraph', children: [{ text: '' }] },
+    ]);
+    expect(editor.selection).toEqual(Editor.range(editor, [0]));
+    removeSpy.mockRestore();
+    insertSpy.mockRestore();
+    focusSpy.mockRestore();
   });
 
   it('应该处理媒体节点的方向键导航', async () => {

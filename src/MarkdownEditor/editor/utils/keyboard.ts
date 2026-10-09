@@ -1,4 +1,3 @@
-import copy from 'copy-to-clipboard';
 import isHotkey from 'is-hotkey';
 import { useEffect, useMemo } from 'react';
 import { Subject } from 'rxjs';
@@ -6,8 +5,8 @@ import { Editor, Element, Path, Range, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
 import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { MarkdownEditorProps } from '../../BaseMarkdownEditor';
-import { AttachNode, MediaNode } from '../../el';
 import { useSubject } from '../../hooks/subscribe';
+import { deleteSelectedMedia } from '../plugins/cardPluginBehavior';
 import type { EditorStore } from '../store';
 import { isCodeBlockAceInputTarget } from './codeBlockBehavior';
 import {
@@ -489,53 +488,11 @@ export const useSystemKeyboard = (
       return;
     }
 
-    if (isHotkey('mod+c', e) || isHotkey('mod+x', e)) {
-      const [node] = Editor.nodes<MediaNode | AttachNode>(store?.editor, {
-        mode: 'lowest',
-        match: (m) =>
-          Element.isElement(m) && (m.type === 'media' || m.type === 'attach'),
-      });
-      if (!node) return;
-      let readlUrl = node[0]?.url as string;
-
-      if (node?.[0]?.type === 'media') {
-        const url = `media://file?url=${readlUrl}&height=${
-          node[0].height || ''
-        }`;
-        try {
-          copy(url);
-        } catch (error) {}
-        if (isHotkey('mod+x', e) && store?.editor) {
-          Transforms.delete(store.editor, { at: node[1] });
-          ReactEditor.focus(store.editor);
-        }
-      }
-      if (node?.[0]?.type === 'attach') {
-        const url = `attach://file?size=${node[0].size}&name=${node[0].name}&url=${node[0]?.url}`;
-        try {
-          copy(url);
-        } catch (error) {}
-
-        if (isHotkey('mod+x', e) && store?.editor) {
-          Transforms.delete(store.editor, { at: node[1] });
-          ReactEditor.focus(store.editor);
-        }
-      }
-    }
-
-    if (isHotkey('backspace', e)) {
-      const [node] = task.curNodes;
-      if (node?.[0].type === 'media') {
-        e.preventDefault();
-        Editor.withoutNormalizing(task.editor, () => {
-          Transforms.removeNodes(task.editor, { at: node[1] });
-          Transforms.insertNodes(task.editor, EditorUtils.p, {
-            at: node[1],
-            select: true,
-          });
-        });
-        ReactEditor.focus(task.editor);
-      }
+    if (isHotkey('backspace', e) && deleteSelectedMedia(task.editor)) {
+      e.preventDefault();
+      e.stopPropagation();
+      ReactEditor.focus(task.editor);
+      return;
     }
     if (isHotkey('arrowUp', e) || isHotkey('arrowDown', e)) {
       const [node] = task.curNodes;

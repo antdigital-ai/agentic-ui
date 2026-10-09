@@ -135,7 +135,7 @@ describe('TableCellIndex 组件测试', () => {
     };
 
     const defaultContextValue = {
-      deleteIconPosition: null,
+      deleteIconPosition: { rowIndex: defaultProps.rowIndex },
       setDeleteIconPosition: mockSetDeleteIconPosition,
       ...contextValue,
     };
@@ -237,7 +237,7 @@ describe('TableCellIndex 组件测试', () => {
     if (deleteButton) {
       fireEvent.click(deleteButton);
     }
-    expect(deleteButton).toBeInTheDocument();
+    expect(deleteButton).not.toBeInTheDocument();
   });
 
   it('应该设置正确的 padding', () => {
@@ -319,7 +319,7 @@ describe('TableCellIndex 组件测试', () => {
     expect(deleteButton).toBeInTheDocument();
   });
 
-  it('应该在删除按钮点击时处理没有 rowIndex 的情况', () => {
+  it('没有 rowIndex 时不挂载删除按钮', () => {
     renderTableCellIndex({ rowIndex: undefined });
     const deleteButton = document.querySelector(
       '.ant-agentic-md-editor-table-cell-index-delete-icon',
@@ -327,7 +327,7 @@ describe('TableCellIndex 组件测试', () => {
     if (deleteButton) {
       fireEvent.click(deleteButton);
     }
-    expect(deleteButton).toBeInTheDocument();
+    expect(deleteButton).not.toBeInTheDocument();
   });
 
   it('应该处理 clearSelect 中的异常情况', () => {
@@ -425,7 +425,7 @@ describe('TableCellIndex 组件测试', () => {
       fireEvent.click(deleteButton);
     }
 
-    expect(deleteButton).toBeInTheDocument();
+    expect(deleteButton).not.toBeInTheDocument();
     mockRemoveNodes.mockRestore();
   });
 
@@ -457,7 +457,7 @@ describe('TableCellIndex 组件测试', () => {
       <ConfigProvider>
         <TableContextTestProvider
           value={{
-            deleteIconPosition: null,
+            deleteIconPosition: { rowIndex: 0 },
             setDeleteIconPosition: mockSetDeleteIconPosition,
           }}
         >
@@ -908,7 +908,7 @@ describe('TableCellIndex 组件测试', () => {
         <ConfigProvider>
           <TableContextTestProvider
             value={{
-              deleteIconPosition: null,
+              deleteIconPosition: { rowIndex: 0 },
               setDeleteIconPosition: mockSetDeleteIconPosition,
             }}
           >
@@ -935,7 +935,7 @@ describe('TableCellIndex 组件测试', () => {
       if (deleteButton) {
         fireEvent.click(deleteButton);
       }
-      expect(deleteButton).toBeInTheDocument();
+      expect(deleteButton).not.toBeInTheDocument();
     });
 
     it('应该处理只有一行一列的情况（删除整个表格）', async () => {
@@ -966,7 +966,7 @@ describe('TableCellIndex 组件测试', () => {
         <ConfigProvider>
           <TableContextTestProvider
             value={{
-              deleteIconPosition: null,
+              deleteIconPosition: { rowIndex: 0 },
               setDeleteIconPosition: mockSetDeleteIconPosition,
             }}
           >
@@ -993,7 +993,7 @@ describe('TableCellIndex 组件测试', () => {
       if (deleteButton) {
         fireEvent.click(deleteButton);
       }
-      expect(deleteButton).toBeInTheDocument();
+      expect(deleteButton).not.toBeInTheDocument();
     });
 
     it('应该处理只有一行多列的情况（删除整个表格）', async () => {
@@ -1028,7 +1028,7 @@ describe('TableCellIndex 组件测试', () => {
         <ConfigProvider>
           <TableContextTestProvider
             value={{
-              deleteIconPosition: null,
+              deleteIconPosition: { rowIndex: 0 },
               setDeleteIconPosition: mockSetDeleteIconPosition,
             }}
           >
@@ -1055,7 +1055,7 @@ describe('TableCellIndex 组件测试', () => {
       if (deleteButton) {
         fireEvent.click(deleteButton);
       }
-      expect(deleteButton).toBeInTheDocument();
+      expect(deleteButton).not.toBeInTheDocument();
     });
 
     it('应该处理删除多行表格中的一行', () => {
@@ -1072,7 +1072,7 @@ describe('TableCellIndex 组件测试', () => {
         fireEvent.click(deleteButton);
       }
 
-      expect(deleteButton).toBeInTheDocument();
+      expect(deleteButton).not.toBeInTheDocument();
       mockRemoveNodes.mockRestore();
     });
 
@@ -1103,7 +1103,7 @@ describe('TableCellIndex 组件测试', () => {
         <ConfigProvider>
           <TableContextTestProvider
             value={{
-              deleteIconPosition: null,
+              deleteIconPosition: { rowIndex: 0 },
               setDeleteIconPosition: mockSetDeleteIconPosition,
             }}
           >
@@ -1132,7 +1132,7 @@ describe('TableCellIndex 组件测试', () => {
       }
 
       Editor.hasPath = originalHasPath;
-      expect(deleteButton).toBeInTheDocument();
+      expect(deleteButton).not.toBeInTheDocument();
     });
   });
 

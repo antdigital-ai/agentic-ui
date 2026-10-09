@@ -130,12 +130,16 @@ vi.mock('slate', () => ({
     parent: vi.fn(() => [{ type: 'root', children: [] }, []]),
     isBlock: vi.fn(() => true),
     isVoid: vi.fn(() => false),
+    pathRef: vi.fn((_editor, path) => ({ current: path, unref: vi.fn() })),
+    withoutNormalizing: vi.fn((_editor, callback) => callback()),
   },
   Element: {
     isElement: vi.fn(() => true),
   },
   Node: {
     string: vi.fn(() => ''),
+    has: vi.fn(() => true),
+    get: vi.fn(() => paragraphNode),
   },
   Transforms: {
     insertNodes: vi.fn(),
@@ -356,7 +360,7 @@ describe('InsertAutocomplete branches - insertMedia via link input', () => {
     expect(getRemoteMediaType).toHaveBeenCalledWith(
       expect.stringContaining('youtube.com/embed/abc123'),
     );
-    expect(Transforms.setNodes).toHaveBeenCalled();
+    expect(Transforms.insertNodes).toHaveBeenCalled();
   });
 
   it('insertMedia with YouTube URL and ?si= preserves query param', async () => {
@@ -399,7 +403,7 @@ describe('InsertAutocomplete branches - insertMedia via link input', () => {
     expect(getRemoteMediaType).toHaveBeenCalledWith(
       expect.stringContaining('player.bilibili.com'),
     );
-    expect(Transforms.setNodes).toHaveBeenCalled();
+    expect(Transforms.insertNodes).toHaveBeenCalled();
   });
 
   it('insertMedia with src= attribute extracts actual URL', async () => {
@@ -421,7 +425,7 @@ describe('InsertAutocomplete branches - insertMedia via link input', () => {
     expect(getRemoteMediaType).toHaveBeenCalledWith(
       'https://example.com/img.png',
     );
-    expect(Transforms.setNodes).toHaveBeenCalled();
+    expect(Transforms.insertNodes).toHaveBeenCalled();
   });
 
   it('insertMedia with plain https URL (no replaceUrl match) passes URL directly', async () => {
@@ -443,7 +447,7 @@ describe('InsertAutocomplete branches - insertMedia via link input', () => {
     expect(getRemoteMediaType).toHaveBeenCalledWith(
       'https://example.com/photo.jpg',
     );
-    expect(Transforms.setNodes).toHaveBeenCalled();
+    expect(Transforms.insertNodes).toHaveBeenCalled();
     expect(mockSelChangeNext).toHaveBeenCalled();
   });
 
@@ -487,7 +491,7 @@ describe('InsertAutocomplete branches - insertMedia via link input', () => {
     });
   });
 
-  it('insertMedia when getRemoteMediaType returns null does not call setNodes', async () => {
+  it('insertMedia when getRemoteMediaType returns null does not call insertNodes', async () => {
     await suppressUnhandledRejections(async () => {
       vi.mocked(getRemoteMediaType).mockResolvedValueOnce(null);
       renderWithCapture();
@@ -506,7 +510,7 @@ describe('InsertAutocomplete branches - insertMedia via link input', () => {
       await act(async () => {});
 
       expect(getRemoteMediaType).toHaveBeenCalled();
-      expect(Transforms.setNodes).not.toHaveBeenCalled();
+      expect(Transforms.insertNodes).not.toHaveBeenCalled();
     });
   });
 
@@ -1667,7 +1671,7 @@ describe('InsertAutocomplete branches - Editor.nodes match callbacks', () => {
     fireEvent.click(embedBtn!);
     await act(async () => {});
 
-    expect(Transforms.setNodes).toHaveBeenCalled();
+    expect(Transforms.insertNodes).toHaveBeenCalled();
   });
 
   it('effect invokes Editor.nodes match callback (line 632)', () => {

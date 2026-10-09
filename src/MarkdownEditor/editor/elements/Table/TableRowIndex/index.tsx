@@ -1,6 +1,6 @@
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
-import React, { useContext } from 'react';
+import React, { memo, useContext } from 'react';
 import { TableCellIndexSpacer } from '../TableCellIndexSpacer';
 
 /**
@@ -51,43 +51,51 @@ export interface TableRowIndexProps {
  * - 根据列宽度数组生成对应的间隔单元格
  * - 包含行索引单元格和列间隔单元格
  */
-export const TableRowIndex: React.FC<TableRowIndexProps> = ({
-  colWidths = [],
-  columnCount = 0,
-  style,
-  className,
-  tablePath,
-}) => {
-  const spacerCount = colWidths.length > 0 ? colWidths.length : columnCount;
-  const context = useContext(ConfigProvider.ConfigContext);
-  const baseClassName = context?.getPrefixCls(
-    'agentic-md-editor-table-row-index',
-  );
+const getSpacerCount = ({ colWidths, columnCount }: TableRowIndexProps) =>
+  colWidths?.length ? colWidths.length : (columnCount ?? 0);
 
-  return (
-    <tr
-      className={classNames(baseClassName, className, 'config-tr')}
-      style={style}
-    >
-      <TableCellIndexSpacer
-        style={{
-          height: 12,
-          width: 12,
-          minHeight: 12,
-          maxHeight: 12,
-          padding: 0,
-        }}
-        columnIndex={-1}
-        key={-1}
-        tablePath={tablePath}
-      />
-      {Array.from({ length: spacerCount }).map((_, index: number) => (
+export const TableRowIndex: React.FC<TableRowIndexProps> = memo(
+  ({ colWidths = [], columnCount = 0, style, className, tablePath }) => {
+    const spacerCount = colWidths.length > 0 ? colWidths.length : columnCount;
+    const context = useContext(ConfigProvider.ConfigContext);
+    const baseClassName = context?.getPrefixCls(
+      'agentic-md-editor-table-row-index',
+    );
+
+    return (
+      <tr
+        className={classNames(baseClassName, className, 'config-tr')}
+        style={style}
+      >
         <TableCellIndexSpacer
-          key={index}
-          columnIndex={index}
+          style={{
+            height: 12,
+            width: 12,
+            minHeight: 12,
+            maxHeight: 12,
+            padding: 0,
+          }}
+          columnIndex={-1}
+          key={-1}
           tablePath={tablePath}
         />
-      ))}
-    </tr>
-  );
-};
+        {Array.from({ length: spacerCount }).map((_, index: number) => (
+          <TableCellIndexSpacer
+            key={index}
+            columnIndex={index}
+            tablePath={tablePath}
+          />
+        ))}
+      </tr>
+    );
+  },
+  (prev, next) =>
+    prev.style === next.style &&
+    prev.className === next.className &&
+    getSpacerCount(prev) === getSpacerCount(next) &&
+    prev.tablePath?.length === next.tablePath?.length &&
+    (prev.tablePath?.every(
+      (index, depth) => index === next.tablePath?.[depth],
+    ) ??
+      true),
+);

@@ -1,4 +1,4 @@
-import { act, cleanup, render } from '@testing-library/react';
+import { act, cleanup, fireEvent, render } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { EditorStoreContext } from '../../MarkdownEditor/editor/store';
@@ -480,6 +480,10 @@ describe('MarkdownRenderer', () => {
     const downloadLink = container.querySelector(`a[href="${downloadUrl}"]`);
 
     expect(thinkBlock).toBeTruthy();
+    expect(thinkBlock).not.toHaveTextContent('构造调用。');
+    fireEvent.click(
+      thinkBlock!.querySelector('[data-testid="tool-use-bar-think-bar"]')!,
+    );
     expect(thinkBlock).toHaveTextContent('构造调用。');
     expect(downloadLink).toBeTruthy();
     expect(thinkBlock).not.toContainElement(downloadLink);
@@ -553,6 +557,18 @@ describe('MarkdownRenderer', () => {
     );
 
     expect(thinkBlocks).toHaveLength(2);
+    thinkBlocks.forEach((thinkBlock) => {
+      const bar = thinkBlock.querySelector(
+        '[data-testid="tool-use-bar-think-bar"]',
+      )!;
+      if (
+        !thinkBlock.querySelector(
+          '[data-testid="tool-use-bar-think-container"]',
+        )
+      ) {
+        fireEvent.click(bar);
+      }
+    });
     expect(thinkBlocks[0]).toHaveTextContent('第一轮思考');
     expect(thinkBlocks[0]).not.toHaveTextContent('第二轮思考');
     expect(thinkBlocks[1]).toHaveTextContent('第二轮思考');

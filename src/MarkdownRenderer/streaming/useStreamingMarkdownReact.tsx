@@ -80,7 +80,9 @@ export const useStreamingMarkdownReact = (
       buildEditorAlignedComponents(
         prefixCls,
         stableComponents ?? {},
-        options?.streaming,
+        // 逐词动画由 processor 控制；切换 streaming 不应替换组件类型，
+        // 否则活动末块中的代码、图表和媒体会在结束流式时重挂。
+        undefined,
         options?.linkConfig,
         stableFncProps,
         options?.eleRender,
@@ -88,7 +90,6 @@ export const useStreamingMarkdownReact = (
     [
       prefixCls,
       stableComponents,
-      options?.streaming,
       options?.linkConfig,
       stableFncProps,
       options?.eleRender,

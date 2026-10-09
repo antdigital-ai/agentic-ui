@@ -21,16 +21,45 @@ const SMART_FONT = '14px sans-serif';
 const CHAR_WIDTH_PX = 12;
 const WORD_SPLIT = /[\s\u4e00-\u9fa5]/;
 
-type TableRow = { children: unknown[] };
+interface TableRow {
+  children: unknown[];
+}
 
-function getTableRows(element: TableNode): TableRow[] {
-  return element.children.flatMap((node) =>
-    node.type === 'table-row'
-      ? [node]
-      : 'children' in node
-        ? (node.children as TableRow[])
-        : [],
-  );
+interface CellMetrics {
+  children: unknown;
+  text: string;
+  contentWidth?: number;
+}
+
+// Slate preserves unchanged cell objects when editing another cell. Cache their
+// text and character width without retaining removed documents.
+const cellMetricsCache = new WeakMap<object, CellMetrics>();
+
+function getCellMetrics(cell: unknown): CellMetrics | undefined {
+  if (!cell || typeof cell !== 'object' || !('children' in cell)) {
+    return undefined;
+  }
+  const cached = cellMetricsCache.get(cell);
+  if (cached && cached.children === cell.children) return cached;
+
+  const metrics: CellMetrics = {
+    children: cell.children,
+    text: Node.string(cell as Parameters<typeof Node.string>[0]),
+  };
+  cellMetricsCache.set(cell, metrics);
+  return metrics;
+}
+
+function* getTableRows(
+  element: TableNode,
+): Generator<TableRow, void, undefined> {
+  for (const node of element.children) {
+    if (node.type === 'table-row') {
+      yield node;
+    } else if ('children' in node) {
+      yield* node.children as TableRow[];
+    }
+  }
 }
 
 function getSampledCellTexts(
@@ -38,16 +67,16 @@ function getSampledCellTexts(
   columnCount: number,
   maxRows: number,
 ): string[][] {
-  return getTableRows(element)
-    .slice(0, maxRows)
-    .map((row) =>
+  const grid: string[][] = [];
+  for (const row of getTableRows(element)) {
+    grid.push(
       Array.from({ length: columnCount }, (_, i) => {
-        const cell = row.children?.[i];
-        return cell && typeof cell === 'object' && 'children' in cell
-          ? Node.string(cell as Parameters<typeof Node.string>[0])
-          : '';
+        return getCellMetrics(row.children?.[i])?.text ?? '';
       }),
     );
+    if (grid.length >= maxRows) break;
+  }
+  return grid;
 }
 
 function createMeasureContext(): CanvasRenderingContext2D | null {
@@ -121,16 +150,14 @@ function getContentBasedColWidthsPx(
   element: TableNode,
   columnCount: number,
 ): number[] {
-  const rows = getTableRows(element);
+  const rows = Array.from(getTableRows(element));
   return Array.from({ length: columnCount }, (_, colIndex) => {
     let maxPx = TABLE_DEFAULT_COL_WIDTH;
     for (const row of rows) {
-      const cell = row.children?.[colIndex];
-      if (cell && typeof cell === 'object' && 'children' in cell) {
-        const w =
-          stringWidth(Node.string(cell as Parameters<typeof Node.string>[0])) *
-          CHAR_WIDTH_PX;
-        if (w > maxPx) maxPx = w;
+      const metrics = getCellMetrics(row.children?.[colIndex]);
+      if (metrics) {
+        metrics.contentWidth ??= stringWidth(metrics.text) * CHAR_WIDTH_PX;
+        if (metrics.contentWidth > maxPx) maxPx = metrics.contentWidth;
       }
     }
     return maxPx;
@@ -153,6 +180,7 @@ export function getReadonlyTableColWidths(
   if (columnCount === 0) return [];
 
   const useSmart =
+    columnCount > TABLE_COL_WIDTH_MIN_COLUMNS &&
     element?.children?.length &&
     typeof containerWidth === 'number' &&
     containerWidth > 0;

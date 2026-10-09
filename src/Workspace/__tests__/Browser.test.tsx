@@ -140,7 +140,7 @@ describe('BrowserList Component', () => {
     const headerWrapper = container.querySelector(
       '.ant-browser-header-wrapper',
     );
-    expect(headerWrapper).toBeInTheDocument();
+    expect(headerWrapper).not.toBeInTheDocument();
     // 关闭头部时不应该渲染具体的头部内容
     expect(
       container.querySelector('.ant-browser-header'),

@@ -1,10 +1,48 @@
-import { BaseElement, Path, Transforms } from 'slate';
-import { ReactEditor, useSlate } from 'slate-react';
+import { useCallback, useRef } from 'react';
+import { BaseElement, Editor, Node, Path, Range, Transforms } from 'slate';
+import { ReactEditor, useSlateSelector, useSlateStatic } from 'slate-react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { EditorStore, useEditorStore } from '../editor/store';
 import { useGetSetState } from '../editor/utils';
 import { EditorUtils } from '../editor/utils/editorUtils';
 import { useSubject } from './subscribe';
+
+const isSamePath = (a: Path | null, b: Path) => a !== null && Path.equals(a, b);
+
+/** A removed element may still have a queued selector and stale DOM path mapping. */
+export const useElementSelected = (element: BaseElement): boolean => {
+  const cachedPath = useRef<Path | null>(null);
+  const selector = useCallback(
+    (editor: Editor) => {
+      if (!editor.selection) return false;
+      try {
+        let path = cachedPath.current;
+        if (
+          !path ||
+          !Editor.hasPath(editor, path) ||
+          Node.get(editor, path) !== element
+        ) {
+          path = ReactEditor.findPath(editor, element);
+        }
+        if (
+          !Editor.hasPath(editor, path) ||
+          Node.get(editor, path) !== element
+        ) {
+          return false;
+        }
+        cachedPath.current = path;
+        return !!Range.intersection(
+          Editor.range(editor, path),
+          editor.selection,
+        );
+      } catch {
+        return false;
+      }
+    },
+    [element],
+  );
+  return useSlateSelector(selector, undefined, { deferred: true });
+};
 
 /**
  * 自定义钩子 `useMEditor` 用于管理 Slate 编辑器中的节点更新和删除操作。
@@ -30,7 +68,7 @@ import { useSubject } from './subscribe';
  *          包含编辑器实例、更新函数和删除函数的元组。
  */
 export const useMEditor = (el: BaseElement) => {
-  const editor = useSlate();
+  const editor = useSlateStatic();
 
   const update = useRefFunction(
     (props: Record<string, any>, current?: BaseElement) => {
@@ -59,36 +97,42 @@ export const useMEditor = (el: BaseElement) => {
  * ```
  */
 export const useSelStatus = (element: any) => {
-  const editor = useSlate();
+  const editor = useSlateStatic();
   const { store, markdownEditorRef, selChange$ } = useEditorStore();
+  const cachedPath = useRef<Path | null>(null);
+  const getElementPath = useCallback(
+    (currentEditor: Editor) => {
+      const path = cachedPath.current;
+      // Text/selection operations preserve paths. Only resolve the DOM mapping
+      // again when a structural operation moved this element.
+      try {
+        if (path && Node.get(currentEditor, path) === element) return path;
+      } catch {
+        // A removed sibling can make the previously valid path out of bounds.
+      }
+      cachedPath.current = EditorUtils.findPath(currentEditor, element);
+      return cachedPath.current;
+    },
+    [element],
+  );
+  // Path updates must also work with FloatBar/selection tracking disabled.
+  // Defer until Editable has refreshed Slate's DOM-to-path mappings.
+  const elementPath = useSlateSelector(getElementPath, isSamePath, {
+    deferred: true,
+  });
   const [state, setState] = useGetSetState({
     selected: ReactEditor.isFocused(editor),
-    path: EditorUtils.findPath(editor, element),
   });
 
   useSubject(
     selChange$,
     (ctx) => {
-      const path = EditorUtils.findPath(markdownEditorRef.current, element);
+      const path = getElementPath(markdownEditorRef.current);
       const selected = ctx ? Path.equals(path, ctx.node?.[1] || []) : false;
-      const prev = state();
-      if (
-        prev.selected === selected &&
-        prev.path.length === path.length &&
-        prev.path.every((segment, i) => segment === path[i])
-      ) {
-        return;
-      }
-      setState({
-        path,
-        selected,
-      });
+      if (state().selected === selected) return;
+      setState({ selected });
     },
-    [element],
+    [element, selChange$, getElementPath],
   );
-  return [state().selected, state().path, store] as [
-    boolean,
-    Path,
-    EditorStore,
-  ];
+  return [state().selected, elementPath, store] as [boolean, Path, EditorStore];
 };

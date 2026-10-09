@@ -7,6 +7,7 @@ import {
   Range,
   Transforms,
 } from 'slate';
+import { HistoryEditor } from 'slate-history';
 import type {
   CardAfterNode,
   CardBeforeNode,
@@ -66,6 +67,79 @@ export const getCardSlotParent = (
     return null;
   }
   return { parentPath, parentNode };
+};
+
+export const getSelectedMediaPath = (editor: Editor): Path | null => {
+  const selection = editor.selection;
+  if (!selection || !Range.isCollapsed(selection)) return null;
+  const mediaPath = safeParentPath(selection.anchor.path);
+  const media = safeGetNode(editor, mediaPath);
+  if (
+    !mediaPath ||
+    !Element.isElement(media) ||
+    !['image', 'media', 'attach'].includes(media.type)
+  ) {
+    return null;
+  }
+  return mediaPath;
+};
+
+/** Media children are Slate selection anchors, not editable caption text. */
+export const getSelectedMediaBlockPath = (editor: Editor): Path | null => {
+  const mediaPath = getSelectedMediaPath(editor);
+  if (!mediaPath) return null;
+  const parentPath = safeParentPath(mediaPath);
+  const parent = safeGetNode(editor, parentPath);
+  return parentPath && Element.isElement(parent) && parent.type === 'card'
+    ? parentPath
+    : mediaPath;
+};
+
+/** Delete one media, retaining the rest of its card and a visible caret. */
+export const deleteMediaAtPath = (editor: Editor, mediaPath: Path): boolean => {
+  const media = safeGetNode(editor, mediaPath);
+  if (
+    !Element.isElement(media) ||
+    !['image', 'media', 'attach'].includes(media.type)
+  ) {
+    return false;
+  }
+  const parentPath = safeParentPath(mediaPath);
+  const parent = safeGetNode(editor, parentPath);
+  const mediaIndex = mediaPath[mediaPath.length - 1];
+  const removePath =
+    parentPath &&
+    Element.isElement(parent) &&
+    parent.type === 'card' &&
+    isCardEmpty({
+      ...parent,
+      children: parent.children.filter(
+        (_: Node, index: number) => index !== mediaIndex,
+      ),
+    })
+      ? parentPath
+      : mediaPath;
+  const remove = () =>
+    Editor.withoutNormalizing(editor, () => {
+      // Select the replacement before removing media so no step targets its hidden leaf.
+      Transforms.insertNodes(
+        editor,
+        { type: 'paragraph', children: [{ text: '' }] } satisfies ParagraphNode,
+        { at: removePath, select: true },
+      );
+      Transforms.removeNodes(editor, { at: Path.next(removePath) });
+    });
+  if (HistoryEditor.isHistoryEditor(editor)) {
+    HistoryEditor.withNewBatch(editor, remove);
+  } else {
+    remove();
+  }
+  return true;
+};
+
+export const deleteSelectedMedia = (editor: Editor): boolean => {
+  const mediaPath = getSelectedMediaPath(editor);
+  return !!mediaPath && deleteMediaAtPath(editor, mediaPath);
 };
 
 /**
@@ -293,6 +367,17 @@ export const tryHandleCardInsertText = (
     return false;
   }
 
+  const mediaBlockPath = getSelectedMediaBlockPath(editor);
+  if (mediaBlockPath) {
+    if (!text) return true;
+    Transforms.insertNodes(
+      editor,
+      { type: 'paragraph', children: [{ text }] } satisfies ParagraphNode,
+      { at: Path.next(mediaBlockPath), select: true },
+    );
+    return true;
+  }
+
   const slot = getCardSlotParent(editor, selection.anchor.path);
   if (!slot) {
     return false;
@@ -346,6 +431,7 @@ export const handleCardDeleteBackward = (
   unit: Parameters<Editor['deleteBackward']>[0],
   deleteBackward: Editor['deleteBackward'],
 ): boolean => {
+  if (deleteSelectedMedia(editor)) return true;
   const { selection } = editor;
   if (
     !selection ||

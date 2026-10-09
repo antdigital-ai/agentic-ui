@@ -1,4 +1,5 @@
 import type { CSSInterpolation } from '@ant-design/cssinjs';
+import { Keyframes } from '@ant-design/cssinjs';
 import {
   TEXT_SWAP_BLUR_PX,
   TEXT_SWAP_EASING,
@@ -17,6 +18,41 @@ import {
   type GenStyleFn,
 } from '../Hooks/useStyle';
 import { STREAM_TOKEN_CLASS } from '../MarkdownRenderer/streaming/rehypeStreamingTokens';
+
+// ── Tag chip 波浪动画（对齐 dtcoder-ide composer-chip-wave）────────────────
+// 波动双色取主题蓝/绿（同 dtcoder 的 wave-start 蓝 → wave-end 绿渐变），
+// 中点色用于扫光渐变
+const CHIP_WAVE_START_COLOR = 'var(--color-blue-text-default, #1677ff)';
+const CHIP_WAVE_END_COLOR = 'var(--color-green-text-default, #52c41a)';
+const chipWaveColorMid = `color-mix(in oklab, ${CHIP_WAVE_START_COLOR} 50%, ${CHIP_WAVE_END_COLOR} 50%)`;
+
+/** 逐字波浪：上抛 -0.2em → 下压 0.08em → 回位，颜色灰 → 蓝 → 绿 → 灰 */
+const chipWave = new Keyframes('chipWave', {
+  '0%, 100%': {
+    top: '0',
+    color: 'var(--color-gray-text-secondary, rgba(80, 94, 119, 0.88))',
+  },
+  '35%': {
+    top: '-0.2em',
+    color: CHIP_WAVE_START_COLOR,
+  },
+  '65%': {
+    top: '0.08em',
+    color: CHIP_WAVE_END_COLOR,
+  },
+});
+
+/** 容器扫光：渐变带从右向左扫过一次 */
+const chipSweep = new Keyframes('chipSweep', {
+  from: {
+    backgroundPosition: '100% 0',
+    opacity: 1,
+  },
+  to: {
+    backgroundPosition: '0 0',
+    opacity: 1,
+  },
+});
 
 // ── Table ──────────────────────────────────────────────────────────────────
 const TABLE_BORDER = '1px solid var(--agentic-ui-table-border-color, #E7E9E8)';
@@ -620,6 +656,41 @@ const genStyle: GenStyleFn<'MarkdownEditor'> = (token) => {
         },
         '&-loading': {
           // 加载状态的样式可以在这里添加
+        },
+
+        // --- chip 插入波浪动画（对齐 dtcoder-ide composer-chip-wave） ---
+        // 认领成功的那一次渲染：逐字 span 用 CSS 变量算延迟，容器叠渐变扫光
+        '&-chip-wave': {
+          display: 'inline',
+          position: 'relative',
+          overflow: 'visible',
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            inset: '-1px -2px',
+            borderRadius: 'inherit',
+            background: `linear-gradient(110deg, transparent 40%, ${chipWaveColorMid} 50%, transparent 60%)`,
+            backgroundSize: '300% 100%',
+            backgroundPosition: '100% 0',
+            opacity: 0,
+            pointerEvents: 'none',
+            animationName: chipSweep,
+            animationDuration: '960ms',
+            animationTimingFunction: 'linear',
+            animationIterationCount: 1,
+            animationFillMode: 'both',
+          },
+        },
+        '&-chip-wave-char': {
+          display: 'inline-block',
+          position: 'relative',
+          animationName: chipWave,
+          animationDuration: '640ms',
+          animationTimingFunction: 'ease-in-out',
+          animationIterationCount: 1,
+          animationFillMode: 'both',
+          animationDelay:
+            'calc(320ms * var(--chip-wave-step) / max(1, var(--chip-wave-count) - 1))',
         },
       },
 

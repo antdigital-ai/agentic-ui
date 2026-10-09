@@ -7,9 +7,9 @@ import { ReactEditor, RenderElementProps, RenderLeafProps } from 'slate-react';
 import { I18nContext } from '../../../I18n';
 import { debugInfo } from '../../../Utils/debugUtils';
 import { MarkdownEditorProps } from '../../types';
-import { JINJA_DOLLAR_PLACEHOLDER } from '../parser/constants';
 import { useEditorStore } from '../store';
 import { EditorUtils } from '../utils/editorUtils';
+import { restoreJinjaDollarInChildren } from '../utils/restoreJinjaDollarInChildren';
 import {
   AgenticUiFileMapBlock,
   ReadonlyAgenticUiFileMapBlock,
@@ -60,25 +60,7 @@ import { ReadonlySchema } from './Schema/ReadonlySchema';
 import { tableRenderElement } from './Table';
 import { ReadonlyTableComponent } from './Table/ReadonlyTableComponent';
 import { TagPopup } from './TagPopup';
-
-/** 递归将 Jinja 占位符还原为 $ 显示 */
-const restoreJinjaDollarInChildren = (
-  children: React.ReactNode,
-): React.ReactNode =>
-  React.Children.map(children, (child) => {
-    if (typeof child === 'string') {
-      return child.split(JINJA_DOLLAR_PLACEHOLDER).join('$');
-    }
-    if (React.isValidElement(child)) {
-      const props = child.props as { children?: React.ReactNode };
-      if (props.children !== undefined && props.children !== null) {
-        return React.cloneElement(child as React.ReactElement<any>, {
-          children: restoreJinjaDollarInChildren(props.children),
-        });
-      }
-    }
-    return child;
-  });
+import { markTagChipWave } from './TagPopup/chipWaveMotion';
 
 /**
  * 性能优化说明：
@@ -409,17 +391,18 @@ const MLeafComponent = (
               if (!path?.length) return;
               if (!markdownEditorRef.current) return;
 
-              Editor.withoutNormalizing(markdownEditorRef.current, () => {
-                const newText =
-                  tagTextRender?.(
-                    {
-                      ...props,
-                      ...props.tagInputProps,
-                      text: v,
-                    },
-                    `${triggerText ?? '$'}${v}`,
-                  ) || `${triggerText ?? '$'}${v}`;
+              // chip 最终文本需在 transform 闭包外也可用，先计算
+              const chipNewText =
+                tagTextRender?.(
+                  {
+                    ...props,
+                    ...props.tagInputProps,
+                    text: v,
+                  },
+                  `${triggerText ?? '$'}${v}`,
+                ) || `${triggerText ?? '$'}${v}`;
 
+              Editor.withoutNormalizing(markdownEditorRef.current, () => {
                 // 使用 Point 而不是 Path 来避免 Slate 的 Range 转换问题
                 // 先删除节点的全部文本，再在起始位置插入新文本
                 const startPoint = Editor.start(
@@ -434,7 +417,7 @@ const MLeafComponent = (
                 });
 
                 // 在节点起始位置插入新文本
-                Transforms.insertText(markdownEditorRef.current, newText, {
+                Transforms.insertText(markdownEditorRef.current, chipNewText, {
                   at: startPoint,
                 });
 
@@ -448,8 +431,8 @@ const MLeafComponent = (
                   },
                   { at: path },
                 );
-                // tag \u5904\u4E8E\u7236\u8282\u70B9\u9996\u4F4D\u65F6\u65E0 previous\uFF0C\u76F4\u63A5\u63D2\u5230\u5F53\u524D path\uFF0C
-                // \u7531 Slate \u628A\u5DF2\u6709\u7684 tag \u987A\u52BF\u540E\u79FB\uFF0C\u6548\u679C\u7B49\u4EF7\u4E8E"\u63D2\u5230 tag \u4E4B\u524D"\u3002
+                // tag 处于父节点首位时无 previous，直接插到当前 path，
+                // 由 Slate 把已有的 tag 顺势后移，效果等同于"插到 tag 之前"。
                 const lastIdx = path[path.length - 1];
                 const beforePath = lastIdx > 0 ? Path.previous(path) : path;
                 Transforms.insertNodes(
@@ -460,6 +443,11 @@ const MLeafComponent = (
                   },
                 );
               });
+
+              // 登记插入波浪动画（对齐 dtcoder-ide composerChipShimmer）：
+              // key 为 chip 最终文本 —— 插入零宽空格后 TagPopup 的 DOM ref
+              // 可能解析到旧位置，文本才是稳定的身份标识
+              markTagChipWave(markdownEditorRef.current, chipNewText);
 
               const focusElement = markdownContainerRef.current?.querySelector(
                 'div[data-slate-node="value"]',
@@ -521,7 +509,6 @@ const MLeafComponent = (
   }
   if (leaf.bold) {
     style.fontWeight = 'bold';
-    children = <span data-testid="markdown-bold">{children}</span>;
   }
   if (leaf.strikethrough) {
     children = <s>{children}</s>;
@@ -671,6 +658,7 @@ const MLeafComponent = (
     <span
       {...props.attributes}
       data-be="text"
+      {...(leaf.bold ? { 'data-testid': 'markdown-bold' } : {})}
       draggable={false}
       onDragStart={dragStart}
       onClick={(e) => {

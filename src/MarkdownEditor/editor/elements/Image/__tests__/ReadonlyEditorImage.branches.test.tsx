@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ReadonlyEditorImage } from '../ReadonlyEditorImage';
@@ -133,11 +133,8 @@ describe('ReadonlyEditorImage 分支覆盖', () => {
       />,
     );
 
-    const probeImg =
-      imgInstances.find((img) => !document.contains(img)) ?? imgInstances[0];
-    await act(async () => {
-      probeImg?.onerror?.({} as Event);
-    });
+    const image = document.querySelector('img')!;
+    fireEvent.error(image);
     expect(screen.getByText('https://fail.example/x.png')).toBeInTheDocument();
   });
 

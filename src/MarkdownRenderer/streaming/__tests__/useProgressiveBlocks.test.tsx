@@ -66,6 +66,31 @@ describe('useProgressiveBlocks', () => {
     expect(smallDocumentResult.current).toBe(12);
   });
 
+  it('keeps already mounted blocks when streaming finishes', () => {
+    const { result, rerender } = renderHook(
+      ({ streaming }) => useProgressiveBlocks(50, streaming, 1),
+      { initialProps: { streaming: true } },
+    );
+
+    expect(result.current).toBe(50);
+    rerender({ streaming: false });
+    expect(result.current).toBe(50);
+  });
+
+  it('reveals appended blocks without hiding the previously mounted document', async () => {
+    const { result, rerender } = renderHook(
+      ({ total }) => useProgressiveBlocks(total, false, 1),
+      { initialProps: { total: LARGE_BLOCK_COUNT } },
+    );
+    await advanceFrame();
+    await advanceFrame();
+
+    rerender({ total: 25 });
+    expect(result.current).toBe(LARGE_BLOCK_COUNT);
+    await advanceFrame();
+    expect(result.current).toBe(21);
+  });
+
   it('flushes remaining blocks when the document becomes hidden', () => {
     const { result } = renderHook(() =>
       useProgressiveBlocks(LARGE_BLOCK_COUNT, false, 1),

@@ -88,7 +88,7 @@ describe('handlePaste 分支覆盖', () => {
   /* ====== handleSlateMarkdownFragment ====== */
 
   describe('handleSlateMarkdownFragment 分支', () => {
-    it('单段落空文本时返回 true', () => {
+    it('单段落空文本时返回 true，阻断其他剪贴板格式重复插入', () => {
       const fragment = [{ type: 'paragraph', children: [{ text: '' }] }];
       mockClipboard.getData.mockReturnValue(JSON.stringify(fragment));
 
@@ -135,7 +135,7 @@ describe('handlePaste 分支覆盖', () => {
       expect(result).toBe(true);
     });
 
-    it('非数组 JSON 数据应被安全处理', () => {
+    it('非数组 JSON 按空 fragment 处理返回 true', () => {
       mockClipboard.getData.mockReturnValue(JSON.stringify({ not: 'array' }));
 
       const result = handleSlateMarkdownFragment(
@@ -263,13 +263,13 @@ describe('handlePaste 分支覆盖', () => {
       expect(mocks.toUnixPath).toHaveBeenCalled();
     });
 
-    it('media:// 后下一个节点是空段落时删除该节点', () => {
+    it('media:// 不会复用插入前选区删除后方空段落', () => {
       vi.spyOn(Editor, 'next').mockReturnValue([
         { type: 'paragraph', children: [{ text: '' }] },
         [1],
       ] as any);
-      const deleteSpy = vi
-        .spyOn(Transforms, 'delete')
+      const removeSpy = vi
+        .spyOn(Transforms, 'removeNodes')
         .mockImplementation(() => {});
 
       const text = 'media://?url=https://img.com/a.jpg';
@@ -277,17 +277,17 @@ describe('handlePaste 分支覆盖', () => {
       const result = handleSpecialTextPaste(editor, text, sel);
 
       expect(result).toBe(true);
-      expect(deleteSpy).toHaveBeenCalledWith(editor, { at: sel });
-      deleteSpy.mockRestore();
+      expect(removeSpy).not.toHaveBeenCalled();
+      removeSpy.mockRestore();
     });
 
-    it('attach:// 后下一个节点是空段落时删除该节点', () => {
+    it('attach:// 不会复用插入前选区删除后方空段落', () => {
       vi.spyOn(Editor, 'next').mockReturnValue([
         { type: 'paragraph', children: [{ text: '' }] },
         [1],
       ] as any);
-      const deleteSpy = vi
-        .spyOn(Transforms, 'delete')
+      const removeSpy = vi
+        .spyOn(Transforms, 'removeNodes')
         .mockImplementation(() => {});
 
       const text =
@@ -296,8 +296,8 @@ describe('handlePaste 分支覆盖', () => {
       const result = handleSpecialTextPaste(editor, text, sel);
 
       expect(result).toBe(true);
-      expect(deleteSpy).toHaveBeenCalledWith(editor, { at: sel });
-      deleteSpy.mockRestore();
+      expect(removeSpy).not.toHaveBeenCalled();
+      removeSpy.mockRestore();
     });
   });
 
@@ -697,7 +697,7 @@ describe('handlePaste istanbul residual', () => {
     mockClipboard = { getData: vi.fn(), files: [] };
   });
 
-  it('fragment JSON 为原始字符串时按空数组处理并返回 true', () => {
+  it('fragment JSON 为原始字符串时按空数组处理返回 true', () => {
     mockClipboard.getData.mockReturnValue('"just-string"');
     expect(
       handleSlateMarkdownFragment(
@@ -708,7 +708,7 @@ describe('handlePaste istanbul residual', () => {
     ).toBe(true);
   });
 
-  it('fragment 数组无有效 Text/Element 节点时按空 fragment 返回 true', () => {
+  it('fragment 数组无有效节点时按空 fragment 返回 true', () => {
     // { type: 'x' } 无 children → 非 Element；无 text → 非 Text → filter 后 length 0
     mockClipboard.getData.mockReturnValue(JSON.stringify([{ type: 'x' }]));
     expect(

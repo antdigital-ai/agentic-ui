@@ -21,10 +21,42 @@ const storeState: any = {
   readonly: false,
 };
 
+const currentImageNode = vi.hoisted(() => ({ current: undefined as unknown }));
+vi.mock('slate-react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('slate-react')>();
+  return {
+    ...actual,
+    useSelected: () => true,
+    ReactEditor: {
+      ...actual.ReactEditor,
+      findPath: (_editor: unknown, node: unknown) => {
+        currentImageNode.current = node;
+        return [0, 0];
+      },
+    },
+  };
+});
+vi.mock('slate', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('slate')>();
+  return {
+    ...actual,
+    Node: { ...actual.Node, get: () => currentImageNode.current },
+    Editor: {
+      ...actual.Editor,
+      withoutNormalizing: (_editor: unknown, callback: () => void) =>
+        callback(),
+    },
+  };
+});
+
 vi.mock('antd', () => {
   const confirm = vi.fn();
   return {
-    Image: (props: any) => <img data-testid="antd-img" {...props} />,
+    Image: ({ 'data-testid': testId, 'data-be': dataBe, ...props }: any) => (
+      <div data-testid={testId} data-be={dataBe}>
+        <img data-testid="antd-img" {...props} />
+      </div>
+    ),
     Skeleton: { Image: () => <div data-testid="skeleton-image" /> },
     Popover: ({ children, content, open }: any) => (
       <div data-testid="popover" data-open={String(open)}>
@@ -103,6 +135,7 @@ vi.mock('../../../store', () => ({
 }));
 
 vi.mock('../../../../hooks/editor', () => ({
+  useElementSelected: () => true,
   useSelStatus: () => [false, [0]],
 }));
 
@@ -247,12 +280,12 @@ describe('Image/index deepen residual branches', () => {
       </EditorImage>,
     );
 
-    const probe = createdImgs.find((img) => img.crossOrigin === 'anonymous');
+    const probe = document.querySelector('img')!;
     act(() => {
-      probe?.onerror?.(new Event('error') as any);
+      fireEvent.error(probe!);
     });
     const link = screen.getByTestId('media-error-link');
-    expect(link).toHaveAttribute('data-fallback', 'https://bad.png');
+    expect(link).toHaveAttribute('data-url', 'https://bad.png');
 
     const container = screen.getByTestId('image-container');
     fireEvent.contextMenu(container);
@@ -291,7 +324,9 @@ describe('Image/index deepen residual branches', () => {
     });
     fireEvent.load(img);
     fireEvent.click(screen.getByTestId('rnd-resize'));
-    expect(img.style.width).toContain('300');
+    expect(screen.getByTestId('resize-image-container').style.width).toBe(
+      '300px',
+    );
   });
 
   it('EditorImage 选中后 Popover open；block 标题随 element.block 切换', () => {

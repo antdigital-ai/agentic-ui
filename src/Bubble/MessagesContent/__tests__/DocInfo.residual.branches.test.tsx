@@ -28,8 +28,8 @@ vi.mock('../../../Components/ActionIconBox', () => ({
   ),
 }));
 
-const wrap = (ui: React.ReactNode, locale: any = {}) =>
-  render(
+const wrap = (ui: React.ReactNode, locale: any = {}) => {
+  const result = render(
     <ConfigProvider>
       <I18nContext.Provider value={{ locale } as any}>
         <BubbleConfigContext.Provider value={{} as any}>
@@ -38,6 +38,10 @@ const wrap = (ui: React.ReactNode, locale: any = {}) =>
       </I18nContext.Provider>
     </ConfigProvider>,
   );
+  const toggle = result.container.querySelector('[class*="doc-info-label"]');
+  if (toggle) fireEvent.click(toggle);
+  return result;
+};
 
 describe('DocInfoList residual branches', () => {
   it('options 空 / 含 falsy 过滤', () => {

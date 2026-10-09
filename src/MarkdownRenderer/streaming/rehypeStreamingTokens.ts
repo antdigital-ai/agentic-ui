@@ -40,6 +40,7 @@ interface HastText {
 interface HastElement {
   type: 'element';
   tagName: string;
+  data?: { streamingToken?: boolean };
   properties?: Record<string, unknown> & { className?: unknown };
   children?: HastNode[];
 }
@@ -67,6 +68,7 @@ const wrapTextValue = (value: string): HastNode[] => {
       ? ({
           type: 'element',
           tagName: 'span',
+          data: { streamingToken: true },
           properties: { className: [STREAM_TOKEN_CLASS] },
           children: [{ type: 'text', value: piece }],
         } as HastElement)

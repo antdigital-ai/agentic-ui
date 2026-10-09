@@ -24,6 +24,12 @@ vi.mock('../../../../../Hooks/useDebounceFn', () => ({
 }));
 
 const editorStoreMock = {
+  store: {
+    getMDContent: () =>
+      parserSlateNodeToMarkdown(
+        editorStoreMock.markdownEditorRef.current?.children ?? [],
+      ),
+  },
   readonly: false,
   setRefreshFloatBar: vi.fn(),
   setDomRect: vi.fn(),

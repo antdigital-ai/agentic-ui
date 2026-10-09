@@ -96,16 +96,7 @@ describe('ReadonlyMedia deepen2 residual branches', () => {
     ).toBeInTheDocument();
   });
 
-  it('video finished=false 超时后默认「视频链接」；loadSuccess false 错误链', () => {
-    const stateData = {
-      loadSuccess: false,
-      url: 'https://example.com/v.mp4',
-      type: 'video' as const,
-    };
-    vi.mocked(editorUtils.useGetSetState).mockReturnValue([
-      () => stateData,
-      vi.fn((p) => Object.assign(stateData, p)),
-    ]);
+  it('video 可见播放器错误后显示错误链接', () => {
     vi.mocked(domUtils.getMediaType).mockReturnValue('video');
     renderMedia({
       ...baseElement,
@@ -113,6 +104,7 @@ describe('ReadonlyMedia deepen2 residual branches', () => {
       finished: true,
       alt: undefined,
     } as MediaNode);
+    fireEvent.error(screen.getByTestId('video-element'));
     expect(screen.getByTestId('err')).toHaveTextContent(/视频链接|v\.mp4/);
   });
 

@@ -88,7 +88,7 @@ describe('useSystemKeyboard deepen branches', () => {
     return e;
   };
 
-  it('mod+c 选中 media 时复制 media:// URL', () => {
+  it('mod+c 选中 media 时保留浏览器复制事件', () => {
     editor.children = [
       {
         type: 'media',
@@ -101,13 +101,14 @@ describe('useSystemKeyboard deepen branches', () => {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [0, 0], offset: 0 },
     };
-    dispatch({ key: 'c', ctrlKey: true });
-    expect(copy).toHaveBeenCalledWith(
-      expect.stringContaining('media://file?url=https://img.test/a.png'),
-    );
+    const before = JSON.stringify(editor.children);
+    const event = dispatch({ key: 'c', ctrlKey: true });
+    expect(copy).not.toHaveBeenCalled();
+    expect(event.defaultPrevented).toBe(false);
+    expect(JSON.stringify(editor.children)).toBe(before);
   });
 
-  it('mod+x 选中 attach 时复制并删除', () => {
+  it('mod+x 选中 attach 时等待剪贴板事件后再删除', () => {
     const deleteSpy = vi.spyOn(Transforms, 'delete');
     editor.children = [
       {
@@ -122,15 +123,16 @@ describe('useSystemKeyboard deepen branches', () => {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [0, 0], offset: 0 },
     };
-    dispatch({ key: 'x', ctrlKey: true });
-    expect(copy).toHaveBeenCalledWith(
-      expect.stringContaining('attach://file?size=100'),
-    );
-    expect(deleteSpy).toHaveBeenCalled();
+    const before = JSON.stringify(editor.children);
+    const event = dispatch({ key: 'x', ctrlKey: true });
+    expect(copy).not.toHaveBeenCalled();
+    expect(deleteSpy).not.toHaveBeenCalled();
+    expect(event.defaultPrevented).toBe(false);
+    expect(JSON.stringify(editor.children)).toBe(before);
     deleteSpy.mockRestore();
   });
 
-  it('copy 抛错时被吞掉', () => {
+  it('媒体复制快捷键不调用 copy-to-clipboard', () => {
     vi.mocked(copy).mockImplementation(() => {
       throw new Error('copy-fail');
     });
@@ -142,6 +144,7 @@ describe('useSystemKeyboard deepen branches', () => {
       focus: { path: [0, 0], offset: 0 },
     };
     expect(() => dispatch({ key: 'c', ctrlKey: true })).not.toThrow();
+    expect(copy).not.toHaveBeenCalled();
     vi.mocked(copy).mockReturnValue(true);
   });
 

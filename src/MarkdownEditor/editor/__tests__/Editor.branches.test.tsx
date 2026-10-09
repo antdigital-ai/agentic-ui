@@ -15,6 +15,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 let editableProps: Record<string, any> = {};
 let slateOnChange: ((v: any[]) => void) | null = null;
+let slateInitialValue: any[] = [];
 let mockStoreConfig: any = {};
 const mockOnKeyDown = vi.fn();
 const mockOnChange = vi.fn();
@@ -26,7 +27,8 @@ vi.mock('../../../Hooks/useDebounceFn', () => ({
   useDebounceFn: (fn: any) => ({ run: fn, cancel: vi.fn() }),
 }));
 
-vi.mock('slate', () => ({
+vi.mock('slate', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('slate')>()),
   Editor: {
     fragment: vi.fn(() => []),
     hasPath: vi.fn(() => true),
@@ -35,6 +37,7 @@ vi.mock('slate', () => ({
     nodes: vi.fn(function* () {}),
     start: vi.fn(() => ({ path: [0, 0], offset: 0 })),
     end: vi.fn(() => ({ path: [0, 0], offset: 0 })),
+    normalize: vi.fn(),
   },
   Node: {
     get: vi.fn(() => ({ type: 'paragraph', children: [{ text: '' }] })),
@@ -54,8 +57,9 @@ vi.mock('slate', () => ({
 }));
 
 vi.mock('slate-react', () => ({
-  Slate: ({ children, onChange }: any) => {
+  Slate: ({ children, onChange, initialValue }: any) => {
     slateOnChange = onChange;
+    slateInitialValue = initialValue;
     return children;
   },
   Editable: (props: Record<string, any>) => {
@@ -162,7 +166,9 @@ vi.mock('../utils/editorUtils', () => ({
 }));
 
 vi.mock('../../BaseMarkdownEditor', () => ({
-  parserMdToSchema: vi.fn(() => ({ schema: [] })),
+  parserMdToSchema: vi.fn((text: string) => ({
+    schema: text ? [{ type: 'paragraph', children: [{ text }] }] : [],
+  })),
 }));
 
 vi.mock('../../plugin', () => ({
@@ -927,7 +933,7 @@ describe('Editor branches - handlePasteEvent', () => {
     ).not.toHaveBeenCalled();
   });
 
-  it('non-collapsed selection triggers delete before paste', async () => {
+  it('delegates replacement without eagerly deleting a non-collapsed selection', async () => {
     const { editor } = setupStore({ readonly: false });
     editor.selection = {
       anchor: { path: [0, 0], offset: 0 },
@@ -951,7 +957,7 @@ describe('Editor branches - handlePasteEvent', () => {
     editableProps.onPaste(event);
     await flushPromises();
 
-    expect(Transforms.delete).toHaveBeenCalled();
+    expect(Transforms.delete).not.toHaveBeenCalled();
   });
 
   it('handleTagNodePaste returns true stops paste', async () => {
@@ -973,7 +979,10 @@ describe('Editor branches - handlePasteEvent', () => {
     const event = {
       preventDefault: vi.fn(),
       stopPropagation: vi.fn(),
-      clipboardData: createClipboardData({ types: ['text/plain'] }),
+      clipboardData: createClipboardData({
+        types: ['text/plain'],
+        getData: (type: string) => (type === 'text/plain' ? 'tag text' : ''),
+      }),
       target: document.createElement('div'),
     } as any;
 
@@ -1426,7 +1435,7 @@ describe('Editor branches - handlePasteEvent', () => {
     expect(Transforms.insertText).not.toHaveBeenCalled();
   });
 
-  it('fallback to ReactEditor.insertData for unsupported types', async () => {
+  it('does not insert unsupported clipboard types through the native fallback', async () => {
     const { editor } = setupStore({ readonly: false });
     editor.selection = null;
     vi.mocked(handlePasteModule.handleTagNodePaste).mockReturnValue(false);
@@ -1447,7 +1456,7 @@ describe('Editor branches - handlePasteEvent', () => {
     editableProps.onPaste(event);
     await flushPromises();
 
-    expect(ReactEditor.insertData).toHaveBeenCalled();
+    expect(ReactEditor.insertData).not.toHaveBeenCalled();
   });
 
   it('pasteConfig.allowedTypes filters out types', async () => {
@@ -2017,11 +2026,11 @@ describe('Editor branches - initialNote', () => {
     expect(editableProps).toBeDefined();
   });
 
-  it('EditorUtils.reset error falls back to deleteAll', () => {
+  it('初始化 normalize 失败时回退到默认文档', () => {
     setupStore({ readonly: false });
 
-    vi.mocked(EditorUtils.reset).mockImplementation(() => {
-      throw new Error('reset error');
+    vi.mocked(Editor.normalize).mockImplementationOnce(() => {
+      throw new Error('normalize error');
     });
 
     renderEditor({
@@ -3643,8 +3652,8 @@ describe('Editor branches - deepen round 2', () => {
     expect(EditorUtils.focus).not.toHaveBeenCalledWith(editor);
   });
 
-  it('initialNote 空 initSchemaValue 时不向 reset 传 schema', () => {
-    setupStore({ readonly: false });
+  it('空 initSchemaValue 使用默认段落且初始化不重复 reset', () => {
+    const { editor } = setupStore({ readonly: false });
     vi.mocked(EditorUtils.reset).mockClear();
 
     renderEditor({
@@ -3653,27 +3662,53 @@ describe('Editor branches - deepen round 2', () => {
       tableConfig: { minColumn: 2, minRows: 2 },
     });
 
-    expect(EditorUtils.reset).toHaveBeenCalledWith(
-      expect.anything(),
-      undefined,
-    );
+    expect(slateInitialValue).toEqual([
+      { type: 'paragraph', children: [{ text: '' }] },
+    ]);
+    expect(Editor.normalize).toHaveBeenCalledExactlyOnceWith(editor, {
+      force: true,
+    });
+    expect(EditorUtils.reset).not.toHaveBeenCalled();
+    expect(EditorUtils.deleteAll).not.toHaveBeenCalled();
   });
 
-  it('initialNote 有 schema 与 tableConfig 时调用 reset', () => {
-    setupStore({ readonly: false });
+  it('初始正文与表格最小尺寸在首次 Slate 渲染前准备且不重复 reset', () => {
+    const { editor } = setupStore({ readonly: false });
     vi.mocked(EditorUtils.reset).mockClear();
 
-    const schema = [{ type: 'paragraph', children: [{ text: 'seed' }] }];
+    const schema = [
+      { type: 'paragraph', children: [{ text: 'seed' }] },
+      {
+        type: 'table',
+        children: [
+          {
+            type: 'table-row',
+            children: [{ type: 'table-cell', children: [{ text: 'A' }] }],
+          },
+        ],
+      },
+    ];
     renderEditor({
       instance: { id: 'with-schema' },
       initSchemaValue: schema,
       tableConfig: { minColumn: 2, minRows: 2 },
     });
 
-    expect(EditorUtils.reset).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.arrayContaining([expect.objectContaining({ type: 'paragraph' })]),
-    );
+    expect(slateInitialValue[0]).toEqual(schema[0]);
+    expect(slateInitialValue[1].children).toHaveLength(2);
+    for (const row of slateInitialValue[1].children) {
+      expect(row.children).toHaveLength(2);
+    }
+    expect(slateInitialValue[1].children[0].children[0].children).toEqual([
+      { text: 'A' },
+    ]);
+    expect(schema[1].children).toHaveLength(1);
+    expect(schema[1].children[0].children).toHaveLength(1);
+    expect(Editor.normalize).toHaveBeenCalledExactlyOnceWith(editor, {
+      force: true,
+    });
+    expect(EditorUtils.reset).not.toHaveBeenCalled();
+    expect(EditorUtils.deleteAll).not.toHaveBeenCalled();
   });
 
   it('Word HTML 转 markdown 为空时回退 handleHtmlPaste', async () => {

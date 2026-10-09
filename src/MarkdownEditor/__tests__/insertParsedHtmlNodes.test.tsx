@@ -938,7 +938,7 @@ describe('insertParsedHtmlNodes', () => {
       expect(result).toBe(true);
     });
 
-    it('非折叠选区延迟回调会删除首个空段落', async () => {
+    it('替换选区后保留选区外的首个空段落', async () => {
       editor.children = [
         { type: 'paragraph', children: [{ text: '' }] },
         { type: 'paragraph', children: [{ text: 'keep' }] },
@@ -947,14 +947,12 @@ describe('insertParsedHtmlNodes', () => {
         anchor: { path: [1, 0], offset: 0 },
         focus: { path: [1, 0], offset: 2 },
       };
-      const deleteSpy = vi.spyOn(Transforms, 'delete');
       vi.useFakeTimers();
       const p = insertParsedHtmlNodes(editor, '<p>x</p>', {}, '');
       await vi.runAllTimersAsync();
       await p;
       vi.useRealTimers();
-      expect(deleteSpy).toHaveBeenCalledWith(editor, { at: [0] });
-      deleteSpy.mockRestore();
+      expect(editor.children.map(Node.string)).toEqual(['', 'Test contentep']);
     });
 
     it('list-item 空段落且父节点 children>1 时触发 moveNodes', async () => {

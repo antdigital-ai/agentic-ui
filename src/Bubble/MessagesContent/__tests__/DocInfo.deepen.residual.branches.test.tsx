@@ -31,8 +31,8 @@ vi.mock('../../../Components/ActionIconBox', () => ({
 const wrap = (
   ui: React.ReactNode,
   opts?: { locale?: any; compact?: boolean },
-) =>
-  render(
+) => {
+  const result = render(
     <ConfigProvider>
       <I18nContext.Provider value={{ locale: opts?.locale ?? {} } as any}>
         <BubbleConfigContext.Provider value={{ compact: opts?.compact } as any}>
@@ -41,6 +41,10 @@ const wrap = (
       </I18nContext.Provider>
     </ConfigProvider>,
   );
+  const toggle = result.container.querySelector('[class*="doc-info-label"]');
+  if (toggle) fireEvent.click(toggle);
+  return result;
+};
 
 describe('DocInfoList deepen residual branches', () => {
   beforeEach(() => {

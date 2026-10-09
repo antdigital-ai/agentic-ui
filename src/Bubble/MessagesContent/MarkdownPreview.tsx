@@ -1,12 +1,7 @@
 import { Popover } from 'antd';
-import React, { useContext, useEffect, useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import {
-  MarkdownEditor,
-  MarkdownEditorInstance,
-  MarkdownEditorProps,
-  parserMdToSchema,
-} from '../../';
+import { MarkdownEditor, MarkdownEditorProps } from '../../';
 import { useLocale } from '../../I18n';
 import { MarkdownRenderer } from '../../MarkdownRenderer';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
@@ -55,7 +50,6 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
     afterContent,
   } = props;
 
-  const editorRef = React.useRef<MarkdownEditorInstance | undefined>(undefined);
   const { hidePadding } = useContext(MessagesContext) || {};
   const config = useContext(BubbleConfigContext);
   const locale = useLocale();
@@ -69,12 +63,9 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
   const isFinished = props.originData?.isFinished ?? props.isFinished;
   const noPadding = !!extra;
 
-  useEffect(() => {
-    if (renderMode !== 'slate') return;
-    editorRef.current?.store.updateNodeList(parserMdToSchema(content).schema);
-  }, [content, renderMode]);
-
   const markdown = useMemo(() => {
+    if (content === '' && !rc?.initSchemaValue?.length) return null;
+
     if (renderMode === 'markdown') {
       return (
         <MarkdownRenderer
@@ -110,7 +101,6 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
       <MarkdownEditor
         {...(rc || {})}
         fncProps={fncProps}
-        editorRef={editorRef}
         initValue={content}
         toc={false}
         width="100%"
@@ -143,6 +133,11 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
     typing,
     props.originData?.isLast,
     props.originData?.isFinished,
+    props.originData?.isAborted,
+    props.style,
+    htmlRef,
+    isStreaming,
+    isFinished,
     noPadding,
     content,
     renderMode,

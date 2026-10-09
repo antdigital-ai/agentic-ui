@@ -1,9 +1,21 @@
 import '@testing-library/jest-dom';
-import { render, screen, within } from '@testing-library/react';
+import {
+  fireEvent,
+  render as renderComponent,
+  screen,
+  within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DocInfoList } from '../MessagesContent/DocInfo';
+
+const renderExpanded: typeof renderComponent = (...args) => {
+  const result = renderComponent(...args);
+  const toggle = result.container.querySelector('[class*="doc-info-label"]');
+  if (toggle) fireEvent.click(toggle);
+  return result;
+};
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
@@ -56,7 +68,7 @@ describe('DocInfoList', () => {
 
   describe('基本渲染测试', () => {
     it('应该正确渲染文档列表', () => {
-      render(<DocInfoList {...defaultProps} />);
+      renderExpanded(<DocInfoList {...defaultProps} />);
       expect(
         screen.getAllByText((content, node: any) => {
           const hasText = (node: any) =>
@@ -67,7 +79,7 @@ describe('DocInfoList', () => {
     });
 
     it('应该显示正确的文档数量', () => {
-      render(<DocInfoList {...defaultProps} />);
+      renderExpanded(<DocInfoList {...defaultProps} />);
       expect(
         screen.getAllByText((content, node: any) => {
           const hasText = (node: any) =>
@@ -85,7 +97,7 @@ describe('DocInfoList', () => {
     });
 
     it('应该渲染文档内容', () => {
-      render(<DocInfoList {...defaultProps} />);
+      renderExpanded(<DocInfoList {...defaultProps} />);
       expect(screen.getByText('Test document 1')).toBeInTheDocument();
       expect(screen.getByText('Test document 2')).toBeInTheDocument();
     });
@@ -93,13 +105,13 @@ describe('DocInfoList', () => {
 
   describe('文档项测试', () => {
     it('应该渲染文档项', () => {
-      render(<DocInfoList {...defaultProps} />);
+      renderExpanded(<DocInfoList {...defaultProps} />);
       expect(screen.getByText('Test document 1')).toBeInTheDocument();
       expect(screen.getByText('Test document 2')).toBeInTheDocument();
     });
 
     it('应该显示文档名称', () => {
-      render(<DocInfoList {...defaultProps} />);
+      renderExpanded(<DocInfoList {...defaultProps} />);
       expect(
         screen.getAllByText((content, node: any) => {
           const hasText = (node: any) =>
@@ -110,7 +122,7 @@ describe('DocInfoList', () => {
     });
 
     it('应该渲染操作按钮', () => {
-      render(<DocInfoList {...defaultProps} />);
+      renderExpanded(<DocInfoList {...defaultProps} />);
       expect(screen.getAllByLabelText('查看原文')).toHaveLength(
         defaultProps.options.length,
       );
@@ -134,7 +146,7 @@ describe('DocInfoList', () => {
           },
         ],
       };
-      render(<DocInfoList {...props} />);
+      renderExpanded(<DocInfoList {...props} />);
       expect(
         screen.getAllByText((content, node: any) => {
           const hasText = (node: any) =>
@@ -151,7 +163,7 @@ describe('DocInfoList', () => {
         ...defaultProps,
         options: [],
       };
-      render(<DocInfoList {...props} />);
+      renderExpanded(<DocInfoList {...props} />);
       expect(
         screen.getAllByText((content, node: any) => {
           const hasText = (node: any) =>
@@ -172,7 +184,7 @@ describe('DocInfoList', () => {
           },
         ],
       };
-      render(<DocInfoList {...props} />);
+      renderExpanded(<DocInfoList {...props} />);
       expect(screen.getByText('Empty Doc')).toBeInTheDocument();
     });
 
@@ -187,7 +199,7 @@ describe('DocInfoList', () => {
           },
         ],
       };
-      render(<DocInfoList {...props} />);
+      renderExpanded(<DocInfoList {...props} />);
       expect(
         screen.getAllByText((content, node: any) => {
           const hasText = (node: any) =>
@@ -200,7 +212,7 @@ describe('DocInfoList', () => {
 
   describe('样式测试', () => {
     it('应该应用正确的样式类名', () => {
-      render(<DocInfoList {...defaultProps} />);
+      renderExpanded(<DocInfoList {...defaultProps} />);
       expect(
         screen.getAllByText((content, node: any) => {
           const hasText = (node: any) =>
@@ -211,7 +223,7 @@ describe('DocInfoList', () => {
     });
 
     it('应该处理紧凑模式的样式', () => {
-      render(<DocInfoList {...defaultProps} />);
+      renderExpanded(<DocInfoList {...defaultProps} />);
       expect(
         screen.getAllByText((content, node: any) => {
           const hasText = (node: any) =>
@@ -224,7 +236,7 @@ describe('DocInfoList', () => {
 
   describe('动画测试', () => {
     it('应该应用正确的动画属性', () => {
-      const { container } = render(<DocInfoList {...defaultProps} />);
+      const { container } = renderExpanded(<DocInfoList {...defaultProps} />);
 
       // happy-dom 下 framer-motion mock 的 data-testid 可能未被渲染到 DOM，
       // 改为通过 container 查询所有带 data-testid="motion-div" 的元素，
@@ -248,7 +260,7 @@ describe('DocInfoList', () => {
   describe('交互与分支覆盖', () => {
     it('点击引用区域 label 应切换展开/收起 (115)', async () => {
       const user = userEvent.setup();
-      const { container } = render(
+      const { container } = renderExpanded(
         <DocInfoList
           {...defaultProps}
           options={[
@@ -278,14 +290,14 @@ describe('DocInfoList', () => {
           { placeholder: 'ref1', url: 'https://ref1.com', doc_id: '' },
         ],
       };
-      render(<DocInfoList {...props} />);
+      renderExpanded(<DocInfoList {...props} />);
       expect(screen.getByText('Doc')).toBeInTheDocument();
     });
 
     it('点击列表项且存在 onOriginUrlClick 时应调用回调 (212-213)', async () => {
       const user = userEvent.setup();
       const onOriginUrlClick = vi.fn();
-      render(
+      renderExpanded(
         <DocInfoList
           {...defaultProps}
           onOriginUrlClick={onOriginUrlClick}
@@ -308,7 +320,7 @@ describe('DocInfoList', () => {
     it('点击列表项且无 originUrl 时应调用 window.open (215)', async () => {
       const user = userEvent.setup();
       const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
-      render(
+      renderExpanded(
         <DocInfoList
           {...defaultProps}
           onOriginUrlClick={undefined}
@@ -332,7 +344,7 @@ describe('DocInfoList', () => {
     it('点击「查看原文」且存在 onOriginUrlClick 时应调用回调 (305-307)', async () => {
       const user = userEvent.setup();
       const onOriginUrlClick = vi.fn();
-      render(
+      renderExpanded(
         <DocInfoList
           {...defaultProps}
           onOriginUrlClick={onOriginUrlClick}
@@ -352,7 +364,7 @@ describe('DocInfoList', () => {
 
     it('点击「查看原文」且无 onOriginUrlClick 时不抛错 (308-310)', async () => {
       const user = userEvent.setup();
-      render(
+      renderExpanded(
         <DocInfoList
           {...defaultProps}
           onOriginUrlClick={undefined}
@@ -371,7 +383,7 @@ describe('DocInfoList', () => {
     });
 
     it('内容长度小于 20 时不包 Popover 直接渲染 dom (323)', () => {
-      render(
+      renderExpanded(
         <DocInfoList
           {...defaultProps}
           options={[
@@ -391,7 +403,7 @@ describe('DocInfoList', () => {
       const user = userEvent.setup();
       const longContent = 'A'.repeat(25);
       const docName = 'LongDocInPopover';
-      const { container: _container } = render(
+      const { container: _container } = renderExpanded(
         <DocInfoList
           {...defaultProps}
           options={[
@@ -429,7 +441,7 @@ describe('DocInfoList', () => {
       const renderItem = vi.fn((item: any, _dom: React.ReactNode) => (
         <div data-testid="custom-render">{item?.content}</div>
       ));
-      render(
+      renderExpanded(
         <DocInfoList
           {...defaultProps}
           options={[

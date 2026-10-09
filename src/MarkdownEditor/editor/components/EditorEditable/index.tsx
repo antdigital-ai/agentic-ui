@@ -1,6 +1,7 @@
 import type { ComponentProps } from 'react';
-import React, { useContext } from 'react';
-import { Editable, useSlate } from 'slate-react';
+import React, { useCallback, useContext, useRef } from 'react';
+import type { Node } from 'slate';
+import { Editable, useSlateSelector } from 'slate-react';
 import { I18nContext } from '../../../../I18n';
 import { useEditorStore } from '../../store';
 import { canUseSlateNativePlaceholder } from '../../utils/canUseSlateNativePlaceholder';
@@ -17,7 +18,22 @@ export type EditorEditableProps = Omit<
 
 export function EditorEditable(props: EditorEditableProps) {
   const { suppressPlaceholder = false, ...editableProps } = props;
-  const editor = useSlate();
+  const placeholderBlock = useRef<{ node: Node; eligible: boolean } | null>(
+    null,
+  );
+  const selectPlaceholder = useCallback(
+    (editor: Parameters<typeof canUseSlateNativePlaceholder>[0]) => {
+      if (editor.children.length !== 1) return false;
+      const node = editor.children[0];
+      const cached = placeholderBlock.current;
+      if (cached && cached.node === node) return cached.eligible;
+      const eligible = canUseSlateNativePlaceholder(editor);
+      placeholderBlock.current = { node, eligible };
+      return eligible;
+    },
+    [],
+  );
+  const canShowPlaceholder = useSlateSelector(selectPlaceholder);
   const { locale } = useContext(I18nContext);
   const { editorProps, readonly } = useEditorStore();
 
@@ -27,7 +43,7 @@ export function EditorEditable(props: EditorEditableProps) {
   );
 
   const placeholder =
-    !readonly && !suppressPlaceholder && canUseSlateNativePlaceholder(editor)
+    !readonly && !suppressPlaceholder && canShowPlaceholder
       ? placeholderText
       : undefined;
 

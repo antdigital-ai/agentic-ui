@@ -21,12 +21,62 @@ const storeState: any = {
   readonly: false,
 };
 
+// The component fixture delegates removal; real Slate behavior is covered by
+// MediaCard.deletion.regression.test.tsx.
+vi.mock('../../../plugins/cardPluginBehavior', async (importOriginal) => {
+  const actual =
+    await importOriginal<
+      typeof import('../../../plugins/cardPluginBehavior')
+    >();
+  return {
+    ...actual,
+    deleteMediaAtPath: vi.fn<typeof actual.deleteMediaAtPath>(
+      (editor, path) => {
+        Transforms.removeNodes(editor, { at: path });
+        return true;
+      },
+    ),
+  };
+});
+
+const currentImageNode = vi.hoisted(() => ({ current: undefined as unknown }));
+vi.mock('slate-react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('slate-react')>();
+  return {
+    ...actual,
+    useSelected: () => true,
+    ReactEditor: {
+      ...actual.ReactEditor,
+      findPath: (_editor: unknown, node: unknown) => {
+        currentImageNode.current = node;
+        return [0, 0];
+      },
+    },
+  };
+});
+vi.mock('slate', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('slate')>();
+  return {
+    ...actual,
+    Node: { ...actual.Node, get: () => currentImageNode.current },
+    Editor: {
+      ...actual.Editor,
+      withoutNormalizing: (_editor: unknown, callback: () => void) =>
+        callback(),
+    },
+  };
+});
+
 vi.mock('antd', () => {
   const confirm = vi.fn((opts: any) => {
     (globalThis as any).__imgConfirm = opts;
   });
   return {
-    Image: (props: any) => <img data-testid="antd-img" {...props} />,
+    Image: ({ 'data-testid': testId, 'data-be': dataBe, ...props }: any) => (
+      <div data-testid={testId} data-be={dataBe}>
+        <img data-testid="antd-img" {...props} />
+      </div>
+    ),
     Skeleton: { Image: () => <div data-testid="skeleton-image" /> },
     Popover: ({ children, content, open }: any) => (
       <div data-testid="popover" data-open={String(open)}>
@@ -87,6 +137,7 @@ vi.mock('../../../store', () => ({
 }));
 
 vi.mock('../../../../hooks/editor', () => ({
+  useElementSelected: () => true,
   useSelStatus: () => [false, [0]],
 }));
 

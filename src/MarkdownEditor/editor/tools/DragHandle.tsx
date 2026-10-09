@@ -37,9 +37,7 @@ export const DragHandle = (props: { style?: CSSProperties }) => {
           store.draggedElement = parent;
         }}
       >
-        <div data-drag-icon>
-          <HolderOutlined />
-        </div>
+        <HolderOutlined data-drag-icon />
       </span>
     </Tooltip>
   );

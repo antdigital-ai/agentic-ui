@@ -527,13 +527,15 @@ describe('handlePaste utilities', () => {
 
       expect(result).toBe(true);
       expect(mockUpload).toHaveBeenCalledTimes(1);
-      // 第一个 insertNodes 调用应得到 attach 节点
-      const insertedNode = insertNodesSpy.mock.calls[0]?.[1];
-      expect(insertedNode).toMatchObject({
-        type: 'attach',
-        name: 'doc.pdf',
-        url: 'https://example.com/doc.pdf',
-      });
+      // 文件批量插入，保持上传结果顺序
+      const insertedNodes = insertNodesSpy.mock.calls[0]?.[1];
+      expect(insertedNodes).toMatchObject([
+        {
+          type: 'attach',
+          name: 'doc.pdf',
+          url: 'https://example.com/doc.pdf',
+        },
+      ]);
       insertNodesSpy.mockRestore();
     });
 
@@ -827,7 +829,10 @@ describe('handlePaste utilities', () => {
           children: [{ text: '' }],
         },
       ];
-      const selection = { focus: { path: [0, 0], offset: 0 } };
+      const selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      };
 
       const result = shouldInsertTextDirectly(editor, selection);
       expect(result).toBe(true);
@@ -840,7 +845,10 @@ describe('handlePaste utilities', () => {
           children: [{ text: '' }],
         },
       ];
-      const selection = { focus: { path: [0, 0], offset: 0 } };
+      const selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      };
 
       const result = shouldInsertTextDirectly(editor, selection);
       expect(result).toBe(false);
@@ -851,7 +859,10 @@ describe('handlePaste utilities', () => {
     it('should handle tag node paste', () => {
       mockClipboardData.getData.mockReturnValue('Tag text');
       const curNode = { tag: true };
-      const selection = { focus: { path: [0, 0], offset: 0 } };
+      const selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      };
 
       const result = handleTagNodePaste(
         editor,
@@ -865,7 +876,10 @@ describe('handlePaste utilities', () => {
     it('should not handle non-tag nodes', () => {
       mockClipboardData.getData.mockReturnValue('Regular text');
       const curNode = { type: 'paragraph' };
-      const selection = { focus: { path: [0, 0], offset: 0 } };
+      const selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      };
 
       const result = handleTagNodePaste(
         editor,

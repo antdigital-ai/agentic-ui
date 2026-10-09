@@ -21,7 +21,7 @@ let mockSuggestionContext = createMockSuggestionContext();
 
 // 确保在所有测试中，SuggestionConnext.Provider 都提供了包含 open 属性的值
 
-// Mock useSlate 和 ReactEditor 方法
+// Mock useSlateStatic 和 ReactEditor 方法
 vi.mock('slate-react', async () => {
   const actual =
     await vi.importActual<typeof import('slate-react')>('slate-react');
@@ -38,7 +38,7 @@ vi.mock('slate-react', async () => {
 
   return {
     ...actual,
-    useSlate: () => mockEditor,
+    useSlateStatic: () => mockEditor,
     ReactEditor: {
       ...actual.ReactEditor,
       toSlateNode: vi.fn((_editor, domNode) => {
@@ -155,7 +155,7 @@ describe('TagPopup 组件测试', () => {
       render(
         <ConfigProvider>
           <SuggestionConnext.Provider value={mockSuggestionContext}>
-            <TagPopup text="test" items={items} open={true}>
+            <TagPopup text="test" items={items} open={true} type="dropdown">
               <span>test</span>
             </TagPopup>
           </SuggestionConnext.Provider>

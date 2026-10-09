@@ -2,6 +2,7 @@ import React, { memo, useMemo, useRef } from 'react';
 import type { Processor } from 'unified';
 
 import { renderMarkdownBlock } from '../markdownReactShared';
+import { compactStreamingTokens } from './compactStreamingTokens';
 import { shouldReparseLastBlock } from './lastBlockThrottle';
 
 export interface MarkdownBlockPieceProps {
@@ -53,11 +54,13 @@ export const MarkdownBlockPiece = memo(function MarkdownBlockPiece({
       // 触发不必要的子树替换（chart / agentar-card 等重组件依赖 React 同位置同
       // 类型 reconciliation 来保留实例）。
       if (lastParsedRef.current?.source === blockSource) {
-        const el = lastParsedRef.current.node;
+        const el = compactStreamingTokens(lastParsedRef.current.node);
+        lastParsedRef.current = { source: blockSource, node: el };
         cacheRef.current.set(blockSource, el);
         return el;
       }
-      const el = renderMarkdownBlock(blockSource, processor, comps);
+      const parsed = renderMarkdownBlock(blockSource, processor, comps);
+      const el = streaming ? compactStreamingTokens(parsed) : parsed;
       cacheRef.current.set(blockSource, el);
       return el;
     }

@@ -18,11 +18,15 @@ import { isHtml } from '../utils/htmlToMarkdown';
 import { toUnixPath } from '../utils/path';
 import { insertParsedHtmlNodes } from './insertParsedHtmlNodes';
 import { parseMarkdownToNodesAndInsert } from './parseMarkdownToNodesAndInsert';
+import { prepareMediaPaste } from './prepareMediaPaste';
 
 const isValidSlateNode = (node: unknown): node is Node => {
-  if (Element.isElement(node)) return true;
   if (Text.isText(node)) return true;
-  return false;
+  return (
+    Element.isElement(node) &&
+    node.children.length > 0 &&
+    node.children.every(isValidSlateNode)
+  );
 };
 
 /** 媒体文件扩展名映射 */
@@ -114,14 +118,22 @@ export const handleSlateMarkdownFragment = (
       // 单段落用 insertFragment(children) 保留 marks（bold / italic / mark / 颜色等），
       // 旧版本走 insertText 会丢全部叶子样式。
       const children = (fragment[0] as any)?.children;
-      if (Array.isArray(children) && children.length) {
+      if (
+        Array.isArray(children) &&
+        children.some(
+          (child) => !Text.isText(child) || (child.text ?? '').length > 0,
+        )
+      ) {
+        prepareMediaPaste(editor);
         Transforms.insertFragment(editor, children);
         return true;
       }
+      // 空 children 视为已处理：阻断后续 text/plain 降级，避免重复插入
       return true;
     }
 
     if (fragment.length === 0) return true;
+    prepareMediaPaste(editor);
     EditorUtils.replaceSelectedNode(editor, fragment);
     return true;
   } catch (error) {
@@ -196,6 +208,7 @@ export const handleFilesPaste = async (
   clipboardData: DataTransfer,
   editorProps: MarkdownEditorProps,
 ) => {
+  let selectionRef: ReturnType<typeof Editor.rangeRef> | undefined;
   try {
     const fileList = clipboardData.files;
     if (fileList.length === 0 || !editorProps.image?.upload) {
@@ -203,44 +216,60 @@ export const handleFilesPaste = async (
     }
 
     const files = Array.from(fileList);
+    if (editor.selection) {
+      selectionRef = Editor.rangeRef(editor, editor.selection, {
+        affinity: 'inward',
+      });
+    }
     // 一次批量上传；上传函数本身就接受 File[]
     const uploadResult = await editorProps.image.upload(files);
-    const uploadedUrls = (
-      Array.isArray(uploadResult) ? uploadResult : [uploadResult]
-    ).filter((u): u is string => typeof u === 'string' && !!u);
-
-    if (uploadedUrls.length === 0) return false;
-
-    const focusPath = editor?.selection?.focus?.path;
-    const parentNode = focusPath
-      ? Node.get(editor, Path.parent(focusPath)!)
-      : null;
-
-    const insertAt = focusPath
-      ? EditorUtils.findNext(editor, focusPath)!
-      : undefined;
-
-    uploadedUrls.forEach((uploadedUrl, idx) => {
-      const file = files[idx] || files[0];
+    const uploadedUrls = Array.isArray(uploadResult)
+      ? uploadResult
+      : [uploadResult];
+    const nodes: Node[] = [];
+    uploadedUrls.forEach((uploadedUrl, index) => {
+      if (typeof uploadedUrl !== 'string' || !uploadedUrl) return;
+      // Pair each result before skipping failed URLs to retain file types/names.
+      const file = files[index] || files[0];
       const mediaType = detectFileMediaType(file);
-      const node =
+      nodes.push(
         mediaType === 'attachment'
           ? buildAttachNode(uploadedUrl, file)
-          : EditorUtils.createMediaNode(uploadedUrl, mediaType);
-      Transforms.insertNodes(editor, node as any, {
-        at: [
-          ...(parentNode && parentNode.type === 'table-cell'
-            ? focusPath!
-            : insertAt
-              ? insertAt
-              : [editor.children.length - 1]),
-        ],
+          : EditorUtils.createMediaNode(uploadedUrl, mediaType),
+      );
+    });
+    if (!nodes.length) return false;
+    const selection = selectionRef?.current;
+    if (selectionRef && !selection) return false;
+
+    // Track the original paste range across edits while the upload is pending.
+    Editor.withoutNormalizing(editor, () => {
+      if (selection) {
+        Transforms.select(editor, selection);
+        prepareMediaPaste(editor);
+        if (!Range.isCollapsed(selection))
+          Transforms.delete(editor, { at: selection });
+      }
+      const focusPath = editor.selection?.focus.path;
+      const parentNode = focusPath
+        ? Node.get(editor, Path.parent(focusPath))
+        : null;
+      const insertAt = focusPath
+        ? EditorUtils.findNext(editor, focusPath)
+        : undefined;
+      Transforms.insertNodes(editor, nodes, {
+        at:
+          parentNode?.type === 'table-cell'
+            ? focusPath
+            : insertAt || [editor.children.length],
       });
     });
     return true;
   } catch (error) {
     console.error('[handlePaste] 文件粘贴上传失败:', error);
     return false;
+  } finally {
+    selectionRef?.unref();
   }
 };
 
@@ -260,17 +289,19 @@ export const handleSpecialTextPaste = (
       url = toUnixPath(url);
     }
     if (path && url) {
+      prepareMediaPaste(editor);
+      if (Range.isRange(selection) && !Range.isCollapsed(selection)) {
+        Transforms.delete(editor, { at: selection });
+      }
+      const insertAt = EditorUtils.findMediaInsertPath(editor);
+      if (!insertAt) return false;
       if (text.startsWith('media://')) {
         Editor.withoutNormalizing(editor, () => {
           Transforms.insertNodes(
             editor,
             EditorUtils.createMediaNode(url!, 'image'),
-            { select: true, at: path },
+            { select: true, at: insertAt },
           );
-          const next = Editor.next(editor, { at: path });
-          if (next && next[0].type === 'paragraph' && !Node.string(next[0])) {
-            Transforms.delete(editor, { at: selection! });
-          }
         });
         return true;
       }
@@ -285,12 +316,8 @@ export const handleSpecialTextPaste = (
             url,
             children: [{ text: '' }],
           },
-          { select: true, at: path },
+          { select: true, at: insertAt },
         );
-        const next = Editor.next(editor, { at: path });
-        if (next && next[0].type === 'paragraph' && !Node.string(next[0])) {
-          Transforms.delete(editor, { at: selection! });
-        }
       });
       return true;
     }
@@ -315,18 +342,25 @@ export const handleHttpLinkPaste = (
     if (isValidMediaUrl(text, mediaType)) {
       const path = EditorUtils.findMediaInsertPath(editor);
       if (!path) return false;
+      const targetSelection = prepareMediaPaste(editor)
+        ? editor.selection
+        : selection;
       Transforms.insertNodes(
         editor,
-        EditorUtils.createMediaNode(text, 'image'),
+        EditorUtils.createMediaNode(text, mediaType),
         {
           select: true,
-          at: selection ?? undefined,
+          at: targetSelection ?? undefined,
         },
       );
       return true;
     }
   }
 
+  if (Range.isRange(selection) && !Range.isCollapsed(selection)) {
+    Transforms.delete(editor, { at: selection });
+  }
+  prepareMediaPaste(editor);
   store.insertLink(text);
   return true;
 };
@@ -356,8 +390,11 @@ export const handlePlainTextPaste = async (
     if (success) return true;
   }
 
-  if (selection) {
-    Transforms.insertText(editor, text, { at: selection });
+  // HTML 解析可能异步返回 false，此时使用当前选区而不是解析前的 Range。
+  prepareMediaPaste(editor);
+  const currentSelection = editor.selection;
+  if (currentSelection) {
+    Transforms.insertText(editor, text, { at: currentSelection });
   } else {
     Transforms.insertNodes(editor, [
       {
@@ -400,7 +437,7 @@ export const handleTagNodePaste = (
     const text = clipboardData.getData('text/plain');
     if (text) {
       Transforms.insertText(editor, text, {
-        at: currentTextSelection.focus,
+        at: currentTextSelection,
       });
       return true;
     }

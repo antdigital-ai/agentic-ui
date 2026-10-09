@@ -290,9 +290,7 @@ describe('List Components', () => {
           },
         };
         const { container } = render(<ListItem {...taskItemProps} />);
-        await vi.waitFor(() => {
-          expect(loadMentions).toHaveBeenCalled();
-        });
+        expect(loadMentions).not.toHaveBeenCalled();
         const trigger = container.querySelector('.ant-dropdown-trigger');
         const wrapperDiv =
           trigger?.parentElement ??
@@ -331,12 +329,12 @@ describe('List Components', () => {
           },
         };
         const { container } = render(<ListItem {...taskItemProps} />);
+        const trigger = container.querySelector('.ant-dropdown-trigger');
+        expect(loadMentions).not.toHaveBeenCalled();
+        fireEvent.mouseEnter(trigger!);
         await vi.waitFor(() => {
           expect(loadMentions).toHaveBeenCalled();
         });
-        const trigger =
-          container.querySelector('.ant-dropdown-trigger') ??
-          container.querySelector('div[style*="cursor: pointer"]');
         if (trigger) {
           fireEvent.click(trigger);
           await vi.waitFor(() => {

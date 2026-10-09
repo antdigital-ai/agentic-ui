@@ -31,9 +31,12 @@
 ## 逐词淡入（展示层）
 
 - 与块缓存正交：`rehypeStreamingTokens` 在最终 hast 上把可见文本拆成 `.stream-token` span；CSS `agenticMdBlurFadeIn` 仅对新节点播放。
+- 仅活动末块保留动画 span；封版时复用 React 树，去除内部标记的动画 span 并合并相邻文本节点。段落、链接、格式和自定义代码组件保持原有类型与 key，不重新解析封版块。
 - 开关：`throttleOptions.fade`（默认开启，仅 `streaming`）；代码块 / 表格 / KaTeX 跳过拆词。
 - processor 实例在流式会话内保持稳定，避免 chart / 代码块因 plugin 引用变化而卸载重挂。
 
 ## 性能上限
+
+- 渐进渲染只在初次加载或文档修订代变化时重新从首批开始。同一文档追加正文或结束流式时保留已挂载块，避免后部图表、代码和媒体重复挂载。
 
 - `useStreaming` 的 pending 缓冲区由各 recognizer 的正则上限决定：link/image/html 限 1000 字符、emphasis 限 1000、inline-code 限 300。pending 超过上限时正则不再匹配，自然走 `commitCache` 路径——所以"不完整 token 暂缓"对超长行有自我兜底。

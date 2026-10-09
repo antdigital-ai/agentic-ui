@@ -6,7 +6,6 @@ import {
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import React, { memo, useContext, useRef } from 'react';
-import { useClickAway } from '../../../../../Hooks/useClickAway';
 import { useRefFunction } from '../../../../../Hooks/useRefFunction';
 import { I18nContext } from '../../../../../I18n';
 import { useEditorStore } from '../../../store';
@@ -17,6 +16,7 @@ import {
   selectTableColumn,
   selectWholeTable,
 } from '../commands/tableCommands';
+import { TableChromeActions } from '../TableChromeActions';
 import {
   useSetTableChromePosition,
   useTableColumnChromeActive,
@@ -191,12 +191,6 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = memo(
 
     const ref = useRef<HTMLTableDataCellElement>(null);
 
-    useClickAway(() => {
-      if (shouldShowDeleteIcon) {
-        clearSelect();
-      }
-    }, ref);
-
     const shouldShowInsertButtons = shouldShowDeleteIcon;
 
     const stopEditorMouseDown = useRefFunction((e: React.MouseEvent) => {
@@ -229,52 +223,61 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = memo(
             : undefined
         }
       >
-        <div
-          className={classNames(
-            `${baseClassName}-action-buttons`,
-            shouldShowDeleteIcon && `${baseClassName}-action-buttons-visible`,
-          )}
-        >
-          {/* 总是显示增加列的按钮 */}
-          {shouldShowInsertButtons && (
+        {shouldShowDeleteIcon && (
+          <TableChromeActions targetRef={ref} onDismiss={clearSelect}>
             <div
               className={classNames(
-                `${baseClassName}-action-button`,
-                `${baseClassName}-insert-column-before`,
+                `${baseClassName}-action-buttons`,
+                shouldShowDeleteIcon &&
+                  `${baseClassName}-action-buttons-visible`,
               )}
-              onClick={handleInsertColumnBefore}
-              onMouseDown={stopEditorMouseDown}
-              title={locale?.['table.insertColumnBefore'] || '在前面增加一列'}
             >
-              <InsertRowLeftOutlined />
-            </div>
-          )}
-          <div
-            className={classNames(
-              `${baseClassName}-action-button`,
-              `${baseClassName}-delete-icon`,
-            )}
-            onClick={handleDeleteClick}
-            onMouseDown={stopEditorMouseDown}
-            title={locale?.['table.deleteColumn'] || '删除整列'}
-          >
-            <DeleteOutlined />
-          </div>
-          {/* 总是显示增加列的按钮 */}
-          {shouldShowInsertButtons && (
-            <div
-              className={classNames(
-                `${baseClassName}-action-button`,
-                `${baseClassName}-insert-column-after`,
+              {/* 总是显示增加列的按钮 */}
+              {shouldShowInsertButtons && (
+                <div
+                  className={classNames(
+                    `${baseClassName}-action-button`,
+                    `${baseClassName}-insert-column-before`,
+                  )}
+                  onClick={handleInsertColumnBefore}
+                  onMouseDown={stopEditorMouseDown}
+                  title={
+                    locale?.['table.insertColumnBefore'] || '在前面增加一列'
+                  }
+                >
+                  <InsertRowLeftOutlined />
+                </div>
               )}
-              onClick={handleInsertColumnAfter}
-              onMouseDown={stopEditorMouseDown}
-              title={locale?.['table.insertColumnAfter'] || '在后面增加一列'}
-            >
-              <InsertRowRightOutlined />
+              <div
+                className={classNames(
+                  `${baseClassName}-action-button`,
+                  `${baseClassName}-delete-icon`,
+                )}
+                onClick={handleDeleteClick}
+                onMouseDown={stopEditorMouseDown}
+                title={locale?.['table.deleteColumn'] || '删除整列'}
+              >
+                <DeleteOutlined />
+              </div>
+              {/* 总是显示增加列的按钮 */}
+              {shouldShowInsertButtons && (
+                <div
+                  className={classNames(
+                    `${baseClassName}-action-button`,
+                    `${baseClassName}-insert-column-after`,
+                  )}
+                  onClick={handleInsertColumnAfter}
+                  onMouseDown={stopEditorMouseDown}
+                  title={
+                    locale?.['table.insertColumnAfter'] || '在后面增加一列'
+                  }
+                >
+                  <InsertRowRightOutlined />
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </TableChromeActions>
+        )}
       </td>
     );
   },

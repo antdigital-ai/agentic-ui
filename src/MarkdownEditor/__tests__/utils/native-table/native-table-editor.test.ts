@@ -16,6 +16,7 @@ vi.mock('slate', async () => {
       ...(actual as any).Editor,
       above: vi.fn(),
       isBlock: vi.fn(() => true),
+      withoutNormalizing: vi.fn((_editor, callback) => callback()),
     },
   };
 });

@@ -1159,10 +1159,12 @@ describe('SlateMarkdownEditor', () => {
       expect(screen.getByRole('textbox')).toBeInTheDocument();
     });
 
-    it('EditorUtils.reset 抛错时应 fallback 到 deleteAll', () => {
-      const resetSpy = vi.spyOn(EditorUtils, 'reset').mockImplementation(() => {
-        throw new Error('reset error');
-      });
+    it('初始化 normalize 抛错时应 fallback 到 deleteAll', () => {
+      const normalizeSpy = vi
+        .spyOn(Editor, 'normalize')
+        .mockImplementationOnce(() => {
+          throw new Error('normalize error');
+        });
       const deleteAllSpy = vi
         .spyOn(EditorUtils, 'deleteAll')
         .mockImplementation(() => {});
@@ -1172,7 +1174,7 @@ describe('SlateMarkdownEditor', () => {
         ],
       });
       expect(deleteAllSpy).toHaveBeenCalled();
-      resetSpy.mockRestore();
+      normalizeSpy.mockRestore();
       deleteAllSpy.mockRestore();
     });
   });

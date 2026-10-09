@@ -12,29 +12,18 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { useRefFunction } from '../../../../Hooks/useRefFunction';
-
 import { Rnd } from 'react-rnd';
-import { Path, Transforms } from 'slate';
+import { Editor, Node, Path, Transforms } from 'slate';
+import { ReactEditor } from 'slate-react';
 import { ActionIconBox } from '../../../../Components/ActionIconBox';
-import { useDebounceFn } from '../../../../Hooks/useDebounceFn';
+import { useRefFunction } from '../../../../Hooks/useRefFunction';
 import { I18nContext } from '../../../../I18n';
-import { debugInfo } from '../../../../Utils/debugUtils';
 import { ElementProps, MediaNode } from '../../../el';
-import { useSelStatus } from '../../../hooks/editor';
+import { useElementSelected } from '../../../hooks/editor';
 import { MediaErrorLink } from '../../components/MediaErrorLink';
+import { deleteMediaAtPath } from '../../plugins/cardPluginBehavior';
 import { useEditorStore } from '../../store';
-import { useGetSetState } from '../../utils';
-import { getMediaType } from '../../utils/dom';
 
-/**
- * 只读模式下的图片组件，带有错误处理功能
- * 如果图片加载失败，将显示可点击的链接
- *
- * @component
- * @param props - 图片属性
- * @returns 返回一个图片组件，如果加载失败则返回一个链接
- */
 interface ReadonlyImageProps {
   src?: string;
   alt?: string;
@@ -43,378 +32,357 @@ interface ReadonlyImageProps {
   crossOrigin?: 'anonymous' | 'use-credentials' | '';
 }
 
-export const ReadonlyImage: React.FC<ReadonlyImageProps> = ({
-  src,
-  alt,
-  width,
-  height,
-  crossOrigin,
-}) => {
-  const { editorProps } = useEditorStore();
-  const [error, setError] = React.useState(false);
+function useImageSource(src?: string) {
+  const source = useMemo(() => ({ src }), [src]);
+  const currentSource = useRef<typeof source | null>(null);
+  useLayoutEffect(() => {
+    currentSource.current = source;
+    return () => {
+      currentSource.current = null;
+    };
+  }, [source]);
+  return { source, currentSource };
+}
 
-  // 图片加载失败时显示为链接
-  if (error) {
-    return <MediaErrorLink url={src} displayText={alt || src || '图片链接'} />;
-  }
+/** A single displayed image owns loading failures; replacing its URL retries. */
+export const ReadonlyImage: React.FC<ReadonlyImageProps> = React.memo(
+  ({ src, alt, width, height, crossOrigin }) => {
+    const { editorProps } = useEditorStore();
+    const { source, currentSource } = useImageSource(src);
+    const [failedSource, setFailedSource] = useState<typeof source | null>(
+      null,
+    );
 
-  const imageProps: ImageProps = {
-    src,
-    alt: alt || 'image',
-    // 未传 width 时不设默认值，宽度交给 CSS（与 MarkdownRenderer img 渲染保持一致）
-    width: width ? Number(width) || width : undefined,
-    height,
-    preview: {
-      getContainer: () => document.body,
-    },
-    referrerPolicy: 'no-referrer',
-    crossOrigin,
-    draggable: false,
-    style: {
-      maxWidth: '100%',
-      height: 'auto',
-      display: 'block',
-    },
-    onError: () => {
-      setError(true);
-    },
-  };
+    if (failedSource === source) {
+      return (
+        <MediaErrorLink url={src} displayText={alt || src || '图片链接'} />
+      );
+    }
 
-  if (editorProps?.image?.render) {
-    return editorProps.image.render?.(imageProps, <Image {...imageProps} />);
-  }
+    const imageProps: ImageProps = {
+      src,
+      alt: alt || 'image',
+      width: width ? Number(width) || width : undefined,
+      height,
+      preview: { getContainer: () => document.body },
+      referrerPolicy: 'no-referrer',
+      crossOrigin,
+      draggable: false,
+      loading: 'lazy',
+      decoding: 'async',
+      style: { maxWidth: '100%', height: 'auto', display: 'block' },
+      onError: () => {
+        if (currentSource.current === source) setFailedSource(source);
+      },
+    };
+    const image = (
+      <Image
+        key={src}
+        {...imageProps}
+        data-testid="image-container"
+        data-be="image-container"
+      />
+    );
+    if (editorProps?.image?.render) {
+      return editorProps.image.render(imageProps, image);
+    }
+    return image;
+  },
+);
+ReadonlyImage.displayName = 'ReadonlyImage';
 
-  return (
-    <div data-testid="image-container" data-be="image-container">
-      <Image {...imageProps} />
-    </div>
-  );
-};
-
-/**
- * 修复图片大小的问题
- * @param props
- * @returns
- */
-export const ResizeImage = ({
-  onResizeStart,
-  onResizeStop,
-  selected,
-  defaultSize,
-  ...props
-}: React.ImgHTMLAttributes<HTMLImageElement> & {
+export interface ResizeImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   onResizeStart?: () => void;
   onResizeStop?: (size: {
     width: number | string;
     height: number | string;
   }) => void;
-  defaultSize?: {
-    width?: number;
-    height?: number;
-  };
+  defaultSize?: { width?: number | string; height?: number | string };
+  /** Only active images mount resize handles; omission preserves the standalone API. */
   selected?: boolean;
-}) => {
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState(false);
-  const radio = useRef<number>(1);
-  const [size, setSize] = React.useState({
-    width: defaultSize?.width || 400,
-    height: defaultSize?.height || 0,
-  } as {
-    width: number | string;
-    height: number | string;
-  });
-  const imgRef = useRef<HTMLImageElement>(null);
+}
 
-  const resize = useDebounceFn((size: { width: number; height?: number }) => {
-    setSize({
-      width: size.width,
-      height: size.width / radio.current,
+const positiveDimension = (value: number | string | undefined) => {
+  if (typeof value === 'string' && !value.trim()) return undefined;
+  const dimension = Number(value);
+  return Number.isFinite(dimension) && dimension > 0 ? dimension : undefined;
+};
+
+const resizeHandleStyle = { pointerEvents: 'auto' as const };
+const resizeHandleStyles = {
+  top: resizeHandleStyle,
+  right: resizeHandleStyle,
+  bottom: resizeHandleStyle,
+  left: resizeHandleStyle,
+  topRight: resizeHandleStyle,
+  bottomRight: resizeHandleStyle,
+  bottomLeft: resizeHandleStyle,
+  topLeft: resizeHandleStyle,
+};
+// Ant Design 5 names the panel body; Ant Design 6 names it content.
+const imagePopoverStyles = { body: { padding: 8 }, content: { padding: 8 } };
+
+/** Resize locally during dragging, then persist the actual final size once. */
+export const ResizeImage = React.memo(
+  ({
+    onResizeStart,
+    onResizeStop,
+    selected,
+    defaultSize,
+    src,
+    alt,
+    onLoad,
+    onError,
+    style,
+    ...props
+  }: ResizeImageProps) => {
+    const { source, currentSource } = useImageSource(src);
+    const [loadState, setLoadState] = useState({
+      source,
+      loaded: false,
+      error: false,
     });
-    imgRef.current?.style.setProperty('width', `${size.width}px`);
-    imgRef.current?.style.setProperty(
-      'height',
-      `${size.width / radio.current}px`,
+    const loading = loadState.source !== source || !loadState.loaded;
+    const error = loadState.source === source && loadState.error;
+    const initialSize = {
+      width: positiveDimension(defaultSize?.width) ?? 400,
+      height: positiveDimension(defaultSize?.height) ?? 0,
+    };
+    const [size, setSize] = useState(initialSize);
+    const currentSize = useRef(initialSize);
+    const ratio = useRef(
+      initialSize.height ? initialSize.width / initialSize.height : 1,
     );
-  }, 160);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const imageRef = useRef<HTMLImageElement>(null);
+    const [maxWidth, setMaxWidth] = useState<number>();
 
-  // 如果图片加载失败，显示为链接
-  if (error) {
-    return (
-      <MediaErrorLink
-        url={props.src}
-        displayText={props.alt || props.src || '图片链接'}
+    useEffect(() => {
+      const nextSize = {
+        width: positiveDimension(defaultSize?.width) ?? 400,
+        height: positiveDimension(defaultSize?.height) ?? 0,
+      };
+      currentSize.current = nextSize;
+      if (nextSize.height) ratio.current = nextSize.width / nextSize.height;
+      setSize((previous) =>
+        previous.width === nextSize.width && previous.height === nextSize.height
+          ? previous
+          : nextSize,
+      );
+    }, [src, defaultSize?.width, defaultSize?.height]);
+
+    const availableWidth = () =>
+      positiveDimension(containerRef.current?.parentElement?.clientWidth);
+    const finalSize = (element?: HTMLElement) => {
+      const width =
+        positiveDimension(element?.clientWidth) ?? currentSize.current.width;
+      const height =
+        positiveDimension(element?.clientHeight) ??
+        (currentSize.current.height ? width / ratio.current : 0);
+      return { width, height };
+    };
+
+    if (error) {
+      return (
+        <MediaErrorLink
+          url={src}
+          displayText={alt || src || '图片链接'}
+          style={{ fontSize: '13px', lineHeight: '1.5' }}
+        />
+      );
+    }
+
+    const image = (
+      <img
+        {...props}
+        key={src}
+        ref={imageRef}
+        src={src}
+        alt={alt || 'image'}
+        draggable={false}
+        referrerPolicy="no-referrer"
+        loading={props.loading ?? 'lazy'}
+        decoding={props.decoding ?? 'async'}
+        width={size.width}
+        height={size.height || undefined}
         style={{
-          fontSize: '13px',
-          lineHeight: '1.5',
+          width: '100%',
+          height: size.height ? '100%' : 'auto',
+          display: 'block',
+          visibility: loading ? 'hidden' : undefined,
+          minHeight: loading ? 40 : undefined,
+          outline: selected ? '2px solid #1890ff' : undefined,
+          userSelect: 'none',
+          pointerEvents: 'none',
+          ...style,
+        }}
+        onLoad={(event) => {
+          if (currentSource.current !== source) return;
+          const imageElement = event.currentTarget;
+          const requestedWidth = positiveDimension(defaultSize?.width) ?? 400;
+          const requestedHeight = positiveDimension(defaultSize?.height);
+          if (requestedHeight) {
+            ratio.current = requestedWidth / requestedHeight;
+          } else if (
+            imageElement.naturalWidth > 0 &&
+            imageElement.naturalHeight > 0
+          ) {
+            ratio.current =
+              imageElement.naturalWidth / imageElement.naturalHeight;
+          }
+          const limit = availableWidth();
+          setMaxWidth(limit);
+          const width = Math.min(requestedWidth, limit ?? Infinity);
+          const nextSize = {
+            width,
+            height: width / ratio.current,
+          };
+          currentSize.current = nextSize;
+          setSize(nextSize);
+          setLoadState({ source, loaded: true, error: false });
+          onLoad?.(event);
+        }}
+        onError={(event) => {
+          if (currentSource.current !== source) return;
+          setLoadState({ source, loaded: false, error: true });
+          onError?.(event);
         }}
       />
     );
-  }
 
-  return (
-    <div
-      data-testid="resize-image-container"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 4,
-        overflow: 'hidden',
-        width: size.width as number,
-        height: size.height as number,
-        maxWidth: '100%',
-        boxSizing: 'border-box',
-      }}
-    >
-      {loading ? (
-        <div
-          style={{
-            width: '24px',
-            height: '24px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'rgba(0,0,0,0.05)',
-            borderRadius: 12,
-          }}
-        >
-          <LoadingOutlined
-            style={{
-              fontSize: 16,
-              color: '#1890ff',
-            }}
-          />
-        </div>
-      ) : null}
-      <Rnd
-        onResizeStart={onResizeStart}
-        onResizeStop={() => {
-          onResizeStop?.(size);
-        }}
-        default={{
-          x: 0,
-          y: 0,
-          width: defaultSize?.width || '100%',
-          height: defaultSize?.height || '100%',
-        }}
-        size={size}
-        disableDragging
+    return (
+      <div
+        ref={containerRef}
+        data-testid="resize-image-container"
         style={{
-          userSelect: 'none',
-          WebkitUserSelect: 'none',
-          MozUserSelect: 'none',
-          msUserSelect: 'none',
-        }}
-        onResize={(_, dir, ele) => {
-          imgRef.current?.style.setProperty('width', `${ele.clientWidth}px`);
-          imgRef.current?.style.setProperty(
-            'height',
-            `${ele.clientWidth / radio.current}px`,
-          );
-
-          resize.cancel();
-          resize.run({
-            width: ele.clientWidth,
-            height: ele.clientWidth / radio.current,
-          });
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: 4,
+          width: size.width,
+          height: size.height || undefined,
+          minHeight: loading ? 40 : undefined,
+          maxWidth: '100%',
+          boxSizing: 'border-box',
         }}
       >
-        <img
-          draggable={false}
-          onLoad={(e) => {
-            setLoading(false);
-            let width = (e.target as HTMLImageElement).naturalWidth;
-            const height = (e.target as HTMLImageElement).naturalHeight;
-            radio.current = width / height;
-            const containerWidth =
-              document.documentElement.clientWidth || window.innerWidth || 600;
-            const maxAllowedWidth = Math.min(containerWidth * 0.9, 600);
-            width = Math.min(defaultSize?.width || 400, maxAllowedWidth);
-            setSize({
-              width: width,
-              height: width / radio.current,
-            });
-          }}
-          onError={() => {
-            setError(true);
-          }}
-          alt={'image'}
-          referrerPolicy={'no-referrer'}
-          width={`min(${size.width}px, 100%)`}
-          ref={imgRef}
-          style={{
-            width: '100%',
-            height: 'auto',
-            position: 'relative',
-            zIndex: 99,
-            outline: selected ? '2px solid #1890ff' : 'none',
-            boxShadow: selected ? '0 0 0 2px #1890ff' : 'none',
-            minHeight: 20,
-            display: loading ? 'none' : 'block',
-            userSelect: 'none',
-            WebkitUserSelect: 'none',
-            MozUserSelect: 'none',
-            msUserSelect: 'none',
-            pointerEvents: 'none',
-          }}
-          {...props}
-        />
-      </Rnd>
-    </div>
-  );
-};
+        {loading ? (
+          <LoadingOutlined
+            style={{ position: 'absolute', fontSize: 16, color: '#1890ff' }}
+          />
+        ) : null}
+        {image}
+        {selected !== false ? (
+          <Rnd
+            size={size}
+            position={{ x: 0, y: 0 }}
+            disableDragging
+            lockAspectRatio={ratio.current}
+            minWidth={40}
+            minHeight={20}
+            maxWidth={maxWidth}
+            style={{ userSelect: 'none', pointerEvents: 'none' }}
+            resizeHandleStyles={resizeHandleStyles}
+            onResizeStart={() => {
+              if (currentSource.current !== source) return;
+              setMaxWidth(availableWidth());
+              onResizeStart?.();
+            }}
+            onResize={(_event, _direction, element) => {
+              if (currentSource.current !== source) return;
+              const nextSize = finalSize(element);
+              currentSize.current = nextSize;
+              if (containerRef.current) {
+                containerRef.current.style.width = `${nextSize.width}px`;
+                containerRef.current.style.height = `${nextSize.height}px`;
+              }
+            }}
+            onResizeStop={(_event, _direction, element) => {
+              if (currentSource.current !== source) return;
+              const nextSize = finalSize(element);
+              currentSize.current = nextSize;
+              setSize(nextSize);
+              onResizeStop?.(nextSize);
+            }}
+          />
+        ) : null}
+      </div>
+    );
+  },
+);
+ResizeImage.displayName = 'ResizeImage';
 
 export function EditorImage({
   element,
   attributes,
   children,
 }: ElementProps<MediaNode>) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_, path] = useSelStatus(element);
-  const { markdownEditorRef } = useEditorStore();
-
-  const htmlRef = React.useRef<HTMLDivElement>(null);
-  const [showAsText, setShowAsText] = useState(false);
-  const [state, setState] = useGetSetState({
-    height: element.height,
-    dragging: false,
-    loadSuccess: true,
-    url: '',
-    selected: false,
-    type: getMediaType(element?.url, element.alt),
-  });
-  const updateElement = useRefFunction((attr: Record<string, any>) => {
-    if (!markdownEditorRef?.current) return;
-    Transforms.setNodes(markdownEditorRef.current, attr, { at: path });
-  });
-
-  const { locale } = useContext(I18nContext);
-
-  const initial = useRefFunction(async () => {
-    debugInfo('EditorImage - 初始化图片', {
-      url: element?.url?.substring(0, 100),
-      alt: element?.alt,
-    });
-    let type = getMediaType(element?.url, element.alt);
-    type = !type ? 'image' : type;
-    setState({
-      type: ['image', 'video', 'autio', 'attachment'].includes(type!)
-        ? type!
-        : 'other',
-    });
-    let realUrl = element?.url;
-
-    setState({ url: realUrl });
-    if (state().type === 'image' || state().type === 'other') {
-      const img = document.createElement('img');
-      img.referrerPolicy = 'no-referrer';
-      img.crossOrigin = 'anonymous';
-      img.src = realUrl!;
-      img.onerror = () => {
-        setState({ loadSuccess: false });
-      };
-      img.onload = () => {
-        setState({ loadSuccess: true });
-      };
-    }
-    if (!element.mediaType) {
-      updateElement({
-        mediaType: state().type,
-      });
-    }
-  });
-
+  const selected = useElementSelected(element);
+  const { markdownEditorRef, readonly } = useEditorStore();
+  const mounted = useRef(false);
   useLayoutEffect(() => {
-    initial();
-  }, [element?.url]);
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+  const { locale } = useContext(I18nContext);
+  const [showAsText, setShowAsText] = useState(false);
+  const defaultSize = useMemo(
+    () => ({ width: element.width, height: element.height }),
+    [element.width, element.height],
+  );
 
-  // 如果 finished 为 false，设置 5 秒超时，超时后显示为文本
+  const getCurrentPath = useRefFunction(() => {
+    if (!mounted.current || readonly) return;
+    const editor = markdownEditorRef.current;
+    if (!editor) return;
+    try {
+      const path = ReactEditor.findPath(editor, element);
+      if (Node.get(editor, path) === element) return path;
+    } catch {
+      // The image may have been removed while its confirmation dialog was open.
+    }
+  });
+  const updateSize = useRefFunction(
+    (size: { width: number | string; height: number | string }) => {
+      const path = getCurrentPath();
+      if (path)
+        Transforms.setNodes(markdownEditorRef.current, size, { at: path });
+    },
+  );
+  const removeImage = useRefFunction(() => {
+    const path = getCurrentPath();
+    if (path) deleteMediaAtPath(markdownEditorRef.current, path);
+  });
+
   useEffect(() => {
-    if (element.finished === false) {
-      setShowAsText(false);
-      const timer = setTimeout(() => {
-        setShowAsText(true);
-      }, 5000);
+    setShowAsText(false);
+    if (element.finished !== false) return;
+    const timer = setTimeout(() => setShowAsText(true), 5000);
+    return () => clearTimeout(timer);
+  }, [element.finished, element.url]);
 
-      return () => {
-        clearTimeout(timer);
-      };
-    } else {
-      setShowAsText(false);
-    }
-  }, [element.finished]);
-
-  const imageDom = useMemo(() => {
-    // 检查是否为不完整的图片（finished 状态）
-    if (element.finished === false) {
-      // 如果 5 秒后仍未完成，显示为文本
-      if (showAsText) {
-        return (
-          <div
-            style={{
-              padding: '8px 12px',
-              border: '1px solid #d9d9d9',
-              borderRadius: '4px',
-              color: 'rgba(0, 0, 0, 0.65)',
-              wordBreak: 'break-all',
-            }}
-          >
-            {element.alt || element.url || '图片链接'}
-          </div>
-        );
-      }
-      // 5 秒内显示 loading 状态的占位符
-      return <Skeleton.Image active />;
-    }
-
-    // 如果图片加载失败，显示为链接
-    if (!state().loadSuccess) {
-      return (
-        <MediaErrorLink
-          url={state()?.url}
-          fallbackUrl={element?.url}
-          displayText={
-            element?.alt || state()?.url || element?.url || '图片链接'
-          }
-          style={{
-            fontSize: '13px',
-            lineHeight: '1.5',
-          }}
-        />
-      );
-    }
-
-    // 编辑模式：使用可调整大小的图片
-    return (
+  const image =
+    element.finished === false ? (
+      showAsText ? (
+        <div style={{ padding: '8px 12px', wordBreak: 'break-all' }}>
+          {element.alt || element.url || '图片链接'}
+        </div>
+      ) : (
+        <Skeleton.Image active />
+      )
+    ) : (
       <ResizeImage
-        defaultSize={{
-          width: Number(element.width) || element.width || 400,
-          height: Number(element.height) || 400,
-        }}
-        selected={state().selected}
-        src={state()?.url}
-        onResizeStart={() => {
-          setState({ selected: true });
-        }}
-        onResizeStop={(size) => {
-          if (!markdownEditorRef?.current) return;
-          Transforms.setNodes(markdownEditorRef.current, size, {
-            at: path,
-          });
-          setState({ selected: false });
-        }}
+        key={element.url}
+        src={element.url}
+        alt={element.alt}
+        defaultSize={defaultSize}
+        selected={selected}
+        onResizeStop={updateSize}
       />
     );
-  }, [
-    state().type,
-    state()?.url,
-    state().selected,
-    state().loadSuccess,
-    element.finished,
-    showAsText,
-    (element as any)?.rawMarkdown,
-  ]);
 
   return (
     <div
@@ -426,83 +394,72 @@ export function EditorImage({
         cursor: 'pointer',
         position: 'relative',
         userSelect: 'none',
-        WebkitUserSelect: 'none',
-        MozUserSelect: 'none',
-        msUserSelect: 'none',
         width: '100%',
         maxWidth: '100%',
         boxSizing: 'border-box',
       }}
       draggable={false}
-      onContextMenu={(e) => {
-        e.stopPropagation();
+      onContextMenu={(event) => event.stopPropagation()}
+      onMouseDown={(event) => {
+        event.stopPropagation();
+        if (event.button !== 0 || selected) return;
+        const path = getCurrentPath();
+        if (!path) return;
+        event.preventDefault();
+        Transforms.select(
+          markdownEditorRef.current,
+          Editor.start(markdownEditorRef.current, path),
+        );
+        ReactEditor.focus(markdownEditorRef.current);
       }}
-      onMouseDown={(e) => {
-        e.stopPropagation();
-      }}
-      onDragStart={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
+      onDragStart={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
       }}
     >
       <Popover
         arrow={false}
-        styles={
-          {
-            body: {
-              padding: 8,
-            },
-            content: {
-              padding: 8,
-            },
-          } as any
-        }
+        destroyOnHidden
+        styles={imagePopoverStyles}
         trigger="hover"
-        open={state().selected ? undefined : false}
+        open={selected ? undefined : false}
         content={
-          <Space>
+          <Space onMouseDown={(event) => event.preventDefault()}>
             <ActionIconBox
               title={locale?.delete || '删除'}
               type="danger"
-              onClick={(e) => {
-                e.stopPropagation();
+              onClick={(event) => {
+                event.stopPropagation();
                 Modal.confirm({
                   title: locale?.deleteMedia || '删除媒体',
                   content: locale?.confirmDelete || '确定删除该媒体吗？',
-                  onOk: () => {
-                    if (!markdownEditorRef?.current) return;
-                    Transforms.removeNodes(markdownEditorRef.current, {
-                      at: path,
-                    });
-                  },
+                  onOk: removeImage,
                 });
               }}
             >
               <DeleteFilled />
             </ActionIconBox>
             <ActionIconBox
-              title={element?.block ? locale?.blockImage : locale?.inlineImage}
-              onClick={(e) => {
-                e.stopPropagation();
-                if (!markdownEditorRef?.current) return;
-                Transforms.setNodes(
-                  markdownEditorRef.current,
-                  {
-                    block: !element.block,
-                  },
-                  {
-                    at: path,
-                  },
-                );
-                Transforms.setNodes(
-                  markdownEditorRef.current,
-                  {
-                    block: !element.block,
-                  },
-                  {
-                    at: Path.parent(path),
-                  },
-                );
+              title={element.block ? locale?.blockImage : locale?.inlineImage}
+              onClick={(event) => {
+                event.stopPropagation();
+                const path = getCurrentPath();
+                if (!path) return;
+                const editor = markdownEditorRef.current;
+                Editor.withoutNormalizing(editor, () => {
+                  Transforms.setNodes(
+                    editor,
+                    { block: !element.block },
+                    { at: path },
+                  );
+                  const parentPath = Path.parent(path);
+                  if (parentPath.length)
+                    Transforms.setNodes(
+                      editor,
+                      { block: !element.block },
+                      { at: parentPath },
+                    );
+                });
               }}
             >
               <BlockOutlined />
@@ -511,11 +468,6 @@ export function EditorImage({
         }
       >
         <div
-          onClick={() => {
-            setTimeout(() => {
-              setState({ selected: true });
-            }, 16);
-          }}
           tabIndex={-1}
           style={{
             padding: 4,
@@ -524,19 +476,12 @@ export function EditorImage({
             maxWidth: '100%',
             boxSizing: 'border-box',
           }}
-          ref={htmlRef}
           draggable={false}
           contentEditable={false}
           data-be="media-container"
         >
-          {imageDom}
-          <div
-            style={{
-              display: 'none',
-            }}
-          >
-            {children}
-          </div>
+          {image}
+          <div style={{ display: 'none' }}>{children}</div>
         </div>
       </Popover>
     </div>

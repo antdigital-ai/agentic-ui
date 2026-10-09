@@ -6,7 +6,7 @@ import {
 } from '@sofa-design/icons';
 import { Typography } from 'antd';
 import classNames from 'clsx';
-import React, { type FC } from 'react';
+import React, { type FC, memo } from 'react';
 import { ActionIconBox } from '../../../Components/ActionIconBox';
 import type {
   FileBuiltinActions,
@@ -187,19 +187,34 @@ const FileItemComponent: FC<FileItemProps> = ({
   };
 
   const ariaLabel = `${locale?.['workspace.file'] || '文件'}：${fileWithId.name}`;
+  if (layout === 'tree' && isDisabled) {
+    return (
+      <span
+        className={classNames(`${prefixCls}-item-name-text`, hashId)}
+        title={fileWithId.name}
+      >
+        {fileWithId.name}
+      </span>
+    );
+  }
+  const actions = fileWithId.renderActions ? (
+    fileWithId.renderActions(renderContext)
+  ) : !isDisabled &&
+    (showPreviewButton ||
+      showLocationButton ||
+      showShareButton ||
+      showDownloadButton) ? (
+    <>
+      {builtinActions.preview}
+      {builtinActions.locate}
+      {builtinActions.share}
+      {builtinActions.download}
+    </>
+  ) : null;
+  const hasActions =
+    actions !== null && actions !== undefined && actions !== false;
 
   if (layout === 'tree') {
-    if (isDisabled) {
-      return (
-        <span
-          className={classNames(`${prefixCls}-item-name-text`, hashId)}
-          title={fileWithId.name}
-        >
-          {fileWithId.name}
-        </span>
-      );
-    }
-
     return (
       <div
         className={classNames(
@@ -208,35 +223,37 @@ const FileItemComponent: FC<FileItemProps> = ({
           hashId,
         )}
       >
-        <div className={classNames(`${prefixCls}-item-info`, hashId)}>
-          <div className={classNames(`${prefixCls}-item-name`, hashId)}>
-            {fileWithId.renderName ? (
-              fileWithId.renderName(renderContext)
-            ) : (
-              <span
-                className={classNames(`${prefixCls}-item-name-text`, hashId)}
-                title={fileWithId.name}
-              >
-                {fileWithId.name}
-              </span>
+        {fileWithId.renderName ? (
+          <div
+            className={classNames(
+              `${prefixCls}-item-info`,
+              `${prefixCls}-item-name`,
+              hashId,
             )}
+          >
+            {fileWithId.renderName(renderContext)}
           </div>
-        </div>
-        <div
-          className={classNames(`${prefixCls}-item-actions`, hashId)}
-          onClick={(e) => e.stopPropagation()}
-        >
-          {fileWithId.renderActions ? (
-            fileWithId.renderActions(renderContext)
-          ) : (
-            <>
-              {builtinActions.preview}
-              {builtinActions.locate}
-              {builtinActions.share}
-              {builtinActions.download}
-            </>
-          )}
-        </div>
+        ) : (
+          <span
+            className={classNames(
+              `${prefixCls}-item-info`,
+              `${prefixCls}-item-name`,
+              `${prefixCls}-item-name-text`,
+              hashId,
+            )}
+            title={fileWithId.name}
+          >
+            {fileWithId.name}
+          </span>
+        )}
+        {hasActions && (
+          <div
+            className={classNames(`${prefixCls}-item-actions`, hashId)}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {actions}
+          </div>
+        )}
       </div>
     );
   }
@@ -253,15 +270,19 @@ const FileItemComponent: FC<FileItemProps> = ({
             )}
           </div>
           <div className={classNames(`${prefixCls}-item-info`, hashId)}>
-            <div className={classNames(`${prefixCls}-item-name`, hashId)}>
-              {fileWithId.renderName ? (
-                fileWithId.renderName(renderContext)
-              ) : (
-                <Typography.Text ellipsis={{ tooltip: fileWithId.name }}>
-                  {fileWithId.name}
-                </Typography.Text>
-              )}
-            </div>
+            {fileWithId.renderName ? (
+              <div className={classNames(`${prefixCls}-item-name`, hashId)}>
+                {fileWithId.renderName(renderContext)}
+              </div>
+            ) : (
+              <Typography.Text
+                className={classNames(`${prefixCls}-item-name`, hashId)}
+                style={{ display: 'block' }}
+                ellipsis={{ tooltip: fileWithId.name }}
+              >
+                {fileWithId.name}
+              </Typography.Text>
+            )}
             {(fileWithId.renderDetails ||
               fileTypeInfo.displayType ||
               fileWithId.size ||
@@ -327,21 +348,14 @@ const FileItemComponent: FC<FileItemProps> = ({
               </div>
             )}
           </div>
-          <div
-            className={classNames(`${prefixCls}-item-actions`, hashId)}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {fileWithId.renderActions ? (
-              fileWithId.renderActions(renderContext)
-            ) : !isDisabled ? (
-              <>
-                {builtinActions.preview}
-                {builtinActions.locate}
-                {builtinActions.share}
-                {builtinActions.download}
-              </>
-            ) : null}
-          </div>
+          {hasActions && (
+            <div
+              className={classNames(`${prefixCls}-item-actions`, hashId)}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {actions}
+            </div>
+          )}
         </>
       }
       onClick={handleClick}
@@ -359,4 +373,4 @@ const FileItemComponent: FC<FileItemProps> = ({
 
 FileItemComponent.displayName = 'FileItem';
 
-export const FileItem = FileItemComponent;
+export const FileItem = memo(FileItemComponent);

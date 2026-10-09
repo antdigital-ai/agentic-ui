@@ -133,7 +133,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
     };
 
     const defaultContextValue = {
-      deleteIconPosition: null,
+      deleteIconPosition: { columnIndex: defaultProps.columnIndex },
       setDeleteIconPosition: mockSetDeleteIconPosition,
       ...contextValue,
     };
@@ -243,7 +243,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
     if (deleteButton) {
       fireEvent.click(deleteButton);
     }
-    expect(deleteButton).toBeInTheDocument();
+    expect(deleteButton).not.toBeInTheDocument();
   });
 
   it('应该设置正确的 padding', () => {
@@ -320,7 +320,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
     expect(deleteButton).toBeInTheDocument();
   });
 
-  it('应该在删除按钮点击时处理没有 columnIndex 的情况', () => {
+  it('没有 columnIndex 时不挂载删除按钮', () => {
     renderTableCellIndexSpacer({ columnIndex: undefined });
     const deleteButton = document.querySelector(
       '.ant-agentic-md-editor-table-cell-index-spacer-delete-icon',
@@ -328,7 +328,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
     if (deleteButton) {
       fireEvent.click(deleteButton);
     }
-    expect(deleteButton).toBeInTheDocument();
+    expect(deleteButton).not.toBeInTheDocument();
   });
 
   it('应该处理 clearSelect 中的异常情况', () => {
@@ -441,11 +441,13 @@ describe('TableCellIndexSpacer 组件测试', () => {
       },
     ];
 
+    testEditorInstance = editor;
+
     render(
       <ConfigProvider>
         <TableContextTestProvider
           value={{
-            deleteIconPosition: null,
+            deleteIconPosition: { columnIndex: 0 },
             setDeleteIconPosition: mockSetDeleteIconPosition,
           }}
         >
@@ -470,8 +472,8 @@ describe('TableCellIndexSpacer 组件测试', () => {
       fireEvent.click(deleteButton);
     }
 
-    // Since we're mocking the module, we can't check the actual call
-    expect(deleteButton).toBeInTheDocument();
+    expect(NativeTableEditor.removeTable).toHaveBeenCalledWith(editor, [0]);
+    expect(deleteButton).not.toBeInTheDocument();
   });
 
   it('应该在前面插入列', () => {
@@ -977,7 +979,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
         <ConfigProvider>
           <TableContextTestProvider
             value={{
-              deleteIconPosition: null,
+              deleteIconPosition: { columnIndex: 0 },
               setDeleteIconPosition: mockSetDeleteIconPosition,
             }}
           >
@@ -1000,7 +1002,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
       if (deleteButton) {
         fireEvent.click(deleteButton);
       }
-      expect(deleteButton).toBeInTheDocument();
+      expect(deleteButton).not.toBeInTheDocument();
     });
 
     it('应该处理删除列时只有一列的情况', () => {
@@ -1081,7 +1083,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
       if (deleteButton) {
         fireEvent.click(deleteButton);
       }
-      expect(deleteButton).toBeInTheDocument();
+      expect(deleteButton).not.toBeInTheDocument();
     });
   });
 

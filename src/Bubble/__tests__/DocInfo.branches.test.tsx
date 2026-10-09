@@ -2,12 +2,24 @@
  * DocInfoList 分支覆盖：compact、Drawer、占位符、render、Popover 边界。
  */
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import {
+  fireEvent,
+  render as renderComponent,
+  screen,
+  within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
 import { DocInfoList } from '../MessagesContent/DocInfo';
+
+const renderExpanded: typeof renderComponent = (...args) => {
+  const result = renderComponent(...args);
+  const toggle = result.container.querySelector('[class*="doc-info-label"]');
+  if (toggle) fireEvent.click(toggle);
+  return result;
+};
 
 vi.mock('../../MarkdownEditor/BaseMarkdownEditor', () => ({
   BaseMarkdownEditor: ({ initValue }: { initValue?: string }) => (
@@ -35,7 +47,7 @@ const longContent = 'L'.repeat(25);
 
 describe('DocInfoList branches', () => {
   it('compact context 应用 compact 类名', () => {
-    const { container } = render(
+    const { container } = renderExpanded(
       <BubbleConfigContext.Provider value={{ compact: true } as any}>
         <DocInfoList
           options={[
@@ -53,7 +65,7 @@ describe('DocInfoList branches', () => {
   });
 
   it('filter 掉 falsy options', () => {
-    render(
+    renderExpanded(
       <DocInfoList
         options={[null as any, undefined as any, false as any]}
         reference_url_info_list={[]}
@@ -64,7 +76,7 @@ describe('DocInfoList branches', () => {
 
   it('Drawer 关闭清空 docMeta', async () => {
     const user = userEvent.setup();
-    render(
+    renderExpanded(
       <DocInfoList
         options={[
           {
@@ -97,7 +109,7 @@ describe('DocInfoList branches', () => {
   });
 
   it('docMeta 使用 answer 作为名称回退', () => {
-    render(
+    renderExpanded(
       <DocInfoList
         options={[
           {
@@ -113,7 +125,7 @@ describe('DocInfoList branches', () => {
   });
 
   it('占位符 ${} / $ / $[] 三种格式', () => {
-    render(
+    renderExpanded(
       <DocInfoList
         options={[
           {
@@ -133,7 +145,7 @@ describe('DocInfoList branches', () => {
   });
 
   it('无 docMeta.doc_name 时不渲染副标题行', () => {
-    render(
+    renderExpanded(
       <DocInfoList
         options={[
           {
@@ -149,7 +161,7 @@ describe('DocInfoList branches', () => {
   });
 
   it('无 originUrl 时不渲染查看原文按钮', () => {
-    render(
+    renderExpanded(
       <DocInfoList
         options={[
           {
@@ -165,7 +177,7 @@ describe('DocInfoList branches', () => {
 
   it('Popover 内无 docMeta 时不渲染 meta 区块', async () => {
     const user = userEvent.setup();
-    render(
+    renderExpanded(
       <DocInfoList
         options={[
           {
@@ -189,7 +201,7 @@ describe('DocInfoList branches', () => {
     const renderFn = vi.fn((_item, dom) => (
       <div data-testid="wrapped">{dom}</div>
     ));
-    render(
+    renderExpanded(
       <DocInfoList
         options={[
           {
@@ -206,9 +218,9 @@ describe('DocInfoList branches', () => {
     expect(screen.getByTestId('wrapped')).toBeInTheDocument();
   });
 
-  it('expanded 初始 true 点击 label 切换文案', async () => {
+  it('点击 label 切换展开/收起文案', async () => {
     const user = userEvent.setup();
-    const { container } = render(
+    const { container } = renderExpanded(
       <DocInfoList
         options={[{ content: 'x', docMeta: { doc_name: 'n' }, originUrl: '#' }]}
         reference_url_info_list={[]}
@@ -222,7 +234,7 @@ describe('DocInfoList branches', () => {
   it.skip('行点击 originUrl 无 onOriginUrlClick 时 window.open', async () => {
     const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
     const user = userEvent.setup();
-    render(
+    renderExpanded(
       <DocInfoList
         options={[
           {
@@ -240,7 +252,7 @@ describe('DocInfoList branches', () => {
   });
 
   it('options undefined 视为空数组', () => {
-    render(
+    renderExpanded(
       <DocInfoList options={undefined as any} reference_url_info_list={[]} />,
     );
     expect(screen.getByText('0')).toBeInTheDocument();
@@ -248,7 +260,7 @@ describe('DocInfoList branches', () => {
 
   it('长内容 Popover 与 docMeta 展示', async () => {
     const user = userEvent.setup();
-    render(
+    renderExpanded(
       <DocInfoList
         options={[
           {
@@ -272,7 +284,7 @@ describe('DocInfoList branches', () => {
 
   it('收起态点击后 padding 分支', async () => {
     const user = userEvent.setup();
-    const { container } = render(
+    const { container } = renderExpanded(
       <DocInfoList
         options={[
           { content: 'a', docMeta: { doc_name: 'A' }, originUrl: '#' },

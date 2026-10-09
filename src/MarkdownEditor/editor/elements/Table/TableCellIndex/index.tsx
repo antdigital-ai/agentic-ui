@@ -6,7 +6,6 @@ import {
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import React, { memo, useContext, useRef } from 'react';
-import { useClickAway } from '../../../../../Hooks/useClickAway';
 import { useRefFunction } from '../../../../../Hooks/useRefFunction';
 import { I18nContext } from '../../../../../I18n';
 import { useEditorStore } from '../../../store';
@@ -16,6 +15,7 @@ import {
   removeTableRow,
   selectTableRow,
 } from '../commands/tableCommands';
+import { TableChromeActions } from '../TableChromeActions';
 import {
   useSetTableChromePosition,
   useTableRowChromeActive,
@@ -195,12 +195,6 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = memo(
 
     const ref = useRef<HTMLTableDataCellElement>(null);
 
-    useClickAway(() => {
-      if (shouldShowDeleteIcon) {
-        clearSelect();
-      }
-    }, ref);
-
     /** Slate 会在 mousedown 时抢焦点；void 单元格需阻止默认行为，操作按钮才能响应 click */
     const stopEditorMouseDown = useRefFunction((e: React.MouseEvent) => {
       e.preventDefault();
@@ -229,52 +223,57 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = memo(
             : undefined
         }
       >
-        <div
-          className={classNames(
-            `${baseClassName}-action-buttons`,
-            shouldShowDeleteIcon && `${baseClassName}-action-buttons-visible`,
-          )}
-        >
-          {/* 在上面插入一行 */}
-          {shouldShowDeleteIcon && (
+        {shouldShowDeleteIcon && (
+          <TableChromeActions targetRef={ref} onDismiss={clearSelect}>
             <div
               className={classNames(
-                `${baseClassName}-action-button`,
-                `${baseClassName}-insert-row-before`,
+                `${baseClassName}-action-buttons`,
+                shouldShowDeleteIcon &&
+                  `${baseClassName}-action-buttons-visible`,
               )}
-              onClick={handleInsertRowBefore}
-              onMouseDown={stopEditorMouseDown}
-              title={locale?.['table.insertRowBefore'] || '在上面增加一行'}
             >
-              <InsertRowAboveOutlined />
-            </div>
-          )}
-          <div
-            className={classNames(
-              `${baseClassName}-action-button`,
-              `${baseClassName}-delete-icon`,
-            )}
-            onClick={handleDeleteClick}
-            onMouseDown={stopEditorMouseDown}
-            title={locale?.['table.deleteRow'] || '删除整行'}
-          >
-            <DeleteOutlined />
-          </div>
-          {/* 在下面插入一行 */}
-          {shouldShowDeleteIcon && (
-            <div
-              className={classNames(
-                `${baseClassName}-action-button`,
-                `${baseClassName}-insert-row-after`,
+              {/* 在上面插入一行 */}
+              {shouldShowDeleteIcon && (
+                <div
+                  className={classNames(
+                    `${baseClassName}-action-button`,
+                    `${baseClassName}-insert-row-before`,
+                  )}
+                  onClick={handleInsertRowBefore}
+                  onMouseDown={stopEditorMouseDown}
+                  title={locale?.['table.insertRowBefore'] || '在上面增加一行'}
+                >
+                  <InsertRowAboveOutlined />
+                </div>
               )}
-              onClick={handleInsertRowAfter}
-              onMouseDown={stopEditorMouseDown}
-              title={locale?.['table.insertRowAfter'] || '在下面增加一行'}
-            >
-              <InsertRowBelowOutlined />
+              <div
+                className={classNames(
+                  `${baseClassName}-action-button`,
+                  `${baseClassName}-delete-icon`,
+                )}
+                onClick={handleDeleteClick}
+                onMouseDown={stopEditorMouseDown}
+                title={locale?.['table.deleteRow'] || '删除整行'}
+              >
+                <DeleteOutlined />
+              </div>
+              {/* 在下面插入一行 */}
+              {shouldShowDeleteIcon && (
+                <div
+                  className={classNames(
+                    `${baseClassName}-action-button`,
+                    `${baseClassName}-insert-row-after`,
+                  )}
+                  onClick={handleInsertRowAfter}
+                  onMouseDown={stopEditorMouseDown}
+                  title={locale?.['table.insertRowAfter'] || '在下面增加一行'}
+                >
+                  <InsertRowBelowOutlined />
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </TableChromeActions>
+        )}
       </td>
     );
   },

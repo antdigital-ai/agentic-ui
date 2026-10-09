@@ -40,6 +40,10 @@ export const TableChromeStoreContext = createContext<TableChromeStore | null>(
   null,
 );
 
+const TableChromeSetterContext = createContext<
+  (position: TableChromePosition) => void
+>(() => {});
+
 const emptySubscribe = () => () => {};
 
 export function useTableStaticContext(): TableStaticContextValue {
@@ -53,7 +57,7 @@ export function useTableChromeStore(): TableChromeStore | null {
 export function useSetTableChromePosition(): (
   position: TableChromePosition,
 ) => void {
-  return useTableStaticContext().setDeleteIconPosition;
+  return useContext(TableChromeSetterContext);
 }
 
 /** 仅当该行处于「行 chrome 激活」时返回 true，其它行不因 store 更新而重渲染 */
@@ -132,11 +136,13 @@ export const TableContextTestProvider: React.FC<{
 
   return (
     <TableChromeStoreContext.Provider value={storeRef.current}>
-      <TableStaticContext.Provider value={staticValue}>
-        <TablePropsContext.Provider value={legacyValue}>
-          {children}
-        </TablePropsContext.Provider>
-      </TableStaticContext.Provider>
+      <TableChromeSetterContext.Provider value={setDeleteIconPosition}>
+        <TableStaticContext.Provider value={staticValue}>
+          <TablePropsContext.Provider value={legacyValue}>
+            {children}
+          </TablePropsContext.Provider>
+        </TableStaticContext.Provider>
+      </TableChromeSetterContext.Provider>
     </TableChromeStoreContext.Provider>
   );
 };
@@ -180,11 +186,13 @@ export const TablePropsProvider: React.FC<{
 
   return (
     <TableChromeStoreContext.Provider value={storeRef.current}>
-      <TableStaticContext.Provider value={staticValue}>
-        <TablePropsContext.Provider value={legacyValue}>
-          {children}
-        </TablePropsContext.Provider>
-      </TableStaticContext.Provider>
+      <TableChromeSetterContext.Provider value={handleSetDeleteIconPosition}>
+        <TableStaticContext.Provider value={staticValue}>
+          <TablePropsContext.Provider value={legacyValue}>
+            {children}
+          </TablePropsContext.Provider>
+        </TableStaticContext.Provider>
+      </TableChromeSetterContext.Provider>
     </TableChromeStoreContext.Provider>
   );
 };

@@ -1,11 +1,13 @@
 /**
  * TableContext mid-tail：无 store、行/列激活、TestProvider 回调。
  */
-import { act, renderHook } from '@testing-library/react';
+import { act, render, renderHook } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
+import type { TableNode } from '../../../types/Table';
 import {
   TableContextTestProvider,
+  TablePropsProvider,
   useSetTableChromePosition,
   useTableChromeStore,
   useTableColumnChromeActive,
@@ -14,6 +16,32 @@ import {
 } from '../TableContext';
 
 describe('TableContext midtail branches', () => {
+  it.each(['production', 'test'] as const)(
+    '%s Provider keeps setter consumers idle when table content or path changes',
+    (provider) => {
+      const renderSetter = vi.fn();
+      const SetterConsumer = React.memo(() => {
+        renderSetter(useSetTableChromePosition());
+        return null;
+      });
+      const child = <SetterConsumer />;
+      const table: TableNode = { type: 'table', children: [] };
+      const wrap = (tableNode: TableNode, tablePath: number[]) =>
+        provider === 'production' ? (
+          <TablePropsProvider tableNode={tableNode} tablePath={tablePath}>
+            {child}
+          </TablePropsProvider>
+        ) : (
+          <TableContextTestProvider value={{ tableNode, tablePath }}>
+            {child}
+          </TableContextTestProvider>
+        );
+      const { rerender } = render(wrap(table, [0]));
+      rerender(wrap({ ...table }, [1]));
+      expect(renderSetter).toHaveBeenCalledTimes(1);
+    },
+  );
+
   it('无 Provider 时 hooks 安全回退', () => {
     const { result: store } = renderHook(() => useTableChromeStore());
     expect(store.current).toBeNull();

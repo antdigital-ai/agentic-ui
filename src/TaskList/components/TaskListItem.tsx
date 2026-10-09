@@ -1,6 +1,14 @@
 import { ChevronUp } from '@sofa-design/icons';
 import classNames from 'clsx';
-import React, { memo, useCallback, useContext, useEffect, useRef } from 'react';
+import React, {
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext } from '../../I18n';
@@ -17,18 +25,31 @@ interface TaskListItemProps {
   isLast: boolean;
   prefixCls: string;
   hashId: string;
-  expandedKeys: string[];
+  expanded?: boolean;
+  expandedKeys?: string[];
   onToggle: (key: string) => void;
 }
 
 export const TaskListItem: React.FC<TaskListItemProps> = memo(
-  ({ item, isLast, prefixCls, hashId, expandedKeys, onToggle }) => {
+  ({ item, isLast, prefixCls, hashId, expanded, expandedKeys, onToggle }) => {
     const { locale } = useContext(I18nContext);
-    const isCollapsed = !expandedKeys.includes(item.key);
-    const normalizedContent = normalizeTaskContent(item.content, item.title);
-    const hasContent = hasNormalizedTaskContent(item.content, item.title);
+    const isCollapsed = !(expanded ?? expandedKeys?.includes(item.key));
+    // Keep custom content mounted after the first expansion to retain its state.
+    const [hasExpanded, setHasExpanded] = useState(!isCollapsed);
+    const normalizedContent = useMemo(
+      () => normalizeTaskContent(item.content, item.title),
+      [item.content, item.title],
+    );
+    const hasContent = useMemo(
+      () => hasNormalizedTaskContent(item.content, item.title),
+      [item.content, item.title],
+    );
     const bodyRef = useRef<HTMLDivElement>(null);
     const innerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+      if (!isCollapsed) setHasExpanded(true);
+    }, [isCollapsed]);
 
     const handleToggle = useRefFunction(() => {
       onToggle(item.key);
@@ -130,14 +151,17 @@ export const TaskListItem: React.FC<TaskListItemProps> = memo(
               isCollapsed && `${prefixCls}-body-collapsed`,
               hashId,
             )}
+            aria-hidden={isCollapsed}
             onTransitionEnd={handleTransitionEnd}
           >
-            <div
-              ref={innerRef}
-              className={classNames(`${prefixCls}-content`, hashId)}
-            >
-              {normalizedContent}
-            </div>
+            {(!isCollapsed || hasExpanded) && (
+              <div
+                ref={innerRef}
+                className={classNames(`${prefixCls}-content`, hashId)}
+              >
+                {normalizedContent}
+              </div>
+            )}
           </div>
         </div>
       </div>

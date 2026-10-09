@@ -142,6 +142,12 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
     value: expanded,
     onChange: onExpandedChange,
   });
+  // Defer arbitrary custom content until it is visible, then preserve its state.
+  const [hasExpanded, setHasExpanded] = useState(expandedState);
+
+  useEffect(() => {
+    if (expandedState) setHasExpanded(true);
+  }, [expandedState]);
 
   const [floatingExpandedState, setFloatingExpandedState] = useMergedState(
     defaultFloatingExpanded,
@@ -407,8 +413,9 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
       </div>
 
       {/* Container：grid 折叠 + Card resize 时长，与工具条一致 */}
-      {thinkContent && (
+      {thinkContent && (expandedState || hasExpanded) && (
         <div
+          aria-hidden={!expandedState}
           className={classNames(`${prefixCls}-think-collapse`, hashId, {
             [`${prefixCls}-think-collapse-open`]: expandedState,
             // 内容展开时解除父级 maxHeight 限制，使长内容可完整展示
@@ -452,7 +459,7 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
                   {contentExpanded ? locale.collapse : locale.expand}
                 </div>
               )}
-              {showFloatingExpand && (
+              {showFloatingExpand && expandedState && (
                 <div
                   className={cls.floatingExpand}
                   onClick={handleToggleFloatingExpand}

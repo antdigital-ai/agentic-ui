@@ -1,387 +1,147 @@
-/**
- * ReadonlyMedia 分支覆盖：unsafe URL、audio 超时、attachment 回退与 finished 切换。
- */
-import '@testing-library/jest-dom';
 import { act, fireEvent, render, screen } from '@testing-library/react';
-import { ConfigProvider } from 'antd';
 import React from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import * as htmlUrlSafety from '../../../../../Utils/htmlUrlSafety';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ReadonlyMedia } from '../../../../editor/elements/Media/ReadonlyMedia';
-import * as editorUtils from '../../../../editor/utils';
-import * as domUtils from '../../../../editor/utils/dom';
-import { MediaNode } from '../../../../el';
-import { TestSlateWrapper } from '../TestSlateWrapper';
+import type { MediaNode } from '../../../../el';
 
 vi.mock('../../../../editor/store', () => ({
-  useEditorStore: vi.fn(() => ({ editorProps: {} })),
+  useEditorStore: () => ({ editorProps: {} }),
 }));
-
-vi.mock('../../../../editor/utils/dom', async (importOriginal) => {
-  const actual = await importOriginal<typeof domUtils>();
-  return { ...actual, getMediaType: vi.fn() };
-});
-
-vi.mock('../../../../editor/utils', async (importOriginal) => {
-  const actual = await importOriginal<typeof editorUtils>();
-  return { ...actual, useGetSetState: vi.fn(actual.useGetSetState) };
-});
-
-vi.mock('../../../../../Hooks/useRefFunction', () => ({
-  useRefFunction: vi.fn((fn: any) => fn),
-}));
-
-const mockAttributes = {
-  'data-slate-node': 'element' as const,
-  ref: vi.fn(),
-};
-
-const baseElement: MediaNode = {
+const node = (extra: Partial<MediaNode> = {}): MediaNode => ({
   type: 'media',
-  url: 'https://example.com/image.png',
-  alt: 'alt text',
+  mediaType: 'video',
+  url: 'https://example.com/video',
+  alt: '',
   children: [{ text: '' }],
-};
+  ...extra,
+});
+const view = (element: MediaNode) => (
+  <ReadonlyMedia
+    element={element}
+    attributes={{ 'data-slate-node': 'element', ref: () => {} }}
+  >
+    <span />
+  </ReadonlyMedia>
+);
+afterEach(() => {
+  vi.useRealTimers();
+  vi.restoreAllMocks();
+});
 
-const renderMedia = (element: MediaNode) =>
-  render(
-    <ConfigProvider>
-      <TestSlateWrapper>
-        <ReadonlyMedia element={element} attributes={mockAttributes}>
-          {null}
-        </ReadonlyMedia>
-      </TestSlateWrapper>
-    </ConfigProvider>,
-  );
-
-describe('ReadonlyMedia 分支覆盖', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.spyOn(console, 'warn').mockImplementation(() => {});
-    vi.mocked(domUtils.getMediaType).mockReturnValue('image');
-    vi.spyOn(htmlUrlSafety, 'shouldRenderUrlAsPlainText').mockReturnValue(
-      false,
+describe('ReadonlyMedia loading and native player options', () => {
+  it('uses explicit mediaType for extensionless audio URLs', () => {
+    render(
+      view(
+        node({ mediaType: 'audio', url: 'https://cdn.example/resource?id=7' }),
+      ),
     );
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  it('unsafe URL 渲染纯文本分支', () => {
-    vi.spyOn(htmlUrlSafety, 'shouldRenderUrlAsPlainText').mockReturnValue(true);
-    renderMedia({ ...baseElement, url: 'javascript:alert(1)' });
-    expect(
-      screen.getByTestId('media-unsafe-url-plain-text'),
-    ).toBeInTheDocument();
-    expect(screen.getByText('javascript:alert(1)')).toBeInTheDocument();
-  });
-
-  it('finished 从 false 切到 true 时清除 showAsText', async () => {
-    vi.mocked(domUtils.getMediaType).mockReturnValue('image');
-    const { rerender } = renderMedia({ ...baseElement, finished: false });
-    expect(document.querySelector('.ant-skeleton-image')).toBeInTheDocument();
-
-    rerender(
-      <ConfigProvider>
-        <TestSlateWrapper>
-          <ReadonlyMedia
-            element={{ ...baseElement, finished: true }}
-            attributes={mockAttributes}
-          >
-            {null}
-          </ReadonlyMedia>
-        </TestSlateWrapper>
-      </ConfigProvider>,
+    expect(screen.getByTestId('audio-element')).toHaveAttribute(
+      'src',
+      'https://cdn.example/resource?id=7',
     );
-    expect(
-      document.querySelector('.ant-skeleton-image'),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId('video-element')).toBeNull();
   });
-
-  it('audio finished=false 超时后显示链接文本', async () => {
-    vi.useFakeTimers();
-    const stateData = {
-      loadSuccess: true,
-      url: 'https://example.com/a.mp3',
-      type: 'audio' as const,
-    };
-    vi.mocked(editorUtils.useGetSetState).mockReturnValue([
-      () => stateData,
-      vi.fn((patch) => Object.assign(stateData, patch)),
-    ]);
-    vi.mocked(domUtils.getMediaType).mockReturnValue('other');
-    renderMedia({
-      ...baseElement,
-      url: 'https://example.com/a.mp3',
-      finished: false,
-      alt: '音频 alt',
-    });
-    await act(async () => {
-      vi.advanceTimersByTime(5000);
-    });
-    expect(screen.getByText(/音频 alt|音频链接/)).toBeInTheDocument();
-    vi.useRealTimers();
-  });
-
-  it('attachment 无 alt/url 时回退「附件」', async () => {
-    const stateData = {
-      loadSuccess: true,
-      url: '',
-      type: 'attachment' as const,
-    };
-    vi.mocked(editorUtils.useGetSetState).mockReturnValue([
-      () => stateData,
-      vi.fn((patch) => Object.assign(stateData, patch)),
-    ]);
-    vi.mocked(domUtils.getMediaType).mockReturnValue('attachment');
-    renderMedia({
-      ...baseElement,
-      url: '',
-      alt: '',
-    } as MediaNode);
-    await act(async () => {
-      await Promise.resolve();
-    });
-    expect(screen.getByText('附件')).toBeInTheDocument();
-  });
-
-  it('video loadSuccess=true 渲染 controls 属性分支', async () => {
-    const stateData = {
-      loadSuccess: true,
-      url: 'https://example.com/v.mp4',
-      type: 'video' as const,
-    };
-    vi.mocked(editorUtils.useGetSetState).mockReturnValue([
-      () => stateData,
-      vi.fn((patch) => Object.assign(stateData, patch)),
-    ]);
-    vi.mocked(domUtils.getMediaType).mockReturnValue('video');
-    renderMedia({
-      ...baseElement,
-      url: 'https://example.com/v.mp4',
-      controls: false,
-      autoplay: true,
-      loop: true,
-      muted: true,
-      poster: 'https://example.com/p.jpg',
-      width: 320,
-      height: 240,
-    });
-    await act(async () => {
-      await Promise.resolve();
-    });
-    const video = screen.getByTestId('video-element');
-    expect(video).not.toHaveAttribute('controls');
-    expect(video).toHaveAttribute('autoplay');
-  });
-
-  it('audio 使用 otherProps.rawMarkdown 作为 loading 文案', async () => {
-    const stateData = {
-      loadSuccess: true,
-      url: 'https://example.com/a.mp3',
-      type: 'audio' as const,
-    };
-    vi.mocked(editorUtils.useGetSetState).mockReturnValue([
-      () => stateData,
-      vi.fn((patch) => Object.assign(stateData, patch)),
-    ]);
-    vi.mocked(domUtils.getMediaType).mockReturnValue('other');
-    const el = {
-      ...baseElement,
-      url: 'https://example.com/a.mp3',
-      finished: false,
-      otherProps: { rawMarkdown: '![audio](a.mp3)' },
-    } as MediaNode;
-    renderMedia(el);
-    expect(screen.getByText('![audio](a.mp3)')).toBeInTheDocument();
-  });
-
-  it('image 类型 mediaElement 为 null 时 inner width 为 undefined', async () => {
-    vi.mocked(domUtils.getMediaType).mockReturnValue('image');
-    renderMedia(baseElement);
-    await act(async () => {
-      await Promise.resolve();
-    });
-    const inner = document.querySelector(
-      '[data-be="media-container"]',
-    ) as HTMLElement;
-    expect(inner.style.width).toBe('');
-  });
-
-  it('getMediaType 返回 autio 时 initial 走 image 预加载分支', async () => {
-    vi.mocked(domUtils.getMediaType).mockReturnValue('autio' as any);
-    const orig = document.createElement.bind(document);
-    const created: string[] = [];
-    document.createElement = ((tag: string) => {
-      created.push(tag.toLowerCase());
-      return orig(tag);
-    }) as typeof document.createElement;
-
-    renderMedia({ ...baseElement, url: 'https://example.com/x.bin' });
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 20));
-    });
-    expect(created).toContain('img');
-    document.createElement = orig;
-  });
-
-  it('video onError 回调设置 loadSuccess false', async () => {
-    const stateData = {
-      loadSuccess: true,
-      url: 'https://example.com/v.mp4',
-      type: 'video' as const,
-    };
-    const setState = vi.fn((patch: any) => Object.assign(stateData, patch));
-    vi.mocked(editorUtils.useGetSetState).mockReturnValue([
-      () => stateData,
-      setState,
-    ]);
-    vi.mocked(domUtils.getMediaType).mockReturnValue('video');
-    renderMedia({ ...baseElement, url: 'https://example.com/v.mp4' });
-    await act(async () => {
-      await Promise.resolve();
-    });
-    const video = screen.queryByTestId('video-element');
-    if (video) {
-      fireEvent.error(video);
-      expect(setState).toHaveBeenCalledWith({ loadSuccess: false });
-    }
-  });
-
-  it('video finished=false 五秒内展示 Skeleton 占位', () => {
-    vi.mocked(domUtils.getMediaType).mockReturnValue('video');
-    renderMedia({
-      ...baseElement,
-      url: 'https://example.com/v.mp4',
-      finished: false,
-    });
-    expect(document.querySelector('.ant-skeleton-image')).toBeInTheDocument();
-  });
-
-  it('video loadSuccess=false 渲染 MediaErrorLink', async () => {
-    const stateData = {
-      loadSuccess: false,
-      url: 'https://example.com/bad.mp4',
-      type: 'video' as const,
-    };
-    vi.mocked(editorUtils.useGetSetState).mockReturnValue([
-      () => stateData,
-      vi.fn((patch) => Object.assign(stateData, patch)),
-    ]);
-    vi.mocked(domUtils.getMediaType).mockReturnValue('video');
-    renderMedia({
-      ...baseElement,
-      url: 'https://example.com/bad.mp4',
-      alt: '',
-    });
-    await act(async () => {
-      await Promise.resolve();
-    });
-    expect(screen.getByText(/视频链接|bad\.mp4/)).toBeInTheDocument();
-  });
-
-  it('audio loadSuccess=true 渲染 audio 控件', async () => {
-    const stateData = {
-      loadSuccess: true,
-      url: 'https://example.com/a.mp3',
-      type: 'audio' as const,
-    };
-    vi.mocked(editorUtils.useGetSetState).mockReturnValue([
-      () => stateData,
-      vi.fn((patch) => Object.assign(stateData, patch)),
-    ]);
-    vi.mocked(domUtils.getMediaType).mockReturnValue('audio');
-    renderMedia({ ...baseElement, url: 'https://example.com/a.mp3' });
-    await act(async () => {
-      await Promise.resolve();
-    });
+  it('uses the file extension when mediaType is missing', () => {
+    render(
+      view(
+        node({ mediaType: undefined, url: 'https://example.com/audio.mp3' }),
+      ),
+    );
     expect(screen.getByTestId('audio-element')).toBeInTheDocument();
   });
-
-  it('image finished=false 超时后回退 url 文案', async () => {
+  it('falls back to the readonly image for an unrecognized resource type', () => {
+    render(
+      view(node({ mediaType: 'unknown', url: 'https://example.com/unknown' })),
+    );
+    expect(screen.getByAltText('image')).toHaveAttribute(
+      'src',
+      'https://example.com/unknown',
+    );
+  });
+  it('passes all native video options and pixel dimensions', () => {
+    render(
+      view(
+        node({
+          controls: false,
+          autoplay: true,
+          loop: true,
+          muted: true,
+          poster: 'poster.png',
+          width: 640,
+          height: 360,
+        }),
+      ),
+    );
+    const player = screen.getByTestId('video-element') as HTMLVideoElement;
+    expect(player.controls).toBe(false);
+    expect(player.autoplay).toBe(true);
+    expect(player.loop).toBe(true);
+    expect(player.muted).toBe(true);
+    expect(player).toHaveAttribute('poster', 'poster.png');
+    expect(player).toHaveStyle({ width: '640px', height: '360px' });
+  });
+  it('uses responsive dimensions when width and height are omitted', () => {
+    render(view(node()));
+    expect(screen.getByTestId('video-element')).toHaveStyle({
+      width: '100%',
+      height: 'auto',
+    });
+  });
+  it.each(['video', 'audio'])(
+    'uses the URL as a failed %s label when alt is empty',
+    (type) => {
+      render(view(node({ mediaType: type })));
+      fireEvent.error(screen.getByTestId(`${type}-element`));
+      expect(screen.getByText('https://example.com/video')).toBeInTheDocument();
+    },
+  );
+  it.each([
+    ['video', '视频链接'],
+    ['audio', '音频链接'],
+  ])('handles missing %s URLs without attempting playback', (type, label) => {
+    render(view(node({ mediaType: type, url: '' })));
+    expect(screen.queryByTestId(`${type}-element`)).toBeNull();
+    expect(screen.getByText(label)).toBeInTheDocument();
+  });
+  it('uses otherProps.rawMarkdown as the unfinished audio label', () => {
+    render(
+      view(
+        node({
+          mediaType: 'audio',
+          finished: false,
+          otherProps: { rawMarkdown: 'audio markdown' },
+        }),
+      ),
+    );
+    expect(screen.getByText('audio markdown')).toBeInTheDocument();
+  });
+  it('uses a default label for unfinished audio without text', () => {
+    render(view(node({ mediaType: 'audio', url: '', finished: false })));
+    expect(screen.getByText('音频加载中...')).toBeInTheDocument();
+  });
+  it.each([
+    ['video', '视频链接'],
+    ['audio', '音频链接'],
+    ['image', '图片链接'],
+  ])('uses the default %s fallback after five seconds', (type, label) => {
     vi.useFakeTimers();
-    vi.mocked(domUtils.getMediaType).mockReturnValue('image');
-    renderMedia({
-      ...baseElement,
-      url: 'https://example.com/pending.png',
-      alt: '',
-      finished: false,
-    });
-    await act(async () => {
-      vi.advanceTimersByTime(5000);
-    });
-    expect(
-      screen.getByText('https://example.com/pending.png'),
-    ).toBeInTheDocument();
-    vi.useRealTimers();
+    render(view(node({ mediaType: type, url: '', finished: false })));
+    act(() => vi.advanceTimersByTime(5000));
+    expect(screen.getByText(label)).toBeInTheDocument();
   });
-
-  it('attachment 有 url 时展示查看链接', async () => {
-    const stateData = {
-      loadSuccess: true,
-      url: 'https://example.com/file.pdf',
-      type: 'attachment' as const,
-    };
-    vi.mocked(editorUtils.useGetSetState).mockReturnValue([
-      () => stateData,
-      vi.fn((patch) => Object.assign(stateData, patch)),
-    ]);
-    vi.mocked(domUtils.getMediaType).mockReturnValue('attachment');
-    renderMedia({
-      ...baseElement,
-      url: 'https://example.com/file.pdf',
-      alt: '文档.pdf',
-    });
-    await act(async () => {
-      await Promise.resolve();
-    });
-    expect(screen.getByText('查看')).toBeInTheDocument();
-    expect(screen.getByText('文档.pdf')).toBeInTheDocument();
-  });
-
-  it('getMediaType 空值时 initial 默认 image 分支', async () => {
-    vi.mocked(domUtils.getMediaType).mockReturnValue('' as any);
-    renderMedia({ ...baseElement, url: '' });
-    await act(async () => {
-      await Promise.resolve();
-    });
-    expect(
-      document.querySelector('[data-be="media-container"]'),
-    ).toBeInTheDocument();
-  });
-
-  it('video finished=false 超时后展示 url 文案', async () => {
+  it('returns from timed-out text to the player when streaming finishes', () => {
     vi.useFakeTimers();
-    vi.mocked(domUtils.getMediaType).mockReturnValue('video');
-    renderMedia({
-      ...baseElement,
-      url: 'https://example.com/pending.mp4',
-      alt: '',
-      finished: false,
-    });
-    await act(async () => {
-      vi.advanceTimersByTime(5000);
-    });
-    expect(
-      screen.getByText('https://example.com/pending.mp4'),
-    ).toBeInTheDocument();
-    vi.useRealTimers();
+    const { rerender } = render(
+      view(node({ finished: false, alt: 'Pending video' })),
+    );
+    act(() => vi.advanceTimersByTime(5000));
+    expect(screen.getByText('Pending video')).toBeInTheDocument();
+    rerender(view(node({ finished: true })));
+    expect(screen.getByTestId('video-element')).toBeInTheDocument();
+    expect(screen.queryByText('Pending video')).toBeNull();
   });
-
-  it('audio finished=false 超时后展示 alt 文案', async () => {
-    vi.useFakeTimers();
-    vi.mocked(domUtils.getMediaType).mockReturnValue('audio');
-    renderMedia({
-      ...baseElement,
-      url: 'https://example.com/pending.mp3',
-      alt: '音频占位',
-      finished: false,
-    });
-    await act(async () => {
-      vi.advanceTimersByTime(5000);
-    });
-    expect(screen.getByText('音频占位')).toBeInTheDocument();
-    vi.useRealTimers();
+  it('uses the readonly attachment fallback name when no text is supplied', () => {
+    render(view(node({ mediaType: 'attachment', url: '', alt: '' })));
+    expect(screen.getByText('附件')).toHaveAttribute('download', 'attachment');
   });
 });
