@@ -10,6 +10,7 @@ import LinkIcon from '../../icons/link.svg';
 import LogoIcon from '../../icons/logo.svg';
 import SearchIcon from '../../icons/search.svg';
 import TranslateIcon from '../../icons/translate.svg';
+import { navigateToSiteUrl } from '../../utils/navigate';
 import { PCComponentsMenu } from './components';
 import SearchDropdown from './components/SearchDropdown';
 import { useImagePreload } from './hooks/useImagePreload';
@@ -116,7 +117,7 @@ const Header: React.FC = () => {
   const relativePath = getRelativePath();
 
   const menuItems: MenuItemConfig[] = [
-    { name: messages.nav.home, path: '/home' },
+    { name: messages.nav.home, path: '/' },
     {
       name: messages.nav.pcComponents,
       hasDropdown: true,
@@ -131,13 +132,9 @@ const Header: React.FC = () => {
     // 使用相对路径进行比较（已经去掉了 base）
     const normalizedPath = relativePath || '/';
 
-    // 首页特殊处理：/home 对应根路径 '/' 或 '/home'
-    if (path === '/home') {
-      return (
-        normalizedPath === '/' ||
-        normalizedPath === '/home' ||
-        normalizedPath.startsWith('/home/')
-      );
+    // 首页特殊处理：'/' 对应根路径
+    if (path === '/') {
+      return normalizedPath === '/';
     }
 
     // 其他路由：精确匹配或作为前缀
@@ -245,13 +242,7 @@ const Header: React.FC = () => {
               onClick={(e) => {
                 e.preventDefault();
                 if (!item.disabled) {
-                  if (item.link) {
-                    // 如果有 link，使用 window.open 打开新链接
-                    window.open(item.link, '_blank', 'noopener,noreferrer');
-                  } else if (item.path) {
-                    // 如果有 path，使用 window.location 进行路由跳转
-                    window.location.href = item.path;
-                  }
+                  navigateToSiteUrl(item.link || item.path);
                 }
               }}
               href={item.link || item.path || '#'}

@@ -7,86 +7,86 @@ group:
   order: 8
 ---
 
-# 编辑器基础功能 {#basic}
+# 编辑器基础功能
 
-## 基础功能 {#basic-2}
+## 基础功能
 
-<code src="../demos/preview.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/preview.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-<code src="../demos/readonly.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/readonly.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-<code src="../demos/markdown-editor-readonly-compare.tsx" id="editor-readonly-compare-basic" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/markdown-editor-readonly-compare.tsx" id="editor-readonly-compare-basic" background="var(--main-bg-color)" iframe="540"></code>
 
-<code src="../demos/comment-highlight-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/comment-highlight-demo.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-<code src="../demos/empty.tsx" background="var(--main-bg-color)" iframe=540 ></code>
+<code src="../demos/empty.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-<code src="../demos/setmd-content-demo.tsx" id="editor-setmd-under-features" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/setmd-content-demo.tsx" id="editor-setmd-under-features" background="var(--main-bg-color)" iframe="540"></code>
 
-## 编辑器模式 {#mode-mode}
+## 编辑器模式
 
-### 嵌入框模式 {#mode-mode-2}
+### 嵌入框模式
 
-<code src="../demos/min.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/min.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-### 自定义工具栏 {#custom-toolbar}
+### 自定义工具栏
 
-<code src="../demos/minPreview.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/minPreview.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-### 文本框输入 {#textarea-input}
+### 文本框输入
 
-<code src="../demos/markdownInputField/basic.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/markdownInputField/basic.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-### Jinja 模板（`{}` 触发 + 语法高亮） {#jinja}
+### Jinja 模板（`{}` 触发 + 语法高亮）
 
-<code src="../demos/jinja-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/jinja-demo.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-### 只读模式对比 {#readonly-comparison}
+### 只读模式对比
 
-<code src="../demos/markdown-editor-readonly-compare.tsx" id="editor-readonly-compare-mode" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/markdown-editor-readonly-compare.tsx" id="editor-readonly-compare-mode" background="var(--main-bg-color)" iframe="540"></code>
 
-## 自定义渲染 {#custom}
+## 自定义渲染
 
-### 自定义render {#custom-render}
+### 自定义render
 
-<code src="../demos/render.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/render.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-### Agentic UI 嵌入块（`agentic-ui-task` / `agentic-ui-toolusebar`） {#agentic-ui-task-agentic-ui-toolusebar}
+### Agentic UI 嵌入块（`agentic-ui-task` / `agentic-ui-toolusebar`）
 
-<code src="../demos/agentic-ui-embed-render-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/agentic-ui-embed-render-demo.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-### render 地址 {#render}
+### render 地址
 
-<code src="../demos/min-render.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/min-render.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-### 动态render {#render-2}
+### 动态render
 
-<code src="../demos/rerender.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/rerender.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-### Bubble 内动态 render（流式 Markdown · 逐词淡入） {#streaming-markdown}
+### Bubble 内动态 render（流式 Markdown · 逐词淡入）
 
-<code src="../demos/bubble/rerender-bubble-demo.tsx" background="var(--main-bg-color)" iframe=720></code>
+<code src="../demos/bubble/rerender-bubble-demo.tsx" background="var(--main-bg-color)" iframe="720"></code>
 
 > 使用 `markdownRenderConfig.renderMode: 'markdown'` 时默认开启 GPT 风格逐词淡入；关闭见 `throttleOptions.fade`（[MarkdownRenderer](../components/markdown-renderer#streaming-fade)）。
 
-### 编辑模式-动态render {#mode-render}
+### 编辑模式-动态render
 
-<code src="../demos/rerender-edit.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/rerender-edit.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-### 编辑器与渲染器对比 {#comparison}
+### 编辑器与渲染器对比
 
-<code src="../demos/rerender-diff.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/rerender-diff.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-### 相同渲染 {#same-rendering}
+### 相同渲染
 
-<code src="../demos/same-render.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/same-render.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-## 懒加载渲染 {#lazy}
+## 懒加载渲染
 
-<code src="../demos/lazy-render-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/lazy-render-demo.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-<code src="../demos/lazy-render-pdf-jump-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/lazy-render-pdf-jump-demo.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-## 内容设置 {#content}
+## 内容设置
 
-<code src="../demos/setmd-content-demo.tsx" id="editor-setmd-content-settings" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/setmd-content-demo.tsx" id="editor-setmd-content-settings" background="var(--main-bg-color)" iframe="540"></code>

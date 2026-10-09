@@ -7,19 +7,19 @@ group:
   order: 3
 ---
 
-# 插件 {#plugins}
+# 插件
 
-## 概述 {#overview}
+## 概述
 
 Markdown 编辑器插件系统提供了灵活的方式来扩展编辑器的功能。它允许你自定义节点渲染、实现 Markdown 双向转换，以及扩展编辑器行为。
 
-## 插件接口 {#plugin-interface}
+## 插件接口
 
 插件是一个实现了 `MarkdownEditorPlugin` 接口的对象，包含以下可选属性：
 
-### 自定义节点渲染 {#custom}
+### 自定义节点渲染
 
-```typescript | pure
+```typescript pure
 elements?: Record<string, React.ComponentType<ElementProps<any>>>
 ```
 
@@ -27,7 +27,7 @@ elements?: Record<string, React.ComponentType<ElementProps<any>>>
 
 示例：
 
-```typescript | pure
+```typescript pure
 const customBlockquotePlugin: MarkdownEditorPlugin = {
   elements: {
     blockquote: ({ attributes, children }) => (
@@ -39,13 +39,13 @@ const customBlockquotePlugin: MarkdownEditorPlugin = {
 }
 ```
 
-### Markdown 转换 {#markdown}
+### Markdown 转换
 
-#### Markdown 解析 (`parseMarkdown`) {#parsemarkdown}
+#### Markdown 解析 (`parseMarkdown`)
 
 将 Markdown AST 节点转换为 Slate 元素。这个功能允许你自定义如何将 Markdown 语法解析为编辑器中的元素。
 
-```typescript | pure
+```typescript pure
 parseMarkdown?: {
   match: (node: Node) => boolean;  // 匹配 Markdown 语法
   convert: (node: Node) => Elements | NodeEntry<Text>;  // 转换为 Slate 元素
@@ -54,7 +54,7 @@ parseMarkdown?: {
 
 示例：
 
-```typescript | pure
+```typescript pure
 const customCodeBlockPlugin: MarkdownEditorPlugin = {
   parseMarkdown: [
     {
@@ -73,11 +73,11 @@ const customCodeBlockPlugin: MarkdownEditorPlugin = {
 };
 ```
 
-#### 转换为 Markdown (`toMarkdown`) {#tomarkdown}
+#### 转换为 Markdown (`toMarkdown`)
 
 将 Slate 元素转换回 Markdown AST 节点。这个功能用于将编辑器内容导出为 Markdown 格式。
 
-```typescript | pure
+```typescript pure
 toMarkdown?: {
   match: (node: Elements) => boolean;  // 匹配 Slate 元素类型
   convert: (node: Elements) => Node;  // 转换为 Markdown AST 节点
@@ -86,7 +86,7 @@ toMarkdown?: {
 
 示例：
 
-```typescript | pure
+```typescript pure
 const customCodeBlockPlugin: MarkdownEditorPlugin = {
   toMarkdown: [
     {
@@ -101,11 +101,11 @@ const customCodeBlockPlugin: MarkdownEditorPlugin = {
 };
 ```
 
-#### 如何使用 toMarkdown 插件 {#tomarkdown-2}
+#### 如何使用 toMarkdown 插件
 
 要使用 `toMarkdown` 插件导出自定义格式的 Markdown，你需要通过编辑器实例调用 `getMDContent` 方法并传递插件：
 
-```typescript | pure
+```typescript pure
 const editorRef = useRef<MarkdownEditorInstance>();
 
 const handleExportMarkdown = () => {
@@ -124,25 +124,25 @@ const handleExportMarkdown = () => {
 />
 ```
 
-### 编辑器扩展 {#editor-extensions}
+### 编辑器扩展
 
-#### 扩展编辑器 (`withEditor`) {#witheditor}
+#### 扩展编辑器 (`withEditor`)
 
 自定义编辑器实例行为。通过这个功能，你可以修改或扩展编辑器的核心行为。
 
-```typescript | pure
+```typescript pure
 withEditor?: (editor: Editor) => Editor
 ```
 
 当 `plugins` 中 `withEditor` 的实现或顺序变化时，编辑器会 remount Slate 子树并尽量保留文档。参与检测的 key 为：插件顺序、是否含 `withEditor`、以及 `withEditorKey` 或具名 `withEditor` 的函数名（匿名函数视为同一槽位 `w`，替换实现不会 remount，请设置 `withEditorKey`）。
 
-```typescript | pure
+```typescript pure
 withEditorKey?: string
 ```
 
 示例：
 
-```typescript | pure
+```typescript pure
 const customVoidNodePlugin: MarkdownEditorPlugin = {
   withEditorKey: 'custom-void-v1',
   withEditor: (editor) => {
@@ -155,17 +155,17 @@ const customVoidNodePlugin: MarkdownEditorPlugin = {
 };
 ```
 
-#### 快捷键 {#shortcuts}
+#### 快捷键
 
 定义自定义键盘快捷键，用于触发特定的编辑器操作。
 
-```typescript | pure
+```typescript pure
 hotkeys?: Record<string, (editor: Editor) => void>
 ```
 
 示例：
 
-```typescript | pure
+```typescript pure
 const customHotkeyPlugin: MarkdownEditorPlugin = {
   hotkeys: {
     'mod+shift+c': (editor) => {
@@ -176,17 +176,17 @@ const customHotkeyPlugin: MarkdownEditorPlugin = {
 };
 ```
 
-#### 自定义粘贴处理 (`onPaste`) {#custom-onpaste}
+#### 自定义粘贴处理 (`onPaste`)
 
 使用自定义逻辑处理粘贴事件，可以用于实现特殊的粘贴行为。
 
-```typescript | pure
+```typescript pure
 onPaste?: (text: string) => boolean
 ```
 
 示例：
 
-```typescript | pure
+```typescript pure
 const customPastePlugin: MarkdownEditorPlugin = {
   onPaste: (text) => {
     if (text.startsWith('custom:')) {
@@ -198,11 +198,11 @@ const customPastePlugin: MarkdownEditorPlugin = {
 };
 ```
 
-## 使用方法 {#methods}
+## 使用方法
 
 插件通过 React Context 传递给编辑器。你可以组合多个插件来实现不同的功能：
 
-```typescript | pure
+```typescript pure
 import { MarkdownEditor } from './plugin';
 
 function MarkdownEditorWithPlugins({ children }) {
@@ -220,13 +220,13 @@ function MarkdownEditorWithPlugins({ children }) {
 }
 ```
 
-## 完整示例 {#full-example}
+## 完整示例
 
-### 简单的 toMarkdown 插件示例 {#example-tomarkdown}
+### 简单的 toMarkdown 插件示例
 
 以下是一个完整的插件示例，展示了如何创建自定义的笔记代码块：
 
-```typescript | pure
+```typescript pure
 import React, { useRef } from 'react';
 import { MarkdownEditor } from '@ant-design/agentic-ui';
 import { MarkdownEditorInstance } from '@ant-design/agentic-ui';
@@ -303,13 +303,13 @@ export default function SimpleToMarkdownExample() {
 
 这是一个简单的 toMarkdown 插件示例。
 
-## 普通代码块 {#normal-code-block}
+## 普通代码块
 
 \`\`\`javascript
 console.log("这是普通的 JavaScript 代码");
 \`\`\`
 
-## 自定义笔记代码块 {#custom-2}
+## 自定义笔记代码块
 
 下面的代码块会被插件特殊处理：
 
@@ -319,7 +319,7 @@ console.log("这是普通的 JavaScript 代码");
 使用 Ctrl+S 或 Cmd+S 保存文件。
 \`\`\`
 
-## 说明 {#notes}
+## 说明
 
 - 使用 \`note\` 语言标识的代码块会被转换为笔记框
 - 普通的代码块不会被插件影响
@@ -376,11 +376,11 @@ console.log("这是普通的 JavaScript 代码");
 }
 ```
 
-### 复杂插件示例 {#example}
+### 复杂插件示例
 
 以下是一个更复杂的插件示例，包含多种自定义元素：
 
-```typescript | pure
+```typescript pure
 import React, { useState } from 'react';
 import { MarkdownEditor } from '@ant-design/agentic-ui';
 import { MarkdownEditorPlugin } from '@ant-design/agentic-ui';
@@ -481,7 +481,7 @@ export default function ComplexPluginDemo() {
 
 这个演示展示了如何使用多个插件来自定义 Markdown 输出格式。
 
-## 警告代码块 {#warning-code-block}
+## 警告代码块
 
 下面是一个警告代码块，它会被特殊处理：
 
@@ -491,13 +491,13 @@ export default function ComplexPluginDemo() {
 系统可能会因为不当操作而出现问题。
 \`\`\`
 
-## 提示引用块 {#tip-quote-block}
+## 提示引用块
 
 > 💡 提示: 这是一个特殊的提示引用块
 > 它会被渲染为蓝色的提示框
 > 用于提供有用的建议和信息
 
-## 普通内容 {#content}
+## 普通内容
 
 这些是普通的内容，不会被插件特殊处理：
 
@@ -508,7 +508,7 @@ console.log("这是普通的 JavaScript 代码");
 > 这是普通的引用块
 > 不会被特殊处理
 
-## 说明 {#notes-2}
+## 说明
 
 - 使用 \`warning\` 语言标识的代码块会被转换为警告框
 - 以 "💡 提示:" 开头的引用块会被转换为提示框
@@ -550,11 +550,11 @@ console.log("这是普通的 JavaScript 代码");
 }
 ```
 
-### 复杂例子 {#complex-example}
+### 复杂例子
 
-<code src="../demos/useCreateComponentPlugin.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/useCreateComponentPlugin.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-## 最佳实践 {#best-practices}
+## 最佳实践
 
 1. **模块化设计**：每个插件应该专注于一个特定的功能，这样可以更好地组织和维护代码。
 

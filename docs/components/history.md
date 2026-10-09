@@ -6,55 +6,55 @@ group:
   order: 3
 ---
 
-# History 历史记录 {#history}
+# History 历史记录
 
 History 组件用于显示和管理聊天历史记录，支持两种显示模式：下拉菜单模式和独立菜单模式。组件提供历史会话的查看、选择和删除功能。
 
-## 代码演示 {#demo}
+## 代码演示
 
-### 基础用法 {#basic-usage}
+### 基础用法
 
 展示基本的历史记录下拉菜单功能。
 
-<code src="../demos/history-basic.tsx">基础用法 - 下拉菜单</code>
+<code src="../demos/history-basic.tsx" description="基础用法 - 下拉菜单"></code>
 
-### 独立菜单模式 {#mode-mode}
+### 独立菜单模式
 
 使用 `standalone` 属性直接显示历史记录菜单。
 
-<code src="../demos/history-standalone.tsx">独立模式 - 侧边栏会话列表</code>
+<code src="../demos/history-standalone.tsx" description="独立模式 - 侧边栏会话列表"></code>
 
-### 自定义日期格式化和分组 {#custom}
+### 自定义日期格式化和分组
 
 使用 `customDateFormatter` 和 `groupBy` 属性自定义日期显示和分组逻辑。
 
-<code src="../demos/history-custom.tsx">自定义分组与排序</code>
+<code src="../demos/history-custom.tsx" description="自定义分组与排序"></code>
 
-### 自定义额外内容 {#custom-content}
+### 自定义额外内容
 
 使用 `extra` 属性为每个历史记录项添加自定义内容。
 
-<code src="../demos/history-extra.tsx">自定义额外操作</code>
+<code src="../demos/history-extra.tsx" description="自定义额外操作"></code>
 
-### Agent 模式 {#mode-agent}
+### Agent 模式
 
 启用 Agent 模式后，支持搜索、收藏、多选与加载更多等增强能力。
 
-<code src="../demos/history-agent-mode-demo.tsx">Agent 模式 - 搜索收藏多选</code>
+<code src="../demos/history-agent-mode-demo.tsx" description="Agent 模式 - 搜索收藏多选"></code>
 
-<code src="../demos/history-task-demo.tsx">Agent 模式 - 任务管理</code>
+<code src="../demos/history-task-demo.tsx" description="Agent 模式 - 任务管理"></code>
 
-### ActionRef 外部控制 {#actionref}
+### ActionRef 外部控制
 
 使用 `actionRef` 可以外部触发历史记录重新加载。
 
-<code src="../demos/history-actionRef-demo.tsx">外部控制 - ActionRef</code>
+<code src="../demos/history-actionRef-demo.tsx" description="外部控制 - ActionRef"></code>
 
-### 空状态渲染与搜索触发方式 {#status}
+### 空状态渲染与搜索触发方式
 
 使用 `emptyRender` 自定义空状态显示，使用 `searchOptions.trigger` 配置搜索触发方式。
 
-<code src="../demos/history-empty-render.tsx">空状态与搜索触发配置</code>
+<code src="../demos/history-empty-render.tsx" description="空状态与搜索触发配置"></code>
 
 ## API
 
@@ -108,30 +108,30 @@ History 组件用于显示和管理聊天历史记录，支持两种显示模式
 | clientId        | 客户ID       | `string`                                                                                                    | -      | -    |
 | gmtCreate       | 记录创建时间 | `string \| number`                                                                                          | -      | -    |
 
-## 功能特性 {#features}
+## 功能特性
 
-### 显示模式 {#mode-mode-2}
+### 显示模式
 
 - **下拉菜单模式**（默认）：显示为一个可点击的历史图标，点击后显示下拉菜单
 - **独立菜单模式**：直接显示为菜单列表，适用于侧边栏等场景
 
-### 数据分组 {#data-grouping}
+### 数据分组
 
 - 默认按日期分组（今日、昨日、一周内、更早）
 - 支持自定义分组逻辑
 - 每组内按时间倒序排列
 
-### 交互功能 {#interactions}
+### 交互功能
 
 - **查看历史**：点击历史记录项可切换到对应会话
 - **删除记录**：鼠标悬停显示删除按钮，支持确认删除
 - **自定义操作**：通过 `extra` 属性添加自定义按钮或标签
 
-### 样式定制 {#style}
+### 样式定制
 
 组件使用了 Ant Design 的 Menu 组件，可以通过以下方式定制样式：
 
-```tsx | pure
+```tsx pure
 // 通过 ConfigProvider 定制主题
 <ConfigProvider
   theme={{
@@ -148,11 +148,11 @@ History 组件用于显示和管理聊天历史记录，支持两种显示模式
 </ConfigProvider>
 ```
 
-### 国际化支持 {#i18n}
+### 国际化支持
 
 组件支持国际化，通过 `I18nProvide`（或 `I18nContext`）统一提供文案，例如：
 
-```ts | pure
+```ts pure
 {
   'chat.history': '历史记录',
   'chat.history.delete': '删除',
@@ -160,7 +160,7 @@ History 组件用于显示和管理聊天历史记录，支持两种显示模式
 }
 ```
 
-### Agent 配置 {#config-agent}
+### Agent 配置
 
 通过 `agent` 属性启用并配置 Agent 模式。组件会根据提供的回调函数自动显示对应的功能按钮：
 
@@ -176,7 +176,7 @@ History 组件用于显示和管理聊天历史记录，支持两种显示模式
 | runningId         | 正在运行的记录 ID 列表              | `string[]`                                         | -       | -    |
 | searchOptions     | 搜索框配置，详见 SearchOptions 说明 | `SearchOptions`                                    | -       | -    |
 
-### SearchOptions 配置 {#config-searchoptions}
+### SearchOptions 配置
 
 搜索框相关配置选项：
 
@@ -186,7 +186,7 @@ History 组件用于显示和管理聊天历史记录，支持两种显示模式
 | text        | 未展开时的默认文本                                                  | `string`              | -          | -    |
 | trigger     | 搜索触发方式：'change' 为实时搜索（防抖 360ms），'enter' 为回车触发 | `'change' \| 'enter'` | `'change'` | -    |
 
-## 注意事项 {#notes}
+## 注意事项
 
 1. **请求函数**：`request` 函数必须返回 `Promise<HistoryDataType[]>`，用于获取历史数据
 2. **会话ID**：`sessionId` 变更时会自动重新获取数据

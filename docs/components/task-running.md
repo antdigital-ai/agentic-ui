@@ -6,21 +6,21 @@ group:
   order: 3
 ---
 
-# AgentRunBar 任务运行状态 {#status-agentrunbar}
+# AgentRunBar 任务运行状态
 
 用于展示智能体任务的运行状态，包括运行时长、当前状态和操作按钮。支持运行中、暂停、停止、完成、出错、取消等多种状态切换和交互操作。
 
 > 历史名称为 `TaskRunning`，已重命名为 `AgentRunBar`，原 `TaskRunning` 仍以别名形式导出但已废弃，新代码请使用 `AgentRunBar`。
 
-## 何时使用 {#when-to-use}
+## 何时使用
 
 - 智能体执行后台任务时，向用户展示运行进度与可控操作
 - 需要呈现任务运行 / 暂停 / 停止 / 完成 / 错误 / 取消 等状态
 - 需要在状态发生变化时提供「暂停 / 继续 / 停止 / 重试 / 新建任务 / 查看结果」入口
 
-## 代码演示 {#demo}
+## 代码演示
 
-<code src="../demos/task-running.tsx">AgentRunBar - 全状态演示</code>
+<code src="../demos/task-running.tsx" description="AgentRunBar - 全状态演示"></code>
 
 ## API
 
@@ -52,7 +52,7 @@ group:
 > - `false`：不渲染任何自定义 `actionNode`；停止 / 暂停 / 继续控制按钮仍按状态显示
 > - 函数：调用并将其返回值作为 `actionNode` 渲染（返回 `false` / `null` 等同于不渲染）
 
-### 类型定义 {#type-definitions}
+### 类型定义
 
 #### TaskStatus
 
@@ -112,7 +112,7 @@ type AgentRunBarActionsRender = (props: {
 | newTask       | 新任务按钮文案   | `新任务`       |
 | submitTask    | 提交任务按钮文案 | `提交任务`     |
 
-## 别名（向后兼容） {#aliases-backcompat}
+## 别名（向后兼容）
 
 | 历史名称                   | 新名称                     | 说明             |
 | -------------------------- | -------------------------- | ---------------- |

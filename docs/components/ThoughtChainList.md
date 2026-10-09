@@ -8,11 +8,11 @@ group:
   order: 3
 ---
 
-# ThoughtChainList 思维链 {#thoughtchainlist}
+# ThoughtChainList 思维链
 
 一个用于可视化 AI 思考过程和推理链的 React 组件，具有可折叠、交互式格式。
 
-## 功能特点 {#features}
+## 功能特点
 
 - 📝 以结构化格式展示 AI 推理步骤
 - 🔄 自动滚动到最新内容
@@ -22,7 +22,7 @@ group:
 - 📊 支持可折叠/可展开视图
 - 🏷️ 支持多种 category 类型（表查询、工具调用、文档检索、深度思考、联网搜索）
 
-## 使用方法 {#methods}
+## 使用方法
 
 ```tsx
 import { ThoughtChainList } from '@ant-design/agentic-ui'; // 从你的包中导入
@@ -85,7 +85,7 @@ function App() {
 export default App;
 ```
 
-## 属性 {#props}
+## 属性
 
 | 属性                     | 说明                          | 类型                               | 默认值 | 版本   |
 | ------------------------ | ----------------------------- | ---------------------------------- | ------ | ------ |
@@ -108,7 +108,7 @@ export default App;
 | `thoughtChainItemRender` | 自定义思维链项目的渲染        | `object`                           | -      | -      |
 | `onDocMetaClick`         | 文档元数据点击回调            | `(docMeta: DocMeta) => void`       | -      | -      |
 
-## 类型定义 {#type-definitions}
+## 类型定义
 
 ### WhiteBoxProcessInterface
 
@@ -160,9 +160,9 @@ interface DocMeta {
 }
 ```
 
-## 示例 {#examples}
+## 示例
 
-### 基础示例 {#basic-example}
+### 基础示例
 
 ```tsx
 import { ThoughtChainList } from '@ant-design/agentic-ui';
@@ -201,7 +201,7 @@ export default function BasicDemo() {
 }
 ```
 
-### 多步骤示例 {#example}
+### 多步骤示例
 
 ```tsx
 import { ThoughtChainList } from '@ant-design/agentic-ui';
@@ -295,7 +295,7 @@ export default function ProgressDemo() {
 }
 ```
 
-### 错误状态示例 {#example-status}
+### 错误状态示例
 
 ```tsx
 import { ThoughtChainList } from '@ant-design/agentic-ui';
@@ -331,11 +331,11 @@ export default function ErrorDemo() {
 }
 ```
 
-## Category 类型详解 {#types-category}
+## Category 类型详解
 
 ThoughtChainList 支持多种不同的 category 类型，每种类型都有其特定的用途和数据结构。以下是所有支持的 category 类型的详细说明：
 
-### 快速参考 {#quick-reference}
+### 快速参考
 
 | Category       | 中文名称 | 主要用途          | 输出类型      | 图标 |
 | -------------- | -------- | ----------------- | ------------- | ---- |
@@ -345,7 +345,7 @@ ThoughtChainList 支持多种不同的 category 类型，每种类型都有其�
 | `DeepThink`    | 深度思考 | AI 推理分析       | TOKEN/RUNNING | 🧠   |
 | `WebSearch`    | 联网搜索 | 网络信息搜索      | END           | 🌐   |
 
-### TableSql - 表查询 {#tablesql}
+### TableSql - 表查询
 
 用于展示数据库查询操作的思维链项目。
 
@@ -358,7 +358,7 @@ ThoughtChainList 支持多种不同的 category 类型，每种类型都有其�
 
 **数据结构：**
 
-```tsx | pure
+```tsx pure
 {
   category: 'TableSql',
   info: '查询用户表数据',
@@ -380,7 +380,7 @@ ThoughtChainList 支持多种不同的 category 类型，每种类型都有其�
 
 **使用示例：**
 
-```tsx | pure
+```tsx pure
 const sqlThoughtChain = [
   {
     category: 'TableSql',
@@ -402,7 +402,7 @@ const sqlThoughtChain = [
 ];
 ```
 
-### ToolCall - 工具调用 {#toolcall}
+### ToolCall - 工具调用
 
 用于展示外部工具或 API 调用的思维链项目。
 
@@ -415,7 +415,7 @@ const sqlThoughtChain = [
 
 **数据结构：**
 
-```tsx | pure
+```tsx pure
 {
   category: 'ToolCall',
   info: '调用用户信息接口',
@@ -444,7 +444,7 @@ const sqlThoughtChain = [
 
 **使用示例：**
 
-```tsx | pure
+```tsx pure
 const toolCallThoughtChain = [
   {
     category: 'ToolCall',
@@ -476,7 +476,7 @@ const toolCallThoughtChain = [
 ];
 ```
 
-### RagRetrieval - 文档检索 {#ragretrieval}
+### RagRetrieval - 文档检索
 
 用于展示知识库或文档检索操作的思维链项目。
 
@@ -489,7 +489,7 @@ const toolCallThoughtChain = [
 
 **数据结构：**
 
-```tsx | pure
+```tsx pure
 {
   category: 'RagRetrieval',
   info: '检索产品文档',
@@ -515,7 +515,7 @@ const toolCallThoughtChain = [
 
 **使用示例：**
 
-```tsx | pure
+```tsx pure
 const ragThoughtChain = [
   {
     category: 'RagRetrieval',
@@ -553,7 +553,7 @@ const ragThoughtChain = [
 ];
 ```
 
-### DeepThink - 深度思考 {#thinking-deepthink}
+### DeepThink - 深度思考
 
 用于展示 AI 推理和思考过程的思维链项目。
 
@@ -566,7 +566,7 @@ const ragThoughtChain = [
 
 **数据结构：**
 
-```tsx | pure
+```tsx pure
 {
   category: 'DeepThink',
   info: '分析市场趋势',
@@ -579,7 +579,7 @@ const ragThoughtChain = [
 
 **使用示例：**
 
-```tsx | pure
+```tsx pure
 const deepThinkChain = [
   {
     category: 'DeepThink',
@@ -606,7 +606,7 @@ const deepThinkChain = [
 ];
 ```
 
-### WebSearch - 联网搜索 {#websearch}
+### WebSearch - 联网搜索
 
 用于展示网络搜索操作的思维链项目。
 
@@ -619,7 +619,7 @@ const deepThinkChain = [
 
 **数据结构：**
 
-```tsx | pure
+```tsx pure
 {
   category: 'WebSearch',
   info: '搜索最新技术资讯',
@@ -644,7 +644,7 @@ const deepThinkChain = [
 
 **使用示例：**
 
-```tsx | pure
+```tsx pure
 const webSearchChain = [
   {
     category: 'WebSearch',
@@ -670,11 +670,11 @@ const webSearchChain = [
 ];
 ```
 
-### 错误处理 {#error-handling}
+### 错误处理
 
 所有 category 类型都支持错误状态的展示：
 
-```tsx | pure
+```tsx pure
 {
   category: 'ToolCall',
   info: '调用支付接口',
@@ -685,11 +685,11 @@ const webSearchChain = [
 }
 ```
 
-### 加载状态 {#status}
+### 加载状态
 
 支持显示正在执行的状态：
 
-```tsx | pure
+```tsx pure
 {
   category: 'DeepThink',
   info: '正在分析数据...',
@@ -700,7 +700,7 @@ const webSearchChain = [
  }
 ```
 
-### 最佳实践 {#best-practices}
+### 最佳实践
 
 **1. 选择合适的 Category**
 
@@ -712,7 +712,7 @@ const webSearchChain = [
 
 **2. 提供清晰的信息描述**
 
-```tsx | pure
+```tsx pure
 // ✅ 好的做法
 info: '查询用户订单数据';
 
@@ -722,7 +722,7 @@ info: '查询数据';
 
 **3. 合理使用加载状态**
 
-```tsx | pure
+```tsx pure
 // 正在执行的任务
 {
   category: 'ToolCall',
@@ -741,7 +741,7 @@ info: '查询数据';
 
 **4. 错误处理**
 
-```tsx | pure
+```tsx pure
 {
   category: 'ToolCall',
   info: '调用支付接口失败',
@@ -752,9 +752,9 @@ info: '查询数据';
 }
 ```
 
-## 自定义 {#custom}
+## 自定义
 
-### 使用自定义本地化 {#custom-2}
+### 使用自定义本地化
 
 ````tsx
 import { ThoughtChainList } from '@ant-design/agentic-ui';
@@ -874,7 +874,7 @@ export default function LocalizedDemo() {
 }
 ````
 
-### 紧凑模式 {#mode-mode}
+### 紧凑模式
 
 ````tsx
 import { ThoughtChainList } from '@ant-design/agentic-ui';
@@ -991,6 +991,6 @@ export default function CompactDemo() {
 }
 ````
 
-### 综合示例 - 多类型思维链 {#example-types}
+### 综合示例 - 多类型思维链
 
-<code src="./thought-chain-list/big.tsx" background="var(--main-bg-color)"  iframe="540">综合示例 - SQL查询 / 文档检索 / 深度思考 / 工具调用</code>
+<code src="./thought-chain-list/big.tsx" background="var(--main-bg-color)"  iframe="540" description="综合示例 - SQL查询 / 文档检索 / 深度思考 / 工具调用"></code>

@@ -6,13 +6,13 @@ group:
   order: 1
 ---
 
-# Robot 机器人形象 {#robot}
+# Robot 机器人形象
 
 机器人形象组件，提供多种动画状态的机器人图标，支持自定义大小、状态和图标。
 
-## 代码演示 {#demo}
+## 代码演示
 
-<code src="../demos/robot.tsx">基础用法</code>
+<code src="../demos/robot.tsx" description="基础用法"></code>
 
 ## API
 
@@ -26,7 +26,7 @@ group:
 | style     | 自定义样式         | `React.CSSProperties`   | -           | -    |
 | icon      | 自定义图标         | `React.ReactNode`       | -           | -    |
 
-### 通用 API {#api}
+### 通用 API
 
 所有Lottie动画组件通用的 API。
 

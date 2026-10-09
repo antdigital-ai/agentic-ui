@@ -14,19 +14,17 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@@/*": [".dumi/tmp/*"],
       "@ant-design/agentic-ui": ["./src"],
       "@ant-design/agentic-ui/*": ["src/*", "*"]
     }
   },
   "include": [
-    ".dumirc.ts",
-    ".dumi/typing.d.ts",
+    "rspress.config.ts",
+    "theme/**/*",
     "docs/demos/**/*",
     "docs/components/**/*",
     "src/**/*",
     "src/MarkDown/demos/.tsx",
-    "docs/pure.tsx",
     "home/**/*"
   ],
   "exclude": ["home/demo-components", "**/__tests__/**", "_test_helpers", "**/*.test.ts", "**/*.test.tsx"]

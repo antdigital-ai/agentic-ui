@@ -19,7 +19,8 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          # Rspress 2.x / Rsbuild 依赖 Node 22+（Node 18 下 @rsbuild/core 崩溃）
+          node-version: 22
 
       - name: Enable Corepack and install dependencies
         run: |

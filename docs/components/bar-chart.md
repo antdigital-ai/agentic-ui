@@ -7,22 +7,22 @@ group:
   order: 4
 ---
 
-# BarChart 柱状图 {#barchart}
+# BarChart 柱状图
 
 支持垂直/水平、堆叠、多序列以及筛选，含响应式与主题配置。
 
-## 代码演示 {#demo}
+## 代码演示
 
-<code src="../demos/charts/bar/bar.tsx" background="var(--main-bg-color)" iframe=540></code>
-<code src="../demos/charts/bar/bar-stacked.tsx" background="var(--main-bg-color)" title="堆叠柱状图" iframe=540></code>
-<code src="../demos/charts/bar/bar-negative.tsx" background="var(--main-bg-color)" title="正负柱状图" iframe=540></code>
-<code src="../demos/charts/bar/bar-horizontal.tsx" background="var(--main-bg-color)" title="条形图（横向）" iframe=540></code>
-<code src="../demos/charts/bar/bar-horizontal-stacked.tsx" background="var(--main-bg-color)" title="条形堆叠图（横向堆叠）" iframe=540></code>
-<code src="../demos/charts/bar/bar-with-labels.tsx" background="var(--main-bg-color)" title="带数据标签" iframe=540></code>
-<code src="../demos/charts/bar/bar-max-thickness.tsx" background="var(--main-bg-color)" title="柱子最大宽度控制" iframe=540></code>
-<code src="../demos/charts/bar/bar-with-statistic.tsx" background="var(--main-bg-color)" title="指标统计" iframe=540></code>
-<code src="../demos/charts/bar/bar-chinese-currency.tsx" background="var(--main-bg-color)" title="中文金额（亿元/万元/元）" iframe=540></code>
-<code src="../demos/charts/bar/bar-dark.tsx" background="#141414" title="暗黑主题" iframe=520></code>
+<code src="../demos/charts/bar/bar.tsx" background="var(--main-bg-color)" iframe="540"></code>
+<code src="../demos/charts/bar/bar-stacked.tsx" background="var(--main-bg-color)" title="堆叠柱状图" iframe="540"></code>
+<code src="../demos/charts/bar/bar-negative.tsx" background="var(--main-bg-color)" title="正负柱状图" iframe="540"></code>
+<code src="../demos/charts/bar/bar-horizontal.tsx" background="var(--main-bg-color)" title="条形图（横向）" iframe="540"></code>
+<code src="../demos/charts/bar/bar-horizontal-stacked.tsx" background="var(--main-bg-color)" title="条形堆叠图（横向堆叠）" iframe="540"></code>
+<code src="../demos/charts/bar/bar-with-labels.tsx" background="var(--main-bg-color)" title="带数据标签" iframe="540"></code>
+<code src="../demos/charts/bar/bar-max-thickness.tsx" background="var(--main-bg-color)" title="柱子最大宽度控制" iframe="540"></code>
+<code src="../demos/charts/bar/bar-with-statistic.tsx" background="var(--main-bg-color)" title="指标统计" iframe="540"></code>
+<code src="../demos/charts/bar/bar-chinese-currency.tsx" background="var(--main-bg-color)" title="中文金额（亿元/万元/元）" iframe="540"></code>
+<code src="../demos/charts/bar/bar-dark.tsx" background="#141414" title="暗黑主题" iframe="520"></code>
 
 ## API
 
@@ -56,7 +56,7 @@ group:
 | showDataLabels        | 是否显示数据标签（在柱子顶部或右侧显示数值）                                                                       | `boolean`                                        | `false`    | -    |
 | dataLabelFormatter    | 数据标签格式化函数，可自定义显示格式（如添加单位、格式化数字）                                                     | `(params: DataLabelFormatterParams) => string`   | -          | -    |
 
-### ChartContainerProps（继承） {#chartcontainerprops}
+### ChartContainerProps（继承）
 
 | 属性       | 说明                                                                            | 类型                        | 默认值  | 版本 |
 | ---------- | ------------------------------------------------------------------------------- | --------------------------- | ------- | ---- |
@@ -109,7 +109,7 @@ group:
 | block          | 是否使用块级布局（弹性占用空间，多个时平分父容器宽度） | `boolean`                                                           | `false`     | -    |
 | extra          | 右上角自定义内容（图标、按钮等）                       | `React.ReactNode`                                                   | -           | -    |
 
-## 说明 {#notes}
+## 说明
 
 - `chartOptions` 类型中的 `ChartOptions` 来自 `chart.js`，用于在默认配置之上做增量合并。
 - `stacked` 为 `true` 时，将按 `type` 将数据叠加显示。

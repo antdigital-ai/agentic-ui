@@ -1,0 +1,283 @@
+[
+  {
+    "type": "section-header",
+    "label": "通用"
+  },
+  {
+    "type": "file",
+    "name": "action-icon-box",
+    "label": "ActionIconBox"
+  },
+  {
+    "type": "file",
+    "name": "action-item-box",
+    "label": "ActionItemBox"
+  },
+  {
+    "type": "file",
+    "name": "button",
+    "label": "Button"
+  },
+  {
+    "type": "file",
+    "name": "gradient-text",
+    "label": "GradientText"
+  },
+  {
+    "type": "file",
+    "name": "icon",
+    "label": "Icon"
+  },
+  {
+    "type": "file",
+    "name": "input",
+    "label": "Input"
+  },
+  {
+    "type": "file",
+    "name": "office-viewer",
+    "label": "OfficeViewer"
+  },
+  {
+    "type": "file",
+    "name": "sandbox-renderer",
+    "label": "SandboxRenderer"
+  },
+  {
+    "type": "file",
+    "name": "segmented",
+    "label": "Segmented"
+  },
+  {
+    "type": "file",
+    "name": "text-animate",
+    "label": "TextAnimate"
+  },
+  {
+    "type": "file",
+    "name": "typing-animation",
+    "label": "TypingAnimation"
+  },
+  {
+    "type": "file",
+    "name": "VisualList",
+    "label": "VisualList"
+  },
+  {
+    "type": "section-header",
+    "label": "布局"
+  },
+  {
+    "type": "file",
+    "name": "agentic-layout",
+    "label": "AgenticLayout"
+  },
+  {
+    "type": "file",
+    "name": "chat-flow-container",
+    "label": "ChatLayout"
+  },
+  {
+    "type": "file",
+    "name": "chat-layout",
+    "label": "ChatLayout"
+  },
+  {
+    "type": "file",
+    "name": "layout-header",
+    "label": "LayoutHeader"
+  },
+  {
+    "type": "section-header",
+    "label": "入口"
+  },
+  {
+    "type": "file",
+    "name": "ai-label",
+    "label": "AILabel"
+  },
+  {
+    "type": "file",
+    "name": "back-to",
+    "label": "BackTo"
+  },
+  {
+    "type": "file",
+    "name": "chat-boot",
+    "label": "ChatBootPage"
+  },
+  {
+    "type": "file",
+    "name": "robot",
+    "label": "Robot"
+  },
+  {
+    "type": "file",
+    "name": "welcome",
+    "label": "WelcomeMessage"
+  },
+  {
+    "type": "section-header",
+    "label": "对话流"
+  },
+  {
+    "type": "file",
+    "name": "answer-alert",
+    "label": "AnswerAlert"
+  },
+  {
+    "type": "file",
+    "name": "bubble",
+    "label": "Bubble"
+  },
+  {
+    "type": "file",
+    "name": "history",
+    "label": "History"
+  },
+  {
+    "type": "file",
+    "name": "loading",
+    "label": "Loading"
+  },
+  {
+    "type": "file",
+    "name": "quote",
+    "label": "Quote"
+  },
+  {
+    "type": "file",
+    "name": "SuggestionList",
+    "label": "SuggestionList"
+  },
+  {
+    "type": "file",
+    "name": "task-list",
+    "label": "TaskList"
+  },
+  {
+    "type": "file",
+    "name": "task-running",
+    "label": "AgentRunBar"
+  },
+  {
+    "type": "file",
+    "name": "text-loading",
+    "label": "TextLoading"
+  },
+  {
+    "type": "file",
+    "name": "ThoughtChainList",
+    "label": "ThoughtChainList"
+  },
+  {
+    "type": "file",
+    "name": "tool-use-bar-think",
+    "label": "ToolUseBarThink"
+  },
+  {
+    "type": "file",
+    "name": "tool-use-bar",
+    "label": "ToolUseBar"
+  },
+  {
+    "type": "file",
+    "name": "workspace",
+    "label": "Workspace"
+  },
+  {
+    "type": "section-header",
+    "label": "意图输入"
+  },
+  {
+    "type": "file",
+    "name": "api",
+    "label": "MarkdownEditor"
+  },
+  {
+    "type": "file",
+    "name": "markdownInputField",
+    "label": "MarkdownInputField"
+  },
+  {
+    "type": "section-header",
+    "label": "图文输出"
+  },
+  {
+    "type": "file",
+    "name": "area-chart",
+    "label": "AreaChart"
+  },
+  {
+    "type": "file",
+    "name": "bar-chart",
+    "label": "BarChart"
+  },
+  {
+    "type": "file",
+    "name": "boxplot-chart",
+    "label": "BoxPlotChart"
+  },
+  {
+    "type": "file",
+    "name": "chart-statistic",
+    "label": "ChartStatistic"
+  },
+  {
+    "type": "file",
+    "name": "donut-chart",
+    "label": "DonutChart"
+  },
+  {
+    "type": "file",
+    "name": "file-attachment",
+    "label": "FileAttachment"
+  },
+  "FileMapView",
+  {
+    "type": "file",
+    "name": "footnote",
+    "label": "Footnote"
+  },
+  {
+    "type": "file",
+    "name": "funnel-chart",
+    "label": "FunnelChart"
+  },
+  {
+    "type": "file",
+    "name": "histogram-chart",
+    "label": "HistogramChart"
+  },
+  {
+    "type": "file",
+    "name": "line-chart",
+    "label": "LineChart"
+  },
+  {
+    "type": "file",
+    "name": "mermaid",
+    "label": "Mermaid"
+  },
+  {
+    "type": "file",
+    "name": "radar-chart",
+    "label": "RadarChart"
+  },
+  {
+    "type": "file",
+    "name": "scatter-chart",
+    "label": "ScatterChart"
+  },
+  "schema",
+  "SchemaEditor",
+  {
+    "type": "section-header",
+    "label": "内容呈现"
+  },
+  {
+    "type": "file",
+    "name": "markdown-renderer",
+    "label": "MarkdownRenderer"
+  }
+]

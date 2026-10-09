@@ -11,6 +11,7 @@ import {
   ResultTitle,
   ScrollContent,
 } from './style';
+import { navigateToSiteUrl } from '../../../../utils/navigate';
 import { SearchDropdownProps, SearchResultType } from './types';
 import { filterSearchResults, transformSearchData } from './utils';
 
@@ -155,13 +156,7 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
                       onClick={(e) => {
                         e.preventDefault();
                         onClose();
-                        if (item.url) {
-                          window.open(
-                            item.url,
-                            '_blank',
-                            'noopener,noreferrer',
-                          );
-                        }
+                        navigateToSiteUrl(item.url);
                       }}
                     >
                       <IconContainer $type={type}>

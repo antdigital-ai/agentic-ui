@@ -6,17 +6,17 @@ group:
   order: 3
 ---
 
-# TaskList 任务列表 {#list-tasklist}
+# TaskList 任务列表
 
 用于展示任务列表的组件，支持折叠/展开、加载状态和不同的任务状态。
 
-## 代码演示 {#demo}
+## 代码演示
 
-<code src="../demos/task-list.tsx">基础用法 - 多状态任务流</code>
+<code src="../demos/task-list.tsx" description="基础用法 - 多状态任务流"></code>
 
-<code src="../demos/task-list-simple.tsx">Simple 模式 - 紧凑摘要条</code>
+<code src="../demos/task-list-simple.tsx" description="Simple 模式 - 紧凑摘要条"></code>
 
-<code src="../demos/task-list-task-complete-text.tsx">Simple 模式 - 自定义任务完成文案</code>
+<code src="../demos/task-list-task-complete-text.tsx" description="Simple 模式 - 自定义任务完成文案"></code>
 
 ## API
 
@@ -47,7 +47,7 @@ group:
 | content | 任务内容；支持字符串、React 节点；JSON/工具调用场景下的序列化元素（如 `{ type: 'pre', props: { children } }`）会在渲染前规范化；正文为空时回退为 `title` | `React.ReactNode \| React.ReactNode[]`           | -      | -    |
 | status  | 任务状态；`pending` 与 `loading` 展示一致（主色 + Loading 图标），摘要「进行中」逻辑相同                                                                 | `'success' \| 'loading' \| 'pending' \| 'error'` | -      | -    |
 
-### Simple 模式与摘要状态 {#simple-variant-summary}
+### Simple 模式与摘要状态
 
 `variant="simple"` 将列表收成摘要条 + 可展开详情：
 
@@ -62,7 +62,7 @@ group:
 
 工具调用时间线若需逐步 API 展示，可优先考虑 [ToolUseBar](/components/tool-use-bar)；继续用 TaskList simple 时请接受收起时仅显示最后一步，并保证流式结束后 `loading={false}`、item `status` 与内容字段正确。
 
-### 自定义任务完成文案示例 {#custom-example}
+### 自定义任务完成文案示例
 
 `taskCompleteText` 仅在 `variant="simple"` 摘要条上生效，未配置时回退到 i18n 默认值（如「任务完成」）。
 支持直接传入 `React.ReactNode`（字符串 / JSX），也支持传入函数 `({ items }) => ReactNode` 基于当前任务列表动态生成。
@@ -92,7 +92,7 @@ export default () => {
 };
 ```
 
-### 受控模式示例 {#controlled-example}
+### 受控模式示例
 
 ```tsx
 import { useState } from 'react';
@@ -126,7 +126,7 @@ export default () => {
 };
 ```
 
-### 样式定制 {#style}
+### 样式定制
 
 组件使用了以下的样式变量，可以通过 CSS-in-JS 进行样式定制：
 

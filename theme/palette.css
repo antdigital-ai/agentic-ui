@@ -1,3 +1,9 @@
+/*
+ * Agentic UI 调色板（原由 scripts/extract-palette.mjs 自 .dumi/reset-ant.css 生成，
+ * dumi 已移除，本文件为 palette 的唯一权威来源，可直接编辑）。
+ * 暗色选择器同时覆盖 html.dark（Rspress）与 [data-prefers-color="dark"]（组件库语义）。
+ */
+
 :root {
   /* 语义变量 - 请在业务与组件中使用 */
   --color-primary-bg-page-light: var(--color-primary-1);
@@ -3306,6 +3312,7 @@ a .ant-dropdown-trigger:hover {
   --otk-typography-title-margin-top: 1.2em;
   --otk-typography-title-margin-bottom: 0.5em;
 }
+html.dark,
 [data-prefers-color="dark"] {
   /* ============================================================ */
   /* 暗色模式调色板覆盖                                            */

@@ -1,0 +1,20 @@
+[
+  {
+    "type": "section-header",
+    "label": "开发指南"
+  },
+  "changelog.en-US",
+  "changelog.zh-CN",
+  "chat-message-bubble-adapters",
+  "component-development-guide",
+  "css-in-js-guide",
+  "development-guide",
+  "project-overview",
+  "pull-request-guide",
+  "release-guide",
+  {
+    "type": "section-header",
+    "label": "Development"
+  },
+  "chat-message-bubble-adapters.en-US"
+]

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useSiteI18n } from '../../i18n';
+import { navigateToSiteUrl } from '../../utils/navigate';
 import LinkIcon from '../../icons/link.svg';
 import BoltIconSelected from './icons/bolt.png';
 import BoltIcon from './icons/bolt.svg';
@@ -161,7 +162,7 @@ const AIChatbot: React.FC = () => {
               </div>
               <ExpandIcon
                 onClick={() => {
-                  window.open(AI_CHATBOT_URL);
+                  navigateToSiteUrl(AI_CHATBOT_URL);
                 }}
               >
                 <img

@@ -1,17 +1,17 @@
-# Open Issue 修复计划 {#open-issue-fix-plan}
+# Open Issue 修复计划
 
 > 盘点时间：2026-09-25  
 > 数据源：[antdigital-ai/agentic-ui open issues](https://github.com/antdigital-ai/agentic-ui/issues?q=is%3Aissue%20state%3Aopen)  
 > 当前范围：11 个开放 issue
 
-## 目标 {#goals}
+## 目标
 
 - 优先消除影响输入正确性、流式渲染正确性和内容复制的缺陷。
 - 将兼容性升级与常规缺陷拆分，避免 Ant Design 6 迁移阻塞补丁发布。
 - 对咨询、反馈和信息不足的 issue 先完成分流，不把它们计入缺陷修复吞吐。
 - 每个代码修复都包含回归测试、文档或 changelog，并通过相关组件测试、`pnpm tsc` 和 lint。
 
-## Issue 分流 {#issue-triage}
+## Issue 分流
 
 | 优先级 | Issue                                                                                                                     | 分类                            | 当前判断                                                             | 下一步                                  |
 | ------ | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------- | -------------------------------------------------------------------- | --------------------------------------- |
@@ -27,11 +27,11 @@
 | P3     | [#59 所见即所得体验反馈](https://github.com/antdigital-ai/agentic-ui/issues/59)                                           | Product feedback                | 缺少具体缺陷、期望行为和复现                                         | 说明现有模式，征集具体场景后关闭或拆分  |
 | P3     | [#245 正向反馈](https://github.com/antdigital-ai/agentic-ui/issues/245)                                                   | Feedback                        | 无待办事项                                                           | 致谢并关闭                              |
 
-## 修复批次 {#delivery-batches}
+## 修复批次
 
-### 批次 1：正确性回归 {#batch-1-correctness}
+### 批次 1：正确性回归
 
-#### #722 MarkdownEditor 流式松散列表重复 {#list-markdowneditor}
+#### #722 MarkdownEditor 流式松散列表重复
 
 建议实现：
 
@@ -47,7 +47,7 @@
 - 覆盖列表后跟标题、表格、引用的场景，避免后续节点反复删除和插入。
 - 新增 issue 提供的两个回归用例，并运行 MarkdownEditor、MarkdownRenderer 全量相关测试。
 
-#### #721 MarkdownInputField IME 删除残留 {#markdowninputfield-ime}
+#### #721 MarkdownInputField IME 删除残留
 
 建议实现：
 
@@ -62,9 +62,9 @@
 - 选择候选词、取消组合、组合后立即发送、受控/非受控模式均正常。
 - 至少覆盖 Chromium；手工验证 Windows 与 macOS 的一种系统输入法。
 
-### 批次 2：输入与复制集成 {#batch-2-integration}
+### 批次 2：输入与复制集成
 
-#### #682 Suggestion Dropdown 配置 {#config-suggestion-dropdown}
+#### #682 Suggestion Dropdown 配置
 
 建议实现：
 
@@ -78,7 +78,7 @@
 - Shadow DOM 中可将 popup 放入与 trigger 相同的 root。
 - API 类型、中文/英文文档、demo 和单元测试同步更新。
 
-#### #201 apaasify 自定义组件复制 {#custom-apaasify}
+#### #201 apaasify 自定义组件复制
 
 建议实现：
 
@@ -92,7 +92,7 @@
 - 普通 Markdown、代码块、卡片和编辑模式的既有复制行为不回退。
 - 若问题来自业务自定义组件，补充集成约束文档并关闭 issue，不修改核心代码。
 
-### 批次 3：Ant Design 6 兼容专项 {#batch-3-antd-6}
+### 批次 3：Ant Design 6 兼容专项
 
 该项独立于补丁批次推进：
 
@@ -108,7 +108,7 @@
 - 核心聊天、输入、Markdown、Workspace 和弹层组件在 antd 5/6 矩阵中通过。
 - 构建、类型检查、SSR 冒烟和文档站均通过。
 
-## Triage 与维护动作 {#maintenance-actions}
+## Triage 与维护动作
 
 - 为所有开放 issue 补充 `bug`、`enhancement`、`documentation`、`needs-reproduction`、`compatibility` 等标签。
 - #397、#201 设置 `needs-reproduction`，7 天无补充时发一次提醒，14 天后按信息不足关闭；后续可随时重开。
@@ -116,7 +116,7 @@
 - #59 若没有可验证的体验目标，则转为 discussion 或拆成具体功能 issue。
 - #330 在明确威胁模型、代码来源、依赖安装、网络权限、资源限制和浏览器隔离前，不承诺实现时间。
 
-## 建议里程碑 {#milestones}
+## 建议里程碑
 
 | 里程碑        | 内容                              | 预计工作量 | 发布策略                               |
 | ------------- | --------------------------------- | ---------- | -------------------------------------- |
@@ -128,7 +128,7 @@
 
 工作量是基于当前 issue 信息的初估；#721、#201、#397 在拿到真实浏览器复现后重新估算。
 
-## 完成定义 {#definition-of-done}
+## 完成定义
 
 每个代码 issue 关闭前必须满足：
 

@@ -7,44 +7,44 @@ group:
   order: 4
 ---
 
-# 历史记录 {#history}
+# 历史记录
 
-## 基础用法 {#basic-usage}
+## 基础用法
 
-<code src="../demos/history-basic.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/history-basic.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-## 自定义配置 {#custom-config}
+## 自定义配置
 
-<code src="../demos/history-custom.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/history-custom.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-## 扩展功能 {#extended-features}
+## 扩展功能
 
-<code src="../demos/history-extra.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/history-extra.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-## 独立使用 {#standalone-usage}
+## 独立使用
 
-<code src="../demos/history-standalone.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/history-standalone.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-## 空状态渲染 {#status}
+## 空状态渲染
 
-<code src="../demos/history-empty-render.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/history-empty-render.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-## Agent 模式 {#mode-agent}
+## Agent 模式
 
-<code src="../demos/history-agent-mode-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/history-agent-mode-demo.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-## ActionRef 使用 {#actionref}
+## ActionRef 使用
 
-<code src="../demos/history-actionRef-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/history-actionRef-demo.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-## 运行图标 {#icon}
+## 运行图标
 
-<code src="../demos/history-running-icon-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/history-running-icon-demo.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-## 任务演示 {#demo}
+## 任务演示
 
-<code src="../demos/history-task-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/history-task-demo.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-## 替换功能 {#replacement}
+## 替换功能
 
-<code src="../demos/replace-functionality.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/replace-functionality.tsx" background="var(--main-bg-color)" iframe="540"></code>

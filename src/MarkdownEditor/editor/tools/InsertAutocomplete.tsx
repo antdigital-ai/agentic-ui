@@ -660,6 +660,11 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
 
   const { hashId } = useStyle(baseClassName);
 
+  // SSR/SSG 环境无 document，createPortal 无处挂载
+  if (typeof document === 'undefined') {
+    return null;
+  }
+
   return ReactDOM.createPortal(
     <div
       ref={dom}

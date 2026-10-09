@@ -9,11 +9,11 @@ group:
   order: 4
 ---
 
-# FileMapView - 文件预览组件 {#filemapview}
+# FileMapView - 文件预览组件
 
 FileMapView 是一个强大的文件预览组件,支持多种文件类型的展示和预览功能,提供友好的文件列表视图。
 
-## 功能特性 {#features}
+## 功能特性
 
 - 📁 **多文件支持**: 支持同时展示多个文件
 - 🖼️ **图片预览**: 支持图片文件的缩略图展示
@@ -25,23 +25,23 @@ FileMapView 是一个强大的文件预览组件,支持多种文件类型的展�
 - ♿ **可访问性**: 普通文件卡片带有基于文件名的 `aria-label`
 - 🔧 **类型安全**: 完整的 TypeScript 类型支持
 
-## 基本用法 {#basic-usage}
+## 基本用法
 
-<code src="../demos/fileMapView.tsx" background="var(--main-bg-color)" iframe=540 ></code>
+<code src="../demos/fileMapView.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
-## 无 url/previewUrl 时的文件卡片展示 {#url-previewurl}
+## 无 url/previewUrl 时的文件卡片展示
 
 当附件暂时没有 `url` / `previewUrl`，但提供了 `type` 和 `name` 时，组件不会把图片或视频渲染为空缩略图，而是降级为普通文件卡片，展示对应文件类型图标和文件名。
 
-<code src="../demos/fileMapView-status-only.tsx" background="var(--main-bg-color)" iframe=360 ></code>
+<code src="../demos/fileMapView-status-only.tsx" background="var(--main-bg-color)" iframe="360"></code>
 
-## 自定义文件点击 {#custom}
+## 自定义文件点击
 
 通过 `onFileClick` 可以接管普通文件卡片点击；通过 `disableDefaultFileClick` 可以禁用普通文件卡片内置的默认预览点击，适合在业务侧统一打开抽屉、侧边栏或自定义预览器。
 
-<code src="../demos/fileMapView-click-control.tsx" background="var(--main-bg-color)" iframe=520 ></code>
+<code src="../demos/fileMapView-click-control.tsx" background="var(--main-bg-color)" iframe="520"></code>
 
-## API 参考 {#api}
+## API 参考
 
 ### Props
 
@@ -75,32 +75,32 @@ FileMapView 是一个强大的文件预览组件,支持多种文件类型的展�
 | `uuid`         | 文件唯一标识符 | `string` | -      | -    |
 | `lastModified` | 最后修改时间戳 | `number` | -      | -    |
 
-## 支持的文件类型 {#types}
+## 支持的文件类型
 
-### 图片格式 {#image-formats}
+### 图片格式
 
 - JPEG/JPG
 - PNG
 - GIF
 - WebP
 
-### 文档格式 {#document-formats}
+### 文档格式
 
 - PDF (application/pdf)
 - Word (application/msword, .docx)
 - PowerPoint (application/vnd.ms-powerpoint, .pptx)
 
-### 数据格式 {#data-format}
+### 数据格式
 
 - JSON (application/json)
 - YAML/YML (application/x-yaml)
 - TXT (text/plain)
 
-## 使用示例 {#examples}
+## 使用示例
 
-### 基本示例 {#basic-example}
+### 基本示例
 
-```tsx | pure
+```tsx pure
 import { FileMapView, AttachmentFile } from '@ant-design/agentic-ui';
 
 const fileMap = new Map<string, AttachmentFile>();
@@ -120,11 +120,11 @@ export default () => {
 };
 ```
 
-### 限制显示数量 {#limit-display-count}
+### 限制显示数量
 
 使用 `maxDisplayCount` 限制非图片文件的显示数量，超出部分会显示"查看所有文件"按钮：
 
-```tsx | pure
+```tsx pure
 import { FileMapView, AttachmentFile } from '@ant-design/agentic-ui';
 import { message } from 'antd';
 
@@ -164,11 +164,11 @@ export default () => {
 };
 ```
 
-### 自定义图片预览（onPreview） {#custom-onpreview}
+### 自定义图片预览（onPreview）
 
 传入 `onPreview` 后，点击图片缩略图不再打开 antd 内置灯箱，而是执行自定义逻辑（如打开自己的图片查看器）：
 
-```tsx | pure
+```tsx pure
 import { FileMapView, AttachmentFile } from '@ant-design/agentic-ui';
 import { message } from 'antd';
 
@@ -183,11 +183,11 @@ export default () => {
 };
 ```
 
-### 自定义媒体条目渲染（itemRender） {#custom-itemrender}
+### 自定义媒体条目渲染（itemRender）
 
 使用 `itemRender` 可以完全接管每个图片/视频缩略图的渲染，常用于回显场景（如显示自定义蒙层、额外操作按钮等）：
 
-```tsx | pure
+```tsx pure
 import { FileMapView, AttachmentFile } from '@ant-design/agentic-ui';
 import { Button } from 'antd';
 
@@ -209,9 +209,9 @@ export default () => {
 };
 ```
 
-### 自定义预览和下载 {#custom-2}
+### 自定义预览和下载
 
-```tsx | pure
+```tsx pure
 import { FileMapView, AttachmentFile } from '@ant-design/agentic-ui';
 import { message } from 'antd';
 
@@ -241,11 +241,11 @@ export default () => {
 };
 ```
 
-### 接管普通文件点击 {#takeover-file-click}
+### 接管普通文件点击
 
 `onFileClick` 只接管普通文件卡片点击，优先级高于 `onPreview` 和默认 `window.open`。如果只想禁止卡片点击打开默认预览，可以传 `disableDefaultFileClick`。
 
-```tsx | pure
+```tsx pure
 import { FileMapView, AttachmentFile } from '@ant-design/agentic-ui';
 import { message } from 'antd';
 
@@ -266,11 +266,11 @@ export default () => {
 };
 ```
 
-### 无 URL 媒体文件降级为普通文件卡片 {#url}
+### 无 URL 媒体文件降级为普通文件卡片
 
 图片和视频只有在存在 `url` 或 `previewUrl` 时才会进入缩略图区域。只有 `type` 和 `name` 的媒体文件会按普通文件卡片展示，避免出现空图片或空视频缩略图。
 
-```tsx | pure
+```tsx pure
 import { FileMapView, AttachmentFile } from '@ant-design/agentic-ui';
 
 const fileMap = new Map<string, AttachmentFile>([
@@ -297,11 +297,11 @@ const fileMap = new Map<string, AttachmentFile>([
 export default () => <FileMapView fileMap={fileMap} />;
 ```
 
-### 自定义更多操作 {#custom-3}
+### 自定义更多操作
 
 使用 `renderMoreAction` 添加自定义的更多操作按钮：
 
-```tsx | pure
+```tsx pure
 import { FileMapView, AttachmentFile } from '@ant-design/agentic-ui';
 import { Popover } from 'antd';
 import {
@@ -403,11 +403,11 @@ export default () => {
 };
 ```
 
-### 自定义悬浮动作区 {#custom-4}
+### 自定义悬浮动作区
 
 使用 `customSlot` 完全自定义文件项的悬浮动作区：
 
-```tsx | pure
+```tsx pure
 import { FileMapView, AttachmentFile } from '@ant-design/agentic-ui';
 import { Button, Space } from 'antd';
 
@@ -431,11 +431,11 @@ export default () => {
 };
 ```
 
-### 右侧布局 {#layout}
+### 右侧布局
 
 使用 `placement` 属性控制文件列表的位置：
 
-```tsx | pure
+```tsx pure
 import { FileMapView, AttachmentFile } from '@ant-design/agentic-ui';
 
 export default () => {
@@ -443,11 +443,11 @@ export default () => {
 };
 ```
 
-### 自定义样式 {#custom-style}
+### 自定义样式
 
 使用 `style` 和 `className` 自定义组件样式：
 
-```tsx | pure
+```tsx pure
 import { FileMapView, AttachmentFile } from '@ant-design/agentic-ui';
 
 export default () => {
@@ -465,11 +465,11 @@ export default () => {
 };
 ```
 
-### 完整示例（结合 Bubble 组件） {#full-bubble}
+### 完整示例（结合 Bubble 组件）
 
 在 Bubble 组件中使用 FileMapView：
 
-```tsx | pure
+```tsx pure
 import { Bubble, MessageBubbleData, AttachmentFile } from '@ant-design/agentic-ui';
 import { message } from 'antd';
 
@@ -510,7 +510,7 @@ export default () => {
 };
 ```
 
-## 布局特性 {#layout-2}
+## 布局特性
 
 FileMapView 会根据文件数量和类型自动调整布局:
 
@@ -521,13 +521,13 @@ FileMapView 会根据文件数量和类型自动调整布局:
 - **混合文件**: 图片在上方网格展示,其他文件在下方列表展示
 - **溢出控制**: 当非图片文件超过 `maxDisplayCount` 时,显示"查看所有文件"按钮
 
-## 高级用法 {#advanced-usage}
+## 高级用法
 
-### 文件事件处理 {#events}
+### 文件事件处理
 
 FileMapView 支持多种文件操作事件,可以通过回调函数自定义处理逻辑:
 
-```tsx | pure
+```tsx pure
 const handlePreview = (file: AttachmentFile) => {
   // 根据文件类型执行不同的预览逻辑
   if (file.type.startsWith('image/')) {
@@ -576,9 +576,9 @@ const handleViewAll = async (files: AttachmentFile[]) => {
 };
 ```
 
-### 动态文件管理 {#dynamic-file-management}
+### 动态文件管理
 
-```tsx | pure
+```tsx pure
 import { FileMapView, AttachmentFile } from '@ant-design/agentic-ui';
 import { useState } from 'react';
 import { Button, message } from 'antd';
@@ -624,11 +624,11 @@ export default () => {
 };
 ```
 
-### 文件权限控制 {#file-permissions}
+### 文件权限控制
 
 根据用户权限显示不同的操作按钮:
 
-```tsx | pure
+```tsx pure
 import { FileMapView, AttachmentFile } from '@ant-design/agentic-ui';
 
 const UserRole = {
@@ -673,11 +673,11 @@ export default () => {
 };
 ```
 
-### 文件加载状态 {#status}
+### 文件加载状态
 
 处理文件加载和错误状态:
 
-```tsx | pure
+```tsx pure
 import { FileMapView, AttachmentFile } from '@ant-design/agentic-ui';
 import { Spin, Alert } from 'antd';
 import { useState, useEffect } from 'react';
@@ -714,48 +714,48 @@ export default () => {
 };
 ```
 
-## 注意事项 {#notes}
+## 注意事项
 
-### 性能优化 {#performance}
+### 性能优化
 
 1. **文件大小**: 建议合理控制预览图片的大小,避免影响加载性能
 2. **懒加载**: 对于大量文件,建议使用 `maxDisplayCount` 限制初始显示数量
 3. **图片优化**: 使用 `previewUrl` 提供压缩后的预览图,而不是原图
 4. **内存管理**: 及时清理不再使用的文件 Map,避免内存泄漏
 
-### 类型安全 {#types-2}
+### 类型安全
 
 1. **文件类型**: 确保 `type` 字段使用正确的 MIME 类型
 2. **必填字段**: 建议提供 `name`、`type`、`uuid`；如果没有 `url` / `previewUrl`，组件会按文件卡片降级展示
 3. **类型检查**: 使用 TypeScript 确保类型正确
 
-### 用户体验 {#user-experience}
+### 用户体验
 
 1. **预览链接**: `previewUrl` 应该指向可访问的资源地址
 2. **错误处理**: 提供友好的错误提示和降级方案
 3. **加载状态**: 显示文件加载状态,避免用户等待
 4. **操作反馈**: 文件操作后提供明确的反馈信息
 
-### 安全性 {#security}
+### 安全性
 
 1. **URL 验证**: 验证文件 URL 的合法性,防止 XSS 攻击
 2. **文件类型**: 限制可预览和下载的文件类型
 3. **权限控制**: 根据用户权限控制文件操作
 4. **跨域处理**: 处理跨域文件访问问题
 
-### 兼容性 {#compatibility}
+### 兼容性
 
 1. **浏览器支持**: 确保在目标浏览器中正常工作
 2. **移动端适配**: 在移动设备上测试文件预览和下载功能
 3. **文件大小限制**: 考虑浏览器和设备的文件大小限制
 
-## 常见问题 {#faq}
+## 常见问题
 
-### 如何自定义文件图标? {#custom-icon}
+### 如何自定义文件图标?
 
 FileMapView 会根据文件类型自动显示对应的图标。如果需要自定义,可以通过 CSS 覆盖默认样式。
 
-### 图片预览不显示怎么办? {#image-preview-not-showing}757} {#image-preview-not-showing}
+### 图片预览不显示怎么办?
 
 1. 检查 `previewUrl` 或 `url` 是否正确
 2. 确认图片资源可访问
@@ -763,22 +763,22 @@ FileMapView 会根据文件类型自动显示对应的图标。如果需要自�
 4. 验证 `type` 字段是否为图片类型
 5. 如果没有 `url` / `previewUrl`，图片会按普通文件卡片展示，这是预期行为
 
-### 如何限制文件类型? {#types-3}
+### 如何限制文件类型?
 
 在传入 `fileMap` 之前过滤文件:
 
-```tsx | pure
+```tsx pure
 const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
 const filteredMap = new Map(
   Array.from(fileMap).filter(([_, file]) => allowedTypes.includes(file.type)),
 );
 ```
 
-### 如何实现文件上传? {#upload}
+### 如何实现文件上传?
 
 FileMapView 是纯展示组件,不包含上传功能。可以配合 Upload 组件使用:
 
-```tsx | pure
+```tsx pure
 import { Upload } from 'antd';
 import { FileMapView, AttachmentFile } from '@ant-design/agentic-ui';
 
@@ -796,12 +796,12 @@ const handleUpload = (file) => {
 };
 ```
 
-## 相关组件 {#related-components}
+## 相关组件
 
 - [Workspace](./workspace.md) - 工作区组件
 - [Bubble](./bubble.md) - 气泡组件
 
-## 更新日志 {#changelog}
+## 更新日志
 
 ### v1.0.0
 

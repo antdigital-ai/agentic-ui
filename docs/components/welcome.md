@@ -6,13 +6,13 @@ group:
   order: 1
 ---
 
-# WelcomeMessage 欢迎语 {#welcomemessage}
+# WelcomeMessage 欢迎语
 
 通过简短友好的欢迎语引入使用场景。
 
-## 代码演示 {#demo}
+## 代码演示
 
-<code src="../demos/welcome/index.tsx" background="var(--main-bg-color)" iframe=600>欢迎语 - 品牌引导与输入框</code>
+<code src="../demos/welcome/index.tsx" background="var(--main-bg-color)" iframe="600" description="欢迎语 - 品牌引导与输入框"></code>
 
 ## API
 
@@ -28,7 +28,7 @@ group:
 | style                   | 自定义样式           | `React.CSSProperties`                      | -      | -    |
 | rootClassName           | 自定义根节点样式类名 | `string`                                   | -      | -    |
 
-### 类型定义 {#type-definitions}
+### 类型定义
 
 #### WelcomeMessageTitleAnimateProps
 
@@ -38,11 +38,11 @@ group:
 
 `Pick<TextAnimateProps, 'delay' | 'duration' | 'variants' | 'by' | 'startOnView' | 'once' | 'animation'>`
 
-## 使用示例 {#examples}
+## 使用示例
 
-### 基础用法 {#basic-usage}
+### 基础用法
 
-```tsx | pure
+```tsx pure
 import { WelcomeMessage } from '@ant-design/agentic-ui';
 
 export default () => {
@@ -55,9 +55,9 @@ export default () => {
 };
 ```
 
-### 自定义类名 {#custom}
+### 自定义类名
 
-```tsx | pure
+```tsx pure
 import { WelcomeMessage } from '@ant-design/agentic-ui';
 
 export default () => {
@@ -75,9 +75,9 @@ export default () => {
 };
 ```
 
-### 仅标题 {#title}
+### 仅标题
 
-```tsx | pure
+```tsx pure
 import { WelcomeMessage } from '@ant-design/agentic-ui';
 
 export default () => {

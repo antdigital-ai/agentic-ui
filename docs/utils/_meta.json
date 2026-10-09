@@ -1,0 +1,20 @@
+[
+  {
+    "type": "section-header",
+    "label": "基础能力"
+  },
+  "chart-config",
+  "dom",
+  "editorUtils",
+  "html-to-markdown-utils",
+  "i18n",
+  "isMarkdown",
+  "markdown-syntax.en-US",
+  "markdown-syntax",
+  {
+    "type": "file",
+    "name": "markdownToHtml",
+    "label": "markdownToHtml"
+  },
+  "sandbox"
+]

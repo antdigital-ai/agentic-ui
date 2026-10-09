@@ -7,6 +7,9 @@ node_modules
 .dumi/tmp-production
 .DS_Store
 /docs-dist
+/doc_build
+rsbuild-log.txt
+/docs/_demoRegistry.json
 tsconfig.tsbuildinfo
 tsconfig.test.tsbuildinfo
 coverage/**

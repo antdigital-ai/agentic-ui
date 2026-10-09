@@ -7,23 +7,23 @@ group:
   order: 2
 ---
 
-# 图表配置文档 {#config}
+# 图表配置文档
 
-## 配置方式 {#config-2}
+## 配置方式
 
 图表配置通过 Markdown 注释的方式添加，格式如下：
 
 ```markdown
-<!-- [配置JSON] -->
+{/* [配置JSON] */}
 
 | 表头1 | 表头2 | 表头3 |
 | ----- | ----- | ----- |
 | 数据1 | 数据2 | 数据3 |
 ```
 
-## 配置参数 {#config-params}
+## 配置参数
 
-### 筛选维度层次关系 {#filter}
+### 筛选维度层次关系
 
 图表支持三个层次的筛选维度，从高到低依次为：
 
@@ -42,9 +42,9 @@ group:
    - 决定图表中的线条/柱子的颜色区分
    - 展现形式：图例
 
-### 基础配置 {#basic-config}
+### 基础配置
 
-```typescript | pure
+```typescript pure
 type ChartConfig = {
   chartType: string; // 图表类型
   x: string; // X 轴字段
@@ -60,14 +60,14 @@ type ChartConfig = {
 };
 ```
 
-### 支持的图表类型 {#types}
+### 支持的图表类型
 
 1. **饼图 (pie)**
 
    实心圆形图表，适用于显示各部分占整体的比例关系。
 
    ```markdown
-   <!-- {"chartType": "pie", "x": "业务", "y": "2021Q1"} -->
+   {/* {"chartType": "pie", "x": "业务", "y": "2021Q1"} */}
    ```
 
 2. **环形图 (donut)**
@@ -75,61 +75,61 @@ type ChartConfig = {
    中心空心的圆环图表，相比饼图更现代化，可在中心显示总计信息。
 
    ```markdown
-   <!-- {"chartType": "donut", "x": "业务", "y": "2021Q1"} -->
+   {/* {"chartType": "donut", "x": "业务", "y": "2021Q1"} */}
    ```
 
 3. **条形图 (bar)**
 
    ```markdown
-   <!-- {"chartType": "bar", "x": "业务", "y": "2021Q1"} -->
+   {/* {"chartType": "bar", "x": "业务", "y": "2021Q1"} */}
    ```
 
 4. **折线图 (line)**
 
    ```markdown
-   <!-- {"chartType": "line", "x": "业务", "y": "2021Q1"} -->
+   {/* {"chartType": "line", "x": "业务", "y": "2021Q1"} */}
    ```
 
 5. **柱状图 (column)**
 
    ```markdown
-   <!-- {"chartType": "column", "x": "业务", "y": "2021Q1"} -->
+   {/* {"chartType": "column", "x": "业务", "y": "2021Q1"} */}
    ```
 
 6. **面积图 (area)**
 
    ```markdown
-   <!-- {"chartType": "area", "x": "业务", "y": "2021Q1"} -->
+   {/* {"chartType": "area", "x": "业务", "y": "2021Q1"} */}
    ```
 
 7. **雷达图 (radar)**
 
    ```markdown
-   <!-- {"chartType": "radar", "x": "label", "y": "score"} -->
+   {/* {"chartType": "radar", "x": "label", "y": "score"} */}
    ```
 
 8. **散点图 (scatter)**
 
    ```markdown
-   <!-- {"chartType": "scatter", "x": "x", "y": "y"} -->
+   {/* {"chartType": "scatter", "x": "x", "y": "y"} */}
    ```
 
 9. **表格 (table)**
 
    ```markdown
-   <!-- {"chartType": "table"} -->
+   {/* {"chartType": "table"} */}
    ```
 
 10. **漏斗图 (funnel)**
 
     ```markdown
-    <!-- {"chartType": "funnel", "x": "阶段", "y": "人数"} -->
+    {/* {"chartType": "funnel", "x": "阶段", "y": "人数"} */}
     ```
 
 11. **定义列表 (descriptions)**
 
 ```markdown
-<!-- {"chartType": "descriptions"} -->
+{/* {"chartType": "descriptions"} */}
 ```
 
 12. **卡片列表 (docCards)**
@@ -149,7 +149,7 @@ type ChartConfig = {
     通过 `fieldMap` 将语义字段显式映射到自定义表头。
 
     ```markdown
-    <!-- {"chartType": "docCards", "title": "优秀开发者文档站", "cardColumns": 2} -->
+    {/* {"chartType": "docCards", "title": "优秀开发者文档站", "cardColumns": 2} */}
 
     | 名称              | 地址                          | 简介                   | 亮点                       |
     | :---------------- | :---------------------------- | :--------------------- | :------------------------- |
@@ -168,7 +168,7 @@ type ChartConfig = {
     - 不足 4 行时自动补空占位。
 
     ```markdown
-    <!-- {"chartType": "quadrant", "title": "优先级矩阵"} -->
+    {/* {"chartType": "quadrant", "title": "优先级矩阵"} */}
 
     | 象限         | 内容                      |
     | :----------- | :------------------------ |
@@ -178,42 +178,42 @@ type ChartConfig = {
     | 不重要不紧急 | 整理桌面, 清理文档        |
     ```
 
-## 高级配置示例 {#example-config}
+## 高级配置示例
 
-### 1. 多图表配置 {#config-3}
-
-```markdown
-<!-- [{"chartType": "bar", "title": "样本数据", "x": "sens_type", "y": "count"}, {"chartType": "column", "x": "sens_type", "y": "count"}, {"chartType": "pie", "x": "sens_type", "y": "percentage"}, {"chartType": "line", "x": "sens_type", "y": "percentage"}, {"chartType": "area", "x": "sens_type", "y": "percentage"}] -->
-```
-
-### 2. 带分组的折线图 {#grouped-line-chart}
+### 1. 多图表配置
 
 ```markdown
-<!-- {"chartType": "line", "x": "日期", "y": "uv点击标记", "title": "UV 点击标记",
-      "rest": {"colorLegend": "内容", "groupBy": "名称"}} -->
+{/* [{"chartType": "bar", "title": "样本数据", "x": "sens_type", "y": "count"}, {"chartType": "column", "x": "sens_type", "y": "count"}, {"chartType": "pie", "x": "sens_type", "y": "percentage"}, {"chartType": "line", "x": "sens_type", "y": "percentage"}, {"chartType": "area", "x": "sens_type", "y": "percentage"}] */}
 ```
 
-### 3. 带标题的图表 {#title}
+### 2. 带分组的折线图
 
 ```markdown
-<!-- {"chartType": "bar", "x": "业务", "y": "2021Q1", "title": "2021年第一季度业务数据"} -->
+{/* {"chartType": "line", "x": "日期", "y": "uv点击标记", "title": "UV 点击标记",
+      "rest": {"colorLegend": "内容", "groupBy": "名称"}} */}
 ```
 
-### 3.1 带数据时间的图表 {#chart-with-time-data}
+### 3. 带标题的图表
+
+```markdown
+{/* {"chartType": "bar", "x": "业务", "y": "2021Q1", "title": "2021年第一季度业务数据"} */}
+```
+
+### 3.1 带数据时间的图表
 
 通过 `dataTime` 参数可以在图表工具栏中显示数据时间：
 
 ```markdown
-<!-- {"chartType": "bar", "x": "业务", "y": "2021Q1", "title": "2021年第一季度业务数据", "dataTime": "2025-10-30 10:00:00"} -->
+{/* {"chartType": "bar", "x": "业务", "y": "2021Q1", "title": "2021年第一季度业务数据", "dataTime": "2025-10-30 10:00:00"} */}
 ```
 
-### 4. 带图例的图表 {#chart-with-legend}
+### 4. 带图例的图表
 
 图例用于区分不同的数据系列，通过 `colorLegend` 参数配置：
 
 ```markdown
-<!-- {"chartType": "line", "x": "月份", "y": "数值", "title": "月度数据趋势",
-      "colorLegend": "系列"} -->
+{/* {"chartType": "line", "x": "月份", "y": "数值", "title": "月度数据趋势",
+      "colorLegend": "系列"} */}
 
 | 月份 | 数值 | 系列  |
 | ---- | ---- | ----- |
@@ -225,13 +225,13 @@ type ChartConfig = {
 | 3月  | 95   | B系列 |
 ```
 
-### 5. 带业务分组的图表 {#chart-with-business-grouping}
+### 5. 带业务分组的图表
 
 业务分组用于将数据按不同业务类别分组显示，通过 `groupBy` 参数配置：
 
 ```markdown
-<!-- {"chartType": "bar", "x": "产品", "y": "销量", "title": "产品销量对比",
-      "groupBy": "业务类型"} -->
+{/* {"chartType": "bar", "x": "产品", "y": "销量", "title": "产品销量对比",
+      "groupBy": "业务类型"} */}
 
 | 产品  | 销量 | 业务类型 |
 | ----- | ---- | -------- |
@@ -243,13 +243,13 @@ type ChartConfig = {
 | 产品C | 90   | 线下业务 |
 ```
 
-### 6. 带主筛选的图表 {#filter-2}
+### 6. 带主筛选的图表
 
 主筛选提供最高维度的数据筛选，通过 `filterBy` 参数配置：
 
 ```markdown
-<!-- {"chartType": "pie", "x": "类别", "y": "占比", "title": "市场份额分布",
-      "groupBy": "业务类型", "filterBy": "地区"} -->
+{/* {"chartType": "pie", "x": "类别", "y": "占比", "title": "市场份额分布",
+      "groupBy": "业务类型", "filterBy": "地区"} */}
 
 | 类别  | 占比 | 业务类型 | 地区 |
 | ----- | ---- | -------- | ---- |
@@ -261,13 +261,13 @@ type ChartConfig = {
 | 类别C | 25   | 线上业务 | 华南 |
 ```
 
-### 7. 组合筛选图表 {#filter-3}
+### 7. 组合筛选图表
 
 可以同时使用数据系列、业务分组和主筛选：
 
 ```markdown
-<!-- {"chartType": "radar", "x": "指标", "y": "得分", "title": "能力评估",
-      "colorLegend": "类型", "groupBy": "维度", "filterBy": "地区"} -->
+{/* {"chartType": "radar", "x": "指标", "y": "得分", "title": "能力评估",
+      "colorLegend": "类型", "groupBy": "维度", "filterBy": "地区"} */}
 
 | 指标 | 得分 | 类型     | 维度 | 地区 |
 | ---- | ---- | -------- | ---- | ---- |
@@ -279,7 +279,7 @@ type ChartConfig = {
 | 产品 | 95   | 目标能力 | 年龄 | 全球 |
 ```
 
-## 数据格式要求 {#data-format-requirements}
+## 数据格式要求
 
 1. **表格数据**
    - 必须包含表头
@@ -294,7 +294,7 @@ type ChartConfig = {
    - 支持数字格式化
    - 支持千分位显示
 
-## 特殊功能 {#special-features}
+## 特殊功能
 
 1. **图表切换**
    - 支持在图表类型之间切换
@@ -310,13 +310,13 @@ type ChartConfig = {
    - 自动适应容器宽度
    - 最小宽度为256px
 
-## 完整示例 {#full-example}
+## 完整示例
 
 ```markdown
-## 业务数据图表 {#business-charts}
+## 业务数据图表
 
-<!-- {"chartType": "bar", "x": "业务", "y": "2021Q1", "title": "2021年第一季度业务数据", "dataTime": "2025-10-30 10:00:00",
-      "groupBy": "业务类型", "colorLegend": "数据系列", "filterBy": "地区"} -->
+{/* {"chartType": "bar", "x": "业务", "y": "2021Q1", "title": "2021年第一季度业务数据", "dataTime": "2025-10-30 10:00:00",
+      "groupBy": "业务类型", "colorLegend": "数据系列", "filterBy": "地区"} */}
 
 | 业务         | 2021Q1  | 2021Q2  | 2021Q3  | 2021Q4  |
 | ------------ | ------- | ------- | ------- | ------- |
@@ -330,7 +330,7 @@ type ChartConfig = {
 | 云           | 162,012 | 111,521 | 111,353 | 112,799 |
 ```
 
-## 注意事项 {#notes}
+## 注意事项
 
 1. 配置必须放在表格之前
 2. 配置必须是有效的JSON格式

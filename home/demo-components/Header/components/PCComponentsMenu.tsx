@@ -7,6 +7,7 @@ import {
   PC_COMPONENT_URL,
 } from '../../../constants/links';
 import { useSiteI18n } from '../../../i18n';
+import { navigateToSiteUrl } from '../../../utils/navigate';
 import {
   DesignResourceCard,
   DesignResourceCardContent,
@@ -143,11 +144,7 @@ const PCComponentsMenu: React.FC = () => {
                           href={PC_COMPONENT_URL.COMPONENTS}
                           onClick={(e) => {
                             e.preventDefault();
-                            window.open(
-                              PC_COMPONENT_URL.COMPONENTS,
-                              '_blank',
-                              'noopener,noreferrer',
-                            );
+                            navigateToSiteUrl(PC_COMPONENT_URL.COMPONENTS);
                           }}
                         >
                           <NavItemTitle>
@@ -165,11 +162,7 @@ const PCComponentsMenu: React.FC = () => {
                           href={PC_COMPONENT_URL.DEMO}
                           onClick={(e) => {
                             e.preventDefault();
-                            window.open(
-                              PC_COMPONENT_URL.DEMO,
-                              '_blank',
-                              'noopener,noreferrer',
-                            );
+                            navigateToSiteUrl(PC_COMPONENT_URL.DEMO);
                           }}
                         >
                           <NavItemTitle>{messages.menu.demo}</NavItemTitle>
@@ -185,11 +178,7 @@ const PCComponentsMenu: React.FC = () => {
                           href={PC_COMPONENT_URL.CHANGELOG}
                           onClick={(e) => {
                             e.preventDefault();
-                            window.open(
-                              PC_COMPONENT_URL.CHANGELOG,
-                              '_blank',
-                              'noopener,noreferrer',
-                            );
+                            navigateToSiteUrl(PC_COMPONENT_URL.CHANGELOG);
                           }}
                         >
                           <NavItemTitle>{messages.menu.changelog}</NavItemTitle>

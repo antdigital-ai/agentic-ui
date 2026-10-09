@@ -7,13 +7,13 @@ group:
   order: 4
 ---
 
-# Mermaid 图 {#mermaid}
+# Mermaid 图
 
 用于渲染 Mermaid 图表，支持流程图、时序图、甘特图、类图等多种图表类型。基于 Mermaid 库实现，提供美观的图表渲染和交互功能。
 
-## 代码演示 {#demo}
+## 代码演示
 
-<code src="../demos/charts/mermaid.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/charts/mermaid.tsx" background="var(--main-bg-color)" iframe="540"></code>
 
 ## API
 
@@ -39,9 +39,9 @@ interface CodeNode {
 }
 ```
 
-## 支持的图表类型 {#types}
+## 支持的图表类型
 
-### 1. 流程图 (Flowchart) {#flowchart}
+### 1. 流程图 (Flowchart)
 
 ```mermaid
 graph TD
@@ -52,7 +52,7 @@ graph TD
     D --> E
 ```
 
-### 2. 时序图 (Sequence Diagram) {#sequence-diagram}
+### 2. 时序图 (Sequence Diagram)
 
 ```mermaid
 sequenceDiagram
@@ -66,7 +66,7 @@ sequenceDiagram
     B-->>A: 响应数据
 ```
 
-### 3. 甘特图 (Gantt Chart) {#gantt-chart}
+### 3. 甘特图 (Gantt Chart)
 
 ```mermaid
 gantt
@@ -78,7 +78,7 @@ gantt
     编码实现    :         des3, 2024-01-16, 2024-02-15
 ```
 
-### 4. 类图 (Class Diagram) {#class-diagram}
+### 4. 类图 (Class Diagram)
 
 ```mermaid
 classDiagram
@@ -94,7 +94,7 @@ classDiagram
     Animal <|-- Dog
 ```
 
-## 功能特性 {#features}
+## 功能特性
 
 - **多种图表类型**：支持流程图、时序图、甘特图、类图、状态图等
 - **错误处理**：自动检测和显示 Mermaid 语法错误
@@ -104,7 +104,7 @@ classDiagram
 - **空状态处理**：优雅处理空内容状态
 - **唯一标识**：自动生成唯一 ID 避免冲突
 
-## 说明 {#notes}
+## 说明
 
 - **移动端适配**：移动端自动启用响应式布局，宽度 100%，高度不超过 400px
 - **性能优化**：使用延迟渲染机制，避免频繁重绘

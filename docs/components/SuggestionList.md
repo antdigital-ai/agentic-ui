@@ -6,13 +6,13 @@ group:
   order: 3
 ---
 
-# SuggestionList 追问建议 {#suggestionlist}
+# SuggestionList 追问建议
 
 一个轻量的追问建议列表组件，支持图标、提示、不同布局与三种样式类型。
 
-## 代码演示 {#demo}
+## 代码演示
 
-<code src="../demos/suggestion-list-basic.tsx">基础用法</code>
+<code src="../demos/suggestion-list-basic.tsx" description="基础用法"></code>
 
 ## API
 
@@ -41,7 +41,7 @@ group:
 | onClick    | 自定义点击回调    | `(text: string) => void \| Promise<void>` | -       | -    |
 | actionIcon | 右侧动作图标/箭头 | `React.ReactNode`                         | -       | -    |
 
-## 样式类型说明 {#notes-style}
+## 样式类型说明
 
 - basic：
   - background: `var(--color-gray-bg-card-light)`

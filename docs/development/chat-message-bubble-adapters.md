@@ -7,25 +7,25 @@ group:
   order: 2
 ---
 
-# 多厂商聊天消息 → BubbleList 适配 {#chat-message-bubble-adapters}
+# 多厂商聊天消息 → BubbleList 适配
 
 > English: [Chat messages → BubbleList adapters](./chat-message-bubble-adapters.en-US.md)
 
-本文说明如何将 **OpenAI**、**OpenClaw**、**Ollama** 等常见请求/会话中的 `messages` 转为库内 [`MessageBubbleData`](../../src/Types/message.ts)，并配合 [`BubbleList`](../../src/Bubble/List/index.tsx) 渲染。
+本文说明如何将 **OpenAI**、**OpenClaw**、**Ollama** 等常见请求/会话中的 `messages` 转为库内 `MessageBubbleData`，并配合 `BubbleList` 渲染。
 
-实现代码位于 [`src/Bubble/OpenAIMessageBubble/`](../../src/Bubble/OpenAIMessageBubble/index.ts)，**不依赖**各厂商官方 npm SDK，类型均为库内自建 interface。
+实现代码位于 `src/Bubble/OpenAIMessageBubble/`，**不依赖**各厂商官方 npm SDK，类型均为库内自建 interface。
 
-## 目录 {#toc}
+## 目录
 
-- [设计概览](#overview)
-- [OpenAI Chat Completions](#openai)
-- [OpenClaw 会话 / transcript](#openclaw)
-- [Ollama /api/chat](#ollama)
-- [流式（SSE）与稳定 id](#streaming)
-- [API 速查](#api-reference)
-- [与 BubbleList 组合示例](#bubblelist-example)
+- [设计概览](#概述)
+- [OpenAI Chat Completions](#openai-chat-completions)
+- [OpenClaw 会话 / transcript](#openclaw-会话-transcript)
+- [Ollama /api/chat](#ollama-apichat)
+- [流式（SSE）与稳定 id](#流式sse与稳定-id)
+- [API 速查](#api-速查)
+- [与 BubbleList 组合示例](#与-bubblelist-组合示例)
 
-## 设计概览 {#overview}
+## 设计概览
 
 - **统一目标**：得到 `MessageBubbleData[]`，作为 `BubbleList` 的 `bubbleList`。
 - **两条路径**：
@@ -58,7 +58,7 @@ flowchart LR
   MAP --> MBD
 ```
 
-## OpenAI Chat Completions {#openai}
+## OpenAI Chat Completions
 
 对应 `chat.completions` 常见的 `messages`：`role` + `content`（字符串或多段），可含 `tool_calls`、`tool`、`function` 等。
 
@@ -69,11 +69,11 @@ flowchart LR
 
 **默认 id**：`msg.id ?? \`openai-msg-${index}\``（**不**用 content 做 hash，避免流式抖动）。
 
-**`mapOptions` 要点**：`baseTime` / `timeStepMs`、`getMessageId`、`toolRoleAs`（`tool`/`function` 映射到的 [`RoleType`](../../src/Types/common.ts)）、`appendToolCallsToContent`、`preserveRawInExtra`（`extra.openai.raw`）、`bumpUpdateAtOnLastMessage`。
+**`mapOptions` 要点**：`baseTime` / `timeStepMs`、`getMessageId`、`toolRoleAs`（`tool`/`function` 映射到的 `RoleType`）、`appendToolCallsToContent`、`preserveRawInExtra`（`extra.openai.raw`）、`bumpUpdateAtOnLastMessage`。
 
 文档内嵌 demo：「OpenAI messages - useOpenAIMessageBubbleData」（见 [Bubble 文档](../components/bubble.md)）。
 
-## OpenClaw 会话 / transcript {#openclaw}
+## OpenClaw 会话 / transcript
 
 在 OpenAI 形状基础上，常见额外字段：
 
@@ -86,7 +86,7 @@ flowchart LR
 | `mapOpenClawMessagesToMessageBubbleData` | 纯函数     |
 | `normalizeOpenClawMessage(s)ToOpenAI`    | 仅结构转换 |
 
-## Ollama /api/chat {#ollama}
+## Ollama /api/chat
 
 对齐 [Ollama Chat API](https://docs.ollama.com/api/chat) 的 `ChatMessage`：`role` 为 `system` | `user` | `assistant` | `tool`，`content` 为字符串；可选 **`images`**（base64 列表）、**`tool_calls`**、**`thinking`** 等。
 
@@ -98,7 +98,7 @@ flowchart LR
 | `mapOllamaMessagesToMessageBubbleData` | 纯函数     |
 | `normalizeOllamaMessage(s)ToOpenAI`    | 仅结构转换 |
 
-## 流式（SSE）与稳定 id {#streaming}
+## 流式（SSE）与稳定 id
 
 适配层 **不解析 SSE**，只消费你已维护好的 `messages` 数组。流式时在回调里更新 state（例如最后一条 `assistant` 的 `content` 不断增长）即可。
 
@@ -107,7 +107,7 @@ flowchart LR
 - 服务端或客户端在**本轮开始时**为消息分配的 **`id`**，或
 - 默认的 **按索引** id（同一索引在流式过程中不变）。
 
-## API 速查 {#api-reference}
+## API 速查
 
 从包入口可导入（亦可通过 `./Bubble` 再导出）：
 
@@ -129,7 +129,7 @@ import {
 
 单条自定义：三种格式均支持 `mapMessage`（OpenAI 路径下签名：`OpenAIMessagesMapMessage`），在默认 `draft` 上做不可变覆盖即可。
 
-## 与 BubbleList 组合示例 {#bubblelist-example}
+## 与 BubbleList 组合示例
 
 ```tsx
 import {
@@ -156,6 +156,6 @@ const Demo = () => {
 };
 ```
 
-## 变更记录 {#changelog}
+## 变更记录
 
 详见 [changelog.zh-CN.md](./changelog.zh-CN.md) / [changelog.en-US.md](./changelog.en-US.md) 中 **v2.30.22** 及后续版本 **Bubble** 小节。

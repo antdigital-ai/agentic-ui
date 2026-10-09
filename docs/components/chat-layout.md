@@ -6,77 +6,77 @@ group:
   order: 3
 ---
 
-# ChatLayout 聊天布局 {#layout-chatlayout}
+# ChatLayout 聊天布局
 
 `ChatLayout` 提供了一个标准的聊天界面布局，包含头部、可滚动的消息区域和底部的输入/操作区域。内置自动滚动到底部功能，并通过 `ref` 暴露滚动容器和滚动方法。
 
-## 代码演示 {#demo}
+## 代码演示
 
 ### API Playground
 
 通过控制面板调试 `header` / `footer` / `footerHeight` / `showFooterBackground` / `scrollBehavior` / 命令式 ref（`scrollToBottom` / `isAtBottom`）/ `onScrollStateChange` 等核心 API。
 
-<code src="../demos/chat-layout-playground.tsx" iframe=820>API Playground - 全部核心 props</code>
+<code src="../demos/chat-layout-playground.tsx" iframe="820" description="API Playground - 全部核心 props"></code>
 
-### 基础用法 {#basic-usage}
+### 基础用法
 
 最简单的用法：配置 `header`、`children`（消息列表）和 `footer`（输入区域），通过 `ref` 调用 `scrollToBottom`。
 
-<code src="../demos/chat-layout-basic.tsx" iframe=520>基础用法</code>
+<code src="../demos/chat-layout-basic.tsx" iframe="520" description="基础用法"></code>
 
-### header 配置详解 {#config-header}
+### header 配置详解
 
 `header` 属性接受 `LayoutHeaderConfig`，支持标题、分享按钮、左右侧折叠按钮、受控/非受控模式及自定义扩展内容。
 
-<code src="../demos/chat-layout-header.tsx">header API 演示</code>
+<code src="../demos/chat-layout-header.tsx" description="header API 演示"></code>
 
-### footer 与背景渐变 {#footer}
+### footer 与背景渐变
 
 `footer` 放置输入框等底部操作区，`footerHeight` 控制最小高度，`showFooterBackground` 开关底部渐变遮罩。
 
-<code src="../demos/chat-layout-footer.tsx">footer API 演示</code>
+<code src="../demos/chat-layout-footer.tsx" description="footer API 演示"></code>
 
-### 滚动控制 {#scroll-control}
+### 滚动控制
 
 通过 `scrollBehavior` 切换滚动动画，使用 `ref` 上的 `scrollToBottom` 方法或直接操作 `scrollContainer` DOM 元素实现精细滚动控制。
 
-<code src="../demos/chat-layout-scroll.tsx">滚动 API 演示</code>
+<code src="../demos/chat-layout-scroll.tsx" description="滚动 API 演示"></code>
 
-### classNames 与 styles 自定义样式 {#custom-classnames-styles}
+### classNames 与 styles 自定义样式
 
 通过 `classNames` / `styles` 对根容器、内容区、滚动区、底部区等各区域进行精细的样式定制。
 
-<code src="../demos/chat-layout-classnames-styles.tsx">样式定制演示</code>
+<code src="../demos/chat-layout-classnames-styles.tsx" description="样式定制演示"></code>
 
-### 滚动状态监听 {#status}
+### 滚动状态监听
 
 通过 `onScrollStateChange` 监听滚动状态（`isAtBottom` / `isPinned`），实现"回到底部"浮动按钮等交互。用户上滑离开底部时显示按钮，点击后平滑滚动回底部。
 
-<code src="../demos/chat-layout-scroll-state.tsx" iframe=600>滚动状态监听</code>
+<code src="../demos/chat-layout-scroll-state.tsx" iframe="600" description="滚动状态监听"></code>
 
-### 完整对话场景 {#full}
+### 完整对话场景
 
 模拟真实聊天场景：输入框 + 发送按钮 + 自动回复，展示 ChatLayout 与 BubbleList 配合使用的典型模式。
 
-<code src="../demos/chat-layout-chat-scenario.tsx" iframe=600>完整对话场景</code>
+<code src="../demos/chat-layout-chat-scenario.tsx" iframe="600" description="完整对话场景"></code>
 
-### 无头部模式 {#mode-mode}
+### 无头部模式
 
 不传 `header` 时，ChatLayout 仅包含内容区和底部区，适用于嵌入式面板、侧边栏等不需要顶部标题栏的场景。
 
-<code src="../demos/chat-layout-no-header.tsx">无头部模式</code>
+<code src="../demos/chat-layout-no-header.tsx" description="无头部模式"></code>
 
-### 动态底部高度 {#dynamic-footer-height}
+### 动态底部高度
 
 footer 实际高度可随内容变化（如多行输入框），ChatLayout 自动检测并调整内容区底部留白，无需手动同步 `footerHeight`。
 
-<code src="../demos/chat-layout-dynamic-footer.tsx">动态底部高度</code>
+<code src="../demos/chat-layout-dynamic-footer.tsx" description="动态底部高度"></code>
 
-### 空状态与新对话 {#status-2}
+### 空状态与新对话
 
 对话列表为空时展示欢迎页和快捷提问，发送消息后切换为 BubbleList 列表，演示空状态到有内容状态的过渡。
 
-<code src="../demos/chat-layout-empty.tsx" iframe=600>空状态与新对话</code>
+<code src="../demos/chat-layout-empty.tsx" iframe="600" description="空状态与新对话"></code>
 
 ## API
 
@@ -115,7 +115,7 @@ footer 实际高度可随内容变化（如多行输入框），ChatLayout 自�
 | isAtBottom | 是否贴近底部（距离底部 ≤ 容差阈值）          | `boolean` | -      | -    |
 | isPinned   | 是否处于"跟随底部"状态（用户未主动上滑离开） | `boolean` | -      | -    |
 
-```tsx | pure
+```tsx pure
 import { useRef } from 'react';
 import { ChatLayout, ChatLayoutRef } from '@ant-design/agentic-ui';
 
@@ -129,7 +129,7 @@ const el = chatRef.current?.scrollContainer;
 console.log(el?.scrollTop, el?.scrollHeight);
 ```
 
-### LayoutHeaderConfig（header 属性） {#props-header}
+### LayoutHeaderConfig（header 属性）
 
 | 属性                  | 说明                             | 类型                           | 默认值  | 版本 |
 | --------------------- | -------------------------------- | ------------------------------ | ------- | ---- |
@@ -148,7 +148,7 @@ console.log(el?.scrollTop, el?.scrollHeight);
 | rightExtra            | 右侧操作区自定义内容             | `ReactNode`                    | -       | -    |
 | className             | 头部自定义类名                   | `string`                       | -       | -    |
 
-## 特性 {#features}
+## 特性
 
 - **自动滚动**：内置 `useAutoScroll` hook，新内容添加时自动滚动到底部，滚动容器内手动上划后停止跟随。
 - **布局结构**：标准 Header-Content-Footer 结构，内容区自适应高度并独立可滚动。

@@ -7,25 +7,25 @@ group:
   order: 2
 ---
 
-# Chat messages → BubbleList adapters {#chat-message-bubble-adapters}
+# Chat messages → BubbleList adapters
 
 > 中文：[多厂商聊天消息 → BubbleList 适配](./chat-message-bubble-adapters.md)
 
-This guide explains how to turn `messages` from common **OpenAI**, **OpenClaw**, and **Ollama** requests/sessions into [`MessageBubbleData`](../../src/Types/message.ts) for [`BubbleList`](../../src/Bubble/List/index.tsx).
+This guide explains how to turn `messages` from common **OpenAI**, **OpenClaw**, and **Ollama** requests/sessions into `MessageBubbleData` for `BubbleList`.
 
-Implementation lives in [`src/Bubble/OpenAIMessageBubble/`](../../src/Bubble/OpenAIMessageBubble/index.ts). It does **not** depend on vendor npm SDKs; types are defined in-repo.
+Implementation lives in `src/Bubble/OpenAIMessageBubble/`. It does **not** depend on vendor npm SDKs; types are defined in-repo.
 
-## Table of contents {#toc}
+## Table of contents
 
-- [Design overview](#overview)
-- [OpenAI Chat Completions](#openai)
-- [OpenClaw session / transcript](#openclaw)
-- [Ollama /api/chat](#ollama)
-- [Streaming (SSE) and stable ids](#streaming)
-- [API cheat sheet](#api-reference)
-- [Example with BubbleList](#bubblelist-example)
+- [Design overview](#概述)
+- [OpenAI Chat Completions](#openai-chat-completions)
+- [OpenClaw session / transcript](#openclaw-会话-transcript)
+- [Ollama /api/chat](#ollama-apichat)
+- [Streaming (SSE) and stable ids](#流式sse与稳定-id)
+- [API cheat sheet](#api-速查)
+- [Example with BubbleList](#与-bubblelist-组合示例)
 
-## Design overview {#overview}
+## Design overview
 
 - **Goal**: produce `MessageBubbleData[]` for the `bubbleList` prop on `BubbleList`.
 - **Two ways in**:
@@ -58,7 +58,7 @@ flowchart LR
   MAP --> MBD
 ```
 
-## OpenAI Chat Completions {#openai}
+## OpenAI Chat Completions
 
 Typical `chat.completions` `messages`: `role` + `content` (string or parts), optional `tool_calls`, `tool`, `function`, etc.
 
@@ -69,11 +69,11 @@ Typical `chat.completions` `messages`: `role` + `content` (string or parts), opt
 
 **Default id**: `msg.id ?? \`openai-msg-${index}\`` (content is **not** hashed, to keep streaming stable).
 
-**Notable `mapOptions`**: `baseTime` / `timeStepMs`, `getMessageId`, `toolRoleAs` ([`RoleType`](../../src/Types/common.ts) for `tool` / `function` rows), `appendToolCallsToContent`, `preserveRawInExtra` (`extra.openai.raw`), `bumpUpdateAtOnLastMessage`.
+**Notable `mapOptions`**: `baseTime` / `timeStepMs`, `getMessageId`, `toolRoleAs` (`RoleType` for `tool` / `function` rows), `appendToolCallsToContent`, `preserveRawInExtra` (`extra.openai.raw`), `bumpUpdateAtOnLastMessage`.
 
 Embedded demo: “OpenAI messages - useOpenAIMessageBubbleData” under [Bubble](../components/bubble.md).
 
-## OpenClaw session / transcript {#openclaw}
+## OpenClaw session / transcript
 
 Extra fields on top of the OpenAI-like shape:
 
@@ -86,7 +86,7 @@ Extra fields on top of the OpenAI-like shape:
 | `mapOpenClawMessagesToMessageBubbleData` | Pure function             |
 | `normalizeOpenClawMessage(s)ToOpenAI`    | Structure-only conversion |
 
-## Ollama /api/chat {#ollama}
+## Ollama /api/chat
 
 Aligned with [Ollama Chat API](https://docs.ollama.com/api/chat) `ChatMessage`: `role` is `system` | `user` | `assistant` | `tool`, `content` is a string; optional **`images`** (base64 list), **`tool_calls`**, **`thinking`**, etc.
 
@@ -98,7 +98,7 @@ Aligned with [Ollama Chat API](https://docs.ollama.com/api/chat) `ChatMessage`: 
 | `mapOllamaMessagesToMessageBubbleData` | Pure function             |
 | `normalizeOllamaMessage(s)ToOpenAI`    | Structure-only conversion |
 
-## Streaming (SSE) and stable ids {#streaming}
+## Streaming (SSE) and stable ids
 
 The adapters **do not parse SSE**; they only consume the `messages` array you keep in state. On each chunk, update state (for example grow the last `assistant` `content`).
 
@@ -107,7 +107,7 @@ Avoid using a **hash of `content`** as the message id, or keys will change every
 - A stable **`id`** assigned when the turn starts (server- or client-side), or
 - The default **index-based** id (index stays fixed while streaming that row).
 
-## API cheat sheet {#api-reference}
+## API cheat sheet
 
 Import from the package entry (also re-exported via `./Bubble`):
 
@@ -129,7 +129,7 @@ import {
 
 Per-message overrides: all three paths support `mapMessage` (signature `OpenAIMessagesMapMessage` on the OpenAI-shaped step); return an immutable update of `draft`.
 
-## Example with BubbleList {#bubblelist-example}
+## Example with BubbleList
 
 ```tsx
 import {
@@ -156,6 +156,6 @@ const Demo = () => {
 };
 ```
 
-## Changelog {#changelog}
+## Changelog
 
 See **Bubble** in [changelog.en-US.md](./changelog.en-US.md) / [changelog.zh-CN.md](./changelog.zh-CN.md) for **v2.30.22** and later.

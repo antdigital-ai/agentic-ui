@@ -7,11 +7,11 @@ group:
   order: 3
 ---
 
-# 常见问题与故障排除 {#faq-troubleshooting}
+# 常见问题与故障排除
 
 本页面整理了使用 agentic-ui 过程中经常遇到的问题和解决方案。
 
-## 📋 目录 {#toc}
+## 📋 目录
 
 - [安装和配置问题](#安装和配置问题)
 - [编辑器功能问题](#编辑器功能问题)
@@ -21,9 +21,9 @@ group:
 - [TypeScript 类型问题](#typescript-类型问题)
 - [构建和部署问题](#构建和部署问题)
 
-## 🔧 安装和配置问题 {#config}
+## 🔧 安装和配置问题
 
-### Q: 安装后出现 "Cannot resolve module '@ant-design/agentic-ui'" 错误 {#q-cannot-resolve-module-ant-design-agentic-ui}
+### Q: 安装后出现 "Cannot resolve module '@ant-design/agentic-ui'" 错误
 
 **A:** 检查以下几个方面：
 
@@ -52,7 +52,7 @@ group:
    node --version  # 需要 >= 16.0.0
    ```
 
-### Q: TypeScript 项目中出现类型错误 {#types-q-typescript}
+### Q: TypeScript 项目中出现类型错误
 
 **A:** 确保正确配置 TypeScript：
 
@@ -86,11 +86,11 @@ group:
    import MarkdownEditor from '@ant-design/agentic-ui';
    ```
 
-### Q: Webpack 构建时出现错误 {#q-webpack}
+### Q: Webpack 构建时出现错误
 
 **A:** 配置 Webpack 正确处理 agentic-ui：
 
-```tsx | pure
+```tsx pure
 // webpack.config.js
 module.exports = {
   resolve: {
@@ -111,9 +111,9 @@ module.exports = {
 };
 ```
 
-## ✏️ 编辑器功能问题 {#editor-issues}
+## ✏️ 编辑器功能问题
 
-### Q: 编辑器无法正常渲染或显示空白 {#q}
+### Q: 编辑器无法正常渲染或显示空白
 
 **A:** 检查以下配置：
 
@@ -144,11 +144,11 @@ module.exports = {
    </ErrorBoundary>
    ```
 
-### Q: 图片上传功能不工作 {#upload-q}
+### Q: 图片上传功能不工作
 
 **A:** 确保正确配置图片上传：
 
-```tsx | pure
+```tsx pure
 const handleImageUpload = async (files: File[]) => {
   try {
     // 实现上传逻辑
@@ -175,7 +175,7 @@ const handleImageUpload = async (files: File[]) => {
 />;
 ```
 
-### Q: 粘贴内容格式不正确 {#content-q}
+### Q: 粘贴内容格式不正确
 
 **A:** 自定义粘贴处理：
 
@@ -200,7 +200,7 @@ const customPastePlugin = {
 <MarkdownEditor plugins={[customPastePlugin]} />;
 ````
 
-### Q: 数学公式不显示 {#q-2}
+### Q: 数学公式不显示
 
 **A:** 确保 KaTeX 配置正确：
 
@@ -235,9 +235,9 @@ const customPastePlugin = {
    />;
    ```
 
-## ⚡ 性能和优化问题 {#performance-issues}
+## ⚡ 性能和优化问题
 
-### Q: 大文档编辑时出现卡顿 {#q-3}
+### Q: 大文档编辑时出现卡顿
 
 **A:** 实施性能优化策略：
 
@@ -272,7 +272,7 @@ const customPastePlugin = {
    <MarkdownEditor onChange={debouncedOnChange} />;
    ```
 
-### Q: 内存使用过高 {#q-4}
+### Q: 内存使用过高
 
 **A:** 优化内存使用：
 
@@ -308,13 +308,13 @@ const customPastePlugin = {
    };
    ```
 
-## 🎨 样式和主题问题 {#style}
+## 🎨 样式和主题问题
 
-### Q: 自定义主题不生效 {#custom-q}
+### Q: 自定义主题不生效
 
 **A:** 正确配置主题：
 
-```tsx | pure
+```tsx pure
 import { ConfigProvider } from 'antd';
 import { MarkdownEditor } from '@ant-design/agentic-ui';
 
@@ -330,7 +330,7 @@ const customTheme = {
 </ConfigProvider>;
 ```
 
-### Q: CSS 样式冲突 {#style-q-css}
+### Q: CSS 样式冲突
 
 **A:** 解决样式冲突：
 
@@ -364,11 +364,11 @@ const customTheme = {
    }));
    ```
 
-### Q: 暗色主题不工作 {#q-5}
+### Q: 暗色主题不工作
 
 **A:** 配置暗色主题：
 
-```tsx | pure
+```tsx pure
 import { ConfigProvider, theme } from 'antd';
 
 <ConfigProvider
@@ -380,9 +380,9 @@ import { ConfigProvider, theme } from 'antd';
 </ConfigProvider>;
 ```
 
-## 🔌 插件相关问题 {#plugin-issues}
+## 🔌 插件相关问题
 
-### Q: 自定义插件不生效 {#custom-q-2}
+### Q: 自定义插件不生效
 
 **A:** 检查插件配置：
 
@@ -411,7 +411,7 @@ import { ConfigProvider, theme } from 'antd';
    />
    ```
 
-### Q: 插件之间冲突 {#q-6}
+### Q: 插件之间冲突
 
 **A:** 解决插件冲突：
 
@@ -433,9 +433,9 @@ import { ConfigProvider, theme } from 'antd';
    }, [enableAdvanced]);
    ```
 
-## 📘 TypeScript 类型问题 {#types-typescript}
+## 📘 TypeScript 类型问题
 
-### Q: 类型定义不完整或错误 {#full-q}
+### Q: 类型定义不完整或错误
 
 **A:** 解决类型问题：
 
@@ -475,9 +475,9 @@ import { ConfigProvider, theme } from 'antd';
    };
    ```
 
-## 🚀 构建和部署问题 {#build-deploy-issues}
+## 🚀 构建和部署问题
 
-### Q: 生产环境构建失败 {#q-7}
+### Q: 生产环境构建失败
 
 **A:** 解决构建问题：
 
@@ -513,7 +513,7 @@ import { ConfigProvider, theme } from 'antd';
    };
    ```
 
-### Q: 部署后功能异常 {#q-8}
+### Q: 部署后功能异常
 
 **A:** 检查部署环境：
 
@@ -538,11 +538,11 @@ import { ConfigProvider, theme } from 'antd';
    import 'regenerator-runtime/runtime';
    ```
 
-## 🔍 调试技巧 {#debugging-tips}
+## 🔍 调试技巧
 
-### 启用调试模式 {#mode-mode}
+### 启用调试模式
 
-```tsx | pure
+```tsx pure
 // 开发环境启用详细日志
 <MarkdownEditor
   debug={process.env.NODE_ENV === 'development'}
@@ -550,7 +550,7 @@ import { ConfigProvider, theme } from 'antd';
 />
 ```
 
-### 使用浏览器调试工具 {#browser-devtools}
+### 使用浏览器调试工具
 
 1. **React Developer Tools**
    - 安装 React DevTools 浏览器扩展
@@ -566,7 +566,7 @@ import { ConfigProvider, theme } from 'antd';
    window.editorInstance = editorRef.current;
    ```
 
-## 🆘 寻求帮助 {#getting-help}
+## 🆘 寻求帮助
 
 如果以上解决方案无法解决您的问题：
 
@@ -583,7 +583,7 @@ import { ConfigProvider, theme } from 'antd';
    - [GitHub Discussions](https://github.com/ant-design/agentic-ui/discussions)
    - 技术交流和经验分享
 
-## 📚 相关资源 {#related-resources}
+## 📚 相关资源
 
 - [API 文档](/components/api)
 - [开发指南](/development/development-guide)

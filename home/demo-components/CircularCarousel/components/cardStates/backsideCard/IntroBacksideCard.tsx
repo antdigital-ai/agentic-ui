@@ -3,6 +3,7 @@ import React from 'react';
 import designStrategyIcon from '../../../../../assets/design-strategy-icon.png';
 import { COMPONENT_LIBRARY_URL } from '../../../../../constants/links';
 import { useSiteI18n } from '../../../../../i18n';
+import { navigateToSiteUrl } from '../../../../../utils/navigate';
 import { getGradientSvg } from '../../BacksideCard';
 import { Rotate3DIcon } from '../../Rotate3DIcon';
 import { FeatureItem } from '../types';
@@ -132,8 +133,7 @@ export const IntroBacksideCard: React.FC<IntroBacksideCardProps> = ({
           <Button
             block
             onClick={() => {
-              // Handle learn more action
-              window.open(COMPONENT_LIBRARY_URL);
+              navigateToSiteUrl(COMPONENT_LIBRARY_URL);
             }}
             style={{
               backgroundColor: 'white',

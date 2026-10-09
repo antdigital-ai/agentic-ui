@@ -6,11 +6,11 @@ group:
   order: 3
 ---
 
-# Workspace - 工作空间 {#workspace}
+# Workspace - 工作空间
 
 Workspace 是一个功能强大的工作空间组件，提供了标签页式的内容管理界面。支持多种内容类型的展示，包括实时跟随、任务管理、文件预览、浏览器内容等，为用户提供统一的工作环境。
 
-## ✨ 功能特点 {#features}
+## ✨ 功能特点
 
 - 🔄 **实时跟随**: 支持 shell、markdown、html 等内容的实时更新显示，也支持完全自定义渲染
 - 📋 **任务管理**: 内置任务列表和任务状态管理功能
@@ -19,56 +19,56 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 - 🎛️ **自定义内容**: 支持自定义组件和内容渲染（通过 customContent 或 Workspace.Custom）
 - 📱 **响应式设计**: 适配不同屏幕尺寸，提供良好的用户体验
 
-## 代码演示 {#demo}
+## 代码演示
 
 > 已废弃事件保留向下兼容：`onToggleGroup` → `onGroupToggle`、`loading` → `isLoading`，详见各 API 表里带删除线 + version 标记的行。
 
-### 基础用法 {#basic-usage}
+### 基础用法
 
-<code src="../demos/workspace-demo.tsx" description="展示工作空间的基本功能和标签页切换">基础用法 - 多标签工作台</code>
+<code src="../demos/workspace-demo.tsx" description="展示工作空间的基本功能和标签页切换" description="基础用法 - 多标签工作台"></code>
 
-### 文件管理 {#file-management}
+### 文件管理
 
-<code src="../demos/workspace-file-demo.tsx" description="演示文件上传、预览、下载等文件管理功能">文件管理 - 预览与下载</code>
-<code src="../demos/workspace-file-large-demo.tsx" description="演示约 120 个文件的分页展示效果，支持分组与扁平两种视图，每组默认展示 50 条，点击查看更多每次追加 100 条">文件管理 - 大数据量</code>
-<code src="../demos/workspace-file-share-demo.tsx" description="演示不分组文件分享功能（列表 + 预览页分享按钮）">文件管理 - 分享功能</code>
-<code src="../demos/workspace-file-custom-preview-flow.tsx" description="演示自定义预览流程（onPreview 拦截并替换内容）">文件管理 - 自定义预览流程</code>
-<code src="../demos/workspace-file-actionref-demo.tsx" description="演示通过 actionRef 在外部控制预览页打开/返回">文件管理 - ActionRef 外部控制</code>
-<code src="../demos/workspace-file-search-demo.tsx" description="演示文件名搜索过滤">文件管理 - 搜索过滤</code>
-<code src="../demos/workspace-file-tree-demo.tsx" description="树形展示文件，展开目录时通过 onLoadChildren 懒加载子节点">文件管理 - 文件树（懒加载）</code>
-<code src="../demos/workspace-file-list-tree-switch-demo.tsx" description="fileTreeSwitch 分段切换；树模式与平铺共用搜索框，树筛选仅作用于已展开分支">文件管理 - 平铺与文件树动态切换</code>
-<code src="../demos/workspace-locate.tsx" description="演示文件与网页结果的定位回调（onLocate）">定位功能 - 文件与网页</code>
-<code src="../demos/workspace-file-custom-render-demo.tsx" description="演示通过 renderName / renderDetails / renderActions 自定义文件卡片">文件管理 - 自定义渲染</code>
+<code src="../demos/workspace-file-demo.tsx" description="演示文件上传、预览、下载等文件管理功能" description="文件管理 - 预览与下载"></code>
+<code src="../demos/workspace-file-large-demo.tsx" description="演示约 120 个文件的分页展示效果，支持分组与扁平两种视图，每组默认展示 50 条，点击查看更多每次追加 100 条" description="文件管理 - 大数据量"></code>
+<code src="../demos/workspace-file-share-demo.tsx" description="演示不分组文件分享功能（列表 + 预览页分享按钮）" description="文件管理 - 分享功能"></code>
+<code src="../demos/workspace-file-custom-preview-flow.tsx" description="演示自定义预览流程（onPreview 拦截并替换内容）" description="文件管理 - 自定义预览流程"></code>
+<code src="../demos/workspace-file-actionref-demo.tsx" description="演示通过 actionRef 在外部控制预览页打开/返回" description="文件管理 - ActionRef 外部控制"></code>
+<code src="../demos/workspace-file-search-demo.tsx" description="演示文件名搜索过滤" description="文件管理 - 搜索过滤"></code>
+<code src="../demos/workspace-file-tree-demo.tsx" description="树形展示文件，展开目录时通过 onLoadChildren 懒加载子节点" description="文件管理 - 文件树（懒加载）"></code>
+<code src="../demos/workspace-file-list-tree-switch-demo.tsx" description="fileTreeSwitch 分段切换；树模式与平铺共用搜索框，树筛选仅作用于已展开分支" description="文件管理 - 平铺与文件树动态切换"></code>
+<code src="../demos/workspace-locate.tsx" description="演示文件与网页结果的定位回调（onLocate）" description="定位功能 - 文件与网页"></code>
+<code src="../demos/workspace-file-custom-render-demo.tsx" description="演示通过 renderName / renderDetails / renderActions 自定义文件卡片" description="文件管理 - 自定义渲染"></code>
 
-<!-- <code src="../demos/workspace-file-previewComponent.tsx">导出文件预览组件</code> -->
+{/* <code src="../demos/workspace-file-previewComponent.tsx" description="导出文件预览组件"></code> */}
 
-### 实时跟随 {#realtime-follow}
+### 实时跟随
 
-<code src="../demos/workspace-realtime-demo.tsx" description="展示实时内容更新和跟随功能">实时跟随 - Markdown / Shell / HTML</code>
+<code src="../demos/workspace-realtime-demo.tsx" description="展示实时内容更新和跟随功能" description="实时跟随 - Markdown / Shell / HTML"></code>
 
-### 浏览器 {#browser}
+### 浏览器
 
-<code src="../demos/workspace-browser-demo.tsx" description="展示浏览器搜索结果">浏览器 - 联网搜索结果展示</code>
+<code src="../demos/workspace-browser-demo.tsx" description="展示浏览器搜索结果" description="浏览器 - 联网搜索结果展示"></code>
 
-### 任务管理 {#task-management}
+### 任务管理
 
-<code src="../demos/workspace-task-demo.tsx" description="演示任务创建、编辑、状态管理等功能">任务管理 - 状态跟踪</code>
+<code src="../demos/workspace-task-demo.tsx" description="演示任务创建、编辑、状态管理等功能" description="任务管理 - 状态跟踪"></code>
 
-### 空状态 {#status}
+### 空状态
 
-<code src="../demos/workspace-empty-demo.tsx" description="演示空状态功能">空状态处理</code>
+<code src="../demos/workspace-empty-demo.tsx" description="演示空状态功能" description="空状态处理"></code>
 
-### 自定义内容 {#custom-content}
+### 自定义内容
 
-<code src="../demos/workspace-custom-demo.tsx" description="展示如何添加自定义组件和内容">自定义标签页内容</code>
+<code src="../demos/workspace-custom-demo.tsx" description="展示如何添加自定义组件和内容" description="自定义标签页内容"></code>
 
-### 高级用法 {#advanced-usage}
+### 高级用法
 
-<code src="../demos/workspace-advanced-demo.tsx" description="展示复杂场景下的工作空间配置和使用">高级用法 - 复杂场景配置</code>
+<code src="../demos/workspace-advanced-demo.tsx" description="展示复杂场景下的工作空间配置和使用" description="高级用法 - 复杂场景配置"></code>
 
-### Header 右侧自定义 {#custom-header}
+### Header 右侧自定义
 
-<code src="../demos/workspace-header-extra-demo.tsx" description="展示如何自定义 header 右侧区域，添加自定义按钮或操作">Header 右侧自定义操作</code>
+<code src="../demos/workspace-header-extra-demo.tsx" description="展示如何自定义 header 右侧区域，添加自定义按钮或操作" description="Header 右侧自定义操作"></code>
 
 ## API
 
@@ -89,13 +89,13 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 | emptyContent                   | 无有效子面板时的占位内容                                                  | `ReactNode`                | -       | -    |
 | pure                           | 纯净模式，关闭阴影和边框                                                  | `boolean`                  | `false` | -    |
 
-#### 子面板识别 {#workspace-panel-recognition}
+#### 子面板识别
 
 内置子组件带有面板类型标记，支持 `React.memo(Workspace.File)` 等常见包裹（通过 `type` 链解析）。自定义 HOC 若无法识别，可在子组件上传入 `panelType`（如 `panelType="file"`），或使用 `markWorkspacePanel(YourPanel, 'file')` 标记组件。
 
 各子面板的 `tab` 配置见 `TabConfiguration`；`BaseChildProps.panelType` 仅用于无法自动识别时显式声明类型。
 
-#### 受控标签与文件预览 {#workspace-controlled-tab}
+#### 受控标签与文件预览
 
 - **受控**：传入 `activeTabKey` 时，在 `onTabChange` 中更新 state。非法 key 时界面回退到有效项；`notifyOnInvalidActiveTabKey={false}` 可仅静默回退、不触发回调。
 - **非受控**：使用 `defaultActiveTabKey` 指定初始标签，未传则激活第一项。
@@ -203,7 +203,7 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 | bindDomId             | 是否在每个文件项的根元素上绑定 `id` 属性                                                                         | `boolean`                                                                                                       | `false` | -      |
 | tab                   | 标签页配置                                                                                                       | `TabConfiguration`                                                                                              | -       | -      |
 
-#### DOM id 绑定策略 {#dom-id}
+#### DOM id 绑定策略
 
 - 当 `bindDomId` 为 `false`（默认）：不会在文件项根元素写入 `id` 属性，更推荐通过选择器如 `[data-testid]` 或 className 进行自动化选择。
 - 当 `bindDomId` 为 `true`：组件会在文件项根元素绑定 `id`。来源遵循：
@@ -396,7 +396,7 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 | children | 自定义内容 | `ReactNode`        | -      | -    |
 | tab      | 标签页配置 | `TabConfiguration` | -      | -    |
 
-### TabItem（内部结构） {#tabitem}
+### TabItem（内部结构）
 
 `Workspace` 解析子组件后得到的标签项，供内部分栏与内容渲染使用；其中 `componentType` 为内置子面板类型（`realtime` | `browser` | `task` | `file` | `fileTree` | `custom`），用于在首个「实时跟随」后插入视觉分割线。
 
@@ -413,29 +413,29 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 
 所有 `Workspace.*` 子组件另支持 `BaseChildProps.panelType`（`WorkspacePanelType`），用于 HOC 无法自动识别时显式声明面板类型。
 
-## 使用场景 {#use-cases}
+## 使用场景
 
-### 1. 开发工作空间 {#dev-workspace}
+### 1. 开发工作空间
 
 适用于开发环境中的多标签页工作空间，可以同时查看代码、日志、文档等。
 
-### 2. 数据分析工作台 {#data-analysis-workbench}
+### 2. 数据分析工作台
 
 用于数据分析场景，可以同时展示数据文件、分析结果、可视化图表等。
 
-### 3. 文档管理系统 {#document-management}
+### 3. 文档管理系统
 
 用于文档的预览、编辑、版本对比等功能。
 
-### 4. 实时监控面板 {#realtime-monitor}
+### 4. 实时监控面板
 
 用于展示实时数据、日志流、系统状态等信息。
 
-### 5. 任务管理界面 {#task-management-ui}
+### 5. 任务管理界面
 
 用于展示任务进度、执行状态、结果输出等。
 
-## 最佳实践 {#best-practices}
+## 最佳实践
 
 1. **合理使用标签页数量**：建议单个工作空间内的标签页数量不超过 8 个，避免界面过于拥挤。
 
@@ -458,13 +458,13 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 
 9. **无障碍支持**：确保工作空间组件具有良好的键盘导航和屏幕阅读器支持。
 
-10. **子组件识别**：优先使用 `Workspace.*` 内置子组件；`memo` 一般可直接使用，自定义 HOC 用 `panelType` 或 `markWorkspacePanel`（见 [子面板识别](#workspace-panel-recognition)）。
+10. **子组件识别**：优先使用 `Workspace.*` 内置子组件；`memo` 一般可直接使用，自定义 HOC 用 `panelType` 或 `markWorkspacePanel`（见 [子面板识别](#子面板识别)）。
 
 11. **受控标签**：`activeTabKey` + `onTabChange` 成对使用；非法 key 可用 `notifyOnInvalidActiveTabKey={false}` 避免多余回调。
 
 12. **文件预览**：需要跨 Tab 保留预览时设置 `preserveFilePreviewOnTabChange`。
 
-## 扩展 API {#api}
+## 扩展 API
 
 ### HtmlPreviewProps
 
@@ -505,7 +505,7 @@ HTML 预览组件的属性接口，用于 HTML 内容的预览和代码查看。
 | markdownEditorProps | Markdown 编辑器配置                  | `Partial<Omit<MarkdownEditorProps, 'editorRef' \| 'initValue' \| 'readonly'>>`    | -      | -    |
 | headerFileOverride  | 仅用于覆盖默认头部区域展示的文件信息 | `Partial<FileNode>`                                                               | -      | -    |
 
-## 工具函数 {#utils}
+## 工具函数
 
 ### getFileType
 
