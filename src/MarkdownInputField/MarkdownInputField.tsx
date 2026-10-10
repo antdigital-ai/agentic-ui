@@ -354,11 +354,14 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
             branchName={props.branch!.branchName}
             tooltipTitle={props.branch!.tooltipTitle}
             branches={props.branch!.branches}
+            currentBranchOverview={props.branch!.currentBranchOverview}
             switching={props.branch!.switching}
             disabled={props.branch!.disabled}
             onSelectBranch={props.branch!.onSelectBranch}
             onSearch={props.branch!.onSearch}
+            onCreateBranch={props.branch!.onCreateBranch}
             loading={props.branch!.loading}
+            labels={props.branch!.labels}
           />
         ) : null}
         {hasContextUsage ? (
@@ -368,6 +371,10 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
             categories={props.contextUsage!.categories}
             highUsageThreshold={props.contextUsage!.highUsageThreshold}
             onClick={props.contextUsage!.onClick}
+            panelLabels={props.contextUsage!.panelLabels}
+            onCompact={props.contextUsage!.onCompact}
+            compactDisabled={props.contextUsage!.compactDisabled}
+            compacting={props.contextUsage!.compacting}
           />
         ) : null}
       </div>

@@ -13,6 +13,16 @@ export interface ComposerBranchOption {
   isCurrent: boolean;
 }
 
+/** 当前分支未提交变更概览（对齐 ComposerBranchMenuOverview） */
+export interface ComposerBranchOverview {
+  /** 未提交文件数 */
+  fileCount: number;
+  /** 新增行数 */
+  insertions: number;
+  /** 删除行数 */
+  deletions: number;
+}
+
 export interface ComposerBranchTriggerProps {
   /** 当前分支名（空 / undefined 时组件不渲染） */
   branchName?: string | null;
@@ -20,38 +30,68 @@ export interface ComposerBranchTriggerProps {
   tooltipTitle?: string;
   /** 可切换的分支列表（不传则仅展示当前分支，不可下拉） */
   branches?: ComposerBranchOption[];
-  /** 切换中（展示 loading，禁止操作） */
-  switching?: boolean;
+  /** 当前分支未提交概览（菜单内当前分支行下展示） */
+  currentBranchOverview?: ComposerBranchOverview | null;
+  /** 切换中（展示 loading，禁止操作；也可传具体分支名仅对该分支 spinner） */
+  switching?: boolean | string;
   /** 禁用（已有会话锁定切换，对齐 isComposerBranchSwitchLocked） */
   disabled?: boolean;
   /** 选择分支回调 */
   onSelectBranch?: (branchName: string) => void;
   /** 搜索过滤回调（不传用本地过滤） */
   onSearch?: (query: string) => void;
+  /** 新建分支回调（不传不显示入口） */
+  onCreateBranch?: () => void;
   /** 加载中 */
   loading?: boolean;
+  /** 文案（对齐 ComposerBranchMenuLabels） */
+  labels?: {
+    searchPlaceholder?: string;
+    switchHeading?: string;
+    loading?: string;
+    empty?: string;
+    noMatch?: string;
+    remote?: string;
+    create?: string;
+    uncommittedFiles?: (count: number) => string;
+  };
   prefixCls?: string;
   className?: string;
   testId?: string;
 }
 
+const DEFAULT_LABELS = {
+  searchPlaceholder: 'Search branches...',
+  switchHeading: 'Switch branch',
+  loading: 'Loading…',
+  empty: 'No branches',
+  noMatch: 'No match',
+  remote: 'remote',
+  create: 'Create branch',
+  uncommittedFiles: (count: number) => `${count} uncommitted files`,
+};
+
 /**
  * ComposerBranchTrigger — 输入框工具栏的分支选择触发器。
  *
  * 对齐 dtcoder-ide ComposerBranchTrigger + ComposerBranchMenuView 的组合形态：
- * - 触发器：分支图标 + 当前分支名（长名 middle-ellipsis 由宿主 label 控制）+ 下拉箭头。
- * - 菜单：搜索框 + 分支列表（remote 标记 + 当前分支高亮）+ 新建分支入口。
- * - switching 时显示 loading 并禁用；disabled（会话锁定）时仅展示不可点。
+ * - 触发器：分支图标 + 当前分支名 + 下拉箭头；切换中显示 loading 并禁用。
+ * - 菜单：搜索框 + 分支列表（remote 标记 + 当前分支高亮 + 未提交概览
+ *   + 逐分支切换 spinner）+ 新建分支入口。
+ * - disabled（会话锁定）时仅展示不可点。
  */
 export const ComposerBranchTrigger: React.FC<ComposerBranchTriggerProps> = ({
   branchName,
   tooltipTitle,
   branches,
+  currentBranchOverview,
   switching = false,
   disabled = false,
   onSelectBranch,
   onSearch,
+  onCreateBranch,
   loading = false,
+  labels,
   prefixCls,
   className,
   testId,
@@ -61,6 +101,10 @@ export const ComposerBranchTrigger: React.FC<ComposerBranchTriggerProps> = ({
     prefixCls ?? antdContext?.getPrefixCls('agentic-branch-trigger');
   const [searchQuery, setSearchQuery] = useState('');
   const [open, setOpen] = useState(false);
+
+  const mergedLabels = { ...DEFAULT_LABELS, ...labels };
+  const switchingBranchName = typeof switching === 'string' ? switching : null;
+  const isSwitchingAny = switching === true || !!switchingBranchName;
 
   const filtered = useMemo(() => {
     if (!branches) return [];
@@ -82,7 +126,7 @@ export const ComposerBranchTrigger: React.FC<ComposerBranchTriggerProps> = ({
         <Input
           size="small"
           value={searchQuery}
-          placeholder="Search branches..."
+          placeholder={mergedLabels.searchPlaceholder}
           onChange={(e) => {
             setSearchQuery(e.target.value);
             onSearch?.(e.target.value);
@@ -94,11 +138,20 @@ export const ComposerBranchTrigger: React.FC<ComposerBranchTriggerProps> = ({
       disabled: true,
     },
     { type: 'divider' },
+    {
+      key: '__heading__',
+      label: (
+        <span className={`${baseCls}-heading`}>
+          {mergedLabels.switchHeading}
+        </span>
+      ),
+      disabled: true,
+    },
     ...(loading
       ? [
           {
             key: '__loading__',
-            label: 'Loading…',
+            label: mergedLabels.loading,
             disabled: true,
           },
         ]
@@ -106,7 +159,9 @@ export const ComposerBranchTrigger: React.FC<ComposerBranchTriggerProps> = ({
         ? [
             {
               key: '__empty__',
-              label: branches?.length ? 'No match' : 'No branches',
+              label: branches?.length
+                ? mergedLabels.noMatch
+                : mergedLabels.empty,
               disabled: true,
             },
           ]
@@ -118,28 +173,82 @@ export const ComposerBranchTrigger: React.FC<ComposerBranchTriggerProps> = ({
                   [`${baseCls}-option-current`]: b.isCurrent,
                 })}
               >
-                <span className={`${baseCls}-option-icon`}>⑂</span>
-                <span className={`${baseCls}-option-name`} title={b.name}>
-                  {b.displayName}
+                <span className={`${baseCls}-option-icon`} aria-hidden>
+                  ⑂
                 </span>
-                {b.isRemote ? (
-                  <span className={`${baseCls}-option-remote`}>remote</span>
-                ) : null}
-                {b.isCurrent ? (
+                <span className={`${baseCls}-option-main`}>
+                  <span className={`${baseCls}-option-title`}>
+                    <span className={`${baseCls}-option-name`} title={b.name}>
+                      {b.displayName}
+                    </span>
+                    {b.isRemote ? (
+                      <span className={`${baseCls}-option-remote`}>
+                        {mergedLabels.remote}
+                      </span>
+                    ) : null}
+                  </span>
+                  {b.isCurrent &&
+                  currentBranchOverview &&
+                  currentBranchOverview.fileCount > 0 ? (
+                    <span className={`${baseCls}-option-overview`}>
+                      {mergedLabels.uncommittedFiles(
+                        currentBranchOverview.fileCount,
+                      )}{' '}
+                      <span className={`${baseCls}-option-overview-add`}>
+                        +{currentBranchOverview.insertions}
+                      </span>{' '}
+                      <span className={`${baseCls}-option-overview-del`}>
+                        -{currentBranchOverview.deletions}
+                      </span>
+                    </span>
+                  ) : null}
+                </span>
+                {switchingBranchName === b.name ? (
+                  <span
+                    className={`${baseCls}-option-spinner`}
+                    aria-label="switching"
+                    style={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: '50%',
+                      border: '2px solid currentColor',
+                      borderTopColor: 'transparent',
+                      animation: 'spin 0.8s linear infinite',
+                    }}
+                  />
+                ) : b.isCurrent ? (
                   <span className={`${baseCls}-option-check`}>✓</span>
                 ) : null}
               </span>
             ),
           }))),
+    ...(onCreateBranch
+      ? [
+          { type: 'divider' as const },
+          {
+            key: '__create__',
+            label: (
+              <span className={`${baseCls}-create`}>
+                <span aria-hidden>＋</span> {mergedLabels.create}
+              </span>
+            ),
+          },
+        ]
+      : []),
   ];
 
   const handleMenuClick: MenuProps['onClick'] = (e) => {
+    if (e.key === '__create__') {
+      onCreateBranch?.();
+      setOpen(false);
+      return;
+    }
     if (e.key.startsWith('__')) return;
     onSelectBranch?.(e.key);
     setOpen(false);
   };
 
-  const canDropdown = !!branches && !disabled && !switching;
+  const canDropdown = !!branches && !disabled && !isSwitchingAny;
 
   const triggerDom = (
     <button
@@ -147,7 +256,7 @@ export const ComposerBranchTrigger: React.FC<ComposerBranchTriggerProps> = ({
       className={classNames(baseCls, className)}
       data-testid={testId ?? 'composer-branch-trigger'}
       data-branch-mode={canDropdown ? 'switch' : 'view'}
-      disabled={disabled || switching}
+      disabled={disabled || isSwitchingAny}
       aria-label={`branch: ${branchName}`}
       style={{
         display: 'inline-flex',
@@ -177,7 +286,7 @@ export const ComposerBranchTrigger: React.FC<ComposerBranchTriggerProps> = ({
       >
         {branchName}
       </span>
-      {switching ? (
+      {isSwitchingAny ? (
         <span
           className={`${baseCls}-spinner`}
           aria-label="switching"

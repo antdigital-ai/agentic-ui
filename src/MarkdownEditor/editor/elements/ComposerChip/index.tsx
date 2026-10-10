@@ -1,6 +1,6 @@
-import { ConfigProvider, Tooltip } from 'antd';
+import { ConfigProvider, Popover, Tooltip } from 'antd';
 import classNames from 'clsx';
-import React, { useContext, useRef } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { Editor, Transforms } from 'slate';
 import { ReactEditor, useSlateStatic } from 'slate-react';
 import { I18nContext } from '../../../../I18n';
@@ -20,11 +20,22 @@ interface ComposerChipElementProps {
   prefixCls?: string;
 }
 
-/** slash chip 视觉（对齐 IDE glass-composer-slash 色调分档） */
-const SECTION_COLOR: Record<string, string> = {
+/** slash chip 色调分档（对齐 IDE resolveSlashCommandToneKey：section 优先，plan/goal 名称专属 tone） */
+const SLASH_TONE_COLOR: Record<string, string> = {
   default: 'var(--color-blue-text, #1677ff)',
+  goal: 'var(--color-green-text, #52c41a)',
+  plan: 'var(--color-orange-text, #fa8c16)',
   custom: 'var(--color-purple-text, #722ed1)',
   skill: 'var(--color-green-text, #52c41a)',
+};
+
+const resolveSlashToneKey = (commandName: string, section: string): string => {
+  const normalized = commandName.trim().replace(/^\/+/, '').toLowerCase();
+  if (section === 'custom') return 'custom';
+  if (section === 'skill') return 'skill';
+  if (normalized === 'plan') return 'plan';
+  if (normalized === 'goal') return 'goal';
+  return 'default';
 };
 
 const chipBaseStyle: React.CSSProperties = {
@@ -43,13 +54,15 @@ const chipBaseStyle: React.CSSProperties = {
   whiteSpace: 'nowrap',
 };
 
-/** slash chip 视觉（对齐 IDE glass-composer-slash 色调分档） */
+/** slash chip 视觉（对齐 IDE glass-composer-slash 色调分档 + placeholder） */
 const SlashChipView: React.FC<{
   chip: ComposerSlashChip;
   prefixCls: string;
   label: string;
-}> = ({ chip, prefixCls, label }) => {
-  const color = SECTION_COLOR[chip.section] ?? SECTION_COLOR.default;
+  /** 无后续输入时展示 placeholder（对齐 hasFollowingInput 反逻辑） */
+  placeholder?: string;
+}> = ({ chip, prefixCls, label, placeholder }) => {
+  const color = SLASH_TONE_COLOR[resolveSlashToneKey(chip.name, chip.section)];
   return (
     <span className={`${prefixCls}-slash`} style={{ ...chipBaseStyle, color }}>
       <span className={`${prefixCls}-slash-icon`} style={{ fontWeight: 600 }}>
@@ -61,7 +74,14 @@ const SlashChipView: React.FC<{
       >
         {label}
       </span>
-      {chip.placeholderKey && !chip.payload ? (
+      {placeholder ? (
+        <span
+          className={`${prefixCls}-slash-placeholder`}
+          style={{ opacity: 0.55, fontSize: 11 }}
+        >
+          {placeholder}
+        </span>
+      ) : chip.placeholderKey && !chip.payload ? (
         <span style={{ opacity: 0.55, fontSize: 11 }}>…</span>
       ) : null}
     </span>
@@ -129,28 +149,52 @@ const SymbolChipView: React.FC<{
   </span>
 );
 
-/** 长文本折叠 chip 视觉（统计 + 展开提示） */
+/** 长文本折叠 chip 视觉（统计 + 展开提示），点击弹出原文预览（对齐 ComposerLongTextPreview） */
 const LongTextChipView: React.FC<{
   chip: Extract<ComposerChipData, { kind: 'long-text' }>;
   prefixCls: string;
   locale: any;
-}> = ({ chip, prefixCls, locale }) => (
-  <span className={`${prefixCls}-long-text`} style={chipBaseStyle}>
-    <span
-      className={`${prefixCls}-long-text-badge`}
-      style={{ fontWeight: 500 }}
-    >
-      {locale?.['composer.chip.longText'] ?? '长文本'}
+  onPreview?: () => void;
+}> = ({ chip, prefixCls, locale, onPreview }) => {
+  const content = (
+    <span className={`${prefixCls}-long-text`} style={chipBaseStyle}>
+      <span
+        className={`${prefixCls}-long-text-badge`}
+        style={{ fontWeight: 500 }}
+      >
+        {locale?.['composer.chip.longText'] ?? '长文本'}
+      </span>
+      <span
+        className={`${prefixCls}-long-text-stats`}
+        style={{ fontSize: 11, opacity: 0.65 }}
+      >
+        {chip.characterCount} {locale?.['composer.chip.chars'] ?? '字符'} ·{' '}
+        {chip.lineCount} {locale?.['composer.chip.lines'] ?? '行'}
+      </span>
     </span>
+  );
+  if (!onPreview) return content;
+  return (
     <span
-      className={`${prefixCls}-long-text-stats`}
-      style={{ fontSize: 11, opacity: 0.65 }}
+      role="button"
+      tabIndex={0}
+      className={`${prefixCls}-long-text-trigger`}
+      onClick={(e) => {
+        e.stopPropagation();
+        onPreview();
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onPreview();
+        }
+      }}
+      style={{ cursor: 'pointer' }}
     >
-      {chip.characterCount} {locale?.['composer.chip.chars'] ?? '字符'} ·{' '}
-      {chip.lineCount} {locale?.['composer.chip.lines'] ?? '行'}
+      {content}
     </span>
-  </span>
-);
+  );
+};
 
 /**
  * ComposerChip — 编辑器内的内联原子 chip。
@@ -166,6 +210,7 @@ export const ComposerChip: React.FC<ComposerChipElementProps> = (props) => {
   const { locale } = useContext(I18nContext);
   const baseCls = antdContext?.getPrefixCls('agentic-md-editor-chip');
   const chipRef = useRef<HTMLSpanElement>(null);
+  const [longTextPreviewOpen, setLongTextPreviewOpen] = useState(false);
 
   const chip = readComposerChipData(element.chip);
 
@@ -217,7 +262,18 @@ export const ComposerChip: React.FC<ComposerChipElementProps> = (props) => {
     switch (chip.kind) {
       case 'slash':
         return (
-          <SlashChipView chip={chip} prefixCls={baseCls} label={chip.name} />
+          <SlashChipView
+            chip={chip}
+            prefixCls={baseCls}
+            label={chip.name}
+            placeholder={
+              chip.placeholderKey && !chip.payload
+                ? ((element as any).contextProps?.placeholderText as
+                    | string
+                    | undefined)
+                : undefined
+            }
+          />
         );
       case 'file':
       case 'folder':
@@ -230,7 +286,12 @@ export const ComposerChip: React.FC<ComposerChipElementProps> = (props) => {
         );
       case 'long-text':
         return (
-          <LongTextChipView chip={chip} prefixCls={baseCls} locale={locale} />
+          <LongTextChipView
+            chip={chip}
+            prefixCls={baseCls}
+            locale={locale}
+            onPreview={() => setLongTextPreviewOpen(true)}
+          />
         );
       default:
         return null;
@@ -238,6 +299,7 @@ export const ComposerChip: React.FC<ComposerChipElementProps> = (props) => {
   };
 
   const isSlash = chip.kind === 'slash';
+  const isLongText = chip.kind === 'long-text';
   const tooltipTitle =
     chip.kind === 'file' || chip.kind === 'folder'
       ? chip.path
@@ -246,6 +308,19 @@ export const ComposerChip: React.FC<ComposerChipElementProps> = (props) => {
           ? `${chip.name} · ${chip.containerName}`
           : chip.name
         : undefined;
+
+  const innerChip = (
+    <Tooltip title={tooltipTitle}>
+      <span
+        className={`${baseCls}-inner`}
+        role={isSlash && !readonly ? 'button' : undefined}
+        tabIndex={isSlash && !readonly ? 0 : undefined}
+        onClick={isSlash ? handleSlashClick : undefined}
+      >
+        {renderChipContent()}
+      </span>
+    </Tooltip>
+  );
 
   return (
     <span
@@ -258,16 +333,38 @@ export const ComposerChip: React.FC<ComposerChipElementProps> = (props) => {
         [`${baseCls}-readonly`]: readonly,
       })}
     >
-      <Tooltip title={tooltipTitle}>
-        <span
-          className={`${baseCls}-inner`}
-          role={isSlash && !readonly ? 'button' : undefined}
-          tabIndex={isSlash && !readonly ? 0 : undefined}
-          onClick={isSlash ? handleSlashClick : undefined}
+      {isLongText && !readonly ? (
+        <Popover
+          open={longTextPreviewOpen}
+          trigger={[]}
+          placement="top"
+          onOpenChange={setLongTextPreviewOpen}
+          content={
+            <div
+              className={`${baseCls}-long-text-preview`}
+              style={{ maxWidth: 480 }}
+            >
+              <pre
+                style={{
+                  margin: 0,
+                  maxHeight: 320,
+                  overflow: 'auto',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                  fontSize: 12,
+                  lineHeight: '20px',
+                }}
+              >
+                {chip.kind === 'long-text' ? chip.text : ''}
+              </pre>
+            </div>
+          }
         >
-          {renderChipContent()}
-        </span>
-      </Tooltip>
+          {innerChip}
+        </Popover>
+      ) : (
+        innerChip
+      )}
       {!readonly ? (
         <button
           type="button"

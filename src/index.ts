@@ -515,14 +515,23 @@ export { ActionItemContainer } from './MarkdownInputField/BeforeToolContainer/Be
 export {
   ComposerBranchTrigger,
   type ComposerBranchOption,
+  type ComposerBranchOverview,
   type ComposerBranchTriggerProps,
 } from './MarkdownInputField/BranchSelector/ComposerBranchTrigger';
 export {
   ContextUsageIndicator,
   HIGH_USAGE_THRESHOLD_PERCENT,
+  MIN_VISIBLE_RING_PERCENT,
   type ContextUsageCategory,
   type ContextUsageIndicatorProps,
 } from './MarkdownInputField/ContextUsage/ContextUsageIndicator';
+export {
+  ContextUsagePanel,
+  computeBarSegments,
+  type ContextUsageBarSegment,
+  type ContextUsagePanelLabels,
+  type ContextUsagePanelProps,
+} from './MarkdownInputField/ContextUsage/ContextUsagePanel';
 export {
   FileMapView,
   type FileMapViewProps,

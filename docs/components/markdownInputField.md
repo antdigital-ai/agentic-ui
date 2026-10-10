@@ -1732,6 +1732,8 @@ insertComposerChip(editor, {
 
 开启 `longTextFold.enable` 后，纯文本粘贴超过阈值（≥ 1200 字符或 ≥ 12 行）时自动折叠为单个「长文本」chip，展示字符数与行数统计，避免一次粘贴撑爆输入框；发送时自动还原完整原文（多行原文以 fenced code 形式序列化）。
 
+点击长文本 chip 可弹出原文预览浮层（对齐 IDE ComposerLongTextPreview），在不展开编辑器的情况下核对折叠内容。
+
 ```tsx | pure
 <MarkdownInputField longTextFold={{ enable: true }} />
 ```
@@ -1759,7 +1761,9 @@ insertComposerChip(editor, {
 
 ### 上下文用量指示 {#context-usage}
 
-配置 `contextUsage` 后在工具栏渲染环形用量指示器：16px 圆环 + 分档颜色（<50% 灰、≥50% 黄、≥80% 高用量深黄、溢出红），悬浮展示 `used / window (percent%)`，点击触发回调供宿主打开分类明细面板。
+配置 `contextUsage` 后在工具栏渲染环形用量指示器：16px 圆环 + 分档颜色（<50% 灰、≥50% 黄、≥80% 高用量深黄、溢出红），悬浮展示 `used / window (percent%)`。
+
+**内置面板**：未传 `onClick` 且提供 `categories` 时，点击指示器展开内置 `ContextUsagePanel`——占用百分比 + token 摘要、分类分段条形图（分类合计超出/不足总占用时自动缩放/补残差）、分类明细行（可展开 items）、高用量警告行、compact 压缩操作（`onCompact` / `compacting` / `compactDisabled`）。传入 `onClick` 则由宿主自管面板。
 
 ```tsx | pure
 <MarkdownInputField
@@ -1767,16 +1771,35 @@ insertComposerChip(editor, {
     usedTokens: 42000,
     contextWindow: 128000,
     highUsageThreshold: 80,
-    onClick: ({ percent }) => openUsagePanel(percent),
+    categories: [
+      { key: 'system', name: '系统', tokenCount: 12000 },
+      {
+        key: 'skills',
+        name: '技能',
+        tokenCount: 8000,
+        items: [{ label: 'pdf-reader', estimatedTokens: 5000 }],
+      },
+      { key: 'messages', name: '会话', tokenCount: 22000 },
+    ],
+    onCompact: () => compactSession(),
+    compacting: false,
   }}
 />
 ```
 
-也可直接使用独立导出的 `ContextUsageIndicator` 组件自定义布局。
+也可直接使用独立导出的 `ContextUsageIndicator` / `ContextUsagePanel` 组件与 `computeBarSegments` 工具函数自定义布局。
 
 ### 分支选择 {#branch-selector}
 
-配置 `branch` 后在工具栏渲染分支触发器：分支图标 + 当前分支名 pill，点击展开可搜索的分支菜单（本地 / 远程分组、当前分支高亮、切换中 loading）。不传 `branches` 时仅展示当前分支不可切换。
+配置 `branch` 后在工具栏渲染分支触发器：分支图标 + 当前分支名 pill，点击展开可搜索的分支菜单。不传 `branches` 时仅展示当前分支不可切换。
+
+菜单能力（对齐 IDE ComposerBranchMenuView）：
+
+- **搜索过滤**（本地过滤或 `onSearch` 远程）；
+- **当前分支概览**：`currentBranchOverview` 展示未提交文件数与 `+新增/-删除` 行数；
+- **逐分支切换 spinner**：`switching` 传分支名时仅对该分支行显示 loading（全局切换传 `true`）；
+- **新建分支入口**：传入 `onCreateBranch` 时显示；
+- **文案定制**：`labels` 覆盖搜索占位、分组标题、remote 标记等。
 
 ```tsx | pure
 <MarkdownInputField
@@ -1798,8 +1821,10 @@ insertComposerChip(editor, {
         isCurrent: false,
       },
     ],
+    currentBranchOverview: { fileCount: 3, insertions: 120, deletions: 8 },
     switching: false,
     onSelectBranch: (name) => switchBranch(name),
+    onCreateBranch: () => openCreateDialog(),
   }}
 />
 ```

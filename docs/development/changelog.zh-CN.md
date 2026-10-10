@@ -13,10 +13,11 @@ group:
 
 - MarkdownInputField
   - 🆕 新增内联原子 chip 体系（`composerChips`）：slash 命令 chip（结构化技能节点 + 发送前 `onSlashChipGate` 拦截）、`@file` / `@folder` 与 `@symbol` 内联 mention chip，从纯文本标签升级为 Slate inline void 节点，整体删除、点击配置、发送时序列化为 `/name` 与 `@path`。
-  - 🆕 新增长文本粘贴折叠（`longTextFold`）：纯文本粘贴 ≥1200 字符或 ≥12 行时折叠为「长文本」chip（展示字符 / 行统计），发送时还原原文。
+  - 🆕 新增长文本粘贴折叠（`longTextFold`）：纯文本粘贴 ≥1200 字符或 ≥12 行时折叠为「长文本」chip（展示字符 / 行统计，点击弹出原文预览），发送时还原原文。
   - 🆕 新增 fragment 级草稿恢复（`draft`）：idle / blur / send / switch / unmount 自动提交，`draftKey` 切换时自动恢复；默认 localStorage，可自定义 `storage`。
-  - 🆕 新增上下文用量指示（`contextUsage`）：工具栏环形指示器（分档配色 + token 摘要悬浮 + 高用量告警），独立组件 `ContextUsageIndicator` 一并导出。
-  - 🆕 新增分支选择（`branch`）：分支 pill + 可搜索下拉菜单（本地 / 远程分组、当前高亮、切换 loading），独立组件 `ComposerBranchTrigger` 一并导出。
+  - 🆕 新增上下文用量指示（`contextUsage`）：工具栏环形指示器 + 内置 `ContextUsagePanel` 详情面板（分类分段条形图、可展开明细、高用量警告、compact 压缩操作），独立导出 `ContextUsageIndicator` / `ContextUsagePanel` / `computeBarSegments`。
+  - 🆕 新增分支选择（`branch`）：分支 pill + 可搜索下拉菜单（当前分支未提交概览、逐分支切换 spinner、新建分支入口、文案定制），独立组件 `ComposerBranchTrigger` 一并导出。
+  - 💄 slash chip 色调对齐 IDE `resolveSlashCommandToneKey`：`plan` / `goal` 命令专属色，未配置 chip 无后续输入时展示 `placeholderText`。
   - 🛠 导出 `insertComposerChip` / `withComposerChips` / `findUnconfiguredSlashChips` / `handleLongTextPasteFold` 及 `ComposerChipNode` 系列 chip 工具函数与类型。
 
 ## v2.32.48

@@ -653,12 +653,22 @@ export type MarkdownInputFieldProps = {
     }>;
     /** 高用量阈值百分比，默认 80 */
     highUsageThreshold?: number;
-    /** 点击回调 */
+    /** 点击回调（传入后不渲染内置面板） */
     onClick?: (info: {
       usedTokens: number;
       contextWindow: number;
       percent: number;
     }) => void;
+    /** 内置面板文案 */
+    panelLabels?: Partial<
+      import('../ContextUsage/ContextUsagePanel').ContextUsagePanelLabels
+    >;
+    /** 压缩回调（内置面板 compact 按钮） */
+    onCompact?: () => void;
+    /** 压缩禁用（会话处理中） */
+    compactDisabled?: boolean;
+    /** 压缩中 */
+    compacting?: boolean;
   };
 
   /**
@@ -687,16 +697,35 @@ export type MarkdownInputFieldProps = {
       isRemote: boolean;
       isCurrent: boolean;
     }>;
-    /** 切换中 */
-    switching?: boolean;
+    /** 当前分支未提交概览（文件数 / ±行数） */
+    currentBranchOverview?: {
+      fileCount: number;
+      insertions: number;
+      deletions: number;
+    } | null;
+    /** 切换中（true 全局 spinner，或传分支名仅对该分支 spinner） */
+    switching?: boolean | string;
     /** 禁用（会话锁定时仅展示） */
     disabled?: boolean;
     /** 选择分支回调 */
     onSelectBranch?: (branchName: string) => void;
     /** 搜索回调（远程过滤场景） */
     onSearch?: (query: string) => void;
+    /** 新建分支回调（不传不显示入口） */
+    onCreateBranch?: () => void;
     /** 分支列表加载中 */
     loading?: boolean;
+    /** 菜单文案 */
+    labels?: {
+      searchPlaceholder?: string;
+      switchHeading?: string;
+      loading?: string;
+      empty?: string;
+      noMatch?: string;
+      remote?: string;
+      create?: string;
+      uncommittedFiles?: (count: number) => string;
+    };
   };
 
   /**

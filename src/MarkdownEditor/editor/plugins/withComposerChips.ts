@@ -135,7 +135,12 @@ export const withComposerChips = (editor: Editor) => {
 export const insertComposerChip = (
   editor: Editor,
   data: ComposerChipData,
-  options?: { at?: any; ensureTrailingSpace?: boolean },
+  options?: {
+    at?: any;
+    ensureTrailingSpace?: boolean;
+    /** 渲染层附加上下文（如 slash chip 的 placeholderText） */
+    contextProps?: Record<string, any>;
+  },
 ) => {
   const ensureTrailingSpace = options?.ensureTrailingSpace !== false;
   const target = options?.at ?? editor.selection;
@@ -148,7 +153,14 @@ export const insertComposerChip = (
       const at = Range.start(target as Range);
       // chip 与分隔空格作为兄弟节点数组一次插入，保证空格紧跟 chip
       const nodes: any[] = [
-        { type: 'composer-chip', chip: data, children: [{ text: '' }] },
+        {
+          type: 'composer-chip',
+          chip: data,
+          ...(options?.contextProps
+            ? { contextProps: options.contextProps }
+            : {}),
+          children: [{ text: '' }],
+        },
       ];
       if (ensureTrailingSpace) {
         nodes.push({ text: ' ' });
