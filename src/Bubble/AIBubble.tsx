@@ -1,4 +1,11 @@
-import { memo, MutableRefObject, useContext, useMemo, useRef } from 'react';
+import {
+  memo,
+  MutableRefObject,
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+} from 'react';
 
 import { ConfigProvider, Flex } from 'antd';
 import clsx from 'clsx';
@@ -8,6 +15,7 @@ import { WhiteBoxProcessInterface } from '../ThoughtChainList/types';
 import { BubbleAvatar } from './Avatar';
 import { BubbleBeforeNode } from './BubbleBeforeNode';
 import { BubbleConfigContext } from './BubbleConfigProvide';
+import { bubblePropsAreEqual } from './bubblePropsAreEqual';
 import { ContentFilemapView } from './ContentFilemapView';
 import { extractFilemapBlocks } from './extractFilemapBlocks';
 import { BubbleFileView } from './FileView';
@@ -17,24 +25,12 @@ import { BubbleExtra } from './MessagesContent/BubbleExtra';
 import { useStyle } from './style';
 import { BubbleTitle } from './Title';
 import type { BubbleMetaData, BubbleProps } from './type';
+import { createFeedbackHandler } from './utils/createFeedbackHandler';
+import { runRender } from './utils/runRender';
+
+export { runRender } from './utils/runRender';
 
 const AI_PLACEMENT = 'left' as const;
-
-export const runRender = (
-  render: any,
-  props: BubbleProps,
-  defaultDom: React.ReactNode,
-  ...rest: undefined[]
-) => {
-  // WithFalse：显式 false 表示关闭该插槽，不得回退到 defaultDom
-  if (render === false) {
-    return null;
-  }
-  if (typeof render === 'function') {
-    return render(props, defaultDom, ...rest);
-  }
-  return defaultDom;
-};
 
 const isSameRoleAsPrevious = (preMessage: any, originData: any) => {
   if (!preMessage?.role || !originData?.role) return false;
@@ -98,7 +94,29 @@ export const AIBubble: React.FC<
 
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const context = useContext(BubbleConfigContext);
-  const { compact, standalone, extraShowOnHover } = context!;
+  const { compact, standalone, extraShowOnHover } = context || {};
+  const bubbleContext = useMemo(
+    () => ({
+      ...context,
+      compact,
+      standalone: !!standalone,
+      extraShowOnHover,
+      bubble: props as NonNullable<typeof context>['bubble'],
+    }),
+    [context, compact, standalone, extraShowOnHover, props],
+  );
+  const setMessage = useCallback<
+    NonNullable<React.ContextType<typeof MessagesContext>['setMessage']>
+  >(
+    (message) => {
+      props.bubbleRef?.current?.setMessageItem?.(props.id!, message);
+    },
+    [props.bubbleRef, props.id],
+  );
+  const messageContext = useMemo(
+    () => ({ message: originData, hidePadding, setHidePadding, setMessage }),
+    [originData, hidePadding, setMessage],
+  );
 
   const prefixClass = getPrefixCls('agentic');
   const { hashId } = useStyle(prefixClass);
@@ -164,6 +182,8 @@ export const AIBubble: React.FC<
   const messageContent = (
     <BubbleMessageDisplay
       markdownRenderConfig={props.markdownRenderConfig}
+      renderMode={props.renderMode}
+      renderType={props.renderType}
       docListProps={props.docListProps}
       bubbleListRef={props.bubbleListRef}
       bubbleListItemExtraStyle={styles?.bubbleListItemExtraStyle}
@@ -172,7 +192,7 @@ export const AIBubble: React.FC<
       key={messageDisplayKey}
       data-id={props.originData?.id}
       avatar={props.originData?.meta as BubbleMetaData}
-      readonly={props.readonly ?? false}
+      readonly={props.readonly}
       onReply={props.onReply}
       id={props.id}
       originData={props.originData}
@@ -181,7 +201,9 @@ export const AIBubble: React.FC<
       onDisLike={props.onDisLike}
       onDislike={props.onDislike}
       onLike={props.onLike}
-      customConfig={props.bubbleRenderConfig?.customConfig}
+      customConfig={
+        props.bubbleRenderConfig?.customConfig ?? props.customConfig
+      }
       pure={props.pure}
       onCancelLike={props.onCancelLike}
       onLikeCancel={props.onLikeCancel}
@@ -190,6 +212,7 @@ export const AIBubble: React.FC<
       fileViewConfig={props.fileViewConfig}
       renderFileMoreAction={props.renderFileMoreAction}
       shouldShowVoice={props.shouldShowVoice}
+      useSpeech={props.useSpeech}
       bubbleRenderConfig={props.bubbleRenderConfig}
     />
   );
@@ -251,14 +274,7 @@ export const AIBubble: React.FC<
   );
 
   const itemDom = (
-    <BubbleConfigContext.Provider
-      value={{
-        compact,
-        standalone: !!standalone,
-        extraShowOnHover,
-        bubble: props as any,
-      }}
-    >
+    <BubbleConfigContext.Provider value={bubbleContext}>
       <Flex
         className={clsx(
           hashId,
@@ -380,16 +396,7 @@ export const AIBubble: React.FC<
 
   if (bubbleRenderConfig?.render === false) return null;
   return (
-    <MessagesContext.Provider
-      value={{
-        message: props.originData,
-        hidePadding,
-        setHidePadding,
-        setMessage: (message) => {
-          props.bubbleRef?.current?.setMessageItem?.(props.id!, message as any);
-        },
-      }}
-    >
+    <MessagesContext.Provider value={messageContext}>
       <>
         {bubbleRenderConfig?.render?.(
           props,
@@ -428,52 +435,22 @@ export const AIBubble: React.FC<
                   shouldShowCopy={props.shouldShowCopy}
                   useSpeech={props.useSpeech}
                   shouldShowVoice={props.shouldShowVoice}
-                  onDisLike={
-                    props.onDisLike
-                      ? async () => {
-                          try {
-                            await props.onDisLike?.(props.originData as any);
-                            props.bubbleRef?.current?.setMessageItem?.(
-                              props.id!,
-                              {
-                                feedback: 'thumbsDown',
-                              } as any,
-                            );
-                          } catch (error) {}
-                        }
-                      : undefined
-                  }
-                  onDislike={
-                    props.onDislike
-                      ? async () => {
-                          try {
-                            await props.onDislike?.(props.originData as any);
-                            props.bubbleRef?.current?.setMessageItem?.(
-                              props.id!,
-                              {
-                                feedback: 'thumbsDown',
-                              } as any,
-                            );
-                          } catch (error) {}
-                        }
-                      : undefined
-                  }
+                  onDisLike={createFeedbackHandler(
+                    props,
+                    props.onDisLike,
+                    'thumbsDown',
+                  )}
+                  onDislike={createFeedbackHandler(
+                    props,
+                    props.onDislike,
+                    'thumbsDown',
+                  )}
                   bubble={props as any}
-                  onLike={
-                    props.onLike
-                      ? async () => {
-                          try {
-                            await props.onLike?.(props.originData as any);
-                            props.bubbleRef?.current?.setMessageItem?.(
-                              props.id!,
-                              {
-                                feedback: 'thumbsUp',
-                              } as any,
-                            );
-                          } catch (error) {}
-                        }
-                      : undefined
-                  }
+                  onLike={createFeedbackHandler(
+                    props,
+                    props.onLike,
+                    'thumbsUp',
+                  )}
                 />
               ),
             messageContent: messageContent,
@@ -484,4 +461,4 @@ export const AIBubble: React.FC<
       </>
     </MessagesContext.Provider>
   );
-});
+}, bubblePropsAreEqual);

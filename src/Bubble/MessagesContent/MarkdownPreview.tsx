@@ -1,12 +1,12 @@
 import { Popover } from 'antd';
 import React, { useContext, useMemo } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { MarkdownEditor, MarkdownEditorProps } from '../../';
 import { useLocale } from '../../I18n';
+import { MarkdownEditor } from '../../MarkdownEditor';
+import type { MarkdownEditorProps } from '../../MarkdownEditor/types';
 import { MarkdownRenderer } from '../../MarkdownRenderer';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
 import { MessageBubbleData } from '../type';
-import { MessagesContext } from './BubbleContext';
 
 export interface MarkdownPreviewProps {
   content: string;
@@ -20,6 +20,7 @@ export interface MarkdownPreviewProps {
   style?: React.CSSProperties;
   originData?: MessageBubbleData;
   markdownRenderConfig?: MarkdownEditorProps;
+  readonly?: boolean;
   beforeContent: React.ReactNode;
   afterContent: React.ReactNode;
 }
@@ -50,12 +51,14 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
     afterContent,
   } = props;
 
-  const { hidePadding } = useContext(MessagesContext) || {};
   const config = useContext(BubbleConfigContext);
   const locale = useLocale();
   const standalone = config?.standalone;
   const extraShowOnHover = config?.extraShowOnHover;
   const rc = props.markdownRenderConfig;
+  const markdownContent = rc?.initValue ?? content;
+  const readonly = props.readonly ?? rc?.readonly ?? true;
+  const effectiveFncProps = fncProps ?? rc?.fncProps;
   const renderMode = rc?.renderMode ?? rc?.renderType ?? 'slate';
   const isStreaming =
     (rc?.streaming ?? rc?.typewriter ?? Boolean(typing)) &&
@@ -64,18 +67,18 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
   const noPadding = !!extra;
 
   const markdown = useMemo(() => {
-    if (content === '' && !rc?.initSchemaValue?.length) return null;
+    if (markdownContent === '' && !rc?.initSchemaValue?.length) return null;
 
-    if (renderMode === 'markdown') {
+    if (readonly && renderMode === 'markdown') {
       return (
         <MarkdownRenderer
-          content={content}
+          content={markdownContent}
           streaming={isStreaming}
           isFinished={isFinished}
           throttleOptions={rc?.throttleOptions}
           plugins={rc?.plugins}
           remarkPlugins={rc?.markdownToHtmlOptions}
-          fncProps={fncProps}
+          fncProps={effectiveFncProps}
           linkConfig={rc?.linkConfig}
           codeProps={rc?.codeProps}
           apaasify={rc?.apaasify}
@@ -91,7 +94,7 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
       );
     }
 
-    const minWidth = content.includes('chartType')
+    const minWidth = markdownContent.includes('chartType')
       ? standalone
         ? Math.max((htmlRef?.current?.clientWidth || 600) - 23, 500)
         : Math.min((htmlRef?.current?.clientWidth || 600) - 128, 500)
@@ -100,8 +103,8 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
     return (
       <MarkdownEditor
         {...(rc || {})}
-        fncProps={fncProps}
-        initValue={content}
+        fncProps={effectiveFncProps}
+        initValue={markdownContent}
         toc={false}
         width="100%"
         height="auto"
@@ -125,12 +128,10 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
           margin: noPadding ? 0 : undefined,
           ...(rc?.style || {}),
         }}
-        readonly
+        readonly={readonly}
       />
     );
   }, [
-    hidePadding,
-    typing,
     props.originData?.isLast,
     props.originData?.isFinished,
     props.originData?.isAborted,
@@ -139,11 +140,12 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
     isStreaming,
     isFinished,
     noPadding,
-    content,
+    markdownContent,
     renderMode,
     rc,
-    fncProps,
+    effectiveFncProps,
     standalone,
+    readonly,
   ]);
 
   const errorDom = (

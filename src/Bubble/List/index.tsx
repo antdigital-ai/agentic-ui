@@ -1,7 +1,12 @@
 import SkeletonList from './SkeletonList';
-export { PureBubbleList } from './PureBubbleList';
 
-import { MutableRefObject, useContext, useMemo, useRef } from 'react';
+import {
+  MutableRefObject,
+  useContext,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+} from 'react';
 
 import type { RoleType } from '../../Types/common';
 import type {
@@ -317,6 +322,23 @@ export type BubbleListProps = {
   };
 };
 
+interface LoadingRowKey {
+  key: string;
+  createAt: MessageBubbleData['createAt'];
+}
+
+interface BubbleListRowData {
+  source: MessageBubbleData;
+  isLast: boolean;
+  value: MessageBubbleData;
+}
+
+interface BubbleListAvatarData {
+  base: BubbleMetaData | undefined;
+  meta: MessageBubbleData['meta'];
+  value: BubbleMetaData;
+}
+
 /**
  * BubbleList 组件 - 聊天气泡列表组件
  *
@@ -376,7 +398,7 @@ export type BubbleListProps = {
  * - 支持滚动和触摸事件
  * - 提供消息复制功能
  */
-export const BubbleList: React.FC<BubbleListProps> = (props) => {
+export const BubbleList = React.memo<BubbleListProps>((props) => {
   const {
     bubbleListRef,
     bubbleRenderConfig,
@@ -433,81 +455,31 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
   const prefixClass = getPrefixCls('agentic-bubble-list');
   const { hashId } = useStyle(prefixClass);
   const prevStyleRef = useRef(props.style);
-  if (
-    props.style !== prevStyleRef.current &&
-    !shallowEqualRecord(
-      (props.style || {}) as Record<string, unknown>,
-      (prevStyleRef.current || {}) as Record<string, unknown>,
-    )
-  ) {
-    prevStyleRef.current = props.style;
-  }
-  const deps = useMemo(() => [prevStyleRef.current], [prevStyleRef.current]);
+  const stableStyle = shallowEqualRecord(
+    (props.style || {}) as Record<string, unknown>,
+    (prevStyleRef.current || {}) as Record<string, unknown>,
+  )
+    ? prevStyleRef.current
+    : props.style;
+  const deps = useMemo(() => [stableStyle], [stableStyle]);
 
-  // 为 loading 项生成唯一的 key，使用 ref 缓存以确保稳定性
-  const loadingKeysRef = useRef<Map<string, string>>(new Map());
   // 记录每个 index 在上一轮是否是 loading，用于 loading→real 过渡时保持 key 稳定，避免闪动
-  const loadingKeyByIndexRef = useRef<Map<number, string>>(new Map());
+  const loadingKeyByIndexRef = useRef<Map<number, LoadingRowKey>>(new Map());
   // 真实 id 映射到稳定 key（过渡后沿用），避免同一条消息因 id 变化导致 remount
   const realIdToStableKeyRef = useRef<Map<string, string>>(new Map());
-  /** 按列表行稳定 key 缓存合并后的 Bubble styles，避免每条消息每次父级渲染都换引用 */
-  const bubbleMergedStylesRef = useRef<Map<string, BubbleProps['styles']>>(
+  const bubbleMergedStylesRef = useRef<
+    Map<'left' | 'right', BubbleProps['styles']>
+  >(new Map());
+  const bubbleMergedAvatarRef = useRef<Map<string, BubbleListAvatarData>>(
     new Map(),
   );
-  const bubbleMergedAvatarRef = useRef<Map<string, BubbleMetaData>>(new Map());
+  const originDataRef = useRef<Map<string, BubbleListRowData>>(new Map());
 
-  const bubbleListDom = useMemo(() => {
-    const isLazyEnabled = props.lazy?.enable;
-    const totalCount = bubbleList.length;
-    const activeRowKeys = new Set<string>();
-
-    const rows = bubbleList.map((item, index) => {
-      const isLast = bubbleList.length - 1 === index;
-      const placement = item.role === 'user' ? 'right' : 'left';
-      const originDataWithFlags = {
-        ...item,
-        isLatest: isLast,
-        isLast,
-      };
-
-      let itemKey: string;
-      if (item.id === LOADING_FLAT) {
-        const cacheKey = `${index}-${item.createAt || Date.now()}`;
-        if (!loadingKeysRef.current.has(cacheKey)) {
-          loadingKeysRef.current.set(cacheKey, nanoid());
-        }
-        itemKey = loadingKeysRef.current.get(cacheKey)!;
-        loadingKeyByIndexRef.current.set(index, itemKey);
-      } else {
-        const realId = item.id as string;
-        const prevLoadingKey = loadingKeyByIndexRef.current.get(index);
-        if (prevLoadingKey) {
-          itemKey = prevLoadingKey;
-          realIdToStableKeyRef.current.set(realId, prevLoadingKey);
-          loadingKeyByIndexRef.current.delete(index);
-        } else if (realIdToStableKeyRef.current.has(realId)) {
-          itemKey = realIdToStableKeyRef.current.get(realId)!;
-        } else {
-          itemKey = realId;
-        }
-      }
-
-      activeRowKeys.add(itemKey);
-
-      const candidateAvatar = {
-        ...(item.role === 'user' ? userMeta : assistantMeta),
-        ...(item as any).meta,
-      } as BubbleMetaData;
-      const prevAvatar = bubbleMergedAvatarRef.current.get(itemKey);
-      if (
-        !prevAvatar ||
-        !shallowEqualRecord(prevAvatar as any, candidateAvatar as any)
-      ) {
-        bubbleMergedAvatarRef.current.set(itemKey, candidateAvatar);
-      }
-      const mergedAvatar = bubbleMergedAvatarRef.current.get(itemKey)!;
-
-      const candidateStyles: BubbleProps['styles'] = {
+  // 每个布局只合并一次样式，流式消息更新时复用历史行使用的引用。
+  const mergedStyles = useMemo(() => {
+    const nextStyles = new Map<'left' | 'right', BubbleProps['styles']>();
+    for (const placement of ['left', 'right'] as const) {
+      const candidate: BubbleProps['styles'] = {
         ...styles,
         bubbleListItemContentStyle: {
           ...styles?.bubbleListItemContentStyle,
@@ -516,14 +488,77 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
             : styles?.bubbleListLeftItemContentStyle),
         },
       };
-      const prevMergedStyles = bubbleMergedStylesRef.current.get(itemKey);
-      if (
-        !prevMergedStyles ||
-        !shallowEqualStyles(prevMergedStyles, candidateStyles)
-      ) {
-        bubbleMergedStylesRef.current.set(itemKey, candidateStyles);
+      const previous = bubbleMergedStylesRef.current.get(placement);
+      nextStyles.set(
+        placement,
+        shallowEqualStyles(previous, candidate) ? previous : candidate,
+      );
+    }
+    return nextStyles;
+  }, [styles]);
+
+  const rowState = useMemo(() => {
+    const isLazyEnabled = props.lazy?.enable;
+    const totalCount = bubbleList.length;
+    const nextLoadingKeys = new Map<number, LoadingRowKey>();
+    const nextRealKeys = new Map<string, string>();
+    const nextOriginData = new Map<string, BubbleListRowData>();
+    const nextAvatars = new Map<string, BubbleListAvatarData>();
+
+    const rows = bubbleList.map((item, index) => {
+      const isLast = bubbleList.length - 1 === index;
+      const placement = item.role === 'user' ? 'right' : 'left';
+      let itemKey: string;
+      if (item.id === LOADING_FLAT) {
+        const previous = loadingKeyByIndexRef.current.get(index);
+        itemKey =
+          previous && previous.createAt === item.createAt
+            ? previous.key
+            : nanoid();
+        nextLoadingKeys.set(index, { key: itemKey, createAt: item.createAt });
+      } else {
+        const realId = item.id as string;
+        const prevLoadingKey = loadingKeyByIndexRef.current.get(index);
+        itemKey =
+          realIdToStableKeyRef.current.get(realId) ??
+          prevLoadingKey?.key ??
+          realId;
+        nextRealKeys.set(realId, itemKey);
       }
-      const mergedStyles = bubbleMergedStylesRef.current.get(itemKey)!;
+
+      let cachedData = originDataRef.current.get(itemKey);
+      if (cachedData?.source !== item || cachedData.isLast !== isLast) {
+        cachedData = {
+          source: item,
+          isLast,
+          value: { ...item, isLatest: isLast, isLast },
+        };
+      }
+      nextOriginData.set(itemKey, cachedData);
+
+      const baseAvatar = placement === 'right' ? userMeta : assistantMeta;
+      const prevAvatar = bubbleMergedAvatarRef.current.get(itemKey);
+      let mergedAvatar = prevAvatar;
+      if (
+        !prevAvatar ||
+        prevAvatar.base !== baseAvatar ||
+        prevAvatar.meta !== item.meta
+      ) {
+        const candidateAvatar = { ...baseAvatar, ...item.meta };
+        mergedAvatar = {
+          base: baseAvatar,
+          meta: item.meta,
+          value:
+            prevAvatar &&
+            shallowEqualRecord(
+              prevAvatar.value as Record<string, unknown>,
+              candidateAvatar as Record<string, unknown>,
+            )
+              ? prevAvatar.value
+              : candidateAvatar,
+        };
+      }
+      nextAvatars.set(itemKey, mergedAvatar!);
 
       // LazyElement 依赖被观察元素的几何尺寸；display:contents 不产生盒子，会导致
       // IntersectionObserver 在部分环境下永不触发，气泡永远不渲染。
@@ -540,13 +575,11 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
         >
           <Bubble
             data-id={item.id}
-            avatar={mergedAvatar}
+            avatar={mergedAvatar!.value}
             preMessage={bubbleList[index - 1]}
             id={item.id}
-            style={{
-              ...styles?.bubbleListItemStyle,
-            }}
-            originData={originDataWithFlags}
+            style={styles?.bubbleListItemStyle}
+            originData={cachedData.value}
             placement={placement}
             time={item.updateAt || item.createAt}
             deps={deps}
@@ -558,7 +591,7 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
             markdownRenderConfig={markdownRenderConfig}
             docListProps={props.docListProps}
             fileViewConfig={props.fileViewConfig}
-            styles={mergedStyles}
+            styles={mergedStyles.get(placement)}
             readonly={props.readonly}
             onReply={props.onReply}
             onDisLike={props.onDisLike}
@@ -586,18 +619,7 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
       };
     });
 
-    for (const k of bubbleMergedStylesRef.current.keys()) {
-      if (!activeRowKeys.has(k)) {
-        bubbleMergedStylesRef.current.delete(k);
-      }
-    }
-    for (const k of bubbleMergedAvatarRef.current.keys()) {
-      if (!activeRowKeys.has(k)) {
-        bubbleMergedAvatarRef.current.delete(k);
-      }
-    }
-
-    return rows.map(
+    const dom = rows.map(
       ({
         itemKey,
         bubbleElement,
@@ -653,6 +675,13 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
         return bubbleElement;
       },
     );
+    return {
+      dom,
+      loadingKeys: nextLoadingKeys,
+      realKeys: nextRealKeys,
+      originData: nextOriginData,
+      avatars: nextAvatars,
+    };
   }, [
     bubbleList,
     bubbleListRef,
@@ -660,6 +689,7 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
     classNames,
     deps,
     markdownRenderConfig,
+    mergedStyles,
     props.bubbleRef,
     props.docListProps,
     props.lazy,
@@ -680,6 +710,16 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
     userMeta,
     assistantMeta,
   ]);
+
+  // 仅发布已提交的行缓存；被 Suspense 放弃的渲染不能改变当前消息的 key。
+  useLayoutEffect(() => {
+    prevStyleRef.current = stableStyle;
+    bubbleMergedStylesRef.current = mergedStyles;
+    loadingKeyByIndexRef.current = rowState.loadingKeys;
+    realIdToStableKeyRef.current = rowState.realKeys;
+    originDataRef.current = rowState.originData;
+    bubbleMergedAvatarRef.current = rowState.avatars;
+  }, [stableStyle, mergedStyles, rowState]);
 
   if (loading)
     return (
@@ -715,10 +755,12 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
         onWheel={(e) => onWheel?.(e, bubbleListRef?.current ?? null)}
         onTouchMove={(e) => onTouchMove?.(e, bubbleListRef?.current ?? null)}
       >
-        {bubbleListDom}
+        {rowState.dom}
       </div>
     </BubbleConfigContext.Provider>
   );
-};
+});
+
+BubbleList.displayName = 'BubbleList';
 
 export default BubbleList;

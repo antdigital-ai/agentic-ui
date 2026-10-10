@@ -13,7 +13,7 @@ vi.mock('../../../MarkdownRenderer', () => ({
   ),
 }));
 
-vi.mock('../../../', () => ({
+vi.mock('../../../MarkdownEditor', () => ({
   MarkdownEditor: (props: any) => (
     <div
       data-testid="md-editor"

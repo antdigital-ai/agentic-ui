@@ -36,7 +36,7 @@ vi.mock('react-error-boundary', () => ({
   ),
 }));
 
-vi.mock('../..', () => ({
+vi.mock('../../MarkdownEditor', () => ({
   MarkdownEditor: ({ typewriter }: { typewriter?: boolean }) => (
     <div data-testid="markdown-editor">
       Editor

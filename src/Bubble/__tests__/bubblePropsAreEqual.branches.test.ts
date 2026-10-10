@@ -229,14 +229,14 @@ describe('bubblePropsAreEqual branches', () => {
     ).toBe(false);
   });
 
-  it('ignores meta differences when meta does not affect bubble', () => {
+  it('compares custom meta fields used by render callbacks', () => {
     const a = baseProps({
       originData: baseOrigin({ meta: { unknownKey: 'x' } }),
     });
     const b = baseProps({
       originData: baseOrigin({ meta: { unknownKey: 'y' } }),
     });
-    expect(bubblePropsAreEqual(a, b)).toBe(true);
+    expect(bubblePropsAreEqual(a, b)).toBe(false);
   });
 
   it('compares meta when avatar/title/name/description/backgroundColor/metadata present', () => {
@@ -549,13 +549,13 @@ describe('bubblePropsAreEqual branches', () => {
     ).toBe(false);
   });
 
-  it('returns true when meta only differs on non-affecting keys', () => {
+  it('returns false when custom meta fields differ', () => {
     expect(
       bubblePropsAreEqual(
         baseProps({ originData: baseOrigin({ meta: { foo: 1 } as any }) }),
         baseProps({ originData: baseOrigin({ meta: { foo: 2 } as any }) }),
       ),
-    ).toBe(true);
+    ).toBe(false);
   });
 
   it('returns false when meta metadata nested value differs', () => {
@@ -659,7 +659,7 @@ describe('bubblePropsAreEqual istanbul residual', () => {
     ).toBe(false);
   });
 
-  it('meta metadata 空对象不计入 affect', () => {
+  it('compares metadata and custom meta key changes', () => {
     expect(
       bubblePropsAreEqual(
         baseProps({
@@ -669,7 +669,7 @@ describe('bubblePropsAreEqual istanbul residual', () => {
           originData: baseOrigin({ meta: { foo: 1 } as any }),
         }),
       ),
-    ).toBe(true);
+    ).toBe(false);
   });
 
   it('avatar 一侧 null 一侧对象', () => {

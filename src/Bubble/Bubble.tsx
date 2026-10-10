@@ -4,7 +4,7 @@ import React from 'react';
 import { debugInfo } from '../Utils/debugUtils';
 import { AIBubble } from './AIBubble';
 import { bubblePropsAreEqual } from './bubblePropsAreEqual';
-import { useSchemaEditorBridge } from './schema-editor';
+import { useSchemaEditorBridge } from './schema-editor/useSchemaEditorBridge';
 import type { BubbleProps } from './type';
 import { UserBubble } from './UserBubble';
 
@@ -108,9 +108,7 @@ const BubbleComponent: React.FC<
 
   // 使用提前返回优化
   if (isUserMessage) {
-    return (
-      <UserBubble {...bubbleProps} pure={false} {...props.userBubbleProps} />
-    );
+    return <UserBubble {...bubbleProps} {...props.userBubbleProps} />;
   }
 
   return <AIBubble {...bubbleProps} {...aiOverride} />;

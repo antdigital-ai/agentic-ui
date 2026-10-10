@@ -2,10 +2,10 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { PureBubbleList } from '../List/PureBubbleList';
+import { BubbleList } from '../List';
 import type { BubbleProps, MessageBubbleData } from '../type';
 
-describe('PureBubbleList historical messages', () => {
+describe('BubbleList historical messages', () => {
   it('updates only the streaming row while retaining historic content and customization', () => {
     const contentRender = vi.fn((props: BubbleProps) => (
       <p>{props.originData?.content}</p>
@@ -21,7 +21,7 @@ describe('PureBubbleList historical messages', () => {
       }),
     );
     const { rerender } = render(
-      <PureBubbleList
+      <BubbleList
         bubbleList={messages}
         bubbleRenderConfig={bubbleRenderConfig}
       />,
@@ -32,10 +32,7 @@ describe('PureBubbleList historical messages', () => {
       index === 99 ? { ...message, content: 'Streamed content' } : message,
     );
     rerender(
-      <PureBubbleList
-        bubbleList={next}
-        bubbleRenderConfig={bubbleRenderConfig}
-      />,
+      <BubbleList bubbleList={next} bubbleRenderConfig={bubbleRenderConfig} />,
     );
     expect(contentRender).toHaveBeenCalledOnce();
     expect(screen.getByText('Message 0')).toBeInTheDocument();
@@ -43,7 +40,7 @@ describe('PureBubbleList historical messages', () => {
 
     contentRender.mockClear();
     rerender(
-      <PureBubbleList
+      <BubbleList
         bubbleList={next}
         bubbleRenderConfig={bubbleRenderConfig}
         classNames={{

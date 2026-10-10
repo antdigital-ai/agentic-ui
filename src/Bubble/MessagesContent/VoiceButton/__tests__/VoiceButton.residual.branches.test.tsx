@@ -16,7 +16,7 @@ vi.mock('@sofa-design/icons', () => ({
   Pause: () => <span data-testid="pause-icon" />,
 }));
 
-vi.mock('@ant-design/agentic-ui', () => ({
+vi.mock('../../../../Components/lotties/bubble-actions/Play', () => ({
   PlayLottie: () => <span data-testid="play-lottie" />,
 }));
 

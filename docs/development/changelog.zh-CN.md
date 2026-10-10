@@ -49,6 +49,11 @@ group:
 ## 未发布 {#unreleased}
 
 - Bubble
+  - 🛠 移除独立的 `PureBubble`、`PureAIBubble`、`PureUserBubble`、`PureBubbleList` 和 `PureBubbleListProps`，统一使用 `Bubble` / `BubbleList`；简洁样式通过 `pure` 配置。新增 `@ant-design/agentic-ui/Bubble` 按需入口。
+  - 🐞 统一正文配置的优先级，保留 `markdownRenderConfig.initValue` 和显式 `readonly`；正文默认只读，原 Pure 用法需要编辑时请设置 `readonly={false}`。修复扩展消息字段、会话配置及回调变化被 memo 忽略的问题。
+  - ⚡️ 流式更新复用未变的历史消息、样式和上下文；loading 消息使用稳定标识，避免重复挂载与丢失内部状态。
+  - ⚡️ 删除每条用户消息的一层重复容器，稳定正文属性，避免反馈与布局状态变化重复渲染未变正文。
+  - ⚡️ Schema 编辑桥接仅在开发环境按需加载；外部正文更新直接反映在当前渲染，避免旧正文回显与额外渲染。
   - ⚡️ 引用列表仅在展开时挂载条目，折叠或关闭预览时释放隐藏内容；Slate 正文更新复用编辑器同步入口，避免重复解析并保留插件配置。
 
 - MarkdownRenderer

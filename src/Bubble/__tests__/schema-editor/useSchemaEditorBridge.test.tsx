@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SchemaEditorBridgeManager } from '../../schema-editor/SchemaEditorBridgeManager';
 import { useSchemaEditorBridge } from '../../schema-editor/useSchemaEditorBridge';
@@ -73,16 +73,16 @@ describe('useSchemaEditorBridge', () => {
   });
 
   describe('开发环境启用', () => {
-    it('开发环境应该注册到管理器', () => {
+    it('开发环境应该注册到管理器', async () => {
       process.env.NODE_ENV = 'development';
 
       renderHook(() => useSchemaEditorBridge('test-id', 'content'));
 
       const manager = SchemaEditorBridgeManager.getInstance();
-      expect(manager.has('test-id')).toBe(true);
+      await waitFor(() => expect(manager.has('test-id')).toBe(true));
     });
 
-    it('开发环境下 getContent 应返回 contentRef 当前值', () => {
+    it('开发环境下 getContent 应返回 contentRef 当前值', async () => {
       process.env.NODE_ENV = 'development';
 
       const { result } = renderHook(() =>
@@ -90,7 +90,9 @@ describe('useSchemaEditorBridge', () => {
       );
 
       const manager = SchemaEditorBridgeManager.getInstance();
-      expect(manager.getContentById('getcontent-id')).toBe('initial');
+      await waitFor(() =>
+        expect(manager.getContentById('getcontent-id')).toBe('initial'),
+      );
 
       act(() => {
         result.current.setContent('updated');
@@ -116,51 +118,24 @@ describe('useSchemaEditorBridge', () => {
       expect(manager.has('test-id')).toBe(false);
     });
 
-    it('生产环境应该注销已注册的 handler', () => {
-      /** 模拟：先在开发环境注册 handler */
-      const manager = SchemaEditorBridgeManager.getInstance();
-      manager.setEnabled(true);
-      manager.register('prod-test-id', {
-        getContent: () => 'content',
-        setContent: () => {},
-      });
-      expect(manager.has('prod-test-id')).toBe(true);
-
-      /** 切换到生产环境并执行 hook */
+    it('生产环境不创建开发桥接管理器', () => {
       process.env.NODE_ENV = 'production';
-
-      /** 使用 rerender 触发 useEffect */
-      const { rerender } = renderHook(
-        ({ id }: { id: string }) => useSchemaEditorBridge(id, 'content'),
-        { initialProps: { id: 'prod-test-id' } },
-      );
-
-      /** 触发 effect */
-      rerender({ id: 'prod-test-id' });
-
-      /** 应该注销已存在的 handler */
-      expect(manager.has('prod-test-id')).toBe(false);
+      const getInstance = vi.spyOn(SchemaEditorBridgeManager, 'getInstance');
+      renderHook(() => useSchemaEditorBridge('prod-test-id', 'content'));
+      expect(getInstance).not.toHaveBeenCalled();
+      getInstance.mockRestore();
     });
 
-    it('生产环境 effect 应该执行注销逻辑', () => {
-      /** 先手动注册一个 handler */
-      const manager = SchemaEditorBridgeManager.getInstance();
-      manager.setEnabled(true);
-      manager.register('unregister-test', {
-        getContent: () => 'test',
-        setContent: () => {},
-      });
-
-      /** 确认已注册 */
-      expect(manager.has('unregister-test')).toBe(true);
-
-      /** 在生产环境运行 hook */
-      process.env.NODE_ENV = 'production';
-
-      renderHook(() => useSchemaEditorBridge('unregister-test', 'content'));
-
-      /** 验证被注销 */
-      expect(manager.has('unregister-test')).toBe(false);
+    it('异步模块加载前卸载不会注册过期消息', async () => {
+      process.env.NODE_ENV = 'development';
+      const { unmount } = renderHook(() =>
+        useSchemaEditorBridge('unmounted', 'content'),
+      );
+      unmount();
+      await act(async () => {});
+      expect(SchemaEditorBridgeManager.getInstance().has('unmounted')).toBe(
+        false,
+      );
     });
   });
 
@@ -174,7 +149,7 @@ describe('useSchemaEditorBridge', () => {
       expect(manager.getRegistrySize()).toBe(0);
     });
 
-    it('id 变化时应该重新注册', () => {
+    it('id 变化时应该重新注册', async () => {
       process.env.NODE_ENV = 'development';
 
       const { rerender } = renderHook(
@@ -183,17 +158,50 @@ describe('useSchemaEditorBridge', () => {
       );
 
       const manager = SchemaEditorBridgeManager.getInstance();
-      expect(manager.has('id-1')).toBe(true);
+      await waitFor(() => expect(manager.has('id-1')).toBe(true));
 
       rerender({ id: 'id-2' });
 
       /** 旧 id 应该被注销，新 id 应该被注册 */
       expect(manager.has('id-1')).toBe(false);
-      expect(manager.has('id-2')).toBe(true);
+      await waitFor(() => expect(manager.has('id-2')).toBe(true));
     });
   });
 
   describe('initialContent 变化', () => {
+    it('流式更新在当次渲染返回新正文，每次更新只渲染一次', () => {
+      process.env.NODE_ENV = 'production';
+      const rendered: string[] = [];
+      const { rerender } = renderHook(
+        ({ value }: { value: string }) => {
+          const bridge = useSchemaEditorBridge('stream', value);
+          rendered.push(bridge.content);
+          return bridge;
+        },
+        { initialProps: { value: 'first' } },
+      );
+      rendered.length = 0;
+      rerender({ value: 'first token' });
+      expect(rendered).toEqual(['first token']);
+    });
+
+    it('外部更新、切换消息和恢复旧值都不会复活开发工具旧草稿', () => {
+      const { result, rerender } = renderHook(
+        ({ id, value }: { id: string; value: string }) =>
+          useSchemaEditorBridge(id, value),
+        { initialProps: { id: 'first', value: 'original' } },
+      );
+      act(() => result.current.setContent('draft'));
+      expect(result.current.content).toBe('draft');
+      rerender({ id: 'first', value: 'streamed' });
+      expect(result.current.content).toBe('streamed');
+      rerender({ id: 'first', value: 'original' });
+      expect(result.current.content).toBe('original');
+      act(() => result.current.setContent('another draft'));
+      rerender({ id: 'second', value: 'original' });
+      expect(result.current.content).toBe('original');
+    });
+
     it('initialContent 变化时应该更新内部状态', () => {
       const { result, rerender } = renderHook(
         ({ initialContent }: { initialContent: string }) =>
@@ -210,7 +218,7 @@ describe('useSchemaEditorBridge', () => {
   });
 
   describe('组件卸载', () => {
-    it('卸载时应该注销 handler', () => {
+    it('卸载时应该注销 handler', async () => {
       process.env.NODE_ENV = 'development';
 
       const { unmount } = renderHook(() =>
@@ -218,7 +226,7 @@ describe('useSchemaEditorBridge', () => {
       );
 
       const manager = SchemaEditorBridgeManager.getInstance();
-      expect(manager.has('test-id')).toBe(true);
+      await waitFor(() => expect(manager.has('test-id')).toBe(true));
 
       unmount();
 
@@ -227,7 +235,7 @@ describe('useSchemaEditorBridge', () => {
   });
 
   describe('多个 Hook 实例', () => {
-    it('多个实例应该各自独立注册', () => {
+    it('多个实例应该各自独立注册', async () => {
       process.env.NODE_ENV = 'development';
 
       renderHook(() => useSchemaEditorBridge('id-1', 'content 1'));
@@ -235,13 +243,13 @@ describe('useSchemaEditorBridge', () => {
       renderHook(() => useSchemaEditorBridge('id-3', 'content 3'));
 
       const manager = SchemaEditorBridgeManager.getInstance();
-      expect(manager.getRegistrySize()).toBe(3);
+      await waitFor(() => expect(manager.getRegistrySize()).toBe(3));
       expect(manager.has('id-1')).toBe(true);
       expect(manager.has('id-2')).toBe(true);
       expect(manager.has('id-3')).toBe(true);
     });
 
-    it('部分实例卸载不应该影响其他实例', () => {
+    it('部分实例卸载不应该影响其他实例', async () => {
       process.env.NODE_ENV = 'development';
 
       const hook1 = renderHook(() =>
@@ -252,7 +260,7 @@ describe('useSchemaEditorBridge', () => {
       );
 
       const manager = SchemaEditorBridgeManager.getInstance();
-      expect(manager.getRegistrySize()).toBe(2);
+      await waitFor(() => expect(manager.getRegistrySize()).toBe(2));
 
       hook1.unmount();
 
@@ -267,7 +275,7 @@ describe('useSchemaEditorBridge', () => {
   });
 
   describe('边界情况', () => {
-    it('特殊字符 id 应该正常工作', () => {
+    it('特殊字符 id 应该正常工作', async () => {
       process.env.NODE_ENV = 'development';
 
       const specialIds = [
@@ -279,16 +287,16 @@ describe('useSchemaEditorBridge', () => {
         '123-numeric-start',
       ];
 
-      specialIds.forEach((id) => {
+      for (const id of specialIds) {
         const { unmount } = renderHook(() =>
           useSchemaEditorBridge(id, 'content'),
         );
 
         const manager = SchemaEditorBridgeManager.getInstance();
-        expect(manager.has(id)).toBe(true);
+        await waitFor(() => expect(manager.has(id)).toBe(true));
 
         unmount();
-      });
+      }
     });
   });
 });

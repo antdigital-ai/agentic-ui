@@ -19,6 +19,8 @@ import { useMessagesContentStyle } from './style';
 export const LOADING_FLAT = '...';
 const THINKING_FALLBACK_TEXT = '思考中...';
 const THINKING_DOT_INDICES = [0, 1, 2] as const;
+const USER_MESSAGE_CONTENT_STYLE: React.CSSProperties = { color: '#343A45' };
+const BOT_MESSAGE_CONTENT_STYLE: React.CSSProperties = {};
 
 /**
  * BubbleMessageDisplay 组件 - 聊天气泡消息显示组件
@@ -87,6 +89,16 @@ export const BubbleMessageDisplay: React.FC<
   const { hashId } = useMessagesContentStyle(baseChatCls);
 
   const docTagTooltipProps = useAdaptiveTooltipProps('informational');
+  const markdownRenderConfig = useMemo(() => {
+    const mode =
+      props.renderMode ??
+      props.renderType ??
+      props.markdownRenderConfig?.renderMode ??
+      props.markdownRenderConfig?.renderType;
+    return mode
+      ? { ...props.markdownRenderConfig, renderMode: mode }
+      : props.markdownRenderConfig;
+  }, [props.markdownRenderConfig, props.renderMode, props.renderType]);
 
   const funRender = (props: { identifier?: any }) => {
     const node = nodeList.find((item) => item.placeholder === props.identifier);
@@ -113,29 +125,12 @@ export const BubbleMessageDisplay: React.FC<
   ]);
 
   // 处理 beforeContent 和 afterContent
-  const beforeContent = useMemo(() => {
-    return props.bubbleRenderConfig?.beforeMessageRender
-      ? props.bubbleRenderConfig.beforeMessageRender(props, null)
-      : null;
-  }, [
-    props.bubbleRenderConfig?.beforeMessageRender,
-    typing,
-    props.originData,
-    props.originData?.isLast,
-  ]);
-
-  const afterContent = useMemo(() => {
-    const userAfter = props.bubbleRenderConfig?.afterMessageRender
-      ? props.bubbleRenderConfig.afterMessageRender(props, contentAfterDom)
-      : contentAfterDom;
-    return <>{userAfter}</>;
-  }, [
-    props.bubbleRenderConfig?.afterMessageRender,
-    typing,
-    props.originData,
-    props.originData?.isLast,
-    contentAfterDom,
-  ]);
+  const beforeContent = props.bubbleRenderConfig?.beforeMessageRender
+    ? props.bubbleRenderConfig.beforeMessageRender(props, null)
+    : null;
+  const afterContent = props.bubbleRenderConfig?.afterMessageRender
+    ? props.bubbleRenderConfig.afterMessageRender(props, contentAfterDom)
+    : contentAfterDom;
 
   const mdReferenceRender = useRefFunction(
     (mdProps: { children?: React.ReactNode }, _: React.ReactNode) => {
@@ -267,7 +262,8 @@ export const BubbleMessageDisplay: React.FC<
     ],
   );
 
-  const messageContent = useMemo(() => {
+  // 外壳响应所有事件与布局配置；MarkdownPreview 单独缓存开销较大的正文。
+  const messageContent = (() => {
     if (
       content === LOADING_FLAT ||
       (!props.originData?.isFinished && !content)
@@ -412,13 +408,16 @@ export const BubbleMessageDisplay: React.FC<
           onDoubleClick={props.onDoubleClick}
         >
           <MarkdownPreview
+            readonly={readonly}
             beforeContent={beforeContent}
             afterContent={afterContent}
             placement={props.placement}
-            markdownRenderConfig={props.markdownRenderConfig}
+            markdownRenderConfig={markdownRenderConfig}
             isFinished={true}
             style={
-              props.originData?.role === 'bot' ? {} : { color: '#343A45' } // 使用类名方式需要传递className，这里保留style以兼容现有API
+              props.originData?.role === 'bot'
+                ? BOT_MESSAGE_CONTENT_STYLE
+                : USER_MESSAGE_CONTENT_STYLE
             }
             extra={extra}
             typing={false}
@@ -472,7 +471,8 @@ export const BubbleMessageDisplay: React.FC<
 
     return (
       <MarkdownPreview
-        markdownRenderConfig={props.markdownRenderConfig}
+        readonly={readonly}
+        markdownRenderConfig={markdownRenderConfig}
         isFinished={props.originData?.isFinished}
         beforeContent={beforeContent}
         afterContent={afterContent}
@@ -493,18 +493,7 @@ export const BubbleMessageDisplay: React.FC<
         originData={props.originData}
       />
     );
-  }, [
-    content,
-    props.originData?.feedback,
-    props.originData?.isFinished,
-    props.originData?.isAborted,
-    props.originData?.isLast,
-    isExtraNull,
-    props.deps,
-    props.bubbleRenderConfig?.beforeMessageRender,
-    props.bubbleRenderConfig?.afterMessageRender,
-    markdownPreviewFncProps,
-  ]);
+  })();
 
   return messageContent;
 };

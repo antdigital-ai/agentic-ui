@@ -1,9 +1,3 @@
-import {
-  CopyLottie,
-  DislikeLottie,
-  LikeLottie,
-  RefreshLottie,
-} from '@ant-design/agentic-ui';
 import { DislikeFilled, LikeFilled } from '@ant-design/icons';
 import { ConfigProvider, Divider } from 'antd';
 import classNames from 'clsx';
@@ -12,6 +6,10 @@ import copy from 'copy-to-clipboard';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { Loading } from '../../Components/Loading';
+import { CopyLottie } from '../../Components/lotties/bubble-actions/Copy';
+import { DislikeLottie } from '../../Components/lotties/bubble-actions/Dislike';
+import { LikeLottie } from '../../Components/lotties/bubble-actions/Like';
+import { RefreshLottie } from '../../Components/lotties/bubble-actions/Refresh';
 import { useLocale } from '../../I18n';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
 import { BubbleExtraProps } from '../types/BubbleExtra';
@@ -162,6 +160,10 @@ export const BubbleExtra = ({
       feedbackLoading,
       props.onLikeCancel,
       props.onCancelLike,
+      props.onLike,
+      originalData?.feedback,
+      likeButtonTitle,
+      bubble,
     ],
   );
 
@@ -203,6 +205,10 @@ export const BubbleExtra = ({
       alreadyFeedback,
       originalData?.isFinished,
       typing,
+      props.onDislike,
+      props.onDisLike,
+      originalData?.feedback,
+      getDislikeButtonTitle,
     ],
   );
 
@@ -296,7 +302,14 @@ export const BubbleExtra = ({
         useSpeech={props.useSpeech}
       />
     );
-  }, [props.shouldShowVoice, props.useSpeech, bubble.originData?.content]);
+  }, [
+    props.shouldShowVoice,
+    props.useSpeech,
+    bubble.originData?.content,
+    originalData?.extra?.answerStatus,
+    typing,
+    locale,
+  ]);
 
   const dom = useMemo(
     () =>
@@ -361,7 +374,15 @@ export const BubbleExtra = ({
         )}
       </ActionIconBox>
     );
-  }, [originalData?.isAborted, typing, originalData?.isFinished, locale]);
+  }, [
+    originalData?.isAborted,
+    typing,
+    originalData?.isFinished,
+    originalData?.extra?.preMessage?.content,
+    onReply,
+    chatCls,
+    locale,
+  ]);
 
   useEffect(() => {
     props.onRenderExtraNull?.(!dom && !reSend);

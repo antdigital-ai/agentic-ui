@@ -68,10 +68,6 @@ export {
   Bubble,
   BubbleConfigContext,
   MessagesContext,
-  PureAIBubble,
-  PureBubble,
-  PureBubbleList,
-  PureUserBubble,
   SchemaEditorBridgeManager,
   UserBubble,
   mapOllamaMessagesToMessageBubbleData,
@@ -829,4 +825,4 @@ export {
   type SchemaElementEditorConfig,
   type SchemaElementEditorRecording,
   type SchemaValue,
-} from '@schema-element-editor/host-sdk';
+} from './compat/schemaElementEditorHostSdk';

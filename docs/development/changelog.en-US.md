@@ -49,6 +49,11 @@ group:
 ## Unreleased
 
 - Bubble
+  - 🛠 Remove separate `PureBubble`, `PureAIBubble`, `PureUserBubble`, `PureBubbleList`, and `PureBubbleListProps` exports in favor of `Bubble` / `BubbleList`; use `pure` for compact styling. Add the `@ant-design/agentic-ui/Bubble` import entry.
+  - 🐞 Unify content configuration precedence, retaining `markdownRenderConfig.initValue` and explicit `readonly`; content defaults to readonly, so migrated Pure usage needs `readonly={false}` for editing. Fix memo ignoring updated custom message fields, session configuration, and callbacks.
+  - ⚡️ Reuse unchanged historical messages, styles, and context during streaming; stabilize loading message identities to avoid remounting and losing local state.
+  - ⚡️ Remove one redundant wrapper per user message and stabilize content props so feedback and layout changes do not rerender unchanged Markdown.
+  - ⚡️ Load the Schema editing bridge on demand in development only; reflect external content updates in the current render without stale content or an extra render.
   - ⚡️ Mount reference entries only while expanded and release hidden content when collapsing or closing previews; reuse the editor's Slate synchronization to avoid duplicate parsing and retain plugin configuration.
 
 - MarkdownRenderer

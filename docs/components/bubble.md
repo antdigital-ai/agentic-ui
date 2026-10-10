@@ -1253,6 +1253,8 @@ const messageWithFiles: MessageBubbleData = {
 
 为嵌入式场景提供的简洁模式：
 
+所有对话消息统一使用 `Bubble` / `BubbleList`。`pure` 只控制外观，消息更新、反馈、附件与正文渲染共用同一实现。
+
 ```tsx | pure
 // 启用 Pure 模式
 <Bubble pure originData={message} />
@@ -1263,6 +1265,32 @@ const messageWithFiles: MessageBubbleData = {
   <Bubble pure originData={message} />   {/* Pure 模式 */}
 </div>
 ```
+
+独立的 `Pure*` 组件已移除，迁移方式如下：
+
+| 原组件 / 类型         | 替代方式                            |
+| --------------------- | ----------------------------------- |
+| `PureBubble`          | `<Bubble pure />`                   |
+| `PureAIBubble`        | `<Bubble pure placement="left" />`  |
+| `PureUserBubble`      | `<Bubble pure placement="right" />` |
+| `PureBubbleList`      | `<BubbleList pure />`               |
+| `PureBubbleListProps` | `BubbleListProps`                   |
+
+正文默认只读，与普通 `Bubble` 一致。原 `Pure*` 用法如需编辑正文，请显式传入 `readonly={false}`；显式 `readonly` 优先于 `markdownRenderConfig.readonly`，`markdownRenderConfig.initValue` 仍可覆盖消息正文。
+
+可从对话组件入口按需导入，或继续使用包根的具名导入；两种入口均支持 tree shaking：
+
+```tsx | pure
+import { Bubble, BubbleList } from '@ant-design/agentic-ui/Bubble';
+import type {
+  BubbleListProps,
+  BubbleProps,
+} from '@ant-design/agentic-ui/Bubble';
+```
+
+列表更新时复用未改变的消息对象，为变化的消息创建新对象。自定义配置与回调可通过 `useMemo` / `useCallback` 保持稳定，避免流式更新反复渲染历史消息。默认正文保留现有编辑器能力，`pure` 不改变正文依赖或渲染引擎。
+
+在仓库运行 `pnpm run build` 后，可用 `pnpm run bench:bubble-bundle` 验证发布包的按需导入。探针使用临时消费者安装发布产物，分别构建消息、列表和转换工具，统计入口及其全部静态依赖 chunk；React、ReactDOM、Ant Design 和 CSS 不计入字节结果。
 
 **适用场景：**
 

@@ -7,10 +7,7 @@
   "sideEffects": [
     "**/*.css",
     "**/*.less",
-    "**/*.scss",
-    "./dist/MarkdownEditor/editor/utils/sideEffects.js",
-    "./dist/Utils/proxySandbox/index.js",
-    "./dist/Plugins/chart/components/index.js"
+    "**/*.scss"
   ],
   "exports": {
     ".": {
@@ -22,6 +19,16 @@
       "types": "./dist/MarkdownEditor/index.d.ts",
       "import": "./dist/MarkdownEditor/index.js",
       "default": "./dist/MarkdownEditor/index.js"
+    },
+    "./Bubble": {
+      "types": "./dist/Bubble/index.d.ts",
+      "import": "./dist/Bubble/index.js",
+      "default": "./dist/Bubble/index.js"
+    },
+    "./Bubble/List": {
+      "types": "./dist/Bubble/List/index.d.ts",
+      "import": "./dist/Bubble/List/index.js",
+      "default": "./dist/Bubble/List/index.js"
     },
     "./TaskList": {
       "types": "./dist/TaskList/index.d.ts",
@@ -59,6 +66,7 @@
     "guidelines"
   ],
   "scripts": {
+    "bench:bubble-bundle": "node scripts/bench-bubble-bundle.mjs --dist --check",
     "bench:parsemd": "vitest --run src/MarkdownEditor/__tests__/editor/parseMd.benchmark.test.ts",
     "build": "father build",
     "build:watch": "father dev",
