@@ -24,24 +24,6 @@ vi.mock('../../Bubble', () => ({
   ),
 }));
 
-const lazyElementSpy = vi.fn(
-  ({ children, renderPlaceholder, elementInfo }: any) => {
-    if (renderPlaceholder) {
-      renderPlaceholder({
-        height: 100,
-        style: {},
-        isIntersecting: false,
-        elementInfo,
-      });
-    }
-    return <div data-testid="lazy-wrap">{children}</div>;
-  },
-);
-
-vi.mock('../../../MarkdownEditor/editor/components/LazyElement', () => ({
-  LazyElement: (props: any) => lazyElementSpy(props),
-}));
-
 vi.mock('../style', () => ({
   useStyle: () => ({ wrapSSR: (n: any) => n, hashId: 'hash' }),
 }));
@@ -64,7 +46,6 @@ import { BubbleList } from '../index';
 describe('BubbleList deepen residual branches', () => {
   afterEach(() => {
     vi.restoreAllMocks();
-    lazyElementSpy.mockClear();
   });
 
   it('isLoading 渲染 SkeletonList；legacy loading 兼容', () => {
@@ -205,7 +186,7 @@ describe('BubbleList deepen residual branches', () => {
     expect(screen.getByTestId('ai-stable-id')).toHaveTextContent('y');
   });
 
-  it('lazy 启用且 shouldLazyLoad 为 true 时走 LazyElement', () => {
+  it('lazy 启用且 shouldLazyLoad 为 true 时使用行占位符', () => {
     render(
       <BubbleList
         bubbleList={[
@@ -220,8 +201,9 @@ describe('BubbleList deepen residual branches', () => {
         }}
       />,
     );
-    expect(lazyElementSpy).toHaveBeenCalled();
-    expect(screen.getAllByTestId('lazy-wrap').length).toBeGreaterThan(0);
+    expect(
+      document.querySelectorAll('[data-bubble-list-item][aria-hidden="true"]'),
+    ).toHaveLength(2);
   });
 
   it('lazy renderPlaceholder 适配 elementInfo 含 role', () => {
@@ -242,36 +224,16 @@ describe('BubbleList deepen residual branches', () => {
     );
   });
 
-  it('lazy renderPlaceholder 无 elementInfo 时不注入 role', () => {
-    const renderPlaceholder = vi.fn(() => <div data-testid="ph2" />);
-    lazyElementSpy.mockImplementationOnce(({ renderPlaceholder: rp }: any) => {
-      rp?.({
-        height: 50,
-        style: {},
-        isIntersecting: true,
-        elementInfo: undefined,
-      });
-      return <div data-testid="lazy-no-info" />;
-    });
-    render(
-      <BubbleList
-        bubbleList={[{ id: '1', role: 'assistant', content: 'a' } as any]}
-        lazy={{ enable: true, renderPlaceholder }}
-      />,
-    );
-    expect(renderPlaceholder).toHaveBeenCalledWith(
-      expect.objectContaining({ elementInfo: undefined }),
-    );
-  });
-
-  it('lazy shouldLazyLoad 返回 false 时不包裹 LazyElement', () => {
+  it('lazy shouldLazyLoad 返回 false 时直接显示行内容', () => {
     render(
       <BubbleList
         bubbleList={[{ id: '1', role: 'assistant', content: 'a' } as any]}
         lazy={{ enable: true, shouldLazyLoad: () => false }}
       />,
     );
-    expect(screen.queryByTestId('lazy-wrap')).not.toBeInTheDocument();
+    expect(
+      document.querySelector('[data-bubble-list-item][aria-hidden="true"]'),
+    ).not.toBeInTheDocument();
     expect(screen.getByTestId('ai-1')).toBeInTheDocument();
   });
 

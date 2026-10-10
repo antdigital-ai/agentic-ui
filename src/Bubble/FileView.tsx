@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { AttachmentFile } from '../MarkdownInputField/AttachmentButton/types';
 import { FileMapView } from '../MarkdownInputField/FileMapView';
 import { BubbleProps } from './type';
@@ -98,54 +98,78 @@ const createViewAllHandler = (
  * <BubbleFileView bubble={bubbleData} placement="left" />
  * ```
  */
+interface BubbleFileContentProps {
+  fileMap: NonNullable<NonNullable<BubbleProps['originData']>['fileMap']>;
+  fileViewConfig?: BubbleProps['fileViewConfig'];
+  fileViewEvents?: BubbleProps['fileViewEvents'];
+  renderFileMoreAction?: BubbleProps['renderFileMoreAction'];
+  placement: 'left' | 'right';
+}
+
+const BubbleFileContent: React.FC<BubbleFileContentProps> = memo(
+  ({
+    fileMap,
+    fileViewConfig: config,
+    fileViewEvents,
+    renderFileMoreAction,
+    placement,
+  }) => {
+    // null/false 与缺省一样视为空配置（解构默认值只覆盖 undefined）
+    const fileViewConfig = config && typeof config === 'object' ? config : {};
+    const moreAction =
+      fileViewConfig.renderFileMoreAction ?? renderFileMoreAction;
+
+    let events: {
+      onPreview?: (file: AttachmentFile) => void;
+      onDownload?: (file: AttachmentFile) => void;
+      onViewAll?: (files: AttachmentFile[]) => void;
+    } = {};
+    try {
+      events = fileViewEvents?.(defaultHandlers) || {};
+    } catch {
+      console.warn('fileViewEvents execution failed');
+    }
+
+    return (
+      <FileMapView
+        className={fileViewConfig.className}
+        style={fileViewConfig.style}
+        maxDisplayCount={fileViewConfig.maxDisplayCount}
+        showMoreButton={fileViewConfig.showMoreButton}
+        onPreview={events.onPreview}
+        onFileClick={fileViewConfig.onFileClick}
+        disableDefaultFileClick={fileViewConfig.disableDefaultFileClick}
+        itemRender={fileViewConfig.itemRender}
+        onDownload={events.onDownload}
+        onViewAll={createViewAllHandler(events.onViewAll)}
+        renderMoreAction={
+          moreAction
+            ? (file) =>
+                renderMoreAction(moreAction as RenderMoreActionConfig, file)
+            : undefined
+        }
+        customSlot={fileViewConfig.customSlot}
+        placement={placement}
+        fileMap={fileMap}
+        data-testid="file-item"
+      />
+    );
+  },
+);
+
 export const BubbleFileView: React.FC<BubbleFileViewProps> = ({
   bubble,
   placement,
 }) => {
-  const { originData, fileViewEvents } = bubble;
-  // null/false 与缺省一样视为空配置（解构默认值只覆盖 undefined）
-  const fileViewConfig =
-    bubble.fileViewConfig && typeof bubble.fileViewConfig === 'object'
-      ? bubble.fileViewConfig
-      : {};
-
-  if (!originData?.fileMap || originData.fileMap.size === 0) return null;
-
-  let events: {
-    onPreview?: (file: AttachmentFile) => void;
-    onDownload?: (file: AttachmentFile) => void;
-    onViewAll?: (files: AttachmentFile[]) => void;
-  } = {};
-  try {
-    events = fileViewEvents?.(defaultHandlers) || {};
-  } catch {
-    console.warn('fileViewEvents execution failed');
-  }
-
+  const fileMap = bubble.originData?.fileMap;
+  if (!fileMap || fileMap.size === 0) return null;
   return (
-    <FileMapView
-      className={fileViewConfig.className}
-      style={fileViewConfig.style}
-      maxDisplayCount={fileViewConfig.maxDisplayCount}
-      showMoreButton={fileViewConfig.showMoreButton}
-      onPreview={events.onPreview}
-      onFileClick={fileViewConfig.onFileClick}
-      disableDefaultFileClick={fileViewConfig.disableDefaultFileClick}
-      onDownload={events.onDownload}
-      onViewAll={createViewAllHandler(events.onViewAll)}
-      renderMoreAction={
-        fileViewConfig.renderFileMoreAction
-          ? (file) =>
-              renderMoreAction(
-                fileViewConfig.renderFileMoreAction as RenderMoreActionConfig,
-                file,
-              )
-          : undefined
-      }
-      customSlot={fileViewConfig.customSlot}
+    <BubbleFileContent
+      fileMap={fileMap}
+      fileViewConfig={bubble.fileViewConfig}
+      fileViewEvents={bubble.fileViewEvents}
+      renderFileMoreAction={bubble.renderFileMoreAction}
       placement={placement}
-      fileMap={originData.fileMap}
-      data-testid="file-item"
     />
   );
 };

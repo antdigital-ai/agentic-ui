@@ -37,9 +37,9 @@ vi.mock('../EXCEPTION', () => ({
   EXCEPTION: () => <div data-testid="exception-d8" />,
 }));
 
-vi.mock('../../../MarkdownEditor', () => ({
-  MarkdownEditor: ({ initValue }: any) => (
-    <div data-testid="ref-editor-d8">{initValue}</div>
+vi.mock('../../../MarkdownRenderer', () => ({
+  MarkdownRenderer: ({ content }: any) => (
+    <div data-testid="ref-editor-d8">{content}</div>
   ),
 }));
 

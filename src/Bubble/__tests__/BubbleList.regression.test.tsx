@@ -271,14 +271,12 @@ describe('BubbleList regression', () => {
     });
   });
 
-  it('流式消息更新时复用历史行正文、头像和样式引用', () => {
+  it('流式消息更新时复用历史行元素并跳过其渲染', () => {
     const historic = createBubble('history', 'assistant', 'history');
     const streaming = createBubble('streaming', 'assistant', 'initial');
     const messages = [historic, streaming];
     const { rerender } = render(<BubbleList bubbleList={messages} />);
-    const previous = mockState.renderedProps.find(
-      (props) => props.id === historic.id,
-    )!;
+    const historicElement = screen.getByTestId('mock-bubble-history');
     mockState.renderedProps = [];
 
     rerender(
@@ -286,12 +284,10 @@ describe('BubbleList regression', () => {
         bubbleList={[historic, { ...streaming, content: 'updated' }]}
       />,
     );
-    const next = mockState.renderedProps.find(
-      (props) => props.id === historic.id,
-    )!;
-    expect(next.originData).toBe(previous.originData);
-    expect(next.avatar).toBe(previous.avatar);
-    expect(next.styles).toBe(previous.styles);
+    expect(mockState.renderedProps.map((props) => props.id)).toEqual([
+      'streaming',
+    ]);
+    expect(screen.getByTestId('mock-bubble-history')).toBe(historicElement);
   });
 
   describe('renderMode / renderType 合并优先级', () => {

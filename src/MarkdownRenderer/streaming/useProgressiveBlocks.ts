@@ -59,8 +59,11 @@ export function useProgressiveBlocks(
   if (totalChanged || streamingChanged || generationChanged) {
     // 同一文档追加内容或结束流式时，保留已挂载块。重置到首批会使后部
     // 代码、图表和媒体卸载后再次挂载；仅整体修订才重新开始分帧。
-    visibleCount =
-      generationChanged || streaming || totalBlocks <= PROGRESSIVE_THRESHOLD
+    const completedStream =
+      streamingChanged && state.lastStreaming && !generationChanged;
+    visibleCount = completedStream
+      ? totalBlocks
+      : generationChanged || streaming || totalBlocks <= PROGRESSIVE_THRESHOLD
         ? computeResetVisibleCount(totalBlocks, streaming)
         : Math.min(totalBlocks, Math.max(INITIAL_BATCH, state.visibleCount));
     setState({

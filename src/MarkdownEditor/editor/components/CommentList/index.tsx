@@ -8,14 +8,10 @@ import { Avatar, ConfigProvider, Popconfirm, Tooltip } from 'antd';
 import classNames from 'clsx';
 import dayjs from 'dayjs';
 import React, { useContext } from 'react';
-import { Transforms } from 'slate';
-import {
-  CommentDataType,
-  MarkdownEditorProps,
-} from '../../../BaseMarkdownEditor';
+import type { CommentDataType, MarkdownEditorProps } from '../../../types';
 
 import { I18nContext } from '../../../../I18n';
-import { EditorStoreContext, useEditorStore } from '../../store';
+import { EditorStoreContext, useEditorStore } from '../../editorStoreContext';
 import { useStyle } from './style';
 
 /**
@@ -185,9 +181,12 @@ export const CommentList: React.FC<{
                             e?.preventDefault();
                             try {
                               await props.comment?.onDelete?.(item.id, item);
+                              const editor = markdownEditorRef.current;
+                              if (!editor) return;
+                              const { Transforms } = await import('slate');
                               // 更新时间戳,触发一下dom的rerender，不然不给我更新
                               Transforms.setNodes(
-                                markdownEditorRef.current,
+                                editor,
                                 {
                                   updateTimestamp: Date.now(),
                                 },

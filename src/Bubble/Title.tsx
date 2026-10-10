@@ -9,6 +9,7 @@ import {
 } from '../Hooks/useStyle';
 import { formatTime } from '../Utils/formatTime';
 import { BubbleProps, MessageBubbleData } from './type';
+import { hasRenderableContent } from './utils/hasRenderableContent';
 
 const TITLE_GAP = 8;
 
@@ -36,6 +37,8 @@ export interface TitleProps {
   style?: React.CSSProperties;
   /** 气泡名称类名 */
   bubbleNameClassName?: string;
+  /** 名称区域样式 */
+  bubbleNameStyle?: React.CSSProperties;
   /** 引用内容 */
   quote?: React.ReactNode;
 }
@@ -47,13 +50,20 @@ const genStyle: GenStyleFn<'BubbleTitle'> = (token) => {
       letterSpacing: ['var(--letter-spacing-h6-base, normal)', 'normal'],
       textAlign: 'justify',
       color: 'var(--color-gray-text-default)',
+      '&-name': {
+        fontWeight: 600,
+        fontSize: '1em',
+        color: 'var(--color-gray-text-default)',
+        display: 'flex',
+        alignItems: 'center',
+      },
       '&-time': {
         visibility: 'hidden',
         font: 'var(--font-text-body-sm)',
         letterSpacing: 'var(--letter-spacing-body-sm, normal)',
         color: 'var(--color-gray-text-light)',
       },
-      '&:hover': {
+      '&:hover, &:focus-within': {
         [`${token.componentCls}-time`]: {
           visibility: 'visible',
         },
@@ -86,17 +96,22 @@ const useStyle = (prefixCls?: string) => {
  * />
  * ```
  */
-export const BubbleTitle: React.FC<TitleProps> = ({
+const BubbleTitleComponent: React.FC<TitleProps> = ({
   style,
-  prefixClass,
+  prefixClass = 'BubbleTitle',
   className,
   placement,
   time,
   bubbleNameClassName,
+  bubbleNameStyle,
   quote,
   title,
 }) => {
   const { hashId } = useStyle(prefixClass);
+  const hasTitle = hasRenderableContent(title);
+  const hasTime = time !== undefined && time !== null;
+  if (!hasTitle && !hasTime)
+    return hasRenderableContent(quote) ? <>{quote}</> : null;
 
   const flexStyle: React.CSSProperties = {
     flexDirection: getFlexDirection(placement),
@@ -113,8 +128,15 @@ export const BubbleTitle: React.FC<TitleProps> = ({
         gap={TITLE_GAP}
         data-testid="bubble-title"
       >
-        {title && <span className={bubbleNameClassName}>{title}</span>}
-        {time && (
+        {hasTitle && (
+          <span
+            className={classNames(`${prefixClass}-name`, bubbleNameClassName)}
+            style={bubbleNameStyle}
+          >
+            {title}
+          </span>
+        )}
+        {hasTime && (
           <time
             className={classNames(`${prefixClass}-time`, hashId)}
             data-testid="bubble-time"
@@ -127,3 +149,6 @@ export const BubbleTitle: React.FC<TitleProps> = ({
     </>
   );
 };
+
+export const BubbleTitle = React.memo(BubbleTitleComponent);
+BubbleTitle.displayName = 'BubbleTitle';

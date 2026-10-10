@@ -1,4 +1,4 @@
-import { memo, MutableRefObject, useMemo } from 'react';
+import { memo, useMemo } from 'react';
 
 import React from 'react';
 import { debugInfo } from '../Utils/debugUtils';
@@ -58,7 +58,6 @@ import { UserBubble } from './UserBubble';
 const BubbleComponent: React.FC<
   BubbleProps & {
     deps?: any[];
-    bubbleRef?: MutableRefObject<any | null | undefined>;
   }
 > = (props) => {
   const { originData } = props;

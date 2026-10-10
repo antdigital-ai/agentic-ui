@@ -52,6 +52,11 @@ describe('media DOM budget', () => {
       );
       expect(container.querySelectorAll('video')).toHaveLength(50);
       expect(
+        Array.from(container.querySelectorAll('video')).every(
+          (player) => player.preload === (readonly ? 'none' : 'metadata'),
+        ),
+      ).toBe(true);
+      expect(
         roots.every(
           (root) =>
             root.querySelectorAll('[data-slate-node="text"]').length === 1,

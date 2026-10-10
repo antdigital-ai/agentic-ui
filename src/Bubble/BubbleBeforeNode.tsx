@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import {
   ThoughtChainList,
   WhiteBoxProcessInterface,
@@ -6,20 +6,13 @@ import {
 import { BubbleConfigContext } from './BubbleConfigProvide';
 import { BubbleProps } from './type';
 
-type BubbleBeforeNodeProps = {
-  bubble: BubbleProps<{
-    content: string;
-    uuid: number;
-    extra: {
-      white_box_process: WhiteBoxProcessInterface[] | WhiteBoxProcessInterface;
-      preMessage: {
-        content: string;
-      };
-    };
-  }>;
+interface BubbleBeforeNodeProps {
+  bubble: BubbleProps;
   className?: string;
   style?: React.CSSProperties;
-};
+  /** @internal Already normalized by the parent bubble. */
+  taskList?: WhiteBoxProcessInterface[];
+}
 
 const DEFAULT_TASK_LIST = [{ info: '理解问题' }];
 
@@ -59,9 +52,34 @@ export const BubbleBeforeNode: React.FC<BubbleBeforeNodeProps> = ({
   bubble,
   className,
   style,
+  taskList: normalizedTaskList,
 }) => {
   const context = useContext(BubbleConfigContext);
   const { placement, originData } = bubble;
+  const whiteBoxProcess = originData?.extra?.white_box_process;
+  const taskList = useMemo(
+    () => normalizedTaskList ?? getTaskList(whiteBoxProcess),
+    [normalizedTaskList, whiteBoxProcess],
+  );
+  const isFinished = originData?.isFinished || originData?.isAborted;
+  // The built-in chain only reads lifecycle fields. Keep body tokens out of
+  // its memo boundary while custom title renderers retain the whole message.
+  const statusBubble = useMemo(
+    () => ({
+      id: originData?.id,
+      isFinished,
+      isAborted: originData?.isAborted,
+      createAt: originData?.createAt,
+      endTime: originData?.endTime,
+    }),
+    [
+      originData?.id,
+      isFinished,
+      originData?.isAborted,
+      originData?.createAt,
+      originData?.endTime,
+    ],
+  );
 
   if (
     !canRenderThoughtChain(
@@ -73,31 +91,27 @@ export const BubbleBeforeNode: React.FC<BubbleBeforeNodeProps> = ({
     return null;
   }
 
-  const taskList = getTaskList(originData?.extra?.white_box_process);
-
   if (taskList.length < 1 && !context?.thoughtChain?.alwaysRender) {
     return null;
   }
 
   if (context?.thoughtChain?.render) {
-    // BubbleConfigContext.thoughtChain.render 形参声明为 BubbleProps<Record<string, any>>，
-    // 此处 bubble 的 T 是其更具体的子集（含 white_box_process 等字段），TS 默认不允许直接转换；
-    // 但运行时只读取 BubbleProps 的公共字段，因此用 unknown 中间断言安全消除类型差异。
-    return context.thoughtChain.render(
-      bubble as unknown as Parameters<typeof context.thoughtChain.render>[0],
-      taskList.join(','),
-    );
+    return context.thoughtChain.render(bubble, taskList.join(','));
   }
 
-  const isFinished = originData?.isFinished || originData?.isAborted;
   const isLoading = originData?.content === '...';
+  const chainBubble =
+    context?.thoughtChain?.titleRender ||
+    context?.thoughtChain?.titleExtraRender
+      ? { ...originData, isFinished }
+      : statusBubble;
 
   return (
     <ThoughtChainList
       {...context?.thoughtChain}
       className={className}
       style={style}
-      bubble={{ ...originData, isFinished }}
+      bubble={chainBubble}
       finishAutoCollapse={true}
       thoughtChainList={taskList.length ? taskList : DEFAULT_TASK_LIST}
       loading={isLoading}

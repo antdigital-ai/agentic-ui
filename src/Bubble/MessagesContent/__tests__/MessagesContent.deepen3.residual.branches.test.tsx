@@ -83,7 +83,7 @@ describe('MessagesContent deepen3 residual branches', () => {
     );
   });
 
-  it('EXCEPTION + isExtraNull：extra 为 null', async () => {
+  it('EXCEPTION 空操作栏仍保留组件以响应后续配置', async () => {
     render(
       <BubbleMessageDisplay
         placement="left"
@@ -102,7 +102,8 @@ describe('MessagesContent deepen3 residual branches', () => {
     await act(async () => {
       fireEvent.click(screen.getByText('null-extra'));
     });
-    expect(screen.getByTestId('ex-extra')).toHaveTextContent('null');
+    expect(screen.getByTestId('ex-extra')).toHaveTextContent('set');
+    expect(screen.getByText('null-extra')).toBeInTheDocument();
   });
 
   it('finished + EXCEPTION：content 空走 generateFailed 回退链', () => {

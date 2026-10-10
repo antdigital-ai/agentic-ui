@@ -317,7 +317,7 @@ describe('DocInfoList', () => {
       expect(onOriginUrlClick).toHaveBeenCalledWith('https://example.com/doc1');
     });
 
-    it('点击列表项且无 originUrl 时应调用 window.open (215)', async () => {
+    it('点击没有 originUrl 的列表项不打开空白窗口', async () => {
       const user = userEvent.setup();
       const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
       renderExpanded(
@@ -337,7 +337,7 @@ describe('DocInfoList', () => {
         .getByText('No url doc')
         .closest('[class*="list-item"]');
       await user.click(item!);
-      expect(openSpy).toHaveBeenCalledWith(undefined);
+      expect(openSpy).not.toHaveBeenCalled();
       openSpy.mockRestore();
     });
 

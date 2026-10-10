@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { BubbleAvatar } from '../Avatar';
@@ -50,5 +50,100 @@ describe('BubbleAvatar', () => {
     expect(screen.getByTestId('bubble-avatar').className).toContain(
       'my-avatar',
     );
+  });
+
+  it.each(['😊', 'AB', 'https://example.com/avatar.png'])(
+    'supports keyboard activation without an extra wrapper for %s',
+    (avatar) => {
+      const onClick = vi.fn();
+      const onKeyDown = vi.fn();
+      const { container } = render(
+        <BubbleAvatar
+          avatar={avatar}
+          onClick={onClick}
+          onKeyDown={onKeyDown}
+          aria-label="Open user"
+        />,
+      );
+      const control = screen.getByRole('button', { name: 'Open user' });
+      expect(container.firstElementChild).toBe(control);
+      expect(control).toHaveAttribute('tabindex', '0');
+      fireEvent.keyDown(control, { key: 'Enter' });
+      fireEvent.keyDown(control, { key: ' ' });
+      fireEvent.keyDown(control, { key: 'ArrowDown' });
+      expect(onClick).toHaveBeenCalledTimes(2);
+      expect(onKeyDown).toHaveBeenCalledTimes(3);
+    },
+  );
+
+  it('preserves emoji semantic class names, styles and clicks on its existing node', () => {
+    const onClick = vi.fn();
+    const { container } = render(
+      <BubbleAvatar
+        avatar="😊"
+        className="custom-avatar"
+        style={{ color: 'red' }}
+        onClick={onClick}
+      />,
+    );
+    const avatar = screen.getByTestId('bubble-avatar');
+    expect(avatar).toHaveClass('custom-avatar');
+    expect(avatar).toHaveStyle({ color: 'red' });
+    expect(container.querySelectorAll('*')).toHaveLength(1);
+    fireEvent.click(avatar);
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('allows callers to intercept keyboard activation and keeps decorative avatars out of the tab order', () => {
+    const onClick = vi.fn();
+    const { rerender } = render(
+      <BubbleAvatar
+        avatar="😊"
+        onClick={onClick}
+        onKeyDown={(event) => event.preventDefault()}
+      />,
+    );
+    fireEvent.keyDown(screen.getByTestId('bubble-avatar'), { key: 'Enter' });
+    expect(onClick).not.toHaveBeenCalled();
+    rerender(<BubbleAvatar avatar="😊" />);
+    expect(screen.getByTestId('bubble-avatar')).not.toHaveAttribute('role');
+    expect(screen.getByTestId('bubble-avatar')).not.toHaveAttribute('tabindex');
+  });
+
+  it('uses the title as a fallback instead of displaying undefined initials', () => {
+    const { rerender } = render(<BubbleAvatar title="Assistant" />);
+    expect(screen.getByTestId('bubble-avatar')).toHaveTextContent('AS');
+    rerender(<BubbleAvatar />);
+    expect(screen.getByTestId('bubble-avatar')).not.toHaveTextContent('UN');
+  });
+
+  it.each(['😊', 'AB', 'https://example.com/avatar.png'])(
+    'applies the configured background while allowing style overrides for %s',
+    (avatar) => {
+      const { rerender } = render(
+        <BubbleAvatar avatar={avatar} background="red" />,
+      );
+      const node = screen.getByTestId('bubble-avatar');
+      expect(node.style.backgroundColor).toBe('red');
+      expect(node).not.toHaveAttribute('background');
+      rerender(
+        <BubbleAvatar
+          avatar={avatar}
+          background="red"
+          style={{ backgroundColor: 'blue' }}
+        />,
+      );
+      expect(node.style.backgroundColor).toBe('blue');
+    },
+  );
+
+  it('ignores repeated keyboard activation and preserves a custom tab order', () => {
+    const onClick = vi.fn();
+    render(<BubbleAvatar avatar="😊" onClick={onClick} tabIndex={3} />);
+    const avatar = screen.getByTestId('bubble-avatar');
+    expect(avatar).toHaveAttribute('tabindex', '3');
+    fireEvent.keyDown(avatar, { key: 'Enter', repeat: true });
+    fireEvent.keyDown(avatar, { key: ' ', repeat: true });
+    expect(onClick).not.toHaveBeenCalled();
   });
 });

@@ -20,10 +20,6 @@ vi.mock('../../Bubble', () => ({
   ),
 }));
 
-vi.mock('../../MarkdownEditor/editor/components/LazyElement', () => ({
-  LazyElement: ({ children }: any) => <>{children}</>,
-}));
-
 vi.mock('../style', () => ({
   useStyle: () => ({ wrapSSR: (n: any) => n, hashId: 'h' }),
 }));

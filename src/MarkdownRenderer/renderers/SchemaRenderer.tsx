@@ -47,11 +47,21 @@ export const SchemaBlockRenderer: React.FC<
   }
 > = (props) => {
   const { children, language, apaasifyRender, editorCodeProps } = props;
-  const code = extractBlockTextContent(children);
+  const code = useMemo(() => extractBlockTextContent(children), [children]);
 
   const schemaValue = useMemo<SchemaValue>(
     () => parseSchemaJson(code) as SchemaValue,
     [code],
+  );
+  const initialValues = useMemo(
+    () => extractInitialValues(schemaValue),
+    [schemaValue],
+  );
+  const hasApaasifyRender = !!apaasifyRender;
+  const hiddenJson = useMemo(
+    () =>
+      hasApaasifyRender ? JSON.stringify(schemaValue, null, 2) : undefined,
+    [schemaValue, hasApaasifyRender],
   );
 
   const applyCodeRender = (
@@ -134,7 +144,7 @@ export const SchemaBlockRenderer: React.FC<
               overflow: 'hidden',
             }}
           >
-            {JSON.stringify(schemaValue, null, 2)}
+            {hiddenJson}
           </div>
         </div>
       );
@@ -151,7 +161,7 @@ export const SchemaBlockRenderer: React.FC<
       >
         <SchemaRenderer
           schema={schemaValue as LowCodeSchema}
-          values={extractInitialValues(schemaValue) as Record<string, any>}
+          values={initialValues}
           useDefaultValues={false}
           debug={false}
           fallbackContent={null}
@@ -165,7 +175,7 @@ export const SchemaBlockRenderer: React.FC<
     <div data-testid="schema-renderer" style={{ padding: '0.5em' }}>
       <SchemaRenderer
         schema={schemaValue as LowCodeSchema}
-        values={extractInitialValues(schemaValue) as Record<string, any>}
+        values={initialValues}
         useDefaultValues={false}
         debug={false}
         fallbackContent={null}

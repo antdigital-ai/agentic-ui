@@ -70,17 +70,18 @@ export class ContentThrottle {
       if (this.displayedLength < content.length) this.ensureTicking();
       return;
     }
-    // O(1) 前缀探测：长度足够且边界字符匹配即视为前缀延伸；否则按 reset 处理。
+    // A matching boundary character is insufficient: a revised answer can
+    // have the same character at that position but a different visible prefix.
     const stillPrefix =
       content.length >= this.displayedLength &&
-      (this.displayedLength === 0 ||
-        content.charCodeAt(this.displayedLength - 1) ===
-          this.fullContent.charCodeAt(this.displayedLength - 1));
+      content.slice(0, this.displayedLength) ===
+        this.fullContent.slice(0, this.displayedLength);
     if (!stillPrefix) {
       this.displayedLength = 0;
     }
     this.fullContent = content;
     if (this.displayedLength >= content.length) {
+      this.cancelAllTicks();
       this.onFlush(content);
       return;
     }

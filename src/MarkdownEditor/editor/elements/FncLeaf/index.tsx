@@ -1,10 +1,11 @@
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import React, { CSSProperties, useContext, useMemo, useState } from 'react';
-import { RenderLeafProps } from 'slate-react';
+import type { RenderLeafProps } from 'slate-react';
 
 import { useRefFunction } from '../../../../Hooks/useRefFunction';
 import { isMobileDevice } from '../../../../MarkdownInputField/AttachmentButton/utils';
+import type { FootnoteDefinitionNode } from '../../../el';
 import { MarkdownEditorProps } from '../../../types';
 import { EditorStoreContext } from '../../editorStoreContext';
 import {
@@ -12,14 +13,20 @@ import {
   formatFootnoteRefDisplayLabel,
   resolveFootnoteRefIdentifier,
 } from '../../utils/footnoteDisplay';
-import { dragStart } from '../index';
 import { FncLeafMobileModal } from './FncLeafMobileModal';
+
+const preventFootnoteDrag = (event: React.DragEvent) => {
+  event.preventDefault();
+  event.stopPropagation();
+};
 
 interface FncLeafProps extends RenderLeafProps {
   fncProps: MarkdownEditorProps['fncProps'];
   linkConfig?: MarkdownEditorProps['linkConfig'];
   style?: CSSProperties;
   prefixClassName?: string;
+  /** Definition supplied by the readonly Markdown renderer. */
+  definition?: FootnoteDefinitionNode;
 }
 
 /**
@@ -33,13 +40,16 @@ export const FncLeaf = ({
   linkConfig,
   style = {},
   prefixClassName = '',
+  definition,
 }: FncLeafProps) => {
   const context = useContext(ConfigProvider.ConfigContext);
   const mdEditorBaseClass = context?.getPrefixCls('agentic-md-editor-content');
   const isMobile = isMobileDevice();
   const hasFnc = leaf.fnc || leaf.identifier;
   const store = useContext(EditorStoreContext)?.store;
-  const [mobileModalOpen, setMobileModalOpen] = useState(false);
+  const [mobileModalState, setMobileModalState] = useState<
+    'unmounted' | 'open' | 'closed'
+  >('unmounted');
 
   const resolvedIdentifier = useMemo(
     () => resolveFootnoteRefIdentifier(leaf.text, leaf.identifier),
@@ -47,11 +57,12 @@ export const FncLeaf = ({
   );
 
   const footnoteDefinition = useMemo(() => {
+    if (definition) return definition;
     if (!resolvedIdentifier || !store?.footnoteDefinitionMap?.get) {
       return undefined;
     }
     return store.footnoteDefinitionMap.get(resolvedIdentifier);
-  }, [resolvedIdentifier, store?.footnoteDefinitionMap]);
+  }, [definition, resolvedIdentifier, store?.footnoteDefinitionMap]);
 
   const fncClassName = useMemo(
     () =>
@@ -97,7 +108,7 @@ export const FncLeaf = ({
     if (isMobile && hasFnc) {
       e.preventDefault();
       e.stopPropagation();
-      setMobileModalOpen(true);
+      setMobileModalState('open');
       fncProps?.onOriginUrlClick?.(leaf?.identifier);
       return;
     }
@@ -131,7 +142,7 @@ export const FncLeaf = ({
       {...attributes}
       data-be="text"
       draggable={false}
-      onDragStart={dragStart}
+      onDragStart={preventFootnoteDrag}
       onClick={handleClick}
       contentEditable={leaf.fnc ? false : undefined}
       data-fnc={leaf.fnc || leaf.identifier ? 'fnc' : undefined}
@@ -162,10 +173,10 @@ export const FncLeaf = ({
   return (
     <>
       {dom}
-      {isMobile && hasFnc ? (
+      {isMobile && hasFnc && mobileModalState !== 'unmounted' ? (
         <FncLeafMobileModal
-          open={mobileModalOpen}
-          onClose={() => setMobileModalOpen(false)}
+          open={mobileModalState === 'open'}
+          onClose={() => setMobileModalState('closed')}
           displayLabel={displayLabel}
           identifier={resolvedIdentifier}
           definition={footnoteDefinition}

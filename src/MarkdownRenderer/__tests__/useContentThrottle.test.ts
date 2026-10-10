@@ -104,4 +104,32 @@ describe('useContentThrottle', () => {
 
     expect(result.current).toBe('disabled content');
   });
+
+  it('restarting with empty content clears the previous message before the next token', async () => {
+    const snapshots: string[] = [];
+    const { result, rerender } = renderHook(
+      ({ content, enabled }) => {
+        const displayed = useContentThrottle(content, enabled, {
+          charsPerFrame: 1,
+        });
+        snapshots.push(displayed);
+        return displayed;
+      },
+      { initialProps: { content: 'Previous answer', enabled: false } },
+    );
+    expect(result.current).toBe('Previous answer');
+    snapshots.length = 0;
+    rerender({ content: '', enabled: true });
+    expect(result.current).toBe('');
+    expect(snapshots.every((displayed) => displayed === '')).toBe(true);
+
+    snapshots.length = 0;
+    rerender({ content: 'New answer', enabled: true });
+    expect(result.current).toBe('');
+    expect(snapshots).not.toContain('Previous answer');
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(16);
+    });
+    expect(result.current).toBe('N');
+  });
 });

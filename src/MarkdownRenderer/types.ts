@@ -76,6 +76,8 @@ export interface MarkdownRendererProps {
   style?: React.CSSProperties;
   prefixCls?: string;
   codeProps?: MarkdownEditorProps['codeProps'];
+  /** 原生只读表格预览；点击全屏后才挂载弹窗，无编辑器实例 */
+  tableConfig?: MarkdownRendererTableConfig;
   fncProps?: MarkdownEditorProps['fncProps'];
   linkConfig?: {
     /** 默认 true */
@@ -93,6 +95,13 @@ export interface MarkdownRendererProps {
     props: MarkdownRendererEleProps,
     defaultDom: React.ReactNode,
   ) => React.ReactNode;
+}
+
+export interface MarkdownRendererTableConfig {
+  actions?: {
+    fullScreen?: 'modal' | 'drawer';
+  };
+  previewTitle?: string;
 }
 
 export interface MarkdownRendererRef {

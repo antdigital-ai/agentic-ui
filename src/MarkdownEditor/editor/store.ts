@@ -22,7 +22,6 @@ import { ReactEditor } from 'slate-react';
 import type { Elements, FootnoteDefinitionNode, ListNode } from '../el';
 import type { MarkdownEditorPlugin } from '../plugin';
 import { CommentDataType, MarkdownEditorProps } from '../types';
-import { EditorStoreContext } from './editorStoreContext';
 import type { ParserMarkdownToSlateNodeConfig } from './parser/parserMarkdownToSlateNode';
 import { parserMdToSchema } from './parser/parserMdToSchema';
 import { parserSlateNodeToMarkdown } from './parser/parserSlateNodeToMarkdown';
@@ -34,9 +33,7 @@ import { KeyboardTask, Methods } from './utils/keyboard';
 import type { MarkdownToHtmlOptions } from './utils/markdownToHtml';
 import { markdownToHtmlSync } from './utils/markdownToHtml';
 
-export { EditorStoreContext };
-
-const { useContext } = React;
+export { EditorStoreContext, useEditorStore } from './editorStoreContext';
 
 /**
  * 编辑器上下文接口
@@ -102,28 +99,6 @@ export interface EditorStoreContextType {
   /** Markdown容器引用 */
   markdownContainerRef: React.MutableRefObject<HTMLDivElement | null>;
 }
-
-/**
- * 获取编辑器存储上下文的Hook
- *
- * 提供安全的上下文访问，包含默认值处理
- *
- * @returns 编辑器存储上下文对象
- *
- * @example
- * ```tsx
- * const { store, readonly, typewriter } = useEditorStore();
- * ```
- */
-export const useEditorStore = (): EditorStoreContextType => {
-  const ctx = useContext(EditorStoreContext);
-  if (!ctx) {
-    throw new Error(
-      'useEditorStore must be used within EditorStoreContext.Provider',
-    );
-  }
-  return ctx;
-};
 
 /** 支持键入操作的标签类型列表 */
 const SUPPORT_TYPING_TAG = ['table-cell', 'paragraph', 'head'];

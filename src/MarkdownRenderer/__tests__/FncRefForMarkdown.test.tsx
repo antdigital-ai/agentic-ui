@@ -1,6 +1,9 @@
 import React from 'react';
 import { describe, expect, it } from 'vitest';
-import { extractFootnoteRefFromSupChildren } from '../FncRefForMarkdown';
+import {
+  extractFootnoteRefFromSupChildren,
+  extractFootnoteRefFromSupHast,
+} from '../FncRefForMarkdown';
 
 describe('extractFootnoteRefFromSupChildren', () => {
   it('returns undefined for empty children', () => {
@@ -56,5 +59,35 @@ describe('extractFootnoteRefFromSupChildren', () => {
   it('returns undefined for anchor without label and non-matching href', () => {
     const child = React.createElement('a', { href: '#other' }, '');
     expect(extractFootnoteRefFromSupChildren(child)).toBeUndefined();
+  });
+});
+
+describe('extractFootnoteRefFromSupHast', () => {
+  it('reads a real GFM anchor before JSX component mapping', () => {
+    expect(
+      extractFootnoteRefFromSupHast({
+        children: [
+          {
+            type: 'element',
+            tagName: 'a',
+            properties: { href: '#user-content-fn-caf%C3%A9' },
+          },
+        ],
+      }),
+    ).toEqual({ identifier: 'café', url: undefined });
+  });
+
+  it('leaves normal superscripts and unrelated links unchanged', () => {
+    expect(
+      extractFootnoteRefFromSupHast({ children: [{ type: 'text' }] }),
+    ).toBeUndefined();
+    expect(
+      extractFootnoteRefFromSupHast({
+        children: [
+          { type: 'element', tagName: 'a', properties: { href: '#ordinary' } },
+        ],
+      }),
+    ).toBeUndefined();
+    expect(extractFootnoteRefFromSupHast({ children: [] })).toBeUndefined();
   });
 });

@@ -22,12 +22,6 @@ vi.mock('../../Bubble', () => ({
   ),
 }));
 
-vi.mock('../../../MarkdownEditor/editor/components/LazyElement', () => ({
-  LazyElement: ({ children }: any) => (
-    <div data-testid="lazy-wrap">{children}</div>
-  ),
-}));
-
 vi.mock('../style', () => ({
   useStyle: () => ({ wrapSSR: (n: any) => n, hashId: 'hash' }),
 }));

@@ -112,7 +112,10 @@ describe.each([false, true])('Media with readonly=%s', (readonly) => {
         },
       ],
     });
-    expect(getByTestId('audio-element')).toHaveAttribute('preload', 'metadata');
+    expect(getByTestId('audio-element')).toHaveAttribute(
+      'preload',
+      readonly ? 'none' : 'metadata',
+    );
     expect(queryByTestId('video-element')).toBeNull();
   });
 

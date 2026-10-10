@@ -1,5 +1,6 @@
 import React from 'react';
 import { MessageBubbleData, WithFalse } from '../../Types';
+import type { UseSpeechAdapter } from '../MessagesContent/VoiceButton/types';
 
 // 简化的 BubbleProps 类型，避免循环依赖
 export interface SimpleBubbleProps<T = Record<string, any>> {
@@ -78,7 +79,10 @@ export type BubbleExtraProps = {
    * 外部语音适配器
    * @description 传入播报适配器替换默认播报
    */
-  useSpeech?: any; // 暂时使用 any，避免循环依赖
+  useSpeech?: UseSpeechAdapter;
+
+  /** 额外操作区域的自定义类名 */
+  className?: string;
 
   /**
    * 额外操作组件的自定义样式
@@ -99,37 +103,12 @@ export type BubbleExtraProps = {
    * 聊天项的数据
    * @description 包含聊天消息的完整信息
    */
-  bubble: SimpleBubbleProps<{
-    /**
-     * 聊天内容
-     * @description 消息的具体文本内容
-     */
-    content: string;
-
-    /**
-     * 聊天项的唯一标识
-     * @description 用于唯一标识一条消息
-     */
-    uuid: number;
-
-    /**
-     * 额外信息
-     * @description 包含消息相关的额外数据
-     */
-    extra: {
-      /**
-       * 预设消息
-       * @description 用于快速回复的预设消息内容
-       */
-      preMessage: {
-        /**
-         * 预设消息的内容
-         * @description 预设消息的具体文本内容
-         */
-        content: string;
-      };
-    };
-  }>;
+  bubble: SimpleBubbleProps<
+    MessageBubbleData & {
+      /** 兼容旧消息标识，推荐使用 id */
+      uuid?: number;
+    }
+  >;
 
   /**
    * 额外内容为空时的回调函数

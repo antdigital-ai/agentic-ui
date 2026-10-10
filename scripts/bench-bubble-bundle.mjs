@@ -36,6 +36,7 @@ const entries = {
   BubbleSubpath: `export { Bubble } from ${JSON.stringify(useDist ? '@ant-design/agentic-ui/Bubble' : path.join(root, source, 'Bubble', `index.${extension}`))};`,
   BubbleListRoot: `export { BubbleList } from ${JSON.stringify(rootEntry)};`,
   MessageMapper: `export { mapOpenAIMessagesToMessageBubbleData } from ${JSON.stringify(rootEntry)};`,
+  ReadonlyMarkdownEditorView: `export { default as ReadonlyMarkdownEditorView } from ${JSON.stringify(useDist ? '@ant-design/agentic-ui/ReadonlyMarkdownEditorView' : path.join(root, source, 'MarkdownEditor', `ReadonlyMarkdownEditorView.${extension}`))};`,
 };
 const entryArg = process.argv.indexOf('--entry');
 const entryNames =
@@ -297,8 +298,12 @@ try {
           `Unused components survived tree shaking: ${report.entry}`,
         );
       }
-      if (report.entry === 'MessageMapper' && report.slate) {
-        throw new Error('The message mapper pulled in Slate');
+      if (
+        (report.entry === 'MessageMapper' ||
+          report.entry === 'ReadonlyMarkdownEditorView') &&
+        report.slate
+      ) {
+        throw new Error(`${report.entry} pulled in Slate`);
       }
     }
   }

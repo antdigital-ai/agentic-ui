@@ -43,6 +43,10 @@ group:
 
 限流与淡入相互独立：`throttleOptions.enabled: false` 时内容即时渲染，`fade` 仍可单独控制。
 
+`isFinished={true}` 会立即展示剩余正文并退出流式状态，即使 `streaming` 仍为 `true`。结束后移除内部逐词动画节点，保留媒体、图表等已有组件的状态。
+
+流式追加会复用未变块的 React 元素与解析结果，普通正文只重新切分末尾窗口；脚注保留定义上下文并增量解析尾部，新增全局定义或正文修订时重新校验。代码块、表格分别订阅自身配置，更新表格预览配置不会刷新代码块。自定义解析插件数组建议保持引用稳定，实际插件变更会重建解析器并重新解析。
+
 ### Mark 标签颜色与 Label {#mark-label}
 
 <code src="../demos/mark-color-label-demo.tsx">Mark 颜色定制与 Label 显示</code>
@@ -154,14 +158,31 @@ export default () => (
 | fileMapConfig   | 文件地图（`agentic-ui-filemap`）代码块渲染配置                                                        | `FileMapConfig`                                                                     | -                        | -       |
 | fncProps        | 脚注配置（透传 MarkdownEditor 同名属性）                                                              | `MarkdownEditorProps['fncProps']`                                                   | -                        | -       |
 | htmlConfig      | Markdown → HTML 配置，见 [MarkdownToHtmlConfig](#markdowntohtmlconfig)                                | `MarkdownToHtmlConfig`                                                              | -                        | -       |
-| isFinished      | 流式是否已结束（触发限流器立即 flush）；仅 `streaming={true}` 时生效                                  | `boolean`                                                                           | `false`                  | -       |
+| isFinished      | 流式是否已结束；立即展示剩余正文、退出流式状态并清理逐词动画节点                                      | `boolean`                                                                           | `false`                  | -       |
 | linkConfig      | 链接行为；仅显式 `openInNewTab: false` 时同标签页打开                                                 | `{ openInNewTab?: boolean; onClick?: (url?: string) => boolean \| void }`           | `{ openInNewTab: true }` | -       |
 | plugins         | 编辑器 / 渲染器插件                                                                                   | `MarkdownEditorPlugin[]`                                                            | -                        | -       |
 | prefixCls       | 类名前缀（透传 antd `getPrefixCls`）                                                                  | `string`                                                                            | `'agentic-md-editor'`    | -       |
 | remarkPlugins   | 自定义 remark/rehype 插件，如 `[remarkGfm, [remarkMath, { singleDollarTextMath: false }]]`            | `MarkdownRemarkPlugin[]`                                                            | -                        | -       |
 | streaming       | 是否处于流式输出                                                                                      | `boolean`                                                                           | `false`                  | -       |
 | style           | 自定义样式                                                                                            | `React.CSSProperties`                                                               | -                        | -       |
+| tableConfig     | 原生只读表格预览配置，支持按需挂载全屏弹窗或抽屉                                                      | `MarkdownRendererTableConfig`                                                       | -                        | 2.32.48 |
 | throttleOptions | 流式限流与展示配置（含逐词淡入 `fade`）；`streaming={true}` 且未设 `enabled: false` 时默认开启限流    | `ContentThrottleOptions`                                                            | -                        | -       |
+
+### MarkdownRendererTableConfig {#markdown-renderer-table-config}
+
+| Property           | Description              | Type                  | Default | Version |
+| ------------------ | ------------------------ | --------------------- | ------- | ------- |
+| actions.fullScreen | 表格全屏预览容器         | `'modal' \| 'drawer'` | -       | 2.32.48 |
+| previewTitle       | 预览标题，默认使用语言包 | `string`              | -       | 2.32.48 |
+
+```tsx | pure
+<MarkdownRenderer
+  content={markdown}
+  tableConfig={{ actions: { fullScreen: 'modal' } }}
+/>
+```
+
+表格操作在悬停或聚焦后挂载，预览正文在打开后挂载，关闭后释放。视频与音频默认 `preload="none"`，自动播放时加载元数据；HTML 中显式指定的 `preload` 优先。
 
 ### MarkdownRendererRef {#markdown-renderer-ref}
 
@@ -228,7 +249,7 @@ export default () => (
 
 ## 注意事项 {#notes}
 
-1. **`isFinished` vs `streaming`**：流式过程保持 `streaming={true}`；结束时将 `isFinished` 置 `true` 可立即 flush 限流剩余字符。`isFinished` 仅在 `streaming={true}` 时生效；不传也不会卡住，限流器会按 `charsPerFrame` 自然推完。
+1. **`isFinished` vs `streaming`**：流式过程保持 `streaming={true}`；结束时将 `isFinished` 置 `true` 会立即展示剩余字符并退出流式状态。未设置结束标记时，限流器也会按 `charsPerFrame` 自然推完，但仍保留流式展示模式。
 2. **`throttleOptions.fade`**：仅 `streaming={true}` 时生效，默认开启；仅显式 `fade: false` 关闭。代码块、表格、公式不参与拆词。Slate 模式（默认 `renderMode: 'slate'`）无逐词淡入。
 3. **`linkConfig.onClick`**：返回 `false` 可阻止默认跳转。
 4. **`eleRender`**：返回 `undefined` / `null` 回退默认 DOM；只有显式返回 React 节点才会覆盖。

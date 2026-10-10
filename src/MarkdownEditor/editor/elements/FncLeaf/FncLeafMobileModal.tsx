@@ -1,6 +1,5 @@
 import { Modal } from 'antd';
 import React from 'react';
-import { Node } from 'slate';
 
 import type { FootnoteDefinitionNode } from '../../../el';
 import type { MarkdownEditorProps } from '../../../types';
@@ -16,6 +15,15 @@ export interface FncLeafMobileModalProps {
   fncProps?: MarkdownEditorProps['fncProps'];
 }
 
+const readDefinitionText = (node: unknown): string => {
+  if (!node || typeof node !== 'object') return '';
+  if ('text' in node && typeof node.text === 'string') return node.text;
+  if ('children' in node && Array.isArray(node.children)) {
+    return node.children.map(readDefinitionText).join('');
+  }
+  return '';
+};
+
 const resolveDefinitionBody = (definition?: FootnoteDefinitionNode): string => {
   if (!definition) {
     return '';
@@ -24,7 +32,7 @@ const resolveDefinitionBody = (definition?: FootnoteDefinitionNode): string => {
     return definition.value;
   }
   try {
-    return Node.string(definition);
+    return readDefinitionText(definition);
   } catch {
     return '';
   }

@@ -26,6 +26,7 @@ export type {
   MarkdownRendererEleProps,
   MarkdownRendererProps,
   MarkdownRendererRef,
+  MarkdownRendererTableConfig,
   RenderMode,
   RendererBlockProps,
 } from './types';

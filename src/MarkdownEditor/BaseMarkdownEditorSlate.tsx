@@ -366,13 +366,17 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
         | (MarkdownEditorPlugin & { jinja?: boolean; jinjaConfig?: any })
         | undefined)
     : undefined;
-  const effectiveJinja = props.jinja
-    ? props.jinja
-    : pluginWithJinja?.jinjaConfig
-      ? pluginWithJinja.jinjaConfig
-      : pluginWithJinja
-        ? { enable: true as const }
-        : undefined;
+  const effectiveJinja = useMemo(
+    () =>
+      props.jinja
+        ? props.jinja
+        : pluginWithJinja?.jinjaConfig
+          ? pluginWithJinja.jinjaConfig
+          : pluginWithJinja
+            ? { enable: true as const }
+            : undefined,
+    [props.jinja, pluginWithJinja],
+  );
   const jinjaTemplatePanelEnabled =
     jinjaEnabled &&
     effectiveJinja !== undefined &&
@@ -388,41 +392,64 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
 
   const isStreaming = props.streaming ?? props.typewriter ?? false;
 
+  const plugins = useMemo(() => props.plugins || [], [props.plugins]);
+  // TOC and mount bookkeeping do not change the editor's runtime context.
+  // Keep these provider values stable so they do not wake every Slate node.
+  const editorContext = useMemo(
+    () => ({
+      keyTask$,
+      insertCompletionText$,
+      openInsertLink$,
+      selChange$,
+      openInsertCompletion,
+      setOpenInsertCompletion,
+      bumpFloatBarRevision,
+      floatBarRevision,
+      refreshFloatBar: floatBarRevision,
+      rootContainer: props.rootContainer,
+      setShowComment,
+      store,
+      domRect,
+      setDomRect,
+      typewriter: isStreaming,
+      readonly: props.readonly ?? false,
+      editorProps:
+        effectiveJinja !== undefined
+          ? { ...props, jinja: effectiveJinja }
+          : props,
+      markdownEditorRef,
+      markdownContainerRef,
+      openJinjaTemplate,
+      setOpenJinjaTemplate,
+      jinjaAnchorPath,
+      setJinjaAnchorPath,
+      jinjaEnabled,
+      jinjaTemplatePanelEnabled,
+    }),
+    [
+      keyTask$,
+      insertCompletionText$,
+      openInsertLink$,
+      selChange$,
+      openInsertCompletion,
+      bumpFloatBarRevision,
+      floatBarRevision,
+      props,
+      store,
+      domRect,
+      isStreaming,
+      effectiveJinja,
+      openJinjaTemplate,
+      jinjaAnchorPath,
+      jinjaEnabled,
+      jinjaTemplatePanelEnabled,
+    ],
+  );
+
   return (
     <I18nBoundary>
-      <PluginContext.Provider value={props.plugins || []}>
-        <EditorStoreContext.Provider
-          value={{
-            keyTask$,
-            insertCompletionText$,
-            openInsertLink$,
-            selChange$,
-            openInsertCompletion,
-            setOpenInsertCompletion,
-            bumpFloatBarRevision,
-            floatBarRevision,
-            refreshFloatBar: floatBarRevision,
-            rootContainer: props.rootContainer,
-            setShowComment,
-            store,
-            domRect,
-            setDomRect,
-            typewriter: isStreaming,
-            readonly: props.readonly ?? false,
-            editorProps:
-              effectiveJinja !== undefined
-                ? { ...props, jinja: effectiveJinja }
-                : props || {},
-            markdownEditorRef,
-            markdownContainerRef,
-            openJinjaTemplate,
-            setOpenJinjaTemplate,
-            jinjaAnchorPath,
-            setJinjaAnchorPath,
-            jinjaEnabled,
-            jinjaTemplatePanelEnabled,
-          }}
-        >
+      <PluginContext.Provider value={plugins}>
+        <EditorStoreContext.Provider value={editorContext}>
           <div
             id={props.id ? String(props.id) || undefined : undefined}
             className={classNames(

@@ -18,23 +18,17 @@ export const useElementSelected = (element: BaseElement): boolean => {
       if (!editor.selection) return false;
       try {
         let path = cachedPath.current;
-        if (
-          !path ||
-          !Editor.hasPath(editor, path) ||
-          Node.get(editor, path) !== element
-        ) {
+        if (!path || Node.getIf(editor, path) !== element) {
           path = ReactEditor.findPath(editor, element);
-        }
-        if (
-          !Editor.hasPath(editor, path) ||
-          Node.get(editor, path) !== element
-        ) {
-          return false;
+          if (Node.getIf(editor, path) !== element) return false;
         }
         cachedPath.current = path;
-        return !!Range.intersection(
-          Editor.range(editor, path),
-          editor.selection,
+        // Descendant paths compare equal to their ancestor. Checking the two
+        // selection edges avoids walking every element's first/last text leaf.
+        const [start, end] = Range.edges(editor.selection);
+        return (
+          Path.compare(start.path, path) <= 0 &&
+          Path.compare(end.path, path) >= 0
         );
       } catch {
         return false;

@@ -1,9 +1,8 @@
-import React, { memo, useMemo, useRef } from 'react';
+import React, { memo, useEffect, useMemo, useRef } from 'react';
 import type { Processor } from 'unified';
 
 import { renderMarkdownBlock } from '../markdownReactShared';
 import { compactStreamingTokens } from './compactStreamingTokens';
-import { shouldReparseLastBlock } from './lastBlockThrottle';
 
 export interface MarkdownBlockPieceProps {
   variant: 'sealed' | 'tail';
@@ -13,8 +12,16 @@ export interface MarkdownBlockPieceProps {
   streaming: boolean;
 }
 
+interface ParsedMarkdownBlock {
+  source: string;
+  node: React.ReactNode;
+  streaming: boolean;
+  variant: MarkdownBlockPieceProps['variant'];
+  processor: Processor;
+}
+
 /**
- * 块级渲染单元：sealed 块缓存不动，tail 块节流重解析。
+ * 块级渲染单元：sealed 块缓存不动，tail 随已展示正文更新。
  */
 export const MarkdownBlockPiece = memo(function MarkdownBlockPiece({
   variant,
@@ -23,12 +30,9 @@ export const MarkdownBlockPiece = memo(function MarkdownBlockPiece({
   components,
   streaming,
 }: MarkdownBlockPieceProps) {
-  const lastParsedRef = useRef<{
-    source: string;
-    node: React.ReactNode;
-  } | null>(null);
-  const cacheRef = useRef<Map<string, React.ReactNode>>(new Map());
-  const processorRef = useRef<Processor | null>(null);
+  // One position only needs its most recent tree. A source-keyed Map retains
+  // every abandoned answer when a stream repeatedly rolls back and branches.
+  const committedParse = useRef<ParsedMarkdownBlock | undefined>(undefined);
   /**
    * 宿主常把 `components: { __codeBlock: X }` 内联在每次 render，引用恒变。
    * 若列入 useMemo 依赖，末块晋升为 sealed 时会误触发重 parse，子树卸载重挂。
@@ -37,52 +41,46 @@ export const MarkdownBlockPiece = memo(function MarkdownBlockPiece({
   const componentsRef = useRef(components);
   componentsRef.current = components;
 
-  const node = useMemo(() => {
-    if (processorRef.current !== processor) {
-      processorRef.current = processor;
-      cacheRef.current.clear();
-      lastParsedRef.current = null;
-    }
-
-    const comps = componentsRef.current;
-
-    if (variant === 'sealed') {
-      const cached = cacheRef.current.get(blockSource);
-      if (cached) return cached;
-      // 末块刚晋升为 sealed 时 cacheRef 通常未命中（tail 路径只写 lastParsedRef）。
-      // 直接复用 lastParsedRef 上一次 parse 的结果，避免再走一次 renderMarkdownBlock
-      // 触发不必要的子树替换（chart / agentar-card 等重组件依赖 React 同位置同
-      // 类型 reconciliation 来保留实例）。
-      if (lastParsedRef.current?.source === blockSource) {
-        const el = compactStreamingTokens(lastParsedRef.current.node);
-        lastParsedRef.current = { source: blockSource, node: el };
-        cacheRef.current.set(blockSource, el);
-        return el;
+  const parsed = useMemo<ParsedMarkdownBlock>(() => {
+    const prev = committedParse.current;
+    if (prev?.processor === processor && prev.source === blockSource) {
+      if (variant === 'sealed' && prev.variant === 'sealed') return prev;
+      if (variant === 'tail' && prev.variant === 'tail') {
+        if (prev.streaming === streaming) return prev;
       }
-      const parsed = renderMarkdownBlock(blockSource, processor, comps);
-      const el = streaming ? compactStreamingTokens(parsed) : parsed;
-      cacheRef.current.set(blockSource, el);
-      return el;
+      if (variant === 'sealed' || !streaming) {
+        return {
+          ...prev,
+          variant,
+          streaming,
+          node: compactStreamingTokens(prev.node),
+        };
+      }
     }
 
-    // tail 块：不写入 cacheRef，仅用 lastParsedRef
-    if (!streaming) {
-      const el = renderMarkdownBlock(blockSource, processor, comps);
-      lastParsedRef.current = { source: blockSource, node: el };
-      return el;
-    }
-
-    const prev = lastParsedRef.current;
-    if (prev && !shouldReparseLastBlock(prev.source, blockSource, true)) {
-      return prev.node;
-    }
-
-    const el = renderMarkdownBlock(blockSource, processor, comps);
-    lastParsedRef.current = { source: blockSource, node: el };
-    return el;
+    // ContentThrottle already controls the displayed source. Parse every new
+    // tail source once; a second character threshold can hide short updates.
+    const node = renderMarkdownBlock(
+      blockSource,
+      processor,
+      componentsRef.current,
+    );
+    return {
+      source: blockSource,
+      node:
+        variant === 'sealed' && streaming ? compactStreamingTokens(node) : node,
+      streaming,
+      variant,
+      processor,
+    };
   }, [variant, blockSource, processor, streaming]);
 
-  return <>{node}</>;
+  // Publishing after commit keeps abandoned concurrent renders out of cache.
+  useEffect(() => {
+    committedParse.current = parsed;
+  }, [parsed]);
+
+  return <>{parsed.node}</>;
 });
 
 MarkdownBlockPiece.displayName = 'MarkdownBlockPiece';

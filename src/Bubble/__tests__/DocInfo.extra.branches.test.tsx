@@ -5,9 +5,9 @@ import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { DocInfoList } from '../MessagesContent/DocInfo';
 
-vi.mock('../../../MarkdownEditor/BaseMarkdownEditor', () => ({
-  BaseMarkdownEditor: ({ initValue }: { initValue?: string }) => (
-    <div data-testid="doc-md">{initValue}</div>
+vi.mock('../../MarkdownRenderer', () => ({
+  MarkdownRenderer: ({ content }: { content: string }) => (
+    <div data-testid="doc-md">{content}</div>
   ),
 }));
 

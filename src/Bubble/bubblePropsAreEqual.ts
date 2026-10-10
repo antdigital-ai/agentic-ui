@@ -137,7 +137,8 @@ const metaEqualForMemo = (
   );
 };
 
-const originDataEqualForMemo = (
+/** Message equality shared by the Bubble memo and committed list row cache. */
+export const messageBubbleDataAreEqual = (
   a: MessageBubbleData | undefined,
   b: MessageBubbleData | undefined,
 ): boolean => {
@@ -190,9 +191,12 @@ export const bubblePropsAreEqual = (
   if (prev.renderType !== next.renderType) return false;
 
   if (prev.shouldShowCopy !== next.shouldShowCopy) return false;
+  if (!shallowEqualConfigObject(prev.quote, next.quote)) return false;
 
-  if (!originDataEqualForMemo(prev.originData, next.originData)) return false;
-  if (!originDataEqualForMemo(prev.preMessage, next.preMessage)) return false;
+  if (!messageBubbleDataAreEqual(prev.originData, next.originData))
+    return false;
+  if (!messageBubbleDataAreEqual(prev.preMessage, next.preMessage))
+    return false;
 
   if (
     !shallowEqualConfigObject(
@@ -313,6 +317,7 @@ const COMPARED_KEYS = [
   'renderMode',
   'renderType',
   'shouldShowCopy',
+  'quote',
   'originData',
   'preMessage',
   'markdownRenderConfig',

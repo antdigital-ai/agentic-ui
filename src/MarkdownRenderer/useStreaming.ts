@@ -61,6 +61,10 @@ const STREAM_INCOMPLETE_REGEX = {
 
 const STREAMING_LOADING_PLACEHOLDER = '...';
 
+// These characters may start an incomplete token. Plain runs can be committed
+// together; line breaks still pass through the fence tracker individually.
+const TOKEN_START_OR_LINE_BREAK = /[![<*_+|`\n-]/g;
+
 const parsePipeRowCells = (line: string): string[] | null => {
   const trimmedLine = line.trim();
   if (!trimmedLine.startsWith('|') || !trimmedLine.endsWith('|')) {
@@ -285,7 +289,9 @@ const getStreamingOutput = (cache: StreamCache): string => {
 
 /** 流式 token 缓存——暂缓不完整的 link/image/table 等，避免 parser 错误解析 */
 export const useStreaming = (input: string, enabled: boolean): string => {
-  const [output, setOutput] = useState('');
+  const [output, setOutput] = useState(() =>
+    !enabled && typeof input === 'string' ? input : '',
+  );
   const cacheRef = useRef<StreamCache>(getInitialCache());
 
   const processStreaming = useCallback((text: string): void => {
@@ -297,7 +303,10 @@ export const useStreaming = (input: string, enabled: boolean): string => {
 
     const expectedPrefix =
       cacheRef.current.completeMarkdown + cacheRef.current.pending;
-    if (!text.startsWith(expectedPrefix)) {
+    if (
+      text.length < expectedPrefix.length ||
+      text.slice(0, expectedPrefix.length) !== expectedPrefix
+    ) {
       cacheRef.current = getInitialCache();
     }
 
@@ -316,7 +325,35 @@ export const useStreaming = (input: string, enabled: boolean): string => {
 
     cache.processedLength += chunk.length;
 
-    for (const char of chunk) {
+    let index = 0;
+    while (index < chunk.length) {
+      if (cache.fenceState.inFenced) {
+        const lineBreak = chunk.indexOf('\n', index);
+        const end = lineBreak < 0 ? chunk.length : lineBreak;
+        if (end > index) {
+          const run = chunk.slice(index, end);
+          cache.pending += run;
+          cache.currentLine += run;
+          index = end;
+          continue;
+        }
+      } else if (cache.token === StreamCacheTokenType.Text && !cache.pending) {
+        TOKEN_START_OR_LINE_BREAK.lastIndex = index;
+        const end =
+          TOKEN_START_OR_LINE_BREAK.exec(chunk)?.index ?? chunk.length;
+        if (end > index) {
+          const run = chunk.slice(index, end);
+          cache.completeMarkdown += run;
+          cache.currentLine += run;
+          index = end;
+          continue;
+        }
+      }
+
+      // Keep code points intact while processing pending tokens, as the
+      // previous for-of loop did (including surrogate pairs split by chunks).
+      const char = String.fromCodePoint(chunk.codePointAt(index)!);
+      index += char.length;
       cache.pending += char;
 
       if (char === '\n') {
@@ -366,6 +403,8 @@ export const useStreaming = (input: string, enabled: boolean): string => {
       return;
     }
     if (!enabled) {
+      // Mirror the current document so re-enabling streaming does not briefly
+      // replace existing media/cards with a stale output from another mode.
       setOutput(input);
       cacheRef.current = getInitialCache();
       return;
@@ -373,5 +412,7 @@ export const useStreaming = (input: string, enabled: boolean): string => {
     processStreaming(input);
   }, [input, enabled, processStreaming]);
 
-  return output;
+  // Ordinary readonly messages need no state round-trip through the streaming
+  // cache. Keep their first render and subsequent updates synchronous.
+  return typeof input !== 'string' || !input ? '' : enabled ? output : input;
 };

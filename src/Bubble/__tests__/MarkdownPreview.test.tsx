@@ -90,7 +90,9 @@ describe('MarkdownPreview', () => {
       expect(
         screen.queryByTestId('markdown-preview-popover-wrapper'),
       ).not.toBeInTheDocument();
-      expect(screen.getByTestId('markdown-editor')).toBeInTheDocument();
+      expect(
+        screen.getByTestId('markdown-renderer-markdown-mode'),
+      ).toBeInTheDocument();
     });
 
     it('extra 为 undefined 时不使用 Popover', () => {
@@ -303,6 +305,7 @@ describe('MarkdownPreview', () => {
       render(
         <MarkdownPreview
           {...defaultProps}
+          markdownRenderConfig={{ renderMode: 'slate' }}
           typing
           originData={{
             role: 'assistant',

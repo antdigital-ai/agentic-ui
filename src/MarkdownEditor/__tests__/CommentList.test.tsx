@@ -11,7 +11,7 @@ const { setShowCommentMock, mockMarkdownEditorRef } = vi.hoisted(() => ({
   mockMarkdownEditorRef: { current: {} },
 }));
 
-vi.mock('../editor/store', async (importOriginal) => {
+vi.mock('../editor/editorStoreContext', async (importOriginal) => {
   const actual = (await importOriginal()) as any;
   const React = await import('react');
   return {

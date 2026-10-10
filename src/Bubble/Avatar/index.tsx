@@ -4,7 +4,14 @@ import classNames from 'clsx';
 import React from 'react';
 import { isEmoji } from './isEmoji';
 
-export interface BubbleAvatarProps extends AvatarProps {
+export interface BubbleAvatarProps
+  extends
+    AvatarProps,
+    React.AriaAttributes,
+    Pick<
+      React.HTMLAttributes<HTMLElement>,
+      'role' | 'tabIndex' | 'onKeyDown' | 'onFocus' | 'onBlur'
+    > {
   /**
    * @description The URL or base64 data of the avatar image
    */
@@ -52,10 +59,11 @@ export const BubbleAvatar: React.FC<BubbleAvatarProps> = ({
   className,
   avatar,
   title,
+  background,
   size = 24,
   shape = 'circle',
   onClick,
-  prefixCls,
+  prefixCls = 'ant-agentic-bubble-avatar',
   style,
   ...props
 }) => {
@@ -64,20 +72,65 @@ export const BubbleAvatar: React.FC<BubbleAvatarProps> = ({
     avatar && ['/', 'http', 'data:'].some((index) => avatar.startsWith(index)),
   );
   const isBase64 = Boolean(avatar?.startsWith('data'));
+  const interactiveProps = onClick
+    ? {
+        role: props.role ?? 'button',
+        tabIndex: props.tabIndex ?? 0,
+        onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
+          props.onKeyDown?.(event);
+          if (event.defaultPrevented || event.repeat) return;
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            event.currentTarget.click();
+          }
+        },
+      }
+    : {};
+  const avatarStyle: React.CSSProperties = {
+    backgroundColor: background,
+    ...(!onClick ? { cursor: 'default' } : {}),
+    ...style,
+  };
 
   if (typeof avatar === 'string' && isEmoji(String(avatar))) {
+    const {
+      gap: _gap,
+      icon: _icon,
+      src: _src,
+      srcSet: _srcSet,
+      alt: _alt,
+      crossOrigin: _crossOrigin,
+      onError: _onError,
+      loading: _loading,
+      rootClassName,
+      ...htmlProps
+    } = props;
     return (
-      <div className={classNames(`${prefixCls}-emoji`, hashId)}>{avatar}</div>
+      <div
+        {...htmlProps}
+        {...interactiveProps}
+        className={classNames(
+          `${prefixCls}-emoji`,
+          className,
+          rootClassName,
+          hashId,
+        )}
+        style={avatarStyle}
+        onClick={onClick}
+        data-testid="bubble-avatar"
+      >
+        {avatar}
+      </div>
     );
   }
 
-  const text = String(isImage ? title : avatar);
+  const text = String((isImage ? title : (avatar ?? title)) ?? '');
 
   const avatarProps = {
     className: classNames(className, `${prefixCls}`, hashId),
     shape: shape,
     size,
-    style: onClick ? style : { cursor: 'default', ...style },
+    style: avatarStyle,
   };
 
   return isImage ? (
@@ -85,6 +138,7 @@ export const BubbleAvatar: React.FC<BubbleAvatarProps> = ({
       src={isBase64 ? avatar : <img src={avatar} alt="avatar" />}
       {...avatarProps}
       {...props}
+      {...interactiveProps}
       onClick={onClick}
       data-testid="bubble-avatar"
     />
@@ -92,6 +146,7 @@ export const BubbleAvatar: React.FC<BubbleAvatarProps> = ({
     <Avatar
       {...avatarProps}
       {...props}
+      {...interactiveProps}
       onClick={onClick}
       data-testid="bubble-avatar"
     >

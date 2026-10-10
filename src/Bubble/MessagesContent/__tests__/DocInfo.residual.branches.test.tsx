@@ -10,10 +10,8 @@ import { I18nContext } from '../../../I18n';
 import { BubbleConfigContext } from '../../BubbleConfigProvide';
 import { DocInfoList } from '../DocInfo';
 
-vi.mock('../../../MarkdownEditor/BaseMarkdownEditor', () => ({
-  BaseMarkdownEditor: ({ initValue }: any) => (
-    <div data-testid="md">{initValue}</div>
-  ),
+vi.mock('../../../MarkdownRenderer', () => ({
+  MarkdownRenderer: ({ content }: any) => <div data-testid="md">{content}</div>,
 }));
 
 vi.mock('../docInfoStyle', () => ({

@@ -52,12 +52,6 @@ const TOOLBAR_BASE_STYLE: React.CSSProperties = {
   userSelect: 'none',
 };
 
-const TOOLBAR_LEFT_STYLE: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 8,
-};
-
 const LANG_LABEL_STYLE: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
@@ -120,15 +114,13 @@ const CodeBlockToolbarComponent: React.FC<CodeBlockToolbarProps> = ({
       contentEditable={false}
       style={buildToolbarStyle(expanded)}
     >
-      <div style={TOOLBAR_LEFT_STYLE}>
-        <div style={LANG_LABEL_STYLE}>
-          {langIcon && (
-            <div style={LANG_ICON_WRAPPER_STYLE}>
-              <LoadImage style={LANG_ICON_INNER_STYLE} src={langIcon} />
-            </div>
-          )}
-          <span>{language || 'plain text'}</span>
-        </div>
+      <div style={LANG_LABEL_STYLE}>
+        {langIcon && (
+          <div style={LANG_ICON_WRAPPER_STYLE}>
+            <LoadImage style={LANG_ICON_INNER_STYLE} src={langIcon} />
+          </div>
+        )}
+        <span>{language || 'plain text'}</span>
       </div>
       <div style={TOOLBAR_RIGHT_STYLE}>
         <ActionIconBox

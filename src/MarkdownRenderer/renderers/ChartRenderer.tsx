@@ -1,6 +1,13 @@
 import { Button, ConfigProvider } from 'antd';
 import clsx from 'clsx';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Loading } from '../../Components/Loading';
 import { useRefFunction } from '../../Hooks/useRefFunction';
@@ -55,6 +62,46 @@ const parseChartData = (code: string): ChartData | null => {
   }
 };
 
+const coerceChartAxisCell = (raw: unknown) => {
+  if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+  const n = Number(raw);
+  if (Number.isFinite(n)) return n;
+  if (typeof raw === 'string') {
+    const cn = parseChineseCurrencyToNumber(raw);
+    if (cn !== null) return cn;
+  }
+  return raw;
+};
+
+const prepareCharts = (chartData: ChartData) => {
+  const configs: ChartData[] = Array.isArray(chartData.config)
+    ? chartData.config
+    : chartData.config
+      ? [chartData.config]
+      : [chartData];
+  const dataSource: Record<string, unknown>[] =
+    chartData.dataSource || chartData.data || [];
+  const columns = chartData.columns || [];
+  return configs.map(({ chartType, x, y, ...rest }) => ({
+    chartType,
+    x,
+    y,
+    rest,
+    columns,
+    chartDataItems: !chartType
+      ? []
+      : dataSource.map(({ chartType: _chartType, ...rowData }) => {
+          const row: Record<string, unknown> = {
+            ...rowData,
+            column_list: Object.keys(rowData),
+          };
+          if (x && row[x] !== undefined) row[x] = coerceChartAxisCell(row[x]);
+          if (y && row[y] !== undefined) row[y] = coerceChartAxisCell(row[y]);
+          return row;
+        }),
+  }));
+};
+
 /** 图表渲染失败时用相同 props 重试一次（销毁再重建） */
 const ChartWithRetry: React.FC<{
   index: number;
@@ -67,7 +114,7 @@ const ChartWithRetry: React.FC<{
   x?: string;
   y?: string;
   columns: { title: string; dataIndex: string }[];
-}> = (props) => {
+}> = memo((props) => {
   const {
     index,
     columnLength,
@@ -81,6 +128,10 @@ const ChartWithRetry: React.FC<{
     columns,
   } = props;
   const [retryKey, setRetryKey] = useState(0);
+  const config = useMemo(
+    () => ({ height, x, y, columns, index, rest }),
+    [height, x, y, columns, index, rest],
+  );
 
   const handleChartError = useRefFunction(
     (error: Error, info: React.ErrorInfo) => {
@@ -149,19 +200,12 @@ const ChartWithRetry: React.FC<{
           groupBy={rest?.groupBy}
           filterBy={rest?.filterBy}
           colorLegend={rest?.colorLegend}
-          config={{
-            height,
-            x,
-            y,
-            columns,
-            index,
-            rest,
-          }}
+          config={config}
         />
       </ErrorBoundary>
     </div>
   );
-};
+});
 
 /**
  * 图表渲染器——复用 MarkdownEditor 的 ChartRender 组件。
@@ -177,11 +221,22 @@ export const ChartBlockRenderer: React.FC<RendererBlockProps> = (props) => {
   const { getPrefixCls } = React.useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-md-editor');
   const containerRef = useRef<HTMLDivElement>(null);
-  const [columnLength, setColumnLength] = useState(2);
+  const [layout, setLayout] = useState({ width: 400, columnLength: 2 });
   const [mounted, setMounted] = useState(false);
+  const setColumnLength = useCallback((columnLength: number) => {
+    setLayout((current) =>
+      current.columnLength === columnLength
+        ? current
+        : { ...current, columnLength },
+    );
+  }, []);
 
-  const code = extractBlockTextContent(children);
+  const code = useMemo(() => extractBlockTextContent(children), [children]);
   const chartData = useMemo(() => parseChartData(code), [code]);
+  const charts = useMemo(
+    () => (mounted && chartData ? prepareCharts(chartData) : []),
+    [chartData, mounted],
+  );
 
   useEffect(() => {
     // 延迟一帧渲染图表，确保容器已挂载到 DOM 且有正确的宽度
@@ -200,25 +255,26 @@ export const ChartBlockRenderer: React.FC<RendererBlockProps> = (props) => {
   }, []);
 
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || charts.length === 0) return;
     if (typeof window === 'undefined') {
       return;
     }
     const updateWidth = () => {
       const width = containerRef.current?.clientWidth || 400;
-      const configs = chartData?.config
-        ? Array.isArray(chartData.config)
-          ? chartData.config
-          : [chartData.config]
-        : [chartData];
-      setColumnLength(
-        Math.min(Math.floor(Math.max(width, 256) / 256), configs.length),
+      const columnLength = Math.min(
+        Math.floor(Math.max(width, 256) / 256),
+        charts.length,
+      );
+      setLayout((current) =>
+        current.width === width && current.columnLength === columnLength
+          ? current
+          : { width, columnLength },
       );
     };
     updateWidth();
     window.addEventListener('resize', updateWidth);
     return () => window.removeEventListener('resize', updateWidth);
-  }, [chartData, mounted]);
+  }, [charts.length, mounted]);
 
   if (!chartData) {
     return (
@@ -233,15 +289,6 @@ export const ChartBlockRenderer: React.FC<RendererBlockProps> = (props) => {
       </div>
     );
   }
-
-  const configs: any[] = Array.isArray(chartData.config)
-    ? chartData.config
-    : chartData.config
-      ? [chartData.config]
-      : [chartData];
-
-  const dataSource = chartData.dataSource || chartData.data || [];
-  const columns = chartData.columns || [];
 
   return (
     <div
@@ -270,63 +317,35 @@ export const ChartBlockRenderer: React.FC<RendererBlockProps> = (props) => {
             userSelect: 'none',
           }}
         >
-          {configs.map((cfg, index) => {
-            const { chartType, x, y, ...rest } = cfg;
+          {charts.map(
+            ({ chartType, x, y, rest, columns, chartDataItems }, index) => {
+              if (!chartType) {
+                return (
+                  <div key={index} style={{ padding: 12, color: '#999' }}>
+                    <Loading />
+                  </div>
+                );
+              }
 
-            if (!chartType) {
+              const height = Math.min(400, layout.width);
+
               return (
-                <div key={index} style={{ padding: 12, color: '#999' }}>
-                  <Loading />
-                </div>
+                <ChartWithRetry
+                  key={index}
+                  index={index}
+                  columnLength={layout.columnLength}
+                  setColumnLength={setColumnLength}
+                  chartType={chartType}
+                  chartDataItems={chartDataItems}
+                  rest={rest}
+                  height={height}
+                  x={x}
+                  y={y}
+                  columns={columns}
+                />
               );
-            }
-
-            const chartDataItems = dataSource.map((item: any) => {
-              const { chartType: _chartType, ...rowData } = item;
-              const row: Record<string, any> = {
-                ...rowData,
-                column_list: Object.keys(rowData),
-              };
-              const coerceChartAxisCell = (raw: unknown) => {
-                if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
-                const n = Number(raw);
-                if (Number.isFinite(n)) return n;
-                if (typeof raw === 'string') {
-                  const cn = parseChineseCurrencyToNumber(raw);
-                  if (cn !== null) return cn;
-                }
-                return raw;
-              };
-              if (x && row[x] !== undefined) {
-                row[x] = coerceChartAxisCell(row[x]);
-              }
-              if (y && row[y] !== undefined) {
-                row[y] = coerceChartAxisCell(row[y]);
-              }
-              return row;
-            });
-
-            const height = Math.min(
-              400,
-              containerRef.current?.clientWidth || 400,
-            );
-
-            return (
-              <ChartWithRetry
-                key={index}
-                index={index}
-                columnLength={columnLength}
-                setColumnLength={setColumnLength}
-                chartType={chartType}
-                chartDataItems={chartDataItems}
-                rest={rest}
-                height={height}
-                x={x}
-                y={y}
-                columns={columns}
-              />
-            );
-          })}
+            },
+          )}
         </div>
       )}
     </div>

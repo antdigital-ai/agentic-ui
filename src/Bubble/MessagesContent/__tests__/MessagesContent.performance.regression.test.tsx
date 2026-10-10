@@ -6,7 +6,10 @@ import type { MessageBubbleData } from '../../type';
 import { BubbleMessageDisplay } from '../index';
 import { MarkdownPreview } from '../MarkdownPreview';
 
-const { editorRender } = vi.hoisted(() => ({ editorRender: vi.fn() }));
+const { editorRender, rendererRender } = vi.hoisted(() => ({
+  editorRender: vi.fn(),
+  rendererRender: vi.fn(),
+}));
 
 vi.mock('../../../MarkdownEditor', () => ({
   MarkdownEditor: (props: { initValue: string; readonly: boolean }) => {
@@ -20,7 +23,10 @@ vi.mock('../../../MarkdownEditor', () => ({
 }));
 
 vi.mock('../../../MarkdownRenderer', () => ({
-  MarkdownRenderer: ({ content }: { content: string }) => <p>{content}</p>,
+  MarkdownRenderer: ({ content }: { content: string }) => {
+    rendererRender(content);
+    return <p data-testid="markdown-renderer">{content}</p>;
+  },
 }));
 
 vi.mock('../BubbleExtra', () => ({
@@ -110,8 +116,8 @@ describe('message content updates without reparsing unchanged Markdown', () => {
     );
   });
 
-  it('keeps the same Markdown editor when only feedback changes', () => {
-    editorRender.mockClear();
+  it('keeps the same Markdown renderer when only feedback changes', () => {
+    rendererRender.mockClear();
     const config = { extraRender: false as const };
     const { rerender } = render(
       <BubbleMessageDisplay
@@ -121,7 +127,7 @@ describe('message content updates without reparsing unchanged Markdown', () => {
         bubbleRenderConfig={config}
       />,
     );
-    expect(editorRender).toHaveBeenCalledTimes(1);
+    expect(rendererRender).toHaveBeenCalledTimes(1);
     rerender(
       <BubbleMessageDisplay
         content="same body"
@@ -130,7 +136,7 @@ describe('message content updates without reparsing unchanged Markdown', () => {
         bubbleRenderConfig={config}
       />,
     );
-    expect(editorRender).toHaveBeenCalledTimes(1);
+    expect(rendererRender).toHaveBeenCalledTimes(1);
     expect(screen.getByText('same body')).toBeInTheDocument();
   });
 
@@ -143,7 +149,7 @@ describe('message content updates without reparsing unchanged Markdown', () => {
         markdownRenderConfig={{ initValue: 'configured body' }}
       />,
     );
-    expect(screen.getByTestId('markdown-editor')).toHaveTextContent(
+    expect(screen.getByTestId('markdown-renderer')).toHaveTextContent(
       'configured body',
     );
     expect(screen.queryByText('original body')).not.toBeInTheDocument();
@@ -184,10 +190,15 @@ describe('message content updates without reparsing unchanged Markdown', () => {
           markdownRenderConfig={{ readonly: configReadonly }}
         />,
       );
-      expect(screen.getByTestId('markdown-editor')).toHaveAttribute(
-        'data-readonly',
-        String(expected),
-      );
+      if (expected) {
+        expect(screen.getByTestId('markdown-renderer')).toBeInTheDocument();
+        expect(screen.queryByTestId('markdown-editor')).not.toBeInTheDocument();
+      } else {
+        expect(screen.getByTestId('markdown-editor')).toHaveAttribute(
+          'data-readonly',
+          'false',
+        );
+      }
     },
   );
 

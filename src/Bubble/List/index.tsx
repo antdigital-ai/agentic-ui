@@ -1,37 +1,39 @@
-import SkeletonList from './SkeletonList';
-
-import {
+import { ConfigProvider } from 'antd';
+import clsx from 'clsx';
+import { nanoid } from 'nanoid';
+import React, {
   MutableRefObject,
   useContext,
   useLayoutEffect,
   useMemo,
   useRef,
 } from 'react';
-
 import type { RoleType } from '../../Types/common';
+import { Bubble } from '../Bubble';
+import { BubbleConfigContext } from '../BubbleConfigProvide';
+import {
+  bubblePropsAreEqual,
+  messageBubbleDataAreEqual,
+  shallowEqualRecord,
+  shallowEqualStyles,
+} from '../bubblePropsAreEqual';
+import { LOADING_FLAT } from '../MessagesContent';
 import type {
   BubbleImperativeHandle,
   BubbleMetaData,
   BubbleProps,
   MessageBubbleData,
 } from '../type';
-
-import { ConfigProvider } from 'antd';
-import clsx from 'clsx';
-import { nanoid } from 'nanoid';
-import React from 'react';
-import { LazyElement } from '../../MarkdownEditor/editor/components/LazyElement';
-import { Bubble } from '../Bubble';
-import { BubbleConfigContext } from '../BubbleConfigProvide';
-import { shallowEqualRecord, shallowEqualStyles } from '../bubblePropsAreEqual';
-import { LOADING_FLAT } from '../MessagesContent';
+import { normalizeBubbleStyles } from '../utils/normalizeBubbleStyles';
+import { BubbleListItem } from './BubbleListItem';
+import SkeletonList from './SkeletonList';
 import { useStyle } from './style';
 
-export type BubbleListProps = {
+export interface BubbleListProps {
   /**
    * 聊天消息列表
    */
-  bubbleList: MessageBubbleData[];
+  bubbleList?: MessageBubbleData[];
 
   readonly?: boolean;
 
@@ -89,133 +91,8 @@ export type BubbleListProps = {
    */
   assistantMeta?: BubbleMetaData;
 
-  styles?: {
-    /**
-     * 气泡根容器的自定义样式
-     */
-    bubbleStyle?: React.CSSProperties;
-
-    /**
-     * 头像标题区域的自定义样式
-     */
-    bubbleAvatarTitleStyle?: React.CSSProperties;
-
-    /**
-     * 主容器的自定义样式
-     */
-    bubbleContainerStyle?: React.CSSProperties;
-
-    /**
-     * 加载图标的自定义样式
-     */
-    bubbleLoadingIconStyle?: React.CSSProperties;
-
-    /**
-     * 名称区域的自定义样式
-     */
-    bubbleNameStyle?: React.CSSProperties;
-
-    /**
-     * 聊天项的样式
-     */
-    bubbleListItemStyle?: React.CSSProperties;
-
-    /**
-     * 聊天项内容的样式
-     */
-    bubbleListItemContentStyle?: React.CSSProperties;
-
-    /**
-     * 内容前置区域的自定义样式
-     */
-    bubbleListItemBeforeStyle?: React.CSSProperties;
-
-    /**
-     * 内容后置区域的自定义样式
-     */
-    bubbleListItemAfterStyle?: React.CSSProperties;
-
-    /**
-     * 聊天项左侧内容的样式
-     */
-    bubbleListLeftItemContentStyle?: React.CSSProperties;
-
-    /**
-     * 聊天项右侧内容的样式
-     */
-    bubbleListRightItemContentStyle?: React.CSSProperties;
-
-    /**
-     * 聊天项标题的样式
-     */
-    bubbleListItemTitleStyle?: React.CSSProperties;
-
-    /**
-     * 聊天项头像的样式
-     */
-    bubbleListItemAvatarStyle?: React.CSSProperties;
-
-    /**
-     * 聊天项额外内容的样式
-     */
-    bubbleListItemExtraStyle?: React.CSSProperties;
-  };
-  classNames?: {
-    /**
-     * 气泡根容器的自定义类名
-     */
-    bubbleClassName?: string;
-
-    /**
-     * 头像标题区域的自定义类名
-     */
-    bubbleAvatarTitleClassName?: string;
-
-    /**
-     * 主容器的自定义类名
-     */
-    bubbleContainerClassName?: string;
-
-    /**
-     * 加载图标的自定义类名
-     */
-    bubbleLoadingIconClassName?: string;
-
-    /**
-     * 名称区域的自定义类名
-     */
-    bubbleNameClassName?: string;
-
-    /**
-     * 聊天项的类名
-     */
-    bubbleListItemClassName?: string;
-
-    /**
-     * 聊天项内容的类名
-     */
-    bubbleListItemContentClassName?: string;
-
-    /**
-     * 内容前置区域的自定义类名
-     */
-    bubbleListItemBeforeClassName?: string;
-
-    /**
-     * 内容后置区域的自定义类名
-     */
-    bubbleListItemAfterClassName?: string;
-
-    /**
-     * 聊天项标题的类名
-     */
-    bubbleListItemTitleClassName?: string;
-
-    /**
-     * 聊天项头像的类名
-     */
-    bubbleListItemAvatarClassName?: string;
-  };
+  styles?: BubbleProps['styles'];
+  classNames?: BubbleProps['classNames'];
 
   /**
    * @deprecated @since 2.29.0 请使用 onDislike 替代（符合命名规范）
@@ -236,8 +113,9 @@ export type BubbleListProps = {
   markdownRenderConfig?: BubbleProps['markdownRenderConfig'];
   /**
    * 渲染模式快捷设置
-   * - 'slate': 使用 Slate 编辑器渲染（默认）
+   * - 'slate': 使用 Slate 编辑器渲染
    * - 'markdown': 使用轻量 MarkdownRenderer（无 Slate 实例，性能更优）
+   * 未指定时，普通只读 Markdown 自动使用轻量渲染；编辑及 Slate 扩展保留编辑器
    * 等效于 markdownRenderConfig={{ renderMode }}
    */
   renderMode?: 'slate' | 'markdown';
@@ -250,13 +128,16 @@ export type BubbleListProps = {
   /**
    * 动态控制复制按钮的显隐
    */
-  shouldShowCopy?: boolean | ((bubbleItem: any) => boolean);
+  shouldShowCopy?: BubbleProps['shouldShowCopy'];
 
   /**
    * 控制语音按钮的显示
    * @description 控制语音按钮是否显示
    */
-  shouldShowVoice?: boolean;
+  shouldShowVoice?: BubbleProps['shouldShowVoice'];
+
+  /** 自定义语音适配器 */
+  useSpeech?: BubbleProps['useSpeech'];
 
   /**
    * 滚动事件的回调
@@ -320,7 +201,7 @@ export type BubbleListProps = {
      */
     shouldLazyLoad?: (index: number, total: number) => boolean;
   };
-};
+}
 
 interface LoadingRowKey {
   key: string;
@@ -337,6 +218,35 @@ interface BubbleListAvatarData {
   base: BubbleMetaData | undefined;
   meta: MessageBubbleData['meta'];
   value: BubbleMetaData;
+}
+
+interface BubbleListRow {
+  data: BubbleListRowData;
+  avatar: BubbleListAvatarData;
+  sharedProps: BubbleProps;
+  preMessage: MessageBubbleData | undefined;
+  styles: BubbleProps['styles'];
+  lazy: BubbleListProps['lazy'];
+  shouldLazyLoad: boolean;
+  index: number;
+  total: number;
+  element: React.ReactElement;
+}
+
+function rowPlaceholderOptionsEqual(
+  previous: BubbleListRow,
+  lazy: BubbleListProps['lazy'],
+  index: number,
+  total: number,
+) {
+  return (
+    (previous.lazy?.rootMargin ?? '200px') === (lazy?.rootMargin ?? '200px') &&
+    (previous.lazy?.placeholderHeight ?? 100) ===
+      (lazy?.placeholderHeight ?? 100) &&
+    previous.lazy?.renderPlaceholder === lazy?.renderPlaceholder &&
+    (!lazy?.renderPlaceholder ||
+      (previous.index === index && previous.total === total))
+  );
 }
 
 /**
@@ -452,8 +362,8 @@ export const BubbleList = React.memo<BubbleListProps>((props) => {
     [parentContext, props.extraShowOnHover],
   );
 
-  const prefixClass = getPrefixCls('agentic-bubble-list');
-  const { hashId } = useStyle(prefixClass);
+  const prefixCls = getPrefixCls('agentic-bubble-list');
+  const { hashId } = useStyle(prefixCls);
   const prevStyleRef = useRef(props.style);
   const stableStyle = shallowEqualRecord(
     (props.style || {}) as Record<string, unknown>,
@@ -470,23 +380,26 @@ export const BubbleList = React.memo<BubbleListProps>((props) => {
   const bubbleMergedStylesRef = useRef<
     Map<'left' | 'right', BubbleProps['styles']>
   >(new Map());
-  const bubbleMergedAvatarRef = useRef<Map<string, BubbleListAvatarData>>(
-    new Map(),
-  );
-  const originDataRef = useRef<Map<string, BubbleListRowData>>(new Map());
+  const rowsRef = useRef<Map<string, BubbleListRow>>(new Map());
+  const sharedPropsRef = useRef<BubbleProps | undefined>(undefined);
 
   // 每个布局只合并一次样式，流式消息更新时复用历史行使用的引用。
   const mergedStyles = useMemo(() => {
     const nextStyles = new Map<'left' | 'right', BubbleProps['styles']>();
+    const normalizedStyles = normalizeBubbleStyles(styles);
     for (const placement of ['left', 'right'] as const) {
+      const contentStyle = {
+        ...normalizedStyles?.bubbleListItemContentStyle,
+        ...(placement === 'right'
+          ? normalizedStyles?.bubbleListRightItemContentStyle
+          : normalizedStyles?.bubbleListLeftItemContentStyle),
+      };
       const candidate: BubbleProps['styles'] = {
-        ...styles,
-        bubbleListItemContentStyle: {
-          ...styles?.bubbleListItemContentStyle,
-          ...(placement === 'right'
-            ? styles?.bubbleListRightItemContentStyle
-            : styles?.bubbleListLeftItemContentStyle),
-        },
+        ...normalizedStyles,
+        bubbleListItemContentStyle: contentStyle,
+        // AI/User normalize short slots again. Keep the alias in sync so the
+        // direction-specific styles remain layered over the common content.
+        ...(styles?.content !== undefined ? { content: contentStyle } : {}),
       };
       const previous = bubbleMergedStylesRef.current.get(placement);
       nextStyles.set(
@@ -497,15 +410,93 @@ export const BubbleList = React.memo<BubbleListProps>((props) => {
     return nextStyles;
   }, [styles]);
 
+  const lazyRows = useMemo(() => {
+    if (loading || !props.lazy?.enable) return undefined;
+    return Array.from(
+      { length: bubbleList.length },
+      (_, index) =>
+        props.lazy?.shouldLazyLoad?.(index, bubbleList.length) ?? true,
+    );
+  }, [
+    loading,
+    props.lazy?.enable,
+    props.lazy?.shouldLazyLoad,
+    bubbleList.length,
+  ]);
+
+  // Compare shared options once per list update. Historical rows can then use
+  // reference equality without building a fresh Bubble props object per token.
+  const sharedProps = useMemo(() => {
+    const candidate: BubbleProps = {
+      style: styles?.bubbleListItemStyle,
+      deps,
+      pure: props.pure,
+      bubbleListRef,
+      bubbleRenderConfig,
+      classNames,
+      bubbleRef: props.bubbleRef,
+      markdownRenderConfig,
+      docListProps: props.docListProps,
+      fileViewConfig: props.fileViewConfig,
+      readonly: props.readonly,
+      onReply: props.onReply,
+      onDisLike: props.onDisLike,
+      onDislike: props.onDislike,
+      onLike: props.onLike,
+      onCancelLike: props.onCancelLike,
+      onLikeCancel: props.onLikeCancel,
+      onAvatarClick: props.onAvatarClick,
+      onDoubleClick: props.onDoubleClick,
+      customConfig: bubbleRenderConfig?.customConfig,
+      shouldShowCopy: props.shouldShowCopy,
+      shouldShowVoice: props.shouldShowVoice,
+      useSpeech: props.useSpeech,
+    };
+    const previous = sharedPropsRef.current;
+    return previous && bubblePropsAreEqual(previous, candidate)
+      ? previous
+      : candidate;
+  }, [
+    bubbleListRef,
+    bubbleRenderConfig,
+    classNames,
+    deps,
+    markdownRenderConfig,
+    props.bubbleRef,
+    props.docListProps,
+    props.fileViewConfig,
+    props.onAvatarClick,
+    props.onCancelLike,
+    props.onDisLike,
+    props.onDislike,
+    props.onDoubleClick,
+    props.onLike,
+    props.onLikeCancel,
+    props.onReply,
+    props.pure,
+    props.readonly,
+    props.shouldShowCopy,
+    props.shouldShowVoice,
+    props.useSpeech,
+    styles?.bubbleListItemStyle,
+  ]);
+
   const rowState = useMemo(() => {
-    const isLazyEnabled = props.lazy?.enable;
+    if (loading) {
+      return {
+        dom: null,
+        loadingKeys: loadingKeyByIndexRef.current,
+        realKeys: realIdToStableKeyRef.current,
+        rows: rowsRef.current,
+      };
+    }
     const totalCount = bubbleList.length;
     const nextLoadingKeys = new Map<number, LoadingRowKey>();
-    const nextRealKeys = new Map<string, string>();
-    const nextOriginData = new Map<string, BubbleListRowData>();
-    const nextAvatars = new Map<string, BubbleListAvatarData>();
+    const nextRows = new Map<string, BubbleListRow>();
+    let realRowCount = 0;
+    let hasRealKeyChanges = false;
 
-    const rows = bubbleList.map((item, index) => {
+    const dom = bubbleList.map((item, index) => {
       const isLast = bubbleList.length - 1 === index;
       const placement = item.role === 'user' ? 'right' : 'left';
       let itemKey: string;
@@ -523,21 +514,28 @@ export const BubbleList = React.memo<BubbleListProps>((props) => {
           realIdToStableKeyRef.current.get(realId) ??
           prevLoadingKey?.key ??
           realId;
-        nextRealKeys.set(realId, itemKey);
+        realRowCount += 1;
+        if (realIdToStableKeyRef.current.get(realId) !== itemKey) {
+          hasRealKeyChanges = true;
+        }
       }
 
-      let cachedData = originDataRef.current.get(itemKey);
+      const previousRow = rowsRef.current.get(itemKey);
+      let cachedData = previousRow?.data;
       if (cachedData?.source !== item || cachedData.isLast !== isLast) {
         cachedData = {
           source: item,
           isLast,
-          value: { ...item, isLatest: isLast, isLast },
+          value:
+            cachedData?.isLast === isLast &&
+            messageBubbleDataAreEqual(cachedData.source, item)
+              ? cachedData.value
+              : { ...item, isLatest: isLast, isLast },
         };
       }
-      nextOriginData.set(itemKey, cachedData);
 
       const baseAvatar = placement === 'right' ? userMeta : assistantMeta;
-      const prevAvatar = bubbleMergedAvatarRef.current.get(itemKey);
+      const prevAvatar = previousRow?.avatar;
       let mergedAvatar = prevAvatar;
       if (
         !prevAvatar ||
@@ -558,155 +556,89 @@ export const BubbleList = React.memo<BubbleListProps>((props) => {
               : candidateAvatar,
         };
       }
-      nextAvatars.set(itemKey, mergedAvatar!);
-
-      // LazyElement 依赖被观察元素的几何尺寸；display:contents 不产生盒子，会导致
-      // IntersectionObserver 在部分环境下永不触发，气泡永远不渲染。
-      const useLazyWrapper =
-        !!isLazyEnabled &&
-        (props.lazy?.shouldLazyLoad?.(index, totalCount) ?? true);
-
-      const bubbleElement = (
-        <div
+      const preMessage = bubbleList[index - 1];
+      const rowStyles = mergedStyles.get(placement);
+      const shouldLazyLoad = lazyRows?.[index] ?? false;
+      const canReuseElement =
+        previousRow &&
+        previousRow.data.value === cachedData.value &&
+        previousRow.avatar.value === mergedAvatar!.value &&
+        previousRow.sharedProps === sharedProps &&
+        previousRow.styles === rowStyles &&
+        previousRow.shouldLazyLoad === shouldLazyLoad &&
+        messageBubbleDataAreEqual(previousRow.preMessage, preMessage) &&
+        rowPlaceholderOptionsEqual(previousRow, props.lazy, index, totalCount);
+      const element = canReuseElement ? (
+        previousRow.element
+      ) : (
+        <BubbleListItem
           key={itemKey}
-          style={{ minWidth: 0, width: '100%' }}
-          data-bubble-list-item
-          data-is-last={isLast ? 'true' : 'false'}
+          className={classNames?.bubbleListItemClassName}
+          lazy={props.lazy}
+          shouldLazyLoad={shouldLazyLoad}
+          index={index}
+          total={totalCount}
+          role={item.role}
+          isLast={isLast}
         >
           <Bubble
+            {...sharedProps}
             data-id={item.id}
             avatar={mergedAvatar!.value}
-            preMessage={bubbleList[index - 1]}
+            preMessage={preMessage}
             id={item.id}
-            style={styles?.bubbleListItemStyle}
             originData={cachedData.value}
             placement={placement}
-            time={item.updateAt || item.createAt}
-            deps={deps}
-            pure={props.pure}
-            bubbleListRef={bubbleListRef}
-            bubbleRenderConfig={bubbleRenderConfig}
-            classNames={classNames}
-            bubbleRef={props.bubbleRef}
-            markdownRenderConfig={markdownRenderConfig}
-            docListProps={props.docListProps}
-            fileViewConfig={props.fileViewConfig}
-            styles={mergedStyles.get(placement)}
-            readonly={props.readonly}
-            onReply={props.onReply}
-            onDisLike={props.onDisLike}
-            onDislike={props.onDislike}
-            onLike={props.onLike}
-            onCancelLike={props.onCancelLike}
-            onLikeCancel={props.onLikeCancel}
-            onAvatarClick={props.onAvatarClick}
-            onDoubleClick={props.onDoubleClick}
-            customConfig={props.bubbleRenderConfig?.customConfig}
-            shouldShowCopy={props.shouldShowCopy}
-            shouldShowVoice={props.shouldShowVoice}
+            time={item.updateAt ?? item.createAt}
+            styles={rowStyles}
           />
-        </div>
+        </BubbleListItem>
       );
-
-      return {
+      nextRows.set(
         itemKey,
-        bubbleElement,
-        isLazyEnabled,
-        index,
-        item,
-        totalCount,
-        useLazyWrapper,
-      };
+        canReuseElement &&
+          previousRow.data === cachedData &&
+          previousRow.avatar === mergedAvatar
+          ? previousRow
+          : {
+              data: cachedData,
+              avatar: mergedAvatar!,
+              sharedProps,
+              preMessage,
+              styles: rowStyles,
+              lazy: props.lazy,
+              shouldLazyLoad,
+              index,
+              total: totalCount,
+              element,
+            },
+      );
+      return element;
     });
-
-    const dom = rows.map(
-      ({
-        itemKey,
-        bubbleElement,
-        isLazyEnabled: lazyOn,
-        index,
-        item,
-        totalCount: count,
-        useLazyWrapper,
-      }) => {
-        // 如果启用了懒加载，用 LazyElement 包裹
-        if (lazyOn) {
-          // 如果不需要懒加载，直接返回元素
-          if (!useLazyWrapper) {
-            return bubbleElement;
-          }
-
-          // 创建适配的 renderPlaceholder，将 role 信息添加到 elementInfo
-          const adaptedRenderPlaceholder = props.lazy?.renderPlaceholder
-            ? (
-                lazyProps: Parameters<
-                  NonNullable<typeof props.lazy.renderPlaceholder>
-                >[0],
-              ) => {
-                return props.lazy!.renderPlaceholder!({
-                  ...lazyProps,
-                  elementInfo: lazyProps.elementInfo
-                    ? {
-                        ...lazyProps.elementInfo,
-                        role: item.role as RoleType,
-                      }
-                    : undefined,
-                });
-              }
-            : undefined;
-
-          return (
-            <LazyElement
-              key={itemKey}
-              placeholderHeight={props.lazy?.placeholderHeight ?? 100}
-              rootMargin={props.lazy?.rootMargin ?? '200px'}
-              renderPlaceholder={adaptedRenderPlaceholder}
-              elementInfo={{
-                type: 'bubble',
-                index,
-                total: count,
-              }}
-            >
-              {bubbleElement}
-            </LazyElement>
-          );
-        }
-
-        return bubbleElement;
-      },
-    );
+    // Token updates usually leave the key set unchanged. Avoid copying every
+    // real-id mapping; rebuild only when membership or a stable key changes.
+    let realKeys = realIdToStableKeyRef.current;
+    if (hasRealKeyChanges || realRowCount !== realKeys.size) {
+      realKeys = new Map<string, string>();
+      nextRows.forEach((row, key) => {
+        const id = row.data.source.id;
+        if (id !== LOADING_FLAT) realKeys.set(id as string, key);
+      });
+    }
     return {
       dom,
       loadingKeys: nextLoadingKeys,
-      realKeys: nextRealKeys,
-      originData: nextOriginData,
-      avatars: nextAvatars,
+      realKeys,
+      rows: nextRows,
     };
   }, [
     bubbleList,
-    bubbleListRef,
-    bubbleRenderConfig,
     classNames,
-    deps,
-    markdownRenderConfig,
+    loading,
+    lazyRows,
     mergedStyles,
-    props.bubbleRef,
-    props.docListProps,
     props.lazy,
-    props.onAvatarClick,
-    props.onCancelLike,
-    props.onDisLike,
-    props.onDislike,
-    props.onDoubleClick,
-    props.onLike,
-    props.onLikeCancel,
-    props.onReply,
-    props.pure,
-    props.readonly,
-    props.shouldShowCopy,
-    props.shouldShowVoice,
-    props.style,
-    styles,
+    sharedProps,
     userMeta,
     assistantMeta,
   ]);
@@ -717,45 +649,26 @@ export const BubbleList = React.memo<BubbleListProps>((props) => {
     bubbleMergedStylesRef.current = mergedStyles;
     loadingKeyByIndexRef.current = rowState.loadingKeys;
     realIdToStableKeyRef.current = rowState.realKeys;
-    originDataRef.current = rowState.originData;
-    bubbleMergedAvatarRef.current = rowState.avatars;
-  }, [stableStyle, mergedStyles, rowState]);
-
-  if (loading)
-    return (
-      <BubbleConfigContext.Provider value={mergedContext}>
-        <div
-          className={clsx(
-            prefixClass,
-            `${prefixClass}-loading`,
-            className,
-            hashId,
-          )}
-          ref={bubbleListRef}
-          style={{
-            padding: 24,
-          }}
-        >
-          <SkeletonList />
-        </div>
-      </BubbleConfigContext.Provider>
-    );
+    rowsRef.current = rowState.rows;
+    sharedPropsRef.current = sharedProps;
+  }, [stableStyle, mergedStyles, rowState, sharedProps]);
 
   return (
     <BubbleConfigContext.Provider value={mergedContext}>
       <div
-        className={clsx(`${prefixClass}`, className, hashId, {
-          [`${prefixClass}-readonly`]: props.readonly,
-          [`${prefixClass}-compact`]: compact,
+        className={clsx(prefixCls, className, hashId, {
+          [`${prefixCls}-loading`]: loading,
+          [`${prefixCls}-readonly`]: props.readonly,
+          [`${prefixCls}-compact`]: compact,
         })}
         data-chat-list={bubbleList.length}
-        style={style}
+        style={loading ? { padding: 24, ...style } : style}
         ref={bubbleListRef}
         onScroll={onScroll}
-        onWheel={(e) => onWheel?.(e, bubbleListRef?.current ?? null)}
-        onTouchMove={(e) => onTouchMove?.(e, bubbleListRef?.current ?? null)}
+        onWheel={(e) => onWheel?.(e, e.currentTarget)}
+        onTouchMove={(e) => onTouchMove?.(e, e.currentTarget)}
       >
-        {rowState.dom}
+        {loading ? <SkeletonList /> : rowState.dom}
       </div>
     </BubbleConfigContext.Provider>
   );

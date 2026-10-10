@@ -245,6 +245,7 @@ export {
   type MarkdownRendererEleProps,
   type MarkdownRendererProps,
   type MarkdownRendererRef,
+  type MarkdownRendererTableConfig,
   type RenderMode,
   type RendererBlockProps,
   type UseMarkdownToReactOptions,

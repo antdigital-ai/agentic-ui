@@ -13,7 +13,8 @@ import { resolveContainerContentStyle } from '../Constants/contentPaddingVars';
 import { MarkdownRenderer } from '../MarkdownRenderer';
 import type { MarkdownRendererRef } from '../MarkdownRenderer/types';
 import { CommentList } from './editor/components/CommentList';
-import { EditorStore, EditorStoreContext } from './editor/store';
+import { EditorStoreContext } from './editor/editorStoreContext';
+import type { EditorStore } from './editor/store';
 import I18nBoundary from './I18nBoundary';
 import { PluginContext } from './plugin';
 import {
@@ -25,6 +26,9 @@ import { createReadonlyMarkdownEditorInstance } from './readonly/ReadonlyMarkdow
 import { useStyle } from './style';
 import type { CommentDataType, MarkdownEditorProps } from './types';
 import { sanitizeEditorChromeStyle } from './utils/sanitizeChromeStyle';
+
+const EMPTY_COMMENTS: CommentDataType[] = [];
+const EMPTY_PLUGINS: NonNullable<MarkdownEditorProps['plugins']> = [];
 
 /**
  * 只读 + renderMode=markdown 专用外壳：不挂载 Slate / EditorStore，不执行 parserMdToSchema 等编辑侧逻辑。
@@ -87,7 +91,7 @@ const ReadonlyMarkdownEditorView: React.FC<MarkdownEditorProps> = (props) => {
     [editorInstance],
   );
 
-  const commentList = comment?.commentList ?? [];
+  const commentList = comment?.commentList ?? EMPTY_COMMENTS;
 
   useEffect(() => {
     if (!commentEnabled) {
@@ -165,15 +169,7 @@ const ReadonlyMarkdownEditorView: React.FC<MarkdownEditorProps> = (props) => {
       clearReadonlyCommentHighlights(getRoot());
       unbindClick();
     };
-  }, [
-    commentEnabled,
-    contentPrefixCls,
-    commentList,
-    editorInstance.store,
-    initValue,
-    isStreaming,
-    props.isFinished,
-  ]);
+  }, [commentEnabled, contentPrefixCls, commentList, editorInstance.store]);
 
   useEffect(() => {
     displayedContentRef.current =
@@ -195,7 +191,7 @@ const ReadonlyMarkdownEditorView: React.FC<MarkdownEditorProps> = (props) => {
 
   return (
     <I18nBoundary>
-      <PluginContext.Provider value={props.plugins || []}>
+      <PluginContext.Provider value={props.plugins ?? EMPTY_PLUGINS}>
         <EditorStoreContext.Provider value={editorStoreContextValue}>
           <div
             id={id ? String(id) || undefined : undefined}
@@ -228,6 +224,7 @@ const ReadonlyMarkdownEditorView: React.FC<MarkdownEditorProps> = (props) => {
               remarkPlugins={props.markdownToHtmlOptions}
               formula={formulaConfig}
               codeProps={props.codeProps}
+              tableConfig={props.tableConfig}
               apaasify={props.apaasify}
               style={{
                 height: '100%',
