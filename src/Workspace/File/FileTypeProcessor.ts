@@ -188,7 +188,9 @@ export class FileTypeProcessor {
       if (!candidate) return false;
       const path = candidate.toLowerCase().split('?')[0].split('#')[0];
       return (
-        path.endsWith('.docx') || path.endsWith('.xlsx') || path.endsWith('.pptx')
+        path.endsWith('.docx') ||
+        path.endsWith('.xlsx') ||
+        path.endsWith('.pptx')
       );
     });
   }
