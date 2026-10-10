@@ -232,6 +232,16 @@ export type MarkdownEditorProps = {
      * @default true
      */
     convertWordToMarkdown?: boolean;
+    /**
+     * 长文本粘贴折叠（对齐 dtcoder-ide pastedLongText）。
+     * 纯文本粘贴超过阈值（默认 1200 字符或 12 行）时折叠为单个
+     * `composer-chip`（kind: long-text）原子块，避免一次粘贴撑爆输入框。
+     * chip 展示字符数 / 行数统计，发送序列化时还原原文。
+     * 默认 false（保持旧行为）；设为 { enable: true } 开启。
+     */
+    longTextFold?: {
+      enable?: boolean;
+    };
   };
 
   jinja?: JinjaConfig;

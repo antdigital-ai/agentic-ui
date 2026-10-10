@@ -248,6 +248,13 @@ const genStyle: GenerateStyle<
         font: 'var(--font-text-body-base)',
         color: 'var(--color-gray-text-default)',
       },
+      // 输入框工具行附加组件（分支触发器 / 上下文用量指示）
+      '&-composer-extras': {
+        display: 'flex',
+        gap: '8px',
+        alignItems: 'center',
+        minWidth: 0,
+      },
       '&-skill-mode &-editor-content': {
         borderRadius: 0,
       },

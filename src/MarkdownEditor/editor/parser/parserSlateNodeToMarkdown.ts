@@ -7,6 +7,10 @@ import stringWidth from 'string-width';
 import { debugInfo } from '../../../Utils/debugUtils';
 import type { ChartNode, CustomLeaf } from '../../el';
 import type { MarkdownEditorPlugin } from '../../plugin';
+import {
+  composerChipToText,
+  readComposerChipData,
+} from '../elements/ComposerChip/types';
 import { getCodeBlockPlainText } from '../utils/codeBlockPlainText';
 import { getMediaType } from '../utils/dom';
 import { extractFootnoteRefIdentifier } from '../utils/footnoteDisplay';
@@ -254,6 +258,9 @@ const parserNode = (
       break;
     case 'card':
       str += handleCard(node, preString, parent, plugins);
+      break;
+    case 'composer-chip':
+      str += handleComposerChip(node);
       break;
     case 'paragraph':
       str += handleParagraph(node, preString, parent, plugins);
@@ -1132,6 +1139,30 @@ const table = (
   });
 
   return result;
+};
+
+/**
+ * 处理内联原子 chip 节点（composer-chip）。
+ *
+ * 序列化规则（对齐 dtcoder-ide renderText）：
+ * - slash → `/name`
+ * - file / folder → `@path`（含空格时 `@<path>`）
+ * - symbol → `@name`
+ * - long-text → 原文（多行原文包一层 fenced code 保住换行与缩进）
+ * 数据非法时返回空串，由段落序列化自然吞掉。
+ */
+const handleComposerChip = (node: any): string => {
+  const chip = readComposerChipData(node?.chip);
+  if (!chip) return '';
+  if (chip.kind === 'long-text') {
+    // 含 ``` 或多行原文必须 fenced；单行长原文直接内联
+    if (chip.text.includes('\n') || chip.text.includes('```')) {
+      const fenced = chip.text.replace(/```/g, '\\`\\`\\`');
+      return `\`\`\`\n${fenced}\n\`\`\``;
+    }
+    return chip.text;
+  }
+  return composerChipToText(chip);
 };
 
 /**

@@ -2,6 +2,7 @@ import { Editor } from 'slate';
 import { withCardPlugin } from './withCardPlugin';
 import { withCodeBlockPlugin } from './withCodeBlockPlugin';
 import { withCodeTagPlugin } from './withCodeTagPlugin';
+import { withComposerChips } from './withComposerChips';
 import { withFootnoteReferenceNormalize } from './withFootnoteReferenceNormalize';
 import { withInlineNodes } from './withInlineNodes';
 import { withLinkAndMediaPlugin } from './withLinkAndMediaPlugin';
@@ -16,6 +17,7 @@ import { withVoidNodes } from './withVoidNodes';
  *
  * ### 从内到外的包装顺序
  * 1. `withInlineNodes` — `isInline`（break、inline-katex）
+ * 1.5 `withComposerChips` — `composer-chip` 内联原子 chip（isInline+isVoid、整体删除、长文本折叠）
  * 2. `withCodeBlockPlugin` — 块级 code → `isVoid`
  * 3. `withVoidNodes` — hr、break 等 `isVoid`（card 系列 deliberately 非 void，见该文件注释）
  * 4. `withListsPlugin` — 列表 normalize / 键盘
@@ -45,7 +47,11 @@ export const withMarkdown = (editor: Editor) => {
             withLinkAndMediaPlugin(
               withCardPlugin(
                 withListsPlugin(
-                  withVoidNodes(withCodeBlockPlugin(withInlineNodes(editor))),
+                  withVoidNodes(
+                    withCodeBlockPlugin(
+                      withComposerChips(withInlineNodes(editor)),
+                    ),
+                  ),
                 ),
               ),
             ),

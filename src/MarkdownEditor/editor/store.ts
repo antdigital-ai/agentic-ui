@@ -22,9 +22,11 @@ import { ReactEditor } from 'slate-react';
 import type { Elements, FootnoteDefinitionNode, ListNode } from '../el';
 import type { MarkdownEditorPlugin } from '../plugin';
 import { CommentDataType, MarkdownEditorProps } from '../types';
+import type { ComposerChipData } from './elements/ComposerChip/types';
 import type { ParserMarkdownToSlateNodeConfig } from './parser/parserMarkdownToSlateNode';
 import { parserMdToSchema } from './parser/parserMdToSchema';
 import { parserSlateNodeToMarkdown } from './parser/parserSlateNodeToMarkdown';
+import { insertComposerChip } from './plugins/withComposerChips';
 import { getOffsetLeft, getOffsetTop } from './utils/dom';
 import type { EditorSelChangePayload } from './utils/editorSelChange';
 import { EditorUtils, findByPathAndText } from './utils/editorUtils';
@@ -335,6 +337,21 @@ export class EditorStore {
    */
   insertNodes(nodes: Node | Node[], options?: any) {
     Transforms.insertNodes(this._editor.current, nodes, options);
+  }
+
+  /**
+   * 在当前选区插入内联原子 chip（对齐 dtcoder-ide insertComposerSlashAtom）。
+   *
+   * @param chip - chip 数据（slash / file / folder / symbol / long-text）
+   * @param options.at - 可选目标 Path；默认当前选区
+   * @param options.ensureTrailingSpace - 是否在 chip 后补一个空格分隔，默认 true
+   * @returns 是否插入成功（无选区时 false）
+   */
+  insertComposerChip(
+    chip: ComposerChipData,
+    options?: { at?: any; ensureTrailingSpace?: boolean },
+  ): boolean {
+    return insertComposerChip(this._editor.current, chip, options);
   }
 
   /**

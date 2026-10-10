@@ -398,6 +398,29 @@ export {
   TablePropsProvider,
   type TableContextValue,
 } from './MarkdownEditor/editor/elements/Table/TableContext';
+// Composer chip 内联原子节点（slash 命令 / @file / @symbol / 长文本折叠）
+export {
+  ComposerChip,
+  ReadonlyComposerChip,
+} from './MarkdownEditor/editor/elements/ComposerChip';
+export {
+  LONG_TEXT_PASTE_MIN_CHARS,
+  LONG_TEXT_PASTE_MIN_LINES,
+  composerChipToText,
+  createFileChipNode,
+  createLongTextChipNode,
+  createSlashChipNode,
+  createSymbolChipNode,
+  isSlashChipUnconfigured,
+  readComposerChipData,
+  shouldCollapsePastedText,
+  type ComposerChipData,
+  type ComposerChipNode,
+  type ComposerFileChip,
+  type ComposerLongTextChip,
+  type ComposerSlashChip,
+  type ComposerSymbolChip,
+} from './MarkdownEditor/editor/elements/ComposerChip/types';
 export { partialParse } from './MarkdownEditor/editor/parser/json-parse';
 export {
   MarkdownToSlateParser,
@@ -410,6 +433,12 @@ export {
   isMix as isMixDirect,
   parserSlateNodeToMarkdown as parserSlateNodeToMarkdownDirect,
 } from './MarkdownEditor/editor/parser/parserSlateNodeToMarkdown';
+export {
+  findUnconfiguredSlashChips,
+  handleLongTextPasteFold,
+  insertComposerChip,
+  withComposerChips,
+} from './MarkdownEditor/editor/plugins/withComposerChips';
 export {
   EditorStore,
   EditorStoreContext,
@@ -484,9 +513,25 @@ export {
 } from './MarkdownInputField/AttachmentButton/utils';
 export { ActionItemContainer } from './MarkdownInputField/BeforeToolContainer/BeforeToolContainer';
 export {
+  ComposerBranchTrigger,
+  type ComposerBranchOption,
+  type ComposerBranchTriggerProps,
+} from './MarkdownInputField/BranchSelector/ComposerBranchTrigger';
+export {
+  ContextUsageIndicator,
+  HIGH_USAGE_THRESHOLD_PERCENT,
+  type ContextUsageCategory,
+  type ContextUsageIndicatorProps,
+} from './MarkdownInputField/ContextUsage/ContextUsageIndicator';
+export {
   FileMapView,
   type FileMapViewProps,
 } from './MarkdownInputField/FileMapView';
+export {
+  useComposerDraft,
+  type DraftCommitReason,
+  type UseComposerDraftOptions,
+} from './MarkdownInputField/hooks/useComposerDraft';
 export {
   MarkdownInputField,
   type ActionsSlotState,

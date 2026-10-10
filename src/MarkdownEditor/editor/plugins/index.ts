@@ -2,6 +2,7 @@ export * from './utils';
 export * from './withCardPlugin';
 export * from './withCodeBlockPlugin';
 export * from './withCodeTagPlugin';
+export * from './withComposerChips';
 export * from './withInlineNodes';
 export * from './withLinkAndMediaPlugin';
 export * from './withListsPlugin';

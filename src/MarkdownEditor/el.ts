@@ -239,8 +239,9 @@ export type SchemaNode<T = Record<string, any>> = {
   h?: number;
 };
 
-export type Elements<T = Record<string, any>> =
+export type Elements<T extends Record<string, any> = Record<string, any>> =
   | CodeNode<T>
+  | import('./editor/elements/ComposerChip/types').ComposerChipNode<T>
   | FootnoteDefinitionNode<T>
   | SchemaNode<{ valueType: string } & T>
   | ParagraphNode<T>

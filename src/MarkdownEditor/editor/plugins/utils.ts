@@ -67,6 +67,7 @@ const ATOMIC_CARD_CONTENT_TYPES = new Set([
   'media',
   'attach',
   'link-card',
+  'composer-chip',
   'code',
   'mermaid',
   'katex',

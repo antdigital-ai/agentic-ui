@@ -9,6 +9,16 @@ group:
 
 # Changelog
 
+## v2.33.0
+
+- MarkdownInputField
+  - 🆕 Added inline atomic chips (`composerChips`): slash command chips (structured skill nodes with pre-send `onSlashChipGate`) plus `@file` / `@folder` and `@symbol` inline mention chips, upgrading from plain text tags to Slate inline void nodes with whole-chip deletion, click-to-configure, and serialization to `/name` / `@path` on send.
+  - 🆕 Added long-text paste folding (`longTextFold`): plain-text pastes of ≥1200 chars or ≥12 lines collapse into a "long text" chip (with char/line stats) that serializes back to the original text on send.
+  - 🆕 Added fragment-level draft recovery (`draft`): auto-commits on idle / blur / send / switch / unmount and restores when `draftKey` changes; defaults to localStorage with a customizable `storage`.
+  - 🆕 Added context usage indicator (`contextUsage`): toolbar circular indicator (tiered colors, token summary tooltip, high-usage warning); the standalone `ContextUsageIndicator` component is exported as well.
+  - 🆕 Added branch selector (`branch`): branch pill with a searchable dropdown menu (local/remote groups, current highlight, switching spinner); the standalone `ComposerBranchTrigger` component is exported as well.
+  - 🛠 Exported `insertComposerChip` / `withComposerChips` / `findUnconfiguredSlashChips` / `handleLongTextPasteFold` plus the `ComposerChipNode` chip helpers and types.
+
 ## v2.32.48
 
 - OfficeViewer

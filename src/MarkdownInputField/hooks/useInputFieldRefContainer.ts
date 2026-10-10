@@ -14,9 +14,7 @@ import type { MarkdownEditorInstance } from '../../MarkdownEditor';
  * 见 `useEditorValueSync` / `useExposeInputRef`。
  */
 export interface InputFieldRefContainer {
-  markdownEditorRef: React.MutableRefObject<
-    MarkdownEditorInstance | undefined
-  >;
+  markdownEditorRef: React.MutableRefObject<MarkdownEditorInstance | undefined>;
   quickActionsRef: React.RefObject<HTMLDivElement | null>;
   actionsRef: React.RefObject<HTMLDivElement | null>;
   isSendingRef: React.MutableRefObject<boolean>;

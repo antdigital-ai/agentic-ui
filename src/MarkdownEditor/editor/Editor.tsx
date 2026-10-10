@@ -58,6 +58,10 @@ import { prepareMediaPaste } from './plugins/prepareMediaPaste';
 import { useHighlight as createHighlight } from './plugins/useHighlight';
 import { useKeyboard } from './plugins/useKeyboard';
 import { useOnchange } from './plugins/useOnchange';
+import {
+  handleLongTextPasteFold,
+  shouldCollapsePastedText,
+} from './plugins/withComposerChips';
 import { useEditorStore } from './store';
 import { useStyle } from './style';
 import {
@@ -785,6 +789,8 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     if (props.onPaste?.(event) === false) return;
 
     const allowedTypes = pasteConfig?.allowedTypes || defaultAllowedTypes;
+    // 长文本折叠开关：pasteConfig.longTextFold 显式开启（默认关闭，保持旧行为）
+    const longTextFoldEnabled = pasteConfig?.longTextFold?.enable === true;
     const currentTextSelection = markdownEditorRef.current.selection;
 
     if (
@@ -921,6 +927,20 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
       if (!text) return;
 
       const selection = markdownEditorRef.current.selection;
+
+      // 长文本粘贴折叠（对齐 dtcoder-ide pastedLongText）：
+      // 超过阈值（1200 字符 / 12 行）的纯文本折叠为单个 long-text chip，
+      // 优先级高于 plainTextOnly 的直接 insertText，避免一次粘贴撑爆输入框。
+      if (longTextFoldEnabled && shouldCollapsePastedText(text)) {
+        if (
+          handleLongTextPasteFold(
+            markdownEditorRef.current,
+            cachedPlain || text,
+          )
+        ) {
+          return;
+        }
+      }
 
       if (pasteConfig?.plainTextOnly) {
         const targetSelection = prepareMediaPaste(markdownEditorRef.current)

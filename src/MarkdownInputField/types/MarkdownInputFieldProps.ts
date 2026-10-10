@@ -4,6 +4,7 @@ import {
   MarkdownEditorInstance,
   MarkdownEditorProps,
 } from '../../MarkdownEditor';
+import type { ComposerSlashChip } from '../../MarkdownEditor/editor/elements/ComposerChip/types';
 import type { FollowupItem } from '../Followups';
 import type { SendButtonCustomizationProps } from '../SendButton';
 import type { SkillModeConfig } from '../SkillModeBar';
@@ -544,6 +545,158 @@ export type MarkdownInputFieldProps = {
     enable?: boolean;
     /** 历史记录上限，超过后移除最旧一条，默认 100 */
     maxLength?: number;
+  };
+
+  /**
+   * 内联原子 chip 配置（对齐 dtcoder-ide composer slash/mention 节点）
+   * @description 开启后编辑器支持 `composer-chip` 内联原子节点：
+   * slash 命令 chip（`/name`）、@file/@folder、@symbol 引用 chip。
+   * 宿主可通过 insertChip 在选区插入，发送文本自动序列化（`/name`、`@path`）。
+   * @example
+   * ```tsx
+   * <MarkdownInputField
+   *   composerChips={{
+   *     enable: true,
+   *     onSlashChipGate: (chips) => {
+   *       message.warning(`请先配置 ${chips[0].name}`);
+   *       return true; // 阻止发送
+   *     },
+   *   }}
+   * />
+   * ```
+   */
+  composerChips?: {
+    /** 是否启用 chip 体系，默认 false */
+    enable?: boolean;
+    /**
+     * 发送前 gate：输入中存在未配置 payload 的 slash chip 时触发。
+     * 返回 true（默认）阻止发送；返回 false 放行。
+     */
+    onSlashChipGate?: (chips: ComposerSlashChip[]) => boolean;
+    /**
+     * 点击 slash chip 回调（宿主打开结构化配置浮层）。
+     * chip 参数为只读数据，配置完成后用 inputRef 更新节点。
+     */
+    onSlashChipClick?: (chip: ComposerSlashChip) => void;
+  };
+
+  /**
+   * 长文本粘贴折叠（对齐 dtcoder-ide pastedLongText）
+   * @description 纯文本粘贴超过阈值（1200 字符 / 12 行）时折叠为单个
+   * 原子 chip 块，避免一次粘贴撑爆输入框。chip 展示统计，发送时还原原文。
+   * @default { enable: false }
+   * @example
+   * ```tsx
+   * <MarkdownInputField longTextFold={{ enable: true }} />
+   * ```
+   */
+  longTextFold?: {
+    enable?: boolean;
+  };
+
+  /**
+   * 草稿恢复配置（对齐 dtcoder-ide fragment 级草稿）
+   * @description 传入 draftKey 后自动持久化输入内容：输入停顿 / 失焦 / 发送 /
+   * 切换会话时提交；draftKey 变化时恢复对应草稿。
+   * @example
+   * ```tsx
+   * <MarkdownInputField
+   *   draft={{
+   *     draftKey: sessionId,
+   *     onDraftCommit: (value, reason) => saveDraft(value, reason),
+   *   }}
+   * />
+   * ```
+   */
+  draft?: {
+    /** 草稿身份 key（会话 id）；变化触发 switch commit + 恢复 */
+    draftKey?: string;
+    /** 自定义存储，默认 localStorage */
+    storage?: Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;
+    /** idle 提交延时 ms，默认 180 */
+    idleDelay?: number;
+    /** 草稿提交回调；返回 false 表示宿主自行持久化（hook 跳过写入） */
+    onDraftCommit?: (
+      value: string,
+      reason: 'idle' | 'blur' | 'send' | 'switch' | 'unmount',
+    ) => boolean | void;
+    /** 草稿恢复回调；返回 true 表示宿主已处理恢复 */
+    onDraftRestore?: (value: string) => boolean;
+  };
+
+  /**
+   * 上下文用量指示（对齐 dtcoder-ide ContextUsageIndicator）
+   * @description 在工具栏渲染环形用量指示器，点击触发回调。
+   * @example
+   * ```tsx
+   * <MarkdownInputField
+   *   contextUsage={{
+   *     usedTokens: 42000,
+   *     contextWindow: 128000,
+   *     onClick: (info) => openUsagePanel(info),
+   *   }}
+   * />
+   * ```
+   */
+  contextUsage?: {
+    /** 已占用 token 数；<= 0 不渲染 */
+    usedTokens: number;
+    /** 上下文窗口总量 */
+    contextWindow: number;
+    /** 分类明细（宿主面板展示用） */
+    categories?: Array<{
+      key: string;
+      name: string;
+      tokenCount: number;
+      color?: string;
+      items?: Array<{ label: string; estimatedTokens: number }>;
+    }>;
+    /** 高用量阈值百分比，默认 80 */
+    highUsageThreshold?: number;
+    /** 点击回调 */
+    onClick?: (info: {
+      usedTokens: number;
+      contextWindow: number;
+      percent: number;
+    }) => void;
+  };
+
+  /**
+   * 分支选择（对齐 dtcoder-ide ComposerBranchTrigger）
+   * @description 在工具栏渲染分支触发器：分支图标 + 当前分支名 + 下拉菜单。
+   * @example
+   * ```tsx
+   * <MarkdownInputField
+   *     branch={{
+   *       branchName: 'main',
+   *       branches: [{ name: 'main', displayName: 'main', isRemote: false, isCurrent: true }],
+   *       onSelectBranch: (name) => switchBranch(name),
+   *     }}
+   *   />
+   * ```
+   */
+  branch?: {
+    /** 当前分支名；空时不渲染 */
+    branchName?: string | null;
+    /** tooltip 文案 */
+    tooltipTitle?: string;
+    /** 可切换分支列表；不传仅展示当前分支 */
+    branches?: Array<{
+      name: string;
+      displayName: string;
+      isRemote: boolean;
+      isCurrent: boolean;
+    }>;
+    /** 切换中 */
+    switching?: boolean;
+    /** 禁用（会话锁定时仅展示） */
+    disabled?: boolean;
+    /** 选择分支回调 */
+    onSelectBranch?: (branchName: string) => void;
+    /** 搜索回调（远程过滤场景） */
+    onSearch?: (query: string) => void;
+    /** 分支列表加载中 */
+    loading?: boolean;
   };
 
   /**
