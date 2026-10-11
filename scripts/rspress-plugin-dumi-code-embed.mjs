@@ -20,7 +20,10 @@ import { fileURLToPath } from 'node:url';
 import { visit } from 'unist-util-visit';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DEMO_REGISTRY_FILE = path.resolve(__dirname, '../docs/_demoRegistry.json');
+const DEMO_REGISTRY_FILE = path.resolve(
+  __dirname,
+  '../docs/_demoRegistry.json',
+);
 
 /** mdx import 声明节点 */
 function mdxImport(name, from) {
@@ -99,7 +102,8 @@ function attrsFromJsx(node) {
   const attrs = {};
   for (const a of node.attributes ?? []) {
     if (!a.name) continue;
-    attrs[a.name] = typeof a.value === 'string' ? a.value : (a.value?.value ?? '');
+    attrs[a.name] =
+      typeof a.value === 'string' ? a.value : (a.value?.value ?? '');
   }
   return attrs;
 }
@@ -107,8 +111,12 @@ function attrsFromJsx(node) {
 /** demo 稳定 ID：显式 id 优先（E2E fixtures 约定），否则由路径推导 */
 export function deriveDemoId(srcRelative, explicitId) {
   if (explicitId) return explicitId;
-  const normalized = srcRelative.replace(/\\/g, '/').replace(/\.(tsx|ts|jsx|js)$/, '');
-  const withoutDots = normalized.startsWith('../') ? normalized.slice(3) : normalized;
+  const normalized = srcRelative
+    .replace(/\\/g, '/')
+    .replace(/\.(tsx|ts|jsx|js)$/, '');
+  const withoutDots = normalized.startsWith('../')
+    ? normalized.slice(3)
+    : normalized;
   return `docs-${withoutDemosSuffix(withoutDots)}`;
 }
 
@@ -144,10 +152,11 @@ function collectCodeEmbeds(mdPath, docsDir) {
  */
 function pickDemoExportName(srcAbs) {
   const src = fs.readFileSync(srcAbs, 'utf8');
-  if (/export\s+default/.test(src) || /export\s*\{\s*default\s*\}/.test(src)) return 'Demo';
-  const named = [...src.matchAll(/export\s+(?:const|function|class)\s+([A-Za-z_$][\w$]*)/g)].map(
-    (m) => m[1],
-  );
+  if (/export\s+default/.test(src) || /export\s*\{\s*default\s*\}/.test(src))
+    return 'Demo';
+  const named = [
+    ...src.matchAll(/export\s+(?:const|function|class)\s+([A-Za-z_$][\w$]*)/g),
+  ].map((m) => m[1]);
   return named[0] ?? 'Demo';
 }
 
@@ -168,11 +177,10 @@ function collectMdFiles(dir) {
 export function dumiDemoPlugin() {
   /** demoId → { srcAbs, attrs }；addPages 与 remark 共享（remark 阶段读取补全 attrs） */
   const registry = new Map();
-  let docsDirResolved = null;
 
   const remarkDumiCodeEmbed = () => (tree, vfile) => {
     const fileDir = path.dirname(vfile.path || vfile.history[0] || '');
-    let seq = 0;
+    let hasDemoCardImport = false;
 
     /**
      * 把 <code src=...> 节点改写为 <DemoCard ... />，并注入 import。
@@ -180,14 +188,16 @@ export function dumiDemoPlugin() {
      * mdxJsxFlowElement（JSX 语义），两种形态都要处理。
      */
     const replaceWithDemoCard = (node) => {
-      const attrs = node.type === 'html' ? parseAttrs(node.value) : attrsFromJsx(node);
+      const attrs =
+        node.type === 'html' ? parseAttrs(node.value) : attrsFromJsx(node);
       if (!attrs.src) return false;
       const srcAbs = path.resolve(fileDir, attrs.src);
       if (!fs.existsSync(srcAbs)) return false;
 
-      const height = attrs.iframe ? Number.parseInt(attrs.iframe, 10) || null : null;
+      const height = attrs.iframe
+        ? Number.parseInt(attrs.iframe, 10) || null
+        : null;
       const demoId = deriveDemoId(attrs.src, attrs.id);
-      const componentName = `StandaloneDemo${++seq}`;
 
       registry.set(demoId, { srcAbs, attrs });
 
@@ -200,14 +210,19 @@ export function dumiDemoPlugin() {
         exprAttr('height', String(height ?? 480)),
         ...(attrs.background ? [strAttr('background', attrs.background)] : []),
         ...(attrs.title ? [strAttr('title', attrs.title)] : []),
-        ...(attrs.description ? [strAttr('description', attrs.description)] : []),
+        ...(attrs.description
+          ? [strAttr('description', attrs.description)]
+          : []),
       ];
       node.children = [];
 
-      tree.children.unshift(
-        mdxImport('DemoCard', '@internal/demo-card'),
-        mdxImport(componentName, `${srcAbs.split(path.sep).join('/')}?standalone-demo`),
-      );
+      // 文档页只渲染 iframe 容器，demo 源码由 /~demos/<id> 独立路由加载。
+      // 不要在此处导入 demo，否则每个组件文档页都会重复打包编辑器、
+      // 图表等重依赖，即使该导入从未被渲染。
+      if (!hasDemoCardImport) {
+        tree.children.unshift(mdxImport('DemoCard', '@internal/demo-card'));
+        hasDemoCardImport = true;
+      }
       return true;
     };
 
@@ -230,8 +245,6 @@ export function dumiDemoPlugin() {
       const docsDir = config.root
         ? path.resolve(__dirname, '..', config.root)
         : path.resolve(__dirname, '..', 'docs');
-      docsDirResolved = docsDir;
-
       const pages = [];
       for (const mdFile of collectMdFiles(docsDir)) {
         for (const { demoId, srcAbs } of collectCodeEmbeds(mdFile, docsDir)) {
@@ -259,10 +272,16 @@ export function dumiDemoPlugin() {
       // 写 registry 供脚本/调试使用
       try {
         const serializable = Object.fromEntries(
-          [...registry.entries()].map(([id, { srcAbs }]) => [id, srcAbs.split(path.sep).join('/')]),
+          [...registry.entries()].map(([id, { srcAbs }]) => [
+            id,
+            srcAbs.split(path.sep).join('/'),
+          ]),
         );
         fs.mkdirSync(path.dirname(DEMO_REGISTRY_FILE), { recursive: true });
-        fs.writeFileSync(DEMO_REGISTRY_FILE, `${JSON.stringify(serializable, null, 2)}\n`);
+        fs.writeFileSync(
+          DEMO_REGISTRY_FILE,
+          `${JSON.stringify(serializable, null, 2)}\n`,
+        );
       } catch {
         /* registry 写失败不阻塞构建 */
       }

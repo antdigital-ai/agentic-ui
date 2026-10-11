@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 export interface DemoCardProps {
   /** demo 稳定 ID（对应 /~demos/<demoId> 路由） */
@@ -13,6 +13,34 @@ export interface DemoCardProps {
 
 const DEFAULT_DEMO_BG = 'var(--main-bg-color, #fff)';
 
+function useNearViewport() {
+  const containerRef = useRef<HTMLElement>(null);
+  const [isNearViewport, setIsNearViewport] = useState(false);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || isNearViewport) return;
+
+    if (!('IntersectionObserver' in window)) {
+      setIsNearViewport(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setIsNearViewport(true);
+        observer.disconnect();
+      },
+      { rootMargin: '300px 0px' },
+    );
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [isNearViewport]);
+
+  return { containerRef, isNearViewport };
+}
+
 /**
  * demo 预览卡片：iframe 加载独立 demo 路由页，与 dumi Previewer 等价。
  * 暗色模式切换时刷新 iframe，保证 demo 内 antd 主题同步。
@@ -25,16 +53,19 @@ export function DemoCard({
   description,
 }: DemoCardProps) {
   const [showSource, setShowSource] = useState(false);
+  const { containerRef, isNearViewport } = useNearViewport();
 
   return (
-    <section className="demo-card" data-demo-id={demoId}>
+    <section ref={containerRef} className="demo-card" data-demo-id={demoId}>
       <div className="demo-card__canvas" style={{ background, height }}>
-        <iframe
-          src={`/~demos/${demoId}`}
-          title={title ?? demoId}
-          data-demo-frame={demoId}
-          loading="lazy"
-        />
+        {isNearViewport && (
+          <iframe
+            src={`/~demos/${demoId}`}
+            title={title ?? demoId}
+            data-demo-frame={demoId}
+            loading="lazy"
+          />
+        )}
       </div>
       {(title || description || true) && (
         <div className="demo-card__meta">

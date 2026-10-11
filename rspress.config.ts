@@ -1,6 +1,6 @@
 import { defineConfig } from '@rspress/core';
-import path from 'node:path';
 import { pluginPreview } from '@rspress/plugin-preview';
+import path from 'node:path';
 import { dumiDemoPlugin } from './scripts/rspress-plugin-dumi-code-embed.mjs';
 
 // Rspress 站点根目录（相对仓库根）
@@ -38,6 +38,10 @@ export default defineConfig({
   },
   // 与 dumi 时代 docs-dist 对齐：E2E preview 端口 4172 在 playwright.config.ts 固定
   builderConfig: {
+    server: {
+      port: 4172,
+      strictPort: true,
+    },
     resolve: {
       alias: {
         // DemoCard 由主题目录提供（standalone 页样式并入 agentic-site.css）
@@ -64,11 +68,6 @@ export default defineConfig({
     },
     // @silurus/ooxml 的 wasm-bindgen 胶水使用 BigInt 字面量，默认 es2015 压缩会拒绝；
     // 与 dumi 时代 jsMinifierOptions.target=['es2020'] 对齐（chrome80 完整支持）
-    performance: {
-      chunkSplit: {
-        strategy: 'split-by-experience',
-      },
-    },
     tools: {
       rspack: (options) => {
         // 静态资源体积上限放宽：图表/lottie 等大资源按需加载
@@ -82,7 +81,8 @@ export default defineConfig({
     // Rspress 不做路由化），保留原链接不再报死链。
     link: {
       checkDeadLinks: {
-        excludes: (url) => /\.(tsx?|jsx?)$/.test(url.split('#')[0].split('?')[0]),
+        excludes: (url) =>
+          /\.(tsx?|jsx?)$/.test(url.split('#')[0].split('?')[0]),
       },
     },
   },
