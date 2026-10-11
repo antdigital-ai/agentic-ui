@@ -19,6 +19,8 @@ group:
   - 🆕 新增分支选择（`branch`）：分支 pill + 可搜索下拉菜单（当前分支未提交概览、逐分支切换 spinner、新建分支入口、文案定制），独立组件 `ComposerBranchTrigger` 一并导出。
   - 💄 slash chip 色调对齐 IDE `resolveSlashCommandToneKey`：`plan` / `goal` 命令专属色，未配置 chip 无后续输入时展示 `placeholderText`。
   - 🛠 导出 `insertComposerChip` / `withComposerChips` / `findUnconfiguredSlashChips` / `handleLongTextPasteFold` 及 `ComposerChipNode` 系列 chip 工具函数与类型。
+- MarkdownRenderer
+  - 🐞 修复 `throttleOptions.fade` 切换后缓存块复用旧 token 树的问题：fade 配置变化现在会重建 processor 触发重解析，流式结束仍保持 processor 稳定不卸载重组件。
 
 ## v2.32.48
 

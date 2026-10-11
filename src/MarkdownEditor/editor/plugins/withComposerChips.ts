@@ -1,14 +1,16 @@
 import { Editor, Element, Node, Path, Range, Transforms } from 'slate';
-import {
+import type {
   ComposerChipData,
   ComposerSlashChip,
+} from '../elements/ComposerChip/types';
+import {
   createLongTextChipNode,
   isSlashChipUnconfigured,
   readComposerChipData,
   shouldCollapsePastedText,
 } from '../elements/ComposerChip/types';
 
-export { ComposerChipData, shouldCollapsePastedText };
+export { shouldCollapsePastedText };
 
 /**
  * withComposerChips — 内联原子 chip 编辑器插件。

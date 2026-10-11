@@ -73,7 +73,15 @@ export const useStreamingMarkdownReact = (
         rehypePlugins,
         tokenStateRef.current,
       ),
-    [remarkPlugins, stableHtmlConfig, stableFormula, rehypePlugins],
+    [
+      remarkPlugins,
+      stableHtmlConfig,
+      stableFormula,
+      rehypePlugins,
+      // fade 配置切换需重建 processor：块缓存键不含 fade，仅改 tokenStateRef
+      // 会让 sealed 块复用旧 token 树（反之流式结束不重建，保住性能优化）。
+      options?.fadeTokensConfig,
+    ],
   );
 
   const prefixCls = options?.prefixCls ?? 'ant-agentic-md-editor';

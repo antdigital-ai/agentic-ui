@@ -205,6 +205,8 @@ const InternalMarkdownRenderer = forwardRef<
     streaming: activeStreaming,
     isFinished: streaming && isFinished,
     fadeTokens: fadeActive,
+    // 仅随宿主 fade 配置变化（不随流式结束翻转），驱动 processor 重建重解析缓存块
+    fadeTokensConfig: throttleOptions?.fade !== false,
     // 修订追踪用未限流的完整 source，保证缓存键随真实流入推进，而非随限流帧抖动。
     contentRevisionSource: activeStreaming ? sourceText : undefined,
     eleRender,

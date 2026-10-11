@@ -19,6 +19,8 @@ group:
   - 🆕 Added branch selector (`branch`): branch pill with a searchable dropdown menu (current-branch uncommitted overview, per-branch switching spinner, create-branch entry, label customization); the standalone `ComposerBranchTrigger` component is exported as well.
   - 💄 Slash chip tones now align with the IDE `resolveSlashCommandToneKey`: dedicated colors for `plan` / `goal` commands, and unconfigured chips show `placeholderText` when no input follows.
   - 🛠 Exported `insertComposerChip` / `withComposerChips` / `findUnconfiguredSlashChips` / `handleLongTextPasteFold` plus the `ComposerChipNode` chip helpers and types.
+- MarkdownRenderer
+  - 🐞 Fixed cached blocks reusing the stale token tree after toggling `throttleOptions.fade`: fade config changes now rebuild the processor to re-parse, while finishing a stream still keeps the processor stable so heavy components are not remounted.
 
 ## v2.32.48
 

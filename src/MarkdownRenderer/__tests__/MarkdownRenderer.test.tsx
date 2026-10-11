@@ -384,7 +384,7 @@ describe('MarkdownRenderer', () => {
       <MarkdownRenderer
         content={'Revenue increased[^1].\n\n[^1]: Verified source.'}
         streaming
-        isFinished
+        throttleOptions={{ enabled: false }}
       />,
     );
 
