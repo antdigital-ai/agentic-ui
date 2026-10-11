@@ -8,6 +8,39 @@ interface UseStreamingHookProps {
 }
 
 describe('useStreaming', () => {
+  it('非流式消息首帧直接显示，初始化不额外提交状态', () => {
+    const snapshots: string[] = [];
+    const { rerender } = renderHook(
+      ({ input }: { input: string }) => {
+        const output = useStreaming(input, false);
+        snapshots.push(output);
+        return output;
+      },
+      { initialProps: { input: 'First answer' } },
+    );
+    expect(snapshots).toEqual(['First answer']);
+    rerender({ input: 'Updated answer' });
+    expect(
+      snapshots.slice(1).every((output) => output === 'Updated answer'),
+    ).toBe(true);
+  });
+
+  it('流式正文清空的首帧不会回显上次输出', () => {
+    const snapshots: string[] = [];
+    const { rerender } = renderHook(
+      ({ input }: { input: string }) => {
+        const output = useStreaming(input, true);
+        snapshots.push(output);
+        return output;
+      },
+      { initialProps: { input: 'Previous answer' } },
+    );
+    snapshots.length = 0;
+    rerender({ input: '' });
+    expect(snapshots.length).toBeGreaterThan(0);
+    expect(snapshots.every((output) => output === '')).toBe(true);
+  });
+
   it('流式输入未形成完整 token 时应返回占位符', async () => {
     const { result } = renderHook(
       ({ input, enabled }: UseStreamingHookProps) =>

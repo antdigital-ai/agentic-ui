@@ -1,26 +1,27 @@
-import React, { useMemo, useRef, useState } from 'react';
-import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
-import {
-  JINJA_DOLLAR_PLACEHOLDER,
-  preprocessNormalizeLeafToContainerDirective,
-} from '../../MarkdownEditor/editor/parser/constants';
-import { debugInfo } from '../../Utils/debugUtils';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   buildEditorAlignedComponents,
   createHastProcessor,
-  splitMarkdownBlocks,
   type UseMarkdownToReactOptions,
 } from '../markdownReactShared';
 
-import { MarkdownBlockPiece } from './MarkdownBlockPiece';
+import {
+  createMarkdownBlockElements,
+  type MarkdownBlockElements,
+} from './markdownBlockElements';
 import type { StreamingTokenState } from './rehypeStreamingTokens';
 import { shouldResetRevisionProgress } from './revisionPolicy';
+import {
+  splitStreamingMarkdownBlocks,
+  type StreamingMarkdownBlocks,
+} from './splitStreamingMarkdownBlocks';
 import { useProgressiveBlocks } from './useProgressiveBlocks';
 import { useShallowMemo } from './useShallowMemo';
-
-/** 空块数组常量，避免每次返回新引用 */
-const EMPTY_BLOCKS: string[] = [];
+import {
+  MarkdownComponentContext,
+  useStableMarkdownComponents,
+} from './useStableMarkdownComponents';
 
 interface RevisionState {
   prevRevision: string | undefined;
@@ -52,21 +53,34 @@ export const useStreamingMarkdownReact = (
   // 避免随 streaming 变化重建导致 chart / 代码块卸载重挂。
   const tokenStateRef = useRef<StreamingTokenState>({ enabled: false });
   tokenStateRef.current.enabled = !!options?.fadeTokens;
+  // useFormulaConfig resolves a fresh flat object on every render. Equal
+  // settings must preserve the processor and its parsed block caches.
+  const stableFormula = useShallowMemo(options?.formula);
+  const stableHtmlConfig = useShallowMemo(options?.htmlConfig);
+  const remarkPlugins = options?.remarkPlugins?.length
+    ? options.remarkPlugins
+    : undefined;
+  const rehypePlugins = options?.rehypePlugins?.length
+    ? options.rehypePlugins
+    : undefined;
 
   const processor = useMemo(
     () =>
       createHastProcessor(
-        options?.remarkPlugins,
-        options?.htmlConfig,
-        options?.formula,
-        options?.rehypePlugins,
+        remarkPlugins,
+        stableHtmlConfig,
+        stableFormula,
+        rehypePlugins,
         tokenStateRef.current,
       ),
     [
-      options?.remarkPlugins,
-      options?.htmlConfig,
-      options?.formula,
-      options?.rehypePlugins,
+      remarkPlugins,
+      stableHtmlConfig,
+      stableFormula,
+      rehypePlugins,
+      // fade 配置切换需重建 processor：块缓存键不含 fade，仅改 tokenStateRef
+      // 会让 sealed 块复用旧 token 树（反之流式结束不重建，保住性能优化）。
+      options?.fadeTokensConfig,
     ],
   );
 
@@ -74,8 +88,9 @@ export const useStreamingMarkdownReact = (
 
   const stableComponents = useShallowMemo(options?.components);
   const stableFncProps = useShallowMemo(options?.fncProps);
+  const stableLinkConfig = useShallowMemo(options?.linkConfig);
 
-  const components = useMemo(
+  const renderers = useMemo(
     () =>
       buildEditorAlignedComponents(
         prefixCls,
@@ -83,17 +98,21 @@ export const useStreamingMarkdownReact = (
         // 逐词动画由 processor 控制；切换 streaming 不应替换组件类型，
         // 否则活动末块中的代码、图表和媒体会在结束流式时重挂。
         undefined,
-        options?.linkConfig,
+        stableLinkConfig,
         stableFncProps,
         options?.eleRender,
       ),
     [
       prefixCls,
       stableComponents,
-      options?.linkConfig,
+      stableLinkConfig,
       stableFncProps,
       options?.eleRender,
     ],
+  );
+  const { components, runtime } = useStableMarkdownComponents(
+    renderers,
+    stableComponents,
   );
 
   // 修订代用 useState 承载：渲染阶段对比 props 派生 next state，并通过
@@ -130,64 +149,58 @@ export const useStreamingMarkdownReact = (
 
   const generation = nextGeneration;
 
-  const blocks = useMemo(() => {
-    if (!content) return EMPTY_BLOCKS;
-    try {
-      const preprocessed = preprocessNormalizeLeafToContainerDirective(
-        content.replace(new RegExp(JINJA_DOLLAR_PLACEHOLDER, 'g'), '$'),
-      );
-      const splitBlocks = splitMarkdownBlocks(preprocessed);
-      return splitBlocks.length > 0 ? splitBlocks : EMPTY_BLOCKS;
-    } catch (error) {
-      debugInfo('[MarkdownRenderer] splitMarkdownBlocks failed', {
-        error: (error as Error).message || String(error),
-      });
-      return EMPTY_BLOCKS;
-    }
-  }, [content]);
+  const committedBlocks = useRef<StreamingMarkdownBlocks | undefined>(
+    undefined,
+  );
+  const splitState = useMemo(
+    () => splitStreamingMarkdownBlocks(content, committedBlocks.current),
+    [content],
+  );
+  // An abandoned concurrent render must not replace the committed prefix.
+  useEffect(() => {
+    committedBlocks.current = splitState;
+  }, [splitState]);
+  const blocks = splitState.blocks;
 
   // 第二步：分帧渐进——非流式大文档首批只渲染部分块，后续空闲帧追加
   const visibleCount = useProgressiveBlocks(
     blocks.length,
-    !!options?.streaming,
+    !!(options?.streaming || options?.isFinished),
     generation,
   );
 
-  // 第三步：生成 React 元素
-  return useMemo(() => {
-    if (blocks.length === 0) return null;
-
-    const renderCount = Math.min(visibleCount, blocks.length);
-    const elements = [];
-
-    for (let index = 0; index < renderCount; index++) {
-      const blockSource = blocks[index];
-      const isLast = index === blocks.length - 1;
-      // key 必须与 variant 解耦——末块由 tail 晋升 sealed 时不能卸载重挂，
-      // 否则 chart / agentar-card 等重组件会重复初始化。
-      const key = `b-${generation}-${index}`;
-      elements.push(
-        jsx(
-          MarkdownBlockPiece,
-          {
-            variant: isLast ? 'tail' : 'sealed',
-            blockSource,
-            processor,
-            components,
-            streaming: !!options?.streaming,
-          },
-          key,
-        ),
-      );
-    }
-
-    return jsxs(Fragment, { children: elements });
-  }, [
-    blocks,
-    generation,
-    visibleCount,
-    processor,
-    components,
-    options?.streaming,
-  ]);
+  // Reuse the actual React elements, not only the parsed contents behind memo.
+  const committedElements = useRef<MarkdownBlockElements | undefined>(
+    undefined,
+  );
+  const elementState = useMemo(
+    () =>
+      createMarkdownBlockElements(
+        blocks,
+        visibleCount,
+        generation,
+        processor,
+        components,
+        !!options?.streaming,
+        committedElements.current,
+      ),
+    [
+      blocks,
+      generation,
+      visibleCount,
+      processor,
+      components,
+      options?.streaming,
+    ],
+  );
+  useEffect(() => {
+    committedElements.current = elementState;
+  }, [elementState]);
+  const renderedBlocks = elementState.node;
+  if (renderedBlocks === null) return null;
+  return (
+    <MarkdownComponentContext.Provider value={runtime}>
+      {renderedBlocks}
+    </MarkdownComponentContext.Provider>
+  );
 };

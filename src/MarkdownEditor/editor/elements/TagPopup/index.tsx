@@ -6,6 +6,7 @@ import React, {
   ReactNode,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -352,7 +353,14 @@ const handleClick = (
   handlePanelClick(suggestionContext, props, onSelect, currentNodePath);
 };
 
-export const TagPopup = (props: RenderProps) => {
+interface TagPopupContentProps extends RenderProps {
+  suggestionContext: SuggestionContextValue;
+}
+
+const TagPopupContent = React.memo(function TagPopupContent({
+  suggestionContext,
+  ...props
+}: TagPopupContentProps) {
   const { items, children, type } = props;
   const editor = useSlateStatic();
   const [open, setOpen] = useState(false);
@@ -360,7 +368,6 @@ export const TagPopup = (props: RenderProps) => {
   const [chipWavePlaying, setChipWavePlaying] = useState(false);
   const domRef = useRef<HTMLDivElement>(null);
   const nodeDomRef = useRef<HTMLDivElement>(null);
-  const suggestionContext = useContext(SuggestionContext);
   const antdContext = useContext(ConfigProvider.ConfigContext);
   const baseCls = antdContext?.getPrefixCls('agentic-md-editor-tag-popup');
   const currentNodePath = useRef<number[] | null>(null);
@@ -389,10 +396,6 @@ export const TagPopup = (props: RenderProps) => {
   const chipWaveClaimedTextRef = useRef<string | null | undefined>(null);
 
   useEffect(() => {
-    const path = getNodePath(editor, nodeDomRef);
-    if (path) {
-      currentNodePath.current = path;
-    }
     // 插入波浪动画（对齐 dtcoder-ide composerChipShimmer）：
     // onSelect 登记的一次性插入意图，key 为 chip 最终文本；props.text
     // 同步到位后认领，成功即播放一轮。Set.delete 保证只播一次。
@@ -417,17 +420,13 @@ export const TagPopup = (props: RenderProps) => {
       onSelect,
       currentNodePath,
     );
-  }, [props.text]);
+  }, [editor, props.text]);
 
-  const [selectedItems, setSelectedItems] = useState(() => {
-    return typeof items === 'function' ? EMPTY_ITEMS : (items ?? EMPTY_ITEMS);
-  });
-
-  useEffect(() => {
-    if (typeof items !== 'function') {
-      setSelectedItems(items ?? EMPTY_ITEMS);
-    }
-  }, [items]);
+  const [loadedItems, setLoadedItems] = useState<TagPopupItem>(EMPTY_ITEMS);
+  // Static menu updates are already props; mirroring them in state costs another
+  // render per tag and briefly displays the previous menu.
+  const selectedItems =
+    typeof items === 'function' ? loadedItems : (items ?? EMPTY_ITEMS);
 
   useEffect(() => {
     // Panel suggestions are loaded once by the shared Suggestion component.
@@ -443,7 +442,7 @@ export const TagPopup = (props: RenderProps) => {
       try {
         const result = await items(props);
         if (!cancelled && Array.isArray(result)) {
-          setSelectedItems(result);
+          setLoadedItems(result);
         }
       } catch (error) {
         if (!cancelled && process.env.NODE_ENV !== 'production') {
@@ -573,4 +572,28 @@ export const TagPopup = (props: RenderProps) => {
       {content}
     </div>
   );
-};
+});
+
+export const TagPopup = React.memo(function TagPopup(props: RenderProps) {
+  const context = useContext(SuggestionContext);
+  // Dropdown tags use their own open state. A shared panel opening elsewhere
+  // must not rerender every dropdown or repeat its onChange callback.
+  const panelOpen = props.type === 'dropdown' ? undefined : context?.open;
+  const suggestionContext = useMemo(
+    () => ({
+      open: panelOpen,
+      setOpen: context?.setOpen,
+      isRender: context?.isRender,
+      onSelectRef: context?.onSelectRef,
+      triggerNodeContext: context?.triggerNodeContext,
+    }),
+    [
+      panelOpen,
+      context?.setOpen,
+      context?.isRender,
+      context?.onSelectRef,
+      context?.triggerNodeContext,
+    ],
+  );
+  return <TagPopupContent {...props} suggestionContext={suggestionContext} />;
+});

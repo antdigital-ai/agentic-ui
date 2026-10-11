@@ -421,9 +421,7 @@ describe('MarkdownInputField - voiceInput', () => {
     });
     handlersRef?.onPartial('hello ');
     await vi.waitFor(() => {
-      expect(handleChange).toHaveBeenLastCalledWith(
-        'hello ',
-      );
+      expect(handleChange).toHaveBeenLastCalledWith('hello ');
     });
 
     // sentence end -> finalize

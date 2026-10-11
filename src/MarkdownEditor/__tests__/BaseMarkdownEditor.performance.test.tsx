@@ -1,10 +1,12 @@
 import { act, render, waitFor } from '@testing-library/react';
-import React from 'react';
-import { Node } from 'slate';
+import React, { useContext } from 'react';
+import { Node, Transforms } from 'slate';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import BaseMarkdownEditorSlate from '../BaseMarkdownEditorSlate';
 import * as markdownParser from '../editor/parser/parserMdToSchema';
+import { useEditorStore } from '../editor/store';
 import type { ParagraphNode } from '../el';
+import { PluginContext } from '../plugin';
 import type { MarkdownEditorInstance } from '../types';
 
 afterEach(() => {
@@ -12,6 +14,61 @@ afterEach(() => {
 });
 
 describe('BaseMarkdownEditor editable lifecycle performance', () => {
+  it('updates the TOC without waking unchanged runtime context subscribers', async () => {
+    vi.useFakeTimers();
+    try {
+      const editorRef = React.createRef<MarkdownEditorInstance>();
+      const renders = vi.fn();
+      const Probe = React.memo(() => {
+        const { editorProps } = useEditorStore();
+        const plugins = useContext(PluginContext);
+        renders({ editorProps, plugins });
+        return (
+          <span data-testid="context-placeholder">
+            {editorProps.placeholder}
+          </span>
+        );
+      });
+      const children = <Probe />;
+      const props = {
+        initValue: '# Heading',
+        editorRef,
+        toc: true,
+        floatBar: { enable: false },
+        placeholder: 'first placeholder',
+        children,
+      };
+      const view = render(<BaseMarkdownEditorSlate {...props} />);
+      await act(async () => {});
+      renders.mockClear();
+
+      await act(async () => {
+        Transforms.insertText(
+          editorRef.current!.markdownEditorRef.current,
+          '!',
+          {
+            at: { path: [0, 0], offset: 7 },
+          },
+        );
+      });
+      await act(() => vi.advanceTimersByTimeAsync(500));
+      expect(
+        view.container.querySelector('.ant-anchor-link-title'),
+      ).toHaveTextContent('Heading!');
+      expect(renders).not.toHaveBeenCalled();
+
+      view.rerender(
+        <BaseMarkdownEditorSlate {...props} placeholder="latest placeholder" />,
+      );
+      expect(view.getByTestId('context-placeholder')).toHaveTextContent(
+        'latest placeholder',
+      );
+      expect(renders).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('does not reconstruct the editor or reparse editable input echoes', () => {
     const withEditor = vi.fn((editor) => editor);
     const plugins = [{ withEditor }];

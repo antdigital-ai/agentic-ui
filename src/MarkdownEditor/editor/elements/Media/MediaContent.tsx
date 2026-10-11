@@ -35,9 +35,11 @@ interface MediaContentProps {
 const MediaPlayer = React.memo(function MediaPlayer({
   element,
   type,
+  readonly,
 }: {
   element: MediaNode;
   type: 'video' | 'audio';
+  readonly?: boolean;
 }) {
   const [failed, setFailed] = useState(false);
   const label =
@@ -51,7 +53,10 @@ const MediaPlayer = React.memo(function MediaPlayer({
     autoPlay: element.autoplay,
     loop: element.loop,
     muted: element.muted,
-    preload: 'metadata' as const,
+    // A history view can contain many players. Defer their network work until
+    // playback; explicit autoplay and the editing preview retain eager metadata.
+    preload:
+      readonly && !element.autoplay ? ('none' as const) : ('metadata' as const),
     onError: () => setFailed(true),
     style: {
       width: element.width ? `${element.width}px` : '100%',
@@ -176,7 +181,14 @@ export const MediaContent = React.memo(function MediaContent({
   }
 
   if (type === 'video' || type === 'audio') {
-    return <MediaPlayer key={source} element={element} type={type} />;
+    return (
+      <MediaPlayer
+        key={source}
+        element={element}
+        type={type}
+        readonly={readonly}
+      />
+    );
   }
 
   return (

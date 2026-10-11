@@ -36,7 +36,7 @@ vi.mock('react-error-boundary', () => ({
   ),
 }));
 
-vi.mock('../..', () => ({
+vi.mock('../../MarkdownEditor', () => ({
   MarkdownEditor: ({ typewriter }: { typewriter?: boolean }) => (
     <div data-testid="markdown-editor">
       Editor
@@ -90,7 +90,9 @@ describe('MarkdownPreview', () => {
       expect(
         screen.queryByTestId('markdown-preview-popover-wrapper'),
       ).not.toBeInTheDocument();
-      expect(screen.getByTestId('markdown-editor')).toBeInTheDocument();
+      expect(
+        screen.getByTestId('markdown-renderer-markdown-mode'),
+      ).toBeInTheDocument();
     });
 
     it('extra 为 undefined 时不使用 Popover', () => {
@@ -303,6 +305,7 @@ describe('MarkdownPreview', () => {
       render(
         <MarkdownPreview
           {...defaultProps}
+          markdownRenderConfig={{ renderMode: 'slate' }}
           typing
           originData={{
             role: 'assistant',

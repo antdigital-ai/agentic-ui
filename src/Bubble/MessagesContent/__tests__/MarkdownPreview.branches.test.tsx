@@ -16,7 +16,7 @@ vi.mock('../../../MarkdownRenderer', () => ({
   ),
 }));
 
-vi.mock('../../../', () => ({
+vi.mock('../../../MarkdownEditor', () => ({
   MarkdownEditor: () => <div data-testid="slate-editor" />,
   parserMdToSchema: () => ({ schema: [] }),
 }));

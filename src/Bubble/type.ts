@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 import { MarkdownEditorProps } from '../MarkdownEditor/types';
 import { AttachmentFile } from '../MarkdownInputField/AttachmentButton/types';
 import type { FileMapViewProps } from '../MarkdownInputField/FileMapView';
+import type { QuoteProps } from '../Quote';
 import {
   BaseStyleProps,
   BubbleMetaData,
@@ -239,8 +240,8 @@ export interface BubbleClassNames {
 export interface BubbleItemStyleProps
   extends
     BubbleStyleProps,
-    MultiStyleProps<BubbleStyles>,
-    MultiClassNameProps<BubbleClassNames> {}
+    MultiStyleProps<BubbleStyles & BubbleSlotStyles>,
+    MultiClassNameProps<BubbleClassNames & BubbleSlotClassNames> {}
 
 // 从统一类型文件导出，避免重复定义
 export type { BubbleMetaData, MessageBubbleData } from '../Types';
@@ -335,6 +336,9 @@ export interface BubbleProps<
    */
   pure?: boolean;
 
+  /** 引用消息配置，在用户气泡中展示 */
+  quote?: QuoteProps;
+
   /**
    * 渲染配置
    */
@@ -371,7 +375,7 @@ export interface BubbleProps<
   bubbleListRef?: React.RefObject<HTMLDivElement | null>;
 
   /**
-   * 是否只读
+   * 是否只读，默认 true；false 时使用 Slate 编辑器
    */
   readonly?: boolean;
 
@@ -382,7 +386,8 @@ export interface BubbleProps<
 
   /**
    * 渲染模式快捷设置
-   * - 'slate': 使用 Slate 编辑器渲染（默认）
+   * 未指定时，普通只读消息使用 MarkdownRenderer；需要 Slate 的配置或插件保留 Slate
+   * - 'slate': 使用 Slate 编辑器渲染
    * - 'markdown': 使用轻量 MarkdownRenderer（无 Slate 实例，性能更优）
    * 等效于 markdownRenderConfig={{ renderMode }}
    */

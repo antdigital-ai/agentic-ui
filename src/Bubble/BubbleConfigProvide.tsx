@@ -1,6 +1,28 @@
 import React from 'react';
 import { ThoughtChainListProps } from '../ThoughtChainList/types';
-import { BubbleProps } from './type';
+import { BubbleProps, BubbleRenderConfig } from './type';
+
+// Context 历史上接受 content/uuid 泛型的渲染回调，保留该赋值兼容性，
+// 同时为直接声明的回调提供统一 BubbleProps 上下文类型。
+type ContextRenderCallback<T> = T extends (
+  props: BubbleProps,
+  ...args: infer Args
+) => infer Result
+  ? { render(props: ContextBubbleProps, ...args: Args): Result }['render']
+  : T;
+
+type ContextBubbleRenderConfig = {
+  [K in keyof BubbleRenderConfig]: K extends
+    | 'extraRender'
+    | 'extraRightRender'
+    | 'customConfig'
+    ? BubbleRenderConfig[K]
+    : ContextRenderCallback<BubbleRenderConfig[K]>;
+};
+
+interface ContextBubbleProps extends Omit<BubbleProps, 'bubbleRenderConfig'> {
+  bubbleRenderConfig?: ContextBubbleRenderConfig;
+}
 
 export type ChatConfigType = {
   agentId?: string;
@@ -21,16 +43,8 @@ export type ChatConfigType = {
      */
     enable: boolean;
   };
-  bubble?: BubbleProps<{
-    /**
-     * 聊天内容
-     */
-    content: string;
-    /**
-     * 聊天项的唯一标识
-     */
-    uuid: number;
-  }>;
+  /** 当前气泡属性 */
+  bubble?: ContextBubbleProps;
   compact?: boolean;
   /**
    * extra（点赞、踩、复制等）是否仅在 hover 时展示

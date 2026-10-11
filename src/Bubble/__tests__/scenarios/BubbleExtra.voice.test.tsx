@@ -5,6 +5,14 @@ import { describe, expect, it, vi } from 'vitest';
 import { BubbleConfigContext } from '../../BubbleConfigProvide';
 import { BubbleExtra } from '../../MessagesContent/BubbleExtra';
 
+vi.mock('../../../Components/lotties/bubble-actions/Play', () => ({
+  PlayLottie: ({ active }: { active: boolean }) => (
+    <span data-testid={active ? 'lottie-animation' : 'voice-play-lottie'}>
+      {active ? 'lottie-active' : 'lottie-inactive'}
+    </span>
+  ),
+}));
+
 const BubbleConfigProvide: React.FC<{
   children: React.ReactNode;
   compact?: boolean;

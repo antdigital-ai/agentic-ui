@@ -18,6 +18,7 @@ import {
 } from '../Utils/htmlUrlSafety';
 import {
   extractFootnoteRefFromSupChildren,
+  extractFootnoteRefFromSupHast,
   FncRefForMarkdown,
 } from './FncRefForMarkdown';
 import { createHastProcessor } from './processor';
@@ -583,6 +584,7 @@ const buildEditorAlignedComponents = (
         },
         children: jsx('video' as any, {
           ...rest,
+          preload: rest.preload ?? (rest.autoPlay ? 'metadata' : 'none'),
           controls: true,
           style: {
             maxWidth: '100%',
@@ -607,6 +609,7 @@ const buildEditorAlignedComponents = (
         },
         children: jsx('audio' as any, {
           ...rest,
+          preload: rest.preload ?? (rest.autoPlay ? 'metadata' : 'none'),
           controls: true,
           style: { width: '100%' },
           children,
@@ -651,7 +654,9 @@ const buildEditorAlignedComponents = (
     // 脚注引用 sup > a（remark-gfm 有定义时生成）— 与 Slate FncLeaf 对齐
     sup: (props: any) => {
       const { node, children, ...rest } = props;
-      const meta = extractFootnoteRefFromSupChildren(children);
+      const meta =
+        extractFootnoteRefFromSupHast(node) ??
+        extractFootnoteRefFromSupChildren(children);
       if (meta) {
         return jsx(FncRefForMarkdown as any, {
           fncProps,
@@ -1031,8 +1036,16 @@ export interface UseMarkdownToReactOptions {
   };
   fncProps?: MarkdownEditorProps['fncProps'];
   streaming?: boolean;
+  /** A completed stream shows all buffered blocks without static batching. */
+  isFinished?: boolean;
   /** 是否对文本拆分 token 做逐词淡入（已含 streaming 判定，由上层解析后传入） */
   fadeTokens?: boolean;
+  /**
+   * 逐词淡入的用户配置开关。与 `fadeTokens` 不同：不随流式结束翻转，
+   * 仅在宿主显式修改 `throttleOptions.fade` 时变化，用于驱动 processor
+   * 重建使缓存块按新配置重解析（fade 切换不重解析会残留旧 token 树）。
+   */
+  fadeTokensConfig?: boolean;
   /** 原始流字符串，与 useStreaming 输出分离避免缓存误判 */
   contentRevisionSource?: string;
   /** 返回 undefined 回退默认渲染 */

@@ -9,6 +9,19 @@ group:
 
 # Changelog
 
+## v2.33.0
+
+- MarkdownInputField
+  - 🆕 新增内联原子 chip 体系（`composerChips`）：slash 命令 chip（结构化技能节点 + 发送前 `onSlashChipGate` 拦截）、`@file` / `@folder` 与 `@symbol` 内联 mention chip，从纯文本标签升级为 Slate inline void 节点，整体删除、点击配置、发送时序列化为 `/name` 与 `@path`。
+  - 🆕 新增长文本粘贴折叠（`longTextFold`）：纯文本粘贴 ≥1200 字符或 ≥12 行时折叠为「长文本」chip（展示字符 / 行统计，点击弹出原文预览），发送时还原原文。
+  - 🆕 新增 fragment 级草稿恢复（`draft`）：idle / blur / send / switch / unmount 自动提交，`draftKey` 切换时自动恢复；默认 localStorage，可自定义 `storage`。
+  - 🆕 新增上下文用量指示（`contextUsage`）：工具栏环形指示器 + 内置 `ContextUsagePanel` 详情面板（分类分段条形图、可展开明细、高用量警告、compact 压缩操作），独立导出 `ContextUsageIndicator` / `ContextUsagePanel` / `computeBarSegments`。
+  - 🆕 新增分支选择（`branch`）：分支 pill + 可搜索下拉菜单（当前分支未提交概览、逐分支切换 spinner、新建分支入口、文案定制），独立组件 `ComposerBranchTrigger` 一并导出。
+  - 💄 slash chip 色调对齐 IDE `resolveSlashCommandToneKey`：`plan` / `goal` 命令专属色，未配置 chip 无后续输入时展示 `placeholderText`。
+  - 🛠 导出 `insertComposerChip` / `withComposerChips` / `findUnconfiguredSlashChips` / `handleLongTextPasteFold` 及 `ComposerChipNode` 系列 chip 工具函数与类型。
+- MarkdownRenderer
+  - 🐞 修复 `throttleOptions.fade` 切换后缓存块复用旧 token 树的问题：fade 配置变化现在会重建 processor 触发重解析，流式结束仍保持 processor 稳定不卸载重组件。
+
 ## v2.32.48
 
 - OfficeViewer
@@ -49,9 +62,28 @@ group:
 ## 未发布 {#unreleased}
 
 - Bubble
+  - 🐞 完成或停止生成时立即展示缓冲正文并退出流式状态，即使配置仍显式开启 `streaming`；清理逐词节点并保留音视频播放状态。
+  - ⚡️ 流式更新复用未变的列表行 React 元素，减少历史行子树创建和包装组件渲染；正文追加时保持附件与默认思维链稳定，配置及状态变化仍即时更新。
+  - 🐞 修复空操作栏无法恢复、自定义操作被隐藏、引用占位符未替换及原文链接无法跳转；保留数字与数组正文，操作栏显隐及切换悬浮模式时保留编辑草稿。
+  - 🐞 统一 `quote`、Context、操作栏与 ref 的公开类型，接通 `styles` / `classNames` 的简短语义字段；附件和语音配置更新即时生效。
+  - ⚡️ 合并 AI 气泡重复容器，省略空标题与前后区域；懒加载共用列表行和观察器，追加消息或切换加载策略时保留已显示消息状态，骨架屏不再计算隐藏消息。
+  - ⚡️ 普通只读消息默认使用 `MarkdownRenderer`，编辑态、Slate 专属配置/插件及编辑器配置注释保留 Slate；引用预览按需挂载并保留语言环境与表格全屏交互。
+  - 🛠 移除独立的 `PureBubble`、`PureAIBubble`、`PureUserBubble`、`PureBubbleList` 和 `PureBubbleListProps`，统一使用 `Bubble` / `BubbleList`；简洁样式通过 `pure` 配置。新增 `@ant-design/agentic-ui/Bubble` 按需入口。
+  - 🐞 统一正文配置的优先级，保留 `markdownRenderConfig.initValue` 和显式 `readonly`；正文默认只读，原 Pure 用法需要编辑时请设置 `readonly={false}`。修复扩展消息字段、会话配置及回调变化被 memo 忽略的问题。
+  - ⚡️ 流式更新复用未变的历史消息、样式和上下文；loading 消息使用稳定标识，避免重复挂载与丢失内部状态。
+  - ⚡️ 删除每条用户消息的一层重复容器，稳定正文属性，避免反馈与布局状态变化重复渲染未变正文。
+  - ⚡️ Schema 编辑桥接仅在开发环境按需加载；外部正文更新直接反映在当前渲染，避免旧正文回显与额外渲染。
   - ⚡️ 引用列表仅在展开时挂载条目，折叠或关闭预览时释放隐藏内容；Slate 正文更新复用编辑器同步入口，避免重复解析并保留插件配置。
 
 - MarkdownRenderer
+  - ⚡️ 流式更新直接复用未变块的 React 元素，单个块仅保留最近一次解析结果；相同 HTML 配置与空插件数组不再重建解析器，减少历史块计算与回退分支的缓存占用。
+  - ⚡️ 普通文本与代码正文按片段处理流式 token；脚注按已提交的定义上下文增量解析尾部，仅更新变化的引用预览，新全局定义或正文修订仍完整校验。
+  - ⚡️ 隔离代码块与表格的配置订阅，复用未变图表数据和 Schema 默认渲染；代码工具栏减少一层 DOM，尚未形成图表的流式内容不注册 resize 监听。
+  - ⚡️ 普通流式正文复用已完成块，仅重新切分末尾窗口；复杂指令保留完整处理，修订、回退与清空仍正确重置。静态正文首帧同步显示，重新开启空流时清除旧正文。
+  - 🐞 限流器比较实际已展示的前缀，修复修改前文但边界字符相同时沿用旧展示进度的问题。
+  - 🆕 新增 `tableConfig`，支持原生表格按需打开弹窗或抽屉全屏预览。
+  - ⚡️ 脚注定义按正文统一解析并共享给引用角标，移动端预览首次点击才挂载；只读音视频默认不预加载。
+  - 🐞 稳定节点渲染桥接，链接、脚注和表格配置更新即时生效并保留媒体播放进度；打开中的表格预览与代码块不再因配置回显重挂载。
   - ⚡️ 清理已封版或已结束流式输出的逐词动画节点，合并相邻文本并保留格式、图表及媒体实例；结束流式输出时不再重复挂载已显示段落。
 
 - TaskList / ToolUseBarThink / ToolUseBar
@@ -61,6 +93,8 @@ group:
   - ⚡️ 精简文件行、文件树叶子和搜索结果的 DOM，按需挂载图片预览；稳定文件行数据引用，避免折叠其他分组时重复渲染文件内容。
 
 - MarkdownEditor
+  - ⚡️ 稳定插件与编辑器上下文，减少卡片与 Tag 的选区订阅和节点遍历；合并普通输入的选区查询，精简链接卡片 DOM。
+  - ⚡️ 只读入口隔离 Slate 运行时依赖，流式更新复用评论观察器；编辑态删除评论时才加载 Slate 操作。
   - 🐞 节点更新和嵌入式代码、Tag 编辑在执行时校验当前 Slate 节点身份，避免节点移动、删除或正文替换后写入相邻节点；表格索引路径随结构变化同步。
   - 🐞 修复只读反向选择、键盘选择与跨编辑器选区同步；加载正文仅清理当前编辑器的浏览器选区，聚焦回调保留插件序列化。
   - ⚡️ 合并连续选区通知并取消卸载后的任务，对相同文档和选区去重，避免重复回调、序列化与测量；相同文字位于不同位置时仍更新浮条定位。

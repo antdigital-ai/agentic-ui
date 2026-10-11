@@ -13,7 +13,7 @@ vi.mock('../../../MarkdownRenderer', () => ({
   ),
 }));
 
-vi.mock('../../../', () => ({
+vi.mock('../../../MarkdownEditor', () => ({
   MarkdownEditor: (props: any) => (
     <div
       data-testid="md-editor"
@@ -42,6 +42,7 @@ const baseProps = {
   content: 'hello',
   beforeContent: null,
   afterContent: null,
+  markdownRenderConfig: { renderMode: 'slate' as const },
 };
 
 describe('MarkdownPreview deepen residual branches', () => {

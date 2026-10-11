@@ -1,9 +1,16 @@
-import { useEffect } from 'react';
-import {
-  SchemaEditorBridgeManager,
-  type BubbleHandler,
-} from './SchemaEditorBridgeManager';
-import { useRefState } from './useRefState';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useRefFunction } from '../../Hooks/useRefFunction';
+import type { BubbleHandler } from './SchemaEditorBridgeManager';
+
+interface ContentSource {
+  id: string | undefined;
+  content: string;
+}
+
+interface ContentOverride {
+  source: ContentSource;
+  content: string;
+}
 
 /**
  * Schema Editor Bridge Hook 返回值
@@ -39,50 +46,50 @@ export function useSchemaEditorBridge(
   /** 开发环境自动启用 */
   const enabled = process.env.NODE_ENV === 'development';
 
-  /**
-   * 内部状态：使用 useRefState 同时维护 state 和 ref
-   * @description setContent 会立即更新 ref，解决 set 后立即读取的问题
-   */
-  const [content, setContent, contentRef] = useRefState(initialContent);
+  const source = useMemo<ContentSource>(
+    () => ({ id, content: initialContent }),
+    [id, initialContent],
+  );
+  const [override, setOverride] = useState<ContentOverride>();
 
-  /**
-   * 同步初始内容变化
-   * @description 当外部传入的 initialContent 变化时，更新内部状态
-   */
-  useEffect(() => {
-    setContent(initialContent);
-  }, [initialContent]);
+  // 外部正文直接用于当前渲染；开发工具的改稿只属于当时的消息版本。
+  const content =
+    override?.source === source ? override.content : initialContent;
+  const contentRef = useRef(content);
+  useLayoutEffect(() => {
+    contentRef.current = content;
+  }, [content]);
+  const setContent = useRefFunction((nextContent: string) => {
+    contentRef.current = nextContent;
+    setOverride({ source, content: nextContent });
+  });
 
   /**
    * 注册到单例管理器
    */
   useEffect(() => {
-    const manager = SchemaEditorBridgeManager.getInstance();
+    if (process.env.NODE_ENV !== 'development' || !id) return;
 
-    /** 无 id 时直接返回 */
-    if (!id) return;
+    let cancelled = false;
+    let unregister: (() => void) | undefined;
+    // 生产包可移除整个开发桥接，避免引入 SDK、预览编辑器和 ReactDOM。
+    void import('./SchemaEditorBridgeManager').then(
+      ({ SchemaEditorBridgeManager }) => {
+        if (cancelled) return;
+        const manager = SchemaEditorBridgeManager.getInstance();
+        const handler: BubbleHandler = {
+          getContent: () => contentRef.current,
+          setContent,
+        };
+        manager.setEnabled(true);
+        manager.register(id, handler);
+        unregister = () => manager.unregister(id);
+      },
+    );
 
-    /** 禁用时注销已注册的 handler 并返回 */
-    if (!enabled) {
-      if (manager.has(id)) manager.unregister(id);
-      return;
-    }
-
-    /** 设置管理器启用状态 */
-    manager.setEnabled(true);
-
-    /** 创建处理器 */
-    const handler: BubbleHandler = {
-      getContent: () => contentRef.current,
-      setContent,
-    };
-
-    /** 注册 */
-    manager.register(id, handler);
-
-    /** 清理：组件卸载时注销 */
     return () => {
-      manager.unregister(id);
+      cancelled = true;
+      unregister?.();
     };
   }, [id, enabled]);
 

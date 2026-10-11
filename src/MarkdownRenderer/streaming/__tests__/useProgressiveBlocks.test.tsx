@@ -77,6 +77,25 @@ describe('useProgressiveBlocks', () => {
     expect(result.current).toBe(50);
   });
 
+  it('reveals all final blocks when completion flushes a large buffered tail', () => {
+    const { result, rerender } = renderHook(
+      ({ total, streaming }) => useProgressiveBlocks(total, streaming, 1),
+      { initialProps: { total: 2, streaming: true } },
+    );
+    rerender({ total: 50, streaming: false });
+    expect(result.current).toBe(50);
+  });
+
+  it('keeps progressive loading when a stream is replaced by a different static document', () => {
+    const { result, rerender } = renderHook(
+      ({ streaming, generation }) =>
+        useProgressiveBlocks(50, streaming, generation),
+      { initialProps: { streaming: true, generation: 1 } },
+    );
+    rerender({ streaming: false, generation: 2 });
+    expect(result.current).toBe(INITIAL_VISIBLE_COUNT);
+  });
+
   it('reveals appended blocks without hiding the previously mounted document', async () => {
     const { result, rerender } = renderHook(
       ({ total }) => useProgressiveBlocks(total, false, 1),

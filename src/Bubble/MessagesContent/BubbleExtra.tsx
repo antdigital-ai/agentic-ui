@@ -1,9 +1,3 @@
-import {
-  CopyLottie,
-  DislikeLottie,
-  LikeLottie,
-  RefreshLottie,
-} from '@ant-design/agentic-ui';
 import { DislikeFilled, LikeFilled } from '@ant-design/icons';
 import { ConfigProvider, Divider } from 'antd';
 import classNames from 'clsx';
@@ -12,11 +6,21 @@ import copy from 'copy-to-clipboard';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { Loading } from '../../Components/Loading';
+import { CopyLottie } from '../../Components/lotties/bubble-actions/Copy';
+import { DislikeLottie } from '../../Components/lotties/bubble-actions/Dislike';
+import { LikeLottie } from '../../Components/lotties/bubble-actions/Like';
+import { RefreshLottie } from '../../Components/lotties/bubble-actions/Refresh';
 import { useLocale } from '../../I18n';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
 import { BubbleExtraProps } from '../types/BubbleExtra';
+import { hasRenderableContent } from '../utils/hasRenderableContent';
 import { CopyButton } from './CopyButton';
 import { VoiceButton } from './VoiceButton';
+
+const getTextContent = (content: React.ReactNode) =>
+  typeof content === 'string' || typeof content === 'number'
+    ? String(content)
+    : '';
 
 /**
  * BubbleExtra 组件用于显示聊天项的额外操作按钮，如点赞、踩、复制等。
@@ -57,6 +61,7 @@ export const BubbleExtra = ({
 
   // 获取聊天项的原始数据
   const originalData = bubble?.originData;
+  const textContent = getTextContent(originalData?.content);
 
   const prefixCls = getPrefixCls('chat-item-extra');
   const chatCls = getPrefixCls('agentic-ui');
@@ -162,6 +167,10 @@ export const BubbleExtra = ({
       feedbackLoading,
       props.onLikeCancel,
       props.onCancelLike,
+      props.onLike,
+      originalData?.feedback,
+      likeButtonTitle,
+      bubble,
     ],
   );
 
@@ -203,6 +212,10 @@ export const BubbleExtra = ({
       alreadyFeedback,
       originalData?.isFinished,
       typing,
+      props.onDislike,
+      props.onDisLike,
+      originalData?.feedback,
+      getDislikeButtonTitle,
     ],
   );
 
@@ -225,10 +238,9 @@ export const BubbleExtra = ({
    */
   const shouldShowCopy = useMemo(() => {
     const defaultConditions =
-      originalData?.content &&
+      textContent &&
       !originalData?.extra?.answerStatus &&
-      originalData?.content !==
-        (locale?.['chat.message.aborted'] || '回答已停止生成');
+      textContent !== (locale?.['chat.message.aborted'] || '回答已停止生成');
 
     if (!defaultConditions) {
       return false;
@@ -244,7 +256,7 @@ export const BubbleExtra = ({
   }, [
     props.shouldShowCopy,
     bubble,
-    originalData?.content,
+    textContent,
     originalData?.extra?.answerStatus,
     locale,
   ]);
@@ -257,7 +269,7 @@ export const BubbleExtra = ({
           title={locale?.['chat.message.copy'] || '复制'}
           onClick={() => {
             try {
-              copy(bubble.originData?.content || '');
+              copy(getTextContent(bubble.originData?.content));
             } catch (error) {
               // 复制失败时静默处理
               console.error('复制失败:', error);
@@ -268,7 +280,7 @@ export const BubbleExtra = ({
           {(isHovered) => <CopyLottie active={isHovered} />}
         </CopyButton>
       ) : null,
-    [shouldShowCopy, locale, bubble.originData?.content],
+    [shouldShowCopy, locale, textContent, bubble.originData],
   );
 
   const voiceDom = useMemo(() => {
@@ -282,21 +294,27 @@ export const BubbleExtra = ({
      *    - 聊天项的内容不等于本地化的 'chat.message.aborted' 消息或其默认值 '回答已停止生成'
      * */
     const defaultShow =
-      !!originalData?.content &&
+      !!textContent &&
       !originalData?.extra?.answerStatus &&
       !typing &&
-      originalData?.content !==
-        (locale?.['chat.message.aborted'] || '回答已停止生成');
+      textContent !== (locale?.['chat.message.aborted'] || '回答已停止生成');
     if (!props.shouldShowVoice || !defaultShow) return null;
     return (
       <VoiceButton
-        text={bubble.originData?.content || ''}
+        text={textContent}
         defaultRate={1}
         rateOptions={[1.5, 1.25, 1, 0.75]}
         useSpeech={props.useSpeech}
       />
     );
-  }, [props.shouldShowVoice, props.useSpeech, bubble.originData?.content]);
+  }, [
+    props.shouldShowVoice,
+    props.useSpeech,
+    textContent,
+    originalData?.extra?.answerStatus,
+    typing,
+    locale,
+  ]);
 
   const dom = useMemo(
     () =>
@@ -361,11 +379,15 @@ export const BubbleExtra = ({
         )}
       </ActionIconBox>
     );
-  }, [originalData?.isAborted, typing, originalData?.isFinished, locale]);
-
-  useEffect(() => {
-    props.onRenderExtraNull?.(!dom && !reSend);
-  }, [dom, reSend, props.onRenderExtraNull]);
+  }, [
+    originalData?.isAborted,
+    typing,
+    originalData?.isFinished,
+    originalData?.extra?.preMessage?.content,
+    onReply,
+    chatCls,
+    locale,
+  ]);
 
   // 检查是否有任何内容需要渲染
   const hasLeftContent = (typing && originalData.content !== '...') || reSend;
@@ -394,21 +416,43 @@ export const BubbleExtra = ({
     ? copyDom
     : props.rightRender === false
       ? false
-      : !!rightDom;
+      : hasRenderableContent(rightDom);
+
+  const pureContent =
+    props.rightRender === undefined
+      ? [reSend, like, disLike, copyDom, voiceDom]
+      : [reSend, originalData?.isAborted ? copyDom : rightDom];
+  const isEmpty = pure
+    ? !pureContent.some(hasRenderableContent)
+    : (!hasLeftContent && !hasRightContent) ||
+      (!copyDom && !!originalData?.isAborted && !reSend);
+
+  useEffect(() => {
+    props.onRenderExtraNull?.(isEmpty);
+  }, [isEmpty, props.onRenderExtraNull]);
 
   // 如果没有任何内容，直接返回 null
-  if (!hasLeftContent && !hasRightContent) return null;
-
-  if (!copyDom && originalData?.isAborted && !reSend) {
-    return null;
-  }
+  if (isEmpty) return null;
   if (pure) {
-    return [reSend, like, disLike, copyDom, voiceDom];
+    if (!props.style && !props.className) return pureContent;
+    return (
+      <div
+        className={classNames(`${prefixCls}-action-box`, props.className)}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          ...props.style,
+        }}
+      >
+        {pureContent}
+      </div>
+    );
   }
   const inPopover = context?.extraShowOnHover;
   return (
     <div
-      className={prefixCls}
+      className={classNames(prefixCls, props.className)}
       style={{
         display: 'flex',
         alignItems: 'center',

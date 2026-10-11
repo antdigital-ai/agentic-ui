@@ -27,12 +27,6 @@ vi.mock('../List/SkeletonList', () => ({
   default: () => <div data-testid="skeleton-list">loading</div>,
 }));
 
-vi.mock('../../MarkdownEditor/editor/components/LazyElement', () => ({
-  LazyElement: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="lazy-element">{children}</div>
-  ),
-}));
-
 const msg = (
   id: string,
   content: string,
@@ -138,17 +132,21 @@ describe('BubbleList branches', () => {
     render(
       <BubbleList bubbleList={[msg('1', 'lazy')]} lazy={{ enable: true }} />,
     );
-    expect(screen.getByTestId('lazy-element')).toBeInTheDocument();
+    expect(
+      document.querySelector('[data-bubble-list-item][aria-hidden="true"]'),
+    ).toBeInTheDocument();
   });
 
-  it('shouldLazyLoad false 跳过 LazyElement', () => {
+  it('shouldLazyLoad false 直接显示行内容', () => {
     render(
       <BubbleList
         bubbleList={[msg('1', 'direct')]}
         lazy={{ enable: true, shouldLazyLoad: () => false }}
       />,
     );
-    expect(screen.queryByTestId('lazy-element')).not.toBeInTheDocument();
+    expect(
+      document.querySelector('[data-bubble-list-item][aria-hidden="true"]'),
+    ).not.toBeInTheDocument();
   });
 
   it('LOADING_FLAT 过渡到真实 id 保持 key', () => {
@@ -212,7 +210,7 @@ describe('BubbleList branches', () => {
     expect(screen.getByText('solo')).toBeInTheDocument();
   });
 
-  it('markdownRenderConfigProp.renderMode 优先于顶层 renderMode', () => {
+  it('顶层 renderMode 优先于 markdownRenderConfigProp.renderMode', () => {
     render(
       <BubbleList
         bubbleList={[msg('1', 'cfg')]}
@@ -262,7 +260,9 @@ describe('BubbleList branches', () => {
         }}
       />,
     );
-    expect(screen.getByTestId('lazy-element')).toBeInTheDocument();
+    expect(
+      document.querySelector('[data-bubble-list-item][aria-hidden="true"]'),
+    ).toBeInTheDocument();
   });
 
   it('item.meta 覆盖角色 meta', () => {

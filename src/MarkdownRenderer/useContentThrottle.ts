@@ -36,6 +36,9 @@ export function useContentThrottle(
     } else {
       engineRef.current.setOptions(optionsRef.current);
     }
+    // A newly created engine already has an empty fullContent, so push('') is
+    // a no-op. Clear state retained from the preceding non-streaming message.
+    if (!content) setDisplayed('');
     engineRef.current.push(content);
     if (isFinished) engineRef.current.complete();
   }, [content, enabled, isFinished]);
@@ -61,5 +64,5 @@ export function useContentThrottle(
   );
 
   // isFinished 时直绕过限流，保证「挂载即结束」的场景首帧就有完整内容（无需等 effect）。
-  return !enabled || isFinished ? content : displayed;
+  return !content || !enabled || isFinished ? content : displayed;
 }

@@ -3,24 +3,38 @@ import { ExportOutlined, RightOutlined } from '@ant-design/icons';
 import { ConfigProvider, Descriptions, Drawer, Popover } from 'antd';
 import classNames from 'clsx';
 import dayjs from 'dayjs';
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { I18nContext } from '../../I18n';
-import { BaseMarkdownEditor } from '../../MarkdownEditor/BaseMarkdownEditor';
 import { DocMeta } from '../../ThoughtChainList/types';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
 import { DocInfoListProps } from '../types/DocInfo';
 import { useStyle } from './docInfoStyle';
+import { ReadonlyMarkdownContent } from './ReadonlyMarkdownContent';
 
-const replaceAllPlaceHolder = (str: string, placeholder: any[]) => {
-  let message = str;
-  placeholder.forEach((item) => {
-    message = message
-      .replaceAll(`\`\${${item.placeholder}}\``, `(${item.url || item.doc_id})`)
-      .replaceAll(`$${item.placeholder}`, `(${item.url || item.doc_id})`)
-      .replaceAll(`$[${item.placeholder}]`, `(${item.url || item.doc_id})`);
+const createPlaceholderReplacer = (
+  placeholders: NonNullable<DocInfoListProps['reference_url_info_list']>,
+) => {
+  const replacements = new Map<string, string>();
+  placeholders.forEach((item) => {
+    const id = item?.placeholder;
+    const destination = item?.url || item?.doc_id;
+    if (id == null || id === '' || destination == null || destination === '')
+      return;
+    for (const token of [`\`\${${id}}\``, `$[${id}]`, `$${id}`]) {
+      if (!replacements.has(token)) replacements.set(token, `(${destination})`);
+    }
   });
-  return str;
+  if (!replacements.size) return (content: string) => content;
+  const pattern = new RegExp(
+    [...replacements.keys()]
+      .sort((a, b) => b.length - a.length)
+      .map((token) => token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+      .join('|'),
+    'g',
+  );
+  return (content: string) =>
+    content.replace(pattern, (token) => replacements.get(token)!);
 };
 
 /**
@@ -52,48 +66,65 @@ export const DocInfoList: React.FC<DocInfoListProps> = ({
   const { locale } = useContext(I18nContext);
   const { hashId } = useStyle(baseCls);
 
-  const docInfoList = (props.options || []).filter((item) => item);
+  const docInfoList = useMemo(
+    () => (props.options || []).filter((item) => item),
+    [props.options],
+  );
+  const replacePlaceholders = useMemo(
+    () => createPlaceholderReplacer(reference_url_info_list ?? []),
+    [reference_url_info_list],
+  );
 
   const [docMeta, setDocMeta] = React.useState<DocMeta | null>(null);
+  const openOriginal = (url?: string) => {
+    if (!url) return;
+    if (props.onOriginUrlClick) {
+      props.onOriginUrlClick(url);
+    } else {
+      window.open(url);
+    }
+  };
 
   return (
     <>
-      <Drawer
-        title={locale?.['chat.message.preview'] || '预览' + docMeta?.doc_name}
-        open={!!docMeta}
-        onClose={() => {
-          setDocMeta(null);
-        }}
-        width={'40vw'}
-      >
-        <Descriptions
-          column={1}
-          items={[
-            {
-              label: locale?.['docInfo.name'] || '名称',
-              span: 1,
-              children: docMeta?.doc_name || docMeta?.answer,
-            },
-            {
-              label: locale?.['docInfo.updateTime'] || '更新时间',
-              span: 1,
-              children: dayjs(docMeta?.upload_time).format(
-                'YYYY-MM-DD HH:mm:ss',
-              ),
-            },
-            {
-              label: locale?.['docInfo.type'] || '类型',
-              span: 1,
-              children: docMeta?.type,
-            },
-            {
-              label: locale?.['docInfo.content'] || '内容',
-              span: 1,
-              children: docMeta?.origin_text,
-            },
-          ]}
-        />
-      </Drawer>
+      {docMeta ? (
+        <Drawer
+          title={locale?.['chat.message.preview'] || '预览' + docMeta?.doc_name}
+          open={!!docMeta}
+          onClose={() => {
+            setDocMeta(null);
+          }}
+          width={'40vw'}
+        >
+          <Descriptions
+            column={1}
+            items={[
+              {
+                label: locale?.['docInfo.name'] || '名称',
+                span: 1,
+                children: docMeta?.doc_name || docMeta?.answer,
+              },
+              {
+                label: locale?.['docInfo.updateTime'] || '更新时间',
+                span: 1,
+                children: dayjs(docMeta?.upload_time).format(
+                  'YYYY-MM-DD HH:mm:ss',
+                ),
+              },
+              {
+                label: locale?.['docInfo.type'] || '类型',
+                span: 1,
+                children: docMeta?.type,
+              },
+              {
+                label: locale?.['docInfo.content'] || '内容',
+                span: 1,
+                children: docMeta?.origin_text,
+              },
+            ]}
+          />
+        </Drawer>
+      ) : null}
       <div
         style={{
           display: 'flex',
@@ -200,10 +231,7 @@ export const DocInfoList: React.FC<DocInfoListProps> = ({
                 className={classNames(`${baseCls}-list-item`, hashId)}
                 title={item?.content}
                 onClick={() => {
-                  if (item?.originUrl) {
-                    return props.onOriginUrlClick?.(item.originUrl);
-                  }
-                  window.open(item.originUrl);
+                  openOriginal(item.originUrl);
                 }}
                 style={
                   {
@@ -217,26 +245,16 @@ export const DocInfoList: React.FC<DocInfoListProps> = ({
                     width: '100%',
                   }}
                 >
-                  <div
+                  <img
+                    className={classNames(`${baseCls}-list-item-icon`, hashId)}
+                    alt=""
+                    src="https://mdn.alipayobjects.com/huamei_ptjqan/afts/img/A*kF_GTppRbp4AAAAAAAAAAAAADkN6AQ/original"
                     style={{
-                      lineHeight: '24px',
-                      borderRadius: 16,
-                      alignItems: 'center',
-                      maxWidth: '100%',
-                      display: 'flex',
+                      boxSizing: 'content-box',
+                      flexShrink: 0,
                       padding: 4,
                     }}
-                  >
-                    <img
-                      className={classNames(
-                        `${baseCls}-list-item-icon`,
-                        hashId,
-                      )}
-                      src={
-                        'https://mdn.alipayobjects.com/huamei_ptjqan/afts/img/A*kF_GTppRbp4AAAAAAAAAAAAADkN6AQ/original'
-                      }
-                    />
-                  </div>
+                  />
                   <div
                     style={{
                       display: 'flex',
@@ -256,10 +274,7 @@ export const DocInfoList: React.FC<DocInfoListProps> = ({
                         maxWidth: 'calc(100% - 24px)',
                       }}
                     >
-                      {replaceAllPlaceHolder(
-                        item?.content || '',
-                        reference_url_info_list || [],
-                      )}
+                      {replacePlaceholders(item?.content || '')}
                     </div>
                     {item?.docMeta?.doc_name ? (
                       <div
@@ -293,7 +308,7 @@ export const DocInfoList: React.FC<DocInfoListProps> = ({
                         e.stopPropagation();
                         e.preventDefault();
                         // originUrl 已在外层条件保证存在
-                        props.onOriginUrlClick?.(item.originUrl!);
+                        openOriginal(item.originUrl);
                       }}
                     >
                       <ExportOutlined />
@@ -302,8 +317,11 @@ export const DocInfoList: React.FC<DocInfoListProps> = ({
                 </div>
               </div>
             );
-            if ((item?.content?.trim().length || 0) < 20) {
-              return dom;
+            const renderedItem = props.render ? props.render(item, dom) : dom;
+            if ((item?.content?.trim().length || 0) < 20 || !renderedItem) {
+              return (
+                <React.Fragment key={index}>{renderedItem}</React.Fragment>
+              );
             }
 
             return (
@@ -322,22 +340,13 @@ export const DocInfoList: React.FC<DocInfoListProps> = ({
                       gap: 12,
                     }}
                   >
-                    <BaseMarkdownEditor
+                    <ReadonlyMarkdownContent
+                      tableConfig={{ actions: { fullScreen: 'modal' } }}
                       style={{
                         padding: 0,
                         width: '100%',
                       }}
-                      tableConfig={{
-                        actions: {
-                          fullScreen: 'modal',
-                        },
-                      }}
-                      readonly
-                      contentStyle={{
-                        padding: 0,
-                        width: '100%',
-                      }}
-                      initValue={item?.content?.trim()}
+                      content={item?.content?.trim() || ''}
                     />
                     {item?.docMeta ? (
                       <div
@@ -382,7 +391,7 @@ export const DocInfoList: React.FC<DocInfoListProps> = ({
                   </div>
                 }
               >
-                {props.render ? props.render?.(item!, dom) : dom}
+                {renderedItem}
               </Popover>
             );
           })}

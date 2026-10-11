@@ -98,11 +98,6 @@ export function useOnchange(
     const sel = editor.selection;
 
     try {
-      const [node] = Editor.nodes<Element>(editor, {
-        match: (n) => Element.isElement(n),
-        mode: 'lowest',
-      });
-
       cancelSelectionNotification();
       selectionTimer.current = setTimeout(() => {
         selectionTimer.current = null;
@@ -130,15 +125,26 @@ export function useOnchange(
         }
       }, 0);
 
-      if (!node) return;
-
       if (
         _operations.some((o) => o.type === 'set_selection') &&
         sel &&
-        !floatBarIgnoreNode.has(node?.[0]?.type) &&
         !Range.isCollapsed(sel) &&
         Path.equals(Path.parent(sel.focus.path), Path.parent(sel.anchor.path))
       ) {
+        // Plain typing only needs the coalesced notification above. Resolve a
+        // node synchronously only when an expanded selection needs a FloatBar.
+        const [node] = Editor.nodes<Element>(editor, {
+          match: (n) => Element.isElement(n),
+          mode: 'lowest',
+        });
+        if (!node) return;
+        if (floatBarIgnoreNode.has(node[0].type)) {
+          rangeContent.current = '';
+          measuredSelection.current = null;
+          measuredDocument.current = null;
+          setDomRect?.(null);
+          return;
+        }
         if (typeof window === 'undefined') return;
         const domSelection = getEditorDOMSelection(editor);
         if (!domSelection?.rangeCount) {

@@ -1,6 +1,6 @@
 import { act, render } from '@testing-library/react';
 import React from 'react';
-import { createEditor, Editor, Transforms } from 'slate';
+import { createEditor, Editor, Point, Range, Transforms } from 'slate';
 import type { RenderElementProps } from 'slate-react';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -91,5 +91,76 @@ describe('element selection subscriptions', () => {
     expect(queryByTestId('https://cdn.example/0.png')).toBeNull();
     expect(Editor.hasPath(editor, editor.selection!.focus.path)).toBe(true);
     expect(error).not.toHaveBeenCalled();
+  });
+
+  it('matches nested selection ranges without walking element text boundaries', async () => {
+    const editor = withReact(createEditor());
+    const initialValue = [
+      { type: 'paragraph' as const, children: [{ text: 'before' }] },
+      {
+        type: 'blockquote' as const,
+        children: [
+          { type: 'paragraph' as const, children: [{ text: 'first nested' }] },
+          { type: 'paragraph' as const, children: [{ text: 'last nested' }] },
+        ],
+      },
+      { type: 'paragraph' as const, children: [{ text: 'after' }] },
+    ];
+    const range = vi.spyOn(Editor, 'range');
+    const Probe = (props: RenderElementProps) => {
+      const selected = useElementSelected(props.element);
+      return (
+        <div
+          {...props.attributes}
+          data-testid={`selected-${ReactEditor.findPath(editor, props.element).join('-')}`}
+          data-selected={String(selected)}
+        >
+          {props.children}
+        </div>
+      );
+    };
+    const view = render(
+      <Slate editor={editor} initialValue={initialValue}>
+        <Editable renderElement={(props) => <Probe {...props} />} />
+      </Slate>,
+    );
+    const cases: [Point, Point][] = [
+      [
+        { path: [0, 0], offset: 6 },
+        { path: [0, 0], offset: 6 },
+      ],
+      [
+        { path: [1, 0, 0], offset: 0 },
+        { path: [1, 0, 0], offset: 0 },
+      ],
+      [
+        { path: [1, 1, 0], offset: 4 },
+        { path: [1, 0, 0], offset: 2 },
+      ],
+      [
+        { path: [0, 0], offset: 4 },
+        { path: [2, 0], offset: 2 },
+      ],
+      [
+        { path: [2, 0], offset: 0 },
+        { path: [2, 0], offset: 0 },
+      ],
+    ];
+    for (const [anchor, focus] of cases) {
+      await act(async () => Transforms.select(editor, { anchor, focus }));
+      const boundaryReads = range.mock.calls.filter(
+        ([, at, to]) => Array.isArray(at) && to === undefined,
+      ).length;
+      for (const path of [[0], [1], [1, 0], [1, 1], [2]]) {
+        const nodeRange = Editor.range(editor, path);
+        expect(view.getByTestId(`selected-${path.join('-')}`)).toHaveAttribute(
+          'data-selected',
+          String(!!Range.intersection(nodeRange, editor.selection!)),
+        );
+      }
+      // Only the reference calculation above may request node boundaries.
+      expect(boundaryReads).toBe(0);
+      range.mockClear();
+    }
   });
 });

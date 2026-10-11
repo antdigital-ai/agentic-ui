@@ -6,7 +6,7 @@ import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('../../../store', () => ({
+vi.mock('../../../editorStoreContext', () => ({
   useEditorStore: () => ({
     markdownEditorRef: { current: { children: [] } },
   }),

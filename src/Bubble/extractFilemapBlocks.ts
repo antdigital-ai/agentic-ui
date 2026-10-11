@@ -19,6 +19,9 @@ export const extractFilemapBlocks = (
   content: string,
 ): { blocks: FilemapBlock[]; stripped: string } => {
   const blocks: FilemapBlock[] = [];
+  if (!content.includes('```agentic-ui-filemap')) {
+    return { blocks, stripped: content.trim() };
+  }
   const stripped = content.replace(
     FILEMAP_FENCE_RE,
     (raw: string, body: string) => {

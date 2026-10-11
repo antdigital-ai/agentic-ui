@@ -63,7 +63,7 @@ describe('ReadonlyMedia displayed resources', () => {
       );
       expect(screen.getByTestId(`${type}-element`)).toHaveAttribute(
         'preload',
-        'metadata',
+        'none',
       );
     },
   );
@@ -76,6 +76,14 @@ describe('ReadonlyMedia displayed resources', () => {
       expect(screen.getByTestId(`${type}-element`)).toBe(player);
     },
   );
+  it('retains eager metadata for explicitly requested autoplay', () => {
+    render(view(node('video', { autoplay: true })));
+    expect(screen.getByTestId('video-element')).toHaveAttribute(
+      'preload',
+      'metadata',
+    );
+    expect(screen.getByTestId('video-element')).toHaveAttribute('autoplay');
+  });
   it.each(['video', 'audio'])(
     'replaces a failed %s with its clickable label',
     (type) => {

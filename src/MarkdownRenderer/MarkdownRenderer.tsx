@@ -1,9 +1,9 @@
 import { ConfigProvider } from 'antd';
 import clsx from 'clsx';
 import React, {
+  createContext,
   forwardRef,
   useContext,
-  useEffect,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -16,15 +16,68 @@ import {
   collectRendererRemarkPlugins,
 } from './collectMarkdownRendererPlugin';
 import { DefaultCodeRouter } from './DefaultCodeRouter';
-import { extractFootnoteDefinitionsFromMarkdown } from './extractFootnoteDefinitions';
+import { MarkdownTable } from './renderers/MarkdownTable';
 import type {
   MarkdownRendererProps,
   MarkdownRendererRef,
   RendererBlockProps,
 } from './types';
 import { useContentThrottle } from './useContentThrottle';
+import {
+  FootnoteDefinitionsContext,
+  useFootnoteDefinitions,
+} from './useFootnoteDefinitions';
 import { useMarkdownToReact } from './useMarkdownToReact';
 import { useStreaming } from './useStreaming';
+
+interface CodeRuntime {
+  pluginComponents: ReturnType<typeof collectRendererComponents>;
+  apaasifyRender: React.ComponentProps<
+    typeof DefaultCodeRouter
+  >['apaasifyRender'];
+  fileMapConfig: MarkdownRendererProps['fileMapConfig'];
+  editorCodeProps: MarkdownRendererProps['codeProps'];
+}
+
+interface TableRuntime {
+  tableConfig: MarkdownRendererProps['tableConfig'];
+  prefixCls: string;
+  eleRender: MarkdownRendererProps['eleRender'];
+}
+
+const CodeRuntimeContext = createContext<CodeRuntime | null>(null);
+const TableRuntimeContext = createContext<TableRuntime | null>(null);
+
+const CodeRouter = (props: RendererBlockProps) => {
+  const runtime = useContext(CodeRuntimeContext);
+  if (!runtime) return null;
+  return (
+    <DefaultCodeRouter
+      {...props}
+      pluginComponents={runtime.pluginComponents}
+      apaasifyRender={runtime.apaasifyRender}
+      fileMapConfig={runtime.fileMapConfig}
+      editorCodeProps={runtime.editorCodeProps}
+    />
+  );
+};
+
+const TableRenderer = ({ node, ...props }: RendererBlockProps) => {
+  const runtime = useContext(TableRuntimeContext);
+  if (!runtime?.tableConfig) return null;
+  const defaultDom = (
+    <MarkdownTable
+      {...props}
+      prefixCls={runtime.prefixCls}
+      config={runtime.tableConfig}
+    />
+  );
+  const rendered = runtime.eleRender?.(
+    { tagName: 'table', node, ...props },
+    defaultDom,
+  );
+  return rendered !== undefined ? rendered : defaultDom;
+};
 
 /** 轻量流式 Markdown 渲染器——无 Slate 实例，Markdown → hast → React */
 const InternalMarkdownRenderer = forwardRef<
@@ -48,6 +101,7 @@ const InternalMarkdownRenderer = forwardRef<
     fileMapConfig,
     fncProps,
     codeProps: editorCodeProps,
+    tableConfig,
     formula: formulaProp,
   } = props;
 
@@ -60,8 +114,9 @@ const InternalMarkdownRenderer = forwardRef<
 
   const containerRef = useRef<HTMLDivElement>(null);
   const sourceText = content || '';
+  const activeStreaming = streaming && !isFinished;
 
-  const throttleEnabled = streaming && throttleOptions?.enabled !== false;
+  const throttleEnabled = activeStreaming && throttleOptions?.enabled !== false;
 
   const displayedText = useContentThrottle(
     sourceText,
@@ -96,51 +151,47 @@ const InternalMarkdownRenderer = forwardRef<
     [plugins],
   );
 
-  const lastFootnoteEmptyRef = useRef(false);
-  useEffect(() => {
-    const notify = fncProps?.onFootnoteDefinitionChange;
-    if (!notify) return;
-    if (
-      !displayedText.includes('[^') ||
-      !/^\[\^[^\]]+\]:/m.test(displayedText)
-    ) {
-      if (!lastFootnoteEmptyRef.current) {
-        notify([]);
-        lastFootnoteEmptyRef.current = true;
-      }
-      return;
-    }
-    lastFootnoteEmptyRef.current = false;
-    notify(extractFootnoteDefinitionsFromMarkdown(displayedText));
-  }, [displayedText, fncProps?.onFootnoteDefinitionChange]);
+  const { definitionMap } = useFootnoteDefinitions(
+    displayedText,
+    fncProps?.onFootnoteDefinitionChange,
+  );
 
   const apaasifyRender = useMemo(() => {
     if (apaasify?.enable && apaasify.render) return apaasify.render;
     return undefined;
   }, [apaasify]);
 
-  const components = useMemo(() => {
-    const codeRouter = (blockProps: RendererBlockProps) => (
-      <DefaultCodeRouter
-        {...blockProps}
-        pluginComponents={pluginComponents}
-        apaasifyRender={apaasifyRender}
-        fileMapConfig={fileMapConfig}
-        editorCodeProps={editorCodeProps}
-      />
-    );
-    codeRouter.displayName = 'CodeRouter';
-
-    return {
-      __codeBlock: codeRouter,
+  const codeRuntime = useMemo(
+    () => ({
+      pluginComponents,
+      apaasifyRender,
+      fileMapConfig,
+      editorCodeProps,
+    }),
+    [pluginComponents, apaasifyRender, fileMapConfig, editorCodeProps],
+  );
+  const tableRuntime = useMemo(
+    () => ({
+      tableConfig,
+      prefixCls,
+      eleRender,
+    }),
+    [tableConfig, prefixCls, eleRender],
+  );
+  const tablePreviewEnabled = !!tableConfig?.actions?.fullScreen;
+  const components = useMemo(
+    () => ({
+      __codeBlock: CodeRouter,
+      ...(tablePreviewEnabled ? { table: TableRenderer } : {}),
       ...pluginComponents,
-    };
-  }, [pluginComponents, apaasifyRender, fileMapConfig, editorCodeProps]);
+    }),
+    [pluginComponents, tablePreviewEnabled],
+  );
 
-  const safeContent = useStreaming(displayedText, streaming);
+  const safeContent = useStreaming(displayedText, activeStreaming);
 
   // 逐词淡入是否生效：流式 + 未显式关闭。单一来源，同时驱动 token 拆分与容器类。
-  const fadeActive = streaming && throttleOptions?.fade !== false;
+  const fadeActive = activeStreaming && throttleOptions?.fade !== false;
 
   const reactContent = useMarkdownToReact(safeContent, {
     remarkPlugins: mergedRemarkPlugins,
@@ -151,10 +202,13 @@ const InternalMarkdownRenderer = forwardRef<
     prefixCls,
     linkConfig,
     fncProps,
-    streaming,
+    streaming: activeStreaming,
+    isFinished: streaming && isFinished,
     fadeTokens: fadeActive,
+    // 仅随宿主 fade 配置变化（不随流式结束翻转），驱动 processor 重建重解析缓存块
+    fadeTokensConfig: throttleOptions?.fade !== false,
     // 修订追踪用未限流的完整 source，保证缓存键随真实流入推进，而非随限流帧抖动。
-    contentRevisionSource: streaming ? sourceText : undefined,
+    contentRevisionSource: activeStreaming ? sourceText : undefined,
     eleRender,
   });
 
@@ -178,7 +232,13 @@ const InternalMarkdownRenderer = forwardRef<
           )}
           style={{ whiteSpace: 'normal', wordWrap: 'normal' }}
         >
-          {reactContent}
+          <FootnoteDefinitionsContext.Provider value={definitionMap}>
+            <CodeRuntimeContext.Provider value={codeRuntime}>
+              <TableRuntimeContext.Provider value={tableRuntime}>
+                {reactContent}
+              </TableRuntimeContext.Provider>
+            </CodeRuntimeContext.Provider>
+          </FootnoteDefinitionsContext.Provider>
         </div>
       </div>
     </div>

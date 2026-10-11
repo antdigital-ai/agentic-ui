@@ -15,7 +15,7 @@ Bubble 组件是一个功能丰富的聊天消息气泡组件，为现代化对�
 - 🎨 **灵活定制**：支持全方位的自定义渲染，包括标题、内容、头像、操作区域
 - 📱 **响应式设计**：完美适配桌面端和移动端，支持左右布局切换
 - 📎 **文件支持**：智能识别和展示多种文件类型，支持预览和下载
-- 🚀 **高性能**：支持虚拟滚动和大量消息的流畅展示
+- 🚀 **高性能**：支持消息懒加载和流式更新复用
 - 🎯 **交互丰富**：内置点赞、点踩、回复、复制等常用操作
 - 🌈 **主题友好**：支持明暗主题切换和自定义样式配置
 - 💡 **Pure 模式**：提供简洁的无边框模式，适合嵌入式场景
@@ -412,7 +412,7 @@ export default () => (
 
 ### BubbleList 性能优化 {#bubblelist-2}
 
-演示 BubbleList 组件的性能优化特性，包括虚拟滚动和大数据量处理。
+演示 BubbleList 组件的性能优化特性，包括懒加载和大数据量处理。
 
 <code src="../demos/bubble/bubblelist-performance-demo.tsx">BubbleList 性能优化</code>
 
@@ -442,7 +442,9 @@ OpenClaw 会话 / transcript 常见字段：`timestamp`（毫秒）、工具结�
 
 ### 流式 Markdown：`throttleOptions.fade` {#streaming-fade}
 
-当 `markdownRenderConfig.renderMode`（或 `renderType`）为 `'markdown'` 且消息处于流式输出时，默认对新出现的词语做 GPT 风格逐词淡入（未传 `fade` 时开启）。完整说明见 [MarkdownRenderer · 流式与逐词淡入](./markdown-renderer#streaming-fade)。
+普通只读消息默认使用 `MarkdownRenderer`；消息处于流式输出时，默认对新出现的词语做 GPT 风格逐词淡入（未传 `fade` 时开启）。显式设置 `markdownRenderConfig.renderMode`（或 `renderType`）为 `'markdown'` 时也适用。完整说明见 [MarkdownRenderer · 流式与逐词淡入](./markdown-renderer#streaming-fade)。
+
+生成完成时设置 `isFinished: true`，用户停止生成时设置 `isAborted: true`。两者都会立即展示已收到的剩余正文、结束流式限流并清理逐词动画节点；停止生成不必同时修改 `isFinished`。
 
 关闭淡入：
 
@@ -471,17 +473,18 @@ import { BubbleList } from '@ant-design/agentic-ui';
 | originData | 消息的原始数据         | `MessageBubbleData` | -        | -    |
 | avatar     | 头像元数据配置         | `BubbleMetaData`    | -        | -    |
 | placement  | 消息布局位置           | `'left' \| 'right'` | `'left'` | -    |
-| loading    | 加载状态显示           | `boolean`           | `false`  | -    |
-| readonly   | 只读模式               | `boolean`           | `false`  | -    |
+| quote      | 用户消息的引用配置     | `QuoteProps`        | -        | -    |
+| readonly   | 正文是否只读           | `boolean`           | `true`   | -    |
 | pure       | 简洁模式（无边框阴影） | `boolean`           | `false`  | -    |
 
 #### 样式配置 {#style-props}
 
-| 属性      | 说明             | 类型                  | 默认值 | 版本 |
-| --------- | ---------------- | --------------------- | ------ | ---- |
-| className | 自定义 CSS 类名  | `string`              | -      | -    |
-| style     | 自定义内联样式   | `React.CSSProperties` | -      | -    |
-| styles    | 详细样式配置对象 | `BubbleStylesConfig`  | -      | -    |
+| 属性       | 说明             | 类型                                      | 默认值 | 版本 |
+| ---------- | ---------------- | ----------------------------------------- | ------ | ---- |
+| className  | 自定义 CSS 类名  | `string`                                  | -      | -    |
+| style      | 自定义内联样式   | `React.CSSProperties`                     | -      | -    |
+| classNames | 各语义区域的类名 | `BubbleSlotClassNames & BubbleClassNames` | -      | -    |
+| styles     | 各语义区域的样式 | `BubbleSlotStyles & BubbleStyles`         | -      | -    |
 
 #### 渲染配置 {#render-config}
 
@@ -519,13 +522,14 @@ import { BubbleList } from '@ant-design/agentic-ui';
 
 #### 引用和样式 {#reference-and-styles}
 
-| 属性          | 说明            | 类型                                       | 默认值 | 版本 |
-| ------------- | --------------- | ------------------------------------------ | ------ | ---- |
-| bubbleListRef | 列表容器引用    | `MutableRefObject<HTMLDivElement>`         | -      | -    |
-| bubbleRef     | 气泡组件引用    | `MutableRefObject<BubbleImperativeHandle>` | -      | -    |
-| className     | 自定义 CSS 类名 | `string`                                   | -      | -    |
-| style         | 自定义内联样式  | `React.CSSProperties`                      | -      | -    |
-| styles        | 详细样式配置    | `BubbleListStylesConfig`                   | -      | -    |
+| 属性          | 说明                     | 类型                                       | 默认值 | 版本 |
+| ------------- | ------------------------ | ------------------------------------------ | ------ | ---- |
+| bubbleListRef | 列表容器引用             | `MutableRefObject<HTMLDivElement>`         | -      | -    |
+| bubbleRef     | 气泡组件引用             | `MutableRefObject<BubbleImperativeHandle>` | -      | -    |
+| className     | 自定义 CSS 类名          | `string`                                   | -      | -    |
+| style         | 自定义内联样式           | `React.CSSProperties`                      | -      | -    |
+| classNames    | 各语义区域的类名         | `BubbleProps['classNames']`                | -      | -    |
+| styles        | 各语义区域与列表方向样式 | `BubbleProps['styles']`                    | -      | -    |
 
 ### useOpenAIMessageBubbleData
 
@@ -653,6 +657,16 @@ interface BubbleSlotStyles {
 ```
 
 > **变更说明**：新增 `BubbleSlotStyles` / `BubbleSlotClassNames` 作为推荐的样式接口，属性名更简洁。原 `BubbleStyles` / `BubbleClassNames`（带 `bubble` 前缀）仍可使用，但已标记为 deprecated。
+
+`Bubble`、`AIBubble`、`UserBubble` 和 `BubbleList` 均接受这两组字段。简短字段与旧字段同时指定时，简短字段优先；列表的左右侧正文样式叠加在通用 `content` 样式之后。
+
+```tsx | pure
+<BubbleList
+  bubbleList={messages}
+  styles={{ content: { lineHeight: 1.6 }, extra: { marginTop: 8 } }}
+  classNames={{ content: 'message-content', extra: 'message-actions' }}
+/>
+```
 
 #### AI 气泡属性 {#props-ai}
 
@@ -1253,6 +1267,8 @@ const messageWithFiles: MessageBubbleData = {
 
 为嵌入式场景提供的简洁模式：
 
+所有对话消息统一使用 `Bubble` / `BubbleList`。`pure` 只控制外观，消息更新、反馈、附件与正文渲染共用同一实现。
+
 ```tsx | pure
 // 启用 Pure 模式
 <Bubble pure originData={message} />
@@ -1263,6 +1279,38 @@ const messageWithFiles: MessageBubbleData = {
   <Bubble pure originData={message} />   {/* Pure 模式 */}
 </div>
 ```
+
+独立的 `Pure*` 组件已移除，迁移方式如下：
+
+| 原组件 / 类型         | 替代方式                            |
+| --------------------- | ----------------------------------- |
+| `PureBubble`          | `<Bubble pure />`                   |
+| `PureAIBubble`        | `<Bubble pure placement="left" />`  |
+| `PureUserBubble`      | `<Bubble pure placement="right" />` |
+| `PureBubbleList`      | `<BubbleList pure />`               |
+| `PureBubbleListProps` | `BubbleListProps`                   |
+
+正文默认只读，与普通 `Bubble` 一致。原 `Pure*` 用法如需编辑正文，请显式传入 `readonly={false}`；显式 `readonly` 优先于 `markdownRenderConfig.readonly`，`markdownRenderConfig.initValue` 仍可覆盖消息正文。
+
+可从对话组件入口按需导入，或继续使用包根的具名导入；两种入口均支持 tree shaking：
+
+```tsx | pure
+import { Bubble, BubbleList } from '@ant-design/agentic-ui/Bubble';
+import type {
+  BubbleListProps,
+  BubbleProps,
+} from '@ant-design/agentic-ui/Bubble';
+```
+
+列表更新时复用未改变的消息对象，为变化的消息创建新对象。自定义配置与回调可通过 `useMemo` / `useCallback` 保持稳定，避免流式更新反复渲染历史消息。
+
+列表会复用未变行的 React 元素，正文流式追加时附件和默认思维链也可跳过更新。消息扩展字段、前一条消息、回调、配置或 Context 变化仍会生效。列表仍需遍历数据识别变化；消息数量很大时，应结合分页加载控制已挂载消息与 DOM 数量。
+
+普通只读正文默认使用 `MarkdownRenderer`，每条历史消息无需创建 Slate 编辑器。编辑态、显式 `renderMode: 'slate'`、Slate 专属配置或插件，以及含编辑器 JSON 配置注释的正文，继续使用 Slate。显式 `renderMode: 'markdown'` 可选择轻量渲染；自定义插件应提供 `renderer` 实现。表格全屏、引用预览和脚注交互仍可使用，隐藏预览按需挂载。`pure` 仅控制样式，`MarkdownEditor` 自身的默认渲染模式保持 Slate。
+
+已经进入编辑态的消息在自动模式下继续复用 Slate，切换只读时保留尚未同步给父组件的草稿。
+
+在仓库运行 `pnpm run build` 后，可用 `pnpm run bench:bubble-bundle` 验证发布包的按需导入。探针使用临时消费者安装发布产物，分别构建消息、列表、转换工具和 `ReadonlyMarkdownEditorView`，统计入口及其全部静态依赖 chunk；React、ReactDOM、Ant Design 和 CSS 不计入字节结果。消息默认不创建编辑器与入口包是否包含编辑器代码是两项独立指标，`Bubble` 仍需兼容编辑态及 Slate 配置。
 
 **适用场景：**
 
@@ -1338,8 +1386,8 @@ const messageWithFiles: MessageBubbleData = {
 
 ### 性能优化特性 {#performance-features}
 
-- **🚀 虚拟滚动**：支持数万条消息流畅展示
-- **⚡ 按需渲染**：只渲染可见区域内容
+- **🚀 消息懒加载**：延迟挂载尚未进入视口的消息
+- **⚡ 按需渲染**：流式更新复用未变化的历史消息
 - **💾 智能缓存**：自动缓存渲染结果
 - **📱 移动端优化**：触摸交互体验优化
 
@@ -1512,12 +1560,15 @@ export default App;
 1. **合理使用自定义渲染**
 
    ```tsx | pure
-   // ✅ 推荐：使用 React.memo 优化自定义渲染函数
-   const titleRender = React.memo((props, defaultDom) => (
-     <div>
-       {defaultDom} <Tag>{props.originData?.model}</Tag>
-     </div>
-   ));
+   // 稳定渲染回调，避免每次父组件更新都创建新配置
+   const titleRender = useCallback(
+     (props, defaultDom) => (
+       <div>
+         {defaultDom} <Tag>{props.originData?.model}</Tag>
+       </div>
+     ),
+     [],
+   );
    ```
 
 2. **文件处理优化**
@@ -1533,12 +1584,15 @@ export default App;
 3. **大量消息处理**
 
    ```tsx | pure
-   // ✅ 推荐：使用 BubbleList 的虚拟滚动
+   // 已显示的消息会保留挂载状态，避免追加消息时丢失内部状态
    <BubbleList
      bubbleList={messages}
+     lazy={{ enable: true, rootMargin: '200px' }}
      style={{ height: 500, overflow: 'auto' }}
    />
    ```
+
+   懒加载延迟首次挂载，已进入视口的消息会继续保留；它不限制滚动完整个会话后的 DOM 总量。特别长的会话可在业务层按页加载历史消息。
 
 4. **列表与 Bubble 的 memo 行为**  
    `Bubble` 使用自定义 `memo` 比较，避免列表每次渲染因 `styles` / `avatar` 等新对象引用触发整表重绘。更新 `BubbleProps` 或 `originData` 时：对 `extra`、`meta` 等对象请**替换引用**（不可变更新），勿仅原地修改嵌套字段；`markdownRenderConfig` 等配置对象若每次 `render` 新建，请用 `useMemo` 稳定子对象引用。扩展 `BubbleProps` 时需在 `bubblePropsAreEqual` 中同步维护比较逻辑。

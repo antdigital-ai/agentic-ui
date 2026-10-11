@@ -1,8 +1,8 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
-import React, { useEffect } from 'react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import React, { useEffect, useRef } from 'react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
 import { BubbleList } from '../List';
 import { LOADING_FLAT } from '../MessagesContent';
@@ -11,6 +11,9 @@ import type { MessageBubbleData } from '../type';
 interface MockBubbleProps {
   id?: string;
   markdownRenderConfig?: { renderMode?: 'slate' | 'markdown' };
+  originData?: MessageBubbleData;
+  avatar?: object;
+  styles?: object;
 }
 
 const mockState = vi.hoisted(() => ({
@@ -22,6 +25,7 @@ const mockState = vi.hoisted(() => ({
 vi.mock('../Bubble', () => {
   const MockBubble: React.FC<MockBubbleProps> = (props) => {
     mockState.renderedProps.push(props);
+    const mountedId = useRef(props.id);
 
     useEffect(() => {
       mockState.mountCount += 1;
@@ -31,7 +35,10 @@ vi.mock('../Bubble', () => {
     }, []);
 
     return (
-      <div data-testid={`mock-bubble-${props.id}`}>
+      <div
+        data-testid={`mock-bubble-${props.id}`}
+        data-mounted-id={mountedId.current}
+      >
         {props.markdownRenderConfig?.renderMode || 'no-mode'}
       </div>
     );
@@ -73,7 +80,124 @@ describe('BubbleList regression', () => {
     mockState.renderedProps = [];
   });
 
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   describe('loading 到真实消息的 key 稳定性', () => {
+    it('没有 createAt 的 loading 在父级更新时保持挂载', () => {
+      const now = vi.spyOn(Date, 'now');
+      now.mockReturnValue(1000);
+      const loading = createBubble(LOADING_FLAT, 'assistant', 'loading', {
+        createAt: undefined,
+      });
+      const { rerender } = render(<BubbleList bubbleList={[loading]} />);
+      expect(mockState.mountCount).toBe(1);
+
+      now.mockReturnValue(2000);
+      rerender(
+        <BubbleList bubbleList={[{ ...loading, content: 'still loading' }]} />,
+      );
+      expect(mockState.mountCount).toBe(1);
+      expect(mockState.unmountCount).toBe(0);
+    });
+
+    it('被挂起后取消的列表清空不会污染已显示消息的 key', () => {
+      const loading = createBubble(LOADING_FLAT, 'assistant', 'loading');
+      const pending = new Promise<void>(() => {});
+      let update: React.Dispatch<
+        React.SetStateAction<{
+          messages: MessageBubbleData[];
+          suspend: boolean;
+        }>
+      >;
+      const SuspendAfterList = ({ suspend }: { suspend: boolean }) => {
+        if (suspend) throw pending;
+        return null;
+      };
+      const App = () => {
+        const [state, setState] = React.useState({
+          messages: [loading],
+          suspend: false,
+        });
+        update = setState;
+        return (
+          <React.Suspense fallback={<p>Suspended</p>}>
+            <BubbleList bubbleList={state.messages} />
+            <SuspendAfterList suspend={state.suspend} />
+          </React.Suspense>
+        );
+      };
+      render(<App />);
+      act(() => {
+        React.startTransition(() => {
+          update({ messages: [], suspend: true });
+        });
+      });
+      expect(
+        screen.getByTestId(`mock-bubble-${LOADING_FLAT}`),
+      ).toBeInTheDocument();
+
+      act(() => {
+        update({
+          messages: [{ ...loading, content: 'updated' }],
+          suspend: false,
+        });
+      });
+      expect(mockState.mountCount).toBe(1);
+      expect(mockState.unmountCount).toBe(0);
+    });
+
+    it('删除 loading 后邻接历史消息移动不应继承 loading 的 key', () => {
+      const historic = createBubble('historic', 'assistant', 'history');
+      const { rerender } = render(
+        <BubbleList
+          bubbleList={[
+            createBubble(LOADING_FLAT, 'assistant', 'loading'),
+            historic,
+          ]}
+        />,
+      );
+      expect(mockState.mountCount).toBe(2);
+
+      rerender(<BubbleList bubbleList={[historic]} />);
+      expect(mockState.mountCount).toBe(2);
+      expect(mockState.unmountCount).toBe(1);
+      expect(screen.getByTestId('mock-bubble-historic')).toHaveAttribute(
+        'data-mounted-id',
+        'historic',
+      );
+    });
+
+    it('清空列表后，重新加入旧 id 应使用当前 loading 的 key', () => {
+      const { rerender } = render(
+        <BubbleList
+          bubbleList={[createBubble(LOADING_FLAT, 'assistant', 'loading')]}
+        />,
+      );
+      rerender(
+        <BubbleList
+          bubbleList={[createBubble('reused', 'assistant', 'done')]}
+        />,
+      );
+      rerender(<BubbleList bubbleList={[]} />);
+      rerender(
+        <BubbleList
+          bubbleList={[createBubble(LOADING_FLAT, 'assistant', 'new loading')]}
+        />,
+      );
+      const mounts = mockState.mountCount;
+      const unmounts = mockState.unmountCount;
+
+      rerender(
+        <BubbleList
+          bubbleList={[createBubble('reused', 'assistant', 'new done')]}
+        />,
+      );
+      expect(mockState.mountCount).toBe(mounts);
+      expect(mockState.unmountCount).toBe(unmounts);
+    });
+
     it('LOADING_FLAT 替换为真实 id 时不应触发卸载重挂载', () => {
       const loadingList = [
         createBubble(LOADING_FLAT, 'assistant', 'loading', { createAt: 12345 }),
@@ -145,6 +269,25 @@ describe('BubbleList regression', () => {
       expect(mockState.mountCount).toBe(2);
       expect(mockState.unmountCount).toBe(0);
     });
+  });
+
+  it('流式消息更新时复用历史行元素并跳过其渲染', () => {
+    const historic = createBubble('history', 'assistant', 'history');
+    const streaming = createBubble('streaming', 'assistant', 'initial');
+    const messages = [historic, streaming];
+    const { rerender } = render(<BubbleList bubbleList={messages} />);
+    const historicElement = screen.getByTestId('mock-bubble-history');
+    mockState.renderedProps = [];
+
+    rerender(
+      <BubbleList
+        bubbleList={[historic, { ...streaming, content: 'updated' }]}
+      />,
+    );
+    expect(mockState.renderedProps.map((props) => props.id)).toEqual([
+      'streaming',
+    ]);
+    expect(screen.getByTestId('mock-bubble-history')).toBe(historicElement);
   });
 
   describe('renderMode / renderType 合并优先级', () => {

@@ -6,19 +6,25 @@ import { ActionIconBox } from '../../Components/ActionIconBox';
 import { useAdaptiveTooltipProps } from '../../Hooks/useAdaptiveTooltipProps';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext } from '../../I18n';
-import { MarkdownEditor } from '../../MarkdownEditor';
 import { Chunk, WhiteBoxProcessInterface } from '../../ThoughtChainList/types';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
 import { BubbleProps, MessageBubbleData } from '../type';
+import {
+  normalizeBubbleClassNames,
+  normalizeBubbleStyles,
+} from '../utils/normalizeBubbleStyles';
 import { BubbleExtra } from './BubbleExtra';
 import { DocInfoList } from './DocInfo';
 import { EXCEPTION } from './EXCEPTION';
 import { MarkdownPreview } from './MarkdownPreview';
+import { ReadonlyMarkdownContent } from './ReadonlyMarkdownContent';
 import { useMessagesContentStyle } from './style';
 
 export const LOADING_FLAT = '...';
 const THINKING_FALLBACK_TEXT = '思考中...';
 const THINKING_DOT_INDICES = [0, 1, 2] as const;
+const USER_MESSAGE_CONTENT_STYLE: React.CSSProperties = { color: '#343A45' };
+const BOT_MESSAGE_CONTENT_STYLE: React.CSSProperties = {};
 
 /**
  * BubbleMessageDisplay 组件 - 聊天气泡消息显示组件
@@ -71,6 +77,14 @@ export const BubbleMessageDisplay: React.FC<
   const { locale } = useContext(I18nContext);
 
   const [isExtraNull, setIsExtraNull] = React.useState(false);
+  const styles = useMemo(
+    () => normalizeBubbleStyles(props.styles),
+    [props.styles],
+  );
+  const slotClassNames = useMemo(
+    () => normalizeBubbleClassNames(props.classNames),
+    [props.classNames],
+  );
 
   const [nodeList, setNodeList] = React.useState<
     {
@@ -87,15 +101,35 @@ export const BubbleMessageDisplay: React.FC<
   const { hashId } = useMessagesContentStyle(baseChatCls);
 
   const docTagTooltipProps = useAdaptiveTooltipProps('informational');
-
-  const funRender = (props: { identifier?: any }) => {
-    const node = nodeList.find((item) => item.placeholder === props.identifier);
-    return node;
-  };
+  const markdownRenderConfig = useMemo(() => {
+    const mode =
+      props.renderMode ??
+      props.renderType ??
+      props.markdownRenderConfig?.renderMode ??
+      props.markdownRenderConfig?.renderType;
+    return mode
+      ? { ...props.markdownRenderConfig, renderMode: mode }
+      : props.markdownRenderConfig;
+  }, [props.markdownRenderConfig, props.renderMode, props.renderType]);
 
   const handleFootnoteDefinitionChange = useRefFunction(
     (list: typeof nodeList) => {
-      setNodeList(list);
+      setNodeList((previous) => {
+        const unchanged =
+          previous.length === list.length &&
+          previous.every((item, index) => {
+            const next = list[index];
+            return (
+              item.id === next.id &&
+              item.placeholder === next.placeholder &&
+              item.origin_text === next.origin_text &&
+              item.url === next.url &&
+              item.origin_url === next.origin_url
+            );
+          });
+        return unchanged ? previous : list;
+      });
+      props.markdownRenderConfig?.fncProps?.onFootnoteDefinitionChange?.(list);
     },
   );
 
@@ -113,31 +147,14 @@ export const BubbleMessageDisplay: React.FC<
   ]);
 
   // 处理 beforeContent 和 afterContent
-  const beforeContent = useMemo(() => {
-    return props.bubbleRenderConfig?.beforeMessageRender
-      ? props.bubbleRenderConfig.beforeMessageRender(props, null)
-      : null;
-  }, [
-    props.bubbleRenderConfig?.beforeMessageRender,
-    typing,
-    props.originData,
-    props.originData?.isLast,
-  ]);
+  const beforeContent = props.bubbleRenderConfig?.beforeMessageRender
+    ? props.bubbleRenderConfig.beforeMessageRender(props, null)
+    : null;
+  const afterContent = props.bubbleRenderConfig?.afterMessageRender
+    ? props.bubbleRenderConfig.afterMessageRender(props, contentAfterDom)
+    : contentAfterDom;
 
-  const afterContent = useMemo(() => {
-    const userAfter = props.bubbleRenderConfig?.afterMessageRender
-      ? props.bubbleRenderConfig.afterMessageRender(props, contentAfterDom)
-      : contentAfterDom;
-    return <>{userAfter}</>;
-  }, [
-    props.bubbleRenderConfig?.afterMessageRender,
-    typing,
-    props.originData,
-    props.originData?.isLast,
-    contentAfterDom,
-  ]);
-
-  const mdReferenceRender = useRefFunction(
+  const mdReferenceRender = React.useCallback(
     (mdProps: { children?: React.ReactNode }, _: React.ReactNode) => {
       const reference_url_info_list =
         props.originData?.extra?.reference_url_info_list || [];
@@ -146,12 +163,19 @@ export const BubbleMessageDisplay: React.FC<
           (row: { placeholder: string; docId: string }) =>
             row.placeholder === `[${mdProps.children}]` ||
             row.placeholder === `[^${mdProps.children}]`,
-        ) || funRender(mdProps as { identifier?: string });
+        ) ||
+        nodeList.find(
+          (item) =>
+            item.placeholder ===
+              (mdProps as { identifier?: string }).identifier ||
+            item.id === (mdProps as { identifier?: string }).identifier,
+        );
 
       if (!item) return;
       if (!item.origin_text) return null;
       return (
         <Popover
+          destroyOnHidden
           title={
             <div
               className={classNames(
@@ -192,22 +216,13 @@ export const BubbleMessageDisplay: React.FC<
               )}
               style={props.customConfig?.PopoverProps?.contentStyle}
             >
-              <MarkdownEditor
+              <ReadonlyMarkdownContent
+                tableConfig={{ actions: { fullScreen: 'modal' } }}
                 style={{
                   padding: 0,
                   width: '100%',
                 }}
-                tableConfig={{
-                  actions: {
-                    fullScreen: 'modal',
-                  },
-                }}
-                readonly
-                contentStyle={{
-                  padding: 0,
-                  width: '100%',
-                }}
-                initValue={item.origin_text.trim()}
+                content={item.origin_text.trim()}
               />
               {item.docId && item.doc_name ? (
                 <Tooltip
@@ -252,25 +267,41 @@ export const BubbleMessageDisplay: React.FC<
         </Popover>
       );
     },
+    [
+      nodeList,
+      props.originData?.extra?.reference_url_info_list,
+      props.customConfig?.PopoverProps?.titleStyle,
+      props.customConfig?.PopoverProps?.contentStyle,
+      props.customConfig?.TooltipProps,
+      props.markdownRenderConfig?.fncProps?.onOriginUrlClick,
+      locale,
+      baseChatCls,
+      hashId,
+      docTagTooltipProps,
+    ],
   );
 
   const markdownPreviewFncProps = useMemo(
     () => ({
       render: mdReferenceRender,
-      onFootnoteDefinitionChange: handleFootnoteDefinitionChange,
       ...(props.markdownRenderConfig?.fncProps || {}),
+      onFootnoteDefinitionChange: handleFootnoteDefinitionChange,
     }),
     [
       mdReferenceRender,
       handleFootnoteDefinitionChange,
       props.markdownRenderConfig?.fncProps,
+      // The renderer extracts definitions after mounting. Refresh its footnote
+      // render callback when definitions change, while retaining history bodies.
+      nodeList,
     ],
   );
 
-  const messageContent = useMemo(() => {
+  // 外壳响应所有事件与布局配置；MarkdownPreview 单独缓存开销较大的正文。
+  const messageContent = (() => {
     if (
       content === LOADING_FLAT ||
-      (!props.originData?.isFinished && !content)
+      (!props.originData?.isFinished && (content === '' || content == null))
     ) {
       if (context?.thoughtChain?.alwaysRender !== true) {
         return (
@@ -294,9 +325,9 @@ export const BubbleMessageDisplay: React.FC<
             <span
               className={classNames(
                 `${baseChatCls}-messages-content-loading-dots`,
-                props.classNames?.bubbleLoadingIconClassName,
+                slotClassNames?.bubbleLoadingIconClassName,
               )}
-              style={props.styles?.bubbleLoadingIconStyle}
+              style={styles?.bubbleLoadingIconStyle}
               data-testid="message-thinking-dots"
               aria-hidden="true"
             >
@@ -318,7 +349,10 @@ export const BubbleMessageDisplay: React.FC<
       props.bubbleRenderConfig?.extraRender === false ? null : (
         <BubbleExtra
           placement={props.placement}
-          style={props.bubbleListItemExtraStyle}
+          style={
+            props.bubbleListItemExtraStyle ?? styles?.bubbleListItemExtraStyle
+          }
+          className={slotClassNames?.bubbleListItemExtraClassName}
           readonly={readonly}
           rightRender={props.bubbleRenderConfig?.extraRightRender}
           onReply={props.onReply}
@@ -352,7 +386,7 @@ export const BubbleMessageDisplay: React.FC<
               : undefined
           }
           bubble={props as any}
-          onRenderExtraNull={(isNull) => setIsExtraNull(isNull)}
+          onRenderExtraNull={setIsExtraNull}
           onLike={
             props.onLike
               ? async () => {
@@ -377,7 +411,9 @@ export const BubbleMessageDisplay: React.FC<
           )
         : defaultExtra;
 
-    if (React.isValidElement(content)) {
+    const extraVisible = extra !== defaultExtra || !isExtraNull;
+
+    if (typeof content !== 'string' && content != null) {
       return (
         <div
           className={classNames(
@@ -412,15 +448,19 @@ export const BubbleMessageDisplay: React.FC<
           onDoubleClick={props.onDoubleClick}
         >
           <MarkdownPreview
+            readonly={readonly}
             beforeContent={beforeContent}
             afterContent={afterContent}
             placement={props.placement}
-            markdownRenderConfig={props.markdownRenderConfig}
+            markdownRenderConfig={markdownRenderConfig}
             isFinished={true}
             style={
-              props.originData?.role === 'bot' ? {} : { color: '#343A45' } // 使用类名方式需要传递className，这里保留style以兼容现有API
+              props.originData?.role === 'bot'
+                ? BOT_MESSAGE_CONTENT_STYLE
+                : USER_MESSAGE_CONTENT_STYLE
             }
             extra={extra}
+            extraVisible={extraVisible}
             typing={false}
             originData={props.originData}
             content={content as string}
@@ -437,14 +477,14 @@ export const BubbleMessageDisplay: React.FC<
         <EXCEPTION
           content={props.originData.content as string}
           originData={props.originData}
-          extra={isExtraNull ? null : extra}
+          extra={extra}
         />
       );
     }
 
-    const docInfoList = [props.originData?.extra?.white_box_process].flat(
-      1,
-    ) as WhiteBoxProcessInterface[];
+    const docInfoList = [props.originData?.extra?.white_box_process]
+      .flat(1)
+      .filter(Boolean) as WhiteBoxProcessInterface[];
     let docInfoDom = null;
 
     if (
@@ -472,7 +512,8 @@ export const BubbleMessageDisplay: React.FC<
 
     return (
       <MarkdownPreview
-        markdownRenderConfig={props.markdownRenderConfig}
+        readonly={readonly}
+        markdownRenderConfig={markdownRenderConfig}
         isFinished={props.originData?.isFinished}
         beforeContent={beforeContent}
         afterContent={afterContent}
@@ -480,7 +521,8 @@ export const BubbleMessageDisplay: React.FC<
         typing={typing}
         placement={props.placement}
         docListNode={docInfoDom}
-        extra={isExtraNull ? null : extra}
+        extra={extra}
+        extraVisible={extraVisible}
         htmlRef={props.bubbleListRef}
         content={
           props.originData?.isFinished &&
@@ -493,18 +535,7 @@ export const BubbleMessageDisplay: React.FC<
         originData={props.originData}
       />
     );
-  }, [
-    content,
-    props.originData?.feedback,
-    props.originData?.isFinished,
-    props.originData?.isAborted,
-    props.originData?.isLast,
-    isExtraNull,
-    props.deps,
-    props.bubbleRenderConfig?.beforeMessageRender,
-    props.bubbleRenderConfig?.afterMessageRender,
-    markdownPreviewFncProps,
-  ]);
+  })();
 
   return messageContent;
 };

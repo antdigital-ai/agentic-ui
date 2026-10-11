@@ -5,10 +5,17 @@
  * - 在 BubbleProps 上新增「会影响渲染」的字段时，必须在此补充比较逻辑，否则可能漏更新。
  * - `markdownRenderConfig` / `bubbleRenderConfig` / `docListProps` / `customConfig`：按**顶层键**浅比较；
  *   顶层值为普通对象时再浅比较一层；数组与函数仍按引用比较。父组件用 `useMemo` 稳定子对象引用更佳。
- * - `originData`：按列出的标量与引用字段比较；`meta` 顶层浅比较；`meta.metadata` 再浅比较一层。
+ * - `originData` / `preMessage`：比较全部自有字段，保留自定义渲染读取扩展字段时的更新；
+ *   `meta` 顶层浅比较，`meta.metadata` 再浅比较一层。
  *   对 `extra` 等对象请勿原地 mutate，应替换引用，否则可能与 `extra !==` 不一致（若仅改嵌套且未换引用会漏更新）。
  */
 import type { BubbleMetaData, BubbleProps, MessageBubbleData } from './type';
+
+const isPlainRecord = (value: unknown): value is Record<string, unknown> => {
+  if (!value || typeof value !== 'object') return false;
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
+};
 
 export const shallowEqualRecord = (
   a: Record<string, unknown> | undefined | null,
@@ -21,6 +28,7 @@ export const shallowEqualRecord = (
   if (keysA.length !== keysB.length) return false;
   for (const k of keysA) {
     if (
+      !Object.prototype.hasOwnProperty.call(b, k) ||
       (a as Record<string, unknown>)[k] !== (b as Record<string, unknown>)[k]
     ) {
       return false;
@@ -40,14 +48,7 @@ export const shallowEqualStyles = (
     const va = (a as Record<string, unknown>)[k];
     const vb = (b as Record<string, unknown>)[k];
     if (va === vb) continue;
-    if (
-      va &&
-      vb &&
-      typeof va === 'object' &&
-      typeof vb === 'object' &&
-      !Array.isArray(va) &&
-      !Array.isArray(vb)
-    ) {
+    if (isPlainRecord(va) && isPlainRecord(vb)) {
       if (
         !shallowEqualRecord(
           va as Record<string, unknown>,
@@ -95,14 +96,7 @@ const shallowEqualConfigObject = (
     const va = ra[k];
     const vb = rb[k];
     if (va === vb) continue;
-    if (
-      va &&
-      vb &&
-      typeof va === 'object' &&
-      typeof vb === 'object' &&
-      !Array.isArray(va) &&
-      !Array.isArray(vb)
-    ) {
+    if (isPlainRecord(va) && isPlainRecord(vb)) {
       if (
         !shallowEqualRecord(
           va as Record<string, unknown>,
@@ -118,28 +112,20 @@ const shallowEqualConfigObject = (
   return true;
 };
 
-const metaAffectsBubble = (m: BubbleMetaData | undefined): boolean =>
-  Boolean(
-    m?.avatar ||
-    m?.title ||
-    m?.name ||
-    m?.description ||
-    m?.backgroundColor ||
-    (m?.metadata && Object.keys(m.metadata).length > 0),
-  );
-
 const metaEqualForMemo = (
   a: BubbleMetaData | undefined,
   b: BubbleMetaData | undefined,
 ): boolean => {
   if (a === b) return true;
-  if (
-    !shallowEqualRecord(
-      (a || {}) as Record<string, unknown>,
-      (b || {}) as Record<string, unknown>,
-    )
-  ) {
-    return false;
+  if (!a || !b) return !a && !b;
+  const keysA = Object.keys(a);
+  const keysB = Object.keys(b);
+  if (keysA.length !== keysB.length) return false;
+  const recordA = a as Record<string, unknown>;
+  const recordB = b as Record<string, unknown>;
+  for (const key of keysA) {
+    if (!Object.prototype.hasOwnProperty.call(b, key)) return false;
+    if (key !== 'metadata' && recordA[key] !== recordB[key]) return false;
   }
   const ma = a?.metadata;
   const mb = b?.metadata;
@@ -151,42 +137,24 @@ const metaEqualForMemo = (
   );
 };
 
-const originDataEqualForMemo = (
+/** Message equality shared by the Bubble memo and committed list row cache. */
+export const messageBubbleDataAreEqual = (
   a: MessageBubbleData | undefined,
   b: MessageBubbleData | undefined,
 ): boolean => {
   if (a === b) return true;
   if (!a || !b) return false;
-  if (
-    a.id !== b.id ||
-    a.role !== b.role ||
-    a.content !== b.content ||
-    a.isFinished !== b.isFinished ||
-    a.isAborted !== b.isAborted ||
-    a.isLast !== b.isLast ||
-    a.isLatest !== b.isLatest ||
-    a.updateAt !== b.updateAt ||
-    a.createAt !== b.createAt ||
-    a.feedback !== b.feedback ||
-    a.originContent !== b.originContent ||
-    a.fileMap !== b.fileMap ||
-    a.extra !== b.extra ||
-    a.error !== b.error
-  ) {
-    return false;
+  const keysA = Object.keys(a);
+  const keysB = Object.keys(b);
+  if (keysA.length !== keysB.length) return false;
+  const recordA = a as unknown as Record<string, unknown>;
+  const recordB = b as unknown as Record<string, unknown>;
+  for (const key of keysA) {
+    if (!Object.prototype.hasOwnProperty.call(b, key)) return false;
+    if (key !== 'meta' && recordA[key] !== recordB[key]) return false;
   }
   if (a.meta === b.meta) return true;
-  if (!metaAffectsBubble(a.meta) && !metaAffectsBubble(b.meta)) return true;
   return metaEqualForMemo(a.meta, b.meta);
-};
-
-const preMessageEqualForMemo = (
-  a: MessageBubbleData | undefined,
-  b: MessageBubbleData | undefined,
-): boolean => {
-  if (a === b) return true;
-  if (!a || !b) return false;
-  return a.id === b.id && a.role === b.role;
 };
 
 const depsArrayEqual = (
@@ -223,9 +191,12 @@ export const bubblePropsAreEqual = (
   if (prev.renderType !== next.renderType) return false;
 
   if (prev.shouldShowCopy !== next.shouldShowCopy) return false;
+  if (!shallowEqualConfigObject(prev.quote, next.quote)) return false;
 
-  if (!originDataEqualForMemo(prev.originData, next.originData)) return false;
-  if (!preMessageEqualForMemo(prev.preMessage, next.preMessage)) return false;
+  if (!messageBubbleDataAreEqual(prev.originData, next.originData))
+    return false;
+  if (!messageBubbleDataAreEqual(prev.preMessage, next.preMessage))
+    return false;
 
   if (
     !shallowEqualConfigObject(
@@ -264,7 +235,7 @@ export const bubblePropsAreEqual = (
 
   if (
     prev.avatar !== next.avatar &&
-    !shallowEqualRecord(prev.avatar as any, next.avatar as any)
+    !metaEqualForMemo(prev.avatar, next.avatar)
   ) {
     return false;
   }
@@ -295,7 +266,8 @@ export const bubblePropsAreEqual = (
 
   if (prev.useSpeech !== next.useSpeech) return false;
   if (prev.fileViewEvents !== next.fileViewEvents) return false;
-  if (prev.fileViewConfig !== next.fileViewConfig) return false;
+  if (!shallowEqualConfigObject(prev.fileViewConfig, next.fileViewConfig))
+    return false;
   if (prev.renderFileMoreAction !== next.renderFileMoreAction) return false;
 
   if (
@@ -345,6 +317,7 @@ const COMPARED_KEYS = [
   'renderMode',
   'renderType',
   'shouldShowCopy',
+  'quote',
   'originData',
   'preMessage',
   'markdownRenderConfig',

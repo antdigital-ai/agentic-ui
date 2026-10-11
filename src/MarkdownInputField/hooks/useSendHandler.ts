@@ -28,6 +28,10 @@ interface UseSendHandlerParams {
   pushHistory?: (value: string) => void;
   /** 输入历史：发送 / 清空后重置导航游标（可选） */
   resetHistory?: () => void;
+  /** 发送前 gate：返回 true 拦截发送（对齐 IDE guiSlashSendGate） */
+  shouldBlockSend?: () => boolean;
+  /** 发送成功回调（草稿 commit reason: 'send' 等） */
+  onSendSuccess?: () => void;
 }
 
 /**
@@ -53,6 +57,8 @@ export const useSendHandler = ({
   stopRecording,
   pushHistory,
   resetHistory,
+  shouldBlockSend,
+  onSendSuccess,
 }: UseSendHandlerParams) => {
   const sendMessage = useRefFunction(async (submittedValue?: string) => {
     // 整体输入禁用
@@ -65,6 +71,8 @@ export const useSendHandler = ({
     // 发送按钮独立禁用（如未上传完成）
     if (sendDisabled) return;
     if (!props.onSend) return;
+    // 发送前 gate：未配置 slash chip 等场景拦截（对齐 IDE guiSlashSendGate）
+    if (submittedValue === undefined && shouldBlockSend?.()) return;
 
     // Acquire before the first await so recording and followup sends share the
     // same lock as keyboard and button submissions.
@@ -93,6 +101,7 @@ export const useSendHandler = ({
       setValue('');
       setFileMap?.(new Map());
       resetHistory?.();
+      onSendSuccess?.();
     } catch (error) {
       console.error('Send message failed:', error);
       throw error;

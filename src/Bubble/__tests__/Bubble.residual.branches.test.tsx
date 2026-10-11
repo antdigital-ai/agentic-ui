@@ -7,7 +7,7 @@ import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { Bubble } from '../Bubble';
 
-vi.mock('../schema-editor', () => ({
+vi.mock('../schema-editor/useSchemaEditorBridge', () => ({
   useSchemaEditorBridge: (_id: string, content: string) => ({ content }),
 }));
 

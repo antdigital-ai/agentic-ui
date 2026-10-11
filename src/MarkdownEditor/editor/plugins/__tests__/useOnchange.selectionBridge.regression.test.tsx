@@ -73,16 +73,22 @@ describe('deferred Slate selection bridge', () => {
 
   it('coalesces rapid selection changes into the current selection', async () => {
     const bridge = mountBridge();
+    const nodes = vi.spyOn(Editor, 'nodes');
     for (let offset = 0; offset < 20; offset++) {
       await act(async () => bridge.select(0, offset % 10));
     }
+    const selectionLookups = () =>
+      nodes.mock.calls.filter(([, options]) => options?.mode === 'lowest');
+    expect(selectionLookups()).toHaveLength(0);
     expect(bridge.listener).not.toHaveBeenCalled();
     await act(() => vi.runOnlyPendingTimersAsync());
+    expect(selectionLookups()).toHaveLength(1);
     expect(bridge.listener).toHaveBeenCalledTimes(1);
     expect(bridge.listener.mock.calls[0][0].sel).toEqual(
       bridge.editor.selection,
     );
     bridge.subscription.unsubscribe();
+    nodes.mockRestore();
   });
 
   it('does not publish after unmounting the bridge', async () => {

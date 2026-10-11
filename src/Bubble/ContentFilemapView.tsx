@@ -1,5 +1,5 @@
 import json5 from 'json5';
-import React, { useMemo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { normalizeFileMapPropsFromJson } from '../MarkdownEditor/editor/elements/AgenticUiBlocks/agenticUiEmbedUtils';
 import partialParse from '../MarkdownEditor/editor/parser/json-parse';
 import { FileMapView } from '../MarkdownInputField/FileMapView';
@@ -25,72 +25,74 @@ const FilemapItem: React.FC<{
   fileViewEvents?: BubbleProps['fileViewEvents'];
   fileMapConfig?: FileMapConfig;
   placement?: 'left' | 'right';
-}> = ({ body, fileViewConfig, fileViewEvents, fileMapConfig, placement }) => {
-  const parsed = useMemo(() => parseBody(body), [body]);
+}> = memo(
+  ({ body, fileViewConfig, fileViewEvents, fileMapConfig, placement }) => {
+    const parsed = useMemo(() => parseBody(body), [body]);
 
-  const { fileList, className } = useMemo(
-    () => normalizeFileMapPropsFromJson(parsed, fileMapConfig?.normalizeFile),
-    [parsed, fileMapConfig?.normalizeFile],
-  );
+    const { fileList, className } = useMemo(
+      () => normalizeFileMapPropsFromJson(parsed, fileMapConfig?.normalizeFile),
+      [parsed, fileMapConfig?.normalizeFile],
+    );
 
-  const fileMap = useMemo(
-    () => new Map(fileList.map((f) => [f.uuid || f.name, f])),
-    [fileList],
-  );
+    const fileMap = useMemo(
+      () => new Map(fileList.map((f) => [f.uuid || f.name, f])),
+      [fileList],
+    );
 
-  const defaultHandlers = useMemo(
-    () => ({
-      onPreview: (file: any) => {
-        const url = file?.previewUrl || file?.url;
-        if (url && typeof window !== 'undefined') window.open(url, '_blank');
-      },
-      onDownload: (file: any) => {
-        const url = file?.url || file?.previewUrl;
-        if (!url || typeof document === 'undefined') return;
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = file?.name || 'download';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      },
-      onViewAll: () => {},
-    }),
-    [],
-  );
+    const defaultHandlers = useMemo(
+      () => ({
+        onPreview: (file: any) => {
+          const url = file?.previewUrl || file?.url;
+          if (url && typeof window !== 'undefined') window.open(url, '_blank');
+        },
+        onDownload: (file: any) => {
+          const url = file?.url || file?.previewUrl;
+          if (!url || typeof document === 'undefined') return;
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = file?.name || 'download';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        },
+        onViewAll: () => {},
+      }),
+      [],
+    );
 
-  let events: ReturnType<NonNullable<BubbleProps['fileViewEvents']>> = {};
-  try {
-    events = fileViewEvents?.(defaultHandlers) || {};
-  } catch (error) {
-    console.warn('fileViewEvents execution failed', error);
-  }
+    let events: ReturnType<NonNullable<BubbleProps['fileViewEvents']>> = {};
+    try {
+      events = fileViewEvents?.(defaultHandlers) || {};
+    } catch (error) {
+      console.warn('fileViewEvents execution failed', error);
+    }
 
-  if (parsed === null || fileMap.size === 0) return null;
+    if (parsed === null || fileMap.size === 0) return null;
 
-  return (
-    <FileMapView
-      fileMap={fileMap}
-      className={className ?? fileViewConfig?.className}
-      style={fileViewConfig?.style}
-      placement={placement}
-      onPreview={
-        events?.onPreview ??
-        fileMapConfig?.onPreview ??
-        defaultHandlers.onPreview
-      }
-      onFileClick={fileViewConfig?.onFileClick}
-      disableDefaultFileClick={fileViewConfig?.disableDefaultFileClick}
-      // FileMapConfig 当前不暴露 onDownload，因此 fallback 链为 events → defaultHandlers
-      onDownload={events?.onDownload ?? defaultHandlers.onDownload}
-      itemRender={fileViewConfig?.itemRender ?? fileMapConfig?.itemRender}
-      maxDisplayCount={fileViewConfig?.maxDisplayCount}
-      showMoreButton={fileViewConfig?.showMoreButton}
-      customSlot={fileViewConfig?.customSlot}
-      renderMoreAction={fileViewConfig?.renderFileMoreAction as any}
-    />
-  );
-};
+    return (
+      <FileMapView
+        fileMap={fileMap}
+        className={className ?? fileViewConfig?.className}
+        style={fileViewConfig?.style}
+        placement={placement}
+        onPreview={
+          events?.onPreview ??
+          fileMapConfig?.onPreview ??
+          defaultHandlers.onPreview
+        }
+        onFileClick={fileViewConfig?.onFileClick}
+        disableDefaultFileClick={fileViewConfig?.disableDefaultFileClick}
+        // FileMapConfig 当前不暴露 onDownload，因此 fallback 链为 events → defaultHandlers
+        onDownload={events?.onDownload ?? defaultHandlers.onDownload}
+        itemRender={fileViewConfig?.itemRender ?? fileMapConfig?.itemRender}
+        maxDisplayCount={fileViewConfig?.maxDisplayCount}
+        showMoreButton={fileViewConfig?.showMoreButton}
+        customSlot={fileViewConfig?.customSlot}
+        renderMoreAction={fileViewConfig?.renderFileMoreAction as any}
+      />
+    );
+  },
+);
 
 /**
  * 将从 markdown content 中提取出的 agentic-ui-filemap 块渲染为 FileMapView 列表。
@@ -103,27 +105,29 @@ export const ContentFilemapView: React.FC<{
   fileMapConfig?: FileMapConfig;
   placement?: 'left' | 'right';
   style?: React.CSSProperties;
-}> = ({
-  blocks,
-  fileViewConfig,
-  fileViewEvents,
-  fileMapConfig,
-  placement,
-  style,
-}) => {
-  if (blocks.length === 0) return null;
-  return (
-    <div style={style} data-testid="content-filemap-view">
-      {blocks.map((block, i) => (
-        <FilemapItem
-          key={i}
-          body={block.body}
-          fileViewConfig={fileViewConfig}
-          fileViewEvents={fileViewEvents}
-          fileMapConfig={fileMapConfig}
-          placement={placement}
-        />
-      ))}
-    </div>
-  );
-};
+}> = memo(
+  ({
+    blocks,
+    fileViewConfig,
+    fileViewEvents,
+    fileMapConfig,
+    placement,
+    style,
+  }) => {
+    if (blocks.length === 0) return null;
+    return (
+      <div style={style} data-testid="content-filemap-view">
+        {blocks.map((block, i) => (
+          <FilemapItem
+            key={i}
+            body={block.body}
+            fileViewConfig={fileViewConfig}
+            fileViewEvents={fileViewEvents}
+            fileMapConfig={fileMapConfig}
+            placement={placement}
+          />
+        ))}
+      </div>
+    );
+  },
+);

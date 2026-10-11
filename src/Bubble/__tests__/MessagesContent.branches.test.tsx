@@ -107,6 +107,12 @@ vi.mock('../../index', () => ({
   useRefFunction: (fn: any) => fn,
 }));
 
+vi.mock('../../MarkdownRenderer', () => ({
+  MarkdownRenderer: ({ content }: { content: string }) => (
+    <div data-testid="reference-preview">{content}</div>
+  ),
+}));
+
 // Mock Antd
 vi.mock('antd', async (importOriginal) => {
   const actual = await importOriginal<typeof import('antd')>();
@@ -248,8 +254,10 @@ describe('BubbleMessageDisplay fncProps.render 分支覆盖', () => {
 
     // [1] 匹配 → 有 origin_text → 渲染 Popover
     expect(screen.getAllByTestId('popover').length).toBeGreaterThan(0);
-    // 应该渲染 MarkdownEditor 内容
-    expect(screen.getAllByTestId('markdown-editor').length).toBeGreaterThan(0);
+    // 引用预览使用轻量 MarkdownRenderer
+    expect(screen.getAllByTestId('reference-preview').length).toBeGreaterThan(
+      0,
+    );
   });
 
   it('fncProps.render 无匹配时返回 undefined (!item 守卫)', () => {

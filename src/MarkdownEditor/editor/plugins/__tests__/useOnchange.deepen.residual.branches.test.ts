@@ -84,7 +84,7 @@ describe('useOnchange deepen residual branches', () => {
     expect(storeState.setRefreshFloatBar).toHaveBeenCalled();
   });
 
-  it('Editor.nodes 无 node 时 setTimeout 后早退', () => {
+  it('内容变更仅异步查节点，并清除旧工具栏位置', () => {
     vi.spyOn(Editor, 'nodes').mockImplementation(function* () {
       // empty iterator
     });
@@ -92,7 +92,7 @@ describe('useOnchange deepen residual branches', () => {
     result.current([], [{ type: 'insert_text' } as any]);
     vi.runAllTimers();
     expect(storeState.selChange$.next).toHaveBeenCalled();
-    expect(storeState.setDomRect).not.toHaveBeenCalled();
+    expect(storeState.setDomRect).toHaveBeenCalledWith(null);
   });
 
   it('collapsed selection / 不同 parent path 重置 domRect', () => {
@@ -127,6 +127,7 @@ describe('useOnchange deepen residual branches', () => {
     });
     const { result } = renderHook(() => useOnchange());
     result.current([], [{ type: 'insert_text' } as any]);
+    vi.runAllTimers();
     expect(errSpy).toHaveBeenCalled();
     errSpy.mockRestore();
   });

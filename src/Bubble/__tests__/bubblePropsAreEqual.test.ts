@@ -366,7 +366,7 @@ describe('bubblePropsAreEqual', () => {
     ).toBe(false);
   });
 
-  it('ignores meta fields that do not affect bubble rendering', () => {
+  it('compares custom meta fields available to render callbacks', () => {
     const a: BubbleProps = {
       id: 'm1',
       originData: { ...baseOrigin(), meta: { customOnly: 'a' } },
@@ -375,7 +375,7 @@ describe('bubblePropsAreEqual', () => {
       id: 'm1',
       originData: { ...baseOrigin(), meta: { customOnly: 'b' } },
     };
-    expect(bubblePropsAreEqual(a, b)).toBe(true);
+    expect(bubblePropsAreEqual(a, b)).toBe(false);
   });
 
   it('returns false when one side metadata is missing', () => {
@@ -463,6 +463,7 @@ describe('shallowEqualRecord', () => {
     expect(shallowEqualRecord({ a: 1 }, { a: 2 })).toBe(false);
     expect(shallowEqualRecord(null, undefined)).toBe(true);
     expect(shallowEqualRecord({ a: 1 }, null)).toBe(false);
+    expect(shallowEqualRecord({ a: undefined }, { b: undefined })).toBe(false);
   });
 });
 

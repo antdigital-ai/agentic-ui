@@ -18,7 +18,7 @@ import { I18nContext } from '../../../../../I18n';
 const setNodes = vi.hoisted(() => vi.fn());
 const setShowComment = vi.hoisted(() => vi.fn());
 
-vi.mock('../../../store', () => ({
+vi.mock('../../../editorStoreContext', () => ({
   useEditorStore: () => ({
     markdownEditorRef: { current: { children: [] } },
   }),

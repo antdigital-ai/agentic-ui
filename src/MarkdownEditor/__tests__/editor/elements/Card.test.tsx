@@ -32,7 +32,7 @@ describe('WarpCard Element', () => {
     const editor = createTestEditor();
 
     vi.mocked(editorStore.useEditorStore).mockReturnValue({ readonly } as any);
-    vi.mocked(editorHooks.useSelStatus).mockReturnValue([selected, [0]] as any);
+    vi.mocked(editorHooks.useElementSelected).mockReturnValue(selected);
 
     return render(
       <Slate editor={editor} initialValue={[element]}>
@@ -211,7 +211,7 @@ describe('WarpCard Element', () => {
     vi.mocked(editorStore.useEditorStore).mockReturnValue({
       readonly: false,
     } as any);
-    vi.mocked(editorHooks.useSelStatus).mockReturnValue([false, [0]] as any);
+    vi.mocked(editorHooks.useElementSelected).mockReturnValue(false);
 
     const { rerender, container } = render(
       <Slate editor={editor} initialValue={[mockElement]}>
@@ -268,7 +268,7 @@ describe('WarpCard Element', () => {
     vi.mocked(editorStore.useEditorStore).mockReturnValue({
       readonly: false,
     } as any);
-    vi.mocked(editorHooks.useSelStatus).mockReturnValue([false, [0]] as any);
+    vi.mocked(editorHooks.useElementSelected).mockReturnValue(false);
 
     const { container } = render(
       <Slate editor={editor} initialValue={[mockElement]}>
@@ -290,7 +290,7 @@ describe('WarpCard Element', () => {
     vi.mocked(editorStore.useEditorStore).mockReturnValue({
       readonly: false,
     } as any);
-    vi.mocked(editorHooks.useSelStatus).mockReturnValue([false, [0]] as any);
+    vi.mocked(editorHooks.useElementSelected).mockReturnValue(false);
 
     const { container } = render(
       <Slate editor={editor} initialValue={[mockElement]}>

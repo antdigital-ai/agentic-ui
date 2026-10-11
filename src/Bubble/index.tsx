@@ -8,8 +8,7 @@
 export { AIBubble, runRender } from './AIBubble';
 export { Bubble } from './Bubble';
 export * from './BubbleConfigProvide';
-export { PureBubbleList } from './List/PureBubbleList';
-export { PureAIBubble, PureBubble, PureUserBubble } from './PureBubble';
+export { BubbleList, type BubbleListProps } from './List';
 
 export * from './MessagesContent/BubbleContext';
 export * from './type';

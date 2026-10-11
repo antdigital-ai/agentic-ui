@@ -1,4 +1,4 @@
-import { cleanup, renderHook } from '@testing-library/react';
+import { act, cleanup, renderHook } from '@testing-library/react';
 import { Subject } from 'rxjs';
 import { Editor } from 'slate';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -123,6 +123,10 @@ describe('useOnchange targeted coverage', () => {
     const { result } = renderHook(() => useOnchange());
     result.current(editor.children, [{ type: 'insert_text' } as any]);
     expect(mockRun).not.toHaveBeenCalled();
+    // 选区跟踪合并到 setTimeout(0) 任务中，需推进一拍再断言
+    act(() => {
+      vi.advanceTimersByTime(0);
+    });
     expect(nodesSpy).toHaveBeenCalled();
   });
 

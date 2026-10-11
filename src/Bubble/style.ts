@@ -13,10 +13,7 @@ const BUBBLE_CONTENT_RADIUS = '12px';
 /** 用户气泡最大宽度（设计稿约束） */
 const USER_BUBBLE_MAX_WIDTH = '668px';
 
-const genStyle = (
-  token: ChatTokenType,
-  classNames?: BubbleProps['classNames'],
-) => {
+const genStyle = (token: ChatTokenType) => {
   return {
     [token.componentCls]: {
       '&-bubble': {
@@ -27,7 +24,7 @@ const genStyle = (
         '&&-compact': {
           padding: 'var(--padding-0-5x)',
         },
-        '&:hover': {
+        '&:hover, &:focus-within': {
           [`${token.componentCls}-bubble-title-time`]: {
             visibility: 'visible',
           },
@@ -57,13 +54,6 @@ const genStyle = (
         '&-quote': {
           marginBottom: '0px',
           flexDirection: 'column',
-        },
-        [`span.${classNames?.bubbleNameClassName}`]: {
-          fontWeight: 600,
-          fontSize: '1em',
-          color: 'var(--color-gray-text-default)',
-          display: 'flex',
-          alignItems: 'center',
         },
       },
       '&-bubble-avatar-emoji': {
@@ -276,21 +266,16 @@ const genStyle = (
 /**
  * 注册 Bubble 组件样式。
  *
- * 注意：cssinjs 缓存以 `(salt, prefixCls)` 为 key，不会感知 `classNames` 变化。
- * 因此把 classNames 显式拼进 salt，避免不同 classNames 命中同一份样式表导致
- * `[span.<bubbleNameClassName>]` 选择器失效或互相覆盖。
+ * 名称样式由 BubbleTitle 的稳定语义类负责，自定义类名不再创建独立样式缓存。
  *
  * @param prefixCls 组件前缀
- * @param classNames 自定义类名配置（仅 bubbleNameClassName 影响样式生成）
+ * @param _classNames 保留内部调用兼容性
  */
 export function useStyle(
   prefixCls?: string,
-  classNames?: BubbleProps['classNames'],
+  _classNames?: BubbleProps['classNames'],
 ) {
-  const salt = classNames?.bubbleNameClassName
-    ? `ListItem|${classNames.bubbleNameClassName}`
-    : 'ListItem';
-  return useEditorStyleRegister(salt, (token) => {
+  return useEditorStyleRegister('ListItem', (token) => {
     const proChatToken = {
       ...token,
       componentCls: `.${prefixCls}`,
@@ -298,7 +283,7 @@ export function useStyle(
 
     return [
       resetComponent(proChatToken),
-      genStyle(proChatToken, classNames),
+      genStyle(proChatToken),
     ] as CSSInterpolation[];
   });
 }

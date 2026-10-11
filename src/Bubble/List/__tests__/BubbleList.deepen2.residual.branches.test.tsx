@@ -1,11 +1,12 @@
 /**
- * BubbleList deepen2：默认 bubbleList、style 浅比较、LOADING_FLAT Date.now。
+ * BubbleList deepen2：默认 bubbleList、style 浅比较、LOADING_FLAT 稳定挂载。
  */
 import '@testing-library/jest-dom';
 import { cleanup, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { LOADING_FLAT } from '../../MessagesContent';
+import type { MessageBubbleData } from '../../type';
 
 vi.mock('../../Bubble', () => ({
   Bubble: ({ originData, placement }: any) => (
@@ -18,12 +19,6 @@ vi.mock('../../Bubble', () => ({
     >
       {originData?.content}
     </div>
-  ),
-}));
-
-vi.mock('../../../MarkdownEditor/editor/components/LazyElement', () => ({
-  LazyElement: ({ children }: any) => (
-    <div data-testid="lazy-wrap">{children}</div>
   ),
 }));
 
@@ -86,23 +81,18 @@ describe('BubbleList deepen2 residual branches', () => {
     expect(screen.getByTestId('ai-1')).toBeInTheDocument();
   });
 
-  it('LOADING_FLAT 无 createAt 走 Date.now 缓存键', () => {
+  it('LOADING_FLAT 无 createAt 时不因时间变化重挂载', () => {
     const nowSpy = vi.spyOn(Date, 'now').mockReturnValue(42_000);
-    render(
-      <BubbleList
-        bubbleList={
-          [
-            {
-              id: LOADING_FLAT,
-              role: 'assistant',
-              content: '',
-            },
-          ] as any
-        }
-      />,
-    );
-    expect(nowSpy).toHaveBeenCalled();
-    expect(screen.getByTestId(`ai-${LOADING_FLAT}`)).toBeInTheDocument();
+    const message = {
+      id: LOADING_FLAT,
+      role: 'assistant' as const,
+      content: '',
+    } as MessageBubbleData;
+    const { rerender } = render(<BubbleList bubbleList={[message]} />);
+    const previous = screen.getByTestId(`ai-${LOADING_FLAT}`);
+    nowSpy.mockReturnValue(43_000);
+    rerender(<BubbleList bubbleList={[{ ...message, content: 'loading' }]} />);
+    expect(screen.getByTestId(`ai-${LOADING_FLAT}`)).toBe(previous);
     nowSpy.mockRestore();
   });
 });

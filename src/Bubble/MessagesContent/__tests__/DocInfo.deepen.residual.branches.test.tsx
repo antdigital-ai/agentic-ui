@@ -10,10 +10,8 @@ import { I18nContext } from '../../../I18n';
 import { BubbleConfigContext } from '../../BubbleConfigProvide';
 import { DocInfoList } from '../DocInfo';
 
-vi.mock('../../../MarkdownEditor/BaseMarkdownEditor', () => ({
-  BaseMarkdownEditor: ({ initValue }: any) => (
-    <div data-testid="md">{initValue}</div>
-  ),
+vi.mock('../../../MarkdownRenderer', () => ({
+  MarkdownRenderer: ({ content }: any) => <div data-testid="md">{content}</div>,
 }));
 
 vi.mock('../docInfoStyle', () => ({
@@ -96,7 +94,7 @@ describe('DocInfoList deepen residual branches', () => {
     openSpy.mockRestore();
   });
 
-  it('无 originUrl 走 window.open；长内容 Popover + Drawer answer 回退', () => {
+  it('无 originUrl 不跳转；长内容 Popover + Drawer answer 回退', () => {
     const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
     const long = 'L'.repeat(30);
     wrap(
@@ -130,7 +128,7 @@ describe('DocInfoList deepen residual branches', () => {
     // 点击列表项无 originUrl
     const item = screen.getByTitle(long);
     fireEvent.click(item);
-    expect(openSpy).toHaveBeenCalled();
+    expect(openSpy).not.toHaveBeenCalled();
 
     // Popover 内 meta 区域打开 Drawer
     const ans = screen.queryByText('fallback-ans');

@@ -54,9 +54,9 @@ describe('MarkdownPreview branches', () => {
     expect(screen.getByTestId('md-renderer')).toBeInTheDocument();
   });
 
-  it('默认 slate 模式渲染 MarkdownEditor', () => {
+  it('普通只读正文默认渲染 MarkdownRenderer', () => {
     render(<MarkdownPreview {...baseProps()} />);
-    expect(screen.getByTestId('slate-editor')).toBeInTheDocument();
+    expect(screen.getByTestId('md-renderer')).toBeInTheDocument();
   });
 
   it('standalone 时 maxWidth 100%', () => {
@@ -81,7 +81,7 @@ describe('MarkdownPreview branches', () => {
         })}
       />,
     );
-    expect(screen.getByTestId('slate-editor')).toHaveAttribute(
+    expect(screen.getByTestId('md-renderer')).toHaveAttribute(
       'data-streaming',
       'true',
     );
@@ -96,7 +96,7 @@ describe('MarkdownPreview branches', () => {
         })}
       />,
     );
-    expect(screen.getByTestId('slate-editor')).toHaveAttribute(
+    expect(screen.getByTestId('md-renderer')).toHaveAttribute(
       'data-streaming',
       'false',
     );
@@ -123,8 +123,8 @@ describe('MarkdownPreview branches', () => {
         />
       </BubbleConfigContext.Provider>,
     );
-    await user.hover(screen.getByTestId('slate-editor').parentElement!);
-    expect(screen.getByTestId('slate-editor')).toBeInTheDocument();
+    await user.hover(screen.getByTestId('md-renderer').parentElement!);
+    expect(screen.getByTestId('md-renderer')).toBeInTheDocument();
   });
 
   it('extraShowOnHover 但 typing 时不包 Popover', () => {
@@ -147,6 +147,7 @@ describe('MarkdownPreview branches', () => {
         <MarkdownPreview
           {...baseProps({
             content: 'chartType line',
+            markdownRenderConfig: { renderMode: 'slate' },
             htmlRef: { current: { clientWidth: 800 } } as any,
           })}
         />
@@ -194,6 +195,6 @@ describe('MarkdownPreview branches', () => {
         <MarkdownPreview {...baseProps()} />
       </MessagesContext.Provider>,
     );
-    expect(screen.getByTestId('slate-editor')).toBeInTheDocument();
+    expect(screen.getByTestId('md-renderer')).toBeInTheDocument();
   });
 });

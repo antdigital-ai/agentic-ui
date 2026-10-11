@@ -1,18 +1,22 @@
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
-import React, { memo, useContext, useState } from 'react';
+import React, { memo, useContext, useEffect, useState } from 'react';
 import { TextLoading } from '../Components/lotties/TextLoading';
 import { useLocale } from '../I18n';
 import { BaseMarkdownEditor } from '../MarkdownEditor';
+import type { ComposerChipData } from '../MarkdownEditor/editor/elements/ComposerChip/types';
 import { BorderBeamAnimation } from './BorderBeamAnimation';
+import { ComposerBranchTrigger } from './BranchSelector/ComposerBranchTrigger';
 import {
   DEFAULT_BORDER_RADIUS_PX,
   ENLARGED_DEFAULT_HEIGHT_PX,
   FALLBACK_BORDER_RADIUS_PX,
   ROOT_TAB_INDEX,
 } from './constants';
+import { ContextUsageIndicator } from './ContextUsage/ContextUsageIndicator';
 import { useFileUploadManager } from './FileUploadManager';
 import { Followups } from './Followups';
+import { useComposerDraft } from './hooks/useComposerDraft';
 import { useDropZone } from './hooks/useDropZone';
 import { useEditorValueSync } from './hooks/useEditorValueSync';
 import { useEnlargeAndContainerHandler } from './hooks/useEnlargeAndContainerHandler';
@@ -23,6 +27,7 @@ import { useInputHistory } from './hooks/useInputHistory';
 import { useKeyboardHandler } from './hooks/useKeyboardHandler';
 import { useMarkdownInputFieldState } from './hooks/useMarkdownInputFieldState';
 import { usePasteHandler } from './hooks/usePasteHandler';
+import { useSendGate } from './hooks/useSendGate';
 import { useSendHandler } from './hooks/useSendHandler';
 import { QuickActions } from './QuickActions';
 import { SendActions } from './SendActions';
@@ -185,6 +190,36 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
     setValue,
   });
 
+  // 内联 chip 体系（对齐 dtcoder-ide composer slash/mention）：
+  // - chip 点击桥：ComposerChip 渲染层经 editor.__composerChipClick 通知宿主
+  // - gate：发送前检查未配置 slash chip（见 useSendGate）
+  const chipsEnabled = props.composerChips?.enable === true;
+  useEffect(() => {
+    if (!chipsEnabled || !markdownEditorRef.current) return;
+    (markdownEditorRef.current as any).__composerChipClick = (
+      chip: ComposerChipData,
+    ) => {
+      if (chip.kind === 'slash') {
+        props.composerChips?.onSlashChipClick?.(chip);
+      }
+    };
+  }, [chipsEnabled, props.composerChips]);
+
+  const { shouldBlockSend } = useSendGate({
+    props,
+    markdownEditorRef,
+  });
+
+  // 草稿恢复（对齐 dtcoder-ide fragment 级草稿）：idle / blur / send / switch / unmount 提交
+  const { notifyInput: notifyDraftInput, commitDraft } = useComposerDraft({
+    draftKey: props.draft?.draftKey,
+    storage: props.draft?.storage,
+    idleDelay: props.draft?.idleDelay,
+    onDraftCommit: props.draft?.onDraftCommit,
+    onDraftRestore: props.draft?.onDraftRestore,
+    markdownEditorRef,
+  });
+
   // 输入历史导航（对齐 dtcoder-ide）：仅在显式开启时拦截 ↑/↓
   const inputHistory = useInputHistory({
     markdownEditorRef,
@@ -237,6 +272,10 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
     stopRecording,
     pushHistory: historyEnabled ? inputHistory.push : undefined,
     resetHistory: historyEnabled ? inputHistory.reset : undefined,
+    // 发送前 gate（对齐 IDE guiSlashSendGate）：未配置 slash chip 阻止发送
+    shouldBlockSend,
+    // 发送成功后提交草稿（reason: 'send' 清空对应草稿）
+    onSendSuccess: () => commitDraft('send'),
   });
 
   const { handlePaste } = usePasteHandler({
@@ -296,6 +335,50 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
   });
 
   const editorReadonly = isLoading || !!props.typing;
+
+  // 输入框工具行附加组件（对齐 dtcoder-ide Composer 工具栏）：
+  // - 分支触发器（branch）：图标 + 分支名 + 下拉切换
+  // - 上下文用量（contextUsage）：环形指示器 + 点击回调
+  const hasBranch = !!props.branch?.branchName?.trim();
+  const hasContextUsage =
+    !!props.contextUsage && props.contextUsage.usedTokens > 0;
+  const composerExtrasNode =
+    hasBranch || hasContextUsage ? (
+      <div
+        className={classNames(`${baseCls}-composer-extras`, hashId)}
+        contentEditable={false}
+        data-testid="markdown-input-field-composer-extras"
+      >
+        {hasBranch ? (
+          <ComposerBranchTrigger
+            branchName={props.branch!.branchName}
+            tooltipTitle={props.branch!.tooltipTitle}
+            branches={props.branch!.branches}
+            currentBranchOverview={props.branch!.currentBranchOverview}
+            switching={props.branch!.switching}
+            disabled={props.branch!.disabled}
+            onSelectBranch={props.branch!.onSelectBranch}
+            onSearch={props.branch!.onSearch}
+            onCreateBranch={props.branch!.onCreateBranch}
+            loading={props.branch!.loading}
+            labels={props.branch!.labels}
+          />
+        ) : null}
+        {hasContextUsage ? (
+          <ContextUsageIndicator
+            usedTokens={props.contextUsage!.usedTokens}
+            contextWindow={props.contextUsage!.contextWindow}
+            categories={props.contextUsage!.categories}
+            highUsageThreshold={props.contextUsage!.highUsageThreshold}
+            onClick={props.contextUsage!.onClick}
+            panelLabels={props.contextUsage!.panelLabels}
+            onCompact={props.contextUsage!.onCompact}
+            compactDisabled={props.contextUsage!.compactDisabled}
+            compacting={props.contextUsage!.compacting}
+          />
+        ) : null}
+      </div>
+    ) : null;
 
   // SendActions 节点。原本封装在 useSendActionsNode 中，但其 useMemo
   // 依赖列表包含 27 项（含 attachment / sendProps 等每次渲染都会变的引用），
@@ -520,6 +603,10 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                   // props.value sync effect skips the redundant setMDContent call
                   // that would disrupt the live Slate selection while typing.
                   setValue(value);
+                  // 草稿恢复：输入变化重排 idle 提交 timer（对齐 IDE IDLE_COMMIT_DELAY_MS）
+                  if (props.draft?.draftKey) {
+                    notifyDraftInput();
+                  }
                 }}
                 onFocus={(value, schema, e) => {
                   onFocus?.(value, schema, e);
@@ -533,6 +620,10 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                   setIsFocused(false);
                   setBeamAnimationComplete(false);
                   flushPendingValue();
+                  // 草稿恢复：失焦即提交（reason: 'blur'）
+                  if (props.draft?.draftKey) {
+                    commitDraft('blur');
+                  }
                 }}
                 onPaste={(e) => {
                   handlePaste(e);
@@ -543,6 +634,8 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                   allowedTypes: ['text/plain'],
                   plainTextOnly: true,
                   ...props.pasteConfig,
+                  // 长文本折叠：MarkdownInputField.longTextFold 透传（默认关闭）
+                  longTextFold: { enable: props.longTextFold?.enable === true },
                 }}
                 markdown={{
                   enableInsertCompletion: false,
@@ -584,7 +677,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
             </Suggestion>
           </div>
         </div>
-        {props.toolsRender || props.actionsRender ? (
+        {props.toolsRender || props.actionsRender || composerExtrasNode ? (
           <div
             className={classNames(`${baseCls}-tools-wrapper`, hashId)}
             data-testid={MARKDOWN_INPUT_FIELD_TEST_IDS.TOOLS_WRAPPER}
@@ -595,6 +688,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
               className={classNames(`${baseCls}-send-tools`, hashId)}
               data-testid={MARKDOWN_INPUT_FIELD_TEST_IDS.SEND_TOOLS}
             >
+              {composerExtrasNode}
               {props?.toolsRender?.({
                 value,
                 fileMap,
@@ -607,6 +701,21 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                 fileUploadStatus,
                 fileUploadSummary,
               })}
+            </div>
+            {sendActionsNode}
+          </div>
+        ) : composerExtrasNode ? (
+          <div
+            className={classNames(`${baseCls}-tools-wrapper`, hashId)}
+            data-testid={MARKDOWN_INPUT_FIELD_TEST_IDS.TOOLS_WRAPPER}
+          >
+            <div
+              ref={actionsRef}
+              contentEditable={false}
+              className={classNames(`${baseCls}-send-tools`, hashId)}
+              data-testid={MARKDOWN_INPUT_FIELD_TEST_IDS.SEND_TOOLS}
+            >
+              {composerExtrasNode}
             </div>
             {sendActionsNode}
           </div>

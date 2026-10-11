@@ -109,6 +109,33 @@ describe('ContentThrottle', () => {
     throttle.dispose();
   });
 
+  it('前文修订即使保留同一个边界字符，也应重新推进', () => {
+    const flushed: string[] = [];
+    const throttle = new ContentThrottle((s) => flushed.push(s), {
+      charsPerFrame: 3,
+    });
+    throttle.push('abcdef');
+    vi.advanceTimersByTime(16);
+    expect(flushed.at(-1)).toBe('abc');
+
+    throttle.push('xycdef-more');
+    vi.advanceTimersByTime(16);
+    expect(flushed.at(-1)).toBe('xyc');
+    throttle.dispose();
+  });
+
+  it('清空内容立即取消已调度帧', () => {
+    const cancel = vi.spyOn(globalThis, 'cancelAnimationFrame');
+    const onFlush = vi.fn();
+    const throttle = new ContentThrottle(onFlush, { charsPerFrame: 1 });
+    throttle.push('abcdef');
+    throttle.push('');
+    expect(onFlush).toHaveBeenLastCalledWith('');
+    expect(cancel).toHaveBeenCalledTimes(1);
+    throttle.dispose();
+    cancel.mockRestore();
+  });
+
   it('已追上目标时不应重复调度或 flush', () => {
     const flushed: string[] = [];
     const throttle = new ContentThrottle((s) => flushed.push(s), {

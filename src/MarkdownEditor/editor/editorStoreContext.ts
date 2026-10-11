@@ -1,4 +1,4 @@
-import { createContext } from 'react';
+import { createContext, useContext } from 'react';
 
 import type { EditorStoreContextType } from './store';
 
@@ -6,3 +6,14 @@ import type { EditorStoreContextType } from './store';
 export const EditorStoreContext = createContext<EditorStoreContextType | null>(
   null,
 );
+
+/** Shared by editor and readonly views without loading the Slate store. */
+export const useEditorStore = (): EditorStoreContextType => {
+  const context = useContext(EditorStoreContext);
+  if (!context) {
+    throw new Error(
+      'useEditorStore must be used within EditorStoreContext.Provider',
+    );
+  }
+  return context;
+};

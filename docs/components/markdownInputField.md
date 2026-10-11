@@ -236,10 +236,10 @@ export default () => {
 
 开启 `inputHistory.enable` 后（对齐桌面 IDE 聊天输入框行为）：
 
-| 快捷键              | 行为                                                       |
-| :------------------ | :--------------------------------------------------------- |
-| <kbd>↑</kbd>        | 光标位于内容开头时，回溯上一条已发送内容                    |
-| <kbd>↓</kbd>        | 光标位于内容末尾时，前进到下一条（回到栈顶时找回编辑中内容） |
+| 快捷键       | 行为                                                         |
+| :----------- | :----------------------------------------------------------- |
+| <kbd>↑</kbd> | 光标位于内容开头时，回溯上一条已发送内容                     |
+| <kbd>↓</kbd> | 光标位于内容末尾时，前进到下一条（回到栈顶时找回编辑中内容） |
 
 - 发送成功的内容自动进入历史栈（去重、上限默认 100 条，可配 `maxLength`）；
 - 回溯前当前编辑中的内容会被暂存，按 <kbd>↓</kbd> 到栈顶可找回；
@@ -288,50 +288,55 @@ export default () => {
 
 ## API
 
-| 属性                     | 说明                                           | 类型                                                                 | 默认值    | 版本 |
-| ------------------------ | ---------------------------------------------- | -------------------------------------------------------------------- | --------- | ---- |
-| `value`                  | 当前的 markdown 文本值                         | `string`                                                             | -         | -    |
-| `onChange`               | 当输入值改变时触发的回调函数                   | `(value: string) => void`                                            | -         | -    |
-| `placeholder`            | 输入字段的占位文本                             | `string`                                                             | -         | -    |
-| `style`                  | 应用于输入字段的内联样式                       | `React.CSSProperties`                                                | -         | -    |
-| `className`              | 应用于输入字段的 CSS 类名                      | `string`                                                             | -         | -    |
-| `disabled`               | 是否禁用输入字段                               | `boolean`                                                            | -         | -    |
-| `typing`                 | AI 回复中等场景下为 true，输入区只读并显示提示 | `boolean`                                                            | -         | -    |
-| `allowEmptySubmit`       | 是否允许在内容为空时也触发发送                 | `boolean`                                                            | `false`   | -    |
-| `triggerSendKey`         | 触发发送操作的键盘快捷键                       | `'Enter' \| 'Mod+Enter'`                                             | `'Enter'` | -    |
-| `onSend`                 | 当内容发送时触发的异步回调函数                 | `(value: string) => Promise<void>`                                   | -         | -    |
-| `onStop`                 | 正在输入中时点击发送按钮的回调函数             | `() => void`                                                         | -         | -    |
-| `onFocus`                | 当输入字段获得焦点时触发的回调函数             | `(value: string, schema: Elements[], e: FocusEvent) => void`         | -         | -    |
-| `onBlur`                 | 当输入字段失去焦点时触发的回调函数             | `(value: string, schema: Elements[], e: MouseEvent) => void`         | -         | -    |
-| `tagInputProps`          | 标签输入的相关属性                             | `MarkdownEditorProps['tagInputProps']`                               | -         | -    |
-| `suggestionProps`        | 内部建议下拉框配置；可关闭下拉框或指定弹层容器 | `SuggestionProps`                                                    | -         | -    |
-| `borderRadius`           | 边框圆角大小                                   | `number`                                                             | `12`      | -    |
-| `attachment`             | 附件配置                                       | `{ enable?: boolean } & AttachmentButtonProps`                       | -         | -    |
-| `voiceRecognizer`        | 语音输入配置                                   | `CreateRecognizer`                                                   | -         | -    |
-| `actionsRender`          | 自定义渲染操作按钮的函数                       | `(props, defaultActions) => React.ReactNode[]`                       | -         | -    |
-| `toolsRender`            | 自定义渲染操作按钮前内容的函数                 | `(props) => React.ReactNode[]`                                       | -         | -    |
-| `beforeToolsRender`      | 自定义渲染输入框上方的工具栏区域               | `(props) => React.ReactNode`                                         | -         | -    |
-| `quickActionRender`      | 自定义右上操作按钮渲染函数                     | `(props) => React.ReactNode[]`                                       | -         | -    |
-| `leafRender`             | 自定义叶子节点渲染函数                         | `(props, defaultDom) => React.ReactElement`                          | -         | -    |
-| `inputRef`               | 输入框引用                                     | `React.MutableRefObject<MarkdownEditorInstance>`                     | -         | -    |
-| `skillMode`              | 技能模式配置                                   | `SkillModeConfig`                                                    | -         | -    |
-| `onSkillModeOpenChange`  | 技能模式状态变化回调                           | `(open: boolean) => void`                                            | -         | -    |
-| `pasteConfig`            | 粘贴配置                                       | `{ enabled?: boolean; allowedTypes?: string[] }`                     | -         | -    |
-| `refinePrompt`           | 提示词优化配置                                 | `{ enable: boolean; onRefine: (input: string) => Promise<string>; }` | -         | -    |
-| `enlargeable`            | 放大功能配置                                   | `{ enable?: boolean; height?: number; }`                             | -         | -    |
-| `isShowTopOperatingArea` | 是否显示顶部操作区域                           | `boolean`                                                            | `false`   | -    |
-| `targetRef`              | 顶部操作区域回到顶部/底部功能的目标元素引用    | `React.RefObject<HTMLDivElement>`                                    | -         | -    |
-| `operationBtnRender`     | 顶部操作区域自定义操作按钮渲染函数             | `() => React.ReactNode`                                              | -         | -    |
-| `isShowBackTo`           | 是否在顶部操作区域显示回到顶部/底部按钮        | `boolean`                                                            | `true`    | -    |
-| `maxHeight`              | 输入框的最大高度                               | `number \| string`                                                   | -         | -    |
-| `maxLength`              | 输入文本的最大字符数限制                       | `number`                                                             | -         | -    |
-| `onMaxLengthExceeded`    | 当输入达到最大长度限制时的回调函数             | `(value: string) => void`                                            | -         | -    |
-| `sendButtonProps`        | 发送按钮配置                                   | `SendButtonCustomizationProps`                                       | -         | -    |
-| `disableHoverAnimation`  | 是否禁用 hover 动画                            | `boolean`                                                            | `false`   | -    |
-| `disableFocusAnimation`  | 是否禁用聚焦边框光束动画                       | `boolean`                                                            | `false`   | -    |
-| `inputHistory`           | 输入历史导航配置（↑/↓ 翻阅已发送内容）         | `{ enable?: boolean; maxLength?: number }`                           | -         | -    |
-| `followups`              | 建议问题配置（输入框下方可点击发送/回填）       | `{ items?: { text: string; fillOnly?: boolean; icon?: ReactNode; title?: string }[] }` | - | -    |
-| `bgColorList`            | 背景颜色列表                                   | `string[]`                                                           | -         | -    |
+| 属性                     | 说明                                               | 类型                                                                                   | 默认值              | 版本   |
+| ------------------------ | -------------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------- | ------ |
+| `value`                  | 当前的 markdown 文本值                             | `string`                                                                               | -                   | -      |
+| `onChange`               | 当输入值改变时触发的回调函数                       | `(value: string) => void`                                                              | -                   | -      |
+| `placeholder`            | 输入字段的占位文本                                 | `string`                                                                               | -                   | -      |
+| `style`                  | 应用于输入字段的内联样式                           | `React.CSSProperties`                                                                  | -                   | -      |
+| `className`              | 应用于输入字段的 CSS 类名                          | `string`                                                                               | -                   | -      |
+| `disabled`               | 是否禁用输入字段                                   | `boolean`                                                                              | -                   | -      |
+| `typing`                 | AI 回复中等场景下为 true，输入区只读并显示提示     | `boolean`                                                                              | -                   | -      |
+| `allowEmptySubmit`       | 是否允许在内容为空时也触发发送                     | `boolean`                                                                              | `false`             | -      |
+| `triggerSendKey`         | 触发发送操作的键盘快捷键                           | `'Enter' \| 'Mod+Enter'`                                                               | `'Enter'`           | -      |
+| `onSend`                 | 当内容发送时触发的异步回调函数                     | `(value: string) => Promise<void>`                                                     | -                   | -      |
+| `onStop`                 | 正在输入中时点击发送按钮的回调函数                 | `() => void`                                                                           | -                   | -      |
+| `onFocus`                | 当输入字段获得焦点时触发的回调函数                 | `(value: string, schema: Elements[], e: FocusEvent) => void`                           | -                   | -      |
+| `onBlur`                 | 当输入字段失去焦点时触发的回调函数                 | `(value: string, schema: Elements[], e: MouseEvent) => void`                           | -                   | -      |
+| `tagInputProps`          | 标签输入的相关属性                                 | `MarkdownEditorProps['tagInputProps']`                                                 | -                   | -      |
+| `suggestionProps`        | 内部建议下拉框配置；可关闭下拉框或指定弹层容器     | `SuggestionProps`                                                                      | -                   | -      |
+| `borderRadius`           | 边框圆角大小                                       | `number`                                                                               | `12`                | -      |
+| `attachment`             | 附件配置                                           | `{ enable?: boolean } & AttachmentButtonProps`                                         | -                   | -      |
+| `voiceRecognizer`        | 语音输入配置                                       | `CreateRecognizer`                                                                     | -                   | -      |
+| `actionsRender`          | 自定义渲染操作按钮的函数                           | `(props, defaultActions) => React.ReactNode[]`                                         | -                   | -      |
+| `toolsRender`            | 自定义渲染操作按钮前内容的函数                     | `(props) => React.ReactNode[]`                                                         | -                   | -      |
+| `beforeToolsRender`      | 自定义渲染输入框上方的工具栏区域                   | `(props) => React.ReactNode`                                                           | -                   | -      |
+| `quickActionRender`      | 自定义右上操作按钮渲染函数                         | `(props) => React.ReactNode[]`                                                         | -                   | -      |
+| `leafRender`             | 自定义叶子节点渲染函数                             | `(props, defaultDom) => React.ReactElement`                                            | -                   | -      |
+| `inputRef`               | 输入框引用                                         | `React.MutableRefObject<MarkdownEditorInstance>`                                       | -                   | -      |
+| `skillMode`              | 技能模式配置                                       | `SkillModeConfig`                                                                      | -                   | -      |
+| `onSkillModeOpenChange`  | 技能模式状态变化回调                               | `(open: boolean) => void`                                                              | -                   | -      |
+| `pasteConfig`            | 粘贴配置                                           | `{ enabled?: boolean; allowedTypes?: string[] }`                                       | -                   | -      |
+| `refinePrompt`           | 提示词优化配置                                     | `{ enable: boolean; onRefine: (input: string) => Promise<string>; }`                   | -                   | -      |
+| `enlargeable`            | 放大功能配置                                       | `{ enable?: boolean; height?: number; }`                                               | -                   | -      |
+| `isShowTopOperatingArea` | 是否显示顶部操作区域                               | `boolean`                                                                              | `false`             | -      |
+| `targetRef`              | 顶部操作区域回到顶部/底部功能的目标元素引用        | `React.RefObject<HTMLDivElement>`                                                      | -                   | -      |
+| `operationBtnRender`     | 顶部操作区域自定义操作按钮渲染函数                 | `() => React.ReactNode`                                                                | -                   | -      |
+| `isShowBackTo`           | 是否在顶部操作区域显示回到顶部/底部按钮            | `boolean`                                                                              | `true`              | -      |
+| `maxHeight`              | 输入框的最大高度                                   | `number \| string`                                                                     | -                   | -      |
+| `maxLength`              | 输入文本的最大字符数限制                           | `number`                                                                               | -                   | -      |
+| `onMaxLengthExceeded`    | 当输入达到最大长度限制时的回调函数                 | `(value: string) => void`                                                              | -                   | -      |
+| `sendButtonProps`        | 发送按钮配置                                       | `SendButtonCustomizationProps`                                                         | -                   | -      |
+| `disableHoverAnimation`  | 是否禁用 hover 动画                                | `boolean`                                                                              | `false`             | -      |
+| `disableFocusAnimation`  | 是否禁用聚焦边框光束动画                           | `boolean`                                                                              | `false`             | -      |
+| `inputHistory`           | 输入历史导航配置（↑/↓ 翻阅已发送内容）             | `{ enable?: boolean; maxLength?: number }`                                             | -                   | -      |
+| `followups`              | 建议问题配置（输入框下方可点击发送/回填）          | `{ items?: { text: string; fillOnly?: boolean; icon?: ReactNode; title?: string }[] }` | -                   | -      |
+| `bgColorList`            | 背景颜色列表                                       | `string[]`                                                                             | -                   | -      |
+| `composerChips`          | 内联原子 chip 体系（slash 命令 / @file / @symbol） | `{ enable?: boolean; onSlashChipGate?; onSlashChipClick? }`                            | -                   | 2.33.0 |
+| `longTextFold`           | 长文本粘贴折叠（≥1200 字符或 ≥12 行折叠为 chip）   | `{ enable?: boolean }`                                                                 | `{ enable: false }` | 2.33.0 |
+| `draft`                  | fragment 级草稿恢复（idle/blur/send/switch 提交）  | `{ draftKey?; storage?; idleDelay?; onDraftCommit?; onDraftRestore? }`                 | -                   | 2.33.0 |
+| `contextUsage`           | 上下文用量环形指示器                               | `{ usedTokens: number; contextWindow: number; ... }`                                   | -                   | 2.33.0 |
+| `branch`                 | 分支选择触发器（分支 pill + 搜索菜单）             | `{ branchName?; branches?; onSelectBranch?; ... }`                                     | -                   | 2.33.0 |
 
 ### 类型定义 {#type-definitions}
 
@@ -1670,6 +1675,161 @@ export default () => {
   );
 };
 ```
+
+### 内联原子 Chip（slash 命令 / @file / @symbol） {#composer-chips}
+
+开启 `composerChips.enable` 后，编辑器支持 `composer-chip` 内联原子节点（对齐桌面 IDE 聊天输入框的 slash 命令与 mention 体验）：
+
+- **slash 命令 chip**：`/name` 结构化技能节点。chip 整体删除（Backspace），点击触发 `onSlashChipClick` 打开宿主配置浮层；未配置参数（无 `payload`）的 chip 在发送前被 gate 拦截（`onSlashChipGate`）。
+- **@file / @folder chip**：文件 / 目录引用，发送时序列化为 `@path`（路径含空格自动加尖括号 `@<path>`）。
+- **@symbol chip**：符号引用（函数 / 类），展示 `symbolKind` 副标题与容器名。
+
+```tsx | pure
+import {
+  MarkdownInputField,
+  createFileChipNode,
+  createSlashChipNode,
+  createSymbolChipNode,
+  insertComposerChip,
+} from '@ant-design/agentic-ui';
+
+// 宿主侧插入 chip（如 slash 命令面板选中、@补全选中）
+insertComposerChip(editor, {
+  kind: 'slash',
+  name: 'plan',
+  section: 'skill',
+  extensionId: 'my-ext',
+});
+insertComposerChip(editor, {
+  kind: 'file',
+  path: 'src/MarkdownInputField/index.tsx',
+  name: 'index.tsx',
+});
+insertComposerChip(editor, {
+  kind: 'symbol',
+  name: 'useComposerDraft',
+  symbolKind: 'function',
+  containerName: 'hooks',
+});
+```
+
+发送前 gate（存在未配置 slash chip 时阻止发送并提示）：
+
+```tsx | pure
+<MarkdownInputField
+  composerChips={{
+    enable: true,
+    onSlashChipClick: (chip) => openSkillConfigOverlay(chip),
+    onSlashChipGate: (chips) => {
+      message.warning(`请先配置 /${chips[0].name} 的参数`);
+      return true; // 阻止发送；返回 false 放行
+    },
+  }}
+/>
+```
+
+### 长文本粘贴折叠 {#long-text-fold}
+
+开启 `longTextFold.enable` 后，纯文本粘贴超过阈值（≥ 1200 字符或 ≥ 12 行）时自动折叠为单个「长文本」chip，展示字符数与行数统计，避免一次粘贴撑爆输入框；发送时自动还原完整原文（多行原文以 fenced code 形式序列化）。
+
+点击长文本 chip 可弹出原文预览浮层（对齐 IDE ComposerLongTextPreview），在不展开编辑器的情况下核对折叠内容。
+
+```tsx | pure
+<MarkdownInputField longTextFold={{ enable: true }} />
+```
+
+### 草稿恢复 {#draft-recovery}
+
+传入 `draft.draftKey` 后自动持久化输入内容（fragment 级，对齐 IDE 会话切换体验）：
+
+- **提交时机**：输入停顿（idle，默认 180ms）、失焦（blur）、发送成功（send）、`draftKey` 切换（switch）、组件卸载（unmount）；
+- **恢复时机**：`draftKey` 变化且当前编辑器为空时自动回填；
+- 默认写入 `localStorage`（key 为 `draftKey` 派生），可通过 `storage` 替换为内存 / IndexedDB 等自定义存储。
+
+```tsx | pure
+<MarkdownInputField
+  draft={{
+    draftKey: sessionId,
+    idleDelay: 200,
+    onDraftCommit: (value, reason) => {
+      // 返回 false 表示宿主自行持久化，hook 跳过默认写入
+      return persistDraft(sessionId, value);
+    },
+  }}
+/>
+```
+
+### 上下文用量指示 {#context-usage}
+
+配置 `contextUsage` 后在工具栏渲染环形用量指示器：16px 圆环 + 分档颜色（<50% 灰、≥50% 黄、≥80% 高用量深黄、溢出红），悬浮展示 `used / window (percent%)`。
+
+**内置面板**：未传 `onClick` 且提供 `categories` 时，点击指示器展开内置 `ContextUsagePanel`——占用百分比 + token 摘要、分类分段条形图（分类合计超出/不足总占用时自动缩放/补残差）、分类明细行（可展开 items）、高用量警告行、compact 压缩操作（`onCompact` / `compacting` / `compactDisabled`）。传入 `onClick` 则由宿主自管面板。
+
+```tsx | pure
+<MarkdownInputField
+  contextUsage={{
+    usedTokens: 42000,
+    contextWindow: 128000,
+    highUsageThreshold: 80,
+    categories: [
+      { key: 'system', name: '系统', tokenCount: 12000 },
+      {
+        key: 'skills',
+        name: '技能',
+        tokenCount: 8000,
+        items: [{ label: 'pdf-reader', estimatedTokens: 5000 }],
+      },
+      { key: 'messages', name: '会话', tokenCount: 22000 },
+    ],
+    onCompact: () => compactSession(),
+    compacting: false,
+  }}
+/>
+```
+
+也可直接使用独立导出的 `ContextUsageIndicator` / `ContextUsagePanel` 组件与 `computeBarSegments` 工具函数自定义布局。
+
+### 分支选择 {#branch-selector}
+
+配置 `branch` 后在工具栏渲染分支触发器：分支图标 + 当前分支名 pill，点击展开可搜索的分支菜单。不传 `branches` 时仅展示当前分支不可切换。
+
+菜单能力（对齐 IDE ComposerBranchMenuView）：
+
+- **搜索过滤**（本地过滤或 `onSearch` 远程）；
+- **当前分支概览**：`currentBranchOverview` 展示未提交文件数与 `+新增/-删除` 行数；
+- **逐分支切换 spinner**：`switching` 传分支名时仅对该分支行显示 loading（全局切换传 `true`）；
+- **新建分支入口**：传入 `onCreateBranch` 时显示；
+- **文案定制**：`labels` 覆盖搜索占位、分组标题、remote 标记等。
+
+```tsx | pure
+<MarkdownInputField
+  branch={{
+    branchName: 'feat/composer',
+    tooltipTitle: '切换工作分支',
+    branches: [
+      { name: 'main', displayName: 'main', isRemote: false, isCurrent: false },
+      {
+        name: 'feat/composer',
+        displayName: 'composer',
+        isRemote: false,
+        isCurrent: true,
+      },
+      {
+        name: 'origin/main',
+        displayName: 'origin/main',
+        isRemote: true,
+        isCurrent: false,
+      },
+    ],
+    currentBranchOverview: { fileCount: 3, insertions: 120, deletions: 8 },
+    switching: false,
+    onSelectBranch: (name) => switchBranch(name),
+    onCreateBranch: () => openCreateDialog(),
+  }}
+/>
+```
+
+也可直接使用独立导出的 `ComposerBranchTrigger` 组件。
 
 ### 粘贴配置 {#config-paste}
 

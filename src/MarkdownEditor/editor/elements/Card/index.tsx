@@ -1,21 +1,12 @@
 import React from 'react';
 import { RenderElementProps } from 'slate-react';
-import { useSelStatus } from '../../../../MarkdownEditor/hooks/editor';
+import { useElementSelected } from '../../../../MarkdownEditor/hooks/editor';
 import { useEditorStore } from '../../store';
 
-export const WarpCard = React.memo(function WarpCard(
+const EditableCard = React.memo(function EditableCard(
   props: RenderElementProps,
 ) {
-  const [selected] = useSelStatus(props.element);
-  const { readonly } = useEditorStore();
-
-  if (readonly) {
-    return (
-      <div {...props.attributes} data-be={'card'} role="button">
-        {props.children}
-      </div>
-    );
-  }
+  const selected = useElementSelected(props.element);
   // Slate replaces children and attributes when descendants change. Caching
   // this subtree by card metadata hides media edits and retains removed nodes.
   return (
@@ -39,4 +30,18 @@ export const WarpCard = React.memo(function WarpCard(
       {props.children}
     </div>
   );
+});
+
+export const WarpCard = React.memo(function WarpCard(
+  props: RenderElementProps,
+) {
+  const { readonly } = useEditorStore();
+  if (readonly) {
+    return (
+      <div {...props.attributes} data-be="card" role="button">
+        {props.children}
+      </div>
+    );
+  }
+  return <EditableCard {...props} />;
 });

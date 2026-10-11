@@ -31,6 +31,7 @@ import { ReadonlyCard } from './Card/ReadonlyCard';
 import { Code } from './Code';
 import { ReadonlyCode } from './Code/ReadonlyCode';
 import { CommentLeaf } from './CommentLeaf';
+import { ComposerChip, ReadonlyComposerChip } from './ComposerChip';
 import { FncLeaf } from './FncLeaf';
 import { FootnoteDefinition } from './FootnoteDefinition';
 import { ReadonlyFootnoteDefinition } from './FootnoteDefinition/ReadonlyFootnoteDefinition';
@@ -142,6 +143,12 @@ const MElementComponent = (
 
   // 统一处理预览/编辑模式切换
   switch (props.element.type) {
+    case 'composer-chip':
+      return props.readonly ? (
+        <ReadonlyComposerChip {...readonlyElementProps} />
+      ) : (
+        <ComposerChip {...props} />
+      );
     case 'link-card':
       return props.readonly ? (
         <ReadonlyLinkCard {...readonlyElementProps} />

@@ -21,9 +21,9 @@ const renderExpanded: typeof renderComponent = (...args) => {
   return result;
 };
 
-vi.mock('../../MarkdownEditor/BaseMarkdownEditor', () => ({
-  BaseMarkdownEditor: ({ initValue }: { initValue?: string }) => (
-    <div data-testid="md-preview">{initValue}</div>
+vi.mock('../../MarkdownRenderer', () => ({
+  MarkdownRenderer: ({ content }: { content: string }) => (
+    <div data-testid="md-preview">{content}</div>
   ),
 }));
 

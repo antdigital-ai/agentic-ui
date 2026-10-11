@@ -9,6 +9,19 @@ group:
 
 # Changelog
 
+## v2.33.0
+
+- MarkdownInputField
+  - 🆕 Added inline atomic chips (`composerChips`): slash command chips (structured skill nodes with pre-send `onSlashChipGate`) plus `@file` / `@folder` and `@symbol` inline mention chips, upgrading from plain text tags to Slate inline void nodes with whole-chip deletion, click-to-configure, and serialization to `/name` / `@path` on send.
+  - 🆕 Added long-text paste folding (`longTextFold`): plain-text pastes of ≥1200 chars or ≥12 lines collapse into a "long text" chip (with char/line stats and a click-to-preview popover) that serializes back to the original text on send.
+  - 🆕 Added fragment-level draft recovery (`draft`): auto-commits on idle / blur / send / switch / unmount and restores when `draftKey` changes; defaults to localStorage with a customizable `storage`.
+  - 🆕 Added context usage indicator (`contextUsage`): toolbar circular indicator plus a built-in `ContextUsagePanel` detail panel (categorical bar segments, expandable breakdown rows, high-usage warning, compact action); `ContextUsageIndicator` / `ContextUsagePanel` / `computeBarSegments` are exported standalone.
+  - 🆕 Added branch selector (`branch`): branch pill with a searchable dropdown menu (current-branch uncommitted overview, per-branch switching spinner, create-branch entry, label customization); the standalone `ComposerBranchTrigger` component is exported as well.
+  - 💄 Slash chip tones now align with the IDE `resolveSlashCommandToneKey`: dedicated colors for `plan` / `goal` commands, and unconfigured chips show `placeholderText` when no input follows.
+  - 🛠 Exported `insertComposerChip` / `withComposerChips` / `findUnconfiguredSlashChips` / `handleLongTextPasteFold` plus the `ComposerChipNode` chip helpers and types.
+- MarkdownRenderer
+  - 🐞 Fixed cached blocks reusing the stale token tree after toggling `throttleOptions.fade`: fade config changes now rebuild the processor to re-parse, while finishing a stream still keeps the processor stable so heavy components are not remounted.
+
 ## v2.32.48
 
 - OfficeViewer
@@ -49,9 +62,28 @@ group:
 ## Unreleased
 
 - Bubble
+  - 🐞 Flush buffered content and exit streaming when generation finishes or is aborted, even with an explicit `streaming` configuration; remove word-animation nodes while retaining media playback state.
+  - ⚡️ Reuse unchanged list row React elements during streaming to avoid recreating historical subtrees and rerendering their wrappers; keep attachments and the default thought chain stable while body text grows, while still applying configuration and lifecycle updates.
+  - 🐞 Restore actions after an empty toolbar, retain custom actions, replace reference placeholders, enable original-link navigation, and preserve numeric and array message bodies; retain edited drafts across action visibility and hover-mode changes.
+  - 🐞 Unify public `quote`, context, action, and ref types, support short semantic `styles` / `classNames` fields, and apply updated attachment and speech configuration.
+  - ⚡️ Merge redundant AI containers and omit empty titles and surrounding slots; share lazy rows and observers, retain visible message state when appending messages or changing loading policies, and skip hidden message computation while showing skeletons.
+  - ⚡️ Use `MarkdownRenderer` for ordinary readonly messages, retaining Slate for editing, Slate-only configuration/plugins, and editor configuration comments; mount reference previews on demand while preserving locale and table fullscreen actions.
+  - 🛠 Remove separate `PureBubble`, `PureAIBubble`, `PureUserBubble`, `PureBubbleList`, and `PureBubbleListProps` exports in favor of `Bubble` / `BubbleList`; use `pure` for compact styling. Add the `@ant-design/agentic-ui/Bubble` import entry.
+  - 🐞 Unify content configuration precedence, retaining `markdownRenderConfig.initValue` and explicit `readonly`; content defaults to readonly, so migrated Pure usage needs `readonly={false}` for editing. Fix memo ignoring updated custom message fields, session configuration, and callbacks.
+  - ⚡️ Reuse unchanged historical messages, styles, and context during streaming; stabilize loading message identities to avoid remounting and losing local state.
+  - ⚡️ Remove one redundant wrapper per user message and stabilize content props so feedback and layout changes do not rerender unchanged Markdown.
+  - ⚡️ Load the Schema editing bridge on demand in development only; reflect external content updates in the current render without stale content or an extra render.
   - ⚡️ Mount reference entries only while expanded and release hidden content when collapsing or closing previews; reuse the editor's Slate synchronization to avoid duplicate parsing and retain plugin configuration.
 
 - MarkdownRenderer
+  - ⚡️ Reuse unchanged block React elements during streaming and retain only each block's latest parsed tree; equal HTML settings and empty plugin arrays preserve the processor, reducing historical work and cache retention after rollbacks.
+  - ⚡️ Process ordinary text and fenced-code bodies in runs; extract footnotes incrementally with committed definition contexts and update only changed reference previews, retaining full validation for new global definitions or document revisions.
+  - ⚡️ Isolate code and table configuration subscriptions and reuse unchanged chart data and default Schema rendering; remove one code-toolbar DOM layer and skip resize listeners until streaming content produces charts.
+  - ⚡️ Reuse completed blocks and resplit only the trailing window for ordinary streaming Markdown; preserve full processing for complex directives and reset correctly for revisions, rollbacks, and clearing. Render static content synchronously on the first frame and clear stale content when restarting an empty stream.
+  - 🐞 Compare the actual displayed prefix in the throttle so revisions sharing the same boundary character cannot retain stale display progress.
+  - 🆕 Add `tableConfig` for native table fullscreen previews in a modal or drawer, mounted on demand.
+  - ⚡️ Parse footnote definitions once per content update and share them with references; mount mobile previews on the first click and disable readonly player preloading by default.
+  - 🐞 Stabilize rendering bridges so link, footnote, and table configuration updates take effect while retaining player positions; preserve open table previews and code blocks across configuration updates.
   - ⚡️ Remove word-animation nodes from sealed blocks and completed streams, merging adjacent text while preserving formatting, charts, and media instances; keep visible paragraphs mounted when streaming ends.
 
 - TaskList / ToolUseBarThink / ToolUseBar
@@ -61,6 +93,8 @@ group:
   - ⚡️ Reduce DOM elements in file rows, tree leaves, and search results, mounting image previews on demand; stabilize file data references to avoid rerendering files when another group collapses.
 
 - MarkdownEditor
+  - ⚡️ Stabilize plugin/editor contexts, reduce card and Tag selection subscriptions and node traversal, coalesce selection queries during typing, and simplify link-card DOM.
+  - ⚡️ Isolate Slate runtime dependencies from the readonly entry and reuse comment observers during streaming; load Slate operations only when deleting comments in an editable editor.
   - 🐞 Validate current Slate node identity when updating nodes, embedded code, and Tags so moving, deleting, or replacing content cannot write into a neighboring node; keep table index paths synchronized with structural edits.
   - 🐞 Fix backward and keyboard selections in readonly editors and selection ownership across editors; loading Markdown only clears this editor's native selection, and focus callbacks retain plugin serialization.
   - ⚡️ Coalesce selection notifications, cancel pending work on unmount, and deduplicate unchanged document selections to avoid repeated callbacks, serialization, and measurements; still reposition the floating toolbar for matching text at different locations.
